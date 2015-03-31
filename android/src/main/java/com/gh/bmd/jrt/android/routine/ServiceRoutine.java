@@ -32,9 +32,11 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
+import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Log;
@@ -46,6 +48,7 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -157,8 +160,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mLogClass = (logClass != null) ? logClass : log.getClass();
         mLogger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);
-        mRoutine = JRoutine.on(withArgs(invocationArgs).factoryOf(
-                (Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass))
+        mRoutine = JRoutine.on(withArgs(mContext, invocationClass, invocationArgs).factoryOf(
+                new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {}))
                            .withConfiguration(configuration.builderFrom()
                                                            .withInputSize(Integer.MAX_VALUE)
                                                            .withInputTimeout(TimeDuration.ZERO)
@@ -176,6 +179,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *
+     * @param logger        the logger instance.
      * @param configuration the routine configuration.
      */
     private static void warn(@Nonnull final Logger logger,
@@ -635,7 +639,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     logger.err(e, "error while sending service invocation message");
                     mStandaloneResultInput.abort(e);
-                    unbindService();
+                    unbindService(); //TODO: move?
                 }
             }
 
@@ -644,6 +648,71 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 mLogger.dbg("service disconnected: %s", name);
                 mStandaloneParamOutput.unbind(mConsumer);
             }
+        }
+    }
+
+    /**
+     * Invocation used to synchronously call the specified one.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class SyncInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
+
+        private final AndroidInvocation<INPUT, OUTPUT> mInvocation;
+
+        /**
+         * Constructor.
+         *
+         * @param context         the the routine context.
+         * @param invocationClass the invocation class.
+         * @param args            the invocation constructor arguments.
+         * @throws java.lang.IllegalAccessException            if an error occurred during the
+         *                                                     invocation instantiation.
+         * @throws java.lang.reflect.InvocationTargetException if an error occurred during the
+         *                                                     invocation instantiation.
+         * @throws java.lang.InstantiationException            if an error occurred during the
+         *                                                     invocation instantiation.
+         */
+        public SyncInvocation(@Nonnull final Context context,
+                @Nonnull final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
+                @Nonnull final Object[] args) throws IllegalAccessException,
+                InvocationTargetException, InstantiationException {
+
+            final AndroidInvocation<INPUT, OUTPUT> invocation =
+                    findConstructor(invocationClass, args).newInstance(args);
+            invocation.onContext(context);
+            mInvocation = invocation;
+        }
+
+        public void onAbort(@Nullable final Throwable reason) {
+
+            mInvocation.onAbort(reason);
+        }
+
+        public void onDestroy() {
+
+            mInvocation.onDestroy();
+        }
+
+        public void onInit() {
+
+            mInvocation.onInit();
+        }
+
+        public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+
+            mInvocation.onInput(input, result);
+        }
+
+        public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+
+            mInvocation.onResult(result);
+        }
+
+        public void onReturn() {
+
+            mInvocation.onReturn();
         }
     }
 }

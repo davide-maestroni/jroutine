@@ -41,6 +41,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 
@@ -177,221 +179,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         }
 
         return null;
-    }
-
-    @Nonnull
-    private static ParamMode getParamMode(@Nonnull final Method method,
-            @Nonnull final Pass passAnnotation, @Nonnull final Class<?> parameterType,
-            final int length) {
-
-        ParamMode paramMode = passAnnotation.mode();
-        final Class<?> paramClass = passAnnotation.value();
-        final boolean isArray = parameterType.isArray();
-
-        if (paramMode == ParamMode.AUTO) {
-
-            if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                if ((length == 1) && (paramClass.isArray() || paramClass.isAssignableFrom(
-                        List.class))) {
-
-                    paramMode = ParamMode.COLLECTION;
-
-                } else {
-
-                    paramMode = ParamMode.OBJECT;
-                }
-
-            } else if (isArray || Iterable.class.isAssignableFrom(parameterType)) {
-
-                if (isArray && !boxingClass(paramClass).isAssignableFrom(
-                        boxingClass(parameterType.getComponentType()))) {
-
-                    throw new IllegalArgumentException(
-                            "[" + method + "] the async input array with param mode "
-                                    + ParamMode.PARALLEL + " does not match the bound type: "
-                                    + paramClass.getCanonicalName());
-                }
-
-                if (length > 1) {
-
-                    throw new IllegalArgumentException(
-                            "[" + method + "] an async input with param mode " + ParamMode.PARALLEL
-                                    + " cannot be applied to a method taking " + length +
-                                    " input parameters");
-
-                }
-
-                paramMode = ParamMode.PARALLEL;
-
-            } else {
-
-                throw new IllegalArgumentException("[" + method + "] cannot automatically choose a "
-                                                           + "param mode for an output of type: "
-                                                           + parameterType.getCanonicalName());
-            }
-
-        } else if (paramMode == ParamMode.OBJECT) {
-
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with param mode " + ParamMode.OBJECT
-                                + " must extends an " + OutputChannel.class.getCanonicalName());
-            }
-
-        } else if (paramMode == ParamMode.COLLECTION) {
-
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with param mode " + ParamMode.COLLECTION
-                                + " must extends an " + OutputChannel.class.getCanonicalName());
-            }
-
-            if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with param mode " + ParamMode.COLLECTION
-                                + " must be bound to an array or a superclass of "
-                                + List.class.getCanonicalName());
-            }
-
-            if (length > 1) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with param mode " + ParamMode.COLLECTION +
-                                " cannot be applied to a method taking " + length
-                                + " input parameters");
-            }
-
-        } else { // ParamMode.PARALLEL
-
-            if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with param mode " + ParamMode.PARALLEL
-                                + " must be an array or implement an "
-                                + Iterable.class.getCanonicalName());
-            }
-
-            if (isArray && !boxingClass(paramClass).isAssignableFrom(
-                    boxingClass(parameterType.getComponentType()))) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] the async input array with param mode "
-                                + ParamMode.PARALLEL + " does not match the bound type: "
-                                + paramClass.getCanonicalName());
-            }
-
-            if (length > 1) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with param mode " + ParamMode.PARALLEL
-                                + " cannot be applied to a method taking " + length
-                                + " input parameters");
-            }
-        }
-
-        return paramMode;
-    }
-
-    @Nonnull
-    private static ParamMode getReturnMode(@Nonnull final Method method,
-            @Nonnull final Pass annotation, @Nonnull final Class<?> returnType) {
-
-        ParamMode paramMode = annotation.mode();
-
-        if (paramMode == ParamMode.AUTO) {
-
-            if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
-
-                final Class<?> returnClass = annotation.value();
-
-                if (returnType.isArray() && !boxingClass(
-                        returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
-
-                    throw new IllegalArgumentException(
-                            "[" + method + "] the async output array with param mode "
-                                    + ParamMode.PARALLEL + " does not match the bound type: "
-                                    + returnClass.getCanonicalName());
-                }
-
-                paramMode = ParamMode.PARALLEL;
-
-            } else if (returnType.isAssignableFrom(OutputChannel.class)) {
-
-                final Class<?> returnClass = annotation.value();
-
-                if (returnClass.isArray() || Iterable.class.isAssignableFrom(returnClass)) {
-
-                    paramMode = ParamMode.COLLECTION;
-
-                } else {
-
-                    paramMode = ParamMode.OBJECT;
-                }
-
-            } else {
-
-                throw new IllegalArgumentException("[" + method + "] cannot automatically choose a "
-                                                           + "param mode for an input of type: "
-                                                           + returnType.getCanonicalName());
-            }
-
-        } else if (paramMode == ParamMode.OBJECT) {
-
-            if (!returnType.isAssignableFrom(OutputChannel.class)) {
-
-                final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with param mode " + ParamMode.OBJECT
-                                + " must be a superclass of " + channelClassName);
-            }
-
-        } else if (paramMode == ParamMode.COLLECTION) {
-
-            if (!returnType.isAssignableFrom(OutputChannel.class)) {
-
-                final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with param mode " + ParamMode.OBJECT
-                                + " must be a superclass of " + channelClassName);
-            }
-
-            final Class<?> returnClass = annotation.value();
-
-            if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(returnClass)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with param mode " + ParamMode.COLLECTION
-                                + " must be bound to an array or a type implementing an "
-                                + Iterable.class.getCanonicalName());
-            }
-
-        } else { // ParamMode.PARALLEL
-
-            if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with param mode " + ParamMode.PARALLEL
-                                + " must be an array or a superclass " +
-                                "of " + List.class.getCanonicalName());
-            }
-
-            final Class<?> returnClass = annotation.value();
-
-            if (returnType.isArray() && !boxingClass(
-                    returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] the async output array with param mode "
-                                + ParamMode.PARALLEL + " does not match the bound type: "
-                                + returnClass.getCanonicalName());
-            }
-        }
-
-        return paramMode;
     }
 
     @Nonnull
@@ -618,8 +405,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            final Class<?> returnType = method.getReturnType();
-            final Class<?>[] targetParameterTypes = method.getParameterTypes();
             ParamMode asyncParamMode = null;
             ParamMode asyncReturnMode = null;
 
@@ -629,9 +414,10 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (methodAnnotation != null) {
 
                 returnClass = methodAnnotation.value();
-                asyncReturnMode = getReturnMode(method, methodAnnotation, returnType);
+                asyncReturnMode = getReturnMode(method);
             }
 
+            final Class<?>[] targetParameterTypes = method.getParameterTypes();
             final Annotation[][] annotations = method.getParameterAnnotations();
             final int length = annotations.length;
 
@@ -681,6 +467,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                         throw new IllegalArgumentException(e);
                     }
 
+                    final Class<?> returnType = method.getReturnType();
                     final Class<?> targetReturnType = targetMethod.getReturnType();
                     boolean isError = false;
 

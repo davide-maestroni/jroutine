@@ -68,6 +68,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *
+     * @param logger        the logger instance.
      * @param configuration the routine configuration.
      */
     private static void warn(@Nonnull final Logger logger,

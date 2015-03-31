@@ -26,27 +26,35 @@ import com.gh.bmd.jrt.annotation.Pass.ParamMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
+import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runner;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
@@ -100,76 +108,35 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
         mContext = context;
         mTargetClass = classToken.getRawClass();
         mFactoryClass = factoryToken.getRawClass();
-    }
 
-    @Nonnull
-    private static ParamMode getReturnMode(@Nonnull final Pass annotation,
-            @Nonnull final Class<?> returnType) {
+        final Class<?> targetClass = mTargetClass;
+        final HashSet<String> bindingSet = new HashSet<String>();
 
-        ParamMode paramMode = annotation.mode();
+        for (final Method method : targetClass.getMethods()) {
 
-        if (paramMode == ParamMode.AUTO) {
+            final Bind annotation = method.getAnnotation(Bind.class);
 
-            if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
+            if (annotation != null) {
 
-                paramMode = ParamMode.PARALLEL;
+                final String name = annotation.value();
 
-            } else if (returnType.isAssignableFrom(OutputChannel.class)) {
+                if (bindingSet.contains(name)) {
 
-                final Class<?> returnClass = annotation.value();
-
-                if (returnClass.isArray() || Iterable.class.isAssignableFrom(returnClass)) {
-
-                    paramMode = ParamMode.COLLECTION;
-
-                } else {
-
-                    paramMode = ParamMode.OBJECT;
+                    throw new IllegalArgumentException(
+                            "the name '" + name + "' has already been used to identify a different"
+                                    + " method");
                 }
+
+                bindingSet.add(name);
             }
         }
-
-        return paramMode;
     }
 
     @Nullable
-    private static String withShareAnnotation(@Nullable final String shareGroup,
-            @Nonnull final Method method) {
-
-        final Share shareAnnotation = method.getAnnotation(Share.class);
-
-        if (shareAnnotation != null) {
-
-            return shareAnnotation.value();
-        }
-
-        return shareGroup;
-    }
-
-    @Nullable
-    private static RoutineConfiguration withTimeoutAnnotation(
-            @Nullable final RoutineConfiguration configuration, @Nonnull final Method method) {
-
-        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
-
-        if (timeoutAnnotation != null) {
-
-            return RoutineConfiguration.notNull(configuration)
-                                       .builderFrom()
-                                       .withReadTimeout(timeoutAnnotation.value(),
-                                                        timeoutAnnotation.unit())
-                                       .onReadTimeout(timeoutAnnotation.action())
-                                       .buildConfiguration();
-        }
-
-        return configuration;
-    }
-
-    @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
+    private static Method getAnnotatedMethod(@Nonnull final Class<?> targetClass,
+            @Nonnull final String name) {
 
         Method targetMethod = null;
-        final Class<CLASS> targetClass = mTargetClass;
 
         for (final Method method : targetClass.getMethods()) {
 
@@ -194,26 +161,154 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
                     break;
                 }
             }
+        }
 
-            if (targetMethod == null) {
+        return targetMethod;
+    }
 
-                throw new IllegalArgumentException(
-                        "no annotated method with name '" + name + "' has been found");
+    @Nonnull
+    private static Class<?>[] toClassArray(@Nonnull final Object[] Objects) {
+
+        final int length = Objects.length;
+        final Class<?>[] classes = new Class<?>[length];
+
+        for (int i = 0; i < length; i++) {
+
+            classes[i] = (Class<?>) Objects[i];
+        }
+
+        return classes;
+    }
+
+    @Nonnull
+    private static Object[] toObjectArray(@Nonnull final Class<?>[] classes) {
+
+        final int length = classes.length;
+        final Object[] objects = new Object[length];
+
+        System.arraycopy(classes, 0, objects, 0, length);
+
+        return objects;
+    }
+
+    /**
+     * Logs any warning related to ignored options in the specified configuration.
+     *
+     * @param logClass      the log class.
+     * @param configuration the routine configuration.
+     */
+    private static void warn(@Nullable final Class<? extends Log> logClass,
+            @Nonnull final RoutineConfiguration configuration) {
+
+        Log log = null;
+
+        if (logClass != null) {
+
+            final Constructor<? extends Log> constructor = findConstructor(logClass);
+
+            try {
+
+                log = constructor.newInstance();
+
+            } catch (final Throwable t) {
+
+                throw new IllegalArgumentException(t);
             }
+        }
+
+        if (log == null) {
+
+            log = configuration.getLogOr(Logger.getGlobalLog());
+        }
+
+        Logger logger = null;
+        final OrderType inputOrder = configuration.getInputOrderOr(null);
+
+        if (inputOrder != null) {
+
+            logger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
+                                      DefaultObjectServiceRoutineBuilder.class);
+            logger.wrn("the specified input order will be ignored: %s", inputOrder);
+        }
+
+        final OrderType outputOrder = configuration.getOutputOrderOr(null);
+
+        if (outputOrder != null) {
+
+            if (logger == null) {
+
+                logger = Logger.newLogger(log,
+                                          configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
+                                          DefaultObjectServiceRoutineBuilder.class);
+            }
+
+            logger.wrn("the specified output order will be ignored: %s", outputOrder);
+        }
+    }
+
+    @Nullable
+    private static String withShareAnnotation(@Nullable final String shareGroup,
+            @Nonnull final Method method) {
+
+        final Share shareAnnotation = method.getAnnotation(Share.class);
+
+        if (shareAnnotation != null) {
+
+            return shareAnnotation.value();
+        }
+
+        return shareGroup;
+    }
+
+    @Nonnull
+    private static Builder withTimeoutAnnotation(@Nullable final RoutineConfiguration configuration,
+            @Nonnull final Method method) {
+
+        final Builder builder = RoutineConfiguration.notNull(configuration).builderFrom();
+        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            return builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
+                          .onReadTimeout(timeoutAnnotation.action());
+        }
+
+        return builder;
+    }
+
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
+
+        final Method targetMethod = getAnnotatedMethod(mTargetClass, name);
+
+        if (targetMethod == null) {
+
+            throw new IllegalArgumentException(
+                    "no annotated method with name '" + name + "' has been found");
+        }
+
+        final RoutineConfiguration configuration = mConfiguration;
+
+        if (configuration != null) {
+
+            warn(mLogClass, configuration);
         }
 
         final ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<BoundMethodInvocation<INPUT, OUTPUT>>() {};
-        final Class<? extends InstanceFactory> tokenClass = mFactoryClass;
+        final Class<? extends InstanceFactory> factoryClass = mFactoryClass;
         final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
-                       .withArgs(findConstructor(tokenClass, args), args,
-                                 withShareAnnotation(mShareGroup, targetMethod), name)
-                       .withConfiguration(withTimeoutAnnotation(mConfiguration, targetMethod))
+                       .withArgs(factoryClass, args, withShareAnnotation(mShareGroup, targetMethod),
+                                 name)
+                       .withConfiguration(
+                               withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
+                                       OrderType.PASSING_ORDER).buildConfiguration())
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
                        .withLogClass(mLogClass)
-                       .dispatchingOn(mLooper);
+                       .dispatchingOn(mLooper)
+                       .buildRoutine();
     }
 
     @Nonnull
@@ -239,19 +334,28 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
             }
         }
 
+        final RoutineConfiguration configuration = mConfiguration;
+
+        if (configuration != null) {
+
+            warn(mLogClass, configuration);
+        }
+
         final ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>>() {};
-        final Class<? extends InstanceFactory> tokenClass = mFactoryClass;
+        final Class<? extends InstanceFactory> factoryClass = mFactoryClass;
         final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
-                       .withArgs(findConstructor(tokenClass, args), args,
-                                 withShareAnnotation(mShareGroup, targetMethod), name,
-                                 parameterTypes)
-                       .withConfiguration(withTimeoutAnnotation(mConfiguration, targetMethod))
+                       .withArgs(factoryClass, args, withShareAnnotation(mShareGroup, targetMethod),
+                                 name, toObjectArray(parameterTypes))
+                       .withConfiguration(
+                               withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
+                                       OrderType.PASSING_ORDER).buildConfiguration())
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
                        .withLogClass(mLogClass)
-                       .dispatchingOn(mLooper);
+                       .dispatchingOn(mLooper)
+                       .buildRoutine();
     }
 
     @Nonnull
@@ -262,6 +366,13 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
     @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+
+        final RoutineConfiguration configuration = mConfiguration;
+
+        if (configuration != null) {
+
+            warn(mLogClass, configuration);
+        }
 
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler<CLASS>(this, itf));
@@ -339,26 +450,25 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
         private final String mBindingName;
 
-        private final String mShareGroup;
+        private final Constructor<? extends InstanceFactory> mFactoryConstructor;
 
-        private final Constructor<? extends InstanceFactory> mTokenConstructor;
+        private final String mShareGroup;
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
         /**
          * Constructor.
          *
-         * @param constructor the object factory constructor.
-         * @param args        the factory constructor arguments.
-         * @param shareGroup  the share group name.
-         * @param name        the binding name.
+         * @param factoryClass the object factory class.
+         * @param args         the factory constructor arguments.
+         * @param shareGroup   the share group name.
+         * @param name         the binding name.
          */
-        public BoundMethodInvocation(
-                @Nonnull final Constructor<? extends InstanceFactory> constructor,
+        public BoundMethodInvocation(@Nonnull final Class<? extends InstanceFactory> factoryClass,
                 @Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final String name) {
 
-            mTokenConstructor = constructor;
+            mFactoryConstructor = findConstructor(factoryClass, args);
             mArgs = args;
             mShareGroup = shareGroup;
             mBindingName = name;
@@ -378,8 +488,9 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
             try {
 
-                mRoutine = JRoutine.on(mTokenConstructor.newInstance(mArgs).newInstance(context))
-                                   .withShareGroup(mShareGroup).boundMethod(mBindingName);
+                mRoutine = JRoutine.on(mFactoryConstructor.newInstance(mArgs).create(context))
+                                   .withShareGroup(mShareGroup)
+                                   .boundMethod(mBindingName);
 
             } catch (final InstantiationException e) {
 
@@ -407,35 +518,35 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
         private final Object[] mArgs;
 
+        private final Constructor<? extends InstanceFactory> mFactoryConstructor;
+
         private final String mMethodName;
 
         private final Class<?>[] mParameterTypes;
 
         private final String mShareGroup;
 
-        private final Constructor<? extends InstanceFactory> mTokenConstructor;
-
         private Routine<INPUT, OUTPUT> mRoutine;
 
         /**
          * Constructor.
          *
-         * @param constructor    the object factory constructor.
+         * @param factoryClass   the object factory class.
          * @param args           the factory constructor arguments.
          * @param shareGroup     the share group name.
          * @param name           the method name.
          * @param parameterTypes the method parameter types.
          */
         public MethodSignatureInvocation(
-                @Nonnull final Constructor<? extends InstanceFactory> constructor,
+                @Nonnull final Class<? extends InstanceFactory> factoryClass,
                 @Nonnull final Object[] args, @Nullable final String shareGroup,
-                @Nonnull final String name, @Nonnull final Class<?>[] parameterTypes) {
+                @Nonnull final String name, @Nonnull final Object[] parameterTypes) {
 
-            mTokenConstructor = constructor;
+            mFactoryConstructor = findConstructor(factoryClass, args);
             mArgs = args;
             mShareGroup = shareGroup;
             mMethodName = name;
-            mParameterTypes = parameterTypes;
+            mParameterTypes = toClassArray(parameterTypes);
         }
 
         @Override
@@ -452,7 +563,7 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
             try {
 
-                mRoutine = JRoutine.on(mTokenConstructor.newInstance(mArgs).newInstance(context))
+                mRoutine = JRoutine.on(mFactoryConstructor.newInstance(mArgs).create(context))
                                    .withShareGroup(mShareGroup)
                                    .method(mMethodName, mParameterTypes);
 
@@ -478,6 +589,10 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
         private final Object[] mArgs;
 
+        private final Class<? extends InstanceFactory<?>> mFactoryClass;
+
+        private final boolean mIsCollection;
+
         private final String mMethodName;
 
         private final Class<?>[] mParameterTypes;
@@ -486,60 +601,146 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
         private final String mShareGroup;
 
-        private final Constructor<? extends InstanceFactory> mTokenConstructor;
+        private final Class<?>[] mTargetParameterTypes;
 
-        private Object mProxy;
+        private Object mMutex;
+
+        private Object mTarget;
 
         /**
          * Constructor.
          *
-         * @param proxyClass     the proxy class.
-         * @param constructor    the object factory constructor.
-         * @param args           the factory constructor arguments.
-         * @param shareGroup     the share group name.
-         * @param name           the method name.
-         * @param parameterTypes the method parameter types.
+         * @param proxyClass           the proxy class.
+         * @param factoryClass         the object factory class.
+         * @param args                 the factory constructor arguments.
+         * @param shareGroup           the share group name.
+         * @param name                 the method name.
+         * @param parameterTypes       the method parameter types.
+         * @param targetParameterTypes the target method parameter types.
+         * @param isOutputCollection   TODO
          */
         public ProxyInvocation(@Nonnull final Class<?> proxyClass,
-                @Nonnull final Constructor<? extends InstanceFactory> constructor,
+                @Nonnull final Class<? extends InstanceFactory<?>> factoryClass,
                 @Nonnull final Object[] args, @Nullable final String shareGroup,
-                @Nonnull final String name, @Nonnull final Class<?>[] parameterTypes) {
+                @Nonnull final String name, @Nonnull final Object[] parameterTypes,
+                @Nonnull final Object[] targetParameterTypes, final boolean isOutputCollection) {
 
-            mTokenConstructor = constructor;
-            mArgs = args;
             mProxyClass = proxyClass;
+            mFactoryClass = factoryClass;
+            mArgs = args;
             mShareGroup = shareGroup;
             mMethodName = name;
-            mParameterTypes = parameterTypes;
+            mParameterTypes = toClassArray(parameterTypes);
+            mTargetParameterTypes = toClassArray(targetParameterTypes);
+            mIsCollection = isOutputCollection;
+            mMutex = this;
+        }
+
+        @Nonnull
+        private Method getTargetMethod(@Nonnull final Method method,
+                @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
+
+            final Class<?> targetClass = mTarget.getClass();
+            final Bind annotation = method.getAnnotation(Bind.class);
+
+            String name = null;
+            Method targetMethod = null;
+
+            if (annotation != null) {
+
+                name = annotation.value();
+                targetMethod = getAnnotatedMethod(targetClass, name);
+            }
+
+            if (targetMethod == null) {
+
+                if (name == null) {
+
+                    name = method.getName();
+                }
+
+                try {
+
+                    targetMethod = targetClass.getMethod(name, targetParameterTypes);
+
+                } catch (final NoSuchMethodException ignored) {
+
+                }
+
+                if (targetMethod == null) {
+
+                    targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
+                }
+            }
+
+            return targetMethod;
         }
 
         @Override
+        @SuppressWarnings("SynchronizeOnNonFinalField")
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
             try {
 
-                final Object proxy = mProxy;
-                final Method method = mProxyClass.getMethod(mMethodName, mParameterTypes);
-                final Object methodResult = method.invoke(proxy, objects.toArray());
-                final Class<?> returnType = method.getReturnType();
+                final Class<?>[] parameterTypes = mParameterTypes;
+                final Class<?>[] targetParameterTypes = mTargetParameterTypes;
+                final Method method = mProxyClass.getMethod(mMethodName, parameterTypes);
 
-                if (!Void.class.equals(boxingClass(returnType))) {
+                final Method targetMethod = getTargetMethod(method, targetParameterTypes);
+                final Object methodResult;
 
-                    final Pass annotation = method.getAnnotation(Pass.class);
+                synchronized (mMutex) {
 
-                    if (annotation != null) {
+                    if (mIsCollection) {
 
-                        final ParamMode returnMode = getReturnMode(annotation, returnType);
+                        final Class<?> paramType = targetParameterTypes[0];
 
-                        if ((returnMode == ParamMode.OBJECT) || ((returnMode == ParamMode.OBJECT)
-                                && OutputChannel.class.isAssignableFrom(returnType))) {
+                        if (paramType.isArray()) {
 
-                            result.pass((OutputChannel<?>) methodResult);
+                            final int size = objects.size();
+                            final Object array =
+                                    Array.newInstance(paramType.getComponentType(), size);
+
+                            for (int i = 0; i < size; i++) {
+
+                                Array.set(array, i, objects.get(i));
+                            }
+
+                            methodResult = targetMethod.invoke(mTarget, array);
 
                         } else {
 
-                            result.pass(methodResult);
+                            methodResult = targetMethod.invoke(mTarget, objects);
+                        }
+
+                    } else {
+
+                        methodResult = targetMethod.invoke(mTarget, objects.toArray());
+                    }
+                }
+
+                final Class<?> returnType = targetMethod.getReturnType();
+
+                if (!Void.class.equals(boxingClass(returnType))) {
+
+                    if (getReturnMode(method) == ParamMode.COLLECTION) {
+
+                        if (returnType.isArray()) {
+
+                            if (methodResult != null) {
+
+                                final int l = Array.getLength(methodResult);
+
+                                for (int i = 0; i < l; ++i) {
+
+                                    result.pass(Array.get(methodResult, i));
+                                }
+                            }
+
+                        } else {
+
+                            result.pass((Iterable<?>) methodResult);
                         }
 
                     } else {
@@ -569,9 +770,15 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
             try {
 
-                mProxy = JRoutine.on(mTokenConstructor.newInstance(mArgs).newInstance(context))
-                                 .withShareGroup(mShareGroup)
-                                 .buildProxy(mProxyClass);
+                final Object[] args = mArgs;
+                mTarget = findConstructor(mFactoryClass, args).newInstance(args).create(context);
+
+                final String shareGroup = mShareGroup;
+
+                if (!Share.NONE.equals(shareGroup)) {
+
+                    mMutex = getSharedMutex(mTarget, shareGroup);
+                }
 
             } catch (final InstantiationException e) {
 
@@ -599,6 +806,8 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
         private final Context mContext;
 
+        private final Class<? extends InstanceFactory<CLASS>> mFactoryClass;
+
         private final Class<? extends Log> mLogClass;
 
         private final Looper mLooper;
@@ -611,8 +820,6 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
         private final String mShareGroup;
 
-        private final Constructor<? extends InstanceFactory<CLASS>> mTokenConstructor;
-
         /**
          * Constructor.
          *
@@ -624,10 +831,12 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
                 @Nonnull final Class<?> proxyClass) {
 
             final Object[] args = builder.mArgs;
+            final Class<? extends InstanceFactory<CLASS>> factoryClass = builder.mFactoryClass;
+
+            findConstructor(factoryClass, args);
 
             mContext = builder.mContext;
-            mTokenConstructor =
-                    findConstructor(builder.mFactoryClass, (args != null) ? args : NO_ARGS);
+            mFactoryClass = factoryClass;
             mArgs = args;
             mServiceClass = builder.mServiceClass;
             mConfiguration = RoutineConfiguration.notNull(builder.mConfiguration)
@@ -643,22 +852,117 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
         public Object invoke(final Object proxy, @Nonnull final Method method,
                 final Object[] args) throws Throwable {
 
-            final OutputChannel<Object> outputChannel =
+            boolean isParallel = false;
+            final Class<?>[] parameterTypes = method.getParameterTypes();
+            final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+            final int length = args.length;
+            final boolean[] isAsync = new boolean[length];
+            final Class<?>[] targetParameterTypes = new Class<?>[length];
+            boolean isCollection = false;
+
+            for (int i = 0; i < length; i++) {
+
+                Pass passAnnotation = null;
+
+                for (final Annotation annotation : parameterAnnotations[i]) {
+
+                    if (annotation instanceof Pass) {
+
+                        isAsync[i] = true;
+                        passAnnotation = (Pass) annotation;
+
+                        final ParamMode paramMode =
+                                getParamMode(method, passAnnotation, parameterTypes[i], length);
+                        isParallel = (paramMode == ParamMode.PARALLEL);
+                        isCollection = (paramMode == ParamMode.COLLECTION);
+                        break;
+                    }
+                }
+
+                if (passAnnotation != null) {
+
+                    targetParameterTypes[i] = passAnnotation.value();
+
+                } else {
+
+                    targetParameterTypes[i] = parameterTypes[i];
+                }
+            }
+
+            ParamMode returnMode = null;
+            final Class<?> returnType = method.getReturnType();
+            final Pass methodAnnotation = method.getAnnotation(Pass.class);
+
+            if (methodAnnotation != null) {
+
+                returnMode = getReturnMode(method);
+            }
+
+            final Builder builder = withTimeoutAnnotation(mConfiguration, method);
+            final RoutineConfiguration configuration =
+                    builder.withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
+                           .withOutputOrder(
+                                   (returnMode == ParamMode.COLLECTION) ? OrderType.PASSING_ORDER
+                                           : OrderType.NONE)
+                           .buildConfiguration();
+            final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
-                            .withArgs(mProxyClass, mTokenConstructor, mArgs,
+                            .withArgs(mProxyClass, mFactoryClass, mArgs,
                                       withShareAnnotation(mShareGroup, method), method.getName(),
-                                      method.getParameterTypes())
-                            .withConfiguration(withTimeoutAnnotation(mConfiguration, method))
+                                      toObjectArray(parameterTypes),
+                                      toObjectArray(targetParameterTypes), isCollection)
+                            .withConfiguration(configuration)
                             .withServiceClass(mServiceClass)
                             .withRunnerClass(mRunnerClass)
                             .withLogClass(mLogClass)
                             .dispatchingOn(mLooper)
-                            .callAsync(args);
-            final Class<?> returnType = method.getReturnType();
+                            .buildRoutine();
+            final ParameterChannel<Object, Object> parameterChannel =
+                    (isParallel) ? routine.invokeParallel() : routine.invokeAsync();
+
+            for (int i = 0; i < length; i++) {
+
+                if (isAsync[i]) {
+
+                    final Class<?> parameterType = parameterTypes[i];
+
+                    if (OutputChannel.class.isAssignableFrom(parameterType)) {
+
+                        parameterChannel.pass((OutputChannel<?>) args[i]);
+
+                    } else if (args[i] == null) {
+
+                        parameterChannel.pass((Object[]) null);
+
+                    } else if (parameterType.isArray()) {
+
+                        final Object array = args[i];
+                        final int size = Array.getLength(array);
+
+                        for (int j = 0; j < size; j++) {
+
+                            parameterChannel.pass(Array.get(array, j));
+                        }
+
+                    } else if (Iterable.class.isAssignableFrom(parameterType)) {
+
+                        for (final Object object : ((Iterable<?>) args[i])) {
+
+                            parameterChannel.pass(object);
+                        }
+                    }
+
+                } else {
+
+                    parameterChannel.pass(args[i]);
+                }
+            }
+
+            final OutputChannel<Object> outputChannel = parameterChannel.result();
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                if (method.getAnnotation(Pass.class) != null) {
+                if (methodAnnotation != null) {
 
                     if (OutputChannel.class.isAssignableFrom(returnType)) {
 

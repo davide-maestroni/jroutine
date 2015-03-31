@@ -131,6 +131,6 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
          * @return the object instance.
          */
         @Nonnull
-        TYPE newInstance(@Nonnull Context context);
+        TYPE create(@Nonnull Context context);
     }
 }

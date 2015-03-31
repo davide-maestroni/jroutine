@@ -278,7 +278,7 @@ public class RoutineService extends Service {
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
 
         final int length = invocationArgs.length;
-        final Parcelable[] argValues = new Parcelable[length];
+        final ParcelableValue[] argValues = new ParcelableValue[length];
 
         for (int i = 0; i < length; i++) {
 
@@ -530,7 +530,7 @@ public class RoutineService extends Service {
         private AndroidRoutine(@Nonnull final Context context,
                 @Nonnull final RoutineConfiguration configuration,
                 @Nonnull final Class<? extends AndroidInvocation<Object, Object>> invocationClass,
-                final Object[] invocationArgs) {
+                @Nonnull final Object[] invocationArgs) {
 
             super(configuration);
 

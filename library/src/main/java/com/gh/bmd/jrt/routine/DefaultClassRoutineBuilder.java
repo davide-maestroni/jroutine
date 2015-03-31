@@ -196,19 +196,19 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     /**
      * Gets or creates the routine.
      *
-     * @param configuration   the routine configuration.
-     * @param shareGroup      the share group name.
-     * @param method          the method to wrap.
-     * @param isCollectParam  whether we need to collect the input parameters.
-     * @param isCollectResult whether the output is a collection.
+     * @param configuration      the routine configuration.
+     * @param shareGroup         the share group name.
+     * @param method             the method to wrap.
+     * @param isInputCollection  whether we need to collect the input parameters.
+     * @param isOutputCollection whether the output is a collection.
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
             @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
-            @Nonnull final Method method, final boolean isCollectParam,
-            final boolean isCollectResult) {
+            @Nonnull final Method method, final boolean isInputCollection,
+            final boolean isOutputCollection) {
 
         if (!method.isAccessible()) {
 
@@ -236,8 +236,8 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
             final String methodShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(configuration, method, methodShareGroup, isCollectParam,
-                                    isCollectResult);
+                    new RoutineInfo(configuration, method, methodShareGroup, isInputCollection,
+                                    isOutputCollection);
             Routine<?, ?> routine = routineMap.get(routineInfo);
 
             if (routine == null) {
@@ -254,7 +254,8 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                 }
 
                 final InvocationFactory<Object, Object> factory =
-                        Invocations.withArgs(target, method, mutex, isCollectParam, isCollectResult)
+                        Invocations.withArgs(target, method, mutex, isInputCollection,
+                                             isOutputCollection)
                                    .factoryOf(MethodSingleCallInvocation.class);
                 routine = new DefaultRoutine<Object, Object>(configuration, factory);
                 routineMap.put(routineInfo, routine);
@@ -484,9 +485,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         private final boolean mIsArrayResult;
 
-        private final boolean mIsCollectParam;
+        private final boolean mIsInputCollection;
 
-        private final boolean mIsCollectResult;
+        private final boolean mIsOutputCollection;
 
         private final Method mMethod;
 
@@ -497,21 +498,21 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         /**
          * Constructor.
          *
-         * @param target          the target object.
-         * @param method          the method to wrap.
-         * @param mutex           the mutex used for synchronization.
-         * @param isCollectParam  whether we need to collect the input parameters.
-         * @param isCollectResult whether the output is a collection.
+         * @param target             the target object.
+         * @param method             the method to wrap.
+         * @param mutex              the mutex used for synchronization.
+         * @param isInputCollection  whether we need to collect the input parameters.
+         * @param isOutputCollection whether the output is a collection.
          */
         public MethodSingleCallInvocation(@Nullable final Object target,
                 @Nonnull final Method method, @Nullable final Object mutex,
-                final boolean isCollectParam, final boolean isCollectResult) {
+                final boolean isInputCollection, final boolean isOutputCollection) {
 
             mTargetReference = new WeakReference<Object>(target);
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
-            mIsCollectParam = isCollectParam;
-            mIsCollectResult = isCollectResult;
+            mIsInputCollection = isInputCollection;
+            mIsOutputCollection = isOutputCollection;
 
             final Class<?> returnClass = method.getReturnType();
             mHasResult = !Void.class.equals(boxingClass(returnClass));
@@ -537,7 +538,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
                     final Object[] args;
 
-                    if (mIsCollectParam) {
+                    if (mIsInputCollection) {
 
                         final Class<?> paramClass = method.getParameterTypes()[0];
 
@@ -568,7 +569,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
                     if (mHasResult) {
 
-                        if (mIsCollectResult) {
+                        if (mIsOutputCollection) {
 
                             if (mIsArrayResult) {
 
@@ -616,9 +617,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final boolean mIsCollectParam;
+        private final boolean mIsInputCollection;
 
-        private final boolean mIsCollectResult;
+        private final boolean mIsOutputCollection;
 
         private final Method mMethod;
 
@@ -627,21 +628,21 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         /**
          * Constructor.
          *
-         * @param configuration   the routine configuration.
-         * @param method          the method to wrap.
-         * @param shareGroup      the group name.
-         * @param isCollectParam  whether we need to collect the input parameters.
-         * @param isCollectResult whether the output is a collection.
+         * @param configuration      the routine configuration.
+         * @param method             the method to wrap.
+         * @param shareGroup         the group name.
+         * @param isInputCollection  whether we need to collect the input parameters.
+         * @param isOutputCollection whether the output is a collection.
          */
         public RoutineInfo(@Nonnull final RoutineConfiguration configuration,
                 @Nonnull final Method method, @Nonnull final String shareGroup,
-                final boolean isCollectParam, final boolean isCollectResult) {
+                final boolean isInputCollection, final boolean isOutputCollection) {
 
             mMethod = method;
             mShareGroup = shareGroup;
             mConfiguration = configuration;
-            mIsCollectParam = isCollectParam;
-            mIsCollectResult = isCollectResult;
+            mIsInputCollection = isInputCollection;
+            mIsOutputCollection = isOutputCollection;
         }
 
         @Override
@@ -649,8 +650,8 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
             // auto-generated code
             int result = mConfiguration.hashCode();
-            result = 31 * result + (mIsCollectParam ? 1 : 0);
-            result = 31 * result + (mIsCollectResult ? 1 : 0);
+            result = 31 * result + (mIsInputCollection ? 1 : 0);
+            result = 31 * result + (mIsOutputCollection ? 1 : 0);
             result = 31 * result + mMethod.hashCode();
             result = 31 * result + mShareGroup.hashCode();
             return result;
@@ -672,8 +673,8 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return mIsCollectParam == that.mIsCollectParam
-                    && mIsCollectResult == that.mIsCollectResult && mConfiguration.equals(
+            return mIsInputCollection == that.mIsInputCollection
+                    && mIsOutputCollection == that.mIsOutputCollection && mConfiguration.equals(
                     that.mConfiguration) && mMethod.equals(that.mMethod) && mShareGroup.equals(
                     that.mShareGroup);
         }

@@ -52,7 +52,6 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.gh.bmd.jrt.time.TimeDuration.days;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -117,7 +116,7 @@ public class ObjectServiceRoutineBuilderTest
 
     public void testBoundMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = days(1);
+        final TimeDuration timeout = seconds(1);
         final RoutineConfiguration configuration =
                 builder().withSyncRunner(Runners.sequentialRunner())
                          .withAsyncRunner(Runners.poolRunner())

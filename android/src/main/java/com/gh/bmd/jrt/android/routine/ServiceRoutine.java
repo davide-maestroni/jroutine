@@ -639,7 +639,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     logger.err(e, "error while sending service invocation message");
                     mStandaloneResultInput.abort(e);
-                    unbindService(); //TODO: move?
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                        public void run() {
+
+                            unbindService();
+                        }
+                    });
                 }
             }
 

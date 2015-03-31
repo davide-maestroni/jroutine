@@ -367,6 +367,12 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
     @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
+        if (!itf.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getCanonicalName());
+        }
+
         final RoutineConfiguration configuration = mConfiguration;
 
         if (configuration != null) {
@@ -617,7 +623,7 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
          * @param name                 the method name.
          * @param parameterTypes       the method parameter types.
          * @param targetParameterTypes the target method parameter types.
-         * @param isOutputCollection   TODO
+         * @param isOutputCollection   whether the output is a collection.
          */
         public ProxyInvocation(@Nonnull final Class<?> proxyClass,
                 @Nonnull final Class<? extends InstanceFactory<?>> factoryClass,

@@ -698,8 +698,43 @@ public class ObjectRoutineBuilderTest {
                                                                 Arrays.asList((int) 'e', (int) 'z'),
                                                                 Arrays.asList((int) 'f',
                                                                               (int) 'z'));
-
-        //TODO: get/set
+        assertThat(itf.get0()).isEqualTo(31);
+        assertThat(itf.get1().readAll()).containsExactly(31);
+        assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
+        assertThat(itf.getA1().readAll()).containsExactly(1, 2, 3);
+        assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL1().readAll()).containsExactly(1, 2, 3);
+        assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
+        itf.set0(-17);
+        final StandaloneChannel<Integer> channel35 = JRoutine.standalone().buildChannel();
+        channel35.input().pass(-17).close();
+        itf.set1(channel35.output());
+        final StandaloneChannel<Integer> channel36 = JRoutine.standalone().buildChannel();
+        channel36.input().pass(-17).close();
+        itf.set2(channel36.output());
+        itf.setA0(new int[]{1, 2, 3});
+        final StandaloneChannel<int[]> channel37 = JRoutine.standalone().buildChannel();
+        channel37.input().pass(new int[]{1, 2, 3}).close();
+        itf.setA1(channel37.output());
+        final StandaloneChannel<Integer> channel38 = JRoutine.standalone().buildChannel();
+        channel38.input().pass(1, 2, 3).close();
+        itf.setA2(channel38.output());
+        final StandaloneChannel<int[]> channel39 = JRoutine.standalone().buildChannel();
+        channel39.input().pass(new int[]{1, 2, 3}).close();
+        itf.setA3(channel39.output());
+        itf.setL0(Arrays.asList(1, 2, 3));
+        final StandaloneChannel<List<Integer>> channel40 = JRoutine.standalone().buildChannel();
+        channel40.input().pass(Arrays.asList(1, 2, 3)).close();
+        itf.setL1(channel40.output());
+        final StandaloneChannel<Integer> channel41 = JRoutine.standalone().buildChannel();
+        channel41.input().pass(1, 2, 3).close();
+        itf.setL2(channel41.output());
+        final StandaloneChannel<List<Integer>> channel42 = JRoutine.standalone().buildChannel();
+        channel42.input().pass(Arrays.asList(1, 2, 3)).close();
+        itf.setL3(channel42.output());
     }
 
     @Test
@@ -1313,12 +1348,13 @@ public class ObjectRoutineBuilderTest {
         @Bind("ga")
         public int[] getArray() {
 
-            return new int[3];
+            return new int[]{1, 2, 3};
         }
 
         @Bind("sa")
         public void setArray(int[] i) {
 
+            assertThat(i).containsExactly(1, 2, 3);
         }
 
         @Bind("gl")
@@ -1330,11 +1366,13 @@ public class ObjectRoutineBuilderTest {
         @Bind("sl")
         public void setList(List<Integer> l) {
 
+            assertThat(l).containsExactly(1, 2, 3);
         }
 
         @Bind("s")
         public void set(int i) {
 
+            assertThat(i).isEqualTo(-17);
         }
     }
 

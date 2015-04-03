@@ -151,17 +151,17 @@ public class ObjectServiceRoutineBuilderTest
                                                             .buildConfiguration();
         JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
                            ClassToken.tokenOf(TestClassFactory.class))
-                .withConfiguration(configuration)
+                .withConfiguration(configuration).withShareGroup("test")
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         JRoutine.onService(getActivity(), ClassToken.tokenOf(Square.class),
                            ClassToken.tokenOf(SquareFactory.class))
-                .withConfiguration(configuration)
+                .withConfiguration(configuration).withShareGroup("test")
                 .dispatchingOn(Looper.getMainLooper())
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
+        assertThat(countLog.getWrnCount()).isEqualTo(13);
     }
 
     public void testDuplicateAnnotationError() {

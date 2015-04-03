@@ -37,8 +37,8 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind} and {@link com.gh.bmd.jrt.annotation.Timeout}
-     * annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout}
+     * and {@link com.gh.bmd.jrt.annotation.Share} annotations.<br/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
@@ -60,8 +60,8 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind} and {@link com.gh.bmd.jrt.annotation.Timeout}
-     * annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout}
+     * and {@link com.gh.bmd.jrt.annotation.Share} annotations.<br/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
@@ -72,9 +72,9 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class is null.
+     * @throws java.lang.NullPointerException     if the specified class token is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);

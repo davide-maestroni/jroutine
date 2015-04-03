@@ -416,6 +416,21 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
     }
 
     @Nonnull
+    public ObjectServiceRoutineBuilder withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
+
+        mConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ObjectServiceRoutineBuilder withShareGroup(@Nullable final String group) {
+
+        mShareGroup = group;
+        return this;
+    }
+
+    @Nonnull
     public ObjectServiceRoutineBuilder dispatchingOn(@Nullable final Looper looper) {
 
         mLooper = looper;
@@ -449,21 +464,6 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
     public ObjectServiceRoutineBuilder withArgs(@Nullable final Object... args) {
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
-        return this;
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
-
-        mConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withShareGroup(@Nullable final String group) {
-
-        mShareGroup = group;
         return this;
     }
 

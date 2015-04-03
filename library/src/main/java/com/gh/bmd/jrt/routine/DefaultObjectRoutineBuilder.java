@@ -423,19 +423,21 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             for (int i = 0; i < length; ++i) {
 
-                final Annotation[] paramAnnotations = annotations[i];
+                final ParamMode paramMode = getParamMode(method, i);
 
-                for (final Annotation paramAnnotation : paramAnnotations) {
+                if (paramMode != null) {
 
-                    if (paramAnnotation.annotationType() != Pass.class) {
+                    asyncParamMode = paramMode;
 
-                        continue;
+                    for (final Annotation paramAnnotation : annotations[i]) {
+
+                        if (paramAnnotation.annotationType() == Pass.class) {
+
+                            final Pass passAnnotation = (Pass) paramAnnotation;
+                            targetParameterTypes[i] = passAnnotation.value();
+                            break;
+                        }
                     }
-
-                    final Pass passAnnotation = (Pass) paramAnnotation;
-                    asyncParamMode =
-                            getParamMode(method, passAnnotation, targetParameterTypes[i], length);
-                    targetParameterTypes[i] = passAnnotation.value();
                 }
             }
 

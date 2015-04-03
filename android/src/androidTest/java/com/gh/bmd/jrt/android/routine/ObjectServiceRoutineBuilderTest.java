@@ -771,6 +771,8 @@ public class ObjectServiceRoutineBuilderTest
                                                                 Arrays.asList((int) 'e', (int) 'z'),
                                                                 Arrays.asList((int) 'f',
                                                                               (int) 'z'));
+
+        //TODO: get/set
     }
 
     @SuppressWarnings("NullArgumentToVariableArgMethod")
@@ -819,7 +821,6 @@ public class ObjectServiceRoutineBuilderTest
                                       .buildProxy(ClassToken.tokenOf(IncItf.class));
         assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
         assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
-
     }
 
     public void testShareGroup() throws NoSuchMethodException {
@@ -1268,6 +1269,7 @@ public class ObjectServiceRoutineBuilderTest
                 mode = ParamMode.COLLECTION) OutputChannel<Integer> ints);
     }
 
+    @SuppressWarnings("unused")
     private interface TestItf {
 
         void throwException(@Pass(int.class) RuntimeException ex);
@@ -1280,6 +1282,7 @@ public class ObjectServiceRoutineBuilderTest
         int throwException2(RuntimeException ex);
     }
 
+    @SuppressWarnings("unused")
     public static class Impl {
 
         @Bind("a")
@@ -1437,6 +1440,7 @@ public class ObjectServiceRoutineBuilderTest
         }
     }
 
+    @SuppressWarnings("unused")
     private static class DuplicateAnnotation {
 
         public static final String GET = "get";
@@ -1543,6 +1547,7 @@ public class ObjectServiceRoutineBuilderTest
         }
     }
 
+    @SuppressWarnings("unused")
     private static class TestClass {
 
         public static final String GET = "get";

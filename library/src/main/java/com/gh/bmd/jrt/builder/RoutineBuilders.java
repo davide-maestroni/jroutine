@@ -19,6 +19,7 @@ import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -47,21 +48,37 @@ public class RoutineBuilders {
     }
 
     /**
-     * TODO
+     * Gets the async parameter mode associated to the specified method parameter.
      *
-     * @param method
-     * @param passAnnotation
-     * @param parameterType
-     * @param length
-     * @return
+     * @param method the target method.
+     * @param index  the index of the parameter.
+     * @return the async parameter mode.
      */
-    @Nonnull
-    public static ParamMode getParamMode(@Nonnull final Method method,
-            @Nonnull final Pass passAnnotation, @Nonnull final Class<?> parameterType,
-            final int length) {
+    @Nullable
+    public static ParamMode getParamMode(@Nonnull final Method method, final int index) {
+
+        Pass passAnnotation = null;
+        final Annotation[][] annotations = method.getParameterAnnotations();
+
+        for (final Annotation annotation : annotations[index]) {
+
+            if (annotation.annotationType() == Pass.class) {
+
+                passAnnotation = (Pass) annotation;
+                break;
+            }
+        }
+
+        if (passAnnotation == null) {
+
+            return null;
+        }
 
         ParamMode paramMode = passAnnotation.mode();
         final Class<?> paramClass = passAnnotation.value();
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+        final Class<?> parameterType = parameterTypes[index];
+        final int length = parameterTypes.length;
         final boolean isArray = parameterType.isArray();
 
         if (paramMode == ParamMode.AUTO) {
@@ -173,10 +190,10 @@ public class RoutineBuilders {
     }
 
     /**
-     * TODO
+     * Gets the async parameter mode of the return type of the specified method.
      *
-     * @param method
-     * @return
+     * @param method the target method.
+     * @return the async parameter mode.
      */
     @Nullable
     public static ParamMode getReturnMode(@Nonnull final Method method) {

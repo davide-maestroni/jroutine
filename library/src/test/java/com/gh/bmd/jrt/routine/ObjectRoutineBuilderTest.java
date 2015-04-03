@@ -698,6 +698,8 @@ public class ObjectRoutineBuilderTest {
                                                                 Arrays.asList((int) 'e', (int) 'z'),
                                                                 Arrays.asList((int) 'f',
                                                                               (int) 'z'));
+
+        //TODO: get/set
     }
 
     @Test
@@ -742,7 +744,6 @@ public class ObjectRoutineBuilderTest {
         final IncItf incItf = JRoutine.on(inc).buildProxy(ClassToken.tokenOf(IncItf.class));
         assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
         assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
-
     }
 
     @Test
@@ -1268,6 +1269,7 @@ public class ObjectRoutineBuilderTest {
         int throwException2(RuntimeException ex);
     }
 
+    @SuppressWarnings("unused")
     public static class Impl {
 
         @Bind("a")
@@ -1407,6 +1409,7 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class DuplicateAnnotation {
 
         public static final String GET = "get";
@@ -1475,6 +1478,7 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class TestClass {
 
         public static final String GET = "get";

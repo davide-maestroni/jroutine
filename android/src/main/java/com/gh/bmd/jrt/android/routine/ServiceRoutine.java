@@ -472,7 +472,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
 
                 mIsUnbound = true;
-                mContext.unbindService(mConnection);
+
+                // postpone unbind to avoid crashing the IPC
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                    public void run() {
+
+                        mContext.unbindService(mConnection);
+                    }
+                });
             }
         }
 
@@ -580,16 +588,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     logger.err(t, "error while parsing service message");
 
-                    final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
-                    putError(message.getData(), mUUID, t);
-
                     try {
 
+                        final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+                        putError(message.getData(), mUUID, t);
                         mOutMessenger.send(message);
 
-                    } catch (final RemoteException e) {
+                    } catch (final Throwable ignored) {
 
-                        logger.err(e, "error while sending service abort message");
+                        logger.err(ignored, "error while sending service abort message");
                     }
 
                     mStandaloneResultInput.abort(t);
@@ -639,13 +646,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     logger.err(e, "error while sending service invocation message");
                     mStandaloneResultInput.abort(e);
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                        public void run() {
-
-                            unbindService();
-                        }
-                    });
+                    unbindService();
                 }
             }
 

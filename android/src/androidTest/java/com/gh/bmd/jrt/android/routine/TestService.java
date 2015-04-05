@@ -13,13 +13,52 @@
  */
 package com.gh.bmd.jrt.android.routine;
 
-import com.gh.bmd.jrt.android.service.RoutineService;
+import com.gh.bmd.jrt.android.service.FactoryRoutineService;
+import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.common.RoutineException;
+
+import java.util.HashMap;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
  * Test service.
  * <p/>
  * Created by davide on 1/16/15.
  */
-public class TestService extends RoutineService {
+public class TestService extends FactoryRoutineService {
 
+    private static final HashMap<Class<?>, Object> sInstanceMap = new HashMap<Class<?>, Object>();
+
+    @Nullable
+    @Override
+    @SuppressWarnings("unchecked")
+    public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
+            @Nonnull final Object... args) {
+
+        final HashMap<Class<?>, Object> instanceMap = TestService.sInstanceMap;
+        Object instance = instanceMap.get(type);
+
+        if (instance == null) {
+
+            try {
+
+                instance = findConstructor(type, args).newInstance(args);
+                instanceMap.put(type, instance);
+
+            } catch (final RoutineException e) {
+
+                throw e;
+
+            } catch (final Throwable t) {
+
+                throw new InvocationException(t);
+            }
+        }
+
+        return (TYPE) instance;
+    }
 }

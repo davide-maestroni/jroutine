@@ -45,7 +45,6 @@ import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -529,11 +528,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                        constructor.getDeclaringClass());
             invocation = constructor.newInstance();
             invocation.onContext(loaderContext.getApplicationContext());
-
-        } catch (final InvocationTargetException e) {
-
-            logger.err(e, "error creating the invocation instance [%d]", loaderId);
-            throw new InvocationException(e.getCause());
 
         } catch (final RoutineException e) {
 

@@ -594,13 +594,13 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                         }
                     }
 
-                } catch (final InvocationTargetException e) {
-
-                    throw new InvocationException(e.getCause());
-
                 } catch (final RoutineException e) {
 
                     throw e;
+
+                } catch (final InvocationTargetException e) {
+
+                    throw new InvocationException(e.getCause());
 
                 } catch (final Throwable t) {
 

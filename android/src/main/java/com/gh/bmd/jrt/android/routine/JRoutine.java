@@ -38,7 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * active only during a routine invocation.<br/>
  * The service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels must comply with the
- * {@link android.os.Parcel#writeValue(Object)} method.
+ * {@link android.os.Parcel#writeValue(Object)} method. TODO: serializable
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>
@@ -104,33 +104,16 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
      * Returns a builder of routines running in a service based on the specified context, wrapping
      * the instance created through the specified factory.
      *
-     * @param context      the routine context.
-     * @param classToken   the wrapped object class token.
-     * @param factoryToken the object factory class token.
-     * @param <TYPE>       the wrapped object type.
+     * @param context    the routine context.
+     * @param classToken the wrapped object class.
+     * @param <TYPE>     the wrapped object type.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static <TYPE> ObjectServiceRoutineBuilder onService(@Nonnull final Context context,
-            @Nonnull final ClassToken<TYPE> classToken,
-            @Nonnull final ClassToken<? extends InstanceFactory<TYPE>> factoryToken) {
+            @Nonnull final Class<TYPE> classToken) {
 
-        return new DefaultObjectServiceRoutineBuilder<TYPE>(context, classToken, factoryToken);
-    }
-
-    /**
-     * Interface defining a factory of an object instance.
-     */
-    public interface InstanceFactory<TYPE> {
-
-        /**
-         * Returns an instance of the object.
-         *
-         * @param context the routine context.
-         * @return the object instance.
-         */
-        @Nonnull
-        TYPE create(@Nonnull Context context);
+        return new DefaultObjectServiceRoutineBuilder<TYPE>(context, classToken);
     }
 }

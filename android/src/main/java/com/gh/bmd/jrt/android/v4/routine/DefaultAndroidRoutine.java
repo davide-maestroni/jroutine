@@ -34,7 +34,6 @@ import com.gh.bmd.jrt.runner.Execution;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -136,9 +135,9 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
             throw e;
 
-        } catch (final Throwable t) {
+        } catch (final Throwable ignored) {
 
-            getLogger().wrn(t, "ignoring exception while destroying invocation instance");
+            getLogger().wrn(ignored, "ignoring exception while destroying invocation instance");
         }
 
         return newInvocation(async);
@@ -190,11 +189,6 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
             final AndroidInvocation<INPUT, OUTPUT> invocation = constructor.newInstance();
             invocation.onContext(appContext);
             return invocation;
-
-        } catch (final InvocationTargetException e) {
-
-            logger.err(e, "error creating the invocation instance");
-            throw new InvocationException(e.getCause());
 
         } catch (final RoutineException e) {
 

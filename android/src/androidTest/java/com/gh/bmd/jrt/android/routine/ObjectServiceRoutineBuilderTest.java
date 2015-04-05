@@ -14,12 +14,10 @@
 package com.gh.bmd.jrt.android.routine;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.routine.JRoutine.InstanceFactory;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.ParamMode;
@@ -72,8 +70,7 @@ public class ObjectServiceRoutineBuilderTest
     public void testAsyncInputProxyRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final SumItf sumAsync = JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                                                   ClassToken.tokenOf(SumFactory.class))
+        final SumItf sumAsync = JRoutine.onService(getActivity(), Sum.class)
                                         .withConfiguration(withReadTimeout(timeout))
                                         .dispatchingOn(Looper.getMainLooper())
                                         .buildProxy(SumItf.class);
@@ -101,12 +98,10 @@ public class ObjectServiceRoutineBuilderTest
     public void testAsyncOutputProxyRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final CountItf countAsync =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(Count.class),
-                                   ClassToken.tokenOf(CountFactory.class))
-                        .withConfiguration(withReadTimeout(timeout))
-                        .dispatchingOn(Looper.getMainLooper())
-                        .buildProxy(CountItf.class);
+        final CountItf countAsync = JRoutine.onService(getActivity(), Count.class)
+                                            .withConfiguration(withReadTimeout(timeout))
+                                            .dispatchingOn(Looper.getMainLooper())
+                                            .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).readAll()).containsExactly(new int[]{0, 1, 2});
         assertThat(countAsync.count2(2).readAll()).containsExactly(0, 1);
@@ -127,12 +122,10 @@ public class ObjectServiceRoutineBuilderTest
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(new NullLog())
                          .buildConfiguration();
-        final Routine<Object, Object> routine =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                                   ClassToken.tokenOf(TestClassFactory.class))
-                        .dispatchingOn(Looper.getMainLooper())
-                        .withConfiguration(configuration)
-                        .boundMethod(TestClass.GET);
+        final Routine<Object, Object> routine = JRoutine.onService(getActivity(), TestClass.class)
+                                                        .dispatchingOn(Looper.getMainLooper())
+                                                        .withConfiguration(configuration)
+                                                        .boundMethod(TestClass.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
@@ -149,27 +142,26 @@ public class ObjectServiceRoutineBuilderTest
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();
-        JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                           ClassToken.tokenOf(TestClassFactory.class))
-                .withConfiguration(configuration).withShareGroup("test")
+        JRoutine.onService(getActivity(), TestClass.class)
+                .withConfiguration(configuration)
+                .withShareGroup("test")
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
-        JRoutine.onService(getActivity(), ClassToken.tokenOf(Square.class),
-                           ClassToken.tokenOf(SquareFactory.class))
-                .withConfiguration(configuration).withShareGroup("test")
+        JRoutine.onService(getActivity(), Square.class)
+                .withConfiguration(configuration)
+                .withShareGroup("test")
                 .dispatchingOn(Looper.getMainLooper())
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(13);
+        assertThat(countLog.getWrnCount()).isEqualTo(12);
     }
 
     public void testDuplicateAnnotationError() {
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(DuplicateAnnotation.class),
-                               ClassToken.tokenOf(DuplicateAnnotationFactory.class));
+            JRoutine.onService(getActivity(), DuplicateAnnotation.class);
 
             fail();
 
@@ -181,11 +173,9 @@ public class ObjectServiceRoutineBuilderTest
     public void testException() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine3 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                                   ClassToken.tokenOf(TestClassFactory.class))
-                        .dispatchingOn(Looper.getMainLooper())
-                        .boundMethod(TestClass.THROW);
+        final Routine<Object, Object> routine3 = JRoutine.onService(getActivity(), TestClass.class)
+                                                         .dispatchingOn(Looper.getMainLooper())
+                                                         .boundMethod(TestClass.THROW);
 
         try {
 
@@ -204,9 +194,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class))
-                    .buildProxy(TestClass.class);
+            JRoutine.onService(getActivity(), TestClass.class).buildProxy(TestClass.class);
 
             fail();
 
@@ -216,8 +204,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class))
+            JRoutine.onService(getActivity(), TestClass.class)
                     .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
@@ -231,8 +218,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(1, new int[0]);
 
@@ -244,8 +230,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new String[0]);
 
@@ -257,8 +242,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new int[0]);
 
@@ -270,8 +254,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(Collections.<Integer>emptyList());
 
@@ -285,8 +268,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(channel.output());
 
@@ -298,8 +280,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(1, channel.output());
 
@@ -311,8 +292,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new Object());
 
@@ -324,8 +304,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new Object[0]);
 
@@ -337,8 +316,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Sum.class),
-                               ClassToken.tokenOf(SumFactory.class))
+            JRoutine.onService(getActivity(), Sum.class)
                     .buildProxy(SumError.class)
                     .compute("test", new int[0]);
 
@@ -353,8 +331,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class))
+            JRoutine.onService(getActivity(), TestClass.class)
                     .withConfiguration(withReadTimeout(INFINITY))
                     .buildProxy(TestItf.class)
                     .throwException(null);
@@ -367,8 +344,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class))
+            JRoutine.onService(getActivity(), TestClass.class)
                     .withConfiguration(withReadTimeout(INFINITY))
                     .buildProxy(TestItf.class)
                     .throwException1(null);
@@ -382,8 +358,7 @@ public class ObjectServiceRoutineBuilderTest
         //TODO: should get target method...
         //        try {
         //
-        //            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-        //                               ClassToken.tokenOf(TestClassFactory.class))
+        //            JRoutine.onService(getActivity(), TestClass.class)
         //                    .buildProxy(TestItf.class)
         //                    .throwException2(null);
         //
@@ -398,10 +373,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Count.class),
-                               ClassToken.tokenOf(CountFactory.class))
-                    .buildProxy(CountError.class)
-                    .count(3);
+            JRoutine.onService(getActivity(), Count.class).buildProxy(CountError.class).count(3);
 
             fail();
 
@@ -411,10 +383,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Count.class),
-                               ClassToken.tokenOf(CountFactory.class))
-                    .buildProxy(CountError.class)
-                    .count1(3);
+            JRoutine.onService(getActivity(), Count.class).buildProxy(CountError.class).count1(3);
 
             fail();
 
@@ -424,10 +393,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Count.class),
-                               ClassToken.tokenOf(CountFactory.class))
-                    .buildProxy(CountError.class)
-                    .count2(3);
+            JRoutine.onService(getActivity(), Count.class).buildProxy(CountError.class).count2(3);
 
             fail();
 
@@ -437,8 +403,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Count.class),
-                               ClassToken.tokenOf(CountFactory.class))
+            JRoutine.onService(getActivity(), Count.class)
                     .buildProxy(CountError.class)
                     .countList(3);
 
@@ -450,8 +415,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Count.class),
-                               ClassToken.tokenOf(CountFactory.class))
+            JRoutine.onService(getActivity(), Count.class)
                     .buildProxy(CountError.class)
                     .countList1(3);
 
@@ -463,8 +427,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(Count.class),
-                               ClassToken.tokenOf(CountFactory.class))
+            JRoutine.onService(getActivity(), Count.class)
                     .buildProxy(CountError.class)
                     .countList2(3);
 
@@ -484,13 +447,12 @@ public class ObjectServiceRoutineBuilderTest
                                                              .withAvailableTimeout(
                                                                      TimeDuration.ZERO)
                                                              .buildConfiguration();
-        final Routine<Object, Object> routine2 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                                   ClassToken.tokenOf(TestClassFactory.class))
-                        .withConfiguration(configuration2)
-                        .withShareGroup("test")
-                        .dispatchingOn(Looper.getMainLooper())
-                        .method(TestClass.class.getMethod("getLong"));
+        final Routine<Object, Object> routine2 = JRoutine.onService(getActivity(), TestClass.class)
+                                                         .withConfiguration(configuration2)
+                                                         .withShareGroup("test")
+                                                         .dispatchingOn(Looper.getMainLooper())
+                                                         .method(TestClass.class.getMethod(
+                                                                 "getLong"));
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
@@ -502,12 +464,10 @@ public class ObjectServiceRoutineBuilderTest
         final RoutineConfiguration configuration1 = builder().withSyncRunner(Runners.queuedRunner())
                                                              .withAsyncRunner(Runners.poolRunner())
                                                              .buildConfiguration();
-        final Routine<Object, Object> routine1 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                                   ClassToken.tokenOf(TestClassFactory.class))
-                        .withConfiguration(configuration1)
-                        .dispatchingOn(Looper.getMainLooper())
-                        .method("getLong");
+        final Routine<Object, Object> routine1 = JRoutine.onService(getActivity(), TestClass.class)
+                                                         .withConfiguration(configuration1)
+                                                         .dispatchingOn(Looper.getMainLooper())
+                                                         .method("getLong");
 
         assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
@@ -516,8 +476,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class)).boundMethod("test");
+            JRoutine.onService(getActivity(), TestClass.class).boundMethod("test");
 
             fail();
 
@@ -530,8 +489,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class)).method("test");
+            JRoutine.onService(getActivity(), TestClass.class).method("test");
 
             fail();
 
@@ -545,17 +503,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), null, ClassToken.tokenOf(TestClassFactory.class));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class), null);
+            JRoutine.onService(getActivity(), (Class<?>) null);
 
             fail();
 
@@ -569,9 +517,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class))
-                    .buildProxy((Class<?>) null);
+            JRoutine.onService(getActivity(), TestClass.class).buildProxy((Class<?>) null);
 
             fail();
 
@@ -581,9 +527,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass.class),
-                               ClassToken.tokenOf(TestClassFactory.class))
-                    .buildProxy((ClassToken<?>) null);
+            JRoutine.onService(getActivity(), TestClass.class).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -595,8 +539,7 @@ public class ObjectServiceRoutineBuilderTest
     @SuppressWarnings("unchecked")
     public void testProxyAnnotations() {
 
-        final Itf itf = JRoutine.onService(getActivity(), ClassToken.tokenOf(Impl.class),
-                                           ClassToken.tokenOf(ImplFactory.class))
+        final Itf itf = JRoutine.onService(getActivity(), Impl.class)
                                 .withConfiguration(withReadTimeout(INFINITY))
                                 .dispatchingOn(Looper.getMainLooper())
                                 .buildProxy(Itf.class);
@@ -814,11 +757,9 @@ public class ObjectServiceRoutineBuilderTest
     public void testProxyRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final SquareItf squareAsync =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(Square.class),
-                                   ClassToken.tokenOf(SquareFactory.class))
-                        .dispatchingOn(Looper.getMainLooper())
-                        .buildProxy(SquareItf.class);
+        final SquareItf squareAsync = JRoutine.onService(getActivity(), Square.class)
+                                              .dispatchingOn(Looper.getMainLooper())
+                                              .buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.compute1(3)).containsExactly(9);
@@ -850,8 +791,7 @@ public class ObjectServiceRoutineBuilderTest
                               .afterMax(timeout)
                               .readAll()).contains(1, 4, 9);
 
-        final IncItf incItf = JRoutine.onService(getActivity(), ClassToken.tokenOf(Inc.class),
-                                                 ClassToken.tokenOf(IncFactory.class))
+        final IncItf incItf = JRoutine.onService(getActivity(), Inc.class)
                                       .dispatchingOn(Looper.getMainLooper())
                                       .buildProxy(ClassToken.tokenOf(IncItf.class));
         assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
@@ -860,11 +800,10 @@ public class ObjectServiceRoutineBuilderTest
 
     public void testShareGroup() throws NoSuchMethodException {
 
-        final ObjectRoutineBuilder builder =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(TestClass2.class),
-                                   ClassToken.tokenOf(TestClass2Factory.class))
-                        .withConfiguration(withReadTimeout(seconds(2)))
-                        .dispatchingOn(Looper.getMainLooper());
+        final ObjectRoutineBuilder builder = JRoutine.onService(getActivity(), TestClass2.class)
+                                                     .withServiceClass(TestService.class)
+                                                     .withConfiguration(withReadTimeout(seconds(2)))
+                                                     .dispatchingOn(Looper.getMainLooper());
 
         long startTime = System.currentTimeMillis();
 
@@ -1389,15 +1328,6 @@ public class ObjectServiceRoutineBuilderTest
         }
     }
 
-    public static class ImplFactory implements InstanceFactory<Impl> {
-
-        @Nonnull
-        public Impl create(@Nonnull final Context context) {
-
-            return new Impl();
-        }
-    }
-
     @SuppressWarnings("unused")
     private static class Count {
 
@@ -1423,15 +1353,6 @@ public class ObjectServiceRoutineBuilderTest
             }
 
             return list;
-        }
-    }
-
-    private static class CountFactory implements InstanceFactory<Count> {
-
-        @Nonnull
-        public Count create(@Nonnull final Context context) {
-
-            return new Count();
         }
     }
 
@@ -1496,17 +1417,6 @@ public class ObjectServiceRoutineBuilderTest
         }
     }
 
-
-    private static class DuplicateAnnotationFactory
-            implements InstanceFactory<DuplicateAnnotation> {
-
-        @Nonnull
-        public DuplicateAnnotation create(@Nonnull final Context context) {
-
-            return new DuplicateAnnotation();
-        }
-    }
-
     @SuppressWarnings("unused")
     private static class Inc {
 
@@ -1516,30 +1426,12 @@ public class ObjectServiceRoutineBuilderTest
         }
     }
 
-    private static class IncFactory implements InstanceFactory<Inc> {
-
-        @Nonnull
-        public Inc create(@Nonnull final Context context) {
-
-            return new Inc();
-        }
-    }
-
     @SuppressWarnings("unused")
     private static class Square {
 
         public int compute(final int i) {
 
             return i * i;
-        }
-    }
-
-    private static class SquareFactory implements InstanceFactory<Square> {
-
-        @Nonnull
-        public Square create(@Nonnull final Context context) {
-
-            return new Square();
         }
     }
 
@@ -1573,15 +1465,6 @@ public class ObjectServiceRoutineBuilderTest
             }
 
             return s;
-        }
-    }
-
-    private static class SumFactory implements InstanceFactory<Sum> {
-
-        @Nonnull
-        public Sum create(@Nonnull final Context context) {
-
-            return new Sum();
         }
     }
 
@@ -1621,26 +1504,6 @@ public class ObjectServiceRoutineBuilderTest
             TimeDuration.millis(500).sleepAtLeast();
 
             return 2;
-        }
-    }
-
-    private static class TestClass2Factory implements InstanceFactory<TestClass2> {
-
-        private static final TestClass2 sInstance = new TestClass2();
-
-        @Nonnull
-        public TestClass2 create(@Nonnull final Context context) {
-
-            return sInstance;
-        }
-    }
-
-    private static class TestClassFactory implements InstanceFactory<TestClass> {
-
-        @Nonnull
-        public TestClass create(@Nonnull final Context context) {
-
-            return new TestClass();
         }
     }
 }

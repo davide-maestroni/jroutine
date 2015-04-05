@@ -239,10 +239,10 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                         mIsComplete = true;
                         mAbortException = e;
 
-                    } catch (final Throwable e) {
+                    } catch (final Throwable t) {
 
                         mIsComplete = true;
-                        mAbortException = new InvocationException(e);
+                        mAbortException = new InvocationException(t);
                     }
                 }
 

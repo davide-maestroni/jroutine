@@ -125,7 +125,7 @@ public class InvocationServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), null);
+            JRoutine.onService(getActivity(), (ClassToken<AndroidPassingInvocation<String>>) null);
 
             fail();
 
@@ -376,7 +376,7 @@ public class InvocationServiceRoutineBuilderTest
         }
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
     private static class CountLog implements Log {
 
         private int mDgbCount;

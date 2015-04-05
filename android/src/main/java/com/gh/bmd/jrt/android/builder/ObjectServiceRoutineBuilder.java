@@ -18,7 +18,6 @@ import android.os.Looper;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
 
@@ -34,46 +33,6 @@ import javax.annotation.Nullable;
  * Created by davide on 3/29/15.
  */
 public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, ObjectRoutineBuilder {
-
-    /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.<b/>
-     * Note that any {@link com.gh.bmd.jrt.annotation.Share} annotation will be ignored.
-     *
-     * @param itf    the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class is null.
-     */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
-
-    /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.<b/>
-     * Note that any {@link com.gh.bmd.jrt.annotation.Share} annotation will be ignored.
-     *
-     * @param itf    the token of the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
-     *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class token is null.
-     */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withShareGroup(@Nullable String group);
 
     /**
      * {@inheritDoc}
@@ -93,9 +52,6 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
     @Nonnull
     ObjectServiceRoutineBuilder withRunnerClass(@Nullable Class<? extends Runner> runnerClass);
 
-    /**
-     * {@inheritDoc}
-     */
     @Nonnull
     ObjectServiceRoutineBuilder withServiceClass(
             @Nullable Class<? extends RoutineService> serviceClass);
@@ -111,4 +67,16 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
      */
     @Nonnull
     ObjectServiceRoutineBuilder withArgs(@Nullable Object... args);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectServiceRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectServiceRoutineBuilder withShareGroup(@Nullable String group);
 }

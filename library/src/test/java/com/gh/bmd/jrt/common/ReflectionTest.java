@@ -95,7 +95,7 @@ public class ReflectionTest {
         }
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
     public static class TestClass {
 
         public TestClass() {

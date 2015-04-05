@@ -140,7 +140,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                         invocation.onReturn();
                         manager.recycle(invocation);
 
-                    } catch (final Throwable t) {
+                    } catch (final Throwable ignored) {
 
                         manager.discard(invocation);
 

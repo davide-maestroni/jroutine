@@ -189,9 +189,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     throw e;
 
-                } catch (final Throwable t) {
+                } catch (final Throwable ignored) {
 
-                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                    logger.wrn(ignored, "ignoring exception while destroying invocation instance");
                 }
             }
 
@@ -209,9 +209,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     throw e;
 
-                } catch (final Throwable t) {
+                } catch (final Throwable ignored) {
 
-                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                    logger.wrn(ignored, "ignoring exception while destroying invocation instance");
                 }
             }
 
@@ -410,9 +410,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     throw e;
 
-                } catch (final Throwable t) {
+                } catch (final Throwable ignored) {
 
-                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                    logger.wrn(ignored, "ignoring exception while destroying invocation instance");
                 }
 
                 --mRunningCount;
@@ -453,9 +453,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                         throw e;
 
-                    } catch (final Throwable t) {
+                    } catch (final Throwable ignored) {
 
-                        logger.wrn(t, "ignoring exception while destroying invocation instance");
+                        logger.wrn(ignored,
+                                   "ignoring exception while destroying invocation instance");
                     }
                 }
 

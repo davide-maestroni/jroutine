@@ -164,10 +164,6 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
                 return interfaceClass.cast(
                         constructor.newInstance(target, shareGroup, configuration));
 
-            } catch (final InstantiationException e) {
-
-                throw new IllegalArgumentException(e.getCause());
-
             } catch (final Throwable t) {
 
                 throw new IllegalArgumentException(t);

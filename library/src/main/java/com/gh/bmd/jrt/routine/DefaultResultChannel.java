@@ -531,9 +531,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 throw e;
 
-            } catch (final Throwable t) {
+            } catch (final Throwable ignored) {
 
-                logger.wrn(t, "ignoring consumer exception (%s)", consumer);
+                logger.wrn(ignored, "ignoring consumer exception (%s)", consumer);
             }
         }
 
@@ -600,9 +600,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                                 throw e;
 
-                            } catch (final Throwable t) {
+                            } catch (final Throwable ignored) {
 
-                                logger.wrn(t, "ignoring consumer exception (%s)", consumer);
+                                logger.wrn(ignored, "ignoring consumer exception (%s)", consumer);
                             }
 
                             break;

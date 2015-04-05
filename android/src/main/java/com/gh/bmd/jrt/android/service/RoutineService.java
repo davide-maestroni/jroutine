@@ -42,7 +42,6 @@ import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +70,7 @@ public class RoutineService extends Service {
 
     private static final String KEY_AVAILABLE_TIMEOUT = "avail_time";
 
-    private static final String KEY_AVAILABLE_TIMEUNIT = "avail_unit";
+    private static final String KEY_AVAILABLE_UNIT = "avail_unit";
 
     private static final String KEY_CORE_INVOCATIONS = "max_retained";
 
@@ -112,7 +111,7 @@ public class RoutineService extends Service {
     /**
      * Constructor.
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
     public RoutineService() {
 
         this(Logger.getGlobalLog(), Logger.getGlobalLogLevel());
@@ -296,7 +295,7 @@ public class RoutineService extends Service {
         if (availTimeout != null) {
 
             bundle.putLong(KEY_AVAILABLE_TIMEOUT, availTimeout.time);
-            bundle.putSerializable(KEY_AVAILABLE_TIMEUNIT, availTimeout.unit);
+            bundle.putSerializable(KEY_AVAILABLE_UNIT, availTimeout.unit);
         }
 
         bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderOr(null));
@@ -438,7 +437,7 @@ public class RoutineService extends Service {
             final int coreInvocations = data.getInt(KEY_CORE_INVOCATIONS);
             final int maxInvocations = data.getInt(KEY_MAX_INVOCATIONS);
             final long timeout = data.getLong(KEY_AVAILABLE_TIMEOUT);
-            final TimeUnit timeUnit = (TimeUnit) data.getSerializable(KEY_AVAILABLE_TIMEUNIT);
+            final TimeUnit timeUnit = (TimeUnit) data.getSerializable(KEY_AVAILABLE_UNIT);
             final TimeDuration availTimeout =
                     (timeUnit != null) ? TimeDuration.fromUnit(timeout, timeUnit) : null;
             final OrderType inputOrder = (OrderType) data.getSerializable(KEY_INPUT_ORDER);
@@ -554,11 +553,6 @@ public class RoutineService extends Service {
                 invocation.onContext(mContext);
                 return invocation;
 
-            } catch (final InvocationTargetException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw new InvocationException(e.getCause());
-
             } catch (final RoutineException e) {
 
                 logger.err(e, "error creating the invocation instance");
@@ -632,46 +626,52 @@ public class RoutineService extends Service {
 
                 logger.err(t, "error while parsing routine message");
 
-                final Bundle data = msg.peekData();
+                try {
 
-                if (data != null) {
+                    final Bundle data = msg.peekData();
 
-                    data.setClassLoader(service.getClassLoader());
-                    final String invocationId = data.getString(KEY_INVOCATION_ID);
+                    if (data != null) {
 
-                    if (invocationId != null) {
+                        data.setClassLoader(service.getClassLoader());
+                        final String invocationId = data.getString(KEY_INVOCATION_ID);
 
-                        synchronized (service.mMutex) {
+                        if (invocationId != null) {
 
-                            final RoutineInvocation invocation =
-                                    service.mInvocationMap.get(invocationId);
+                            synchronized (service.mMutex) {
 
-                            if (invocation != null) {
+                                final RoutineInvocation invocation =
+                                        service.mInvocationMap.get(invocationId);
 
-                                invocation.recycle();
+                                if (invocation != null) {
+
+                                    invocation.recycle();
+                                }
                             }
                         }
                     }
+
+                } catch (final Throwable ignored) {
+
+                    logger.err(ignored, "error while destroying invocation");
                 }
-
-                final Messenger outMessenger = msg.replyTo;
-
-                if (outMessenger == null) {
-
-                    logger.wrn("avoid aborting since reply messenger is null");
-                    return;
-                }
-
-                final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
-                putError(message.getData(), t);
 
                 try {
 
+                    final Messenger outMessenger = msg.replyTo;
+
+                    if (outMessenger == null) {
+
+                        logger.wrn("avoid aborting since reply messenger is null");
+                        return;
+                    }
+
+                    final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+                    putError(message.getData(), t);
                     outMessenger.send(message);
 
-                } catch (final RemoteException e) {
+                } catch (final Throwable ignored) {
 
-                    logger.err(e, "error while sending routine abort message");
+                    logger.err(ignored, "error while sending routine abort message");
                 }
             }
         }

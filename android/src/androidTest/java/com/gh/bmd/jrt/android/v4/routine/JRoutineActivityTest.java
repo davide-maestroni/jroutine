@@ -1104,7 +1104,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
     private static class CountLog implements Log {
 
         private int mDgbCount;
@@ -1160,7 +1160,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
     private static class ErrorInvocation extends AndroidTemplateInvocation<String, String> {
 
         private ErrorInvocation(final int ignored) {

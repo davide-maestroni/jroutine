@@ -491,7 +491,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     if (isError) {
 
                         throw new IllegalArgumentException(
-                                "the bound method has incompatible return type: " + targetMethod);
+                                "the proxy method has incompatible return type: " + method);
                     }
                 }
             }

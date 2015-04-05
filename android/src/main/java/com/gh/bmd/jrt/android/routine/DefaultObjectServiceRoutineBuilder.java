@@ -732,6 +732,25 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
                 final Method method = mProxyClass.getMethod(mMethodName, parameterTypes);
 
                 final Method targetMethod = getTargetMethod(method, targetParameterTypes);
+                final Class<?> returnType = targetMethod.getReturnType();
+                final Pass annotation = targetMethod.getAnnotation(Pass.class);
+                final Class<?> expectedType;
+
+                if (annotation != null) {
+
+                    expectedType = annotation.value();
+
+                } else {
+
+                    expectedType = targetMethod.getReturnType();
+                }
+
+                if (!expectedType.isAssignableFrom(method.getReturnType())) {
+
+                    throw new IllegalArgumentException(
+                            "the proxy method has incompatible return type: " + method);
+                }
+
                 final Object methodResult;
 
                 synchronized (mMutex) {
@@ -763,8 +782,6 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
                         methodResult = targetMethod.invoke(mTarget, objects.toArray());
                     }
                 }
-
-                final Class<?> returnType = targetMethod.getReturnType();
 
                 if (!Void.class.equals(boxingClass(returnType))) {
 

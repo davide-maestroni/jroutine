@@ -355,18 +355,20 @@ public class ObjectServiceRoutineBuilderTest
 
         }
 
-        //TODO: should get target method...
-        //        try {
-        //
-        //            JRoutine.onService(getActivity(), TestClass.class)
-        //                    .buildProxy(TestItf.class)
-        //                    .throwException2(null);
-        //
-        //            fail();
-        //
-        //        } catch (final IllegalArgumentException ignored) {
-        //
-        //        }
+        try {
+
+            JRoutine.onService(getActivity(), TestClass.class)
+                    .withConfiguration(withReadTimeout(INFINITY))
+                    .dispatchingOn(Looper.getMainLooper())
+                    .buildProxy(TestItf.class)
+                    .throwException2(null);
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     public void testInvalidProxyOutputAnnotationError() {

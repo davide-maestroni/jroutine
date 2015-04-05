@@ -38,7 +38,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * active only during a routine invocation.<br/>
  * The service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels must comply with the
- * {@link android.os.Parcel#writeValue(Object)} method. TODO: serializable
+ * {@link android.os.Parcel#writeValue(Object)} method. Be aware though, that issues may arise when
+ * employing {@link java.io.Serializable} objects on the Lollipop OS version, so, it is advisable
+ * to use {@link android.os.Parcelable} objects instead.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>
@@ -102,7 +104,9 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
 
     /**
      * Returns a builder of routines running in a service based on the specified context, wrapping
-     * the instance created through the specified factory.
+     * the specified object instances.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.service.FactoryRoutineService} as the invocation context.
      *
      * @param context    the routine context.
      * @param classToken the wrapped object class.

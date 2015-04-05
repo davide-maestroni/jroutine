@@ -61,6 +61,9 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
      * <p/>
      * Note that, like the object passed to the service routine input and output channels, the
      * specified arguments must comply with the {@link android.os.Parcel#writeValue(Object)} method.
+     * Be aware though, that issues may arise when employing {@link java.io.Serializable} objects on
+     * the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable} objects
+     * instead.
      *
      * @param args the arguments.
      * @return this builder.

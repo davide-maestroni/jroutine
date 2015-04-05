@@ -920,12 +920,13 @@ public class ProcessorTest {
         @Bind("ga")
         public int[] getArray() {
 
-            return new int[3];
+            return new int[]{1, 2, 3};
         }
 
         @Bind("sa")
         public void setArray(int[] i) {
 
+            assertThat(i).containsExactly(1, 2, 3);
         }
 
         @Bind("gl")
@@ -937,11 +938,13 @@ public class ProcessorTest {
         @Bind("sl")
         public void setList(List<Integer> l) {
 
+            assertThat(l).containsExactly(1, 2, 3);
         }
 
         @Bind("s")
         public void set(int i) {
 
+            assertThat(i).isEqualTo(-17);
         }
     }
 

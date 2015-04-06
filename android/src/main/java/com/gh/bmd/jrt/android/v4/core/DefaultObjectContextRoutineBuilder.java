@@ -68,6 +68,8 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  */
 class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder {
 
+    private static final Object sFactoryMutex = new Object();
+
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
@@ -248,7 +250,10 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         if (context instanceof FactoryContext) {
 
-            target = ((FactoryContext) context).geInstance(targetClass, args);
+            synchronized (sFactoryMutex) {
+
+                target = ((FactoryContext) context).geInstance(targetClass, args);
+            }
         }
 
         if (target == null) {

@@ -136,7 +136,8 @@ public class FunctionBuilderTest {
                         return param1 + " " + param2 + " " + param3 + " " + param4;
                     }
                 };
-        assertThat(JRoutine.onFunction(function4).withConfiguration(withInputOrder(OrderType.NONE))
+        assertThat(JRoutine.onFunction(function4)
+                           .withConfiguration(withInputOrder(OrderType.NONE))
                            .callAsync("test1", "test2", "test3", "test4")
                            .eventually()
                            .readNext()).isEqualTo("test1 test2 test3 test4");

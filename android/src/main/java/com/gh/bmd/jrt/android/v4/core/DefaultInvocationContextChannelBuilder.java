@@ -71,7 +71,8 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
      * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the fragment is null.
      */
-    DefaultInvocationContextChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
+    DefaultInvocationContextChannelBuilder(@Nonnull final Fragment fragment,
+            final int invocationId) {
 
         this((Object) fragment, invocationId);
     }

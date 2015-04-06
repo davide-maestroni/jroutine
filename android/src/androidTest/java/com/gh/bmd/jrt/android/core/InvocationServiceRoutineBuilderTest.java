@@ -139,8 +139,8 @@ public class InvocationServiceRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<PassingDecorator<String>> token =
                 ClassToken.tokenOf(new PassingDecorator<String>());
-        final RoutineConfiguration configuration =
-                builder().withSyncRunner(Runners.queuedRunner()).withInputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration = builder().withSyncRunner(Runners.queuedRunner())
+                                                            .withInputOrder(OrderType.NONE)
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .buildConfiguration();
         final Routine<String, String> routine = JRoutine.onService(getActivity(), token)
@@ -181,8 +181,8 @@ public class InvocationServiceRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<StringSingleCallInvocation> token =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
-        final RoutineConfiguration configuration2 =
-                builder().withSyncRunner(Runners.queuedRunner()).withOutputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration2 = builder().withSyncRunner(Runners.queuedRunner())
+                                                             .withOutputOrder(OrderType.NONE)
                                                              .withLogLevel(LogLevel.DEBUG)
                                                              .buildConfiguration();
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)

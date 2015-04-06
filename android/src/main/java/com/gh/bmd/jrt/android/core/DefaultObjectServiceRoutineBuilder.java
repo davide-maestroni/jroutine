@@ -67,6 +67,8 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  */
 class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder {
 
+    private static final Object sFactoryMutex = new Object();
+
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
@@ -198,7 +200,10 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         if (context instanceof FactoryContext) {
 
-            target = ((FactoryContext) context).geInstance(targetClass, args);
+            synchronized (sFactoryMutex) {
+
+                target = ((FactoryContext) context).geInstance(targetClass, args);
+            }
         }
 
         if (target == null) {
@@ -334,7 +339,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         final ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<BoundMethodInvocation<INPUT, OUTPUT>>() {};
         final Object[] args = mArgs;
-        return JRoutine.onService(mContext, classToken).withArgs(targetClass.getName(), args,
+        return JRoutine.onService(mContext, classToken)
+                       .withArgs(targetClass.getName(), args,
                                  withShareAnnotation(mShareGroup, targetMethod), name)
                        .withConfiguration(
                                withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
@@ -379,7 +385,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         final ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>>() {};
         final Object[] args = mArgs;
-        return JRoutine.onService(mContext, classToken).withArgs(targetClass.getName(), args,
+        return JRoutine.onService(mContext, classToken)
+                       .withArgs(targetClass.getName(), args,
                                  withShareAnnotation(mShareGroup, targetMethod), name,
                                  toNames(parameterTypes))
                        .withConfiguration(

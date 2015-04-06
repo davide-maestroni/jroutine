@@ -733,7 +733,7 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
                 final Method targetMethod = getTargetMethod(method, targetParameterTypes);
                 final Class<?> returnType = targetMethod.getReturnType();
-                final Pass annotation = targetMethod.getAnnotation(Pass.class);
+                final Pass annotation = method.getAnnotation(Pass.class);
                 final Class<?> expectedType;
 
                 if (annotation != null) {

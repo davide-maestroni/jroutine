@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.v4.core;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -50,7 +50,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
     private final List<? extends INPUT> mInputs;
 
-    private final AndroidInvocation<INPUT, OUTPUT> mInvocation;
+    private final ContextInvocation<INPUT, OUTPUT> mInvocation;
 
     private final Logger mLogger;
 
@@ -73,7 +73,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
-            @Nonnull final AndroidInvocation<INPUT, OUTPUT> invocation,
+            @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation,
             @Nonnull final Object[] args, @Nonnull final List<? extends INPUT> inputs,
             @Nullable final OrderType order, @Nonnull final Logger logger) {
 
@@ -164,7 +164,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     public InvocationResult<OUTPUT> loadInBackground() {
 
         final Logger logger = mLogger;
-        final AndroidInvocation<INPUT, OUTPUT> invocation = mInvocation;
+        final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
         final LoaderResultChannel<OUTPUT> channel =
                 new LoaderResultChannel<OUTPUT>(mOrderType, logger);
         final InvocationOutputConsumer<OUTPUT> consumer =

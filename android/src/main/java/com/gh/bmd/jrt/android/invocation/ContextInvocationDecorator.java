@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class AndroidInvocationDecorator<INPUT, OUTPUT> implements AndroidInvocation<INPUT, OUTPUT> {
+public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
 
     private final Invocation<INPUT, OUTPUT> mInvocation;
 
@@ -40,7 +40,7 @@ public class AndroidInvocationDecorator<INPUT, OUTPUT> implements AndroidInvocat
      * @throws java.lang.NullPointerException if the specified invocation is null.
      */
     @SuppressWarnings("ConstantConditions")
-    public AndroidInvocationDecorator(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+    public ContextInvocationDecorator(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
         if (invocation == null) {
 

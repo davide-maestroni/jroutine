@@ -19,17 +19,17 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.R;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
 import com.gh.bmd.jrt.android.builder.InvocationMissingException;
-import com.gh.bmd.jrt.android.invocation.AndroidPassingInvocation;
-import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
-import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextPassingInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
-import com.gh.bmd.jrt.android.routine.AndroidRoutine;
+import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -137,8 +137,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -149,7 +149,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel4.readNext()).isEqualTo("test");
         assertThat(channel4.checkComplete());
         JRoutine.onActivity(getActivity(), 0).purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testActivityBuilderPurgeInputs() throws InterruptedException {
@@ -159,8 +159,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -171,19 +171,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel5.readNext()).isEqualTo("test");
         assertThat(channel5.checkComplete());
         JRoutine.onActivity(getActivity(), 0).purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel6.readAll()).containsExactly("test1", "test2");
         assertThat(channel6.checkComplete());
         JRoutine.onActivity(getActivity(), 0).purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel7.readAll()).containsExactly("test1", "test2");
         assertThat(channel7.checkComplete());
         JRoutine.onActivity(getActivity(), 0).purge(Arrays.asList((Object) "test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testActivityClearError() {
@@ -321,7 +321,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onActivity(getActivity(), AndroidRoutineBuilder.AUTO);
+            JRoutine.onActivity(getActivity(), ContextRoutineBuilder.AUTO);
 
             fail();
 
@@ -564,8 +564,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -576,7 +576,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel.readNext()).isEqualTo("test");
         assertThat(channel.checkComplete());
         routine.purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testActivityRoutinePurgeInputs() throws InterruptedException {
@@ -586,8 +586,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -598,19 +598,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel1.readNext()).isEqualTo("test");
         assertThat(channel1.checkComplete());
         routine.purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel2.readAll()).containsExactly("test1", "test2");
         assertThat(channel2.checkComplete());
         routine.purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel3.readAll()).containsExactly("test1", "test2");
         assertThat(channel3.checkComplete());
         routine.purge(Arrays.asList("test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testActivitySame() {
@@ -771,8 +771,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -783,7 +783,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel4.readNext()).isEqualTo("test");
         assertThat(channel4.checkComplete());
         JRoutine.onFragment(fragment, 0).purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testFragmentBuilderPurgeInputs() throws InterruptedException {
@@ -796,8 +796,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -808,19 +808,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel5.readNext()).isEqualTo("test");
         assertThat(channel5.checkComplete());
         JRoutine.onFragment(fragment, 0).purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel6.readAll()).containsExactly("test1", "test2");
         assertThat(channel6.checkComplete());
         JRoutine.onFragment(fragment, 0).purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel7.readAll()).containsExactly("test1", "test2");
         assertThat(channel7.checkComplete());
         JRoutine.onFragment(fragment, 0).purge(Arrays.asList((Object) "test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testFragmentChannel() {
@@ -878,7 +878,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
-            JRoutine.onFragment(fragment, AndroidRoutineBuilder.AUTO);
+            JRoutine.onFragment(fragment, ContextRoutineBuilder.AUTO);
 
             fail();
 
@@ -1069,8 +1069,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -1081,7 +1081,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel.readNext()).isEqualTo("test");
         assertThat(channel.checkComplete());
         routine.purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testFragmentRoutinePurgeInputs() throws InterruptedException {
@@ -1094,8 +1094,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+        final ContextRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
                                                     .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
@@ -1106,19 +1106,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(channel1.readNext()).isEqualTo("test");
         assertThat(channel1.checkComplete());
         routine.purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel2.readAll()).containsExactly("test1", "test2");
         assertThat(channel2.checkComplete());
         routine.purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel3.readAll()).containsExactly("test1", "test2");
         assertThat(channel3.checkComplete());
         routine.purge(Arrays.asList("test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testFragmentSame() throws InterruptedException {
@@ -1264,7 +1264,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new DefaultAndroidRoutine<String, String>(null, reference, 0, ClashResolution.KEEP_THAT,
+            new DefaultContextRoutine<String, String>(null, reference, 0, ClashResolution.KEEP_THAT,
                                                       CacheStrategy.CACHE,
                                                       ToUpperCase.class.getDeclaredConstructor(),
                                                       Reflection.NO_ARGS);
@@ -1277,7 +1277,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultContextRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
                                                       null, 0, ClashResolution.KEEP_THAT,
                                                       CacheStrategy.CACHE,
                                                       ToUpperCase.class.getDeclaredConstructor(),
@@ -1291,7 +1291,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultContextRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
                                                       reference, 0, ClashResolution.KEEP_THAT, null,
                                                       null, Reflection.NO_ARGS);
 
@@ -1303,7 +1303,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultContextRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
                                                       reference, 0, ClashResolution.KEEP_THAT, null,
                                                       ToUpperCase.class.getDeclaredConstructor(),
                                                       null);
@@ -1315,7 +1315,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    private static class Abort extends AndroidTemplateInvocation<Data, Data> {
+    private static class Abort extends ContextTemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -1380,7 +1380,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     }
 
-    private static class Delay extends AndroidTemplateInvocation<Data, Data> {
+    private static class Delay extends ContextTemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -1390,14 +1390,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     @SuppressWarnings("unused")
-    private static class ErrorInvocation extends AndroidTemplateInvocation<String, String> {
+    private static class ErrorInvocation extends ContextTemplateInvocation<String, String> {
 
         private ErrorInvocation(final int ignored) {
 
         }
     }
 
-    private static class PurgeAndroidInvocation extends AndroidPassingInvocation<String> {
+    private static class PurgeContextInvocation extends ContextPassingInvocation<String> {
 
         private static final Semaphore sSemaphore = new Semaphore(0);
 
@@ -1415,12 +1415,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    private static class StringPassingInvocation extends AndroidPassingInvocation<String> {
+    private static class StringPassingInvocation extends ContextPassingInvocation<String> {
 
     }
 
     private static class StringSingleCallInvocation
-            extends AndroidSingleCallInvocation<String, String> {
+            extends ContextSingleCallInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,
@@ -1430,7 +1430,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    private static class ToUpperCase extends AndroidTemplateInvocation<String, String> {
+    private static class ToUpperCase extends ContextTemplateInvocation<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {

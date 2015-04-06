@@ -24,12 +24,12 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.SparseArray;
 
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
@@ -82,7 +82,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
     private final ClashResolution mClashResolution;
 
-    private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> mConstructor;
 
     private final WeakReference<Object> mContext;
 
@@ -108,7 +108,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
             @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
-            @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor,
+            @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
 
@@ -263,7 +263,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if (((loaderId == AndroidRoutineBuilder.AUTO) || (loaderId == id))
+                if (((loaderId == ContextRoutineBuilder.AUTO) || (loaderId == id))
                         && loader.areSameInputs(inputs)) {
 
                     loaderManager.destroyLoader(id);
@@ -407,7 +407,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if ((loaderId == AndroidRoutineBuilder.AUTO) || (loaderId == id)) {
+                if ((loaderId == ContextRoutineBuilder.AUTO) || (loaderId == id)) {
 
                     loaderManager.destroyLoader(id);
                     callbackArray.removeAt(i);
@@ -488,7 +488,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         int loaderId = mLoaderId;
 
-        if (loaderId == AndroidRoutineBuilder.AUTO) {
+        if (loaderId == ContextRoutineBuilder.AUTO) {
 
             loaderId = mConstructor.getDeclaringClass().hashCode();
 
@@ -571,8 +571,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         final Logger logger = mLogger;
         final Object[] args = mArgs;
-        final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor = mConstructor;
-        final AndroidInvocation<INPUT, OUTPUT> invocation;
+        final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor = mConstructor;
+        final ContextInvocation<INPUT, OUTPUT> invocation;
 
         try {
 
@@ -618,7 +618,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         }
 
         final RoutineLoader<INPUT, OUTPUT> routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
-        final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+        final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
                 mConstructor.getDeclaringClass();
 
         if ((new ClassToken<MissingLoaderInvocation<INPUT, OUTPUT>>() {}.getRawClass()

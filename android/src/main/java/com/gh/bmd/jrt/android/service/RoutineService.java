@@ -24,7 +24,7 @@ import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.RemoteException;
 
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -185,7 +185,7 @@ public class RoutineService extends Service {
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
-            @Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
+            @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
             @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
@@ -235,7 +235,7 @@ public class RoutineService extends Service {
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
-            @Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
+            @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
             @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
@@ -266,7 +266,7 @@ public class RoutineService extends Service {
 
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
-            @Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
+            @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
             @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
@@ -392,8 +392,8 @@ public class RoutineService extends Service {
                             + "ID");
         }
 
-        final Class<? extends AndroidInvocation<Object, Object>> invocationClass =
-                (Class<? extends AndroidInvocation<Object, Object>>) data.getSerializable(
+        final Class<? extends ContextInvocation<Object, Object>> invocationClass =
+                (Class<? extends ContextInvocation<Object, Object>>) data.getSerializable(
                         KEY_INVOCATION_CLASS);
 
         if (invocationClass == null) {
@@ -514,7 +514,7 @@ public class RoutineService extends Service {
 
         private final Object[] mArgs;
 
-        private final Constructor<? extends AndroidInvocation<Object, Object>> mConstructor;
+        private final Constructor<? extends ContextInvocation<Object, Object>> mConstructor;
 
         private final Context mContext;
 
@@ -528,7 +528,7 @@ public class RoutineService extends Service {
          */
         private AndroidRoutine(@Nonnull final Context context,
                 @Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<? extends AndroidInvocation<Object, Object>> invocationClass,
+                @Nonnull final Class<? extends ContextInvocation<Object, Object>> invocationClass,
                 @Nonnull final Object[] invocationArgs) {
 
             super(configuration);
@@ -546,10 +546,10 @@ public class RoutineService extends Service {
 
             try {
 
-                final Constructor<? extends AndroidInvocation<Object, Object>> constructor =
+                final Constructor<? extends ContextInvocation<Object, Object>> constructor =
                         mConstructor;
                 logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-                final AndroidInvocation<Object, Object> invocation = constructor.newInstance(mArgs);
+                final ContextInvocation<Object, Object> invocation = constructor.newInstance(mArgs);
                 invocation.onContext(mContext);
                 return invocation;
 
@@ -686,7 +686,7 @@ public class RoutineService extends Service {
 
         private final Object[] mInvocationArgs;
 
-        private final Class<? extends AndroidInvocation<?, ?>> mInvocationClass;
+        private final Class<? extends ContextInvocation<?, ?>> mInvocationClass;
 
         private final Class<? extends Log> mLogClass;
 
@@ -707,7 +707,7 @@ public class RoutineService extends Service {
          * @param logClass        the log class.
          * @param logLevel        the log level.
          */
-        private RoutineInfo(@Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
+        private RoutineInfo(@Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
                 @Nonnull final Object[] invocationArgs, @Nullable final OrderType inputOrder,
                 @Nullable final OrderType outputOrder,
                 @Nullable final Class<? extends Runner> runnerClass,

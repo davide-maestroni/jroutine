@@ -18,10 +18,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.AndroidChannelBuilder;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.builder.ContextChannelBuilder;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
  * Created by davide on 1/14/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
+class DefaultContextChannelBuilder implements ContextChannelBuilder {
 
     private final WeakReference<Object> mContext;
 
@@ -61,7 +61,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
      * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the activity is null.
      */
-    DefaultAndroidChannelBuilder(@Nonnull final Activity activity, final int invocationId) {
+    DefaultContextChannelBuilder(@Nonnull final Activity activity, final int invocationId) {
 
         this((Object) activity, invocationId);
     }
@@ -73,7 +73,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
      * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the fragment is null.
      */
-    DefaultAndroidChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
+    DefaultContextChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
 
         this((Object) fragment, invocationId);
     }
@@ -86,7 +86,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
      * @throws java.lang.NullPointerException if the context is null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultAndroidChannelBuilder(@Nonnull final Object context, final int invocationId) {
+    private DefaultContextChannelBuilder(@Nonnull final Object context, final int invocationId) {
 
         if (context == null) {
 
@@ -107,7 +107,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
             return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf()).callSync();
         }
 
-        final AndroidRoutineBuilder<OUTPUT, OUTPUT> builder;
+        final ContextRoutineBuilder<OUTPUT, OUTPUT> builder;
 
         if (context instanceof Activity) {
 
@@ -134,7 +134,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     }
 
     @Nonnull
-    public AndroidChannelBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
+    public ContextChannelBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
         return this;
@@ -204,7 +204,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     }
 
     @Nonnull
-    public AndroidChannelBuilder withConfiguration(
+    public ContextChannelBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;

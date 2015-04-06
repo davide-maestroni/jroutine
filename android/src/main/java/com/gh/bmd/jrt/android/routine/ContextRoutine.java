@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface AndroidRoutine<INPUT, OUTPUT> extends Routine<INPUT, OUTPUT> {
+public interface ContextRoutine<INPUT, OUTPUT> extends Routine<INPUT, OUTPUT> {
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified input.

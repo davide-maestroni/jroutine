@@ -15,24 +15,35 @@ package com.gh.bmd.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining an invocation aware of the specific Android context.
+ * Single call invocation implementing an Android invocation.
  * <p/>
  * Created by davide on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface AndroidInvocation<INPUT, OUTPUT> extends Invocation<INPUT, OUTPUT> {
+public abstract class ContextSingleCallInvocation<INPUT, OUTPUT>
+        extends SingleCallInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+
+    private Context mContext;
+
+    public void onContext(@Nonnull final Context context) {
+
+        mContext = context;
+    }
 
     /**
-     * Called right after the instantiation to specify the invocation context.
+     * Returns this invocation context.
      *
-     * @param context the context of the invocation.
+     * @return the context of this invocation.
      */
-    void onContext(@Nonnull Context context);
+    protected Context getContext() {
+
+        return mContext;
+    }
 }

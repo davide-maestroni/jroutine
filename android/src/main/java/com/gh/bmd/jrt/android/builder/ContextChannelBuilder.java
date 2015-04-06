@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -28,9 +28,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 1/14/15.
  *
- * @see com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder
+ * @see ContextRoutineBuilder
  */
-public interface AndroidChannelBuilder extends ConfigurableBuilder {
+public interface ContextChannelBuilder extends ConfigurableBuilder {
 
     /**
      * Builds and returns an output channel bound to the routine invocation.
@@ -48,7 +48,7 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
+    ContextChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
      * Makes the builder destroy all the cached invocation instances.
@@ -83,5 +83,5 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    AndroidChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    ContextChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

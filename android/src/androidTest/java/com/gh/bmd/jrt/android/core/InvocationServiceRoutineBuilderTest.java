@@ -20,10 +20,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.invocation.AndroidInvocationDecorator;
-import com.gh.bmd.jrt.android.invocation.AndroidPassingInvocation;
-import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
-import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationDecorator;
+import com.gh.bmd.jrt.android.invocation.ContextPassingInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -110,8 +110,8 @@ public class InvocationServiceRoutineBuilderTest
     @SuppressWarnings("ConstantConditions")
     public void testBuilderError() {
 
-        final ClassToken<AndroidPassingInvocation<String>> classToken =
-                new ClassToken<AndroidPassingInvocation<String>>() {};
+        final ClassToken<ContextPassingInvocation<String>> classToken =
+                new ClassToken<ContextPassingInvocation<String>>() {};
 
         try {
 
@@ -125,7 +125,7 @@ public class InvocationServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), (ClassToken<AndroidPassingInvocation<String>>) null);
+            JRoutine.onService(getActivity(), (ClassToken<ContextPassingInvocation<String>>) null);
 
             fail();
 
@@ -266,8 +266,8 @@ public class InvocationServiceRoutineBuilderTest
 
     public void testReadTimeout() {
 
-        final ClassToken<AndroidPassingInvocation<String>> classToken =
-                new ClassToken<AndroidPassingInvocation<String>>() {};
+        final ClassToken<ContextPassingInvocation<String>> classToken =
+                new ClassToken<ContextPassingInvocation<String>>() {};
         final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.EXIT)
                                                              .buildConfiguration();
@@ -279,8 +279,8 @@ public class InvocationServiceRoutineBuilderTest
 
     public void testReadTimeout2() {
 
-        final ClassToken<AndroidPassingInvocation<String>> classToken =
-                new ClassToken<AndroidPassingInvocation<String>>() {};
+        final ClassToken<ContextPassingInvocation<String>> classToken =
+                new ClassToken<ContextPassingInvocation<String>>() {};
         final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.ABORT)
                                                              .buildConfiguration();
@@ -301,8 +301,8 @@ public class InvocationServiceRoutineBuilderTest
 
     public void testReadTimeout3() {
 
-        final ClassToken<AndroidPassingInvocation<String>> classToken =
-                new ClassToken<AndroidPassingInvocation<String>>() {};
+        final ClassToken<ContextPassingInvocation<String>> classToken =
+                new ClassToken<ContextPassingInvocation<String>>() {};
         final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.DEADLOCK)
                                                              .buildConfiguration();
@@ -358,7 +358,7 @@ public class InvocationServiceRoutineBuilderTest
         assertThat(countLog.getWrnCount()).isEqualTo(4);
     }
 
-    private static class Abort extends AndroidTemplateInvocation<Data, Data> {
+    private static class Abort extends ContextTemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -445,7 +445,7 @@ public class InvocationServiceRoutineBuilderTest
         }
     }
 
-    private static class Delay extends AndroidTemplateInvocation<Data, Data> {
+    private static class Delay extends ContextTemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -520,11 +520,11 @@ public class InvocationServiceRoutineBuilderTest
         }
     }
 
-    private static class MyParcelableInvocation extends AndroidPassingInvocation<MyParcelable> {
+    private static class MyParcelableInvocation extends ContextPassingInvocation<MyParcelable> {
 
     }
 
-    private static class PassingDecorator<DATA> extends AndroidInvocationDecorator<DATA, DATA> {
+    private static class PassingDecorator<DATA> extends ContextInvocationDecorator<DATA, DATA> {
 
         public PassingDecorator() {
 
@@ -532,12 +532,12 @@ public class InvocationServiceRoutineBuilderTest
         }
     }
 
-    private static class StringPassingInvocation extends AndroidPassingInvocation<String> {
+    private static class StringPassingInvocation extends ContextPassingInvocation<String> {
 
     }
 
     private static class StringSingleCallInvocation
-            extends AndroidSingleCallInvocation<String, String> {
+            extends ContextSingleCallInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,

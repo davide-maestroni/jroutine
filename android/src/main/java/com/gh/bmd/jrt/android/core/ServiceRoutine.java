@@ -24,7 +24,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -82,7 +82,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
     private final Object[] mInvocationArgs;
 
-    private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
+    private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
     private final Class<? extends Log> mLogClass;
 
@@ -113,7 +113,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      */
     ServiceRoutine(@Nonnull final Context context,
             @Nullable final Class<? extends RoutineService> serviceClass,
-            @Nonnull final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
+            @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
             @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
             @Nullable final Class<? extends Runner> runnerClass,
@@ -258,7 +258,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private final Object[] mInvocationArgs;
 
-        private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
+        private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
         private final boolean mIsParallel;
 
@@ -306,7 +306,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          */
         private ServiceChannel(boolean isParallel, @Nonnull final Context context,
                 @Nonnull final Class<? extends RoutineService> serviceClass,
-                @Nonnull Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
+                @Nonnull Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
                 @Nonnull final Object[] invocationArgs,
                 @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
                 @Nullable final Class<? extends Runner> runnerClass,
@@ -666,7 +666,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      */
     private static class SyncInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
-        private final AndroidInvocation<INPUT, OUTPUT> mInvocation;
+        private final ContextInvocation<INPUT, OUTPUT> mInvocation;
 
         /**
          * Constructor.
@@ -682,11 +682,11 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          *                                                     invocation instantiation.
          */
         public SyncInvocation(@Nonnull final Context context,
-                @Nonnull final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
+                @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
                 @Nonnull final Object[] args) throws IllegalAccessException,
                 InvocationTargetException, InstantiationException {
 
-            final AndroidInvocation<INPUT, OUTPUT> invocation =
+            final ContextInvocation<INPUT, OUTPUT> invocation =
                     findConstructor(invocationClass, args).newInstance(args);
             invocation.onContext(context);
             mInvocation = invocation;

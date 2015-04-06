@@ -17,7 +17,7 @@ import android.content.Context;
 
 import com.gh.bmd.jrt.android.builder.InvocationServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ObjectServiceRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -97,7 +97,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
     @Nonnull
     public static <INPUT, OUTPUT> InvocationServiceRoutineBuilder<INPUT, OUTPUT> onService(
             @Nonnull final Context context,
-            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         return new DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken);
     }

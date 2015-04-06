@@ -13,22 +13,26 @@
  */
 package com.gh.bmd.jrt.android.invocation;
 
-import com.gh.bmd.jrt.channel.ResultChannel;
+import android.content.Context;
+
+import com.gh.bmd.jrt.invocation.Invocation;
 
 import javax.annotation.Nonnull;
 
 /**
- * Implementation of an invocation simply passing on the input data.
+ * Interface defining an invocation aware of the specific Android context.
  * <p/>
- * Created by davide on 1/12/14.
+ * Created by davide on 1/8/15.
  *
- * @param <DATA> the data type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
-public class AndroidPassingInvocation<DATA> extends AndroidTemplateInvocation<DATA, DATA> {
+public interface ContextInvocation<INPUT, OUTPUT> extends Invocation<INPUT, OUTPUT> {
 
-    @Override
-    public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {
-
-        result.pass(input);
-    }
+    /**
+     * Called right after the instantiation to specify the invocation context.
+     *
+     * @param context the context of the invocation.
+     */
+    void onContext(@Nonnull Context context);
 }

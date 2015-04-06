@@ -19,10 +19,10 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
-import com.gh.bmd.jrt.android.routine.AndroidRoutine;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -54,8 +54,8 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
-        implements AndroidRoutine<INPUT, OUTPUT> {
+class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
+        implements ContextRoutine<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 
@@ -63,7 +63,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
     private final ClashResolution mClashResolution;
 
-    private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> mConstructor;
 
     private final WeakReference<Object> mContext;
 
@@ -86,10 +86,10 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
      *                                            null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultAndroidRoutine(@Nonnull final RoutineConfiguration configuration,
+    DefaultContextRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final WeakReference<Object> context, final int invocationId,
             @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
-            @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor,
+            @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args) {
 
         super(configuration);
@@ -128,7 +128,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         if (context.get() != null) {
 
-            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+            final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
                     mConstructor.getDeclaringClass();
             Runners.mainRunner()
                    .run(new PurgeExecution(context, mInvocationId, invocationClass, mArgs), 0,
@@ -197,10 +197,10 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         try {
 
-            final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor =
+            final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor =
                     mConstructor;
             logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-            final AndroidInvocation<INPUT, OUTPUT> invocation = constructor.newInstance(mArgs);
+            final ContextInvocation<INPUT, OUTPUT> invocation = constructor.newInstance(mArgs);
             invocation.onContext(appContext);
             return invocation;
 
@@ -222,7 +222,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         if (context.get() != null) {
 
-            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+            final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
                     mConstructor.getDeclaringClass();
             final List<INPUT> inputList = Collections.singletonList(input);
             final PurgeInputsExecution<INPUT> execution =
@@ -238,7 +238,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         if (context.get() != null) {
 
-            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+            final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
                     mConstructor.getDeclaringClass();
             final List<INPUT> inputList =
                     (inputs == null) ? Collections.<INPUT>emptyList() : Arrays.asList(inputs);
@@ -271,7 +271,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
                 }
             }
 
-            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+            final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
                     mConstructor.getDeclaringClass();
             final PurgeInputsExecution<INPUT> execution =
                     new PurgeInputsExecution<INPUT>(context, mInvocationId, invocationClass, mArgs,

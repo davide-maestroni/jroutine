@@ -17,7 +17,7 @@ import android.content.Context;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.builder.ObjectServiceRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
 import com.gh.bmd.jrt.android.service.FactoryRoutineService;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.annotation.Bind;
@@ -486,7 +486,7 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
      * @param <OUTPUT> the output data type.
      */
     private static class BoundMethodInvocation<INPUT, OUTPUT>
-            extends AndroidSingleCallInvocation<INPUT, OUTPUT> {
+            extends ContextSingleCallInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -553,7 +553,7 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
      * @param <OUTPUT> the output data type.
      */
     private static class MethodSignatureInvocation<INPUT, OUTPUT>
-            extends AndroidSingleCallInvocation<INPUT, OUTPUT> {
+            extends ContextSingleCallInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -622,7 +622,7 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends AndroidSingleCallInvocation<Object, Object> {
+    private static class ProxyInvocation extends ContextSingleCallInvocation<Object, Object> {
 
         private final Object[] mArgs;
 

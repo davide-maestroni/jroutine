@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.android.v4.core;
 
 import com.gh.bmd.jrt.android.builder.InvocationMissingException;
-import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class MissingLoaderInvocation<INPUT, OUTPUT> extends AndroidTemplateInvocation<INPUT, OUTPUT>
+class MissingLoaderInvocation<INPUT, OUTPUT> extends ContextTemplateInvocation<INPUT, OUTPUT>
         implements InvocationFactory<INPUT, OUTPUT> {
 
     private static final MissingLoaderInvocation<Object, Object> sInvocation =

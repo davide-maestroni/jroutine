@@ -17,7 +17,7 @@ import android.content.Context;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.builder.InvocationServiceRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
@@ -44,7 +44,7 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
 
     private final Context mContext;
 
-    private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
+    private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
     private Object[] mArgs = Reflection.NO_ARGS;
 
@@ -65,7 +65,7 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
      */
     @SuppressWarnings("ConstantConditions")
     DefaultInvocationServiceRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         if (context == null) {
 

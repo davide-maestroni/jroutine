@@ -11,14 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v4.core;
+package com.gh.bmd.jrt.android.v11.core;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Fragment;
+import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
-import com.gh.bmd.jrt.android.routine.AndroidRoutine;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
@@ -45,12 +47,13 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
-        implements AndroidRoutineBuilder<INPUT, OUTPUT> {
+@TargetApi(VERSION_CODES.HONEYCOMB)
+class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
+        implements ContextRoutineBuilder<INPUT, OUTPUT> {
 
     private final WeakReference<Object> mContext;
 
-    private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
+    private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
     private Object[] mArgs = Reflection.NO_ARGS;
 
@@ -58,7 +61,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     private ClashResolution mClashResolution;
 
-    private int mInvocationId = AndroidRoutineBuilder.AUTO;
+    private int mInvocationId = ContextRoutineBuilder.AUTO;
 
     /**
      * Constructor.
@@ -67,8 +70,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @param classToken the invocation class token.
      * @throws java.lang.NullPointerException if the activity or class token are null.
      */
-    DefaultAndroidRoutineBuilder(@Nonnull final FragmentActivity activity,
-            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+    DefaultContextRoutineBuilder(@Nonnull final Activity activity,
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) activity, classToken);
     }
@@ -80,8 +83,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @param classToken the invocation class token.
      * @throws java.lang.NullPointerException if the fragment or class token are null.
      */
-    DefaultAndroidRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+    DefaultContextRoutineBuilder(@Nonnull final Fragment fragment,
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) fragment, classToken);
     }
@@ -94,8 +97,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @throws java.lang.NullPointerException if the context or class token are null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultAndroidRoutineBuilder(@Nonnull final Object context,
-            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+    private DefaultContextRoutineBuilder(@Nonnull final Object context,
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         if (context == null) {
 
@@ -107,7 +110,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public AndroidRoutine<INPUT, OUTPUT> buildRoutine() {
+    public ContextRoutine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = getConfiguration();
         warn(configuration);
@@ -119,15 +122,15 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
                                              .withOutputSize(Integer.MAX_VALUE)
                                              .withOutputTimeout(TimeDuration.INFINITY);
         final Object[] args = mArgs;
-        final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor =
+        final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor =
                 findConstructor(mInvocationClass, args);
-        return new DefaultAndroidRoutine<INPUT, OUTPUT>(builder.buildConfiguration(), mContext,
+        return new DefaultContextRoutine<INPUT, OUTPUT>(builder.buildConfiguration(), mContext,
                                                         mInvocationId, mClashResolution,
                                                         mCacheStrategy, constructor, args);
     }
 
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(
+    public ContextRoutineBuilder<INPUT, OUTPUT> onClash(
             @Nullable final ClashResolution resolution) {
 
         mClashResolution = resolution;
@@ -135,7 +138,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(
+    public ContextRoutineBuilder<INPUT, OUTPUT> onComplete(
             @Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
@@ -143,14 +146,14 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
+    public ContextRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
     }
 
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withId(final int invocationId) {
+    public ContextRoutineBuilder<INPUT, OUTPUT> withId(final int invocationId) {
 
         mInvocationId = invocationId;
         return this;
@@ -179,7 +182,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     @Nonnull
     @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public ContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         super.withConfiguration(configuration);

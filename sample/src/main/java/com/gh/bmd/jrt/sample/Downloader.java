@@ -15,8 +15,8 @@ package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.Invocations;
-import com.gh.bmd.jrt.routine.JRoutine;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
 

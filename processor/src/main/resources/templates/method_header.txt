@@ -27,14 +27,15 @@
                 return new Invocation${methodCount}();
             }
         };
-
-        return com.gh.bmd.jrt.routine.JRoutine.on(factory)
-                                       .withConfiguration(com.gh.bmd.jrt.builder.RoutineConfiguration.builderFrom(configuration)
-                                           ${routineBuilderOptions}
-                                           .withInputSize(Integer.MAX_VALUE)
-                                           .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                                           .withOutputSize(Integer.MAX_VALUE)
-                                           .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                                           .buildConfiguration())
-                                       .buildRoutine();
+        final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration =
+                configuration.builderFrom()
+                             ${routineBuilderOptions}
+                             .withInputSize(Integer.MAX_VALUE)
+                             .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                             .withOutputSize(Integer.MAX_VALUE)
+                             .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                             .buildConfiguration();
+        return com.gh.bmd.jrt.core.JRoutine.on(factory)
+                                           .withConfiguration(routineConfiguration)
+                                           .buildRoutine();
     }

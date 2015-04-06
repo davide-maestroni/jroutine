@@ -17,8 +17,8 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
 import com.gh.bmd.jrt.channel.Channels.Selectable;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
-import com.gh.bmd.jrt.routine.JRoutine;
 import com.gh.bmd.jrt.routine.Routine;
 
 import org.junit.Test;

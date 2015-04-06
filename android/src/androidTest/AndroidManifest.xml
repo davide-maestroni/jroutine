@@ -4,23 +4,23 @@
     <application
         android:label="@string/lib_name">
         <activity
-            android:name="com.gh.bmd.jrt.android.routine.TestActivity"
+            android:name="com.gh.bmd.jrt.android.core.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v11.routine.TestActivity"
+            android:name="com.gh.bmd.jrt.android.v11.core.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v11.routine.RotationTestActivity"
+            android:name="com.gh.bmd.jrt.android.v11.core.RotationTestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v4.routine.TestActivity"
+            android:name="com.gh.bmd.jrt.android.v4.core.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v4.routine.RotationTestActivity"
+            android:name="com.gh.bmd.jrt.android.v4.core.RotationTestActivity"
             android:label="test">
         </activity>
 
@@ -28,7 +28,7 @@
             android:name="com.gh.bmd.jrt.android.service.RoutineService"
             android:process=":remote"/>
         <service
-            android:name="com.gh.bmd.jrt.android.routine.TestService"
+            android:name="com.gh.bmd.jrt.android.core.TestService"
             android:process=":remote"/>
     </application>
 

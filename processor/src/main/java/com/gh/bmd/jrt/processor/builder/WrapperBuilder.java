@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.routine.SharableBuilder;
+import com.gh.bmd.jrt.builder.SharableBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

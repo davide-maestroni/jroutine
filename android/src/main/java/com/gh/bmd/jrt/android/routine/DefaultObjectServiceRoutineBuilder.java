@@ -742,10 +742,10 @@ class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineB
 
                 } else {
 
-                    expectedType = targetMethod.getReturnType();
+                    expectedType = method.getReturnType();
                 }
 
-                if (!expectedType.isAssignableFrom(method.getReturnType())) {
+                if (!returnType.isAssignableFrom(expectedType)) {
 
                     throw new IllegalArgumentException(
                             "the proxy method has incompatible return type: " + method);

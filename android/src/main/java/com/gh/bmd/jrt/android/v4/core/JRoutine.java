@@ -16,8 +16,9 @@ package com.gh.bmd.jrt.android.v4.core;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.ContextChannelBuilder;
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.common.ClassToken;
 
@@ -149,11 +150,11 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @throws java.lang.NullPointerException     if the specified activity or class token are null.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onActivity(
+    public static <INPUT, OUTPUT> InvocationContextRoutineBuilder<INPUT, OUTPUT> onActivity(
             @Nonnull final FragmentActivity activity,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
-        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(activity, classToken);
+        return new DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>(activity, classToken);
     }
 
     /**
@@ -170,7 +171,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @throws java.lang.NullPointerException     if the specified activity is null.
      */
     @Nonnull
-    public static ContextChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
+    public static InvocationContextChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
             final int invocationId) {
 
         if (invocationId == ContextRoutineBuilder.AUTO) {
@@ -178,7 +179,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultContextChannelBuilder(activity, invocationId);
+        return new DefaultInvocationContextChannelBuilder(activity, invocationId);
     }
 
     /**
@@ -198,11 +199,11 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @throws java.lang.NullPointerException     if the specified fragment or class token are null.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onFragment(
+    public static <INPUT, OUTPUT> InvocationContextRoutineBuilder<INPUT, OUTPUT> onFragment(
             @Nonnull final Fragment fragment,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
-        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
+        return new DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
     }
 
     /**
@@ -219,7 +220,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @throws java.lang.NullPointerException     if the specified fragment is null.
      */
     @Nonnull
-    public static ContextChannelBuilder onFragment(@Nonnull final Fragment fragment,
+    public static InvocationContextChannelBuilder onFragment(@Nonnull final Fragment fragment,
             final int invocationId) {
 
         if (invocationId == ContextRoutineBuilder.AUTO) {
@@ -227,6 +228,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultContextChannelBuilder(fragment, invocationId);
+        return new DefaultInvocationContextChannelBuilder(fragment, invocationId);
     }
 }

@@ -17,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -45,8 +46,9 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
-        implements ContextRoutineBuilder<INPUT, OUTPUT> {
+class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
+        extends TemplateRoutineBuilder<INPUT, OUTPUT>
+        implements InvocationContextRoutineBuilder<INPUT, OUTPUT> {
 
     private final WeakReference<Object> mContext;
 
@@ -67,7 +69,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @param classToken the invocation class token.
      * @throws java.lang.NullPointerException if the activity or class token are null.
      */
-    DefaultContextRoutineBuilder(@Nonnull final FragmentActivity activity,
+    DefaultInvocationContextRoutineBuilder(@Nonnull final FragmentActivity activity,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) activity, classToken);
@@ -80,7 +82,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @param classToken the invocation class token.
      * @throws java.lang.NullPointerException if the fragment or class token are null.
      */
-    DefaultContextRoutineBuilder(@Nonnull final Fragment fragment,
+    DefaultInvocationContextRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) fragment, classToken);
@@ -94,7 +96,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @throws java.lang.NullPointerException if the context or class token are null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultContextRoutineBuilder(@Nonnull final Object context,
+    private DefaultInvocationContextRoutineBuilder(@Nonnull final Object context,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         if (context == null) {
@@ -127,7 +129,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ContextRoutineBuilder<INPUT, OUTPUT> onClash(
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(
             @Nullable final ClashResolution resolution) {
 
         mClashResolution = resolution;
@@ -135,7 +137,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ContextRoutineBuilder<INPUT, OUTPUT> onComplete(
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> onComplete(
             @Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
@@ -143,14 +145,14 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ContextRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
     }
 
     @Nonnull
-    public ContextRoutineBuilder<INPUT, OUTPUT> withId(final int invocationId) {
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withId(final int invocationId) {
 
         mInvocationId = invocationId;
         return this;
@@ -179,7 +181,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     @Nonnull
     @Override
-    public ContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         super.withConfiguration(configuration);

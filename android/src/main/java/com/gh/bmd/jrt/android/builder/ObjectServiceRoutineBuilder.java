@@ -52,6 +52,9 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
     @Nonnull
     ObjectServiceRoutineBuilder withRunnerClass(@Nullable Class<? extends Runner> runnerClass);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ObjectServiceRoutineBuilder withServiceClass(
             @Nullable Class<? extends RoutineService> serviceClass);

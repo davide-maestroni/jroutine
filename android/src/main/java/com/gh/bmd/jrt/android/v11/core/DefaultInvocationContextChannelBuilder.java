@@ -18,10 +18,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.ContextChannelBuilder;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
  * Created by davide on 1/14/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class DefaultContextChannelBuilder implements ContextChannelBuilder {
+class DefaultInvocationContextChannelBuilder implements InvocationContextChannelBuilder {
 
     private final WeakReference<Object> mContext;
 
@@ -61,7 +61,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
      * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the activity is null.
      */
-    DefaultContextChannelBuilder(@Nonnull final Activity activity, final int invocationId) {
+    DefaultInvocationContextChannelBuilder(@Nonnull final Activity activity, final int invocationId) {
 
         this((Object) activity, invocationId);
     }
@@ -73,7 +73,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
      * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the fragment is null.
      */
-    DefaultContextChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
+    DefaultInvocationContextChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
 
         this((Object) fragment, invocationId);
     }
@@ -86,7 +86,8 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
      * @throws java.lang.NullPointerException if the context is null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultContextChannelBuilder(@Nonnull final Object context, final int invocationId) {
+    private DefaultInvocationContextChannelBuilder(@Nonnull final Object context,
+            final int invocationId) {
 
         if (context == null) {
 
@@ -107,7 +108,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
             return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf()).callSync();
         }
 
-        final ContextRoutineBuilder<OUTPUT, OUTPUT> builder;
+        final InvocationContextRoutineBuilder<OUTPUT, OUTPUT> builder;
 
         if (context instanceof Activity) {
 
@@ -134,7 +135,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
     }
 
     @Nonnull
-    public ContextChannelBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
+    public InvocationContextChannelBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
         return this;
@@ -158,7 +159,8 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
         if (context.get() != null) {
 
             final List<Object> inputList = Collections.singletonList(input);
-            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -171,7 +173,8 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
 
             final List<Object> inputList =
                     (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
-            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -198,13 +201,14 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder {
                 }
             }
 
-            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
 
     @Nonnull
-    public ContextChannelBuilder withConfiguration(
+    public InvocationContextChannelBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;

@@ -13,10 +13,6 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.routine.ContextRoutine;
-import com.gh.bmd.jrt.builder.RoutineBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -36,35 +32,14 @@ import javax.annotation.Nullable;
  * implementations, a user defined ID or the <code>ABORT_THAT</code> clash resolution should be used
  * to avoid unexpected results.
  * <p/>
- * Created by davide on 12/9/14.
- *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * Created by Davide on 4/6/2015.
  */
-public interface ContextRoutineBuilder<INPUT, OUTPUT>
-        extends RoutineBuilder<INPUT, OUTPUT>, ContextRoutine<INPUT, OUTPUT> {
+public interface ContextRoutineBuilder {
 
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.
      */
     int AUTO = Integer.MIN_VALUE;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ContextRoutine<INPUT, OUTPUT> buildRoutine();
-
-    /**
-     * Note that all the options related to the output and input channels size and timeout will be
-     * ignored.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
-     */
-    @Nonnull
-    ContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
-            @Nullable RoutineConfiguration configuration);
 
     /**
      * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
@@ -75,7 +50,7 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder<INPUT, OUTPUT> onClash(@Nullable ClashResolution resolution);
+    ContextRoutineBuilder onClash(@Nullable ClashResolution resolution);
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
@@ -85,7 +60,7 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
+    ContextRoutineBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
      * Sets the arguments to be passed to the invocation constructor.
@@ -97,7 +72,7 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable Object... args);
+    ContextRoutineBuilder withArgs(@Nullable Object... args);
 
     /**
      * Tells the builder to identify the invocation with the specified ID.
@@ -106,7 +81,7 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder<INPUT, OUTPUT> withId(int invocationId);
+    ContextRoutineBuilder withId(int invocationId);
 
     /**
      * Result cache type enumeration.<br/>

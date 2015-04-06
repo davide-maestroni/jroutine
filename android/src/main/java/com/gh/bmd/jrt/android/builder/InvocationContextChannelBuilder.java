@@ -28,9 +28,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 1/14/15.
  *
- * @see ContextRoutineBuilder
+ * @see InvocationContextRoutineBuilder
  */
-public interface ContextChannelBuilder extends ConfigurableBuilder {
+public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
 
     /**
      * Builds and returns an output channel bound to the routine invocation.
@@ -48,7 +48,7 @@ public interface ContextChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ContextChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
+    InvocationContextChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
      * Makes the builder destroy all the cached invocation instances.
@@ -83,5 +83,5 @@ public interface ContextChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ContextChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    InvocationContextChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

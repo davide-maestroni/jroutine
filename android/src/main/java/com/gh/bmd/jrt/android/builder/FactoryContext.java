@@ -11,40 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.service;
-
-import com.gh.bmd.jrt.log.Log;
-import com.gh.bmd.jrt.log.Log.LogLevel;
+package com.gh.bmd.jrt.android.builder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Service providing wrapped object instances, whose methods are to be called inside asynchronous
- * invocations.
+ * Interface defining a factory providing wrapped object instances, whose methods are to be called
+ * inside asynchronous invocations.
  * <p/>
- * Created by Davide on 4/4/2015.
+ * Created by Davide on 4/6/2015.
  */
-public abstract class FactoryRoutineService extends RoutineService {
-
-    /**
-     * Constructor.
-     */
-    public FactoryRoutineService() {
-
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param log      the log instance.
-     * @param logLevel the log level.
-     */
-    @SuppressWarnings("unused")
-    public FactoryRoutineService(@Nullable final Log log, @Nullable final LogLevel logLevel) {
-
-        super(log, logLevel);
-    }
+public interface FactoryContext {
 
     /**
      * Returns an instance of the object described by the specified parameters.<br/>
@@ -57,6 +35,6 @@ public abstract class FactoryRoutineService extends RoutineService {
      * @return the object instance.
      */
     @Nullable
-    public abstract <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
+    <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
             @Nonnull final Object... args);
 }

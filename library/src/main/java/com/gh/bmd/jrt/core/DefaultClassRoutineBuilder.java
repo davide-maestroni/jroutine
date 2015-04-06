@@ -350,7 +350,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     protected void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
-
         final OrderType inputOrder = configuration.getInputOrderOr(null);
 
         if (inputOrder != null) {

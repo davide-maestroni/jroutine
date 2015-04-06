@@ -106,18 +106,17 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * Returns a builder of routines running in a service based on the specified context, wrapping
      * the specified object instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.service.FactoryRoutineService} as the invocation context.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
      *
-     * @param context    the routine context.
-     * @param classToken the wrapped object class.
-     * @param <TYPE>     the wrapped object type.
+     * @param context     the routine context.
+     * @param targetClass the wrapped object class.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
-    public static <TYPE> ObjectServiceRoutineBuilder onService(@Nonnull final Context context,
-            @Nonnull final Class<TYPE> classToken) {
+    public static ObjectServiceRoutineBuilder onService(@Nonnull final Context context,
+            @Nonnull final Class<?> targetClass) {
 
-        return new DefaultObjectServiceRoutineBuilder<TYPE>(context, classToken);
+        return new DefaultObjectServiceRoutineBuilder(context, targetClass);
     }
 }

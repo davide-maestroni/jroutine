@@ -13,7 +13,8 @@
  */
 package com.gh.bmd.jrt.android.core;
 
-import com.gh.bmd.jrt.android.service.FactoryRoutineService;
+import com.gh.bmd.jrt.android.builder.FactoryContext;
+import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 
@@ -29,12 +30,11 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * <p/>
  * Created by davide on 1/16/15.
  */
-public class TestService extends FactoryRoutineService {
+public class TestService extends RoutineService implements FactoryContext {
 
     private static final HashMap<Class<?>, Object> sInstanceMap = new HashMap<Class<?>, Object>();
 
     @Nullable
-    @Override
     @SuppressWarnings("unchecked")
     public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
             @Nonnull final Object... args) {

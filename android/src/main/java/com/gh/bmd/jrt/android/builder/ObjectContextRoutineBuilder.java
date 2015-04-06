@@ -20,7 +20,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * TODO
+ * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * <p/>
+ * The single methods can be accessed via reflection or the whole instance can be proxied through
+ * an interface.
  * <p/>
  * Created by Davide on 4/6/2015.
  */
@@ -51,7 +54,7 @@ public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, Obje
     ObjectContextRoutineBuilder withId(int invocationId);
 
     /**
-     * TODO
+     * {@inheritDoc}
      */
     @Nonnull
     ObjectContextRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);

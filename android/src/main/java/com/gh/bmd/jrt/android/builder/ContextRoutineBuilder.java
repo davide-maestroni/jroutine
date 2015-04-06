@@ -65,7 +65,10 @@ public interface ContextRoutineBuilder {
     /**
      * Sets the arguments to be passed to the invocation constructor.
      * <p/>
-     * Note that, the specified object will be retained, so, they should be immutable or never
+     * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the invocation
+     * constructor arguments, might be employed to check for clashing of invocations or compute the
+     * invocation ID.<br/>
+     * Note also that, the specified objects will be retained, so, they should be immutable or never
      * change their internal state in order to avoid concurrency issues.
      *
      * @param args the arguments.

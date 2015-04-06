@@ -67,6 +67,17 @@ public class ObjectServiceRoutineBuilderTest
         super(TestActivity.class);
     }
 
+    public void testArgs() {
+
+        assertThat(JRoutine.onService(getActivity(), TestArgs.class)
+                           .withArgs(17)
+                           .dispatchingOn(Looper.getMainLooper())
+                           .method("getId")
+                           .callAsync()
+                           .eventually()
+                           .readNext()).isEqualTo(17);
+    }
+
     public void testAsyncInputProxyRoutine() {
 
         final TimeDuration timeout = seconds(1);
@@ -1467,6 +1478,22 @@ public class ObjectServiceRoutineBuilderTest
             }
 
             return s;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TestArgs {
+
+        private final int mId;
+
+        public TestArgs(final int id) {
+
+            mId = id;
+        }
+
+        public int getId() {
+
+            return mId;
         }
     }
 

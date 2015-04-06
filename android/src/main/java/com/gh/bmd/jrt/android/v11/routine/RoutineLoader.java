@@ -49,6 +49,8 @@ import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
 
+    private final Object[] mArgs;
+
     private final List<? extends INPUT> mInputs;
 
     private final AndroidInvocation<INPUT, OUTPUT> mInvocation;
@@ -66,6 +68,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      *
      * @param context    used to retrieve the application context.
      * @param invocation the invocation instance.
+     * @param args       the invocation constructor arguments.
      * @param inputs     the input data.
      * @param order      the data order.
      * @param logger     the logger instance.
@@ -74,8 +77,8 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
             @Nonnull final AndroidInvocation<INPUT, OUTPUT> invocation,
-            @Nonnull final List<? extends INPUT> inputs, @Nullable final OrderType order,
-            @Nonnull final Logger logger) {
+            @Nonnull final Object[] args, @Nonnull final List<? extends INPUT> inputs,
+            @Nullable final OrderType order, @Nonnull final Logger logger) {
 
         super(context);
 
@@ -84,12 +87,19 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             throw new NullPointerException("the invocation instance must not be null");
         }
 
+        if (args == null) {
+
+            throw new NullPointerException(
+                    "the invocation constructor array of arguments must not be null");
+        }
+
         if (inputs == null) {
 
             throw new NullPointerException("the list of input data must not be null");
         }
 
         mInvocation = invocation;
+        mArgs = args;
         mInputs = inputs;
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
@@ -213,6 +223,17 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         logger.dbg("reading invocation results");
         channel.close();
         return consumer.createResult();
+    }
+
+    /**
+     * Gets the constructor arguments of this loader invocation.
+     *
+     * @return the array of arguments.
+     */
+    @Nonnull
+    Object[] getInvocationArgs() {
+
+        return mArgs;
     }
 
     /**

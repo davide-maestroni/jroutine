@@ -30,7 +30,8 @@ import javax.annotation.Nullable;
  * The local context of the invocations will always be the application one.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
- * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
+ * and constructor argument objects might be employed to check for clashing of invocations or
+ * compute the invocation ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or the <code>ABORT_THAT</code> clash resolution should be used
  * to avoid unexpected results.
@@ -85,6 +86,18 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT>
      */
     @Nonnull
     AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
+
+    /**
+     * Sets the arguments to be passed to the invocation constructor.
+     * <p/>
+     * Note that, the specified object will be retained, so, they should be immutable or never
+     * change their internal state in order to avoid concurrency issues.
+     *
+     * @param args the arguments.
+     * @return this builder.
+     */
+    @Nonnull
+    AndroidRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable Object... args);
 
     /**
      * Tells the builder to identify the invocation with the specified ID.

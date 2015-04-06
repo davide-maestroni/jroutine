@@ -24,6 +24,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -47,9 +48,11 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements AndroidRoutineBuilder<INPUT, OUTPUT> {
 
-    private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
-
     private final WeakReference<Object> mContext;
+
+    private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
+
+    private Object[] mArgs = Reflection.NO_ARGS;
 
     private CacheStrategy mCacheStrategy;
 
@@ -100,7 +103,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         }
 
         mContext = new WeakReference<Object>(context);
-        mConstructor = findConstructor(classToken.getRawClass());
+        mInvocationClass = classToken.getRawClass();
     }
 
     @Nonnull
@@ -115,9 +118,12 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
                                              .withInputTimeout(TimeDuration.INFINITY)
                                              .withOutputSize(Integer.MAX_VALUE)
                                              .withOutputTimeout(TimeDuration.INFINITY);
+        final Object[] args = mArgs;
+        final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor =
+                findConstructor(mInvocationClass, args);
         return new DefaultAndroidRoutine<INPUT, OUTPUT>(builder.buildConfiguration(), mContext,
                                                         mInvocationId, mClashResolution,
-                                                        mCacheStrategy, mConstructor);
+                                                        mCacheStrategy, constructor, args);
     }
 
     @Nonnull
@@ -133,6 +139,13 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
             @Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
+        return this;
+    }
+
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
+
+        mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
     }
 

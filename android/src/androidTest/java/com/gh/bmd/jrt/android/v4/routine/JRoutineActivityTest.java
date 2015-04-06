@@ -37,6 +37,7 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -292,7 +293,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class));
+            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class))
+                    .buildRoutine();
 
             fail();
 
@@ -752,7 +754,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class));
+            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class))
+                    .buildRoutine();
 
             fail();
 
@@ -1009,8 +1012,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP_THAT,
                                                  CacheStrategy.CACHE,
-                                                 ToUpperCase.class.getDeclaredConstructor(), null,
-                                                 logger);
+                                                 ToUpperCase.class.getDeclaredConstructor(),
+                                                 Reflection.NO_ARGS, null, logger);
 
             fail();
 
@@ -1020,8 +1023,22 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP_THAT, null,
-                                                 null, null, logger);
+            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP_THAT,
+                                                 CacheStrategy.CACHE, null, Reflection.NO_ARGS,
+                                                 null, logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP_THAT,
+                                                 CacheStrategy.CACHE,
+                                                 ToUpperCase.class.getDeclaredConstructor(), null,
+                                                 null, logger);
 
             fail();
 
@@ -1033,8 +1050,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP_THAT,
                                                  CacheStrategy.CACHE,
-                                                 ToUpperCase.class.getDeclaredConstructor(), null,
-                                                 null);
+                                                 ToUpperCase.class.getDeclaredConstructor(),
+                                                 Reflection.NO_ARGS, null, null);
 
             fail();
 
@@ -1052,7 +1069,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             new DefaultAndroidRoutine<String, String>(null, reference, 0, ClashResolution.KEEP_THAT,
                                                       CacheStrategy.CACHE,
-                                                      ToUpperCase.class.getDeclaredConstructor());
+                                                      ToUpperCase.class.getDeclaredConstructor(),
+                                                      Reflection.NO_ARGS);
 
             fail();
 
@@ -1065,7 +1083,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
                                                       null, 0, ClashResolution.KEEP_THAT,
                                                       CacheStrategy.CACHE,
-                                                      ToUpperCase.class.getDeclaredConstructor());
+                                                      ToUpperCase.class.getDeclaredConstructor(),
+                                                      Reflection.NO_ARGS);
 
             fail();
 
@@ -1077,6 +1096,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
                                                       reference, 0, ClashResolution.KEEP_THAT, null,
+                                                      null, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                      reference, 0, ClashResolution.KEEP_THAT, null,
+                                                      ToUpperCase.class.getDeclaredConstructor(),
                                                       null);
 
             fail();

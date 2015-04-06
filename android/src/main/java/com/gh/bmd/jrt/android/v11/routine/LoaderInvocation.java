@@ -46,8 +46,10 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -74,6 +76,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             new WeakIdentityHashMap<Object,
                     SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>();
 
+    private final Object[] mArgs;
+
     private final CacheStrategy mCacheStrategy;
 
     private final ClashResolution mClashResolution;
@@ -96,6 +100,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * @param resolution    the clash resolution type.
      * @param cacheStrategy the result cache type.
      * @param constructor   the invocation constructor.
+     * @param args          the invocation constructor arguments.
      * @param order         the input data order.
      * @param logger        the logger instance.
      * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
@@ -104,7 +109,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
             @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
             @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor,
-            @Nullable final OrderType order, @Nonnull final Logger logger) {
+            @Nonnull final Object[] args, @Nullable final OrderType order,
+            @Nonnull final Logger logger) {
 
         if (context == null) {
 
@@ -116,11 +122,18 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             throw new NullPointerException("the invocation constructor must not be null");
         }
 
+        if (args == null) {
+
+            throw new NullPointerException(
+                    "the invocation constructor array of arguments must not be null");
+        }
+
         mContext = context;
         mLoaderId = loaderId;
         mClashResolution = (resolution == null) ? ClashResolution.ABORT_THAT_INPUT : resolution;
         mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
         mConstructor = constructor;
+        mArgs = args;
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }
@@ -195,11 +208,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * @param context         the context.
      * @param loaderId        the loader ID.
      * @param invocationClass the invocation class.
+     * @param invocationArgs  the invocation constructor arguments.
      * @param inputs          the invocation inputs.
      */
     @SuppressWarnings("unchecked")
     static void purgeLoader(@Nonnull final Object context, final int loaderId,
-            @Nonnull final Class<?> invocationClass, @Nonnull final List<?> inputs) {
+            @Nonnull final Class<?> invocationClass, @Nonnull final Object[] invocationArgs,
+            @Nonnull final List<?> inputs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -242,7 +257,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             final RoutineLoader<Object, Object> loader =
                     (RoutineLoader<Object, Object>) callbacks.mLoader;
 
-            if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
+            if ((loader.getInvocationType() == invocationClass) && Arrays.equals(
+                    loader.getInvocationArgs(), invocationArgs) && (loader.getInvocationCount()
                     == 0)) {
 
                 final int id = callbackArray.keyAt(i);
@@ -340,9 +356,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * @param context         the context.
      * @param loaderId        the loader ID.
      * @param invocationClass the invocation class.
+     * @param invocationArgs  the invocation constructor arguments.
      */
     static void purgeLoaders(@Nonnull final Object context, final int loaderId,
-            @Nonnull final Class<?> invocationClass) {
+            @Nonnull final Class<?> invocationClass, @Nonnull final Object[] invocationArgs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -384,7 +401,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<?, ?> loader = callbacks.mLoader;
 
-            if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
+            if ((loader.getInvocationType() == invocationClass) && Arrays.equals(
+                    loader.getInvocationArgs(), invocationArgs) && (loader.getInvocationCount()
                     == 0)) {
 
                 final int id = callbackArray.keyAt(i);
@@ -404,6 +422,29 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             sCallbackMap.remove(context);
         }
+    }
+
+    private static int recursiveHashCode(@Nullable final Object object) {
+
+        if (object == null) {
+
+            return 0;
+        }
+
+        if (object.getClass().isArray()) {
+
+            int hashCode = 0;
+            final int length = Array.getLength(object);
+
+            for (int i = 0; i < length; i++) {
+
+                hashCode = 31 * hashCode + recursiveHashCode(Array.get(object, i));
+            }
+
+            return hashCode;
+        }
+
+        return object.hashCode();
     }
 
     @Override
@@ -449,7 +490,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         if (loaderId == AndroidRoutineBuilder.AUTO) {
 
-            loaderId = 31 * mConstructor.getDeclaringClass().hashCode() + inputs.hashCode();
+            loaderId = mConstructor.getDeclaringClass().hashCode();
+
+            for (final Object arg : mArgs) {
+
+                loaderId = 31 * loaderId + recursiveHashCode(arg);
+            }
+
+            loaderId = 31 * loaderId + inputs.hashCode();
             logger.dbg("generating invocation ID: %d", loaderId);
         }
 
@@ -522,6 +570,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             @Nonnull final List<? extends INPUT> inputs, final int loaderId) {
 
         final Logger logger = mLogger;
+        final Object[] args = mArgs;
         final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor = mConstructor;
         final AndroidInvocation<INPUT, OUTPUT> invocation;
 
@@ -529,7 +578,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             logger.dbg("creating a new instance of class [%d]: %s", loaderId,
                        constructor.getDeclaringClass());
-            invocation = constructor.newInstance();
+            invocation = constructor.newInstance(args);
             invocation.onContext(loaderContext.getApplicationContext());
 
         } catch (final RoutineException e) {
@@ -544,8 +593,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         }
 
         final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
-                : new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, mOrderType,
-                                                   logger);
+                : new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, args, inputs,
+                                                   mOrderType, logger);
         return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
     }
 
@@ -573,7 +622,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                 mConstructor.getDeclaringClass();
 
         if ((new ClassToken<MissingLoaderInvocation<INPUT, OUTPUT>>() {}.getRawClass()
-                != invocationClass) && (routineLoader.getInvocationType() != invocationClass)) {
+                != invocationClass) && ((routineLoader.getInvocationType() != invocationClass)
+                || !Arrays.equals(routineLoader.getInvocationArgs(), mArgs))) {
 
             logger.wrn("clashing invocation ID [%d]: %s", loaderId,
                        routineLoader.getInvocationType().getCanonicalName());

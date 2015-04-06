@@ -57,7 +57,7 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
             @Nullable Class<? extends RoutineService> serviceClass);
 
     /**
-     * Sets the arguments to be passed to the constructor of the wrapped instance factory.
+     * Sets the arguments to be passed to the wrapped instance factory.
      * <p/>
      * Note that, like the object passed to the service routine input and output channels, the
      * specified arguments must comply with the {@link android.os.Parcel#writeValue(Object)} method.

@@ -546,10 +546,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
             try {
 
-                mRoutine = com.gh.bmd.jrt.android.core.JRoutine.on(
-                        getInstance(context, mTargetClass, mArgs))
-                                                               .withShareGroup(mShareGroup)
-                                                               .boundMethod(mBindingName);
+                mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
+                                   .withShareGroup(mShareGroup)
+                                   .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
 
@@ -620,11 +619,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
             try {
 
-                mRoutine = com.gh.bmd.jrt.android.core.JRoutine.on(
-                        getInstance(context, mTargetClass, mArgs))
-                                                               .withShareGroup(mShareGroup)
-                                                               .method(mMethodName,
-                                                                       mParameterTypes);
+                mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
+                                   .withShareGroup(mShareGroup)
+                                   .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
 

@@ -24,6 +24,7 @@ import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
 import com.gh.bmd.jrt.android.builder.InvocationMissingException;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextPassingInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
@@ -349,7 +350,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onActivity(getActivity(), null);
+            JRoutine.onActivity(getActivity(),
+                                (ClassToken<ContextInvocation<Object, Object>>) null);
 
             fail();
 
@@ -829,7 +831,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
-            JRoutine.onFragment(fragment, null);
+            JRoutine.onFragment(fragment, (ClassToken<ContextInvocation<Object, Object>>) null);
 
             fail();
 

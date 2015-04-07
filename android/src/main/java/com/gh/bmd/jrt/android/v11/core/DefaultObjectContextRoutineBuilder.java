@@ -11,15 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.core;
+package com.gh.bmd.jrt.android.v11.core;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
-import android.os.Looper;
 
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
-import com.gh.bmd.jrt.android.builder.ObjectServiceRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ObjectContextRoutineBuilder;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
-import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.ParamMode;
@@ -35,14 +38,12 @@ import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.common.RoutineException;
-import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.runner.Runner;
 
 import java.lang.annotation.Annotation;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -63,32 +64,56 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Class implementing a builder of routine objects based on methods of a concrete object instance.
  * <p/>
- * Created by davide on 3/29/15.
+ * Created by Davide on 4/6/2015.
  */
-class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder {
+class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder {
 
     private static final Object sFactoryMutex = new Object();
 
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
-    private final Context mContext;
+    private final WeakReference<Object> mContext;
 
     private final Class<?> mTargetClass;
 
     private Object[] mArgs = Reflection.NO_ARGS;
 
+    private CacheStrategy mCacheStrategy;
+
+    private ClashResolution mClashResolution;
+
     private RoutineConfiguration mConfiguration;
 
-    private Class<? extends Log> mLogClass;
-
-    private Looper mLooper;
-
-    private Class<? extends Runner> mRunnerClass;
-
-    private Class<? extends RoutineService> mServiceClass;
+    private int mInvocationId = ContextRoutineBuilder.AUTO;
 
     private String mShareGroup;
+
+    /**
+     * Constructor.
+     *
+     * @param activity    the context activity.
+     * @param targetClass the invocation class token.
+     * @throws java.lang.NullPointerException if the activity or class token are null.
+     */
+    DefaultObjectContextRoutineBuilder(@Nonnull final Activity activity,
+            @Nonnull final Class<?> targetClass) {
+
+        this((Object) activity, targetClass);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param fragment    the context fragment.
+     * @param targetClass the invocation class token.
+     * @throws java.lang.NullPointerException if the fragment or class token are null.
+     */
+    DefaultObjectContextRoutineBuilder(@Nonnull final Fragment fragment,
+            @Nonnull final Class<?> targetClass) {
+
+        this((Object) fragment, targetClass);
+    }
 
     /**
      * Constructor.
@@ -98,15 +123,15 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
      * @throws java.lang.NullPointerException if any of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultObjectServiceRoutineBuilder(@Nonnull final Context context,
+    private DefaultObjectContextRoutineBuilder(@Nonnull final Object context,
             @Nonnull final Class<?> targetClass) {
 
         if (context == null) {
 
-            throw new NullPointerException("the context must not be null");
+            throw new NullPointerException("the routine context must not be null");
         }
 
-        mContext = context;
+        mContext = new WeakReference<Object>(context);
         mTargetClass = targetClass;
         final HashSet<String> bindingSet = new HashSet<String>();
 
@@ -191,6 +216,31 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nonnull
+    private static <INPUT, OUTPUT> InvocationContextRoutineBuilder<INPUT, OUTPUT> getBuilder(
+            @Nonnull WeakReference<Object> contextReference,
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+
+        final Object context = contextReference.get();
+
+        if (context == null) {
+
+            throw new IllegalStateException("the routine context has been destroyed");
+        }
+
+        if (context instanceof Activity) {
+
+            return JRoutine.onActivity((Activity) context, classToken);
+
+        } else if (context instanceof Fragment) {
+
+            return JRoutine.onFragment((Fragment) context, classToken);
+        }
+
+        throw new IllegalArgumentException(
+                "invalid context type: " + context.getClass().getCanonicalName());
+    }
+
+    @Nonnull
     private static Object getInstance(@Nonnull final Context context,
             @Nonnull final Class<?> targetClass, @Nonnull final Object[] args) throws
             IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -229,61 +279,6 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         }
 
         return names;
-    }
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param logClass      the log class.
-     * @param configuration the routine configuration.
-     */
-    private static void warn(@Nullable final Class<? extends Log> logClass,
-            @Nonnull final RoutineConfiguration configuration) {
-
-        Log log = null;
-
-        if (logClass != null) {
-
-            final Constructor<? extends Log> constructor = findConstructor(logClass);
-
-            try {
-
-                log = constructor.newInstance();
-
-            } catch (final Throwable t) {
-
-                throw new IllegalArgumentException(t);
-            }
-        }
-
-        if (log == null) {
-
-            log = configuration.getLogOr(Logger.getGlobalLog());
-        }
-
-        Logger logger = null;
-        final OrderType inputOrder = configuration.getInputOrderOr(null);
-
-        if (inputOrder != null) {
-
-            logger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
-                                      DefaultObjectServiceRoutineBuilder.class);
-            logger.wrn("the specified input order will be ignored: %s", inputOrder);
-        }
-
-        final OrderType outputOrder = configuration.getOutputOrderOr(null);
-
-        if (outputOrder != null) {
-
-            if (logger == null) {
-
-                logger = Logger.newLogger(log,
-                                          configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
-                                          DefaultObjectServiceRoutineBuilder.class);
-            }
-
-            logger.wrn("the specified output order will be ignored: %s", outputOrder);
-        }
     }
 
     @Nullable
@@ -332,22 +327,22 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         if (configuration != null) {
 
-            warn(mLogClass, configuration);
+            warn(configuration);
         }
 
         final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
         final Object[] args = mArgs;
-        return JRoutine.onService(mContext, classToken)
-                       .withArgs(targetClass.getName(), args,
-                                 withShareAnnotation(mShareGroup, targetMethod), name)
-                       .withConfiguration(
-                               withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
-                                       OrderType.PASSING_ORDER).buildConfiguration())
-                       .withServiceClass(mServiceClass)
-                       .withRunnerClass(mRunnerClass)
-                       .withLogClass(mLogClass)
-                       .dispatchingOn(mLooper)
-                       .buildRoutine();
+        final RoutineConfiguration routineConfiguration =
+                withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
+                        OrderType.PASSING_ORDER).buildConfiguration();
+        return getBuilder(mContext, classToken).withArgs(targetClass.getName(), args,
+                                                         withShareAnnotation(mShareGroup,
+                                                                             targetMethod), name)
+                                               .withConfiguration(routineConfiguration)
+                                               .withId(mInvocationId)
+                                               .onClash(mClashResolution)
+                                               .onComplete(mCacheStrategy)
+                                               .buildRoutine();
     }
 
     @Nonnull
@@ -377,24 +372,24 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         if (configuration != null) {
 
-            warn(mLogClass, configuration);
+            warn(configuration);
         }
 
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
         final Object[] args = mArgs;
-        return JRoutine.onService(mContext, classToken)
-                       .withArgs(targetClass.getName(), args,
-                                 withShareAnnotation(mShareGroup, targetMethod), name,
-                                 toNames(parameterTypes))
-                       .withConfiguration(
-                               withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
-                                       OrderType.PASSING_ORDER).buildConfiguration())
-                       .withServiceClass(mServiceClass)
-                       .withRunnerClass(mRunnerClass)
-                       .withLogClass(mLogClass)
-                       .dispatchingOn(mLooper)
-                       .buildRoutine();
+        final RoutineConfiguration routineConfiguration =
+                withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
+                        OrderType.PASSING_ORDER).buildConfiguration();
+        return getBuilder(mContext, classToken).withArgs(targetClass.getName(), args,
+                                                         withShareAnnotation(mShareGroup,
+                                                                             targetMethod), name,
+                                                         toNames(parameterTypes))
+                                               .withConfiguration(routineConfiguration)
+                                               .withId(mInvocationId)
+                                               .onClash(mClashResolution)
+                                               .onComplete(mCacheStrategy)
+                                               .buildRoutine();
     }
 
     @Nonnull
@@ -416,7 +411,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         if (configuration != null) {
 
-            warn(mLogClass, configuration);
+            warn(configuration);
         }
 
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
@@ -431,44 +426,35 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder dispatchingOn(@Nullable final Looper looper) {
+    public ObjectContextRoutineBuilder onClash(@Nullable final ClashResolution resolution) {
 
-        mLooper = looper;
+        mClashResolution = resolution;
         return this;
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder withLogClass(@Nullable final Class<? extends Log> logClass) {
+    public ObjectContextRoutineBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
 
-        mLogClass = logClass;
+        mCacheStrategy = cacheStrategy;
         return this;
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder withRunnerClass(
-            @Nullable final Class<? extends Runner> runnerClass) {
-
-        mRunnerClass = runnerClass;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withServiceClass(
-            @Nullable final Class<? extends RoutineService> serviceClass) {
-
-        mServiceClass = serviceClass;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withArgs(@Nullable final Object... args) {
+    public ObjectContextRoutineBuilder withArgs(@Nullable final Object... args) {
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder withConfiguration(
+    public ObjectContextRoutineBuilder withId(final int invocationId) {
+
+        mInvocationId = invocationId;
+        return this;
+    }
+
+    @Nonnull
+    public ObjectContextRoutineBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
@@ -476,10 +462,39 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder withShareGroup(@Nullable final String group) {
+    public ObjectContextRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;
         return this;
+    }
+
+    /**
+     * Logs any warning related to ignored options in the specified configuration.
+     *
+     * @param configuration the routine configuration.
+     */
+    private void warn(@Nonnull final RoutineConfiguration configuration) {
+
+        Logger logger = null;
+        final OrderType inputOrder = configuration.getInputOrderOr(null);
+
+        if (inputOrder != null) {
+
+            logger = Logger.newLogger(configuration, this);
+            logger.wrn("the specified input order will be ignored: %s", inputOrder);
+        }
+
+        final OrderType outputOrder = configuration.getOutputOrderOr(null);
+
+        if (outputOrder != null) {
+
+            if (logger == null) {
+
+                logger = Logger.newLogger(configuration, this);
+            }
+
+            logger.wrn("the specified output order will be ignored: %s", outputOrder);
+        }
     }
 
     /**
@@ -880,19 +895,17 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         private final Object[] mArgs;
 
+        private final CacheStrategy mCacheStrategy;
+
+        private final ClashResolution mClashResolution;
+
         private final RoutineConfiguration mConfiguration;
 
-        private final Context mContext;
+        private final WeakReference<Object> mContext;
 
-        private final Class<? extends Log> mLogClass;
-
-        private final Looper mLooper;
+        private final int mInvocationId;
 
         private final Class<?> mProxyClass;
-
-        private final Class<? extends Runner> mRunnerClass;
-
-        private final Class<? extends RoutineService> mServiceClass;
 
         private final String mShareGroup;
 
@@ -904,20 +917,19 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
          * @param builder    the builder instance.
          * @param proxyClass the proxy class.
          */
-        private ProxyInvocationHandler(@Nonnull final DefaultObjectServiceRoutineBuilder builder,
+        private ProxyInvocationHandler(@Nonnull final DefaultObjectContextRoutineBuilder builder,
                 @Nonnull final Class<?> proxyClass) {
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
             mArgs = builder.mArgs;
-            mServiceClass = builder.mServiceClass;
             mConfiguration = RoutineConfiguration.notNull(builder.mConfiguration)
                                                  .builderFrom()
                                                  .buildConfiguration();
+            mInvocationId = builder.mInvocationId;
+            mClashResolution = builder.mClashResolution;
+            mCacheStrategy = builder.mCacheStrategy;
             mShareGroup = builder.mShareGroup;
-            mRunnerClass = builder.mRunnerClass;
-            mLogClass = builder.mLogClass;
-            mLooper = builder.mLooper;
             mProxyClass = proxyClass;
         }
 
@@ -974,18 +986,19 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                                    (returnMode == ParamMode.COLLECTION) ? OrderType.PASSING_ORDER
                                            : OrderType.NONE)
                            .buildConfiguration();
+            final InvocationContextRoutineBuilder<Object, Object> routineBuilder =
+                    getBuilder(mContext, ClassToken.tokenOf(ProxyInvocation.class));
             final Routine<Object, Object> routine =
-                    JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
-                            .withArgs(mProxyClass.getName(), mTargetClass.getName(), mArgs,
-                                      withShareAnnotation(mShareGroup, method), method.getName(),
-                                      toNames(parameterTypes), toNames(targetParameterTypes),
-                                      isInputCollection, isOutputCollection)
-                            .withConfiguration(configuration)
-                            .withServiceClass(mServiceClass)
-                            .withRunnerClass(mRunnerClass)
-                            .withLogClass(mLogClass)
-                            .dispatchingOn(mLooper)
-                            .buildRoutine();
+                    routineBuilder.withArgs(mProxyClass.getName(), mTargetClass.getName(), mArgs,
+                                            withShareAnnotation(mShareGroup, method),
+                                            method.getName(), toNames(parameterTypes),
+                                            toNames(targetParameterTypes), isInputCollection,
+                                            isOutputCollection)
+                                  .withConfiguration(configuration)
+                                  .withId(mInvocationId)
+                                  .onClash(mClashResolution)
+                                  .onComplete(mCacheStrategy)
+                                  .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();
 

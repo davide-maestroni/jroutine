@@ -60,9 +60,9 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildWrapper(@Nonnull Class<TYPE> itf);
@@ -91,9 +91,9 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildWrapper(@Nonnull ClassToken<TYPE> itf);

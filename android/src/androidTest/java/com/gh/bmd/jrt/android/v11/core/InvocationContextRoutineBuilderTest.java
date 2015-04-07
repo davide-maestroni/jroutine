@@ -11,9 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v4.core;
+package com.gh.bmd.jrt.android.v11.core;
 
 import android.annotation.TargetApi;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -60,19 +61,25 @@ import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * JRoutine activity unit tests.
+ * Invocation context routine unit tests.
  * <p/>
  * Created by davide on 12/10/14.
  */
-@TargetApi(VERSION_CODES.FROYO)
-public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
+@TargetApi(VERSION_CODES.HONEYCOMB)
+public class InvocationContextRoutineBuilderTest
+        extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public JRoutineActivityTest() {
+    public InvocationContextRoutineBuilderTest() {
 
         super(TestActivity.class);
     }
 
     public void testActivityAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
@@ -98,6 +105,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityAbortInput() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -122,6 +134,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityBuilderPurge() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
@@ -138,6 +155,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testActivityBuilderPurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
@@ -167,6 +189,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testActivityClearError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -210,6 +237,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testActivityClearResult() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -266,6 +298,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityInputs() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -279,6 +316,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityInvalidIdError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
             JRoutine.onActivity(getActivity(), ContextRoutineBuilder.AUTO);
@@ -291,6 +333,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testActivityInvalidTokenError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -306,6 +353,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityKeep() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -320,6 +372,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testActivityMissingRoutine() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
@@ -337,6 +394,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     @SuppressWarnings("ConstantConditions")
     public void testActivityNullPointerErrors() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -372,6 +434,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityRestart() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -396,6 +463,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityRestartOnInput() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -419,6 +491,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testActivityRetain() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -465,6 +542,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result4 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
+                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -484,6 +562,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivityRoutinePurge() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
@@ -500,6 +583,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testActivityRoutinePurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
@@ -530,6 +618,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testActivitySame() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine =
@@ -543,6 +636,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testAndroidChannelBuilderWarnings() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
                                                             .withInputSize(3)
@@ -555,7 +653,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         JRoutine.onActivity(getActivity(), 0).withConfiguration(configuration).buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         JRoutine.onFragment(fragment, 0).withConfiguration(configuration).buildChannel();
@@ -563,6 +661,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testAndroidRoutineBuilderWarnings() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
@@ -580,7 +683,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
@@ -592,6 +695,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testClash() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -626,8 +734,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentAbort() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -653,7 +766,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentBuilderPurge() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
@@ -673,7 +791,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentBuilderPurgeInputs() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
@@ -705,8 +828,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentChannel() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -723,8 +851,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentInputs() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -738,9 +871,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentInvalidIdError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
-            final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
             JRoutine.onFragment(fragment, ContextRoutineBuilder.AUTO);
@@ -753,6 +891,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testFragmentInvalidTokenError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -768,8 +911,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentKeep() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -786,8 +934,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentMissingRoutine() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final OutputChannel<String> channel = JRoutine.onFragment(fragment, 0).buildChannel();
@@ -805,6 +958,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     @SuppressWarnings("ConstantConditions")
     public void testFragmentNullPointerErrors() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -828,7 +986,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
             JRoutine.onFragment(fragment, (ClassToken<ContextInvocation<Object, Object>>) null);
@@ -842,8 +1000,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentReset() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -869,8 +1032,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentRestart() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -896,7 +1064,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentRoutinePurge() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
@@ -916,7 +1089,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentRoutinePurgeInputs() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
@@ -948,9 +1126,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testFragmentSame() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Data, Data> routine =
@@ -963,6 +1146,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testInvocations() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<StringPassingInvocation> token1 =
@@ -1006,6 +1194,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     @SuppressWarnings("ConstantConditions")
     public void testLoaderError() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final Logger logger = Logger.newLogger(null, null, this);
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
@@ -1064,6 +1257,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     @SuppressWarnings("ConstantConditions")
     public void testRoutineError() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
 

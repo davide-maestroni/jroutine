@@ -22,6 +22,7 @@ import android.os.Build.VERSION_CODES;
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ObjectContextRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.common.ClassToken;
 
@@ -142,6 +143,31 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
 
     /**
+     * Returns a builder of routines bound to the specified activity, wrapping the specified object
+     * instances.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
+     *
+     * @param activity    the invocation activity context.
+     * @param targetClass the wrapped object class.
+     * @return the routine builder instance.
+     * @throws java.lang.NullPointerException if any of the specified parameters is null.
+     */
+    public static ObjectContextRoutineBuilder onActivity(@Nonnull final Activity activity,
+            @Nonnull final Class<?> targetClass) {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            throw new UnsupportedOperationException(
+                    "this method is supported only with API level >= " +
+                            VERSION_CODES.HONEYCOMB
+                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
+        }
+
+        return new DefaultObjectContextRoutineBuilder(activity, targetClass);
+    }
+
+    /**
      * Returns a builder of routines bound to the specified activity.<br/>
      * Note that the specified invocation class must be static and have a default constructor.<br/>
      * Note also that the built routine results will be always dispatched in the main UI thread,
@@ -153,9 +179,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified invocation has no default
-     *                                            constructor.
-     * @throws java.lang.NullPointerException     if the specified activity or class token are null.
+     * @throws java.lang.NullPointerException if the specified activity or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationContextRoutineBuilder<INPUT, OUTPUT> onActivity(
@@ -207,6 +231,23 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
     }
 
     /**
+     * Returns a builder of routines bound to the specified fragment, wrapping the specified object
+     * instances.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
+     *
+     * @param fragment    the invocation fragment context.
+     * @param targetClass the wrapped object class.
+     * @return the routine builder instance.
+     * @throws java.lang.NullPointerException if any of the specified parameters is null.
+     */
+    public static ObjectContextRoutineBuilder onFragment(@Nonnull final Fragment fragment,
+            @Nonnull final Class<?> targetClass) {
+
+        return new DefaultObjectContextRoutineBuilder(fragment, targetClass);
+    }
+
+    /**
      * Returns a builder of routines bound to the specified fragment.<br/>
      * Note that the specified invocation class must be static and have a default constructor.<br/>
      * Note also that the built routine results will be always dispatched in the main UI thread,
@@ -218,9 +259,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified invocation has no default
-     *                                            constructor.
-     * @throws java.lang.NullPointerException     if the specified fragment or class token are null.
+     * @throws java.lang.NullPointerException if the specified fragment or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationContextRoutineBuilder<INPUT, OUTPUT> onFragment(

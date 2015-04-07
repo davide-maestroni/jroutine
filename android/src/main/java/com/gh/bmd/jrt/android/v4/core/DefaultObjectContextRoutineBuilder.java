@@ -330,8 +330,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             warn(configuration);
         }
 
-        final ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> classToken =
-                new ClassToken<BoundMethodInvocation<INPUT, OUTPUT>>() {};
+        final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
         final Object[] args = mArgs;
         final RoutineConfiguration routineConfiguration =
                 withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
@@ -376,8 +375,8 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             warn(configuration);
         }
 
-        final ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> classToken =
-                new ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>>() {};
+        final MethodSignatureToken<INPUT, OUTPUT> classToken =
+                new MethodSignatureToken<INPUT, OUTPUT>();
         final Object[] args = mArgs;
         final RoutineConfiguration routineConfiguration =
                 withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
@@ -566,6 +565,17 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     /**
+     * Class token of a {@link BoundMethodInvocation}.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class BoundMethodToken<INPUT, OUTPUT>
+            extends ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> {
+
+    }
+
+    /**
      * Generic method invocation.
      *
      * @param <INPUT>  the input data type.
@@ -636,6 +646,17 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 throw new InvocationException(t);
             }
         }
+    }
+
+    /**
+     * Class token of a {@link MethodSignatureInvocation}.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class MethodSignatureToken<INPUT, OUTPUT>
+            extends ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> {
+
     }
 
     /**

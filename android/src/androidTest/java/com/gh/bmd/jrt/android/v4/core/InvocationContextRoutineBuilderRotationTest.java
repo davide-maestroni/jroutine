@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v11.core;
+package com.gh.bmd.jrt.android.v4.core;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION;
@@ -34,19 +34,20 @@ import static com.gh.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * JRoutine activity rotation unit tests.
+ * Invocation context routine rotation unit tests.
  * <p/>
  * Created by davide on 1/28/15.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
-public class JRoutineActivityRotationTest
+@TargetApi(VERSION_CODES.FROYO)
+public class InvocationContextRoutineBuilderRotationTest
         extends ActivityInstrumentationTestCase2<RotationTestActivity> {
 
-    public JRoutineActivityRotationTest() {
+    public InvocationContextRoutineBuilderRotationTest() {
 
         super(RotationTestActivity.class);
     }
 
+    @TargetApi(VERSION_CODES.HONEYCOMB)
     public void testActivityRotationChannel() throws InterruptedException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -79,6 +80,7 @@ public class JRoutineActivityRotationTest
         assertThat(channel.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
     }
 
+    @TargetApi(VERSION_CODES.HONEYCOMB)
     public void testActivityRotationInputs() throws InterruptedException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -117,6 +119,7 @@ public class JRoutineActivityRotationTest
         assertThat(result2.readNext()).isEqualTo("TEST2");
     }
 
+    @TargetApi(VERSION_CODES.HONEYCOMB)
     public void testActivityRotationSame() throws InterruptedException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

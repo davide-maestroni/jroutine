@@ -2,7 +2,7 @@
     package="com.gh.bmd.jrt.android">
 
     <application
-        android:name=".TestApp"
+        android:name=".app.TestApp"
         android:label="@string/lib_name">
         <activity
             android:name="com.gh.bmd.jrt.android.core.TestActivity"

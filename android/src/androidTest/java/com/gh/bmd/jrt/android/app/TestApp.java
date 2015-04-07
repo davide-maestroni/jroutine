@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android;
+package com.gh.bmd.jrt.android.app;
 
 import android.app.Application;
 
@@ -62,5 +62,4 @@ public class TestApp extends Application implements FactoryContext {
 
         return (TYPE) instance;
     }
-
 }

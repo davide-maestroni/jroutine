@@ -275,7 +275,6 @@ public class RoutineService extends Service {
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
-
         final int length = invocationArgs.length;
         final ParcelableValue[] argValues = new ParcelableValue[length];
 
@@ -289,7 +288,6 @@ public class RoutineService extends Service {
                       configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
                       configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT));
-
         final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
 
         if (availTimeout != null) {
@@ -447,7 +445,6 @@ public class RoutineService extends Service {
             final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
             final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
-
             final RoutineInfo routineInfo =
                     new RoutineInfo(invocationClass, invocationArgs, inputOrder, outputOrder,
                                     runnerClass, logClass, logLevel);
@@ -490,7 +487,6 @@ public class RoutineService extends Service {
                        .withInputOrder(inputOrder)
                        .withOutputOrder(outputOrder)
                        .withLogLevel(logLevel);
-
                 final AndroidRoutine androidRoutine =
                         new AndroidRoutine(this, builder.buildConfiguration(), invocationClass,
                                            invocationArgs);
@@ -532,7 +528,6 @@ public class RoutineService extends Service {
                 @Nonnull final Object[] invocationArgs) {
 
             super(configuration);
-
             mContext = context;
             mConstructor = findConstructor(invocationClass, invocationArgs);
             mArgs = invocationArgs;
@@ -737,7 +732,6 @@ public class RoutineService extends Service {
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-
             return mInputOrder == that.mInputOrder && Arrays.equals(mInvocationArgs,
                                                                     that.mInvocationArgs)
                     && mInvocationClass.equals(that.mInvocationClass) && !(mLogClass != null
@@ -870,7 +864,6 @@ public class RoutineService extends Service {
         public void onError(@Nullable final Throwable error) {
 
             mInvocation.recycle();
-
             final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
             putError(message.getData(), error);
 

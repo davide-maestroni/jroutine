@@ -135,7 +135,6 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     private void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
-
         final OrderType inputOrder = configuration.getInputOrderOr(null);
 
         if (inputOrder != null) {

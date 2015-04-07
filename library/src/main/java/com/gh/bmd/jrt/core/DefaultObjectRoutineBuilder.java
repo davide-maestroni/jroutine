@@ -234,11 +234,10 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     private Method getTargetMethod(@Nonnull final Method method,
             @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
 
-        final Class<?> targetClass = getTargetClass();
-        final Bind annotation = method.getAnnotation(Bind.class);
-
         String name = null;
         Method targetMethod = null;
+        final Class<?> targetClass = getTargetClass();
+        final Bind annotation = method.getAnnotation(Bind.class);
 
         if (annotation != null) {
 
@@ -366,7 +365,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             }
 
             warn(configuration);
-
             builder.withInputOrder(
                     (paramMode == ParamMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
                    .withInputSize(Integer.MAX_VALUE)
@@ -375,7 +373,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                                             : OrderType.NONE)
                    .withOutputSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
-
             final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
             if (timeoutAnnotation != null) {
@@ -408,7 +405,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             ParamMode asyncParamMode = null;
             ParamMode asyncReturnMode = null;
-
             Class<?> returnClass = null;
             final Pass methodAnnotation = method.getAnnotation(Pass.class);
 

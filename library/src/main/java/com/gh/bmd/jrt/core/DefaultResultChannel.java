@@ -141,7 +141,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
         mOutputQueue = (configuration.getOutputOrderOr(OrderType.NONE) == OrderType.NONE)
                 ? new SimpleNestedQueue<Object>() : new OrderedNestedQueue<Object>();
-
         final int maxOutputSize = mMaxOutput;
         mHasOutputs = new Check() {
 
@@ -227,12 +226,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             delay = mResultDelay;
             ++mPendingOutputCount;
             mLogger.dbg("passing channel: %s", channel);
-
             consumer = new DefaultOutputConsumer(delay);
         }
 
         channel.bind(consumer);
-
         return this;
     }
 
@@ -255,7 +252,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             outputQueue = mOutputQueue;
             delay = mResultDelay;
-
             int count = 0;
 
             if (delay.isZero()) {
@@ -375,7 +371,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         synchronized (mMutex) {
 
             mLogger.dbg(throwable, "aborting result channel");
-
             channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
             mBoundChannels.clear();
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
@@ -695,9 +690,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         final Object result = mOutputQueue.removeFirst();
         mLogger.dbg("reading output [#%d]: %s [%s]", mOutputCount, result, timeout);
-
         RoutineExceptionWrapper.raise(result);
-
         final int maxOutput = mMaxOutput;
         final int prevOutputCount = mOutputCount;
 
@@ -714,7 +707,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             @Nonnull final TimeoutAction action) {
 
         verifyBound();
-
         final Logger logger = mLogger;
         final NestedQueue<Object> outputQueue = mOutputQueue;
 
@@ -854,7 +846,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             synchronized (mMutex) {
 
                 verifyBound();
-
                 final Logger logger = mSubLogger;
                 final TimeDuration timeout = mTimeout;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
@@ -1040,7 +1031,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             flushOutput(forceClose);
-
             return this;
         }
 
@@ -1324,7 +1314,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             mHandler.onAbort(reason, 0, TimeUnit.MILLISECONDS);
-
             return true;
         }
 

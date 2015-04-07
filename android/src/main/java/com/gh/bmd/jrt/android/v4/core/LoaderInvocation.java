@@ -711,7 +711,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
-
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<StandaloneInput<OUTPUT>> channels = mNewChannels;
             final RoutineConfiguration configuration = builder().withOutputSize(Integer.MAX_VALUE)
@@ -740,7 +739,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             final Logger logger = mLogger;
             final ArrayList<StandaloneInput<OUTPUT>> channels = mChannels;
             final ArrayList<StandaloneInput<OUTPUT>> newChannels = mNewChannels;
-
             logger.dbg("dispatching invocation result: %s", data);
 
             if (data.passTo(newChannels, channels)) {
@@ -748,18 +746,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                 final ArrayList<StandaloneInput<OUTPUT>> channelsToClose =
                         new ArrayList<StandaloneInput<OUTPUT>>(channels);
                 channelsToClose.addAll(newChannels);
-
                 mResultCount += channels.size() + newChannels.size();
                 channels.clear();
                 newChannels.clear();
-
                 final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
 
                 if (mResultCount >= internalLoader.getInvocationCount()) {
 
                     mResultCount = 0;
                     internalLoader.setInvocationCount(0);
-
                     final CacheStrategy cacheStrategy = mCacheStrategy;
 
                     if ((cacheStrategy == CacheStrategy.CLEAR) || (data.isError() ? (cacheStrategy

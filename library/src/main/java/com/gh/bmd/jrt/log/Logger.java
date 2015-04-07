@@ -632,7 +632,6 @@ public class Logger {
         final Object[] thisContexts = mContexts;
         final int thisLength = thisContexts.length;
         final Object[] newContexts = new Object[thisLength + 1];
-
         System.arraycopy(thisContexts, 0, newContexts, 0, thisLength);
         newContexts[thisLength] = context;
         return new Logger(newContexts, mLog, mLogLevel);

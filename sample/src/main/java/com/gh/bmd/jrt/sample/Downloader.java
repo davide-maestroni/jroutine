@@ -143,7 +143,6 @@ public class Downloader {
 
             // remove it from the downloaded set
             mDownloadedSet.remove(uri);
-
             // in order to be able to abort the download at any time we need to split the processing
             // between the routine responsible for reading the data from the socket and the one
             // writing the next chunk of bytes to the local file

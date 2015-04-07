@@ -120,7 +120,6 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     public void purge() {
 
         super.purge();
-
         final WeakReference<Object> context = mContext;
 
         if (context.get() != null) {

@@ -112,7 +112,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 inputIterator.onConsumeStart();
                 mLogger.dbg("running execution");
-
                 final boolean isComplete;
                 final Invocation<INPUT, OUTPUT> invocation;
 
@@ -266,7 +265,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                     invocation = initInvocation();
                     invocation.onAbort(exception);
                     invocation.onReturn();
-
                     manager.recycle(invocation);
                     resultChannel.close(exception);
 

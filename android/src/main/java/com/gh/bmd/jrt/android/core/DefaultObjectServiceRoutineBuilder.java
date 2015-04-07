@@ -108,7 +108,6 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         mContext = context;
         mTargetClass = targetClass;
-
         final HashSet<String> bindingSet = new HashSet<String>();
 
         for (final Method method : targetClass.getMethods()) {
@@ -689,11 +688,10 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         private Method getTargetMethod(@Nonnull final Method method,
                 @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
 
-            final Class<?> targetClass = mTarget.getClass();
-            final Bind annotation = method.getAnnotation(Bind.class);
-
             String name = null;
             Method targetMethod = null;
+            final Class<?> targetClass = mTarget.getClass();
+            final Bind annotation = method.getAnnotation(Bind.class);
 
             if (annotation != null) {
 
@@ -735,7 +733,6 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                 final Class<?>[] parameterTypes = mParameterTypes;
                 final Class<?>[] targetParameterTypes = mTargetParameterTypes;
                 final Method method = mProxyClass.getMethod(mMethodName, parameterTypes);
-
                 final Method targetMethod = getTargetMethod(method, targetParameterTypes);
                 final Class<?> returnType = targetMethod.getReturnType();
                 final Pass annotation = method.getAnnotation(Pass.class);
@@ -837,7 +834,6 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             try {
 
                 mTarget = getInstance(context, mTargetClass, mArgs);
-
                 final String shareGroup = mShareGroup;
 
                 if (!Share.NONE.equals(shareGroup)) {

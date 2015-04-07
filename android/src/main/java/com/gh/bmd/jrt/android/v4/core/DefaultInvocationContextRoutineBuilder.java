@@ -113,7 +113,6 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
         final RoutineConfiguration configuration = getConfiguration();
         warn(configuration);
-
         final Builder builder = configuration.builderFrom()
                                              .withAsyncRunner(Runners.mainRunner())
                                              .withInputSize(Integer.MAX_VALUE)

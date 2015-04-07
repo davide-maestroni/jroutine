@@ -136,7 +136,6 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-
         final byte[] buffer = new byte[2048];
 
         try {
@@ -294,7 +293,6 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(".")
                    .append(methodAnnotation.unit())
                    .append(")");
-
             final TimeoutAction timeoutAction = methodAnnotation.action();
 
             if (timeoutAction == TimeoutAction.DEADLOCK) {
@@ -414,7 +412,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final String typeString = returnType.toString();
             final int firstBracket = typeString.indexOf('[');
-
             builder.append(typeString.substring(0, firstBracket))
                    .append("[$$size]")
                    .append(typeString.substring(firstBracket));
@@ -459,9 +456,7 @@ public class RoutineProcessor extends AbstractProcessor {
             header = header.replace("${interfaceFullName}", element.asType().toString());
             header = header.replace("${routineFieldsInit}",
                                     buildRoutineFieldsInit(methodElements.size()));
-
             writer.append(header);
-
             int count = 0;
 
             for (final ExecutableElement methodElement : methodElements) {
@@ -527,7 +522,6 @@ public class RoutineProcessor extends AbstractProcessor {
             final TypeElement asyncAnnotationElement =
                     getTypeFromName(Pass.class.getCanonicalName());
             final TypeMirror asyncAnnotationType = asyncAnnotationElement.asType();
-
             final List<? extends VariableElement> interfaceTypeParameters =
                     methodElement.getParameters();
             final int length = interfaceTypeParameters.size();
@@ -894,7 +888,6 @@ public class RoutineProcessor extends AbstractProcessor {
                 firstMethodElement.getParameters();
         final List<? extends VariableElement> secondTypeParameters =
                 secondMethodElement.getParameters();
-
         final int length = firstTypeParameters.size();
 
         if (length != secondTypeParameters.size()) {
@@ -1003,7 +996,6 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror objectType = mObjectType;
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
-
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
         final Pass methodAnnotation = methodElement.getAnnotation(Pass.class);
         ParamMode asyncParamMode = null;
@@ -1095,15 +1087,12 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final String resultClassName = getBoxedType(targetReturnType).toString();
-
         String methodHeader;
         methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
                                             buildRoutineOptions(asyncParamMode, asyncReturnMode));
-
         writer.append(methodHeader);
-
         method = method.replace("${resultClassName}", resultClassName);
         method = method.replace("${resultRawClass}", targetReturnType.toString());
         method = method.replace("${resultRawSizedArray}", buildSizedArray(targetReturnType));
@@ -1117,9 +1106,7 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${invokeMethod}",
                                 (asyncParamMode == ParamMode.PARALLEL) ? "invokeParallel"
                                         : "invokeAsync");
-
         writer.append(method);
-
         String methodInvocation;
 
         if ((asyncParamMode == ParamMode.COLLECTION) && (

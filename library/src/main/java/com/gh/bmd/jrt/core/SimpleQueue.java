@@ -149,7 +149,6 @@ class SimpleQueue<E> {
         final Object[] queue = mQueue;
         final int i = mFirst;
         mFirst = (i + 1) & (queue.length - 1);
-
         final Object output = queue[i];
         queue[i] = null;
         return (E) output;
@@ -167,11 +166,9 @@ class SimpleQueue<E> {
 
         final int first = mFirst;
         final int last = mLast;
-
         final Object[] newQueue = new Object[newSize];
         resizeArray(mQueue, newQueue, first);
         mQueue = newQueue;
-
         final int shift = newSize - size;
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;

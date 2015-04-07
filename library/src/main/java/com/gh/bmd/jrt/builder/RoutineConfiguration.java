@@ -949,7 +949,6 @@ public class RoutineConfiguration {
             applyInvocationConfiguration(configuration);
             applyChannelConfiguration(configuration);
             applyLogConfiguration(configuration);
-
             return this;
         }
 

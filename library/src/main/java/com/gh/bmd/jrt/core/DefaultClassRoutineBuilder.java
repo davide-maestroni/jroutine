@@ -323,13 +323,11 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         }
 
         warn(configuration);
-
         builder.withInputOrder(OrderType.PASSING_ORDER)
                .withInputSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
                .withOutputSize(Integer.MAX_VALUE)
                .withOutputTimeout(TimeDuration.ZERO);
-
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
@@ -461,7 +459,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         final Class<?> targetClass = mTargetClass;
         final HashMap<String, Method> methodMap = mMethodMap;
         fillMap(methodMap, targetClass.getMethods(), isClass);
-
         final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
         fillMap(declaredMethodMap, targetClass.getDeclaredMethods(), isClass);
 
@@ -513,7 +510,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             mMutex = (mutex != null) ? mutex : this;
             mIsInputCollection = isInputCollection;
             mIsOutputCollection = isOutputCollection;
-
             final Class<?> returnClass = method.getReturnType();
             mHasResult = !Void.class.equals(boxingClass(returnClass));
             mIsArrayResult = returnClass.isArray();
@@ -672,7 +668,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-
             return mIsInputCollection == that.mIsInputCollection
                     && mIsOutputCollection == that.mIsOutputCollection && mConfiguration.equals(
                     that.mConfiguration) && mMethod.equals(that.mMethod) && mShareGroup.equals(

@@ -361,7 +361,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 }
 
                 ++mRunningCount;
-
                 final boolean async = mAsync;
                 final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
                         (async) ? mAsyncInvocations : mSyncInvocations;

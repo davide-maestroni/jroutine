@@ -127,7 +127,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public boolean isEmpty() {
 
         purge(this);
-
         final SimpleQueue<Object> queue = mQueue;
 
         if (queue.isEmpty()) {
@@ -144,7 +143,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public void moveTo(@Nonnull final Collection<? super E> collection) {
 
         purge(this);
-
         final SimpleQueue<Object> queue = mQueue;
 
         while (!queue.isEmpty()) {
@@ -175,7 +173,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public E removeFirst() {
 
         purge(this);
-
         final Object element = mQueue.peekFirst();
 
         if (element instanceof OrderedNestedQueue) {

@@ -101,7 +101,6 @@ class LocalQueue {
         mExecutionTimeNs[i] = System.nanoTime();
         mExecutions[i] = execution;
         mDelays[i] = delay;
-
         final int newLast;
 
         if ((i >= (mExecutions.length - 1)) || (i == Integer.MAX_VALUE)) {
@@ -155,20 +154,15 @@ class LocalQueue {
 
         final int first = mFirst;
         final int last = mLast;
-
         final long[] newExecutionTimeNs = new long[newSize];
         resizeArray(mExecutionTimeNs, newExecutionTimeNs, first);
-
         final Execution[] newExecutions = new Execution[newSize];
         resizeArray(mExecutions, newExecutions, first);
-
         final TimeDuration[] newDelays = new TimeDuration[newSize];
         resizeArray(mDelays, newDelays, first);
-
         mExecutionTimeNs = newExecutionTimeNs;
         mExecutions = newExecutions;
         mDelays = newDelays;
-
         final int shift = newSize - size;
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;
@@ -187,11 +181,9 @@ class LocalQueue {
                 final long[] executionTimeNs = mExecutionTimeNs;
                 final Execution[] executions = mExecutions;
                 final TimeDuration[] delays = mDelays;
-
                 long timeNs = executionTimeNs[i];
                 Execution execution = executions[i];
                 TimeDuration delay = delays[i];
-
                 final long currentTimeNs = System.nanoTime();
                 long delayNs = timeNs - currentTimeNs + delay.toNanos();
 
@@ -235,7 +227,6 @@ class LocalQueue {
                         timeNs = executionTimeNs[s];
                         execution = executions[s];
                         delay = delays[s];
-
                         executionTimeNs[s] = executionTimeNs[i];
                         executions[s] = executions[i];
                         delays[s] = delays[i];
@@ -273,7 +264,6 @@ class LocalQueue {
                 final int n = mFirst;
                 mExecutions[n] = null;
                 mDelays[n] = null;
-
                 final int newFirst = mFirst + 1;
 
                 if (newFirst >= mExecutions.length) {

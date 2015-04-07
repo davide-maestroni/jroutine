@@ -106,7 +106,6 @@ public class Reflection {
             @Nonnull final Constructor<?>[] constructors, @Nonnull final Object[] args) {
 
         final int argsLength = args.length;
-
         Constructor<?> bestMatch = null;
         int maxConfidence = 0;
 

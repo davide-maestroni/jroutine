@@ -148,7 +148,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
-
         mContext = context.getApplicationContext();
         mLooper = looper;
         mServiceClass = (serviceClass != null) ? serviceClass : RoutineService.class;
@@ -170,7 +169,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                            .withLog(log)
                                                            .buildConfiguration())
                            .buildRoutine();
-
         final Logger logger = mLogger;
         logger.dbg("building service routine with configuration: %s", configuration);
         warn(logger, configuration);
@@ -616,9 +614,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                 final Logger logger = mLogger;
                 logger.dbg("service connected: %s", name);
-
                 mOutMessenger = new Messenger(service);
-
                 final Message message = Message.obtain(null, RoutineService.MSG_INIT);
 
                 if (mIsParallel) {

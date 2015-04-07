@@ -128,7 +128,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     protected void onStartLoading() {
 
         super.onStartLoading();
-
         mLogger.dbg("start background invocation");
 
         if (mResult != null) {
@@ -173,7 +172,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
         channel.output().bind(consumer);
-
         Throwable abortException = null;
         logger.dbg("running invocation");
 

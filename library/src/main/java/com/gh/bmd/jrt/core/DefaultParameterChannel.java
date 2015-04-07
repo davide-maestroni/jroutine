@@ -272,12 +272,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             delay = mInputDelay;
             ++mPendingExecutionCount;
             mLogger.dbg("passing channel: %s", channel);
-
             consumer = new DefaultOutputConsumer(delay);
         }
 
         channel.bind(consumer);
-
         return this;
     }
 
@@ -301,7 +299,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             inputQueue = mInputQueue;
             delay = mInputDelay;
-
             int count = 0;
 
             if (delay.isZero()) {
@@ -369,7 +366,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         synchronized (mMutex) {
 
             verifyOpen();
-
             inputQueue = mInputQueue;
             delay = mInputDelay;
 
@@ -441,7 +437,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         synchronized (mMutex) {
 
             verifyOpen();
-
             mLogger.dbg("closing input channel");
             mState = ChannelState.OUTPUT;
             needsExecution = !mIsPendingExecution && !mIsConsuming;
@@ -609,7 +604,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 final INPUT input = mInputQueue.removeFirst();
                 mLogger.dbg("reading input [#%d]: %s", mInputCount, input);
-
                 final int maxInput = mMaxInput;
                 final int prevInputCount = mInputCount;
 
@@ -631,7 +625,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 exception = mAbortException;
                 mLogger.dbg(exception, "aborting bound channels [%d]", mBoundChannels.size());
-
                 channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
                 mBoundChannels.clear();
             }
@@ -711,7 +704,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             synchronized (mMutex) {
 
                 verifyInput();
-
                 mSubLogger.dbg("closing consumer");
                 mQueue.close();
                 needsExecution = !mIsPendingExecution && !mIsConsuming;
@@ -760,7 +752,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             synchronized (mMutex) {
 
                 verifyInput();
-
                 inputQueue = mQueue;
 
                 if (delay.isZero()) {

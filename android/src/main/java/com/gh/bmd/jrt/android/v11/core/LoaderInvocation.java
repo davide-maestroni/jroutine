@@ -97,8 +97,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      *
      * @param context           the context reference.
      * @param loaderId          the loader ID.
-     * @param resolution        the clash resolution type.
-     * @param cacheStrategyType the result cache type.
+     * @param resolutionType    the clash resolution type.
+     * @param cacheStrategyType the result cache strategy type.
      * @param constructor       the invocation constructor.
      * @param args              the invocation constructor arguments.
      * @param order             the input data order.
@@ -107,7 +107,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
-            @Nullable final ClashResolutionType resolution,
+            @Nullable final ClashResolutionType resolutionType,
             @Nullable final CacheStrategyType cacheStrategyType,
             @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args, @Nullable final OrderType order,
@@ -132,7 +132,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         mContext = context;
         mLoaderId = loaderId;
         mClashResolutionType =
-                (resolution == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolution;
+                (resolutionType == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolutionType;
         mCacheStrategyType =
                 (cacheStrategyType == null) ? CacheStrategyType.CLEAR : cacheStrategyType;
         mConstructor = constructor;

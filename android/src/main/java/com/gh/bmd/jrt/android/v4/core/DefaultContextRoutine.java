@@ -74,8 +74,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
      * @param configuration     the routine configuration.
      * @param context           the context reference.
      * @param invocationId      the invocation ID.
-     * @param resolution        the clash resolution type.
-     * @param cacheStrategyType the result cache type.
+     * @param resolutionType    the clash resolution type.
+     * @param cacheStrategyType the result cache strategy type.
      * @param constructor       the invocation constructor.
      * @param args              the invocation constructor arguments.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
@@ -85,7 +85,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     @SuppressWarnings("ConstantConditions")
     DefaultContextRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final WeakReference<Object> context, final int invocationId,
-            @Nullable final ClashResolutionType resolution,
+            @Nullable final ClashResolutionType resolutionType,
             @Nullable final CacheStrategyType cacheStrategyType,
             @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args) {
@@ -111,7 +111,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         mContext = context;
         mInvocationId = invocationId;
         mClashResolutionType =
-                (resolution == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolution;
+                (resolutionType == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolutionType;
         mCacheStrategyType =
                 (cacheStrategyType == null) ? CacheStrategyType.CLEAR : cacheStrategyType;
         mConstructor = constructor;

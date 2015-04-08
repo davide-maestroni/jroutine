@@ -433,9 +433,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder onClash(@Nullable final ClashResolutionType resolution) {
+    public ObjectContextRoutineBuilder onClash(@Nullable final ClashResolutionType resolutionType) {
 
-        mClashResolutionType = resolution;
+        mClashResolutionType = resolutionType;
         return this;
     }
 

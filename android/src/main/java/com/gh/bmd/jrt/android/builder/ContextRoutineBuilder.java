@@ -48,11 +48,11 @@ public interface ContextRoutineBuilder {
      * of the same type and with the same ID is still running. A null value means that it is up to
      * the framework to choose a default resolution type.
      *
-     * @param resolution the type of resolution.
+     * @param resolutionType the type of resolution.
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder onClash(@Nullable ClashResolutionType resolution);
+    ContextRoutineBuilder onClash(@Nullable ClashResolutionType resolutionType);
 
     //TODO: annotation?
 
@@ -60,7 +60,7 @@ public interface ContextRoutineBuilder {
      * Tells the builder how to cache the invocation result after its completion. A null value means
      * that it is up to the framework to choose a default strategy.
      *
-     * @param cacheStrategyType the cache type.
+     * @param cacheStrategyType the cache strategy type.
      * @return this builder.
      */
     @Nonnull

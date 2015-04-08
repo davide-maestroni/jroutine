@@ -575,7 +575,9 @@ public class InvocationContextRoutineBuilderTest
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                .withConfiguration(configuration).withId(0).onClash(ClashResolutionType.KEEP_THAT)
+                .withConfiguration(configuration)
+                .withId(0)
+                .onClash(ClashResolutionType.KEEP_THAT)
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
@@ -583,7 +585,9 @@ public class InvocationContextRoutineBuilderTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                .withConfiguration(configuration).withId(0).onClash(ClashResolutionType.KEEP_THAT)
+                .withConfiguration(configuration)
+                .withId(0)
+                .onClash(ClashResolutionType.KEEP_THAT)
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(10);
     }

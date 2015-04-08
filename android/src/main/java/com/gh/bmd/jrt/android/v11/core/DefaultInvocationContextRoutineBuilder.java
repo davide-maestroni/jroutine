@@ -132,9 +132,9 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
     @Nonnull
     public InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(
-            @Nullable final ClashResolutionType resolution) {
+            @Nullable final ClashResolutionType resolutionType) {
 
-        mClashResolutionType = resolution;
+        mClashResolutionType = resolutionType;
         return this;
     }
 

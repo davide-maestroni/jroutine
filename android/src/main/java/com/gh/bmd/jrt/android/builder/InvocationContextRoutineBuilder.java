@@ -60,7 +60,7 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
      */
     @Nonnull
     InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(
-            @Nullable ClashResolutionType resolution);
+            @Nullable ClashResolutionType resolutionType);
 
     /**
      * {@inheritDoc}

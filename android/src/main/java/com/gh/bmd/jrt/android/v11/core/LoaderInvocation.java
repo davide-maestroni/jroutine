@@ -95,14 +95,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     /**
      * Constructor.
      *
-     * @param context       the context reference.
-     * @param loaderId      the loader ID.
-     * @param resolution    the clash resolution type.
+     * @param context           the context reference.
+     * @param loaderId          the loader ID.
+     * @param resolution        the clash resolution type.
      * @param cacheStrategyType the result cache type.
-     * @param constructor   the invocation constructor.
-     * @param args          the invocation constructor arguments.
-     * @param order         the input data order.
-     * @param logger        the logger instance.
+     * @param constructor       the invocation constructor.
+     * @param args              the invocation constructor arguments.
+     * @param order             the input data order.
+     * @param logger            the logger instance.
      * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     @SuppressWarnings("ConstantConditions")

@@ -387,7 +387,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
             }
 
-            final TimeoutAction actionAnnotation = targetMethod.getAnnotation(TimeoutAction.class);
+            final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
 
             if (actionAnnotation != null) {
 

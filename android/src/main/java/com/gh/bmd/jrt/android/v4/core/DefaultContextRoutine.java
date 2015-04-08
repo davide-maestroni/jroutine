@@ -71,13 +71,13 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
-     * @param context       the context reference.
-     * @param invocationId  the invocation ID.
-     * @param resolution    the clash resolution type.
+     * @param configuration     the routine configuration.
+     * @param context           the context reference.
+     * @param invocationId      the invocation ID.
+     * @param resolution        the clash resolution type.
      * @param cacheStrategyType the result cache type.
-     * @param constructor   the invocation constructor.
-     * @param args          the invocation constructor arguments.
+     * @param constructor       the invocation constructor.
+     * @param args              the invocation constructor arguments.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      * @throws java.lang.NullPointerException     if any of the specified non-null parameter is
      *                                            null.
@@ -166,8 +166,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
             return new LoaderInvocation<INPUT, OUTPUT>(mContext, mInvocationId,
                                                        mClashResolutionType, mCacheStrategyType,
-                                                       mConstructor, mArgs,
-                                                       mOrderType, logger);
+                                                       mConstructor, mArgs, mOrderType, logger);
         }
 
         final Object context = mContext.get();

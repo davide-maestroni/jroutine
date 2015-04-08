@@ -24,12 +24,14 @@ import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
+import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.log.Log;
@@ -43,12 +45,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
@@ -986,6 +990,95 @@ public class ObjectContextRoutineBuilderFragmentTest
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
+    public void testTimeoutActionAnnotation() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .boundMethod("test")
+                           .callAsync()
+                           .readNext()).isEqualTo(31);
+
+        try {
+
+            JRoutine.onFragment(fragment, TestTimeout.class)
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .boundMethod("test")
+                    .callAsync()
+                    .readNext();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .method("getInt")
+                           .callAsync()
+                           .readNext()).isEqualTo(31);
+
+        try {
+
+            JRoutine.onFragment(fragment, TestTimeout.class)
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .method("getInt")
+                    .callAsync()
+                    .readNext();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .method(TestTimeout.class.getMethod("getInt"))
+                           .callAsync()
+                           .readNext()).isEqualTo(31);
+
+        try {
+
+            JRoutine.onFragment(fragment, TestTimeout.class)
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .method(TestTimeout.class.getMethod("getInt"))
+                    .callAsync()
+                    .readNext();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .buildProxy(TestTimeoutItf.class)
+                           .getInt()).containsExactly(31);
+
+        try {
+
+            JRoutine.onFragment(fragment, TestTimeout.class)
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .buildProxy(TestTimeoutItf.class)
+                    .getInt();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
     public interface Itf {
 
         @Bind("a")
@@ -1416,6 +1509,13 @@ public class ObjectContextRoutineBuilderFragmentTest
         int throwException2(RuntimeException ex);
     }
 
+    private interface TestTimeoutItf {
+
+        @Pass(int.class)
+        @TimeoutAction(TimeoutActionType.ABORT)
+        List<Integer> getInt();
+    }
+
     @SuppressWarnings("unused")
     public static class Impl {
 
@@ -1680,6 +1780,17 @@ public class ObjectContextRoutineBuilderFragmentTest
             TimeDuration.millis(500).sleepAtLeast();
 
             return 2;
+        }
+    }
+
+    private static class TestTimeout {
+
+        @Bind("test")
+        @TimeoutAction(TimeoutActionType.EXIT)
+        public int getInt() throws InterruptedException {
+
+            Thread.sleep(100);
+            return 31;
         }
     }
 }

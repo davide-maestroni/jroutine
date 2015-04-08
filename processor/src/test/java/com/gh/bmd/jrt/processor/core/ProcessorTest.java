@@ -17,10 +17,13 @@ import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassMode;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
+import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.log.Log;
@@ -45,6 +48,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withAsyncRunner;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withSyncRunner;
@@ -372,6 +376,29 @@ public class ProcessorTest {
         final StandaloneChannel<List<Integer>> channel42 = JRoutine.standalone().buildChannel();
         channel42.input().pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42.output());
+    }
+
+    @Test
+    public void testTimeoutActionAnnotation() throws NoSuchMethodException {
+
+        final TestTimeout testTimeout = new TestTimeout();
+        assertThat(JRoutineProcessor.on(testTimeout)
+                                    .withConfiguration(withReadTimeout(seconds(1)))
+                                    .buildWrapper(TestTimeoutItf.class)
+                                    .getInt()).containsExactly(31);
+
+        try {
+
+            JRoutineProcessor.on(testTimeout)
+                             .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                             .buildWrapper(TestTimeoutItf.class)
+                             .getInt();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
     }
 
     @Test
@@ -839,6 +866,14 @@ public class ProcessorTest {
         List<TYPE> getList(int i);
     }
 
+    @Wrap(TestTimeout.class)
+    public interface TestTimeoutItf {
+
+        @Pass(int.class)
+        @TimeoutAction(TimeoutActionType.ABORT)
+        List<Integer> getInt();
+    }
+
     @Wrap(TestClass.class)
     public interface TestWrapper {
 
@@ -977,6 +1012,16 @@ public class ProcessorTest {
         public TYPE get(int i) {
 
             return mList.get(i);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class TestTimeout {
+
+        public int getInt() throws InterruptedException {
+
+            Thread.sleep(100);
+            return 31;
         }
     }
 

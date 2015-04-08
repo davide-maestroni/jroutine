@@ -287,10 +287,12 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (timeoutAnnotation != null) {
 
-            builder.append(".afterMax(").append(timeoutAnnotation.value())
+            builder.append(".afterMax(")
+                   .append(timeoutAnnotation.value())
                    .append(", ")
                    .append(TimeUnit.class.getCanonicalName())
-                   .append(".").append(timeoutAnnotation.unit())
+                   .append(".")
+                   .append(timeoutAnnotation.unit())
                    .append(")");
         }
 

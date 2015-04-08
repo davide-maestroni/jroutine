@@ -67,8 +67,6 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  */
 class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder {
 
-    private static final Object sFactoryMutex = new Object();
-
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
@@ -191,6 +189,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nonnull
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     private static Object getInstance(@Nonnull final Context context,
             @Nonnull final Class<?> targetClass, @Nonnull final Object[] args) throws
             IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -199,7 +198,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         if (context instanceof FactoryContext) {
 
-            synchronized (sFactoryMutex) {
+            // the context here is always the service
+            synchronized (context) {
 
                 target = ((FactoryContext) context).geInstance(targetClass, args);
             }

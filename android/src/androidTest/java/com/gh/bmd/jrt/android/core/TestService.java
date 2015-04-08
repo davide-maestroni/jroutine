@@ -39,7 +39,7 @@ public class TestService extends RoutineService implements FactoryContext {
     public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
             @Nonnull final Object... args) {
 
-        final HashMap<Class<?>, Object> instanceMap = TestService.sInstanceMap;
+        final HashMap<Class<?>, Object> instanceMap = sInstanceMap;
         Object instance = instanceMap.get(type);
 
         if (instance == null) {

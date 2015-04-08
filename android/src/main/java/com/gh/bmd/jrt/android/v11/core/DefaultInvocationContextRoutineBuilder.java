@@ -59,9 +59,9 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
     private Object[] mArgs = Reflection.NO_ARGS;
 
-    private CacheStrategy mCacheStrategy;
+    private CacheStrategyType mCacheStrategyType;
 
-    private ClashResolution mClashResolution;
+    private ClashResolutionType mClashResolutionType;
 
     private int mInvocationId = ContextRoutineBuilder.AUTO;
 
@@ -126,23 +126,23 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
         final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor =
                 findConstructor(mInvocationClass, args);
         return new DefaultContextRoutine<INPUT, OUTPUT>(builder.buildConfiguration(), mContext,
-                                                        mInvocationId, mClashResolution,
-                                                        mCacheStrategy, constructor, args);
+                                                        mInvocationId, mClashResolutionType,
+                                                        mCacheStrategyType, constructor, args);
     }
 
     @Nonnull
     public InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(
-            @Nullable final ClashResolution resolution) {
+            @Nullable final ClashResolutionType resolution) {
 
-        mClashResolution = resolution;
+        mClashResolutionType = resolution;
         return this;
     }
 
     @Nonnull
     public InvocationContextRoutineBuilder<INPUT, OUTPUT> onComplete(
-            @Nullable final CacheStrategy cacheStrategy) {
+            @Nullable final CacheStrategyType cacheStrategyType) {
 
-        mCacheStrategy = cacheStrategy;
+        mCacheStrategyType = cacheStrategyType;
         return this;
     }
 

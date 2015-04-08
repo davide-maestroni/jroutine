@@ -22,9 +22,10 @@ import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.ParamMode;
-import com.gh.bmd.jrt.annotation.Share;
+import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -290,11 +291,11 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     private static String withShareAnnotation(@Nullable final String shareGroup,
             @Nonnull final Method method) {
 
-        final Share shareAnnotation = method.getAnnotation(Share.class);
+        final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
 
-        if (shareAnnotation != null) {
+        if (shareGroupAnnotation != null) {
 
-            return shareAnnotation.value();
+            return shareGroupAnnotation.value();
         }
 
         return shareGroup;
@@ -309,8 +310,14 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         if (timeoutAnnotation != null) {
 
-            return builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
-                          .onReadTimeout(timeoutAnnotation.action());
+            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+        }
+
+        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.onReadTimeout(actionAnnotation.value());
         }
 
         return builder;
@@ -857,7 +864,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                 mTarget = getInstance(context, mTargetClass, mArgs);
                 final String shareGroup = mShareGroup;
 
-                if (!Share.NONE.equals(shareGroup)) {
+                if (!ShareGroup.NONE.equals(shareGroup)) {
 
                     mMutex = getSharedMutex(mTarget, shareGroup);
                 }
@@ -934,13 +941,13 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
             for (int i = 0; i < length; i++) {
 
-                final ParamMode paramMode = getParamMode(method, i);
+                final PassMode paramMode = getParamMode(method, i);
 
                 if (paramMode != null) {
 
                     isAsync[i] = true;
-                    isParallel = (paramMode == ParamMode.PARALLEL);
-                    isInputCollection = (paramMode == ParamMode.COLLECTION);
+                    isParallel = (paramMode == PassMode.PARALLEL);
+                    isInputCollection = (paramMode == PassMode.COLLECTION);
 
                     for (final Annotation annotation : parameterAnnotations[i]) {
 
@@ -957,7 +964,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                 }
             }
 
-            ParamMode returnMode = null;
+            PassMode returnMode = null;
             final Class<?> returnType = method.getReturnType();
             final Pass methodAnnotation = method.getAnnotation(Pass.class);
 
@@ -966,12 +973,12 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                 returnMode = getReturnMode(method);
             }
 
-            final boolean isOutputCollection = (returnMode == ParamMode.COLLECTION);
+            final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
             final Builder builder = withTimeoutAnnotation(mConfiguration, method);
             final RoutineConfiguration configuration =
                     builder.withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
                            .withOutputOrder(
-                                   (returnMode == ParamMode.COLLECTION) ? OrderType.PASSING_ORDER
+                                   (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
                                            : OrderType.NONE)
                            .buildConfiguration();
             final Routine<Object, Object> routine =

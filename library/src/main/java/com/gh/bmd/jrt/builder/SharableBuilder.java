@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.annotation.ShareGroup;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -21,7 +23,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 3/7/15.
  *
- * @see com.gh.bmd.jrt.annotation.Share
+ * @see com.gh.bmd.jrt.annotation.ShareGroup
  */
 public interface SharableBuilder extends ConfigurableBuilder {
 
@@ -36,7 +38,7 @@ public interface SharableBuilder extends ConfigurableBuilder {
      *
      * @param group the group name.
      * @return this builder.
-     * @see com.gh.bmd.jrt.annotation.Share
+     * @see ShareGroup
      */
     @Nonnull
     SharableBuilder withShareGroup(@Nullable String group);

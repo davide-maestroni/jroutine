@@ -20,13 +20,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
- * <p/>
- * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
- * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
- * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * the framework as well.<br/>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Through this annotation, it is possible to exclude single methods from this kind of protection by
  * indicating them as having a different share group. Each group has a name associated, and every
  * method within a specific group is protected so that shared class members can be safely accessed
@@ -35,12 +29,15 @@ import java.lang.annotation.Target;
  * different groups can be invoked in parallel but should not access the same members to avoid
  * concurrency issues.
  * <p/>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * the framework as well.
+ * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
- * <p/>
- * When used to annotate a class instead of a method, its attributes are applied to all the class
- * methods unless specific values are set in the method annotation.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -50,7 +47,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.gh.bmd.jrt.annotation.Share *;
+ *              &#64;com.gh.bmd.jrt.annotation.ShareGroup *;
  *         }
  *     </code>
  * </pre>
@@ -60,12 +57,12 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Share {
+public @interface ShareGroup {
 
     /**
      * Constant indicating the default share group, that is, all member fields are protected.
      */
-    String ALL = "com.gh.bmd.jrt.annotation.Share.ALL";
+    String ALL = "com.gh.bmd.jrt.annotation.ShareGroup.ALL";
 
     /**
      * Constant indicating that no member field needs to be protected.

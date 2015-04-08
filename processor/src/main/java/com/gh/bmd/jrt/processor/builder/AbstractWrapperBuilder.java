@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.processor.builder;
 
-import com.gh.bmd.jrt.annotation.Share;
+import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -59,7 +59,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
             }
 
             final String shareGroup = mShareGroup;
-            final String classShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
+            final String classShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
             final RoutineConfiguration configuration = RoutineConfiguration.notNull(mConfiguration);
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo = new ClassInfo(token, configuration, classShareGroup);

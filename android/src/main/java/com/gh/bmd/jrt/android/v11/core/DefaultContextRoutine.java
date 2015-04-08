@@ -19,8 +19,8 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -59,9 +59,9 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
     private final Object[] mArgs;
 
-    private final CacheStrategy mCacheStrategy;
+    private final CacheStrategyType mCacheStrategyType;
 
-    private final ClashResolution mClashResolution;
+    private final ClashResolutionType mClashResolutionType;
 
     private final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> mConstructor;
 
@@ -78,7 +78,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
      * @param context       the context reference.
      * @param invocationId  the invocation ID.
      * @param resolution    the clash resolution type.
-     * @param cacheStrategy the result cache type.
+     * @param cacheStrategyType the result cache type.
      * @param constructor   the invocation constructor.
      * @param args          the invocation constructor arguments.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
@@ -88,7 +88,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     @SuppressWarnings("ConstantConditions")
     DefaultContextRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final WeakReference<Object> context, final int invocationId,
-            @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
+            @Nullable final ClashResolutionType resolution,
+            @Nullable final CacheStrategyType cacheStrategyType,
             @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args) {
 
@@ -112,8 +113,10 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         mContext = context;
         mInvocationId = invocationId;
-        mClashResolution = (resolution == null) ? ClashResolution.ABORT_THAT_INPUT : resolution;
-        mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
+        mClashResolutionType =
+                (resolution == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolution;
+        mCacheStrategyType =
+                (cacheStrategyType == null) ? CacheStrategyType.CLEAR : cacheStrategyType;
         mConstructor = constructor;
         mArgs = args;
         mOrderType = configuration.getOutputOrderOr(null);
@@ -164,8 +167,9 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         if (async) {
 
-            return new LoaderInvocation<INPUT, OUTPUT>(mContext, mInvocationId, mClashResolution,
-                                                       mCacheStrategy, mConstructor, mArgs,
+            return new LoaderInvocation<INPUT, OUTPUT>(mContext, mInvocationId,
+                                                       mClashResolutionType, mCacheStrategyType,
+                                                       mConstructor, mArgs,
                                                        mOrderType, logger);
         }
 

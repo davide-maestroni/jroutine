@@ -105,11 +105,11 @@ import java.lang.annotation.Target;
 public @interface Pass {
 
     /**
-     * The asynchronous param mode.
+     * The asynchronous passing mode.
      *
      * @return the mode.
      */
-    ParamMode mode() default ParamMode.AUTO;
+    PassMode mode() default PassMode.AUTO;
 
     /**
      * The bound class.
@@ -119,11 +119,11 @@ public @interface Pass {
     Class<?> value();
 
     /**
-     * Asynchronous param mode.<br/>
+     * Asynchronous passing mode.<br/>
      * The type indicates in which way a parameter is passed to the wrapped method or the result
      * is passed outside.
      */
-    enum ParamMode {
+    enum PassMode {
 
         /**
          * Object mode.<br/>
@@ -155,11 +155,11 @@ public @interface Pass {
         PARALLEL,
         /**
          * Automatic mode.<br/>
-         * The mode is automatically assigned based on the parameter or return type. Namely: if the
-         * parameters match the COLLECTION parameter mode, they are assigned it; if they match the
+         * The mode is automatically assigned based to the parameter or return type. Namely: if the
+         * parameters match the COLLECTION passing mode, they are assigned it; if they match the
          * OBJECT mode, they are assigned the latter; finally the PARALLEL conditions are checked.
          * <p/>
-         * Dually, if the return type matches the PARALLEL parameter mode, it is assigned it; if it
+         * Dually, if the return type matches the PARALLEL passing mode, it is assigned it; if it
          * matches the COLLECTION mode, it is assigned the latter; finally the OBJECT conditions are
          * checked.
          */

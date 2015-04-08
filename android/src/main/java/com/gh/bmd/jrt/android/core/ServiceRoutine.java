@@ -28,7 +28,7 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
@@ -345,14 +345,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mStandaloneParamOutput = paramChannel.output();
             final OrderType outputOrder = configuration.getOutputOrderOr(null);
             final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
-            final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
+            final TimeoutActionType timeoutActionType = configuration.getReadTimeoutActionOr(null);
             final RoutineConfiguration outputConfiguration = builder().withOutputOrder(outputOrder)
                                                                       .withOutputSize(
                                                                               Integer.MAX_VALUE)
                                                                       .withOutputTimeout(
                                                                               TimeDuration.ZERO)
                                                                       .withReadTimeout(readTimeout)
-                                                                      .onReadTimeout(timeoutAction)
+                                                                      .onReadTimeout(
+                                                                              timeoutActionType)
                                                                       .withLog(log)
                                                                       .withLogLevel(logLevel)
                                                                       .buildConfiguration();

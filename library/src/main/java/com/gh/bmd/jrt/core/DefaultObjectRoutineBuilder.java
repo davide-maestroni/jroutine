@@ -15,14 +15,15 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.ParamMode;
-import com.gh.bmd.jrt.annotation.Share;
+import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -75,12 +76,12 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @SuppressWarnings("unchecked")
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nullable final ParamMode paramMode, @Nullable final ParamMode returnMode) {
+            @Nullable final PassMode paramMode, @Nullable final PassMode returnMode) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
-        if (paramMode == ParamMode.PARALLEL) {
+        if (paramMode == PassMode.PARALLEL) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
@@ -115,7 +116,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramMode == ParamMode.OBJECT) {
+        } else if (paramMode == PassMode.OBJECT) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -137,7 +138,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramMode == ParamMode.COLLECTION) {
+        } else if (paramMode == PassMode.COLLECTION) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             outputChannel = parameterChannel.pass((OutputChannel<Object>) args[0]).result();
@@ -296,14 +297,20 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                final Timeout methodAnnotation = method.getAnnotation(Timeout.class);
                 TimeDuration outputTimeout = null;
-                TimeoutAction outputAction = null;
+                TimeoutActionType outputAction = null;
+                final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
-                if (methodAnnotation != null) {
+                if (timeoutAnnotation != null) {
 
-                    outputTimeout = fromUnit(methodAnnotation.value(), methodAnnotation.unit());
-                    outputAction = methodAnnotation.action();
+                    outputTimeout = fromUnit(timeoutAnnotation.value(), timeoutAnnotation.unit());
+                }
+
+                final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+                if (actionAnnotation != null) {
+
+                    outputAction = actionAnnotation.value();
                 }
 
                 if (outputTimeout != null) {
@@ -311,15 +318,15 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     outputChannel.afterMax(outputTimeout);
                 }
 
-                if (outputAction == TimeoutAction.DEADLOCK) {
+                if (outputAction == TimeoutActionType.DEADLOCK) {
 
                     outputChannel.eventuallyDeadlock();
 
-                } else if (outputAction == TimeoutAction.EXIT) {
+                } else if (outputAction == TimeoutActionType.EXIT) {
 
                     outputChannel.eventuallyExit();
 
-                } else if (outputAction == TimeoutAction.ABORT) {
+                } else if (outputAction == TimeoutActionType.ABORT) {
 
                     outputChannel.eventuallyAbort();
                 }
@@ -351,25 +358,25 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         @Nonnull
         private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
-                @Nonnull final Method targetMethod, @Nullable final ParamMode paramMode,
-                @Nullable final ParamMode returnMode) {
+                @Nonnull final Method targetMethod, @Nullable final PassMode paramMode,
+                @Nullable final PassMode returnMode) {
 
             String shareGroup = mShareGroup;
             final RoutineConfiguration configuration = mConfiguration;
             final Builder builder = RoutineConfiguration.builderFrom(configuration);
-            final Share shareAnnotation = method.getAnnotation(Share.class);
+            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
 
-            if (shareAnnotation != null) {
+            if (shareGroupAnnotation != null) {
 
-                shareGroup = shareAnnotation.value();
+                shareGroup = shareGroupAnnotation.value();
             }
 
             warn(configuration);
             builder.withInputOrder(
-                    (paramMode == ParamMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
+                    (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
                    .withInputSize(Integer.MAX_VALUE)
                    .withInputTimeout(TimeDuration.ZERO)
-                   .withOutputOrder((returnMode == ParamMode.COLLECTION) ? OrderType.PASSING_ORDER
+                   .withOutputOrder((returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
                                             : OrderType.NONE)
                    .withOutputSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
@@ -377,13 +384,19 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             if (timeoutAnnotation != null) {
 
-                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
-                       .onReadTimeout(timeoutAnnotation.action());
+                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            }
+
+            final TimeoutAction actionAnnotation = targetMethod.getAnnotation(TimeoutAction.class);
+
+            if (actionAnnotation != null) {
+
+                builder.onReadTimeout(actionAnnotation.value());
             }
 
             return getRoutine(builder.buildConfiguration(), shareGroup, targetMethod,
-                              (paramMode == ParamMode.COLLECTION),
-                              (returnMode == ParamMode.COLLECTION));
+                              (paramMode == PassMode.COLLECTION),
+                              (returnMode == PassMode.COLLECTION));
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -403,8 +416,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            ParamMode asyncParamMode = null;
-            ParamMode asyncReturnMode = null;
+            PassMode asyncParamMode = null;
+            PassMode asyncReturnMode = null;
             Class<?> returnClass = null;
             final Pass methodAnnotation = method.getAnnotation(Pass.class);
 
@@ -420,7 +433,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             for (int i = 0; i < length; ++i) {
 
-                final ParamMode paramMode = getParamMode(method, i);
+                final PassMode paramMode = getParamMode(method, i);
 
                 if (paramMode != null) {
 
@@ -476,7 +489,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                     } else {
 
-                        if ((asyncReturnMode == ParamMode.PARALLEL) && returnType.isArray()) {
+                        if ((asyncReturnMode == PassMode.PARALLEL) && returnType.isArray()) {
 
                             isError = !boxingClass(returnType.getComponentType()).isAssignableFrom(
                                     boxingClass(targetReturnType));

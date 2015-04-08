@@ -33,13 +33,13 @@ public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder onClash(@Nullable ClashResolution resolution);
+    ObjectContextRoutineBuilder onClash(@Nullable ClashResolutionType resolution);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
+    ObjectContextRoutineBuilder onComplete(@Nullable CacheStrategyType cacheStrategyType);
 
     /**
      * {@inheritDoc}

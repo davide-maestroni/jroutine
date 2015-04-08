@@ -42,6 +42,7 @@ public interface ContextRoutineBuilder {
     int AUTO = Integer.MIN_VALUE;
 
     //TODO: annotation?
+
     /**
      * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
      * of the same type and with the same ID is still running. A null value means that it is up to
@@ -51,18 +52,19 @@ public interface ContextRoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder onClash(@Nullable ClashResolution resolution);
+    ContextRoutineBuilder onClash(@Nullable ClashResolutionType resolution);
 
     //TODO: annotation?
+
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
      * that it is up to the framework to choose a default strategy.
      *
-     * @param cacheStrategy the cache type.
+     * @param cacheStrategyType the cache type.
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
+    ContextRoutineBuilder onComplete(@Nullable CacheStrategyType cacheStrategyType);
 
     /**
      * Sets the arguments to be passed to the invocation constructor.
@@ -80,6 +82,7 @@ public interface ContextRoutineBuilder {
     ContextRoutineBuilder withArgs(@Nullable Object... args);
 
     //TODO: annotation?
+
     /**
      * Tells the builder to identify the invocation with the specified ID.
      *
@@ -91,10 +94,10 @@ public interface ContextRoutineBuilder {
 
     /**
      * Result cache type enumeration.<br/>
-     * The cache type indicates what will happen to the result of an invocation after its
+     * The cache strategy type indicates what will happen to the result of an invocation after its
      * completion.
      */
-    enum CacheStrategy {
+    enum CacheStrategyType {
 
         /**
          * On completion the invocation results are cleared.
@@ -129,7 +132,7 @@ public interface ContextRoutineBuilder {
      * ones, and retained otherwise</li>
      * </ul>
      */
-    enum ClashResolution {
+    enum ClashResolutionType {
 
         /**
          * The clash is resolved by aborting the running invocation.

@@ -13,17 +13,18 @@
  */
 package com.gh.bmd.jrt.annotation;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
- * Through this annotation it is possible to indicate the timeout for a readable result to become
- * available, and the action to be taken when it elapses.
+ * Through this annotation it is possible to indicate the action to be taken when the timeout for a
+ * readable result to become available elapses.
  * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
@@ -43,29 +44,22 @@ import java.util.concurrent.TimeUnit;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.gh.bmd.jrt.annotation.Timeout *;
+ *              &#64;com.gh.bmd.jrt.annotation.TimeoutAction *;
  *         }
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 9/21/14.
+ * Created by Davide on 4/8/2015.
  */
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Timeout {
+public @interface TimeoutAction {
 
     /**
-     * The time unit of the timeout for an invocation instance to produce a result.
+     * The type of action to be taken on output channel timeout.
      *
-     * @return the time unit.
+     * @return the action type.
      */
-    TimeUnit unit() default TimeUnit.MILLISECONDS;
-
-    /**
-     * The timeout for an invocation instance to produce a result.
-     *
-     * @return the timeout.
-     */
-    long value();
+    TimeoutActionType value();
 }

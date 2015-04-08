@@ -16,8 +16,8 @@ package com.gh.bmd.jrt.android.v4.core;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -47,7 +47,7 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
 
     private final int mInvocationId;
 
-    private CacheStrategy mCacheStrategy;
+    private CacheStrategyType mCacheStrategyType;
 
     private RoutineConfiguration mConfiguration;
 
@@ -128,15 +128,16 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
         }
 
         return builder.withConfiguration(mConfiguration)
-                      .onClash(ClashResolution.KEEP_THAT)
-                      .onComplete(mCacheStrategy)
+                      .onClash(ClashResolutionType.KEEP_THAT)
+                      .onComplete(mCacheStrategyType)
                       .callAsync();
     }
 
     @Nonnull
-    public InvocationContextChannelBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
+    public InvocationContextChannelBuilder onComplete(
+            @Nullable final CacheStrategyType cacheStrategyType) {
 
-        mCacheStrategy = cacheStrategy;
+        mCacheStrategyType = cacheStrategyType;
         return this;
     }
 

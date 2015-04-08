@@ -25,9 +25,10 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.ParamMode;
-import com.gh.bmd.jrt.annotation.Share;
+import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -77,9 +78,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
     private Object[] mArgs = Reflection.NO_ARGS;
 
-    private CacheStrategy mCacheStrategy;
+    private CacheStrategyType mCacheStrategyType;
 
-    private ClashResolution mClashResolution;
+    private ClashResolutionType mClashResolutionType;
 
     private RoutineConfiguration mConfiguration;
 
@@ -285,11 +286,11 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     private static String withShareAnnotation(@Nullable final String shareGroup,
             @Nonnull final Method method) {
 
-        final Share shareAnnotation = method.getAnnotation(Share.class);
+        final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
 
-        if (shareAnnotation != null) {
+        if (shareGroupAnnotation != null) {
 
-            return shareAnnotation.value();
+            return shareGroupAnnotation.value();
         }
 
         return shareGroup;
@@ -304,8 +305,14 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         if (timeoutAnnotation != null) {
 
-            return builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
-                          .onReadTimeout(timeoutAnnotation.action());
+            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+        }
+
+        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.onReadTimeout(actionAnnotation.value());
         }
 
         return builder;
@@ -340,8 +347,8 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                                                                              targetMethod), name)
                                                .withConfiguration(routineConfiguration)
                                                .withId(mInvocationId)
-                                               .onClash(mClashResolution)
-                                               .onComplete(mCacheStrategy)
+                                               .onClash(mClashResolutionType)
+                                               .onComplete(mCacheStrategyType)
                                                .buildRoutine();
     }
 
@@ -387,8 +394,8 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                                                          toNames(parameterTypes))
                                                .withConfiguration(routineConfiguration)
                                                .withId(mInvocationId)
-                                               .onClash(mClashResolution)
-                                               .onComplete(mCacheStrategy)
+                                               .onClash(mClashResolutionType)
+                                               .onComplete(mCacheStrategyType)
                                                .buildRoutine();
     }
 
@@ -426,16 +433,17 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder onClash(@Nullable final ClashResolution resolution) {
+    public ObjectContextRoutineBuilder onClash(@Nullable final ClashResolutionType resolution) {
 
-        mClashResolution = resolution;
+        mClashResolutionType = resolution;
         return this;
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
+    public ObjectContextRoutineBuilder onComplete(
+            @Nullable final CacheStrategyType cacheStrategyType) {
 
-        mCacheStrategy = cacheStrategy;
+        mCacheStrategyType = cacheStrategyType;
         return this;
     }
 
@@ -872,7 +880,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 mTarget = getInstance(context, mTargetClass, mArgs);
                 final String shareGroup = mShareGroup;
 
-                if (!Share.NONE.equals(shareGroup)) {
+                if (!ShareGroup.NONE.equals(shareGroup)) {
 
                     mMutex = getSharedMutex(mTarget, shareGroup);
                 }
@@ -895,9 +903,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         private final Object[] mArgs;
 
-        private final CacheStrategy mCacheStrategy;
+        private final CacheStrategyType mCacheStrategyType;
 
-        private final ClashResolution mClashResolution;
+        private final ClashResolutionType mClashResolutionType;
 
         private final RoutineConfiguration mConfiguration;
 
@@ -927,8 +935,8 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                                                  .builderFrom()
                                                  .buildConfiguration();
             mInvocationId = builder.mInvocationId;
-            mClashResolution = builder.mClashResolution;
-            mCacheStrategy = builder.mCacheStrategy;
+            mClashResolutionType = builder.mClashResolutionType;
+            mCacheStrategyType = builder.mCacheStrategyType;
             mShareGroup = builder.mShareGroup;
             mProxyClass = proxyClass;
         }
@@ -946,13 +954,13 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
             for (int i = 0; i < length; i++) {
 
-                final ParamMode paramMode = getParamMode(method, i);
+                final PassMode paramMode = getParamMode(method, i);
 
                 if (paramMode != null) {
 
                     isAsync[i] = true;
-                    isParallel = (paramMode == ParamMode.PARALLEL);
-                    isInputCollection = (paramMode == ParamMode.COLLECTION);
+                    isParallel = (paramMode == PassMode.PARALLEL);
+                    isInputCollection = (paramMode == PassMode.COLLECTION);
 
                     for (final Annotation annotation : parameterAnnotations[i]) {
 
@@ -969,7 +977,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 }
             }
 
-            ParamMode returnMode = null;
+            PassMode returnMode = null;
             final Class<?> returnType = method.getReturnType();
             final Pass methodAnnotation = method.getAnnotation(Pass.class);
 
@@ -978,12 +986,12 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 returnMode = getReturnMode(method);
             }
 
-            final boolean isOutputCollection = (returnMode == ParamMode.COLLECTION);
+            final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
             final Builder builder = withTimeoutAnnotation(mConfiguration, method);
             final RoutineConfiguration configuration =
                     builder.withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
                            .withOutputOrder(
-                                   (returnMode == ParamMode.COLLECTION) ? OrderType.PASSING_ORDER
+                                   (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
                                            : OrderType.NONE)
                            .buildConfiguration();
             final InvocationContextRoutineBuilder<Object, Object> routineBuilder =
@@ -996,8 +1004,8 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                                             isOutputCollection)
                                   .withConfiguration(configuration)
                                   .withId(mInvocationId)
-                                  .onClash(mClashResolution)
-                                  .onComplete(mCacheStrategy)
+                                  .onClash(mClashResolutionType)
+                                  .onComplete(mCacheStrategyType)
                                   .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

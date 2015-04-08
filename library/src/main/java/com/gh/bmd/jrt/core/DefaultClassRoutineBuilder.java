@@ -14,8 +14,9 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Share;
+import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -235,7 +236,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
+            final String methodShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
             final RoutineInfo routineInfo =
                     new RoutineInfo(configuration, method, methodShareGroup, isInputCollection,
                                     isOutputCollection);
@@ -245,7 +246,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
                 final Object mutex;
 
-                if (!Share.NONE.equals(methodShareGroup)) {
+                if (!ShareGroup.NONE.equals(methodShareGroup)) {
 
                     mutex = getSharedMutex(target, methodShareGroup);
 
@@ -315,11 +316,11 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         String methodShareGroup = shareGroup;
         final Builder builder = RoutineConfiguration.builderFrom(configuration);
-        final Share shareAnnotation = targetMethod.getAnnotation(Share.class);
+        final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
-        if (shareAnnotation != null) {
+        if (shareGroupAnnotation != null) {
 
-            methodShareGroup = shareAnnotation.value();
+            methodShareGroup = shareGroupAnnotation.value();
         }
 
         warn(configuration);
@@ -332,8 +333,14 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         if (timeoutAnnotation != null) {
 
-            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
-                   .onReadTimeout(timeoutAnnotation.action());
+            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+        }
+
+        final TimeoutAction actionAnnotation = targetMethod.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.onReadTimeout(actionAnnotation.value());
         }
 
         return getRoutine(builder.buildConfiguration(), methodShareGroup, targetMethod, false,

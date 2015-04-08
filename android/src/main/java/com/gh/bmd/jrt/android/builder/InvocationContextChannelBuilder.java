@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -44,11 +44,11 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
      * Tells the builder how to cache the invocation result after its completion. A null value means
      * that it is up to the framework to choose a default strategy.
      *
-     * @param cacheStrategy the cache strategy.
+     * @param cacheStrategyType the cache strategy.
      * @return this builder.
      */
     @Nonnull
-    InvocationContextChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
+    InvocationContextChannelBuilder onComplete(@Nullable CacheStrategyType cacheStrategyType);
 
     /**
      * Makes the builder destroy all the cached invocation instances.

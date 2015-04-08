@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
@@ -84,7 +84,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private final Runner mRunner;
 
-    private final TimeoutAction mTimeoutAction;
+    private final TimeoutActionType mTimeoutActionType;
 
     private Throwable mAbortException;
 
@@ -136,7 +136,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mHandler = handler;
         mRunner = runner;
         mReadTimeout = configuration.getReadTimeoutOr(ZERO);
-        mTimeoutAction = configuration.getReadTimeoutActionOr(TimeoutAction.DEADLOCK);
+        mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.DEADLOCK);
         mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
         mOutputQueue = (configuration.getOutputOrderOr(OrderType.NONE) == OrderType.NONE)
@@ -437,15 +437,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Nonnull
     OutputChannel<OUTPUT> getOutput() {
 
-        final TimeoutAction action = mTimeoutAction;
+        final TimeoutActionType action = mTimeoutActionType;
         final OutputChannel<OUTPUT> outputChannel =
                 new DefaultOutputChannel().afterMax(mReadTimeout);
 
-        if (action == TimeoutAction.EXIT) {
+        if (action == TimeoutActionType.EXIT) {
 
             outputChannel.eventuallyExit();
 
-        } else if (action == TimeoutAction.ABORT) {
+        } else if (action == TimeoutActionType.ABORT) {
 
             outputChannel.eventuallyAbort();
         }
@@ -704,7 +704,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     @Nullable
     private OUTPUT readQueue(@Nonnull final TimeDuration timeout,
-            @Nonnull final TimeoutAction action) {
+            @Nonnull final TimeoutActionType action) {
 
         verifyBound();
         final Logger logger = mLogger;
@@ -716,7 +716,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
 
-                if (action == TimeoutAction.DEADLOCK) {
+                if (action == TimeoutActionType.DEADLOCK) {
 
                     throw new ReadDeadlockException("deadlock while waiting for outputs");
                 }
@@ -751,7 +751,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
 
-            if (action == TimeoutAction.DEADLOCK) {
+            if (action == TimeoutActionType.DEADLOCK) {
 
                 throw new ReadDeadlockException("deadlock while waiting for outputs");
             }
@@ -818,7 +818,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     private class DefaultIterator implements Iterator<OUTPUT> {
 
-        private final TimeoutAction mAction;
+        private final TimeoutActionType mAction;
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
@@ -833,7 +833,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param action  the timeout action.
          */
         private DefaultIterator(@Nonnull final TimeDuration timeout,
-                @Nonnull final TimeoutAction action) {
+                @Nonnull final TimeoutActionType action) {
 
             mTimeout = timeout;
             mAction = action;
@@ -856,17 +856,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     if (!hasNext && (mState != ChannelState.DONE)) {
 
-                        final TimeoutAction action = mAction;
+                        final TimeoutActionType action = mAction;
                         logger.wrn("has output timeout: [%s] => [%s]", timeout, action);
 
-                        if (action == TimeoutAction.DEADLOCK) {
+                        if (action == TimeoutActionType.DEADLOCK) {
 
                             throw new ReadDeadlockException(
                                     "deadlock while waiting to know if more outputs are coming");
 
                         } else {
 
-                            isAbort = (action == TimeoutAction.ABORT);
+                            isAbort = (action == TimeoutActionType.ABORT);
                         }
                     }
 
@@ -896,17 +896,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     if (isTimeout) {
 
-                        final TimeoutAction action = mAction;
+                        final TimeoutActionType action = mAction;
                         logger.wrn("has output timeout: [%s] => [%s]", timeout, action);
 
-                        if (action == TimeoutAction.DEADLOCK) {
+                        if (action == TimeoutActionType.DEADLOCK) {
 
                             throw new ReadDeadlockException(
                                     "deadlock while waiting to know if more outputs are coming");
 
                         } else {
 
-                            isAbort = (action == TimeoutAction.ABORT);
+                            isAbort = (action == TimeoutActionType.ABORT);
                         }
                     }
                 }
@@ -934,8 +934,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 synchronized (mMutex) {
 
-                    final TimeoutAction action = mAction;
-                    isAbort = (action == TimeoutAction.ABORT);
+                    final TimeoutActionType action = mAction;
+                    isAbort = (action == TimeoutActionType.ABORT);
 
                     final OUTPUT next = readQueue(mTimeout, action);
                     mRemoved = false;
@@ -980,7 +980,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private TimeDuration mReadTimeout = ZERO;
 
-        private TimeoutAction mTimeoutAction = TimeoutAction.DEADLOCK;
+        private TimeoutActionType mTimeoutActionType = TimeoutActionType.DEADLOCK;
 
         @Nonnull
         @SuppressWarnings("ConstantConditions")
@@ -1077,7 +1077,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                mTimeoutAction = TimeoutAction.ABORT;
+                mTimeoutActionType = TimeoutActionType.ABORT;
             }
 
             return this;
@@ -1088,7 +1088,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                mTimeoutAction = TimeoutAction.DEADLOCK;
+                mTimeoutActionType = TimeoutActionType.DEADLOCK;
             }
 
             return this;
@@ -1099,7 +1099,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                mTimeoutAction = TimeoutAction.EXIT;
+                mTimeoutActionType = TimeoutActionType.EXIT;
             }
 
             return this;
@@ -1160,17 +1160,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     if (mState != ChannelState.DONE) {
 
-                        final TimeoutAction action = mTimeoutAction;
+                        final TimeoutActionType action = mTimeoutActionType;
                         logger.wrn("list output timeout: [%s] => [%s]", timeout, action);
 
-                        if (action == TimeoutAction.DEADLOCK) {
+                        if (action == TimeoutActionType.DEADLOCK) {
 
                             throw new ReadDeadlockException(
                                     "deadlock while waiting to collect all outputs");
 
                         } else {
 
-                            isAbort = (action == TimeoutAction.ABORT);
+                            isAbort = (action == TimeoutActionType.ABORT);
                         }
                     }
 
@@ -1206,17 +1206,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     if (isTimeout) {
 
-                        final TimeoutAction action = mTimeoutAction;
+                        final TimeoutActionType action = mTimeoutActionType;
                         logger.wrn("list output timeout: [%s] => [%s]", timeout, action);
 
-                        if (action == TimeoutAction.DEADLOCK) {
+                        if (action == TimeoutActionType.DEADLOCK) {
 
                             throw new ReadDeadlockException(
                                     "deadlock while waiting to collect all outputs");
 
                         } else {
 
-                            isAbort = (action == TimeoutAction.ABORT);
+                            isAbort = (action == TimeoutActionType.ABORT);
                         }
                     }
                 }
@@ -1239,8 +1239,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 synchronized (mMutex) {
 
-                    final TimeoutAction action = mTimeoutAction;
-                    isAbort = (action == TimeoutAction.ABORT);
+                    final TimeoutActionType action = mTimeoutActionType;
+                    isAbort = (action == TimeoutActionType.ABORT);
 
                     return readQueue(mReadTimeout, action);
                 }
@@ -1277,14 +1277,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public Iterator<OUTPUT> iterator() {
 
             final TimeDuration timeout;
-            final TimeoutAction action;
+            final TimeoutActionType action;
 
             synchronized (mMutex) {
 
                 verifyBound();
 
                 timeout = mReadTimeout;
-                action = mTimeoutAction;
+                action = mTimeoutActionType;
             }
 
             return new DefaultIterator(timeout, action);

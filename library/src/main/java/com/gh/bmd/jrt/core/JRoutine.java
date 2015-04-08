@@ -147,8 +147,9 @@ import javax.annotation.Nonnull;
  *
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Pass
- * @see com.gh.bmd.jrt.annotation.Share
+ * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
+ * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
 public class JRoutine {
 

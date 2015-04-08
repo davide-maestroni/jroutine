@@ -23,8 +23,8 @@ import android.support.v4.content.Loader;
 import android.util.SparseArray;
 
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
@@ -75,9 +75,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
     private final Object[] mArgs;
 
-    private final CacheStrategy mCacheStrategy;
+    private final CacheStrategyType mCacheStrategyType;
 
-    private final ClashResolution mClashResolution;
+    private final ClashResolutionType mClashResolutionType;
 
     private final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> mConstructor;
 
@@ -95,7 +95,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * @param context       the context reference.
      * @param loaderId      the loader ID.
      * @param resolution    the clash resolution type.
-     * @param cacheStrategy the result cache type.
+     * @param cacheStrategyType the result cache type.
      * @param constructor   the invocation constructor.
      * @param args          the invocation constructor arguments.
      * @param order         the input data order.
@@ -104,7 +104,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
-            @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
+            @Nullable final ClashResolutionType resolution,
+            @Nullable final CacheStrategyType cacheStrategyType,
             @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
@@ -127,8 +128,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         mContext = context;
         mLoaderId = loaderId;
-        mClashResolution = (resolution == null) ? ClashResolution.ABORT_THAT_INPUT : resolution;
-        mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
+        mClashResolutionType =
+                (resolution == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolution;
+        mCacheStrategyType =
+                (cacheStrategyType == null) ? CacheStrategyType.CLEAR : cacheStrategyType;
         mConstructor = constructor;
         mArgs = args;
         mOrderType = order;
@@ -542,8 +545,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             callbacks = newCallbacks;
         }
 
-        logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheStrategy);
-        callbacks.setCacheStrategy(mCacheStrategy);
+        logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheStrategyType);
+        callbacks.setCacheStrategy(mCacheStrategyType);
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
@@ -627,30 +630,30 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             throw new InvocationClashException(loaderId);
         }
 
-        final ClashResolution resolution = mClashResolution;
+        final ClashResolutionType resolution = mClashResolutionType;
 
-        if (resolution == ClashResolution.ABORT_THAT) {
+        if (resolution == ClashResolutionType.ABORT_THAT) {
 
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return true;
 
-        } else if (resolution == ClashResolution.ABORT_THIS) {
+        } else if (resolution == ClashResolutionType.ABORT_THIS) {
 
             logger.dbg("aborting invocation [%d]", loaderId);
             throw new InputClashException(loaderId);
 
-        } else if ((resolution == ClashResolution.KEEP_THAT) || routineLoader.areSameInputs(
+        } else if ((resolution == ClashResolutionType.KEEP_THAT) || routineLoader.areSameInputs(
                 inputs)) {
 
             logger.dbg("keeping existing invocation [%d]", loaderId);
             return false;
 
-        } else if (resolution == ClashResolution.ABORT_THAT_INPUT) {
+        } else if (resolution == ClashResolutionType.ABORT_THAT_INPUT) {
 
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return true;
 
-        } else if (resolution == ClashResolution.ABORT_THIS_INPUT) {
+        } else if (resolution == ClashResolutionType.ABORT_THIS_INPUT) {
 
             logger.dbg("aborting invocation [%d]", loaderId);
             throw new InputClashException(loaderId);
@@ -681,7 +684,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         private final ArrayList<StandaloneInput<OUTPUT>> mNewChannels =
                 new ArrayList<StandaloneInput<OUTPUT>>();
 
-        private CacheStrategy mCacheStrategy;
+        private CacheStrategyType mCacheStrategyType;
 
         private int mResultCount;
 
@@ -755,11 +758,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                     mResultCount = 0;
                     internalLoader.setInvocationCount(0);
-                    final CacheStrategy cacheStrategy = mCacheStrategy;
+                    final CacheStrategyType cacheStrategyType = mCacheStrategyType;
 
-                    if ((cacheStrategy == CacheStrategy.CLEAR) || (data.isError() ? (cacheStrategy
-                            == CacheStrategy.CACHE_IF_SUCCESS)
-                            : (cacheStrategy == CacheStrategy.CACHE_IF_ERROR))) {
+                    if ((cacheStrategyType == CacheStrategyType.CLEAR) || (data.isError() ? (
+                            cacheStrategyType == CacheStrategyType.CACHE_IF_SUCCESS)
+                            : (cacheStrategyType == CacheStrategyType.CACHE_IF_ERROR))) {
 
                         final int id = internalLoader.getId();
                         logger.dbg("destroying Android loader: %d", id);
@@ -819,10 +822,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             newChannels.clear();
         }
 
-        private void setCacheStrategy(@Nonnull final CacheStrategy cacheStrategy) {
+        private void setCacheStrategy(@Nonnull final CacheStrategyType cacheStrategyType) {
 
-            mLogger.dbg("setting cache type: %s", cacheStrategy);
-            mCacheStrategy = cacheStrategy;
+            mLogger.dbg("setting cache type: %s", cacheStrategyType);
+            mCacheStrategyType = cacheStrategyType;
         }
     }
 }

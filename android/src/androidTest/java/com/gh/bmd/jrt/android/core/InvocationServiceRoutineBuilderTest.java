@@ -30,7 +30,7 @@ import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -269,7 +269,7 @@ public class InvocationServiceRoutineBuilderTest
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
         final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
-                                                             .onReadTimeout(TimeoutAction.EXIT)
+                                                             .onReadTimeout(TimeoutActionType.EXIT)
                                                              .buildConfiguration();
         assertThat(JRoutine.onService(getActivity(), classToken)
                            .withConfiguration(configuration1)
@@ -282,7 +282,7 @@ public class InvocationServiceRoutineBuilderTest
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
         final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
-                                                             .onReadTimeout(TimeoutAction.ABORT)
+                                                             .onReadTimeout(TimeoutActionType.ABORT)
                                                              .buildConfiguration();
 
         try {
@@ -304,7 +304,8 @@ public class InvocationServiceRoutineBuilderTest
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
         final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
-                                                             .onReadTimeout(TimeoutAction.DEADLOCK)
+                                                             .onReadTimeout(
+                                                                     TimeoutActionType.DEADLOCK)
                                                              .buildConfiguration();
 
         try {

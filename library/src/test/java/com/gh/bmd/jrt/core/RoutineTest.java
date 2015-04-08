@@ -20,6 +20,7 @@ import com.gh.bmd.jrt.builder.InputDeadlockException;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
@@ -62,7 +63,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withCoreInvocations;
@@ -1656,7 +1656,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine1 =
                 on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
-                        onReadTimeout(TimeoutAction.ABORT)).buildRoutine();
+                        onReadTimeout(TimeoutActionType.ABORT)).buildRoutine();
 
         try {
 
@@ -1713,7 +1713,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine2 =
                 on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
-                        builder().onReadTimeout(TimeoutAction.ABORT)
+                        builder().onReadTimeout(TimeoutActionType.ABORT)
                                  .withReadTimeout(millis(10))
                                  .buildConfiguration()).buildRoutine();
 
@@ -1772,7 +1772,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine3 =
                 on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
-                        onReadTimeout(TimeoutAction.DEADLOCK)).buildRoutine();
+                        onReadTimeout(TimeoutActionType.DEADLOCK)).buildRoutine();
         final OutputChannel<String> channel3 = routine3.callAsync("test1");
 
         try {
@@ -1885,7 +1885,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine4 =
                 on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
-                        onReadTimeout(TimeoutAction.EXIT)).buildRoutine();
+                        onReadTimeout(TimeoutActionType.EXIT)).buildRoutine();
         final OutputChannel<String> channel4 = routine4.callAsync("test1");
 
         try {

@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
@@ -506,7 +506,7 @@ public class StandaloneChannelTest {
     public void testReadTimeout() {
 
         final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
-                                                             .onReadTimeout(TimeoutAction.EXIT)
+                                                             .onReadTimeout(TimeoutActionType.EXIT)
                                                              .buildConfiguration();
         final StandaloneChannel<Object> channel1 =
                 JRoutine.standalone().withConfiguration(configuration1).buildChannel();
@@ -518,7 +518,7 @@ public class StandaloneChannelTest {
     public void testReadTimeout2() {
 
         final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
-                                                             .onReadTimeout(TimeoutAction.ABORT)
+                                                             .onReadTimeout(TimeoutActionType.ABORT)
                                                              .buildConfiguration();
         final StandaloneChannel<Object> channel2 =
                 JRoutine.standalone().withConfiguration(configuration2).buildChannel();
@@ -538,7 +538,8 @@ public class StandaloneChannelTest {
     public void testReadTimeout3() {
 
         final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
-                                                             .onReadTimeout(TimeoutAction.DEADLOCK)
+                                                             .onReadTimeout(
+                                                                     TimeoutActionType.DEADLOCK)
                                                              .buildConfiguration();
         final StandaloneChannel<Object> channel3 =
                 JRoutine.standalone().withConfiguration(configuration3).buildChannel();

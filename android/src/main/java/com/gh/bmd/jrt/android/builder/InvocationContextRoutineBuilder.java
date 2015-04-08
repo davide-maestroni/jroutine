@@ -59,14 +59,15 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(@Nullable ClashResolution resolution);
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(
+            @Nullable ClashResolutionType resolution);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
     InvocationContextRoutineBuilder<INPUT, OUTPUT> onComplete(
-            @Nullable CacheStrategy cacheStrategy);
+            @Nullable CacheStrategyType cacheStrategyType);
 
     /**
      * {@inheritDoc}

@@ -868,7 +868,7 @@ public class ObjectContextRoutineBuilderFragmentTest
                                                                           R.id.test_fragment);
         final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
                                                      .withConfiguration(
-                                                             withReadTimeout(seconds(2)));
+                                                             withReadTimeout(seconds(5)));
 
         long startTime = System.currentTimeMillis();
 
@@ -877,7 +877,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         startTime = System.currentTimeMillis();
 
@@ -886,7 +886,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
     }
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
@@ -1672,14 +1672,14 @@ public class ObjectContextRoutineBuilderFragmentTest
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 2;
         }

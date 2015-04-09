@@ -806,7 +806,7 @@ public class ObjectContextRoutineBuilderActivityTest
 
         final ObjectRoutineBuilder builder = JRoutine.onActivity(getActivity(), TestClass2.class)
                                                      .withConfiguration(
-                                                             withReadTimeout(seconds(2)));
+                                                             withReadTimeout(seconds(5)));
 
         long startTime = System.currentTimeMillis();
 
@@ -815,7 +815,7 @@ public class ObjectContextRoutineBuilderActivityTest
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         startTime = System.currentTimeMillis();
 
@@ -824,7 +824,7 @@ public class ObjectContextRoutineBuilderActivityTest
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
     }
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
@@ -1607,14 +1607,14 @@ public class ObjectContextRoutineBuilderActivityTest
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 2;
         }

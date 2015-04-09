@@ -819,7 +819,7 @@ public class ObjectServiceRoutineBuilderTest
 
         final ObjectRoutineBuilder builder = JRoutine.onService(getActivity(), TestClass2.class)
                                                      .withServiceClass(TestService.class)
-                                                     .withConfiguration(withReadTimeout(seconds(2)))
+                                                     .withConfiguration(withReadTimeout(seconds(5)))
                                                      .dispatchingOn(Looper.getMainLooper());
 
         long startTime = System.currentTimeMillis();
@@ -829,7 +829,7 @@ public class ObjectServiceRoutineBuilderTest
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         startTime = System.currentTimeMillis();
 
@@ -838,7 +838,7 @@ public class ObjectServiceRoutineBuilderTest
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
     }
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
@@ -1621,14 +1621,14 @@ public class ObjectServiceRoutineBuilderTest
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 2;
         }

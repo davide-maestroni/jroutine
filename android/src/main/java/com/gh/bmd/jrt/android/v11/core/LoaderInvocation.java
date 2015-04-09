@@ -95,20 +95,20 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     /**
      * Constructor.
      *
-     * @param context           the context reference.
-     * @param loaderId          the loader ID.
-     * @param resolutionType    the clash resolution type.
-     * @param cacheStrategyType the result cache strategy type.
-     * @param constructor       the invocation constructor.
-     * @param args              the invocation constructor arguments.
-     * @param order             the input data order.
-     * @param logger            the logger instance.
+     * @param context        the context reference.
+     * @param loaderId       the loader ID.
+     * @param resolutionType the clash resolution type.
+     * @param strategyType   the result cache strategy type.
+     * @param constructor    the invocation constructor.
+     * @param args           the invocation constructor arguments.
+     * @param order          the input data order.
+     * @param logger         the logger instance.
      * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
             @Nullable final ClashResolutionType resolutionType,
-            @Nullable final CacheStrategyType cacheStrategyType,
+            @Nullable final CacheStrategyType strategyType,
             @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
@@ -133,8 +133,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         mLoaderId = loaderId;
         mClashResolutionType =
                 (resolutionType == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolutionType;
-        mCacheStrategyType =
-                (cacheStrategyType == null) ? CacheStrategyType.CLEAR : cacheStrategyType;
+        mCacheStrategyType = (strategyType == null) ? CacheStrategyType.CLEAR : strategyType;
         mConstructor = constructor;
         mArgs = args;
         mOrderType = order;
@@ -761,11 +760,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                     mResultCount = 0;
                     internalLoader.setInvocationCount(0);
-                    final CacheStrategyType cacheStrategyType = mCacheStrategyType;
+                    final CacheStrategyType strategyType = mCacheStrategyType;
 
-                    if ((cacheStrategyType == CacheStrategyType.CLEAR) || (data.isError() ? (
-                            cacheStrategyType == CacheStrategyType.CACHE_IF_SUCCESS)
-                            : (cacheStrategyType == CacheStrategyType.CACHE_IF_ERROR))) {
+                    if ((strategyType == CacheStrategyType.CLEAR) || (data.isError() ? (strategyType
+                            == CacheStrategyType.CACHE_IF_SUCCESS)
+                            : (strategyType == CacheStrategyType.CACHE_IF_ERROR))) {
 
                         final int id = internalLoader.getId();
                         logger.dbg("destroying Android loader: %d", id);
@@ -825,10 +824,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             newChannels.clear();
         }
 
-        private void setCacheStrategy(@Nonnull final CacheStrategyType cacheStrategyType) {
+        private void setCacheStrategy(@Nonnull final CacheStrategyType strategyType) {
 
-            mLogger.dbg("setting cache type: %s", cacheStrategyType);
-            mCacheStrategyType = cacheStrategyType;
+            mLogger.dbg("setting cache type: %s", strategyType);
+            mCacheStrategyType = strategyType;
         }
     }
 }

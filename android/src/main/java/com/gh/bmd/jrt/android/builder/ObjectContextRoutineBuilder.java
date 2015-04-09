@@ -39,7 +39,7 @@ public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder onComplete(@Nullable CacheStrategyType cacheStrategyType);
+    ObjectContextRoutineBuilder onComplete(@Nullable CacheStrategyType strategyType);
 
     /**
      * {@inheritDoc}

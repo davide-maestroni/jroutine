@@ -140,9 +140,9 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
     @Nonnull
     public InvocationContextRoutineBuilder<INPUT, OUTPUT> onComplete(
-            @Nullable final CacheStrategyType cacheStrategyType) {
+            @Nullable final CacheStrategyType strategyType) {
 
-        mCacheStrategyType = cacheStrategyType;
+        mCacheStrategyType = strategyType;
         return this;
     }
 

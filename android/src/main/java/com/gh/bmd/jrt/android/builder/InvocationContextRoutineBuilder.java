@@ -67,7 +67,7 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
      */
     @Nonnull
     InvocationContextRoutineBuilder<INPUT, OUTPUT> onComplete(
-            @Nullable CacheStrategyType cacheStrategyType);
+            @Nullable CacheStrategyType strategyType);
 
     /**
      * {@inheritDoc}

@@ -29,8 +29,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * specific to the Android platform.<br/>
  * Routine invocations created through the returned builder will be execute inside a service
  * specified through the routine builder. Be aware, though, that the invocation results will be
- * dispatched in the specified looper, so that, waiting for the outputs right after the routine
- * invocation in the looper thread, will result in a deadlock.
+ * dispatched in the specified looper, so that, waiting for the outputs on the very same looper
+ * thread, immediately after its invocation, will result in a deadlock.<br/>
+ * By default output results are dispatched in the main looper.
  * <p/>
  * Note that it is up to the caller to properly declare the service in the manifest file. Note also
  * that it is possible to manage the service lifecycle starting it through the
@@ -84,8 +85,9 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * Returns a builder of routines running in a service based on the specified context.
      * <p/>
      * Note that the built routine results will be dispatched in the looper specified through the
-     * builder, thus, waiting for the outputs immediately after its invocation in the looper thread,
-     * will result in a deadlock.
+     * builder, thus, waiting for the outputs on the very same looper thread, immediately after its
+     * invocation, will result in a deadlock.<br/>
+     * By default output results are dispatched in the main looper.
      *
      * @param context    the routine context.
      * @param classToken the invocation class token.
@@ -107,6 +109,11 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * the specified object instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
+     * <p/>
+     * Note that the built routine results will be dispatched in the looper specified through the
+     * builder, thus, waiting for the outputs on the very same looper thread, immediately after its
+     * invocation, will result in a deadlock.<br/>
+     * By default output results are dispatched in the main looper.
      *
      * @param context     the routine context.
      * @param targetClass the wrapped object class.

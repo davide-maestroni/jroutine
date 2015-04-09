@@ -310,13 +310,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nonnull final Logger logger) {
 
-            Looper handlerLooper = (looper != null) ? looper : Looper.myLooper();
-
-            if (handlerLooper == null) {
-
-                handlerLooper = Looper.getMainLooper();
-            }
-
+            final Looper handlerLooper = (looper != null) ? looper : Looper.getMainLooper();
             mUUID = randomUUID().toString();
             mIsParallel = isParallel;
             mContext = context;

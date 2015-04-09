@@ -60,11 +60,11 @@ public interface ContextRoutineBuilder {
      * Tells the builder how to cache the invocation result after its completion. A null value means
      * that it is up to the framework to choose a default strategy.
      *
-     * @param cacheStrategyType the cache strategy type.
+     * @param strategyType the cache strategy type.
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder onComplete(@Nullable CacheStrategyType cacheStrategyType);
+    ContextRoutineBuilder onComplete(@Nullable CacheStrategyType strategyType);
 
     /**
      * Sets the arguments to be passed to the invocation constructor.

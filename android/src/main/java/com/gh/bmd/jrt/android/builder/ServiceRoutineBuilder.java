@@ -33,7 +33,7 @@ public interface ServiceRoutineBuilder {
 
     /**
      * Sets the looper on which the results from the service are dispatched. A null value means that
-     * results will be dispatched on the invocation thread.
+     * results will be dispatched on the main thread (as by default).
      *
      * @param looper the looper instance.
      * @return this builder.

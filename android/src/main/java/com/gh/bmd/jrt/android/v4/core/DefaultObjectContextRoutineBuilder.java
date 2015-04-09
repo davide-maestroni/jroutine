@@ -440,10 +440,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder onComplete(
-            @Nullable final CacheStrategyType cacheStrategyType) {
+    public ObjectContextRoutineBuilder onComplete(@Nullable final CacheStrategyType strategyType) {
 
-        mCacheStrategyType = cacheStrategyType;
+        mCacheStrategyType = strategyType;
         return this;
     }
 

@@ -138,9 +138,9 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
 
     @Nonnull
     public InvocationContextChannelBuilder onComplete(
-            @Nullable final CacheStrategyType cacheStrategyType) {
+            @Nullable final CacheStrategyType strategyType) {
 
-        mCacheStrategyType = cacheStrategyType;
+        mCacheStrategyType = strategyType;
         return this;
     }
 

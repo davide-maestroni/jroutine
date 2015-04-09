@@ -71,13 +71,13 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     /**
      * Constructor.
      *
-     * @param configuration     the routine configuration.
-     * @param context           the context reference.
-     * @param invocationId      the invocation ID.
-     * @param resolutionType    the clash resolution type.
-     * @param cacheStrategyType the result cache strategy type.
-     * @param constructor       the invocation constructor.
-     * @param args              the invocation constructor arguments.
+     * @param configuration  the routine configuration.
+     * @param context        the context reference.
+     * @param invocationId   the invocation ID.
+     * @param resolutionType the clash resolution type.
+     * @param strategyType   the result cache strategy type.
+     * @param constructor    the invocation constructor.
+     * @param args           the invocation constructor arguments.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      * @throws java.lang.NullPointerException     if any of the specified non-null parameter is
      *                                            null.
@@ -86,7 +86,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     DefaultContextRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final WeakReference<Object> context, final int invocationId,
             @Nullable final ClashResolutionType resolutionType,
-            @Nullable final CacheStrategyType cacheStrategyType,
+            @Nullable final CacheStrategyType strategyType,
             @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Object[] args) {
 
@@ -112,8 +112,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         mInvocationId = invocationId;
         mClashResolutionType =
                 (resolutionType == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolutionType;
-        mCacheStrategyType =
-                (cacheStrategyType == null) ? CacheStrategyType.CLEAR : cacheStrategyType;
+        mCacheStrategyType = (strategyType == null) ? CacheStrategyType.CLEAR : strategyType;
         mConstructor = constructor;
         mArgs = args;
         mOrderType = configuration.getOutputOrderOr(null);

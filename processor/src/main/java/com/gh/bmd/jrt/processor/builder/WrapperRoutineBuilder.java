@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.SharableBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.routine.SharableBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,8 +30,9 @@ import javax.annotation.Nullable;
  *
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Pass
- * @see com.gh.bmd.jrt.annotation.Share
+ * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
+ * @see com.gh.bmd.jrt.annotation.TimeoutAction
  * @see com.gh.bmd.jrt.processor.annotation.Wrap
  */
 public interface WrapperRoutineBuilder extends SharableBuilder {
@@ -40,8 +41,9 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout}
-     * and {@link com.gh.bmd.jrt.annotation.Pass} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
+     * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The wrapping object is created through code generation based on the interfaces annotated
@@ -60,9 +62,9 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildWrapper(@Nonnull Class<TYPE> itf);
@@ -71,8 +73,9 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout}
-     * and {@link com.gh.bmd.jrt.annotation.Pass} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
+     * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The wrapping object is created through code generation based on the interfaces annotated
@@ -91,9 +94,9 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildWrapper(@Nonnull ClassToken<TYPE> itf);

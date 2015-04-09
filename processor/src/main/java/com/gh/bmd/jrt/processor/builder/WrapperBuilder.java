@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.routine.SharableBuilder;
+import com.gh.bmd.jrt.builder.SharableBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,8 +32,9 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout}
-     * and {@link com.gh.bmd.jrt.annotation.Pass} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
+     * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The wrapping object is created through code generation based on the interfaces annotated

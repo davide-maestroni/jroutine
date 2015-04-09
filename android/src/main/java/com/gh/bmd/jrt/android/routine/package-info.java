@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Routine interfaces and implementations specific to the Android platform.
+ * Routine interfaces specific to the Android platform.
  * <p/>
  * Created by davide on 1/10/15.
  */

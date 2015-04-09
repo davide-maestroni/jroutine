@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.annotation;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -23,22 +21,19 @@ import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
+ * Through this annotation it is possible to indicate the timeout for a readable result to become
+ * available, and the action to be taken when it elapses.
  * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * the framework as well.<br/>
- * Through this annotation it is possible to indicate the timeout for a readable result to become
- * available, and the action to be taken when it elapses.
+ * the framework as well.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
- * <p/>
- * When used to annotate a class instead of a method, its attributes are applied to all the class
- * methods unless specific values are set in the method annotation.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -59,13 +54,6 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Timeout {
-
-    /**
-     * The type of action to take on output channel timeout.
-     *
-     * @return the action type.
-     */
-    TimeoutAction action() default TimeoutAction.DEADLOCK;
 
     /**
      * The time unit of the timeout for an invocation instance to produce a result.

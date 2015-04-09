@@ -48,7 +48,6 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
             final long keepAliveTime, @Nonnull final TimeUnit keepAliveUnit) {
 
         super(1);
-
         final RejectingBlockingQueue internalQueue = new RejectingBlockingQueue();
         final QueueRejectedExecutionHandler rejectedExecutionHandler =
                 new QueueRejectedExecutionHandler(internalQueue);

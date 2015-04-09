@@ -26,8 +26,9 @@ import java.lang.annotation.Target;
  * annotated interface will be generated in the interface package and its name will be obtained by
  * prepending "JRoutine_" to the interface simple name.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout} and
- * {@link com.gh.bmd.jrt.annotation.Pass} annotations defined for each interface method.
+ * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+ * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
+ * annotations defined for each interface method.
  * <p/>
  * Special care must be taken when dealing with wrappers of generic classes. First of all, the
  * wrapper interface must declare the same generic types as the wrapped class or interface.

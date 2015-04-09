@@ -15,8 +15,8 @@ package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.Invocations;
-import com.gh.bmd.jrt.routine.JRoutine;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -143,7 +143,6 @@ public class Downloader {
 
             // remove it from the downloaded set
             mDownloadedSet.remove(uri);
-
             // in order to be able to abort the download at any time we need to split the processing
             // between the routine responsible for reading the data from the socket and the one
             // writing the next chunk of bytes to the local file

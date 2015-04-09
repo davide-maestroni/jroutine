@@ -365,7 +365,6 @@ public class TimeDuration extends Time {
         }
 
         TimeUnit.MILLISECONDS.sleep(millisToSleep);
-
         return true;
     }
 
@@ -400,7 +399,6 @@ public class TimeDuration extends Time {
         }
 
         TimeUnit.NANOSECONDS.sleep(nanosToSleep);
-
         return true;
     }
 
@@ -464,7 +462,6 @@ public class TimeDuration extends Time {
         }
 
         TimeUnit.MILLISECONDS.timedWait(target, millisToWait);
-
         return true;
     }
 
@@ -503,7 +500,6 @@ public class TimeDuration extends Time {
         }
 
         TimeUnit.NANOSECONDS.timedWait(target, nanosToWait);
-
         return true;
     }
 

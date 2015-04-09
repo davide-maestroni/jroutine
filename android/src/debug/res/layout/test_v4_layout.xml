@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/test_fragment"
-        class="com.gh.bmd.jrt.android.v4.routine.TestFragment"
+        class="com.gh.bmd.jrt.android.v4.core.TestFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

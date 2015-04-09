@@ -140,7 +140,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     public void putAll(@Nonnull final Map<? extends K, ? extends V> map) {
 
         cleanUp();
-
         final ReferenceQueue<Object> queue = mQueue;
         final HashMap<IdentityWeakReference, V> referenceMap = mMap;
 
@@ -216,7 +215,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
         final HashMap<IdentityWeakReference, V> map = mMap;
         final ReferenceQueue<Object> queue = mQueue;
-
         IdentityWeakReference reference = (IdentityWeakReference) queue.poll();
 
         while (reference != null) {
@@ -244,7 +242,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
                 final ReferenceQueue<? super Object> queue) {
 
             super(referent, queue);
-
             mHashCode = System.identityHashCode(referent);
         }
 
@@ -257,7 +254,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         private IdentityWeakReference(final Object referent) {
 
             super(referent);
-
             mHashCode = System.identityHashCode(referent);
         }
 

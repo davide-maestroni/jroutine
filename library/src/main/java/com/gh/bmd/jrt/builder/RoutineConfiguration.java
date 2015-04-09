@@ -73,7 +73,7 @@ public class RoutineConfiguration {
 
     private final Runner mSyncRunner;
 
-    private final TimeoutAction mTimeoutAction;
+    private final TimeoutActionType mTimeoutActionType;
 
     /**
      * Constructor.
@@ -102,7 +102,7 @@ public class RoutineConfiguration {
     private RoutineConfiguration(@Nullable final Runner syncRunner,
             @Nullable final Runner asyncRunner, final int maxInvocations, final int coreInvocations,
             @Nullable final TimeDuration availTimeout, @Nullable final TimeDuration readTimeout,
-            @Nullable final TimeoutAction actionType, @Nullable final OrderType inputOrder,
+            @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrder,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
             @Nullable final OrderType outputOrder, final int outputMaxSize,
             @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
@@ -114,7 +114,7 @@ public class RoutineConfiguration {
         mCoreInvocations = coreInvocations;
         mAvailTimeout = availTimeout;
         mReadTimeout = readTimeout;
-        mTimeoutAction = actionType;
+        mTimeoutActionType = actionType;
         mInputOrder = inputOrder;
         mInputMaxSize = inputMaxSize;
         mInputTimeout = inputTimeout;
@@ -167,7 +167,7 @@ public class RoutineConfiguration {
      * @return the routine configuration.
      */
     @Nonnull
-    public static RoutineConfiguration onReadTimeout(@Nullable final TimeoutAction action) {
+    public static RoutineConfiguration onReadTimeout(@Nullable final TimeoutActionType action) {
 
         return builder().onReadTimeout(action).buildConfiguration();
     }
@@ -579,10 +579,11 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutAction getReadTimeoutActionOr(@Nullable final TimeoutAction valueIfNotSet) {
+    public TimeoutActionType getReadTimeoutActionOr(
+            @Nullable final TimeoutActionType valueIfNotSet) {
 
-        final TimeoutAction timeoutAction = mTimeoutAction;
-        return (timeoutAction != null) ? timeoutAction : valueIfNotSet;
+        final TimeoutActionType timeoutActionType = mTimeoutActionType;
+        return (timeoutActionType != null) ? timeoutActionType : valueIfNotSet;
     }
 
     /**
@@ -628,7 +629,7 @@ public class RoutineConfiguration {
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
-        result = 31 * result + (mTimeoutAction != null ? mTimeoutAction.hashCode() : 0);
+        result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
     }
 
@@ -725,7 +726,7 @@ public class RoutineConfiguration {
             return false;
         }
 
-        return mTimeoutAction == that.mTimeoutAction;
+        return mTimeoutActionType == that.mTimeoutActionType;
     }
 
     @Override
@@ -746,7 +747,7 @@ public class RoutineConfiguration {
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mReadTimeout=" + mReadTimeout +
                 ", mSyncRunner=" + mSyncRunner +
-                ", mTimeoutAction=" + mTimeoutAction +
+                ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
     }
 
@@ -769,9 +770,9 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Enumeration indicating the action to take on output channel timeout.
+     * Enumeration indicating the type of action to be taken on output channel timeout.
      */
-    public enum TimeoutAction {
+    public enum TimeoutActionType {
 
         /**
          * Deadlock.<br/>
@@ -826,7 +827,7 @@ public class RoutineConfiguration {
 
         private Runner mSyncRunner;
 
-        private TimeoutAction mTimeoutAction;
+        private TimeoutActionType mTimeoutActionType;
 
         /**
          * Constructor.
@@ -853,7 +854,7 @@ public class RoutineConfiguration {
             mCoreInvocations = initialConfiguration.getCoreInvocationsOr(DEFAULT);
             mAvailTimeout = initialConfiguration.getAvailTimeoutOr(null);
             mReadTimeout = initialConfiguration.getReadTimeoutOr(null);
-            mTimeoutAction = initialConfiguration.getReadTimeoutActionOr(null);
+            mTimeoutActionType = initialConfiguration.getReadTimeoutActionOr(null);
             mInputOrder = initialConfiguration.getInputOrderOr(null);
             mInputMaxSize = initialConfiguration.getInputSizeOr(DEFAULT);
             mInputTimeout = initialConfiguration.getInputTimeoutOr(null);
@@ -874,7 +875,7 @@ public class RoutineConfiguration {
 
             return new RoutineConfiguration(mSyncRunner, mAsyncRunner, mMaxInvocations,
                                             mCoreInvocations, mAvailTimeout, mReadTimeout,
-                                            mTimeoutAction, mInputOrder, mInputMaxSize,
+                                            mTimeoutActionType, mInputOrder, mInputMaxSize,
                                             mInputTimeout, mOutputOrder, mOutputMaxSize,
                                             mOutputTimeout, mLog, mLogLevel);
         }
@@ -887,9 +888,9 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder onReadTimeout(@Nullable final TimeoutAction action) {
+        public Builder onReadTimeout(@Nullable final TimeoutActionType action) {
 
-            mTimeoutAction = action;
+            mTimeoutActionType = action;
             return this;
         }
 
@@ -949,7 +950,6 @@ public class RoutineConfiguration {
             applyInvocationConfiguration(configuration);
             applyChannelConfiguration(configuration);
             applyLogConfiguration(configuration);
-
             return this;
         }
 
@@ -1290,11 +1290,11 @@ public class RoutineConfiguration {
                 withReadTimeout(readTimeout);
             }
 
-            final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
+            final TimeoutActionType timeoutActionType = configuration.getReadTimeoutActionOr(null);
 
-            if (timeoutAction != null) {
+            if (timeoutActionType != null) {
 
-                onReadTimeout(timeoutAction);
+                onReadTimeout(timeoutActionType);
             }
         }
 

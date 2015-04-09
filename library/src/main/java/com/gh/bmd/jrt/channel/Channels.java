@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.channel;
 
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
+import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.StatelessInvocation;
-import com.gh.bmd.jrt.routine.JRoutine;
 
 import java.util.List;
 

@@ -32,7 +32,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
         }
 
         mWrapped = new java.lang.ref.WeakReference<${classFullName}>(wrapped);
-        mShareGroup = (shareGroup != null) ? shareGroup : com.gh.bmd.jrt.annotation.Share.ALL;
+        mShareGroup = (shareGroup != null) ? shareGroup : com.gh.bmd.jrt.annotation.ShareGroup.ALL;
         ${routineFieldsInit}
     }
 
@@ -44,7 +44,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
 
     private Object getMutex(final String shareGroup) {
 
-        if (com.gh.bmd.jrt.annotation.Share.NONE.equals(shareGroup)) {
+        if (com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
 
             return null;
         }

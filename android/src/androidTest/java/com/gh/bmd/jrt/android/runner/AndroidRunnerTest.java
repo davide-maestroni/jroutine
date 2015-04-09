@@ -17,7 +17,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 
-import com.gh.bmd.jrt.android.v11.routine.JRoutine;
+import com.gh.bmd.jrt.android.v11.core.JRoutine;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;

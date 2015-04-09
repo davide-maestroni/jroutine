@@ -28,8 +28,9 @@ import javax.annotation.Nullable;
  *
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Pass
- * @see com.gh.bmd.jrt.annotation.Share
+ * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
+ * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
 public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
 
@@ -37,14 +38,16 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind} and {@link com.gh.bmd.jrt.annotation.Timeout}
-     * annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
-     * Note that such annotations will override any configuration set through the builder.
+     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.
      *
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
@@ -60,21 +63,23 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind} and {@link com.gh.bmd.jrt.annotation.Timeout}
-     * annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
-     * Note that such annotations will override any configuration set through the builder.
+     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.
      *
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class is null.
+     * @throws java.lang.NullPointerException     if the specified class token is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);

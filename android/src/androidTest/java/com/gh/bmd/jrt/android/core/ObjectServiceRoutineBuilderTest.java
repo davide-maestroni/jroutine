@@ -845,6 +845,7 @@ public class ObjectServiceRoutineBuilderTest
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
                            .withConfiguration(withReadTimeout(seconds(1)))
+                           .dispatchingOn(Looper.getMainLooper())
                            .boundMethod("test")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -853,6 +854,7 @@ public class ObjectServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), TestTimeout.class)
                     .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .dispatchingOn(Looper.getMainLooper())
                     .boundMethod("test")
                     .callAsync()
                     .readNext();
@@ -865,6 +867,7 @@ public class ObjectServiceRoutineBuilderTest
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
                            .withConfiguration(withReadTimeout(seconds(1)))
+                           .dispatchingOn(Looper.getMainLooper())
                            .method("getInt")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -873,6 +876,7 @@ public class ObjectServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), TestTimeout.class)
                     .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .dispatchingOn(Looper.getMainLooper())
                     .method("getInt")
                     .callAsync()
                     .readNext();
@@ -885,6 +889,7 @@ public class ObjectServiceRoutineBuilderTest
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
                            .withConfiguration(withReadTimeout(seconds(1)))
+                           .dispatchingOn(Looper.getMainLooper())
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -893,6 +898,7 @@ public class ObjectServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), TestTimeout.class)
                     .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .dispatchingOn(Looper.getMainLooper())
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
                     .readNext();
@@ -905,6 +911,7 @@ public class ObjectServiceRoutineBuilderTest
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
                            .withConfiguration(withReadTimeout(seconds(1)))
+                           .dispatchingOn(Looper.getMainLooper())
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
 
@@ -912,6 +919,7 @@ public class ObjectServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), TestTimeout.class)
                     .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .dispatchingOn(Looper.getMainLooper())
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

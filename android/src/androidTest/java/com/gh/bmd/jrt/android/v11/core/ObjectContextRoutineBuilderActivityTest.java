@@ -936,7 +936,7 @@ public class ObjectContextRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(1))).withId(0)
                            .boundMethod("test")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -944,7 +944,7 @@ public class ObjectContextRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK)).withId(1)
                     .boundMethod("test")
                     .callAsync()
                     .readNext();
@@ -956,7 +956,7 @@ public class ObjectContextRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(1))).withId(2)
                            .method("getInt")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -964,7 +964,7 @@ public class ObjectContextRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK)).withId(3)
                     .method("getInt")
                     .callAsync()
                     .readNext();
@@ -976,7 +976,7 @@ public class ObjectContextRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(1))).withId(4)
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -984,7 +984,7 @@ public class ObjectContextRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK)).withId(5)
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
                     .readNext();
@@ -996,14 +996,14 @@ public class ObjectContextRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(1))).withId(6)
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
 
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK)).withId(7)
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

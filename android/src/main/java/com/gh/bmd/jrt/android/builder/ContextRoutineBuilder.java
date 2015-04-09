@@ -41,8 +41,6 @@ public interface ContextRoutineBuilder {
      */
     int AUTO = Integer.MIN_VALUE;
 
-    //TODO: annotation?
-
     /**
      * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
      * of the same type and with the same ID is still running. A null value means that it is up to
@@ -53,8 +51,6 @@ public interface ContextRoutineBuilder {
      */
     @Nonnull
     ContextRoutineBuilder onClash(@Nullable ClashResolutionType resolutionType);
-
-    //TODO: annotation?
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
@@ -80,8 +76,6 @@ public interface ContextRoutineBuilder {
      */
     @Nonnull
     ContextRoutineBuilder withArgs(@Nullable Object... args);
-
-    //TODO: annotation?
 
     /**
      * Tells the builder to identify the invocation with the specified ID.

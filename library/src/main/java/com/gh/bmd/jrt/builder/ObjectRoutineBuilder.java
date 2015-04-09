@@ -41,12 +41,13 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and
      * {@link com.gh.bmd.jrt.annotation.ShareGroup} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
-     * Note that such annotations will override any configuration set through the builder.
+     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.
      *
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
@@ -65,12 +66,13 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and
      * {@link com.gh.bmd.jrt.annotation.ShareGroup} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
-     * Note that such annotations will override any configuration set through the builder.
+     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.
      *
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.

@@ -17,6 +17,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 
+import com.gh.bmd.jrt.android.annotation.CacheStrategy;
+import com.gh.bmd.jrt.android.annotation.ClashResolution;
+import com.gh.bmd.jrt.android.annotation.Id;
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
@@ -283,6 +286,46 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nullable
+    private static CacheStrategyType withCacheAnnotation(
+            @Nullable final CacheStrategyType strategyType, @Nonnull final Method method) {
+
+        final CacheStrategy cacheAnnotation = method.getAnnotation(CacheStrategy.class);
+
+        if (cacheAnnotation != null) {
+
+            return cacheAnnotation.value();
+        }
+
+        return strategyType;
+    }
+
+    @Nullable
+    private static ClashResolutionType withClashAnnotation(
+            @Nullable final ClashResolutionType resolutionType, @Nonnull final Method method) {
+
+        final ClashResolution clashAnnotation = method.getAnnotation(ClashResolution.class);
+
+        if (clashAnnotation != null) {
+
+            return clashAnnotation.value();
+        }
+
+        return resolutionType;
+    }
+
+    private static int withIdAnnotation(final int invocationId, @Nonnull final Method method) {
+
+        final Id idAnnotation = method.getAnnotation(Id.class);
+
+        if (idAnnotation != null) {
+
+            return idAnnotation.value();
+        }
+
+        return invocationId;
+    }
+
+    @Nullable
     private static String withShareAnnotation(@Nullable final String shareGroup,
             @Nonnull final Method method) {
 
@@ -339,16 +382,21 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
         final Object[] args = mArgs;
+        final String shareGroup = withShareAnnotation(mShareGroup, targetMethod);
         final RoutineConfiguration routineConfiguration =
                 withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
                         OrderType.PASSING_ORDER).buildConfiguration();
-        return getBuilder(mContext, classToken).withArgs(targetClass.getName(), args,
-                                                         withShareAnnotation(mShareGroup,
-                                                                             targetMethod), name)
+        final int invocationId = withIdAnnotation(mInvocationId, targetMethod);
+        final ClashResolutionType resolutionType =
+                withClashAnnotation(mClashResolutionType, targetMethod);
+        final CacheStrategyType strategyType =
+                withCacheAnnotation(mCacheStrategyType, targetMethod);
+        return getBuilder(mContext, classToken).withArgs(targetClass.getName(), args, shareGroup,
+                                                         name)
                                                .withConfiguration(routineConfiguration)
-                                               .withId(mInvocationId)
-                                               .onClash(mClashResolutionType)
-                                               .onComplete(mCacheStrategyType)
+                                               .withId(invocationId)
+                                               .onClash(resolutionType)
+                                               .onComplete(strategyType)
                                                .buildRoutine();
     }
 
@@ -385,17 +433,21 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
         final Object[] args = mArgs;
+        final String shareGroup = withShareAnnotation(mShareGroup, targetMethod);
         final RoutineConfiguration routineConfiguration =
                 withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
                         OrderType.PASSING_ORDER).buildConfiguration();
-        return getBuilder(mContext, classToken).withArgs(targetClass.getName(), args,
-                                                         withShareAnnotation(mShareGroup,
-                                                                             targetMethod), name,
-                                                         toNames(parameterTypes))
+        final int invocationId = withIdAnnotation(mInvocationId, targetMethod);
+        final ClashResolutionType resolutionType =
+                withClashAnnotation(mClashResolutionType, targetMethod);
+        final CacheStrategyType strategyType =
+                withCacheAnnotation(mCacheStrategyType, targetMethod);
+        return getBuilder(mContext, classToken).withArgs(targetClass.getName(), args, shareGroup,
+                                                         name, toNames(parameterTypes))
                                                .withConfiguration(routineConfiguration)
-                                               .withId(mInvocationId)
-                                               .onClash(mClashResolutionType)
-                                               .onComplete(mCacheStrategyType)
+                                               .withId(invocationId)
+                                               .onClash(resolutionType)
+                                               .onComplete(strategyType)
                                                .buildRoutine();
     }
 
@@ -433,6 +485,21 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
+    public ObjectContextRoutineBuilder withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
+
+        mConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ObjectContextRoutineBuilder withShareGroup(@Nullable final String group) {
+
+        mShareGroup = group;
+        return this;
+    }
+
+    @Nonnull
     public ObjectContextRoutineBuilder onClash(@Nullable final ClashResolutionType resolutionType) {
 
         mClashResolutionType = resolutionType;
@@ -457,21 +524,6 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     public ObjectContextRoutineBuilder withId(final int invocationId) {
 
         mInvocationId = invocationId;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectContextRoutineBuilder withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
-
-        mConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectContextRoutineBuilder withShareGroup(@Nullable final String group) {
-
-        mShareGroup = group;
         return this;
     }
 
@@ -985,6 +1037,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 returnMode = getReturnMode(method);
             }
 
+            final String shareGroup = withShareAnnotation(mShareGroup, method);
             final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
             final Builder builder = withTimeoutAnnotation(mConfiguration, method);
             final RoutineConfiguration configuration =
@@ -993,18 +1046,21 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                                    (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
                                            : OrderType.NONE)
                            .buildConfiguration();
+            final int invocationId = withIdAnnotation(mInvocationId, method);
+            final ClashResolutionType resolutionType =
+                    withClashAnnotation(mClashResolutionType, method);
+            final CacheStrategyType strategyType = withCacheAnnotation(mCacheStrategyType, method);
             final InvocationContextRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, ClassToken.tokenOf(ProxyInvocation.class));
             final Routine<Object, Object> routine =
                     routineBuilder.withArgs(mProxyClass.getName(), mTargetClass.getName(), mArgs,
-                                            withShareAnnotation(mShareGroup, method),
-                                            method.getName(), toNames(parameterTypes),
+                                            shareGroup, method.getName(), toNames(parameterTypes),
                                             toNames(targetParameterTypes), isInputCollection,
                                             isOutputCollection)
                                   .withConfiguration(configuration)
-                                  .withId(mInvocationId)
-                                  .onClash(mClashResolutionType)
-                                  .onComplete(mCacheStrategyType)
+                                  .withId(invocationId)
+                                  .onClash(resolutionType)
+                                  .onComplete(strategyType)
                                   .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

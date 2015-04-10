@@ -547,9 +547,9 @@ public class InvocationContextRoutineBuilderTest
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
                                                             .withInputSize(3)
-                                                            .withInputTimeout(seconds(1))
+                                                            .withInputTimeout(seconds(10))
                                                             .withOutputSize(3)
-                                                            .withOutputTimeout(seconds(1))
+                                                            .withOutputTimeout(seconds(10))
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();
@@ -568,9 +568,9 @@ public class InvocationContextRoutineBuilderTest
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
                                                             .withInputSize(3)
-                                                            .withInputTimeout(seconds(1))
+                                                            .withInputTimeout(seconds(10))
                                                             .withOutputSize(3)
-                                                            .withOutputTimeout(seconds(1))
+                                                            .withOutputTimeout(seconds(10))
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();

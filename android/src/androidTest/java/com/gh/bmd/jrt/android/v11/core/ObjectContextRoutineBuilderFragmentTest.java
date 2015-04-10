@@ -97,7 +97,7 @@ public class ObjectContextRoutineBuilderFragmentTest
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -132,7 +132,7 @@ public class ObjectContextRoutineBuilderFragmentTest
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -153,7 +153,7 @@ public class ObjectContextRoutineBuilderFragmentTest
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -187,10 +187,10 @@ public class ObjectContextRoutineBuilderFragmentTest
                                                                           R.id.test_fragment);
         final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
-                                                            .withInputTimeout(seconds(1))
+                                                            .withInputTimeout(seconds(10))
                                                             .withOutputOrder(OrderType.NONE)
                                                             .withOutputSize(3)
-                                                            .withOutputTimeout(seconds(1))
+                                                            .withOutputTimeout(seconds(10))
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();
@@ -237,7 +237,7 @@ public class ObjectContextRoutineBuilderFragmentTest
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -541,7 +541,7 @@ public class ObjectContextRoutineBuilderFragmentTest
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -568,7 +568,7 @@ public class ObjectContextRoutineBuilderFragmentTest
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -914,7 +914,7 @@ public class ObjectContextRoutineBuilderFragmentTest
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -969,7 +969,7 @@ public class ObjectContextRoutineBuilderFragmentTest
                                                                           R.id.test_fragment);
         final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
                                                      .withConfiguration(
-                                                             withReadTimeout(seconds(5)));
+                                                             withReadTimeout(seconds(9)));
 
         long startTime = System.currentTimeMillis();
 
@@ -1001,7 +1001,7 @@ public class ObjectContextRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(10)))
                            .withId(0)
                            .boundMethod("test")
                            .callAsync()
@@ -1023,7 +1023,7 @@ public class ObjectContextRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(10)))
                            .withId(2)
                            .method("getInt")
                            .callAsync()
@@ -1045,7 +1045,7 @@ public class ObjectContextRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(10)))
                            .withId(4)
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
@@ -1067,7 +1067,7 @@ public class ObjectContextRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+                           .withConfiguration(withReadTimeout(seconds(10)))
                            .withId(6)
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
@@ -1414,11 +1414,11 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     private interface IncItf {
 
-        @Timeout(1000)
+        @Timeout(10000)
         @Pass(int.class)
         int[] inc(@Pass(int.class) int... i);
 
-        @Timeout(1000)
+        @Timeout(10000)
         @Bind("inc")
         @Pass(int.class)
         Iterable<Integer> incIterable(@Pass(int.class) int... i);
@@ -1426,21 +1426,21 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     private interface SquareItf {
 
-        @Timeout(value = 1, unit = TimeUnit.SECONDS)
+        @Timeout(value = 10, unit = TimeUnit.SECONDS)
         int compute(int i);
 
         @Bind("compute")
         @Pass(value = int.class, mode = PassMode.PARALLEL)
-        @Timeout(1000)
+        @Timeout(10000)
         int[] compute1(int length);
 
         @Bind("compute")
         @Pass(value = int.class, mode = PassMode.PARALLEL)
-        @Timeout(1000)
+        @Timeout(10000)
         List<Integer> compute2(int length);
 
         @Bind("compute")
-        @Timeout(1000)
+        @Timeout(10000)
         int computeAsync(@Pass(int.class) OutputChannel<Integer> i);
 
         @ShareGroup(ShareGroup.NONE)

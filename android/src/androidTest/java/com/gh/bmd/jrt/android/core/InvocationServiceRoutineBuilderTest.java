@@ -268,7 +268,7 @@ public class InvocationServiceRoutineBuilderTest
 
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
-        final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
+        final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(1))
                                                              .onReadTimeout(TimeoutActionType.EXIT)
                                                              .buildConfiguration();
         assertThat(JRoutine.onService(getActivity(), classToken)
@@ -281,7 +281,7 @@ public class InvocationServiceRoutineBuilderTest
 
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
-        final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
+        final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(1))
                                                              .onReadTimeout(TimeoutActionType.ABORT)
                                                              .buildConfiguration();
 
@@ -303,7 +303,7 @@ public class InvocationServiceRoutineBuilderTest
 
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
-        final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
+        final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(1))
                                                              .onReadTimeout(
                                                                      TimeoutActionType.DEADLOCK)
                                                              .buildConfiguration();

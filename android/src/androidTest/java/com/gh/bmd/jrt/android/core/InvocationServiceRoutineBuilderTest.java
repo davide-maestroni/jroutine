@@ -268,11 +268,12 @@ public class InvocationServiceRoutineBuilderTest
 
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
-        final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(1))
+        final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutActionType.EXIT)
                                                              .buildConfiguration();
         assertThat(JRoutine.onService(getActivity(), classToken)
                            .withConfiguration(configuration1)
+                           .dispatchingOn(Looper.myLooper())
                            .callAsync("test1")
                            .readAll()).isEmpty();
     }
@@ -281,7 +282,7 @@ public class InvocationServiceRoutineBuilderTest
 
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
-        final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(1))
+        final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutActionType.ABORT)
                                                              .buildConfiguration();
 
@@ -289,6 +290,7 @@ public class InvocationServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), classToken)
                     .withConfiguration(configuration2)
+                    .dispatchingOn(Looper.myLooper())
                     .callAsync("test2")
                     .readAll();
 
@@ -303,7 +305,7 @@ public class InvocationServiceRoutineBuilderTest
 
         final ClassToken<ContextPassingInvocation<String>> classToken =
                 new ClassToken<ContextPassingInvocation<String>>() {};
-        final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(1))
+        final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(
                                                                      TimeoutActionType.DEADLOCK)
                                                              .buildConfiguration();
@@ -312,6 +314,7 @@ public class InvocationServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), classToken)
                     .withConfiguration(configuration3)
+                    .dispatchingOn(Looper.myLooper())
                     .callAsync("test3")
                     .readAll();
 

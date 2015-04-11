@@ -2,6 +2,7 @@ com.gh.bmd.jrt.annotation
 com.gh.bmd.jrt.builder
 com.gh.bmd.jrt.channel
 com.gh.bmd.jrt.common
+com.gh.bmd.jrt.core
 com.gh.bmd.jrt.invocation
 com.gh.bmd.jrt.log
 com.gh.bmd.jrt.routine

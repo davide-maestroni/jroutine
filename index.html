@@ -102,16 +102,18 @@ This paradigm is nothing but what any developer is already familiar to, that is,
 <strong><em>Automatic code generation</em></strong>: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation</li>
 <li>
 <strong><em>Nice handling of Android configuration changes</em></strong>: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments</li>
+<li>
+<strong><em>Seamlessly run in a remote Service</em></strong>: invocations can be easily configured to run in a dedicated Android service</li>
 </ul>
 
 <p>And more:</p>
 
 <ul>
-<li><strong><em>&lt; 220KB Jar</em></strong></li>
+<li><strong><em>&lt; 210KB Jar</em></strong></li>
 <li>
 <strong><em>Java 5+</em></strong>* <strong><em>and Android 1.6+</em></strong>
 </li>
-<li><strong><em><a href="https://github.com/Nullable" class="user-mention">@Nullable</a> and <a href="https://github.com/Nonnull" class="user-mention">@Nonnull</a> annotations</em></strong></li>
+<li><strong><em>Nullability annotations</em></strong></li>
 </ul>
 
 <p>(*) for older Java versions please have a look at <a href="http://retrotranslator.sourceforge.net/">Retrotranslator</a>.</p>
@@ -124,9 +126,9 @@ If you need event handling, please use <a href="https://github.com/ReactiveX/RxJ
 For anything else <a href="https://github.com/">GitHub</a> is a great source of inspiration.</p>
 
 <h2>
-<a id="usage-examples" class="anchor" href="#usage-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage examples</h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>Please have a look at the dedicated <a href="https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples">wiki page</a>.</p>
+<p>Please have a look at the <a href="https://github.com/davide-maestroni/jroutine/wiki">wiki</a>.</p>
 
 <h2>
 <a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
@@ -135,6 +137,7 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 
 <ul>
 <li><a href="http://davide-maestroni.github.io/jroutine/docs/jroutine">JRoutine</a></li>
+<li><a href="http://davide-maestroni.github.io/jroutine/docs/processor">JRoutine-Processor</a></li>
 <li><a href="http://davide-maestroni.github.io/jroutine/docs/android">JRoutine-Android</a></li>
 </ul>
 
@@ -161,7 +164,7 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 </ul>
 
 <h4>
-<a id="compile-dependencies" class="anchor" href="#compile-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compile dependencies</h4>
+<a id="compilation-dependencies" class="anchor" href="#compilation-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compilation dependencies</h4>
 
 <ul>
 <li>

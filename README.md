@@ -71,7 +71,7 @@ For anything else [GitHub][github] is a great source of inspiration.
 
 ## Usage
 
-Please have a look at the [wiki][wiki].
+Please have a look at the [Wiki][wiki].
 
 ## Documentation
 
@@ -89,7 +89,7 @@ Feel free to contribute with your own [Routine][javadoc routine] or [Runner][jav
 
 ## Build instructions
 
-Please refer to the dedicated [wiki page][wiki build].
+Please refer to the dedicated [Wiki page][wiki build].
 
 ## Dependencies
 

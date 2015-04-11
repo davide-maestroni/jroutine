@@ -81,7 +81,7 @@ Complete Javadoc with insights and examples is available for:
 * [JRoutine-Processor][javadoc processor]
 * [JRoutine-Android][javadoc android]
 
-The project contains an additional sample module showing how to implement a file downloader with just 4 classes.
+The project contains an additional [sample][sample] module showing how to implement a file downloader with just 4 classes.
 
 ## Further development
 
@@ -141,6 +141,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [akka]:http://akka.io/
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
+[sample]:[sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
 [javadoc]:http://davide-maestroni.github.io/jroutine/docs/jroutine
 [javadoc processor]:http://davide-maestroni.github.io/jroutine/docs/processor
 [javadoc android]:http://davide-maestroni.github.io/jroutine/docs/android

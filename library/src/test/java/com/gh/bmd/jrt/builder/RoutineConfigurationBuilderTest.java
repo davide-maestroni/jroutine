@@ -53,9 +53,9 @@ public class RoutineConfigurationBuilderTest {
     @Test
     public void tesAvailableTimeoutEquals() {
 
-        assertThat(withAvailableTimeout(TimeDuration.ZERO)).isEqualTo(
+        assertThat(withAvailableTimeout(TimeDuration.ZERO).buildConfiguration()).isEqualTo(
                 builder().withAvailableTimeout(TimeDuration.ZERO).buildConfiguration());
-        assertThat(withAvailableTimeout(1, TimeUnit.MILLISECONDS)).isEqualTo(
+        assertThat(withAvailableTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration()).isEqualTo(
                 builder().withAvailableTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -65,16 +65,18 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withAvailableTimeout(TimeDuration.ZERO));
-        assertThat(configuration).isNotEqualTo(withAvailableTimeout(1, TimeUnit.MILLISECONDS));
-        assertThat(withAvailableTimeout(TimeDuration.ZERO)).isNotEqualTo(
-                withAvailableTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(
+                withAvailableTimeout(TimeDuration.ZERO).buildConfiguration());
+        assertThat(configuration).isNotEqualTo(
+                withAvailableTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
+        assertThat(withAvailableTimeout(TimeDuration.ZERO).buildConfiguration()).isNotEqualTo(
+                withAvailableTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
     }
 
     @Test
     public void tesCoreInvocationsEquals() {
 
-        assertThat(withCoreInvocations(3)).isEqualTo(
+        assertThat(withCoreInvocations(3).buildConfiguration()).isEqualTo(
                 builder().withCoreInvocations(3).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -85,14 +87,15 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withCoreInvocations(3));
-        assertThat(withCoreInvocations(3)).isNotEqualTo(withCoreInvocations(27));
+        assertThat(configuration).isNotEqualTo(withCoreInvocations(3).buildConfiguration());
+        assertThat(withCoreInvocations(3).buildConfiguration()).isNotEqualTo(
+                withCoreInvocations(27).buildConfiguration());
     }
 
     @Test
     public void tesInputOrderEquals() {
 
-        assertThat(withInputOrder(OrderType.PASSING_ORDER)).isEqualTo(
+        assertThat(withInputOrder(OrderType.PASSING_ORDER).buildConfiguration()).isEqualTo(
                 builder().withInputOrder(OrderType.PASSING_ORDER).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -102,15 +105,16 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withInputOrder(OrderType.NONE));
-        assertThat(withInputOrder(OrderType.NONE)).isNotEqualTo(
-                withInputOrder(OrderType.PASSING_ORDER));
+        assertThat(configuration).isNotEqualTo(withInputOrder(OrderType.NONE).buildConfiguration());
+        assertThat(withInputOrder(OrderType.NONE).buildConfiguration()).isNotEqualTo(
+                withInputOrder(OrderType.PASSING_ORDER).buildConfiguration());
     }
 
     @Test
     public void tesInputSizeEquals() {
 
-        assertThat(withInputSize(10)).isEqualTo(builder().withInputSize(10).buildConfiguration());
+        assertThat(withInputSize(10).buildConfiguration()).isEqualTo(
+                builder().withInputSize(10).buildConfiguration());
 
         final RoutineConfiguration configuration =
                 builder().withAvailableTimeout(TimeDuration.millis(100))
@@ -119,16 +123,17 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withInputSize(10));
-        assertThat(withInputSize(10)).isNotEqualTo(withInputSize(31));
+        assertThat(configuration).isNotEqualTo(withInputSize(10).buildConfiguration());
+        assertThat(withInputSize(10).buildConfiguration()).isNotEqualTo(
+                withInputSize(31).buildConfiguration());
     }
 
     @Test
     public void tesInputTimeoutEquals() {
 
-        assertThat(withInputTimeout(TimeDuration.ZERO)).isEqualTo(
+        assertThat(withInputTimeout(TimeDuration.ZERO).buildConfiguration()).isEqualTo(
                 builder().withInputTimeout(TimeDuration.ZERO).buildConfiguration());
-        assertThat(withInputTimeout(1, TimeUnit.MILLISECONDS)).isEqualTo(
+        assertThat(withInputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration()).isEqualTo(
                 builder().withInputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -138,16 +143,18 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withInputTimeout(TimeDuration.ZERO));
-        assertThat(configuration).isNotEqualTo(withInputTimeout(1, TimeUnit.MILLISECONDS));
-        assertThat(withInputTimeout(TimeDuration.ZERO)).isNotEqualTo(
-                withInputTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(
+                withInputTimeout(TimeDuration.ZERO).buildConfiguration());
+        assertThat(configuration).isNotEqualTo(
+                withInputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
+        assertThat(withInputTimeout(TimeDuration.ZERO).buildConfiguration()).isNotEqualTo(
+                withInputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
     }
 
     @Test
     public void tesLogEquals() {
 
-        assertThat(withLog(Logs.nullLog())).isEqualTo(
+        assertThat(withLog(Logs.nullLog()).buildConfiguration()).isEqualTo(
                 builder().withLog(Logs.nullLog()).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -157,14 +164,15 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withLog(Logs.nullLog()));
-        assertThat(withLog(Logs.nullLog())).isNotEqualTo(withLog(Logs.systemLog()));
+        assertThat(configuration).isNotEqualTo(withLog(Logs.nullLog()).buildConfiguration());
+        assertThat(withLog(Logs.nullLog()).buildConfiguration()).isNotEqualTo(
+                withLog(Logs.systemLog()).buildConfiguration());
     }
 
     @Test
     public void tesLogLevelEquals() {
 
-        assertThat(withLogLevel(LogLevel.DEBUG)).isEqualTo(
+        assertThat(withLogLevel(LogLevel.DEBUG).buildConfiguration()).isEqualTo(
                 builder().withLogLevel(LogLevel.DEBUG).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -174,14 +182,15 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withLogLevel(LogLevel.DEBUG));
-        assertThat(withLogLevel(LogLevel.DEBUG)).isNotEqualTo(withLogLevel(LogLevel.WARNING));
+        assertThat(configuration).isNotEqualTo(withLogLevel(LogLevel.DEBUG).buildConfiguration());
+        assertThat(withLogLevel(LogLevel.DEBUG).buildConfiguration()).isNotEqualTo(
+                withLogLevel(LogLevel.WARNING).buildConfiguration());
     }
 
     @Test
     public void tesMaxInvocationsEquals() {
 
-        assertThat(withMaxInvocations(4)).isEqualTo(
+        assertThat(withMaxInvocations(4).buildConfiguration()).isEqualTo(
                 builder().withMaxInvocations(4).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -191,14 +200,15 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withMaxInvocations(4));
-        assertThat(withMaxInvocations(4)).isNotEqualTo(withMaxInvocations(41));
+        assertThat(configuration).isNotEqualTo(withMaxInvocations(4).buildConfiguration());
+        assertThat(withMaxInvocations(4).buildConfiguration()).isNotEqualTo(
+                withMaxInvocations(41).buildConfiguration());
     }
 
     @Test
     public void tesOutputOrderEquals() {
 
-        assertThat(withOutputOrder(OrderType.NONE)).isEqualTo(
+        assertThat(withOutputOrder(OrderType.NONE).buildConfiguration()).isEqualTo(
                 builder().withOutputOrder(OrderType.NONE).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -208,15 +218,17 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withOutputOrder(OrderType.NONE));
-        assertThat(withOutputOrder(OrderType.NONE)).isNotEqualTo(
-                withOutputOrder(OrderType.PASSING_ORDER));
+        assertThat(configuration).isNotEqualTo(
+                withOutputOrder(OrderType.NONE).buildConfiguration());
+        assertThat(withOutputOrder(OrderType.NONE).buildConfiguration()).isNotEqualTo(
+                withOutputOrder(OrderType.PASSING_ORDER).buildConfiguration());
     }
 
     @Test
     public void tesOutputSizeEquals() {
 
-        assertThat(withOutputSize(10)).isEqualTo(builder().withOutputSize(10).buildConfiguration());
+        assertThat(withOutputSize(10).buildConfiguration()).isEqualTo(
+                builder().withOutputSize(10).buildConfiguration());
 
         final RoutineConfiguration configuration =
                 builder().withAvailableTimeout(TimeDuration.millis(100))
@@ -225,16 +237,17 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withOutputSize(10));
-        assertThat(withOutputSize(10)).isNotEqualTo(withOutputSize(1));
+        assertThat(configuration).isNotEqualTo(withOutputSize(10).buildConfiguration());
+        assertThat(withOutputSize(10).buildConfiguration()).isNotEqualTo(
+                withOutputSize(1).buildConfiguration());
     }
 
     @Test
     public void tesOutputTimeoutEquals() {
 
-        assertThat(withOutputTimeout(TimeDuration.ZERO)).isEqualTo(
+        assertThat(withOutputTimeout(TimeDuration.ZERO).buildConfiguration()).isEqualTo(
                 builder().withOutputTimeout(TimeDuration.ZERO).buildConfiguration());
-        assertThat(withOutputTimeout(1, TimeUnit.MILLISECONDS)).isEqualTo(
+        assertThat(withOutputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration()).isEqualTo(
                 builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -244,18 +257,20 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withOutputTimeout(TimeDuration.ZERO));
-        assertThat(configuration).isNotEqualTo(withOutputTimeout(1, TimeUnit.MILLISECONDS));
-        assertThat(withOutputTimeout(TimeDuration.ZERO)).isNotEqualTo(
-                withOutputTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(
+                withOutputTimeout(TimeDuration.ZERO).buildConfiguration());
+        assertThat(configuration).isNotEqualTo(
+                withOutputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
+        assertThat(withOutputTimeout(TimeDuration.ZERO).buildConfiguration()).isNotEqualTo(
+                withOutputTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
     }
 
     @Test
     public void tesReadTimeoutEquals() {
 
-        assertThat(withReadTimeout(TimeDuration.ZERO)).isEqualTo(
+        assertThat(withReadTimeout(TimeDuration.ZERO).buildConfiguration()).isEqualTo(
                 builder().withReadTimeout(TimeDuration.ZERO).buildConfiguration());
-        assertThat(withReadTimeout(1, TimeUnit.MILLISECONDS)).isEqualTo(
+        assertThat(withReadTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration()).isEqualTo(
                 builder().withReadTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -265,16 +280,18 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withReadTimeout(TimeDuration.ZERO));
-        assertThat(configuration).isNotEqualTo(withReadTimeout(1, TimeUnit.MILLISECONDS));
-        assertThat(withReadTimeout(TimeDuration.ZERO)).isNotEqualTo(
-                withReadTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(
+                withReadTimeout(TimeDuration.ZERO).buildConfiguration());
+        assertThat(configuration).isNotEqualTo(
+                withReadTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
+        assertThat(withReadTimeout(TimeDuration.ZERO).buildConfiguration()).isNotEqualTo(
+                withReadTimeout(1, TimeUnit.MILLISECONDS).buildConfiguration());
     }
 
     @Test
     public void tesRunnerEquals() {
 
-        assertThat(withAsyncRunner(Runners.sharedRunner())).isEqualTo(
+        assertThat(withAsyncRunner(Runners.sharedRunner()).buildConfiguration()).isEqualTo(
                 builder().withAsyncRunner(Runners.sharedRunner()).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -284,8 +301,10 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withAsyncRunner(Runners.sharedRunner()));
-        assertThat(Runners.sharedRunner()).isNotEqualTo(withAsyncRunner(Runners.queuedRunner()));
+        assertThat(configuration).isNotEqualTo(
+                withAsyncRunner(Runners.sharedRunner()).buildConfiguration());
+        assertThat(withAsyncRunner(Runners.sharedRunner()).buildConfiguration()).isNotEqualTo(
+                withAsyncRunner(Runners.queuedRunner()).buildConfiguration());
     }
 
     @Test
@@ -526,7 +545,7 @@ public class RoutineConfigurationBuilderTest {
     @Test
     public void testSyncRunnerEquals() {
 
-        assertThat(withSyncRunner(Runners.queuedRunner())).isEqualTo(
+        assertThat(withSyncRunner(Runners.queuedRunner()).buildConfiguration()).isEqualTo(
                 builder().withSyncRunner(Runners.queuedRunner()).buildConfiguration());
 
         final RoutineConfiguration configuration =
@@ -536,8 +555,9 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(configuration).isNotEqualTo(withSyncRunner(Runners.queuedRunner()));
-        assertThat(withSyncRunner(Runners.sequentialRunner())).isNotEqualTo(
-                withSyncRunner(Runners.queuedRunner()));
+        assertThat(configuration).isNotEqualTo(
+                withSyncRunner(Runners.queuedRunner()).buildConfiguration());
+        assertThat(withSyncRunner(Runners.sequentialRunner()).buildConfiguration()).isNotEqualTo(
+                withSyncRunner(Runners.queuedRunner()).buildConfiguration());
     }
 }

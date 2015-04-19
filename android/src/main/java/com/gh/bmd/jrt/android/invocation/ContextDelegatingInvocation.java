@@ -26,6 +26,11 @@ import javax.annotation.Nonnull;
 public class ContextDelegatingInvocation<INPUT, OUTPUT> extends DelegatingInvocation<INPUT, OUTPUT>
         implements ContextInvocation<INPUT, OUTPUT> {
 
+    /**
+     * TODO
+     *
+     * @param routine
+     */
     public ContextDelegatingInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
 
         super(routine);

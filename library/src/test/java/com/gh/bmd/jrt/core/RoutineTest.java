@@ -33,6 +33,7 @@ import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
+import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations.Function1;
@@ -815,6 +816,32 @@ public class RoutineTest {
                            .afterMax(timeout)
                            .readNext()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
+    }
+
+    @Test
+    public void testDelegation() {
+
+        final TimeDuration timeout = seconds(1);
+        final Routine<Object, Object> routine1 =
+                JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
+        final Routine<Object, Object> routine2 =
+                JRoutine.on(DelegatingInvocation.factoryWith(routine1)).buildRoutine();
+
+        assertThat(routine2.callAsync("test1").afterMax(timeout).readAll()).containsExactly(
+                "test1");
+
+        final ParameterChannel<Object, Object> channel =
+                routine2.invokeAsync().after(timeout).pass("test2");
+        channel.now().abort(new IllegalArgumentException());
+
+        try {
+
+            channel.result().readNext();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Test

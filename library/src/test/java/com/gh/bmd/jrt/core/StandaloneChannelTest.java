@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -237,7 +238,7 @@ public class StandaloneChannelTest {
     public void testAsynchronousInput2() {
 
         final TimeDuration timeout = seconds(1);
-        final RoutineConfiguration configuration = withOutputOrder(OrderType.PASSING_ORDER);
+        final Builder configuration = withOutputOrder(OrderType.PASSING_ORDER);
         final StandaloneChannel<String> standaloneChannel1 =
                 JRoutine.standalone().withConfiguration(configuration).buildChannel();
 
@@ -448,7 +449,7 @@ public class StandaloneChannelTest {
         input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(standaloneChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
-        final RoutineConfiguration config2 = withOutputOrder(OrderType.PASSING_ORDER);
+        final Builder config2 = withOutputOrder(OrderType.PASSING_ORDER);
         final StandaloneChannel<Object> standaloneChannel2 =
                 JRoutine.standalone().withConfiguration(config2).buildChannel();
         final StandaloneInput<Object> input2 = standaloneChannel2.input();

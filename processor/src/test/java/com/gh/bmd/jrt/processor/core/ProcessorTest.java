@@ -19,6 +19,7 @@ import com.gh.bmd.jrt.annotation.Pass.PassMode;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -98,7 +99,7 @@ public class ProcessorTest {
         final TestClass test = new TestClass();
         final ClassToken<TestInterfaceWrapper> token =
                 ClassToken.tokenOf(TestInterfaceWrapper.class);
-        final RoutineConfiguration configuration = withSyncRunner(Runners.sequentialRunner());
+        final Builder configuration = withSyncRunner(Runners.sequentialRunner());
         final TestInterfaceWrapper testWrapper =
                 JRoutineProcessor.on(test).withConfiguration(configuration).buildWrapper(token);
 

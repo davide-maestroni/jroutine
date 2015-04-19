@@ -839,21 +839,21 @@ public class RoutineConfiguration {
          */
         private Builder(@Nonnull final RoutineConfiguration initialConfiguration) {
 
-            mSyncRunner = initialConfiguration.getSyncRunnerOr(null);
-            mAsyncRunner = initialConfiguration.getAsyncRunnerOr(null);
-            mMaxInvocations = initialConfiguration.getMaxInvocationsOr(DEFAULT);
-            mCoreInvocations = initialConfiguration.getCoreInvocationsOr(DEFAULT);
-            mAvailTimeout = initialConfiguration.getAvailTimeoutOr(null);
-            mReadTimeout = initialConfiguration.getReadTimeoutOr(null);
-            mTimeoutActionType = initialConfiguration.getReadTimeoutActionOr(null);
-            mInputOrder = initialConfiguration.getInputOrderOr(null);
-            mInputMaxSize = initialConfiguration.getInputSizeOr(DEFAULT);
-            mInputTimeout = initialConfiguration.getInputTimeoutOr(null);
-            mOutputOrder = initialConfiguration.getOutputOrderOr(null);
-            mOutputMaxSize = initialConfiguration.getOutputSizeOr(DEFAULT);
-            mOutputTimeout = initialConfiguration.getOutputTimeoutOr(null);
-            mLog = initialConfiguration.getLogOr(null);
-            mLogLevel = initialConfiguration.getLogLevelOr(null);
+            mSyncRunner = initialConfiguration.mSyncRunner;
+            mAsyncRunner = initialConfiguration.mAsyncRunner;
+            mMaxInvocations = initialConfiguration.mMaxInvocations;
+            mCoreInvocations = initialConfiguration.mCoreInvocations;
+            mAvailTimeout = initialConfiguration.mAvailTimeout;
+            mReadTimeout = initialConfiguration.mReadTimeout;
+            mTimeoutActionType = initialConfiguration.mTimeoutActionType;
+            mInputOrder = initialConfiguration.mInputOrder;
+            mInputMaxSize = initialConfiguration.mInputMaxSize;
+            mInputTimeout = initialConfiguration.mInputTimeout;
+            mOutputOrder = initialConfiguration.mOutputOrder;
+            mOutputMaxSize = initialConfiguration.mOutputMaxSize;
+            mOutputTimeout = initialConfiguration.mOutputTimeout;
+            mLog = initialConfiguration.mLog;
+            mLogLevel = initialConfiguration.mLogLevel;
         }
 
         /**

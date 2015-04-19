@@ -273,6 +273,7 @@ public class InvocationServiceRoutineBuilderTest
                                                              .buildConfiguration();
         assertThat(JRoutine.onService(getActivity(), classToken)
                            .withConfiguration(configuration1)
+                           .dispatchingOn(Looper.myLooper())
                            .callAsync("test1")
                            .readAll()).isEmpty();
     }
@@ -289,6 +290,7 @@ public class InvocationServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), classToken)
                     .withConfiguration(configuration2)
+                    .dispatchingOn(Looper.myLooper())
                     .callAsync("test2")
                     .readAll();
 
@@ -312,6 +314,7 @@ public class InvocationServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), classToken)
                     .withConfiguration(configuration3)
+                    .dispatchingOn(Looper.myLooper())
                     .callAsync("test3")
                     .readAll();
 

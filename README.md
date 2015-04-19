@@ -1,10 +1,10 @@
-#JRoutine
+# JRoutine
 [![Build Status](https://travis-ci.org/davide-maestroni/jroutine.svg?branch=master)](https://travis-ci.org/davide-maestroni/jroutine)
 [![Coverage Status](https://img.shields.io/coveralls/davide-maestroni/jroutine.svg)](https://coveralls.io/r/davide-maestroni/jroutine?branch=master)
 
 Parallel programming on the go.
 
-##Overview
+## Overview
 
 Inspired by the Go routines, this library provides a powerful, flexible, yet familiar concurrency framework, designed to make multi-threads programming simple and funny.
 
@@ -16,7 +16,7 @@ After the invocation, the routine returns an input channel which is used to pass
 
 The main way to define a routine is to implement an invocation object. Though, the library provides several other ways (always backed by invocations) to call any method of any object (even defined in third party source code) asynchronously.
 
-##It's reactive!
+## It's reactive!
 
 The library adheres to [The Reactive Manifesto][reactive manifesto]. It's responsive, resilient, elastic and "message driven".
 
@@ -25,7 +25,7 @@ It's resilient because errors are gracefully handled and notified through the pr
 It's elastic because the needed number of threads is allocated in response to higher loads.
 It's "message driven" because both ouputs and errors are dispatched along the chain of invocations.
 
-##Why not RxJava?
+## Why not RxJava?
 
 Among the many open source libraries, [RxJava][rxjava] is one of the preferred choices when it comes to handle background tasks.
 Although [Reactive Extensions][reactivex] is a great tool for managing events and composing event listeners, it has not been clearly designed with parallel programming in mind.
@@ -37,7 +37,7 @@ After all, a network request does not really fit in the definition of "event".
 
 RxJava is still one of the best library for handling events, though, something specifically designed is needed to make parallel programming easily accessible and manageable.
 
-##Why JRoutine?
+## Why JRoutine?
 
 The JRoutine library is based on a single paradigm, at the same time simple, but flexible and powerful enough to provide all the features needed to perform, manage and combine asynchronous tasks in any environment and on any platform.
 This paradigm is nothing but what any developer is already familiar to, that is, a function call.
@@ -53,6 +53,7 @@ What the library has to offer is:
 * ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential sequence of operations
 * ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation
 * ***Nice handling of Android configuration changes***: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments
+* ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service
 
 And more:
 
@@ -62,17 +63,17 @@ And more:
 
 (*) for older Java versions please have a look at [Retrotranslator][retrotranslator].
 
-##Why not JRoutine?
+## Why not JRoutine?
 
 The JRoutine library is designed for parallel programming and nothing else. It's no golden hammer and does not pretend to.
 If you need event handling, please use [RxJava][rxjava], it's one of the best library out there. If you need distributed scalable computing, consider using [Akka][akka].
 For anything else [GitHub][github] is a great source of inspiration.
 
-##Usage
+## Usage
 
-Please have a look at the [wiki][wiki].
+Please have a look at the [Wiki][wiki].
 
-##Documentation
+## Documentation
 
 Complete Javadoc with insights and examples is available for:
 
@@ -80,34 +81,34 @@ Complete Javadoc with insights and examples is available for:
 * [JRoutine-Processor][javadoc processor]
 * [JRoutine-Android][javadoc android]
 
-The project contains an additional sample module showing how to implement a file downloader with just 4 classes.
+The project contains an additional [sample][sample] module showing how to implement a file downloader with just 4 classes.
 
-##Further development
+## Further development
 
 Feel free to contribute with your own [Routine][javadoc routine] or [Runner][javadoc runner] implementations, in order to support more platforms other than Android.
 
-##Build instructions
+## Build instructions
 
-Please refer to the dedicated [wiki page][wiki build].
+Please refer to the dedicated [Wiki page][wiki build].
 
-##Dependencies
+## Dependencies
 
-####Runtime dependencies
+#### Runtime dependencies
 
 - None
 
-####Compile dependencies
+#### Compilation dependencies
 
 - [FindBugs][findbugs] annotations ([Lesser GNU Public License][lgpl license])
 - Android SDK ([Terms and Condition][android sdk])
 - Android Support Library ([Apache License v2.0][apache license])
 
-####Test dependencies
+#### Test dependencies
 
 - JUnit ([Eclipse Public License v1.0][eclipse license])
 - [AssertJ][assertj] ([Apache License v2.0][apache license])
 
-##Artifacts
+## Artifacts
 
 Module | Latest Version
 --- | ---
@@ -115,7 +116,7 @@ JRoutine | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/co
 JRoutine-Processor | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor)
 JRoutine-Android | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
 
-##License
+## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
@@ -140,6 +141,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [akka]:http://akka.io/
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
+[sample]:[sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
 [javadoc]:http://davide-maestroni.github.io/jroutine/docs/jroutine
 [javadoc processor]:http://davide-maestroni.github.io/jroutine/docs/processor
 [javadoc android]:http://davide-maestroni.github.io/jroutine/docs/android

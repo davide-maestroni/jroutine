@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 
@@ -58,6 +59,12 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
     }
 
     /**

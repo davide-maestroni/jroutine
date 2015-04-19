@@ -165,6 +165,12 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
+    public ClassRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
+    }
+
+    @Nonnull
     public ClassRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;

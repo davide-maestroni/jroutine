@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
 
@@ -144,6 +145,12 @@ public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, Obje
      */
     @Nonnull
     ObjectContextRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectContextRoutineBuilder withConfiguration(@Nonnull Builder builder);
 
     /**
      * {@inheritDoc}

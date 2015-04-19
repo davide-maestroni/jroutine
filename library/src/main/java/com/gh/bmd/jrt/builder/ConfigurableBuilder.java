@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -65,4 +67,16 @@ public interface ConfigurableBuilder {
      */
     @Nonnull
     ConfigurableBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * Sets the specified configuration to this builder by replacing any configuration already set.
+     * <br/>
+     * Note that the configuration options not supported by the builder implementation might be
+     * ignored.
+     *
+     * @param builder the configuration builder.
+     * @return this builder.
+     */
+    @Nonnull
+    ConfigurableBuilder withConfiguration(@Nonnull Builder builder);
 }

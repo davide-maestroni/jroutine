@@ -161,257 +161,248 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Short for <b><code>builder().onReadTimeout(action).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().onReadTimeout(action)</code></b>.
      *
      * @param action the action type.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration onReadTimeout(@Nullable final TimeoutActionType action) {
+    public static Builder onReadTimeout(@Nullable final TimeoutActionType action) {
 
-        return builder().onReadTimeout(action).buildConfiguration();
+        return builder().onReadTimeout(action);
     }
 
     /**
-     * Short for <b><code>builder().withAsyncRunner(runner).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withAsyncRunner(runner)</code></b>.
      *
      * @param runner the runner instance.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withAsyncRunner(@Nullable final Runner runner) {
+    public static Builder withAsyncRunner(@Nullable final Runner runner) {
 
-        return builder().withAsyncRunner(runner).buildConfiguration();
+        return builder().withAsyncRunner(runner);
     }
 
     /**
-     * Short for <b><code>builder().withAvailableTimeout(timeout, timeUnit).buildConfiguration()
-     * </code></b>.
+     * Short for <b><code>builder().withAvailableTimeout(timeout, timeUnit)</code></b>.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public static RoutineConfiguration withAvailableTimeout(final long timeout,
+    public static Builder withAvailableTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
         return withAvailableTimeout(fromUnit(timeout, timeUnit));
     }
 
     /**
-     * Short for <b><code>builder().withAvailableTimeout(timeout).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withAvailableTimeout(timeout)</code></b>.
      *
      * @param timeout the timeout.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withAvailableTimeout(@Nullable final TimeDuration timeout) {
+    public static Builder withAvailableTimeout(@Nullable final TimeDuration timeout) {
 
-        return builder().withAvailableTimeout(timeout).buildConfiguration();
+        return builder().withAvailableTimeout(timeout);
     }
 
     /**
-     * Short for <b><code>builder().withCoreInvocations(coreInvocations).buildConfiguration()
-     * </code></b>.
+     * Short for <b><code>builder().withCoreInvocations(coreInvocations)</code></b>.
      *
      * @param coreInvocations the max number of instances.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     @Nonnull
-    public static RoutineConfiguration withCoreInvocations(final int coreInvocations) {
+    public static Builder withCoreInvocations(final int coreInvocations) {
 
-        return builder().withCoreInvocations(coreInvocations).buildConfiguration();
+        return builder().withCoreInvocations(coreInvocations);
     }
 
     /**
-     * Short for <b><code>builder().withInputOrder(order).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withInputOrder(order)</code></b>.
      *
      * @param order the order type.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withInputOrder(@Nullable final OrderType order) {
+    public static Builder withInputOrder(@Nullable final OrderType order) {
 
-        return builder().withInputOrder(order).buildConfiguration();
+        return builder().withInputOrder(order);
     }
 
     /**
-     * Short for <b><code>builder().withInputSize(inputMaxSize).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withInputSize(inputMaxSize)</code></b>.
      *
      * @param inputMaxSize the maximum size.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public static RoutineConfiguration withInputSize(final int inputMaxSize) {
+    public static Builder withInputSize(final int inputMaxSize) {
 
-        return builder().withInputSize(inputMaxSize).buildConfiguration();
+        return builder().withInputSize(inputMaxSize);
     }
 
     /**
-     * Short for <b><code>builder().withInputTimeout(timeout, timeUnit).buildConfiguration()
-     * </code></b>.
+     * Short for <b><code>builder().withInputTimeout(timeout, timeUnit)</code></b>.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
-     * @return this builder.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public static RoutineConfiguration withInputTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
+    public static Builder withInputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
         return withInputTimeout(fromUnit(timeout, timeUnit));
     }
 
     /**
-     * Short for <b><code>builder().withInputTimeout(timeout).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withInputTimeout(timeout)</code></b>.
      *
      * @param timeout the timeout.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withInputTimeout(@Nullable final TimeDuration timeout) {
+    public static Builder withInputTimeout(@Nullable final TimeDuration timeout) {
 
-        return builder().withInputTimeout(timeout).buildConfiguration();
+        return builder().withInputTimeout(timeout);
     }
 
     /**
-     * Short for <b><code>builder().withLog(log).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withLog(log)</code></b>.
      *
      * @param log the log instance.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withLog(@Nullable final Log log) {
+    public static Builder withLog(@Nullable final Log log) {
 
-        return builder().withLog(log).buildConfiguration();
+        return builder().withLog(log);
     }
 
     /**
-     * Short for <b><code>builder().withLogLevel(level).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withLogLevel(level)</code></b>.
      *
      * @param level the log level.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withLogLevel(@Nullable final LogLevel level) {
+    public static Builder withLogLevel(@Nullable final LogLevel level) {
 
-        return builder().withLogLevel(level).buildConfiguration();
+        return builder().withLogLevel(level);
     }
 
     /**
-     * Short for <b><code>builder().withMaxInvocations(maxInvocations).buildConfiguration()
-     * </code></b>.
+     * Short for <b><code>builder().withMaxInvocations(maxInvocations)</code></b>.
      *
      * @param maxInvocations the max number of instances.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public static RoutineConfiguration withMaxInvocations(final int maxInvocations) {
+    public static Builder withMaxInvocations(final int maxInvocations) {
 
-        return builder().withMaxInvocations(maxInvocations).buildConfiguration();
+        return builder().withMaxInvocations(maxInvocations);
     }
 
     /**
-     * Short for <b><code>builder().withOutputOrder(order).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withOutputOrder(order)</code></b>.
      *
      * @param order the order type.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withOutputOrder(@Nullable final OrderType order) {
+    public static Builder withOutputOrder(@Nullable final OrderType order) {
 
-        return builder().withOutputOrder(order).buildConfiguration();
+        return builder().withOutputOrder(order);
     }
 
     /**
-     * Short for <b><code>builder().withOutputSize(outputMaxSize).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withOutputSize(outputMaxSize)</code></b>.
      *
      * @param outputMaxSize the maximum size.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public static RoutineConfiguration withOutputSize(final int outputMaxSize) {
+    public static Builder withOutputSize(final int outputMaxSize) {
 
-        return builder().withOutputSize(outputMaxSize).buildConfiguration();
+        return builder().withOutputSize(outputMaxSize);
     }
 
     /**
-     * Short for <b><code>builder().withOutputTimeout(timeout, timeUnit).buildConfiguration()
-     * </code></b>.
+     * Short for <b><code>builder().withOutputTimeout(timeout, timeUnit)</code></b>.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public static RoutineConfiguration withOutputTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
+    public static Builder withOutputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
         return withOutputTimeout(fromUnit(timeout, timeUnit));
     }
 
     /**
-     * Short for <b><code>builder().withOutputTimeout(timeout).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withOutputTimeout(timeout)</code></b>.
      *
      * @param timeout the timeout.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withOutputTimeout(@Nullable final TimeDuration timeout) {
+    public static Builder withOutputTimeout(@Nullable final TimeDuration timeout) {
 
-        return builder().withOutputTimeout(timeout).buildConfiguration();
+        return builder().withOutputTimeout(timeout);
     }
 
     /**
-     * Short for <b><code>builder().withReadTimeout(timeout, timeUnit).buildConfiguration()
-     * </code></b>.
+     * Short for <b><code>builder().withReadTimeout(timeout, timeUnit)</code></b>.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public static RoutineConfiguration withReadTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
+    public static Builder withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
         return withReadTimeout(fromUnit(timeout, timeUnit));
     }
 
     /**
-     * Short for <b><code>builder().withReadTimeout(timeout).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withReadTimeout(timeout)</code></b>.
      *
      * @param timeout the timeout.
-     * @return the routine configuration.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withReadTimeout(@Nullable final TimeDuration timeout) {
+    public static Builder withReadTimeout(@Nullable final TimeDuration timeout) {
 
-        return builder().withReadTimeout(timeout).buildConfiguration();
+        return builder().withReadTimeout(timeout);
     }
 
     /**
-     * Short for <b><code>builder().withSyncRunner(runner).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withSyncRunner(runner)</code></b>.
      *
      * @param runner the runner instance.
-     * @return this builder.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    public static RoutineConfiguration withSyncRunner(@Nullable final Runner runner) {
+    public static Builder withSyncRunner(@Nullable final Runner runner) {
 
-        return builder().withSyncRunner(runner).buildConfiguration();
+        return builder().withSyncRunner(runner);
     }
 
     /**

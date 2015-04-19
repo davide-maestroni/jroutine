@@ -20,6 +20,7 @@ import com.gh.bmd.jrt.android.builder.InvocationServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.Reflection;
@@ -130,6 +131,15 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
             @Nullable final RoutineConfiguration configuration) {
 
         super.withConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nonnull final Builder builder) {
+
+        super.withConfiguration(builder);
         return this;
     }
 }

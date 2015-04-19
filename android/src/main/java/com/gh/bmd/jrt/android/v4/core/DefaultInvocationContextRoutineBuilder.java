@@ -187,6 +187,15 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
         return this;
     }
 
+    @Nonnull
+    @Override
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nonnull final Builder builder) {
+
+        super.withConfiguration(builder);
+        return this;
+    }
+
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *

@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 
@@ -48,5 +49,11 @@ class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public StandaloneChannelBuilder withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
     }
 }

@@ -22,6 +22,7 @@ import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.runner.Execution;
@@ -213,6 +214,12 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public InvocationContextChannelBuilder withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
     }
 
     /**

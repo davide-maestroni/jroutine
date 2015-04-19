@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.SharableBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
 
@@ -109,6 +110,15 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      */
     @Nonnull
     WrapperRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * Note that all the options related to the output and input channels will be ignored.
+     *
+     * @param builder the routine configuration builder.
+     * @return this builder.
+     */
+    @Nonnull
+    WrapperRoutineBuilder withConfiguration(@Nonnull Builder builder);
 
     /**
      * {@inheritDoc}

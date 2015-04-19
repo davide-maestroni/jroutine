@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
@@ -91,6 +92,12 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public WrapperBuilder<TYPE> withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
     }
 
     @Nonnull

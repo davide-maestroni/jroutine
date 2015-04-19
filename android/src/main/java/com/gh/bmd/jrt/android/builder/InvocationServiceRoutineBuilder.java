@@ -18,6 +18,7 @@ import android.os.Looper;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
 
@@ -86,4 +87,10 @@ public interface InvocationServiceRoutineBuilder<INPUT, OUTPUT>
     @Nonnull
     InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable RoutineConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull Builder builder);
 }

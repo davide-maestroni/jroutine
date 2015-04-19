@@ -225,6 +225,14 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
+    public ObjectRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+
+        super.withConfiguration(builder);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public ObjectRoutineBuilder withShareGroup(@Nullable final String group) {
 
         super.withShareGroup(group);

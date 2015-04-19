@@ -483,6 +483,12 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nonnull
+    public ObjectServiceRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
+    }
+
+    @Nonnull
     public ObjectServiceRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;

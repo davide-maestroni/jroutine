@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.android.builder;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +55,16 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
     @Nonnull
     InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable RoutineConfiguration configuration);
+
+    /**
+     * Note that all the options related to the output and input channels size and timeout will be
+     * ignored.
+     *
+     * @param builder the routine configuration builder.
+     * @return this builder.
+     */
+    @Nonnull
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull Builder builder);
 
     /**
      * {@inheritDoc}

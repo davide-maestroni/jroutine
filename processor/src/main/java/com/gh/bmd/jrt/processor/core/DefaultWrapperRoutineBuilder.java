@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.processor.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder;
 import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
@@ -98,6 +99,12 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public WrapperRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
     }
 
     @Nonnull

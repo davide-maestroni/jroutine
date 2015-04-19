@@ -493,6 +493,12 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
+    public ObjectContextRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+
+        return withConfiguration(builder.buildConfiguration());
+    }
+
+    @Nonnull
     public ObjectContextRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;

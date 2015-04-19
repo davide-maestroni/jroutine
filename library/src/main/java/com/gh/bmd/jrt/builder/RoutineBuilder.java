@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
@@ -44,4 +45,10 @@ public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder, Rout
      */
     @Nonnull
     RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull Builder builder);
 }

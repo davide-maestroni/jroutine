@@ -153,6 +153,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
+    @Nonnull
     public static ObjectContextRoutineBuilder onActivity(@Nonnull final Activity activity,
             @Nonnull final Class<?> targetClass) {
 
@@ -241,6 +242,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
+    @Nonnull
     public static ObjectContextRoutineBuilder onFragment(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> targetClass) {
 

@@ -21,15 +21,20 @@ import com.gh.bmd.jrt.routine.Routine;
 import javax.annotation.Nonnull;
 
 /**
+ * Implementation of a delegating invocation implementing the platform specific Android invocation.
+ * <p/>
  * Created by davide on 19/04/15.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 public class ContextDelegatingInvocation<INPUT, OUTPUT> extends DelegatingInvocation<INPUT, OUTPUT>
         implements ContextInvocation<INPUT, OUTPUT> {
 
     /**
-     * TODO
+     * Constructor.
      *
-     * @param routine
+     * @param routine the routine used to execute this invocation.
      */
     public ContextDelegatingInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
 

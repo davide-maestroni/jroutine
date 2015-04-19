@@ -23,18 +23,24 @@ import javax.annotation.Nonnull;
 import static com.gh.bmd.jrt.invocation.Invocations.withArgs;
 
 /**
+ * Invocation implementation delegating the execution to another routine.
+ * <p/>
  * Created by davide on 18/04/15.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
-    private ParameterChannel<INPUT, OUTPUT> mChannel;
+    private ParameterChannel<INPUT, OUTPUT> mChannel = null;
 
     /**
-     * TODO
+     * Constructor.
      *
-     * @param routine
+     * @param routine the routine used to execute this invocation.
+     * @throws java.lang.NullPointerException if the specified routine is null.
      */
     @SuppressWarnings("ConstantConditions")
     public DelegatingInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
@@ -48,12 +54,12 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
     }
 
     /**
-     * TODO
+     * Returns a factory of delegating invocations.
      *
-     * @param routine
-     * @param <INPUT>
-     * @param <OUTPUT>
-     * @return
+     * @param routine  the routine used to execute this invocation.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the factory.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryWith(

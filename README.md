@@ -18,7 +18,7 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 ## It's reactive!
 
-The library adheres to [The Reactive Manifesto][reactive manifesto]. It's responsive, resilient, elastic and "message driven".
+The library adheres to [The Reactive Manifesto][reactive manifesto]. It's *responsive*, *resilient*, *elastic* and *message driven*.
 
 It's *responsive* because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.<br/>
 It's *resilient* because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.<br/>

@@ -161,13 +161,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                    this);
         mRoutine = JRoutine.on(withArgs(mContext, invocationClass, invocationArgs).factoryOf(
                 new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {}))
-                           .withConfiguration(configuration.builderFrom()
-                                                           .withInputSize(Integer.MAX_VALUE)
-                                                           .withInputTimeout(TimeDuration.ZERO)
-                                                           .withOutputSize(Integer.MAX_VALUE)
-                                                           .withOutputTimeout(TimeDuration.ZERO)
-                                                           .withLog(log)
-                                                           .buildConfiguration())
+                           .withConfig(configuration.builderFrom()
+                                                    .withInputSize(Integer.MAX_VALUE)
+                                                    .withInputTimeout(TimeDuration.ZERO)
+                                                    .withOutputSize(Integer.MAX_VALUE)
+                                                    .withOutputTimeout(TimeDuration.ZERO)
+                                                    .withLog(log)
+                                                    .buildConfiguration())
                            .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine with configuration: %s", configuration);
@@ -334,7 +334,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                      .withLogLevel(logLevel)
                                                                      .buildConfiguration();
             final StandaloneChannel<INPUT> paramChannel =
-                    JRoutine.standalone().withConfiguration(inputConfiguration).buildChannel();
+                    JRoutine.standalone().withConfig(inputConfiguration).buildChannel();
             mStandaloneParamInput = paramChannel.input();
             mStandaloneParamOutput = paramChannel.output();
             final OrderType outputOrder = configuration.getOutputOrderOr(null);
@@ -352,7 +352,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                       .withLogLevel(logLevel)
                                                                       .buildConfiguration();
             final StandaloneChannel<OUTPUT> resultChannel =
-                    JRoutine.standalone().withConfiguration(outputConfiguration).buildChannel();
+                    JRoutine.standalone().withConfig(outputConfiguration).buildChannel();
             mStandaloneResultInput = resultChannel.input();
             mStandaloneResultOutput = resultChannel.output();
         }

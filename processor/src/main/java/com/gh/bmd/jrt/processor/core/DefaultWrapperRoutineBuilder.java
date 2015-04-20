@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.processor.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder;
 import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
@@ -36,9 +36,9 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private RoutineConfiguration mConfiguration;
+    private RoutineConfiguration mRoutineConfiguration;
 
-    private String mShareGroup;
+    private ShareConfiguration mShareConfiguration;
 
     /**
      * Constructor.
@@ -82,36 +82,41 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
             throw new IllegalStateException("the target object has been destroyed");
         }
 
-        final RoutineConfiguration configuration = mConfiguration;
+        final RoutineConfiguration configuration = mRoutineConfiguration;
         final ObjectWrapperBuilder<TYPE> builder = new ObjectWrapperBuilder<TYPE>(target, itf);
 
         if (configuration != null) {
 
-            builder.withConfiguration(configuration);
+            builder.withConfig(configuration);
         }
 
-        return builder.withShareGroup(mShareGroup).buildWrapper();
+        return builder.withShare(mShareConfiguration).buildWrapper();
     }
 
     @Nonnull
-    public WrapperRoutineBuilder withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
+    public WrapperRoutineBuilder withConfig(@Nullable final RoutineConfiguration configuration) {
 
-        mConfiguration = configuration;
+        mRoutineConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+    public WrapperRoutineBuilder withConfig(@Nonnull final RoutineConfiguration.Builder builder) {
 
-        return withConfiguration(builder.buildConfiguration());
+        return withConfig(builder.buildConfiguration());
     }
 
     @Nonnull
-    public WrapperRoutineBuilder withShareGroup(@Nullable final String group) {
+    public WrapperRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
 
-        mShareGroup = group;
+        mShareConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public WrapperRoutineBuilder withShare(@Nonnull final ShareConfiguration.Builder builder) {
+
+        return withShare(builder.buildConfiguration());
     }
 
     /**

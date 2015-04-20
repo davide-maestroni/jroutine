@@ -127,19 +127,19 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
 
     @Nonnull
     @Override
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(
             @Nullable final RoutineConfiguration configuration) {
 
-        super.withConfiguration(configuration);
+        super.withConfig(configuration);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(
             @Nonnull final Builder builder) {
 
-        super.withConfiguration(builder);
+        super.withConfig(builder);
         return this;
     }
 }

@@ -18,7 +18,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
 import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
@@ -27,18 +27,14 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
  * Default implementation of an Android routine builder.
@@ -57,13 +53,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
     private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
-    private Object[] mArgs = Reflection.NO_ARGS;
-
-    private CacheStrategyType mCacheStrategyType;
-
-    private ClashResolutionType mClashResolutionType;
-
-    private int mInvocationId = ContextRoutineBuilder.AUTO;
+    private ContextInvocationConfiguration mInvocationConfiguration;
 
     /**
      * Constructor.
@@ -122,42 +112,10 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
                                              .withInputTimeout(TimeDuration.INFINITY)
                                              .withOutputSize(Integer.MAX_VALUE)
                                              .withOutputTimeout(TimeDuration.INFINITY);
-        final Object[] args = mArgs;
-        final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor =
-                findConstructor(mInvocationClass, args);
-        return new DefaultContextRoutine<INPUT, OUTPUT>(builder.buildConfiguration(), mContext,
-                                                        mInvocationId, mClashResolutionType,
-                                                        mCacheStrategyType, constructor, args);
-    }
-
-    @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(
-            @Nullable final ClashResolutionType resolutionType) {
-
-        mClashResolutionType = resolutionType;
-        return this;
-    }
-
-    @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> onComplete(
-            @Nullable final CacheStrategyType strategyType) {
-
-        mCacheStrategyType = strategyType;
-        return this;
-    }
-
-    @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
-
-        mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
-        return this;
-    }
-
-    @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withId(final int invocationId) {
-
-        mInvocationId = invocationId;
-        return this;
+        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass,
+                                                        builder.buildConfiguration(),
+                                                        ContextInvocationConfiguration.notNull(
+                                                                mInvocationConfiguration));
     }
 
     @Override
@@ -183,19 +141,35 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
     @Nonnull
     @Override
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
             @Nullable final RoutineConfiguration configuration) {
 
-        super.withConfiguration(configuration);
+        super.withConfig(configuration);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
-            @Nonnull final Builder builder) {
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
+            @Nonnull final RoutineConfiguration.Builder builder) {
 
-        super.withConfiguration(builder);
+        super.withConfig(builder);
+        return this;
+    }
+
+    @Nonnull
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
+            @Nullable final ContextInvocationConfiguration configuration) {
+
+        mInvocationConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
+            @Nonnull final ContextInvocationConfiguration.Builder builder) {
+
+        mInvocationConfiguration = builder.buildConfiguration();
         return this;
     }
 

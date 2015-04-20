@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
 
@@ -144,41 +144,37 @@ public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    ObjectContextRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder withConfiguration(@Nonnull Builder builder);
+    ObjectContextRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder withShareGroup(@Nullable String group);
+    ObjectContextRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder onClash(@Nullable ClashResolutionType resolutionType);
+    ObjectContextRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder onComplete(@Nullable CacheStrategyType strategyType);
+    ObjectContextRoutineBuilder withInvocations(
+            @Nullable ContextInvocationConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder withArgs(@Nullable Object... args);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectContextRoutineBuilder withId(int invocationId);
+    ObjectContextRoutineBuilder withInvocations(
+            @Nonnull ContextInvocationConfiguration.Builder builder);
 }

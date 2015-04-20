@@ -29,6 +29,7 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -58,6 +59,7 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
+import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
@@ -77,17 +79,17 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
     private Object[] mArgs = Reflection.NO_ARGS;
 
-    private RoutineConfiguration mConfiguration;
-
     private Class<? extends Log> mLogClass;
 
     private Looper mLooper;
+
+    private RoutineConfiguration mRoutineConfiguration;
 
     private Class<? extends Runner> mRunnerClass;
 
     private Class<? extends RoutineService> mServiceClass;
 
-    private String mShareGroup;
+    private ShareConfiguration mShareConfiguration;
 
     /**
      * Constructor.
@@ -288,7 +290,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nullable
-    private static String withShareAnnotation(@Nullable final String shareGroup,
+    private static String withShareAnnotation(@Nullable final ShareConfiguration configuration,
             @Nonnull final Method method) {
 
         final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
@@ -298,7 +300,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             return shareGroupAnnotation.value();
         }
 
-        return shareGroup;
+        return ShareConfiguration.notNull(configuration).getGroupOr(null);
     }
 
     @Nonnull
@@ -335,7 +337,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                     "no annotated method with name '" + name + "' has been found");
         }
 
-        final RoutineConfiguration configuration = mConfiguration;
+        final RoutineConfiguration configuration = mRoutineConfiguration;
 
         if (configuration != null) {
 
@@ -346,8 +348,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
                        .withArgs(targetClass.getName(), args,
-                                 withShareAnnotation(mShareGroup, targetMethod), name)
-                       .withConfiguration(
+                                 withShareAnnotation(mShareConfiguration, targetMethod), name)
+                       .withConfig(
                                withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
                                        OrderType.PASSING_ORDER).buildConfiguration())
                        .withServiceClass(mServiceClass)
@@ -380,7 +382,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             }
         }
 
-        final RoutineConfiguration configuration = mConfiguration;
+        final RoutineConfiguration configuration = mRoutineConfiguration;
 
         if (configuration != null) {
 
@@ -392,9 +394,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
                        .withArgs(targetClass.getName(), args,
-                                 withShareAnnotation(mShareGroup, targetMethod), name,
-                                 toNames(parameterTypes))
-                       .withConfiguration(
+                                 withShareAnnotation(mShareConfiguration, targetMethod), name,
+                                 toNames(parameterTypes)).withConfig(
                                withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
                                        OrderType.PASSING_ORDER).buildConfiguration())
                        .withServiceClass(mServiceClass)
@@ -419,7 +420,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                     "the specified class is not an interface: " + itf.getCanonicalName());
         }
 
-        final RoutineConfiguration configuration = mConfiguration;
+        final RoutineConfiguration configuration = mRoutineConfiguration;
 
         if (configuration != null) {
 
@@ -475,24 +476,32 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder withConfiguration(
+    public ObjectServiceRoutineBuilder withConfig(
             @Nullable final RoutineConfiguration configuration) {
 
-        mConfiguration = configuration;
+        mRoutineConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+    public ObjectServiceRoutineBuilder withConfig(
+            @Nonnull final RoutineConfiguration.Builder builder) {
 
-        return withConfiguration(builder.buildConfiguration());
+        return withConfig(builder.buildConfiguration());
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder withShareGroup(@Nullable final String group) {
+    public ObjectServiceRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
 
-        mShareGroup = group;
+        mShareConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public ObjectServiceRoutineBuilder withShare(
+            @Nonnull final ShareConfiguration.Builder builder) {
+
+        return withShare(builder.buildConfiguration());
     }
 
     /**
@@ -548,7 +557,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .withShareGroup(mShareGroup)
+                                   .withShare(withGroup(mShareGroup))
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -632,7 +641,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .withShareGroup(mShareGroup)
+                                   .withShare(withGroup(mShareGroup))
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -893,8 +902,6 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         private final Object[] mArgs;
 
-        private final RoutineConfiguration mConfiguration;
-
         private final Context mContext;
 
         private final Class<? extends Log> mLogClass;
@@ -903,11 +910,13 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         private final Class<?> mProxyClass;
 
+        private final RoutineConfiguration mRoutineConfiguration;
+
         private final Class<? extends Runner> mRunnerClass;
 
         private final Class<? extends RoutineService> mServiceClass;
 
-        private final String mShareGroup;
+        private final ShareConfiguration mShareConfiguration;
 
         private final Class<?> mTargetClass;
 
@@ -924,10 +933,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             mTargetClass = builder.mTargetClass;
             mArgs = builder.mArgs;
             mServiceClass = builder.mServiceClass;
-            mConfiguration = RoutineConfiguration.notNull(builder.mConfiguration)
-                                                 .builderFrom()
-                                                 .buildConfiguration();
-            mShareGroup = builder.mShareGroup;
+            mRoutineConfiguration = builder.mRoutineConfiguration;
+            mShareConfiguration = builder.mShareConfiguration;
             mRunnerClass = builder.mRunnerClass;
             mLogClass = builder.mLogClass;
             mLooper = builder.mLooper;
@@ -980,7 +987,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             }
 
             final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
-            final Builder builder = withTimeoutAnnotation(mConfiguration, method);
+            final Builder builder = withTimeoutAnnotation(mRoutineConfiguration, method);
             final RoutineConfiguration configuration =
                     builder.withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
                            .withOutputOrder(
@@ -990,10 +997,10 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
                             .withArgs(mProxyClass.getName(), mTargetClass.getName(), mArgs,
-                                      withShareAnnotation(mShareGroup, method), method.getName(),
-                                      toNames(parameterTypes), toNames(targetParameterTypes),
-                                      isInputCollection, isOutputCollection)
-                            .withConfiguration(configuration)
+                                      withShareAnnotation(mShareConfiguration, method),
+                                      method.getName(), toNames(parameterTypes),
+                                      toNames(targetParameterTypes), isInputCollection,
+                                      isOutputCollection).withConfig(configuration)
                             .withServiceClass(mServiceClass)
                             .withRunnerClass(mRunnerClass)
                             .withLogClass(mLogClass)

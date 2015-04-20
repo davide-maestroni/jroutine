@@ -17,8 +17,9 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -26,6 +27,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.core.AbstractRoutine;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -42,6 +44,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
  * Routine implementation delegating to Android loaders the asynchronous processing.
@@ -71,51 +75,46 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     /**
      * Constructor.
      *
-     * @param configuration  the routine configuration.
-     * @param context        the context reference.
-     * @param invocationId   the invocation ID.
-     * @param resolutionType the clash resolution type.
-     * @param strategyType   the result cache strategy type.
-     * @param constructor    the invocation constructor.
-     * @param args           the invocation constructor arguments.
+     * @param context                 the context reference.
+     * @param invocationClass         the invocation class.
+     * @param routineConfiguration    the routine configuration.
+     * @param invocationConfiguration the routine configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      * @throws java.lang.NullPointerException     if any of the specified non-null parameter is
      *                                            null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultContextRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final WeakReference<Object> context, final int invocationId,
-            @Nullable final ClashResolutionType resolutionType,
-            @Nullable final CacheStrategyType strategyType,
-            @Nonnull final Constructor<? extends ContextInvocation<INPUT, OUTPUT>> constructor,
-            @Nonnull final Object[] args) {
+    DefaultContextRoutine(@Nonnull final WeakReference<Object> context,
+            @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
+            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ContextInvocationConfiguration invocationConfiguration) {
 
-        super(configuration);
+        super(routineConfiguration);
 
         if (context == null) {
 
             throw new NullPointerException("the context must not be null");
         }
 
-        if (constructor == null) {
+        if (invocationClass == null) {
 
-            throw new NullPointerException("the invocation constructor must not be null");
+            throw new NullPointerException("the invocation class must not be null");
         }
 
-        if (args == null) {
+        if (invocationConfiguration == null) {
 
-            throw new NullPointerException(
-                    "the invocation constructor array of arguments must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mContext = context;
-        mInvocationId = invocationId;
+        mInvocationId =
+                invocationConfiguration.getInvocationIdOr(ContextInvocationConfiguration.AUTO);
         mClashResolutionType =
-                (resolutionType == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolutionType;
-        mCacheStrategyType = (strategyType == null) ? CacheStrategyType.CLEAR : strategyType;
-        mConstructor = constructor;
-        mArgs = args;
-        mOrderType = configuration.getOutputOrderOr(null);
+                invocationConfiguration.getResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
+        mCacheStrategyType = invocationConfiguration.getStrategyTypeOr(CacheStrategyType.CLEAR);
+        mArgs = invocationConfiguration.getArgsOr(Reflection.NO_ARGS);
+        mConstructor = findConstructor(invocationClass, mArgs);
+        mOrderType = routineConfiguration.getOutputOrderOr(null);
     }
 
     @Override

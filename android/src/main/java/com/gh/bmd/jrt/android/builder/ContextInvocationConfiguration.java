@@ -13,18 +13,26 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolutionType;
-
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
+ * Class storing the context invocation configuration.
+ * <p/>
+ * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
+ * must be created starting from the specific configuration instance.
+ * <p/>
  * Created by davide on 19/04/15.
  */
 public class ContextInvocationConfiguration {
+
+    /**
+     * Constant identifying an invocation ID computed from the executor class and the input
+     * parameters.
+     */
+    public static final int AUTO = Integer.MIN_VALUE;
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
@@ -40,6 +48,14 @@ public class ContextInvocationConfiguration {
 
     private final CacheStrategyType mStrategyType;
 
+    /**
+     * Constructor.
+     *
+     * @param invocationId   the the invocation ID.
+     * @param resolutionType the type of resolution.
+     * @param strategyType   the cache strategy type.
+     * @param args           the arguments.
+     */
     private ContextInvocationConfiguration(final int invocationId,
             @Nullable final ClashResolutionType resolutionType,
             @Nullable final CacheStrategyType strategyType, @Nullable final Object[] args) {
@@ -209,7 +225,7 @@ public class ContextInvocationConfiguration {
     public int getInvocationIdOr(final int valueIfNotSet) {
 
         final int invocationId = mInvocationId;
-        return (invocationId != ContextRoutineBuilder.AUTO) ? invocationId : valueIfNotSet;
+        return (invocationId != AUTO) ? invocationId : valueIfNotSet;
     }
 
     /**
@@ -238,6 +254,72 @@ public class ContextInvocationConfiguration {
     }
 
     /**
+     * Result cache type enumeration.<br/>
+     * The cache strategy type indicates what will happen to the result of an invocation after its
+     * completion.
+     */
+    public enum CacheStrategyType {
+
+        /**
+         * On completion the invocation results are cleared.
+         */
+        CLEAR,
+        /**
+         * Only in case of error the results are cleared, otherwise they are retained.
+         */
+        CACHE_IF_SUCCESS,
+        /**
+         * Only in case of successful completion the results are cleared, otherwise they are
+         * retained.
+         */
+        CACHE_IF_ERROR,
+        /**
+         * On completion the invocation results are retained.
+         */
+        CACHE,
+    }
+
+    /**
+     * Invocation clash resolution enumeration.<br/>
+     * The clash of two invocation happens when the same ID is already in use at the time of the
+     * routine execution. The possible outcomes are:
+     * <ul>
+     * <li>the running invocation is aborted</li>
+     * <li>the running invocation is retained, ignoring the input data</li>
+     * <li>the current invocation is aborted</li>
+     * <li>the running invocation is aborted only if the input data are different from the current
+     * ones, and retained otherwise</li>
+     * <li>the current invocation is aborted only if the input data are different from the current
+     * ones, and retained otherwise</li>
+     * </ul>
+     */
+    public enum ClashResolutionType {
+
+        /**
+         * The clash is resolved by aborting the running invocation.
+         */
+        ABORT_THAT,
+        /**
+         * The clash is resolved by keeping the running invocation.
+         */
+        KEEP_THAT,
+        /**
+         * The clash is resolved by aborting the invocation with an {@link InputClashException}.
+         */
+        ABORT_THIS,
+        /**
+         * The clash is resolved by aborting the running invocation, only in case its input data are
+         * different from the current ones.
+         */
+        ABORT_THAT_INPUT,
+        /**
+         * The clash is resolved by aborting the invocation with an {@link InputClashException},
+         * only in case its input data are different from the current ones.
+         */
+        ABORT_THIS_INPUT,
+    }
+
+    /**
      * Builder of context invocation configurations.
      */
     public static class Builder {
@@ -255,7 +337,7 @@ public class ContextInvocationConfiguration {
          */
         private Builder() {
 
-            mInvocationId = ContextRoutineBuilder.AUTO;
+            mInvocationId = AUTO;
         }
 
         /**
@@ -275,7 +357,7 @@ public class ContextInvocationConfiguration {
         /**
          * Builds and return the configuration instance.
          *
-         * @return the routine configuration instance.
+         * @return the context invocation configuration instance.
          */
         @Nonnull
         public ContextInvocationConfiguration buildConfiguration() {
@@ -286,31 +368,28 @@ public class ContextInvocationConfiguration {
 
         /**
          * Tells the builder how to resolve clashes of invocations. A clash happens when an
-         * invocation
-         * of the same type and with the same ID is still running. A null value means that it is
-         * up to
-         * the framework to choose a default resolution type.
+         * invocation of the same type and with the same ID is still running. A null value means
+         * that it is up to the framework to choose a default resolution type.
          *
          * @param resolutionType the type of resolution.
          * @return this builder.
          */
         @Nonnull
-        public final Builder onClash(@Nullable final ClashResolutionType resolutionType) {
+        public Builder onClash(@Nullable final ClashResolutionType resolutionType) {
 
             mResolutionType = resolutionType;
             return this;
         }
 
         /**
-         * Tells the builder how to cache the invocation result after its completion. A null
-         * value means
-         * that it is up to the framework to choose a default strategy.
+         * Tells the builder how to cache the invocation result after its completion. A null value
+         * means that it is up to the framework to choose a default strategy.
          *
          * @param strategyType the cache strategy type.
          * @return this builder.
          */
         @Nonnull
-        public final Builder onComplete(@Nullable final CacheStrategyType strategyType) {
+        public Builder onComplete(@Nullable final CacheStrategyType strategyType) {
 
             mStrategyType = strategyType;
             return this;
@@ -320,20 +399,60 @@ public class ContextInvocationConfiguration {
          * Sets the arguments to be passed to the invocation constructor.
          * <p/>
          * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the invocation
-         * constructor arguments, might be employed to check for clashing of invocations or
-         * compute the
-         * invocation ID.<br/>
-         * Note also that, the specified objects will be retained, so, they should be immutable
-         * or never
-         * change their internal state in order to avoid concurrency issues.
+         * constructor arguments, might be employed to check for clashing of invocations or compute
+         * the invocation ID.<br/>
+         * Note also that, the specified objects will be retained, so, they should be immutable or
+         * never change their internal state in order to avoid concurrency issues.
          *
          * @param args the arguments.
          * @return this builder.
          */
         @Nonnull
-        public final Builder withArgs(@Nullable final Object... args) {
+        public Builder withArgs(@Nullable final Object... args) {
 
             mArgs = args;
+            return this;
+        }
+
+        /**
+         * Applies the specified configuration to this builder.
+         *
+         * @param configuration the invocation configuration.
+         * @return this builder.
+         * @throws java.lang.NullPointerException if the specified configuration is null.
+         */
+        @Nonnull
+        public Builder withConfiguration(
+                @Nonnull final ContextInvocationConfiguration configuration) {
+
+            final int invocationId = configuration.mInvocationId;
+
+            if (invocationId != AUTO) {
+
+                withId(invocationId);
+            }
+
+            final ClashResolutionType resolutionType = configuration.mResolutionType;
+
+            if (resolutionType != null) {
+
+                onClash(resolutionType);
+            }
+
+            final CacheStrategyType strategyType = configuration.mStrategyType;
+
+            if (strategyType != null) {
+
+                onComplete(strategyType);
+            }
+
+            final Object[] args = configuration.mArgs;
+
+            if (args != null) {
+
+                withArgs(args);
+            }
+
             return this;
         }
 
@@ -344,7 +463,7 @@ public class ContextInvocationConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public final Builder withId(final int invocationId) {
+        public Builder withId(final int invocationId) {
 
             mInvocationId = invocationId;
             return this;

@@ -728,13 +728,13 @@ public class RoutineConfiguration {
                 ", mAvailTimeout=" + mAvailTimeout +
                 ", mCoreInvocations=" + mCoreInvocations +
                 ", mInputMaxSize=" + mInputMaxSize +
-                ", mInputOrder=" + mInputOrder +
+                ", mInputOrderType=" + mInputOrder +
                 ", mInputTimeout=" + mInputTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
                 ", mMaxInvocations=" + mMaxInvocations +
                 ", mOutputMaxSize=" + mOutputMaxSize +
-                ", mOutputOrder=" + mOutputOrder +
+                ", mOutputOrderType=" + mOutputOrder +
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mReadTimeout=" + mReadTimeout +
                 ", mSyncRunner=" + mSyncRunner +
@@ -798,7 +798,7 @@ public class RoutineConfiguration {
 
         private int mInputMaxSize;
 
-        private OrderType mInputOrder;
+        private OrderType mInputOrderType;
 
         private TimeDuration mInputTimeout;
 
@@ -810,7 +810,7 @@ public class RoutineConfiguration {
 
         private int mOutputMaxSize;
 
-        private OrderType mOutputOrder;
+        private OrderType mOutputOrderType;
 
         private TimeDuration mOutputTimeout;
 
@@ -846,10 +846,10 @@ public class RoutineConfiguration {
             mAvailTimeout = initialConfiguration.mAvailTimeout;
             mReadTimeout = initialConfiguration.mReadTimeout;
             mTimeoutActionType = initialConfiguration.mTimeoutActionType;
-            mInputOrder = initialConfiguration.mInputOrder;
+            mInputOrderType = initialConfiguration.mInputOrder;
             mInputMaxSize = initialConfiguration.mInputMaxSize;
             mInputTimeout = initialConfiguration.mInputTimeout;
-            mOutputOrder = initialConfiguration.mOutputOrder;
+            mOutputOrderType = initialConfiguration.mOutputOrder;
             mOutputMaxSize = initialConfiguration.mOutputMaxSize;
             mOutputTimeout = initialConfiguration.mOutputTimeout;
             mLog = initialConfiguration.mLog;
@@ -866,8 +866,8 @@ public class RoutineConfiguration {
 
             return new RoutineConfiguration(mSyncRunner, mAsyncRunner, mMaxInvocations,
                                             mCoreInvocations, mAvailTimeout, mReadTimeout,
-                                            mTimeoutActionType, mInputOrder, mInputMaxSize,
-                                            mInputTimeout, mOutputOrder, mOutputMaxSize,
+                                            mTimeoutActionType, mInputOrderType, mInputMaxSize,
+                                            mInputTimeout, mOutputOrderType, mOutputMaxSize,
                                             mOutputTimeout, mLog, mLogLevel);
         }
 
@@ -971,13 +971,13 @@ public class RoutineConfiguration {
          * Sets the order in which input data are collected from the input channel. A null value
          * means that it is up to the framework to choose a default order type.
          *
-         * @param order the order type.
+         * @param orderType the order type.
          * @return this builder.
          */
         @Nonnull
-        public Builder withInputOrder(@Nullable final OrderType order) {
+        public Builder withInputOrder(@Nullable final OrderType orderType) {
 
-            mInputOrder = order;
+            mInputOrderType = orderType;
             return this;
         }
 
@@ -1087,13 +1087,13 @@ public class RoutineConfiguration {
          * Sets the order in which output data are collected from the result channel. A null value
          * means that it is up to the framework to choose a default order type.
          *
-         * @param order the order type.
+         * @param orderType the order type.
          * @return this builder.
          */
         @Nonnull
-        public Builder withOutputOrder(@Nullable final OrderType order) {
+        public Builder withOutputOrder(@Nullable final OrderType orderType) {
 
-            mOutputOrder = order;
+            mOutputOrderType = orderType;
             return this;
         }
 
@@ -1193,42 +1193,42 @@ public class RoutineConfiguration {
 
         private void applyChannelConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
-            final OrderType inputOrder = configuration.getInputOrderOr(null);
+            final OrderType inputOrder = configuration.mInputOrder;
 
             if (inputOrder != null) {
 
                 withInputOrder(inputOrder);
             }
 
-            final int inputSize = configuration.getInputSizeOr(DEFAULT);
+            final int inputSize = configuration.mInputMaxSize;
 
             if (inputSize != DEFAULT) {
 
                 withInputSize(inputSize);
             }
 
-            final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
+            final TimeDuration inputTimeout = configuration.mInputTimeout;
 
             if (inputTimeout != null) {
 
                 withInputTimeout(inputTimeout);
             }
 
-            final OrderType outputOrder = configuration.getOutputOrderOr(null);
+            final OrderType outputOrder = configuration.mOutputOrder;
 
             if (outputOrder != null) {
 
                 withOutputOrder(outputOrder);
             }
 
-            final int outputSize = configuration.getOutputSizeOr(DEFAULT);
+            final int outputSize = configuration.mOutputMaxSize;
 
             if (outputSize != DEFAULT) {
 
                 withOutputSize(outputSize);
             }
 
-            final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
+            final TimeDuration outputTimeout = configuration.mOutputTimeout;
 
             if (outputTimeout != null) {
 
@@ -1239,49 +1239,49 @@ public class RoutineConfiguration {
         private void applyInvocationConfiguration(
                 @Nonnull final RoutineConfiguration configuration) {
 
-            final Runner syncRunner = configuration.getSyncRunnerOr(null);
+            final Runner syncRunner = configuration.mSyncRunner;
 
             if (syncRunner != null) {
 
                 withSyncRunner(syncRunner);
             }
 
-            final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
+            final Runner asyncRunner = configuration.mAsyncRunner;
 
             if (asyncRunner != null) {
 
                 withAsyncRunner(asyncRunner);
             }
 
-            final int maxInvocations = configuration.getMaxInvocationsOr(DEFAULT);
+            final int maxInvocations = configuration.mMaxInvocations;
 
             if (maxInvocations != DEFAULT) {
 
                 withMaxInvocations(maxInvocations);
             }
 
-            final int coreInvocations = configuration.getCoreInvocationsOr(DEFAULT);
+            final int coreInvocations = configuration.mCoreInvocations;
 
             if (coreInvocations != DEFAULT) {
 
                 withCoreInvocations(coreInvocations);
             }
 
-            final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
+            final TimeDuration availTimeout = configuration.mAvailTimeout;
 
             if (availTimeout != null) {
 
                 withAvailableTimeout(availTimeout);
             }
 
-            final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
+            final TimeDuration readTimeout = configuration.mReadTimeout;
 
             if (readTimeout != null) {
 
                 withReadTimeout(readTimeout);
             }
 
-            final TimeoutActionType timeoutActionType = configuration.getReadTimeoutActionOr(null);
+            final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
 
             if (timeoutActionType != null) {
 
@@ -1291,14 +1291,14 @@ public class RoutineConfiguration {
 
         private void applyLogConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
-            final Log log = configuration.getLogOr(null);
+            final Log log = configuration.mLog;
 
             if (log != null) {
 
                 withLog(log);
             }
 
-            final LogLevel logLevel = configuration.getLogLevelOr(null);
+            final LogLevel logLevel = configuration.mLogLevel;
 
             if (logLevel != null) {
 

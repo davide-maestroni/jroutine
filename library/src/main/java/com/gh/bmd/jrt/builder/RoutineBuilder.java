@@ -44,11 +44,11 @@ public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder, Rout
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nullable RoutineConfiguration configuration);
+    RoutineBuilder<INPUT, OUTPUT> withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull Builder builder);
+    RoutineBuilder<INPUT, OUTPUT> withConfig(@Nonnull Builder builder);
 }

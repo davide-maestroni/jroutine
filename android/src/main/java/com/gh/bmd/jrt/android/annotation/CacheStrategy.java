@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.annotation;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

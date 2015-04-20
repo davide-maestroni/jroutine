@@ -13,6 +13,9 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.builder.RoutineConfiguration;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -34,121 +37,41 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by Davide on 4/6/2015.
  */
-public interface ContextRoutineBuilder {
+public interface ContextRoutineBuilder extends ConfigurableBuilder {
 
     /**
-     * Constant identifying a routine ID computed from the executor class and the input parameters.
+     * {@inheritDoc}
      */
-    int AUTO = Integer.MIN_VALUE;
+    @Nonnull
+    ContextRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
-     * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
-     * of the same type and with the same ID is still running. A null value means that it is up to
-     * the framework to choose a default resolution type.
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ContextRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
+
+    /**
+     * Sets the specified configuration to this builder by replacing any configuration already set.
+     * <br/>
+     * Note that the configuration options not supported by the builder implementation might be
+     * ignored.
      *
-     * @param resolutionType the type of resolution.
+     * @param configuration the configuration.
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder onClash(@Nullable ClashResolutionType resolutionType);
+    ContextRoutineBuilder withInvocations(@Nullable ContextInvocationConfiguration configuration);
 
     /**
-     * Tells the builder how to cache the invocation result after its completion. A null value means
-     * that it is up to the framework to choose a default strategy.
+     * Sets the specified configuration to this builder by replacing any configuration already set.
+     * <br/>
+     * Note that the configuration options not supported by the builder implementation might be
+     * ignored.
      *
-     * @param strategyType the cache strategy type.
+     * @param builder the configuration builder.
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder onComplete(@Nullable CacheStrategyType strategyType);
-
-    /**
-     * Sets the arguments to be passed to the invocation constructor.
-     * <p/>
-     * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the invocation
-     * constructor arguments, might be employed to check for clashing of invocations or compute the
-     * invocation ID.<br/>
-     * Note also that, the specified objects will be retained, so, they should be immutable or never
-     * change their internal state in order to avoid concurrency issues.
-     *
-     * @param args the arguments.
-     * @return this builder.
-     */
-    @Nonnull
-    ContextRoutineBuilder withArgs(@Nullable Object... args);
-
-    /**
-     * Tells the builder to identify the invocation with the specified ID.
-     *
-     * @param invocationId the invocation ID.
-     * @return this builder.
-     */
-    @Nonnull
-    ContextRoutineBuilder withId(int invocationId);
-
-    /**
-     * Result cache type enumeration.<br/>
-     * The cache strategy type indicates what will happen to the result of an invocation after its
-     * completion.
-     */
-    enum CacheStrategyType {
-
-        /**
-         * On completion the invocation results are cleared.
-         */
-        CLEAR,
-        /**
-         * Only in case of error the results are cleared, otherwise they are retained.
-         */
-        CACHE_IF_SUCCESS,
-        /**
-         * Only in case of successful completion the results are cleared, otherwise they are
-         * retained.
-         */
-        CACHE_IF_ERROR,
-        /**
-         * On completion the invocation results are retained.
-         */
-        CACHE,
-    }
-
-    /**
-     * Invocation clash resolution enumeration.<br/>
-     * The clash of two invocation happens when the same ID is already in use at the time of the
-     * routine execution. The possible outcomes are:
-     * <ul>
-     * <li>the running invocation is aborted</li>
-     * <li>the running invocation is retained, ignoring the input data</li>
-     * <li>the current invocation is aborted</li>
-     * <li>the running invocation is aborted only if the input data are different from the current
-     * ones, and retained otherwise</li>
-     * <li>the current invocation is aborted only if the input data are different from the current
-     * ones, and retained otherwise</li>
-     * </ul>
-     */
-    enum ClashResolutionType {
-
-        /**
-         * The clash is resolved by aborting the running invocation.
-         */
-        ABORT_THAT,
-        /**
-         * The clash is resolved by keeping the running invocation.
-         */
-        KEEP_THAT,
-        /**
-         * The clash is resolved by aborting the invocation with an {@link InputClashException}.
-         */
-        ABORT_THIS,
-        /**
-         * The clash is resolved by aborting the running invocation, only in case its input data are
-         * different from the current ones.
-         */
-        ABORT_THAT_INPUT,
-        /**
-         * The clash is resolved by aborting the invocation with an {@link InputClashException},
-         * only in case its input data are different from the current ones.
-         */
-        ABORT_THIS_INPUT,
-    }
+    ContextRoutineBuilder withInvocations(@Nonnull ContextInvocationConfiguration.Builder builder);
 }

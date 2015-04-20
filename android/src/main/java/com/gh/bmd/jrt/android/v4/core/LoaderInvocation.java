@@ -22,9 +22,9 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.util.SparseArray;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
@@ -262,7 +262,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if (((loaderId == ContextRoutineBuilder.AUTO) || (loaderId == id))
+                if (((loaderId == ContextInvocationConfiguration.AUTO) || (loaderId == id))
                         && loader.areSameInputs(inputs)) {
 
                     loaderManager.destroyLoader(id);
@@ -406,7 +406,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if ((loaderId == ContextRoutineBuilder.AUTO) || (loaderId == id)) {
+                if ((loaderId == ContextInvocationConfiguration.AUTO) || (loaderId == id)) {
 
                     loaderManager.destroyLoader(id);
                     callbackArray.remove(id);
@@ -487,7 +487,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         int loaderId = mLoaderId;
 
-        if (loaderId == ContextRoutineBuilder.AUTO) {
+        if (loaderId == ContextInvocationConfiguration.AUTO) {
 
             loaderId = mConstructor.getDeclaringClass().hashCode();
 
@@ -722,7 +722,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                                                                 .withLogLevel(logger.getLogLevel())
                                                                 .buildConfiguration();
             final StandaloneChannel<OUTPUT> channel =
-                    JRoutine.standalone().withConfiguration(configuration).buildChannel();
+                    JRoutine.standalone().withConfig(configuration).buildChannel();
             channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));

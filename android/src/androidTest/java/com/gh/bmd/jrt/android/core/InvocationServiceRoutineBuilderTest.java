@@ -145,7 +145,7 @@ public class InvocationServiceRoutineBuilderTest
                                                             .buildConfiguration();
         final Routine<String, String> routine = JRoutine.onService(getActivity(), token)
                                                         .dispatchingOn(Looper.getMainLooper())
-                                                        .withConfiguration(configuration)
+                                                        .withConfig(configuration)
                                                         .withLogClass(AndroidLog.class)
                                                         .buildRoutine();
         assertThat(
@@ -159,10 +159,10 @@ public class InvocationServiceRoutineBuilderTest
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
                         .dispatchingOn(Looper.getMainLooper())
-                        .withConfiguration(builder().withSyncRunner(Runners.queuedRunner())
-                                                    .withInputOrder(OrderType.NONE)
-                                                    .withLogLevel(LogLevel.DEBUG)
-                                                    .buildConfiguration())
+                        .withConfig(builder().withSyncRunner(Runners.queuedRunner())
+                                             .withInputOrder(OrderType.NONE)
+                                             .withLogLevel(LogLevel.DEBUG)
+                                             .buildConfiguration())
                         .withLogClass(AndroidLog.class)
                         .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
@@ -187,7 +187,7 @@ public class InvocationServiceRoutineBuilderTest
                                                              .buildConfiguration();
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)
                                                          .dispatchingOn(Looper.getMainLooper())
-                                                         .withConfiguration(configuration2)
+                                                         .withConfig(configuration2)
                                                          .withLogClass(AndroidLog.class)
                                                          .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
@@ -211,8 +211,7 @@ public class InvocationServiceRoutineBuilderTest
                                                     .withOutputOrder(OrderType.PASSING_ORDER);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
                                                          .dispatchingOn(Looper.getMainLooper())
-                                                         .withConfiguration(
-                                                                 builder.buildConfiguration())
+                                                         .withConfig(builder.buildConfiguration())
                                                          .buildRoutine();
         assertThat(routine3.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -239,7 +238,7 @@ public class InvocationServiceRoutineBuilderTest
                                                              .buildConfiguration();
         final Routine<String, String> routine4 = JRoutine.onService(getActivity(), token)
                                                          .dispatchingOn(Looper.getMainLooper())
-                                                         .withConfiguration(configuration4)
+                                                         .withConfig(configuration4)
                                                          .buildRoutine();
         assertThat(routine4.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -271,8 +270,7 @@ public class InvocationServiceRoutineBuilderTest
         final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutActionType.EXIT)
                                                              .buildConfiguration();
-        assertThat(JRoutine.onService(getActivity(), classToken)
-                           .withConfiguration(configuration1)
+        assertThat(JRoutine.onService(getActivity(), classToken).withConfig(configuration1)
                            .dispatchingOn(Looper.myLooper())
                            .callAsync("test1")
                            .readAll()).isEmpty();
@@ -288,8 +286,7 @@ public class InvocationServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), classToken)
-                    .withConfiguration(configuration2)
+            JRoutine.onService(getActivity(), classToken).withConfig(configuration2)
                     .dispatchingOn(Looper.myLooper())
                     .callAsync("test2")
                     .readAll();
@@ -312,8 +309,7 @@ public class InvocationServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), classToken)
-                    .withConfiguration(configuration3)
+            JRoutine.onService(getActivity(), classToken).withConfig(configuration3)
                     .dispatchingOn(Looper.myLooper())
                     .callAsync("test3")
                     .readAll();
@@ -355,7 +351,7 @@ public class InvocationServiceRoutineBuilderTest
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                .withConfiguration(configuration)
+                .withConfig(configuration)
                 .dispatchingOn(Looper.getMainLooper())
                 .withServiceClass(TestService.class)
                 .buildRoutine();

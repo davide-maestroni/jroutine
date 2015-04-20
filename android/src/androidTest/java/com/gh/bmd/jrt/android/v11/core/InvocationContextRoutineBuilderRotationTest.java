@@ -30,6 +30,7 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
+import static com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.withId;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,8 +57,8 @@ public class InvocationContextRoutineBuilderRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                .withId(0)
-                .withConfiguration(withOutputOrder(OrderType.PASSING_ORDER))
+                .withInvocations(withId(0))
+                .withConfig(withOutputOrder(OrderType.PASSING_ORDER))
                 .callAsync("test1", "test2");
 
         final Semaphore semaphore = new Semaphore(0);

@@ -16,7 +16,6 @@ package com.gh.bmd.jrt.android.builder;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,7 +52,7 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
             @Nullable RoutineConfiguration configuration);
 
     /**
@@ -64,31 +63,20 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull Builder builder);
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
+            @Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> onClash(
-            @Nullable ClashResolutionType resolutionType);
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
+            @Nullable ContextInvocationConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> onComplete(
-            @Nullable CacheStrategyType strategyType);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable Object... args);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withId(int invocationId);
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
+            @Nonnull ContextInvocationConfiguration.Builder builder);
 }

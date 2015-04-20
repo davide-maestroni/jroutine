@@ -15,8 +15,8 @@ package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
@@ -40,9 +40,9 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
-    private RoutineConfiguration mConfiguration;
+    private RoutineConfiguration mRoutineConfiguration;
 
-    private String mShareGroup;
+    private ShareConfiguration mShareConfiguration;
 
     @Nonnull
     public TYPE buildWrapper() {
@@ -59,9 +59,11 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
                 classMap.put(target, classes);
             }
 
-            final String shareGroup = mShareGroup;
+            final String shareGroup =
+                    ShareConfiguration.notNull(mShareConfiguration).getGroupOr(null);
             final String classShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
-            final RoutineConfiguration configuration = RoutineConfiguration.notNull(mConfiguration);
+            final RoutineConfiguration configuration =
+                    RoutineConfiguration.notNull(mRoutineConfiguration);
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo = new ClassInfo(token, configuration, classShareGroup);
             final Object instance = classes.get(classInfo);
@@ -87,24 +89,29 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
+    public WrapperBuilder<TYPE> withConfig(@Nullable final RoutineConfiguration configuration) {
 
-        mConfiguration = configuration;
+        mRoutineConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> withConfiguration(@Nonnull final Builder builder) {
+    public WrapperBuilder<TYPE> withConfig(@Nonnull final RoutineConfiguration.Builder builder) {
 
-        return withConfiguration(builder.buildConfiguration());
+        return withConfig(builder.buildConfiguration());
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> withShareGroup(@Nullable final String group) {
+    public WrapperBuilder<TYPE> withShare(@Nullable final ShareConfiguration configuration) {
 
-        mShareGroup = group;
+        mShareConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public WrapperBuilder<TYPE> withShare(@Nonnull final ShareConfiguration.Builder builder) {
+
+        return withShare(builder.buildConfiguration());
     }
 
     /**

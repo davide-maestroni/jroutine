@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
@@ -84,7 +84,7 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    InvocationContextChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    InvocationContextChannelBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that only the options related to logs will be employed.
@@ -93,5 +93,5 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    InvocationContextChannelBuilder withConfiguration(@Nonnull Builder builder);
+    InvocationContextChannelBuilder withConfig(@Nonnull Builder builder);
 }

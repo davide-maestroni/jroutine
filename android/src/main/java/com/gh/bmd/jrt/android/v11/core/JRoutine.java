@@ -19,7 +19,7 @@ import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
 import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ObjectContextRoutineBuilder;
@@ -223,7 +223,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
                             + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        if (invocationId == ContextRoutineBuilder.AUTO) {
+        if (invocationId == ContextInvocationConfiguration.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
@@ -288,7 +288,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
     public static InvocationContextChannelBuilder onFragment(@Nonnull final Fragment fragment,
             final int invocationId) {
 
-        if (invocationId == ContextRoutineBuilder.AUTO) {
+        if (invocationId == ContextInvocationConfiguration.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }

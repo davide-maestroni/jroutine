@@ -53,7 +53,7 @@ public class JRoutineTest {
                          .buildConfiguration();
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .withConfiguration(configuration)
+                           .withConfig(configuration)
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
 
@@ -72,7 +72,7 @@ public class JRoutineTest {
                                                              .buildConfiguration();
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .withConfiguration(configuration1)
+                           .withConfig(configuration1)
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
     }

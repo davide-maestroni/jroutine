@@ -54,7 +54,7 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     }
 
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public RoutineBuilder<INPUT, OUTPUT> withConfig(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
@@ -62,9 +62,9 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     }
 
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull final Builder builder) {
+    public RoutineBuilder<INPUT, OUTPUT> withConfig(@Nonnull final Builder builder) {
 
-        return withConfiguration(builder.buildConfiguration());
+        return withConfig(builder.buildConfiguration());
     }
 
     /**

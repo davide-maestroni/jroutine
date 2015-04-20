@@ -20,6 +20,7 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
@@ -65,9 +66,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private RoutineConfiguration mConfiguration;
+    private RoutineConfiguration mRoutineConfiguration;
 
-    private String mShareGroup;
+    private ShareConfiguration mShareConfiguration;
 
     /**
      * Constructor.
@@ -153,28 +154,34 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(RoutineConfiguration.notNull(mConfiguration), mShareGroup, method);
+        return method(RoutineConfiguration.notNull(mRoutineConfiguration),
+                      ShareConfiguration.notNull(mShareConfiguration), method);
     }
 
     @Nonnull
-    public ClassRoutineBuilder withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
+    public ClassRoutineBuilder withConfig(@Nullable final RoutineConfiguration configuration) {
 
-        mConfiguration = configuration;
+        mRoutineConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ClassRoutineBuilder withConfiguration(@Nonnull final Builder builder) {
+    public ClassRoutineBuilder withConfig(@Nonnull final Builder builder) {
 
-        return withConfiguration(builder.buildConfiguration());
+        return withConfig(builder.buildConfiguration());
     }
 
     @Nonnull
-    public ClassRoutineBuilder withShareGroup(@Nullable final String group) {
+    public ClassRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
 
-        mShareGroup = group;
+        mShareConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public ClassRoutineBuilder withShare(@Nonnull final ShareConfiguration.Builder builder) {
+
+        return withShare(builder.buildConfiguration());
     }
 
     /**
@@ -188,17 +195,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     protected Method getAnnotatedMethod(final String name) {
 
         return mMethodMap.get(name);
-    }
-
-    /**
-     * Returns the internal configuration.
-     *
-     * @return the configuration.
-     */
-    @Nullable
-    protected RoutineConfiguration getConfiguration() {
-
-        return mConfiguration;
     }
 
     /**
@@ -274,14 +270,25 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     /**
-     * Returns the share group name.
+     * Returns the internal routine configuration.
      *
-     * @return the share group name.
+     * @return the configuration.
      */
     @Nullable
-    protected String getShareGroup() {
+    protected RoutineConfiguration getRoutineConfiguration() {
 
-        return mShareGroup;
+        return mRoutineConfiguration;
+    }
+
+    /**
+     * Returns the internal share configuration.
+     *
+     * @return the configuration.
+     */
+    @Nullable
+    protected ShareConfiguration getShareConfiguration() {
+
+        return mShareConfiguration;
     }
 
     /**
@@ -309,19 +316,20 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     /**
      * Returns a routine used to call the specified method.
      *
-     * @param configuration the routine configuration.
-     * @param shareGroup    the group name.
-     * @param targetMethod  the target method.
+     * @param routineConfiguration the routine configuration.
+     * @param shareConfiguration   the share configuration.
+     * @param targetMethod         the target method.
      * @return the routine.
      * @throws java.lang.NullPointerException if the specified configuration or method are null.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
+            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ShareConfiguration shareConfiguration,
             @Nonnull final Method targetMethod) {
 
-        String methodShareGroup = shareGroup;
-        final Builder builder = RoutineConfiguration.builderFrom(configuration);
+        String methodShareGroup = shareConfiguration.getGroupOr(null);
+        final Builder builder = RoutineConfiguration.builderFrom(routineConfiguration);
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {
@@ -329,7 +337,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             methodShareGroup = shareGroupAnnotation.value();
         }
 
-        warn(configuration);
+        warn(routineConfiguration);
         builder.withInputOrder(OrderType.PASSING_ORDER)
                .withInputSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)

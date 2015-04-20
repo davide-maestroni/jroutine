@@ -85,12 +85,12 @@ public interface InvocationServiceRoutineBuilder<INPUT, OUTPUT>
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(
             @Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nonnull Builder builder);
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(@Nonnull Builder builder);
 }

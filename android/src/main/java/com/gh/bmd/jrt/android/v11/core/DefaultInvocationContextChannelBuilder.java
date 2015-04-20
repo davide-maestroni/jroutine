@@ -18,8 +18,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -38,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.withId;
 
 /**
  * Default implementation of an Android channel builder.
@@ -116,14 +118,12 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
         if (context instanceof Activity) {
 
             final Activity activity = (Activity) context;
-            builder =
-                    JRoutine.onActivity(activity, new MissingToken<OUTPUT>()).withId(mInvocationId);
+            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>());
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder =
-                    JRoutine.onFragment(fragment, new MissingToken<OUTPUT>()).withId(mInvocationId);
+            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>());
 
         } else {
 
@@ -131,9 +131,9 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
                     "invalid context type: " + context.getClass().getCanonicalName());
         }
 
-        return builder.withConfiguration(mConfiguration)
-                      .onClash(ClashResolutionType.KEEP_THAT)
-                      .onComplete(mCacheStrategyType)
+        return builder.withConfig(mConfiguration)
+                      .withInvocations(withId(mInvocationId).onClash(ClashResolutionType.KEEP_THAT)
+                                                            .onComplete(mCacheStrategyType))
                       .callAsync();
     }
 
@@ -212,7 +212,7 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
     }
 
     @Nonnull
-    public InvocationContextChannelBuilder withConfiguration(
+    public InvocationContextChannelBuilder withConfig(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
@@ -220,9 +220,9 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
     }
 
     @Nonnull
-    public InvocationContextChannelBuilder withConfiguration(@Nonnull final Builder builder) {
+    public InvocationContextChannelBuilder withConfig(@Nonnull final Builder builder) {
 
-        return withConfiguration(builder.buildConfiguration());
+        return withConfig(builder.buildConfiguration());
     }
 
     /**

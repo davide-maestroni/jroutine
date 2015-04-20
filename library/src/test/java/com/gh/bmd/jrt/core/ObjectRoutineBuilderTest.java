@@ -50,6 +50,7 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
+import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,9 +68,8 @@ public class ObjectRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final Sum sum = new Sum();
-        final SumItf sumAsync = JRoutine.on(sum)
-                                        .withConfiguration(withReadTimeout(timeout))
-                                        .buildProxy(SumItf.class);
+        final SumItf sumAsync =
+                JRoutine.on(sum).withConfig(withReadTimeout(timeout)).buildProxy(SumItf.class);
         final StandaloneChannel<Integer> channel3 = JRoutine.standalone().buildChannel();
         channel3.input().pass(7).close();
         assertThat(sumAsync.compute(3, channel3.output())).isEqualTo(10);
@@ -96,9 +96,8 @@ public class ObjectRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final Count count = new Count();
-        final CountItf countAsync = JRoutine.on(count)
-                                            .withConfiguration(withReadTimeout(timeout))
-                                            .buildProxy(CountItf.class);
+        final CountItf countAsync =
+                JRoutine.on(count).withConfig(withReadTimeout(timeout)).buildProxy(CountItf.class);
         assertThat(countAsync.count(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).readAll()).containsExactly(new int[]{0, 1, 2});
         assertThat(countAsync.count2(2).readAll()).containsExactly(0, 1);
@@ -122,7 +121,7 @@ public class ObjectRoutineBuilderTest {
                          .withLog(new NullLog())
                          .buildConfiguration();
         final Routine<Object, Object> routine =
-                JRoutine.on(test).withConfiguration(configuration).boundMethod(TestClass.GET);
+                JRoutine.on(test).withConfig(configuration).boundMethod(TestClass.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
@@ -141,11 +140,11 @@ public class ObjectRoutineBuilderTest {
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();
-        JRoutine.on(test).withConfiguration(configuration).boundMethod(TestClass.GET);
+        JRoutine.on(test).withConfig(configuration).boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         final Square square = new Square();
-        JRoutine.on(square).withConfiguration(configuration).buildProxy(SquareItf.class).compute(3);
+        JRoutine.on(square).withConfig(configuration).buildProxy(SquareItf.class).compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(12);
     }
 
@@ -314,8 +313,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(test)
-                    .withConfiguration(withReadTimeout(INFINITY))
+            JRoutine.on(test).withConfig(withReadTimeout(INFINITY))
                     .buildProxy(TestItf.class)
                     .throwException(null);
 
@@ -327,8 +325,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(test)
-                    .withConfiguration(withReadTimeout(INFINITY))
+            JRoutine.on(test).withConfig(withReadTimeout(INFINITY))
                     .buildProxy(TestItf.class)
                     .throwException1(null);
 
@@ -427,13 +424,12 @@ public class ObjectRoutineBuilderTest {
                                                                      TimeDuration.ZERO)
                                                              .buildConfiguration();
         final Routine<Object, Object> routine2 = JRoutine.on(test)
-                                                         .withConfiguration(configuration2)
-                                                         .withShareGroup("test")
+                                                         .withConfig(configuration2)
+                                                         .withShare(withGroup("test"))
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
-
     }
 
     @Test
@@ -445,7 +441,7 @@ public class ObjectRoutineBuilderTest {
                                                              .withAsyncRunner(Runners.poolRunner())
                                                              .buildConfiguration();
         final Routine<Object, Object> routine1 =
-                JRoutine.on(test).withConfiguration(configuration1).method("getLong");
+                JRoutine.on(test).withConfig(configuration1).method("getLong");
 
         assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
@@ -529,9 +525,8 @@ public class ObjectRoutineBuilderTest {
     public void testProxyAnnotations() {
 
         final Impl impl = new Impl();
-        final Itf itf = JRoutine.on(impl)
-                                .withConfiguration(withReadTimeout(INFINITY))
-                                .buildProxy(Itf.class);
+        final Itf itf =
+                JRoutine.on(impl).withConfig(withReadTimeout(INFINITY)).buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
         final StandaloneChannel<Character> channel1 = JRoutine.standalone().buildChannel();
@@ -798,7 +793,7 @@ public class ObjectRoutineBuilderTest {
                          .withLog(nullLog)
                          .buildConfiguration();
         final Routine<Object, Object> routine1 =
-                JRoutine.on(test).withConfiguration(configuration1).boundMethod(TestClass.GET);
+                JRoutine.on(test).withConfig(configuration1).boundMethod(TestClass.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
@@ -809,7 +804,7 @@ public class ObjectRoutineBuilderTest {
                          .withLog(nullLog)
                          .buildConfiguration();
         final Routine<Object, Object> routine2 =
-                JRoutine.on(test).withConfiguration(configuration2).boundMethod(TestClass.GET);
+                JRoutine.on(test).withConfig(configuration2).boundMethod(TestClass.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -821,7 +816,7 @@ public class ObjectRoutineBuilderTest {
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
         final Routine<Object, Object> routine3 =
-                JRoutine.on(test).withConfiguration(configuration3).boundMethod(TestClass.GET);
+                JRoutine.on(test).withConfig(configuration3).boundMethod(TestClass.GET);
 
         assertThat(routine3.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -834,7 +829,7 @@ public class ObjectRoutineBuilderTest {
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
         final Routine<Object, Object> routine4 =
-                JRoutine.on(test).withConfiguration(configuration4).boundMethod(TestClass.GET);
+                JRoutine.on(test).withConfig(configuration4).boundMethod(TestClass.GET);
 
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -846,7 +841,7 @@ public class ObjectRoutineBuilderTest {
                                                              .withLog(new NullLog())
                                                              .buildConfiguration();
         final Routine<Object, Object> routine5 =
-                JRoutine.on(test).withConfiguration(configuration5).boundMethod(TestClass.GET);
+                JRoutine.on(test).withConfig(configuration5).boundMethod(TestClass.GET);
 
         assertThat(routine5.callSync().readAll()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -857,12 +852,14 @@ public class ObjectRoutineBuilderTest {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder =
-                JRoutine.on(test2).withConfiguration(withReadTimeout(seconds(2)));
+                JRoutine.on(test2).withConfig(withReadTimeout(seconds(2)));
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.withShareGroup("1").method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.withShareGroup("2").method("getTwo").callAsync();
+        OutputChannel<Object> getOne =
+                builder.withShare(withGroup("1")).method("getOne").callAsync();
+        OutputChannel<Object> getTwo =
+                builder.withShare(withGroup("2")).method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -882,16 +879,14 @@ public class ObjectRoutineBuilderTest {
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
         final TestTimeout testTimeout = new TestTimeout();
-        assertThat(JRoutine.on(testTimeout)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+        assertThat(JRoutine.on(testTimeout).withConfig(withReadTimeout(seconds(1)))
                            .boundMethod("test")
                            .callAsync()
                            .readNext()).isEqualTo(31);
 
         try {
 
-            JRoutine.on(testTimeout)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+            JRoutine.on(testTimeout).withConfig(onReadTimeout(TimeoutActionType.DEADLOCK))
                     .boundMethod("test")
                     .callAsync()
                     .readNext();
@@ -902,16 +897,14 @@ public class ObjectRoutineBuilderTest {
 
         }
 
-        assertThat(JRoutine.on(testTimeout)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+        assertThat(JRoutine.on(testTimeout).withConfig(withReadTimeout(seconds(1)))
                            .method("getInt")
                            .callAsync()
                            .readNext()).isEqualTo(31);
 
         try {
 
-            JRoutine.on(testTimeout)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+            JRoutine.on(testTimeout).withConfig(onReadTimeout(TimeoutActionType.DEADLOCK))
                     .method("getInt")
                     .callAsync()
                     .readNext();
@@ -922,16 +915,14 @@ public class ObjectRoutineBuilderTest {
 
         }
 
-        assertThat(JRoutine.on(testTimeout)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+        assertThat(JRoutine.on(testTimeout).withConfig(withReadTimeout(seconds(1)))
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
                            .readNext()).isEqualTo(31);
 
         try {
 
-            JRoutine.on(testTimeout)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+            JRoutine.on(testTimeout).withConfig(onReadTimeout(TimeoutActionType.DEADLOCK))
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
                     .readNext();
@@ -942,15 +933,13 @@ public class ObjectRoutineBuilderTest {
 
         }
 
-        assertThat(JRoutine.on(testTimeout)
-                           .withConfiguration(withReadTimeout(seconds(1)))
+        assertThat(JRoutine.on(testTimeout).withConfig(withReadTimeout(seconds(1)))
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
 
         try {
 
-            JRoutine.on(testTimeout)
-                    .withConfiguration(onReadTimeout(TimeoutActionType.DEADLOCK))
+            JRoutine.on(testTimeout).withConfig(onReadTimeout(TimeoutActionType.DEADLOCK))
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.builder;
 
 import com.gh.bmd.jrt.annotation.ShareGroup;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,21 +31,31 @@ public interface SharableBuilder extends ConfigurableBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    SharableBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    SharableBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    SharableBuilder withConfiguration(@Nonnull Builder builder);
+    SharableBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
-     * Tells the builder to create a routine using the specified share group.
+     * Tells the builder to create a routine using the specified share configuration.
      *
-     * @param group the group name.
+     * @param configuration the configuration.
      * @return this builder.
      * @see ShareGroup
      */
     @Nonnull
-    SharableBuilder withShareGroup(@Nullable String group);
+    SharableBuilder withShare(@Nullable ShareConfiguration configuration);
+
+    /**
+     * Tells the builder to create a routine using the specified share configuration.
+     *
+     * @param builder the configuration builder.
+     * @return this builder.
+     * @see ShareGroup
+     */
+    @Nonnull
+    SharableBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
 }

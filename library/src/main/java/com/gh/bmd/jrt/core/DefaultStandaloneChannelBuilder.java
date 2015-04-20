@@ -44,16 +44,15 @@ class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
     }
 
     @Nonnull
-    public StandaloneChannelBuilder withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
+    public StandaloneChannelBuilder withConfig(@Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public StandaloneChannelBuilder withConfiguration(@Nonnull final Builder builder) {
+    public StandaloneChannelBuilder withConfig(@Nonnull final Builder builder) {
 
-        return withConfiguration(builder.buildConfiguration());
+        return withConfig(builder.buildConfiguration());
     }
 }

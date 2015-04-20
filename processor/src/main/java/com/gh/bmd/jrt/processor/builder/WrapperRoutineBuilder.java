@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.SharableBuilder;
+import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -109,7 +109,7 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    WrapperRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    WrapperRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -118,11 +118,17 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    WrapperRoutineBuilder withConfiguration(@Nonnull Builder builder);
+    WrapperRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    WrapperRoutineBuilder withShareGroup(@Nullable String group);
+    WrapperRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    WrapperRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
 }

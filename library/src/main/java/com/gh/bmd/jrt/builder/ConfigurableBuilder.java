@@ -66,7 +66,7 @@ public interface ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ConfigurableBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    ConfigurableBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * Sets the specified configuration to this builder by replacing any configuration already set.
@@ -78,5 +78,5 @@ public interface ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ConfigurableBuilder withConfiguration(@Nonnull Builder builder);
+    ConfigurableBuilder withConfig(@Nonnull Builder builder);
 }

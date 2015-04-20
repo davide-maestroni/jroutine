@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.reflect.Method;
@@ -97,7 +96,7 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ClassRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    ClassRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -106,11 +105,17 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ClassRoutineBuilder withConfiguration(@Nonnull Builder builder);
+    ClassRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ClassRoutineBuilder withShareGroup(@Nullable String group);
+    ClassRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ClassRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
 }

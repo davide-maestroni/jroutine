@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -92,7 +91,7 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    ObjectRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    ObjectRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -101,11 +100,17 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    ObjectRoutineBuilder withConfiguration(@Nonnull Builder builder);
+    ObjectRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectRoutineBuilder withShareGroup(@Nullable String group);
+    ObjectRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
 }

@@ -288,7 +288,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
                                                                 .withLog(logger.getLog())
                                                                 .withLogLevel(logger.getLogLevel())
                                                                 .buildConfiguration();
-            mStandaloneChannel = JRoutine.standalone().withConfig(configuration).buildChannel();
+            mStandaloneChannel = JRoutine.standalone().configure(configuration).buildChannel();
             mStandaloneInput = mStandaloneChannel.input();
         }
 

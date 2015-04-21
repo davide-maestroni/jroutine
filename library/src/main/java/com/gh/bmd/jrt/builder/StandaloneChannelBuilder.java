@@ -42,7 +42,7 @@ public interface StandaloneChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    StandaloneChannelBuilder withConfig(@Nullable RoutineConfiguration configuration);
+    StandaloneChannelBuilder configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that only options related to the output channel, the asynchronous runner and the logs
@@ -52,5 +52,5 @@ public interface StandaloneChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    StandaloneChannelBuilder withConfig(@Nonnull Builder builder);
+    StandaloneChannelBuilder configure(@Nonnull Builder builder);
 }

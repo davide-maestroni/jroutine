@@ -87,36 +87,36 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
         if (configuration != null) {
 
-            builder.withConfig(configuration);
+            builder.configure(configuration);
         }
 
-        return builder.withShare(mShareConfiguration).buildWrapper();
+        return builder.share(mShareConfiguration).buildWrapper();
     }
 
     @Nonnull
-    public WrapperRoutineBuilder withConfig(@Nullable final RoutineConfiguration configuration) {
+    public WrapperRoutineBuilder configure(@Nullable final RoutineConfiguration configuration) {
 
         mRoutineConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperRoutineBuilder withConfig(@Nonnull final RoutineConfiguration.Builder builder) {
+    public WrapperRoutineBuilder configure(@Nonnull final RoutineConfiguration.Builder builder) {
 
-        return withConfig(builder.buildConfiguration());
+        return configure(builder.buildConfiguration());
     }
 
     @Nonnull
-    public WrapperRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
+    public WrapperRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
 
         mShareConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperRoutineBuilder withShare(@Nonnull final ShareConfiguration.Builder builder) {
+    public WrapperRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
 
-        return withShare(builder.buildConfiguration());
+        return share(builder.buildConfiguration());
     }
 
     /**

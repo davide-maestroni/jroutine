@@ -39,6 +39,30 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
+    ObjectServiceRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectServiceRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectServiceRoutineBuilder share(@Nullable ShareConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectServiceRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
     ObjectServiceRoutineBuilder dispatchingOn(@Nullable Looper looper);
 
     /**
@@ -74,28 +98,4 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
      */
     @Nonnull
     ObjectServiceRoutineBuilder withArgs(@Nullable Object... args);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
 }

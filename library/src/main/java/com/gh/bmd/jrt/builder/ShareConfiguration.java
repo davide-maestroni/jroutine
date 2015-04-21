@@ -191,7 +191,7 @@ public class ShareConfiguration {
          * @throws java.lang.NullPointerException if the specified configuration is null.
          */
         @Nonnull
-        public Builder withConfiguration(@Nonnull final ShareConfiguration configuration) {
+        public Builder configure(@Nonnull final ShareConfiguration configuration) {
 
             final String groupName = configuration.mGroupName;
 

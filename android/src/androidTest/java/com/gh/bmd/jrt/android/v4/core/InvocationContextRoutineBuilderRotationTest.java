@@ -58,8 +58,8 @@ public class InvocationContextRoutineBuilderRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                .withInvocations(withId(0))
-                .withConfig(withOutputOrder(OrderType.PASSING_ORDER))
+                .invocations(withId(0))
+                .configure(withOutputOrder(OrderType.PASSING_ORDER))
                 .callAsync("test1", "test2");
 
         final Semaphore semaphore = new Semaphore(0);

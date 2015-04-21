@@ -55,7 +55,7 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    WrapperBuilder<TYPE> withConfig(@Nullable RoutineConfiguration configuration);
+    WrapperBuilder<TYPE> configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -64,17 +64,17 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    WrapperBuilder<TYPE> withConfig(@Nonnull RoutineConfiguration.Builder builder);
+    WrapperBuilder<TYPE> configure(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    WrapperBuilder<TYPE> withShare(@Nullable ShareConfiguration configuration);
+    WrapperBuilder<TYPE> share(@Nullable ShareConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    WrapperBuilder<TYPE> withShare(@Nonnull ShareConfiguration.Builder builder);
+    WrapperBuilder<TYPE> share(@Nonnull ShareConfiguration.Builder builder);
 }

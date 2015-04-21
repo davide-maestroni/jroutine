@@ -52,7 +52,7 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> configure(
             @Nullable RoutineConfiguration configuration);
 
     /**
@@ -63,20 +63,20 @@ public interface InvocationContextRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> configure(
             @Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> invocations(
             @Nullable ContextInvocationConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
+    InvocationContextRoutineBuilder<INPUT, OUTPUT> invocations(
             @Nonnull ContextInvocationConfiguration.Builder builder);
 }

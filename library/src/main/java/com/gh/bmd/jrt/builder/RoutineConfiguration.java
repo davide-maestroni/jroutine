@@ -872,6 +872,22 @@ public class RoutineConfiguration {
         }
 
         /**
+         * Applies the specified configuration to this builder.
+         *
+         * @param configuration the routine configuration.
+         * @return this builder.
+         * @throws java.lang.NullPointerException if the specified configuration is null.
+         */
+        @Nonnull
+        public Builder configure(@Nonnull final RoutineConfiguration configuration) {
+
+            applyInvocationConfiguration(configuration);
+            applyChannelConfiguration(configuration);
+            applyLogConfiguration(configuration);
+            return this;
+        }
+
+        /**
          * Sets the action to be taken if the timeout elapses before a result can be read from the
          * output channel.
          *
@@ -925,22 +941,6 @@ public class RoutineConfiguration {
         public Builder withAvailableTimeout(@Nullable final TimeDuration timeout) {
 
             mAvailTimeout = timeout;
-            return this;
-        }
-
-        /**
-         * Applies the specified configuration to this builder.
-         *
-         * @param configuration the routine configuration.
-         * @return this builder.
-         * @throws java.lang.NullPointerException if the specified configuration is null.
-         */
-        @Nonnull
-        public Builder withConfiguration(@Nonnull final RoutineConfiguration configuration) {
-
-            applyInvocationConfiguration(configuration);
-            applyChannelConfiguration(configuration);
-            applyLogConfiguration(configuration);
             return this;
         }
 

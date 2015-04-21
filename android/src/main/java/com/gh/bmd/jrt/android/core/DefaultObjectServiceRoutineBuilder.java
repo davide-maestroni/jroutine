@@ -349,14 +349,19 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         return JRoutine.onService(mContext, classToken)
                        .withArgs(targetClass.getName(), args,
                                  withShareAnnotation(mShareConfiguration, targetMethod), name)
-                       .withConfig(
-                               withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
-                                       OrderType.PASSING_ORDER).buildConfiguration())
+                       .configure(withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
+                               OrderType.PASSING_ORDER).buildConfiguration())
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
                        .withLogClass(mLogClass)
                        .dispatchingOn(mLooper)
                        .buildRoutine();
+    }
+
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+
+        return method(method.getName(), method.getParameterTypes());
     }
 
     @Nonnull
@@ -395,20 +400,14 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         return JRoutine.onService(mContext, classToken)
                        .withArgs(targetClass.getName(), args,
                                  withShareAnnotation(mShareConfiguration, targetMethod), name,
-                                 toNames(parameterTypes)).withConfig(
-                               withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
-                                       OrderType.PASSING_ORDER).buildConfiguration())
+                                 toNames(parameterTypes))
+                       .configure(withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
+                               OrderType.PASSING_ORDER).buildConfiguration())
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
                        .withLogClass(mLogClass)
                        .dispatchingOn(mLooper)
                        .buildRoutine();
-    }
-
-    @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
-
-        return method(method.getName(), method.getParameterTypes());
     }
 
     @Nonnull
@@ -436,6 +435,34 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
+    }
+
+    @Nonnull
+    public ObjectServiceRoutineBuilder configure(
+            @Nullable final RoutineConfiguration configuration) {
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ObjectServiceRoutineBuilder configure(
+            @Nonnull final RoutineConfiguration.Builder builder) {
+
+        return configure(builder.buildConfiguration());
+    }
+
+    @Nonnull
+    public ObjectServiceRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
+
+        mShareConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ObjectServiceRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
+
+        return share(builder.buildConfiguration());
     }
 
     @Nonnull
@@ -473,35 +500,6 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withConfig(
-            @Nullable final RoutineConfiguration configuration) {
-
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withConfig(
-            @Nonnull final RoutineConfiguration.Builder builder) {
-
-        return withConfig(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
-
-        mShareConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectServiceRoutineBuilder withShare(
-            @Nonnull final ShareConfiguration.Builder builder) {
-
-        return withShare(builder.buildConfiguration());
     }
 
     /**
@@ -557,7 +555,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .withShare(withGroup(mShareGroup))
+                                   .share(withGroup(mShareGroup))
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -641,7 +639,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .withShare(withGroup(mShareGroup))
+                                   .share(withGroup(mShareGroup))
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -1000,7 +998,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                                       withShareAnnotation(mShareConfiguration, method),
                                       method.getName(), toNames(parameterTypes),
                                       toNames(targetParameterTypes), isInputCollection,
-                                      isOutputCollection).withConfig(configuration)
+                                      isOutputCollection)
+                            .configure(configuration)
                             .withServiceClass(mServiceClass)
                             .withRunnerClass(mRunnerClass)
                             .withLogClass(mLogClass)

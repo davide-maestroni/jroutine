@@ -36,6 +36,6 @@
                              .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                              .buildConfiguration();
         return com.gh.bmd.jrt.core.JRoutine.on(factory)
-                                           .withConfig(routineConfiguration)
+                                           .configure(routineConfiguration)
                                            .buildRoutine();
     }

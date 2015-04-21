@@ -115,6 +115,40 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
                                                                 mInvocationConfiguration));
     }
 
+    @Nonnull
+    @Override
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> configure(
+            @Nullable final RoutineConfiguration configuration) {
+
+        super.configure(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> configure(
+            @Nonnull final RoutineConfiguration.Builder builder) {
+
+        super.configure(builder);
+        return this;
+    }
+
+    @Nonnull
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> invocations(
+            @Nullable final ContextInvocationConfiguration configuration) {
+
+        mInvocationConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public InvocationContextRoutineBuilder<INPUT, OUTPUT> invocations(
+            @Nonnull final ContextInvocationConfiguration.Builder builder) {
+
+        mInvocationConfiguration = builder.buildConfiguration();
+        return this;
+    }
+
     @Override
     public void purge() {
 
@@ -134,40 +168,6 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
     public void purge(@Nullable final Iterable<? extends INPUT> inputs) {
 
         buildRoutine().purge(inputs);
-    }
-
-    @Nonnull
-    @Override
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
-            @Nullable final RoutineConfiguration configuration) {
-
-        super.withConfig(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withConfig(
-            @Nonnull final RoutineConfiguration.Builder builder) {
-
-        super.withConfig(builder);
-        return this;
-    }
-
-    @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
-            @Nullable final ContextInvocationConfiguration configuration) {
-
-        mInvocationConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> withInvocations(
-            @Nonnull final ContextInvocationConfiguration.Builder builder) {
-
-        mInvocationConfiguration = builder.buildConfiguration();
-        return this;
     }
 
     /**

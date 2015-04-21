@@ -109,7 +109,7 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    WrapperRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
+    WrapperRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -118,17 +118,17 @@ public interface WrapperRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    WrapperRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
+    WrapperRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    WrapperRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
+    WrapperRoutineBuilder share(@Nullable ShareConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    WrapperRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
+    WrapperRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
 }

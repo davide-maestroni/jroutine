@@ -131,10 +131,24 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
                     "invalid context type: " + context.getClass().getCanonicalName());
         }
 
-        return builder.withConfig(mConfiguration)
-                      .withInvocations(withId(mInvocationId).onClash(ClashResolutionType.KEEP_THAT)
-                                                            .onComplete(mCacheStrategyType))
+        return builder.configure(mConfiguration)
+                      .invocations(withId(mInvocationId).onClash(ClashResolutionType.KEEP_THAT)
+                                                        .onComplete(mCacheStrategyType))
                       .callAsync();
+    }
+
+    @Nonnull
+    public InvocationContextChannelBuilder configure(
+            @Nullable final RoutineConfiguration configuration) {
+
+        mConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public InvocationContextChannelBuilder configure(@Nonnull final Builder builder) {
+
+        return configure(builder.buildConfiguration());
     }
 
     @Nonnull
@@ -143,17 +157,6 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
 
         mCacheStrategyType = strategyType;
         return this;
-    }
-
-    public void purge() {
-
-        final WeakReference<Object> context = mContext;
-
-        if (context.get() != null) {
-
-            Runners.mainRunner()
-                   .run(new PurgeExecution(context, mInvocationId), 0, TimeUnit.MILLISECONDS);
-        }
     }
 
     public void purge(@Nullable final Object input) {
@@ -211,18 +214,15 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
         }
     }
 
-    @Nonnull
-    public InvocationContextChannelBuilder withConfig(
-            @Nullable final RoutineConfiguration configuration) {
+    public void purge() {
 
-        mConfiguration = configuration;
-        return this;
-    }
+        final WeakReference<Object> context = mContext;
 
-    @Nonnull
-    public InvocationContextChannelBuilder withConfig(@Nonnull final Builder builder) {
+        if (context.get() != null) {
 
-        return withConfig(builder.buildConfiguration());
+            Runners.mainRunner()
+                   .run(new PurgeExecution(context, mInvocationId), 0, TimeUnit.MILLISECONDS);
+        }
     }
 
     /**

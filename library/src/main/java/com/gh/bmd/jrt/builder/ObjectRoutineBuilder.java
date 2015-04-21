@@ -91,7 +91,7 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    ObjectRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
+    ObjectRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -100,17 +100,17 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    ObjectRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
+    ObjectRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
+    ObjectRoutineBuilder share(@Nullable ShareConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
+    ObjectRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
 }

@@ -86,6 +86,24 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
+    @Override
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> configure(
+            @Nullable final RoutineConfiguration configuration) {
+
+        super.configure(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> configure(
+            @Nonnull final Builder builder) {
+
+        super.configure(builder);
+        return this;
+    }
+
+    @Nonnull
     public InvocationServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(
             @Nullable final Looper looper) {
 
@@ -122,24 +140,6 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
     public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(
-            @Nullable final RoutineConfiguration configuration) {
-
-        super.withConfig(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(
-            @Nonnull final Builder builder) {
-
-        super.withConfig(builder);
         return this;
     }
 }

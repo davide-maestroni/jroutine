@@ -53,7 +53,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     private FunctionRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         super(factory);
-        super.withConfig(withInputOrder(OrderType.PASSING_ORDER));
+        super.configure(withInputOrder(OrderType.PASSING_ORDER));
     }
 
     /**
@@ -644,12 +644,12 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
 
     @Nonnull
     @Override
-    public RoutineBuilder<INPUT, OUTPUT> withConfig(
+    public RoutineBuilder<INPUT, OUTPUT> configure(
             @Nullable final RoutineConfiguration configuration) {
 
-        return super.withConfig(RoutineConfiguration.notNull(configuration)
-                                                    .builderFrom()
-                                                    .withInputOrder(OrderType.PASSING_ORDER)
-                                                    .buildConfiguration());
+        return super.configure(RoutineConfiguration.notNull(configuration)
+                                                   .builderFrom()
+                                                   .withInputOrder(OrderType.PASSING_ORDER)
+                                                   .buildConfiguration());
     }
 }

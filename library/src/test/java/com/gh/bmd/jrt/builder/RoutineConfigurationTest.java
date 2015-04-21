@@ -44,11 +44,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Configuration builder unit tests.
+ * Routine configuration unit tests.
  * <p/>
  * Created by davide on 11/22/14.
  */
-public class RoutineConfigurationBuilderTest {
+public class RoutineConfigurationTest {
 
     @Test
     public void tesAvailableTimeoutEquals() {
@@ -332,7 +332,7 @@ public class RoutineConfigurationBuilderTest {
                          .withLog(new NullLog())
                          .withOutputSize(100)
                          .buildConfiguration();
-        assertThat(builder().withConfiguration(configuration).buildConfiguration()).isEqualTo(
+        assertThat(builder().configure(configuration).buildConfiguration()).isEqualTo(
                 configuration);
         assertThat(configuration.builderFrom().buildConfiguration()).isEqualTo(configuration);
     }
@@ -343,7 +343,7 @@ public class RoutineConfigurationBuilderTest {
 
         try {
 
-            builder().withConfiguration(null);
+            builder().configure(null);
 
             fail();
 

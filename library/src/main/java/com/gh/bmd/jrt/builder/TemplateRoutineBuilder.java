@@ -36,6 +36,20 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     private RoutineConfiguration mConfiguration;
 
     @Nonnull
+    public RoutineBuilder<INPUT, OUTPUT> configure(
+            @Nullable final RoutineConfiguration configuration) {
+
+        mConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public RoutineBuilder<INPUT, OUTPUT> configure(@Nonnull final Builder builder) {
+
+        return configure(builder.buildConfiguration());
+    }
+
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return buildRoutine().invokeAsync();
@@ -51,20 +65,6 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     public ParameterChannel<INPUT, OUTPUT> invokeSync() {
 
         return buildRoutine().invokeSync();
-    }
-
-    @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> withConfig(
-            @Nullable final RoutineConfiguration configuration) {
-
-        mConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> withConfig(@Nonnull final Builder builder) {
-
-        return withConfig(builder.buildConfiguration());
     }
 
     /**

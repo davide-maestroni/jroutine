@@ -122,6 +122,39 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
+    public ClassRoutineBuilder configure(@Nullable final RoutineConfiguration configuration) {
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ClassRoutineBuilder configure(@Nonnull final Builder builder) {
+
+        return configure(builder.buildConfiguration());
+    }
+
+    @Nonnull
+    public ClassRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
+
+        mShareConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ClassRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
+
+        return share(builder.buildConfiguration());
+    }
+
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+
+        return method(RoutineConfiguration.notNull(mRoutineConfiguration),
+                      ShareConfiguration.notNull(mShareConfiguration), method);
+    }
+
+    @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
@@ -149,39 +182,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         }
 
         return method(targetMethod);
-    }
-
-    @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
-
-        return method(RoutineConfiguration.notNull(mRoutineConfiguration),
-                      ShareConfiguration.notNull(mShareConfiguration), method);
-    }
-
-    @Nonnull
-    public ClassRoutineBuilder withConfig(@Nullable final RoutineConfiguration configuration) {
-
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ClassRoutineBuilder withConfig(@Nonnull final Builder builder) {
-
-        return withConfig(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public ClassRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
-
-        mShareConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ClassRoutineBuilder withShare(@Nonnull final ShareConfiguration.Builder builder) {
-
-        return withShare(builder.buildConfiguration());
     }
 
     /**

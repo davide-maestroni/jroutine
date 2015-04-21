@@ -217,33 +217,33 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder withConfig(@Nullable final RoutineConfiguration configuration) {
+    public ObjectRoutineBuilder configure(@Nullable final RoutineConfiguration configuration) {
 
-        super.withConfig(configuration);
+        super.configure(configuration);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder withConfig(@Nonnull final Builder builder) {
+    public ObjectRoutineBuilder configure(@Nonnull final Builder builder) {
 
-        super.withConfig(builder);
+        super.configure(builder);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
+    public ObjectRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
 
-        super.withShare(configuration);
+        super.share(configuration);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder withShare(@Nonnull final ShareConfiguration.Builder builder) {
+    public ObjectRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
 
-        super.withShare(builder);
+        super.share(builder);
         return this;
     }
 

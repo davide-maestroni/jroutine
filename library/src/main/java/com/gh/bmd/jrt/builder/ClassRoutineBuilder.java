@@ -53,23 +53,34 @@ public interface ClassRoutineBuilder extends SharableBuilder {
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
 
     /**
-     * Returns a routine used to call the specified method.
-     * <p/>
-     * The method is searched via reflection ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Bind} annotation. Though, optional
-     * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout} and
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} method annotations will be honored.<br/>
-     * Note that such annotations will override any configuration set through the builder.
+     * Note that all the options related to the output and input channels will be ignored.
      *
-     * @param name           the method name.
-     * @param parameterTypes the method parameter types.
-     * @return the routine.
-     * @throws java.lang.IllegalArgumentException if no matching method is found.
-     * @throws java.lang.NullPointerException     if one of the parameter is null.
+     * @param configuration the routine configuration.
+     * @return this builder.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
-            @Nonnull Class<?>... parameterTypes);
+    ClassRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * Note that all the options related to the output and input channels will be ignored.
+     *
+     * @param builder the routine configuration builder.
+     * @return this builder.
+     */
+    @Nonnull
+    ClassRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ClassRoutineBuilder share(@Nullable ShareConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ClassRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
 
     /**
      * Returns a routine used to call the specified method.
@@ -90,32 +101,21 @@ public interface ClassRoutineBuilder extends SharableBuilder {
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
 
     /**
-     * Note that all the options related to the output and input channels will be ignored.
+     * Returns a routine used to call the specified method.
+     * <p/>
+     * The method is searched via reflection ignoring a name specified in a
+     * {@link com.gh.bmd.jrt.annotation.Bind} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} method annotations will be honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
      *
-     * @param configuration the routine configuration.
-     * @return this builder.
+     * @param name           the method name.
+     * @param parameterTypes the method parameter types.
+     * @return the routine.
+     * @throws java.lang.IllegalArgumentException if no matching method is found.
+     * @throws java.lang.NullPointerException     if one of the parameter is null.
      */
     @Nonnull
-    ClassRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @param builder the routine configuration builder.
-     * @return this builder.
-     */
-    @Nonnull
-    ClassRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ClassRoutineBuilder withShare(@Nullable ShareConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ClassRoutineBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
+            @Nonnull Class<?>... parameterTypes);
 }

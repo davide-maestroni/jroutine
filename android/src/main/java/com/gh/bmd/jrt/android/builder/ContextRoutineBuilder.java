@@ -43,13 +43,13 @@ public interface ContextRoutineBuilder extends ConfigurableBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    ContextRoutineBuilder withConfig(@Nullable RoutineConfiguration configuration);
+    ContextRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ContextRoutineBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
+    ContextRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * Sets the specified configuration to this builder by replacing any configuration already set.
@@ -61,7 +61,7 @@ public interface ContextRoutineBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder withInvocations(@Nullable ContextInvocationConfiguration configuration);
+    ContextRoutineBuilder invocations(@Nullable ContextInvocationConfiguration configuration);
 
     /**
      * Sets the specified configuration to this builder by replacing any configuration already set.
@@ -73,5 +73,5 @@ public interface ContextRoutineBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ContextRoutineBuilder withInvocations(@Nonnull ContextInvocationConfiguration.Builder builder);
+    ContextRoutineBuilder invocations(@Nonnull ContextInvocationConfiguration.Builder builder);
 }

@@ -379,9 +379,15 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         final ContextInvocationConfiguration invocationConfiguration =
                 withAnnotations(currentConfiguration, targetMethod).withArgs(invocationArgs)
                                                                    .buildConfiguration();
-        return getBuilder(mContext, classToken).withConfig(routineConfiguration)
-                                               .withInvocations(invocationConfiguration)
+        return getBuilder(mContext, classToken).configure(routineConfiguration)
+                                               .invocations(invocationConfiguration)
                                                .buildRoutine();
+    }
+
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+
+        return method(method.getName(), method.getParameterTypes());
     }
 
     @Nonnull
@@ -428,15 +434,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         final ContextInvocationConfiguration invocationConfiguration =
                 withAnnotations(currentConfiguration, targetMethod).withArgs(invocationArgs)
                                                                    .buildConfiguration();
-        return getBuilder(mContext, classToken).withConfig(routineConfiguration)
-                                               .withInvocations(invocationConfiguration)
+        return getBuilder(mContext, classToken).configure(routineConfiguration)
+                                               .invocations(invocationConfiguration)
                                                .buildRoutine();
-    }
-
-    @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
-
-        return method(method.getName(), method.getParameterTypes());
     }
 
     @Nonnull
@@ -467,21 +467,20 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder withShare(@Nullable final ShareConfiguration configuration) {
+    public ObjectContextRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
 
         mShareConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder withShare(
-            @Nonnull final ShareConfiguration.Builder builder) {
+    public ObjectContextRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
 
-        return withShare(builder.buildConfiguration());
+        return share(builder.buildConfiguration());
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder withConfig(
+    public ObjectContextRoutineBuilder configure(
             @Nullable final RoutineConfiguration configuration) {
 
         mRoutineConfiguration = configuration;
@@ -489,14 +488,14 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder withConfig(
+    public ObjectContextRoutineBuilder configure(
             @Nonnull final RoutineConfiguration.Builder builder) {
 
-        return withConfig(builder.buildConfiguration());
+        return configure(builder.buildConfiguration());
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder withInvocations(
+    public ObjectContextRoutineBuilder invocations(
             @Nullable final ContextInvocationConfiguration configuration) {
 
         mInvocationConfiguration = configuration;
@@ -504,10 +503,10 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder withInvocations(
+    public ObjectContextRoutineBuilder invocations(
             @Nonnull final ContextInvocationConfiguration.Builder builder) {
 
-        return withInvocations(builder.buildConfiguration());
+        return invocations(builder.buildConfiguration());
     }
 
     /**
@@ -592,7 +591,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .withShare(withGroup(mShareGroup))
+                                   .share(withGroup(mShareGroup))
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -676,7 +675,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .withShare(withGroup(mShareGroup))
+                                   .share(withGroup(mShareGroup))
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -1033,8 +1032,8 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                                                                      .buildConfiguration();
             final InvocationContextRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, ClassToken.tokenOf(ProxyInvocation.class));
-            final Routine<Object, Object> routine = routineBuilder.withConfig(configuration)
-                                                                  .withInvocations(
+            final Routine<Object, Object> routine =
+                    routineBuilder.configure(configuration).invocations(
                                                                           invocationConfiguration)
                                                                   .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =

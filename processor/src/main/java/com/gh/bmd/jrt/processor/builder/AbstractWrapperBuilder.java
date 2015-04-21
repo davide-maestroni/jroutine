@@ -89,29 +89,29 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> withConfig(@Nullable final RoutineConfiguration configuration) {
+    public WrapperBuilder<TYPE> configure(@Nullable final RoutineConfiguration configuration) {
 
         mRoutineConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> withConfig(@Nonnull final RoutineConfiguration.Builder builder) {
+    public WrapperBuilder<TYPE> configure(@Nonnull final RoutineConfiguration.Builder builder) {
 
-        return withConfig(builder.buildConfiguration());
+        return configure(builder.buildConfiguration());
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> withShare(@Nullable final ShareConfiguration configuration) {
+    public WrapperBuilder<TYPE> share(@Nullable final ShareConfiguration configuration) {
 
         mShareConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> withShare(@Nonnull final ShareConfiguration.Builder builder) {
+    public WrapperBuilder<TYPE> share(@Nonnull final ShareConfiguration.Builder builder) {
 
-        return withShare(builder.buildConfiguration());
+        return share(builder.buildConfiguration());
     }
 
     /**

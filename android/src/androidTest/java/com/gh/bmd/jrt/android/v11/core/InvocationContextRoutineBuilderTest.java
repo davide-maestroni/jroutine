@@ -85,7 +85,7 @@ public class InvocationContextRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.ABORT_THIS))
+                        .invocations(withId(0).onClash(ClashResolutionType.ABORT_THIS))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
@@ -113,7 +113,7 @@ public class InvocationContextRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.ABORT_THIS_INPUT))
+                        .invocations(withId(0).onClash(ClashResolutionType.ABORT_THIS_INPUT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -140,10 +140,10 @@ public class InvocationContextRoutineBuilderTest
 
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
         assertThat(channel4.readNext()).isEqualTo("test");
@@ -161,10 +161,10 @@ public class InvocationContextRoutineBuilderTest
 
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
         assertThat(channel5.readNext()).isEqualTo("test");
@@ -196,7 +196,7 @@ public class InvocationContextRoutineBuilderTest
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_SUCCESS))
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_SUCCESS))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -214,7 +214,7 @@ public class InvocationContextRoutineBuilderTest
 
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_SUCCESS))
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_SUCCESS))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -223,7 +223,7 @@ public class InvocationContextRoutineBuilderTest
 
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .withInvocations(withId(0))
+                        .invocations(withId(0))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -242,7 +242,7 @@ public class InvocationContextRoutineBuilderTest
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_ERROR))
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_ERROR))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -252,7 +252,7 @@ public class InvocationContextRoutineBuilderTest
         InvocationException error = null;
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_ERROR))
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE_IF_ERROR))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -271,7 +271,7 @@ public class InvocationContextRoutineBuilderTest
 
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withInvocations(withId(0))
+                        .invocations(withId(0))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -354,7 +354,7 @@ public class InvocationContextRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
+                        .invocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -434,7 +434,7 @@ public class InvocationContextRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.ABORT_THAT))
+                        .invocations(withId(0).onClash(ClashResolutionType.ABORT_THAT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
@@ -462,7 +462,7 @@ public class InvocationContextRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.ABORT_THAT_INPUT))
+                        .invocations(withId(0).onClash(ClashResolutionType.ABORT_THAT_INPUT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -491,7 +491,7 @@ public class InvocationContextRoutineBuilderTest
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -500,7 +500,7 @@ public class InvocationContextRoutineBuilderTest
 
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .withInvocations(withId(0))
+                        .invocations(withId(0))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -510,7 +510,7 @@ public class InvocationContextRoutineBuilderTest
         InvocationException error = null;
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -529,7 +529,7 @@ public class InvocationContextRoutineBuilderTest
 
         final OutputChannel<Data> result4 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withInvocations(withId(0))
+                        .invocations(withId(0))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -556,10 +556,10 @@ public class InvocationContextRoutineBuilderTest
 
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel = routine.callAsync("test").eventually();
         assertThat(channel.readNext()).isEqualTo("test");
@@ -577,10 +577,10 @@ public class InvocationContextRoutineBuilderTest
 
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
         assertThat(channel1.readNext()).isEqualTo("test");
@@ -635,13 +635,13 @@ public class InvocationContextRoutineBuilderTest
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();
-        JRoutine.onActivity(getActivity(), 0).withConfig(configuration).buildChannel();
+        JRoutine.onActivity(getActivity(), 0).configure(configuration).buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        JRoutine.onFragment(fragment, 0).withConfig(configuration).buildChannel();
+        JRoutine.onFragment(fragment, 0).configure(configuration).buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
 
@@ -662,8 +662,8 @@ public class InvocationContextRoutineBuilderTest
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                .withConfig(configuration)
-                .withInvocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
+                .configure(configuration)
+                .invocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
@@ -671,8 +671,8 @@ public class InvocationContextRoutineBuilderTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                .withConfig(configuration)
-                .withInvocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
+                .configure(configuration)
+                .invocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
@@ -688,7 +688,7 @@ public class InvocationContextRoutineBuilderTest
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -697,7 +697,7 @@ public class InvocationContextRoutineBuilderTest
 
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withInvocations(withId(0))
+                        .invocations(withId(0))
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -727,7 +727,7 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.ABORT_THIS_INPUT))
+                        .invocations(withId(0).onClash(ClashResolutionType.ABORT_THIS_INPUT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -757,10 +757,10 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
         assertThat(channel4.readNext()).isEqualTo("test");
@@ -781,10 +781,10 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
         assertThat(channel5.readNext()).isEqualTo("test");
@@ -818,8 +818,8 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0))
-                        .withConfig(withOutputOrder(OrderType.PASSING_ORDER))
+                        .invocations(withId(0))
+                        .configure(withOutputOrder(OrderType.PASSING_ORDER))
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
         final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
@@ -901,7 +901,7 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
+                        .invocations(withId(0).onClash(ClashResolutionType.KEEP_THAT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -989,7 +989,7 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.ABORT_THAT))
+                        .invocations(withId(0).onClash(ClashResolutionType.ABORT_THAT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
@@ -1020,7 +1020,7 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withInvocations(withId(0).onClash(ClashResolutionType.ABORT_THAT_INPUT))
+                        .invocations(withId(0).onClash(ClashResolutionType.ABORT_THAT_INPUT))
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -1050,10 +1050,10 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel = routine.callAsync("test").eventually();
         assertThat(channel.readNext()).isEqualTo("test");
@@ -1074,10 +1074,10 @@ public class InvocationContextRoutineBuilderTest
                                                                           R.id.test_fragment);
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withConfig(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                             .withOutputOrder(OrderType.PASSING_ORDER)
-                                             .buildConfiguration())
-                        .withInvocations(withId(0).onComplete(CacheStrategyType.CACHE))
+                        .configure(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                            .withOutputOrder(OrderType.PASSING_ORDER)
+                                            .buildConfiguration())
+                        .invocations(withId(0).onComplete(CacheStrategyType.CACHE))
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
         assertThat(channel1.readNext()).isEqualTo("test");
@@ -1133,9 +1133,8 @@ public class InvocationContextRoutineBuilderTest
                                                              .withLog(Logs.androidLog())
                                                              .withLogLevel(LogLevel.WARNING)
                                                              .buildConfiguration();
-        final Routine<String, String> routine1 = JRoutine.onActivity(getActivity(), token1)
-                                                         .withConfig(configuration1)
-                                                         .buildRoutine();
+        final Routine<String, String> routine1 =
+                JRoutine.onActivity(getActivity(), token1).configure(configuration1).buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
@@ -1152,9 +1151,8 @@ public class InvocationContextRoutineBuilderTest
                                                              .withLog(Logs.androidLog())
                                                              .withLogLevel(LogLevel.WARNING)
                                                              .buildConfiguration();
-        final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(), token2)
-                                                         .withConfig(configuration2)
-                                                         .buildRoutine();
+        final Routine<String, String> routine2 =
+                JRoutine.onActivity(getActivity(), token2).configure(configuration2).buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");

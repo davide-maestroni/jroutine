@@ -43,6 +43,19 @@ public interface InvocationServiceRoutineBuilder<INPUT, OUTPUT>
      * {@inheritDoc}
      */
     @Nonnull
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> configure(
+            @Nullable RoutineConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> configure(@Nonnull Builder builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
     InvocationServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable Looper looper);
 
     /**
@@ -80,17 +93,4 @@ public interface InvocationServiceRoutineBuilder<INPUT, OUTPUT>
      */
     @Nonnull
     InvocationServiceRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable Object... args);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(
-            @Nullable RoutineConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfig(@Nonnull Builder builder);
 }

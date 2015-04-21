@@ -28,6 +28,10 @@ import javax.annotation.Nullable;
  */
 public class ContextInvocationConfiguration {
 
+    //TODO: see annotations?
+    //TODO: replace withConfiguration, withShareGroup
+    //TODO: move withArgs to RoutineConfiguration (withInvocationArgs???)
+
     /**
      * Constant identifying an invocation ID computed from the executor class and the input
      * parameters.
@@ -367,6 +371,47 @@ public class ContextInvocationConfiguration {
         }
 
         /**
+         * Applies the specified configuration to this builder.
+         *
+         * @param configuration the invocation configuration.
+         * @return this builder.
+         * @throws java.lang.NullPointerException if the specified configuration is null.
+         */
+        @Nonnull
+        public Builder configure(@Nonnull final ContextInvocationConfiguration configuration) {
+
+            final int invocationId = configuration.mInvocationId;
+
+            if (invocationId != AUTO) {
+
+                withId(invocationId);
+            }
+
+            final ClashResolutionType resolutionType = configuration.mResolutionType;
+
+            if (resolutionType != null) {
+
+                onClash(resolutionType);
+            }
+
+            final CacheStrategyType strategyType = configuration.mStrategyType;
+
+            if (strategyType != null) {
+
+                onComplete(strategyType);
+            }
+
+            final Object[] args = configuration.mArgs;
+
+            if (args != null) {
+
+                withArgs(args);
+            }
+
+            return this;
+        }
+
+        /**
          * Tells the builder how to resolve clashes of invocations. A clash happens when an
          * invocation of the same type and with the same ID is still running. A null value means
          * that it is up to the framework to choose a default resolution type.
@@ -411,48 +456,6 @@ public class ContextInvocationConfiguration {
         public Builder withArgs(@Nullable final Object... args) {
 
             mArgs = args;
-            return this;
-        }
-
-        /**
-         * Applies the specified configuration to this builder.
-         *
-         * @param configuration the invocation configuration.
-         * @return this builder.
-         * @throws java.lang.NullPointerException if the specified configuration is null.
-         */
-        @Nonnull
-        public Builder withConfiguration(
-                @Nonnull final ContextInvocationConfiguration configuration) {
-
-            final int invocationId = configuration.mInvocationId;
-
-            if (invocationId != AUTO) {
-
-                withId(invocationId);
-            }
-
-            final ClashResolutionType resolutionType = configuration.mResolutionType;
-
-            if (resolutionType != null) {
-
-                onClash(resolutionType);
-            }
-
-            final CacheStrategyType strategyType = configuration.mStrategyType;
-
-            if (strategyType != null) {
-
-                onComplete(strategyType);
-            }
-
-            final Object[] args = configuration.mArgs;
-
-            if (args != null) {
-
-                withArgs(args);
-            }
-
             return this;
         }
 

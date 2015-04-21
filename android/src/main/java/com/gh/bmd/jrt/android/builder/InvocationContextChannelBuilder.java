@@ -42,6 +42,24 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
+     * Note that only the options related to logs will be employed.
+     *
+     * @param configuration the routine configuration.
+     * @return this builder.
+     */
+    @Nonnull
+    InvocationContextChannelBuilder configure(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * Note that only the options related to logs will be employed.
+     *
+     * @param builder the routine configuration builder.
+     * @return this builder.
+     */
+    @Nonnull
+    InvocationContextChannelBuilder configure(@Nonnull Builder builder);
+
+    /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
      * that it is up to the framework to choose a default strategy.
      *
@@ -50,11 +68,6 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
      */
     @Nonnull
     InvocationContextChannelBuilder onComplete(@Nullable CacheStrategyType strategyType);
-
-    /**
-     * Makes the builder destroy all the cached invocation instances.
-     */
-    void purge();
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified input.
@@ -78,20 +91,7 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
     void purge(@Nullable Iterable<?> inputs);
 
     /**
-     * Note that only the options related to logs will be employed.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
+     * Makes the builder destroy all the cached invocation instances.
      */
-    @Nonnull
-    InvocationContextChannelBuilder withConfig(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * Note that only the options related to logs will be employed.
-     *
-     * @param builder the routine configuration builder.
-     * @return this builder.
-     */
-    @Nonnull
-    InvocationContextChannelBuilder withConfig(@Nonnull Builder builder);
+    void purge();
 }

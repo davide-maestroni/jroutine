@@ -43,7 +43,7 @@ public class ChannelsTest {
     public void testSelect() {
 
         final StandaloneChannelBuilder builder =
-                JRoutine.standalone().withConfig(withOutputOrder(OrderType.PASSING_ORDER));
+                JRoutine.standalone().configure(withOutputOrder(OrderType.PASSING_ORDER));
         final StandaloneChannel<String> channel1 = builder.buildChannel();
         final StandaloneChannel<String> channel2 = builder.buildChannel();
         final StandaloneChannel<String> channel3 = builder.buildChannel();

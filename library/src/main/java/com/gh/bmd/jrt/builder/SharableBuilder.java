@@ -31,13 +31,13 @@ public interface SharableBuilder extends ConfigurableBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    SharableBuilder withConfig(@Nullable RoutineConfiguration configuration);
+    SharableBuilder configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    SharableBuilder withConfig(@Nonnull RoutineConfiguration.Builder builder);
+    SharableBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * Tells the builder to create a routine using the specified share configuration.
@@ -47,7 +47,7 @@ public interface SharableBuilder extends ConfigurableBuilder {
      * @see ShareGroup
      */
     @Nonnull
-    SharableBuilder withShare(@Nullable ShareConfiguration configuration);
+    SharableBuilder share(@Nullable ShareConfiguration configuration);
 
     /**
      * Tells the builder to create a routine using the specified share configuration.
@@ -57,5 +57,5 @@ public interface SharableBuilder extends ConfigurableBuilder {
      * @see ShareGroup
      */
     @Nonnull
-    SharableBuilder withShare(@Nonnull ShareConfiguration.Builder builder);
+    SharableBuilder share(@Nonnull ShareConfiguration.Builder builder);
 }

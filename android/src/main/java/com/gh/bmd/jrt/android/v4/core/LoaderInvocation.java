@@ -722,7 +722,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                                                                 .withLogLevel(logger.getLogLevel())
                                                                 .buildConfiguration();
             final StandaloneChannel<OUTPUT> channel =
-                    JRoutine.standalone().withConfig(configuration).buildChannel();
+                    JRoutine.standalone().configure(configuration).buildChannel();
             channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));

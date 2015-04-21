@@ -447,7 +447,7 @@ public class ProcessorTest {
                          .withLog(log)
                          .buildConfiguration();
         final TestWrapper testWrapper =
-                JRoutine_TestWrapper.on(test).withConfig(configuration).buildWrapper();
+                JRoutine_TestWrapper.on(test).configure(configuration).buildWrapper();
 
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
         assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");

@@ -23,8 +23,8 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain wrapper = on(instance).withShareGroup(Share.NONE)
-                                                      .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
+                final AsyncMain wrapper = on(instance).share(ShareGroup.NONE)
+                                                      .configure(withReadTimeout(TimeDuration.INFINITY))
                                                       .buildWrapper(AsyncMain.class);
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 
@@ -88,8 +88,8 @@
 
                 final Main instance = new Main();
                 final AsyncMain wrapper = JRoutine_AsyncMain.on(instance)
-                                                            .withShareGroup(Share.NONE)
-                                                            .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
+                                                            .share(ShareGroup.NONE)
+                                                            .configure(withReadTimeout(TimeDuration.INFINITY))
                                                             .buildWrapper();
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 

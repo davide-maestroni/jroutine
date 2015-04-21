@@ -189,8 +189,8 @@
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder = on(Main.class).withShareGroup(Share.NONE)
-                                                                  .withConfiguration(withReadTimeout(TimeDuration.INFINITY));
+                final ClassRoutineBuilder builder = on(Main.class).share(ShareGroup.NONE)
+                                                                  .configure(withReadTimeout(TimeDuration.INFINITY));
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.boundMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.boundMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.boundMethod(MEAN);
@@ -247,8 +247,8 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = on(instance).withShareGroup(Share.NONE)
-                                                    .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
+                final AsyncMain proxy = on(instance).share(ShareGroup.NONE)
+                                                    .configure(withReadTimeout(TimeDuration.INFINITY))
                                                     .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 

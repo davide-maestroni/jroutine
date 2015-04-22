@@ -38,7 +38,7 @@ public class TestApp extends Application implements FactoryContext {
     @Nullable
     @SuppressWarnings("unchecked")
     public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
-            @Nonnull final Object... args) {
+            @Nonnull final Object[] args) {
 
         final HashMap<Class<?>, Object> instanceMap = sInstanceMap;
         Object instance = instanceMap.get(type);

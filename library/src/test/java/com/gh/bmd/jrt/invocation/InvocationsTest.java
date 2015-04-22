@@ -35,7 +35,7 @@ public class InvocationsTest {
     public void testInvocationFactory() {
 
         final InvocationFactory<Object, Object> factory =
-                Invocations.withArgs((Object[]) null).factoryOf(TestInvocation.class);
+                Invocations.factoryOf(TestInvocation.class);
 
         assertThat(factory.newInvocation()).isExactlyInstanceOf(TestInvocation.class);
     }

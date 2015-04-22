@@ -33,6 +33,7 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -282,10 +283,11 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
     @Nonnull
     private static ContextInvocationConfiguration.Builder withAnnotations(
-            @Nonnull final ContextInvocationConfiguration configuration,
+            @Nullable final ContextInvocationConfiguration configuration,
             @Nonnull final Method method) {
 
-        final ContextInvocationConfiguration.Builder builder = configuration.builderFrom();
+        final ContextInvocationConfiguration.Builder builder =
+                ContextInvocationConfiguration.notNull(configuration).builderFrom();
 
         final Id idAnnotation = method.getAnnotation(Id.class);
 
@@ -327,10 +329,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
     @Nonnull
     private static RoutineConfiguration.Builder withTimeoutAnnotation(
-            @Nullable final RoutineConfiguration configuration, @Nonnull final Method method) {
+            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
 
-        final RoutineConfiguration.Builder builder =
-                RoutineConfiguration.notNull(configuration).builderFrom();
+        final RoutineConfiguration.Builder builder = configuration.builderFrom();
         final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
@@ -368,19 +369,17 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         }
 
         final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
-        final RoutineConfiguration routineConfiguration =
-                withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
-                        OrderType.PASSING_ORDER).buildConfiguration();
+        final RoutineConfiguration currentConfiguration =
+                RoutineConfiguration.notNull(configuration);
+        final Object[] args = currentConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         final String shareGroup = withShareAnnotation(mShareConfiguration, targetMethod);
-        final ContextInvocationConfiguration currentConfiguration =
-                ContextInvocationConfiguration.notNull(mInvocationConfiguration);
-        final Object[] args = currentConfiguration.getArgsOr(Reflection.NO_ARGS);
+        final Builder builder = withTimeoutAnnotation(currentConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name};
-        final ContextInvocationConfiguration invocationConfiguration =
-                withAnnotations(currentConfiguration, targetMethod).withArgs(invocationArgs)
-                                                                   .buildConfiguration();
-        return getBuilder(mContext, classToken).configure(routineConfiguration)
-                                               .invocations(invocationConfiguration)
+        return getBuilder(mContext, classToken).configure(
+                builder.withFactoryArgs(invocationArgs).withInputOrder(OrderType.PASSING_ORDER))
+                                               .invocations(
+                                                       withAnnotations(mInvocationConfiguration,
+                                                                       targetMethod))
                                                .buildRoutine();
     }
 
@@ -422,20 +421,18 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
-        final RoutineConfiguration routineConfiguration =
-                withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
-                        OrderType.PASSING_ORDER).buildConfiguration();
+        final RoutineConfiguration currentConfiguration =
+                RoutineConfiguration.notNull(configuration);
+        final Object[] args = currentConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         final String shareGroup = withShareAnnotation(mShareConfiguration, targetMethod);
-        final ContextInvocationConfiguration currentConfiguration =
-                ContextInvocationConfiguration.notNull(mInvocationConfiguration);
-        final Object[] args = currentConfiguration.getArgsOr(Reflection.NO_ARGS);
+        final Builder builder = withTimeoutAnnotation(currentConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name,
                                                      toNames(parameterTypes)};
-        final ContextInvocationConfiguration invocationConfiguration =
-                withAnnotations(currentConfiguration, targetMethod).withArgs(invocationArgs)
-                                                                   .buildConfiguration();
-        return getBuilder(mContext, classToken).configure(routineConfiguration)
-                                               .invocations(invocationConfiguration)
+        return getBuilder(mContext, classToken).configure(
+                builder.withFactoryArgs(invocationArgs).withInputOrder(OrderType.PASSING_ORDER))
+                                               .invocations(
+                                                       withAnnotations(mInvocationConfiguration,
+                                                                       targetMethod))
                                                .buildRoutine();
     }
 
@@ -959,11 +956,10 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
-            mRoutineConfiguration = builder.mRoutineConfiguration;
+            mRoutineConfiguration = RoutineConfiguration.notNull(builder.mRoutineConfiguration);
             mShareConfiguration = builder.mShareConfiguration;
-            mInvocationConfiguration =
-                    ContextInvocationConfiguration.notNull(builder.mInvocationConfiguration);
-            mArgs = mInvocationConfiguration.getArgsOr(Reflection.NO_ARGS);
+            mInvocationConfiguration = builder.mInvocationConfiguration;
+            mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
             mProxyClass = proxyClass;
         }
 
@@ -1016,25 +1012,23 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
             final RoutineConfiguration.Builder builder =
                     withTimeoutAnnotation(mRoutineConfiguration, method);
-            final RoutineConfiguration configuration =
-                    builder.withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
-                           .withOutputOrder(
-                                   (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
-                                           : OrderType.NONE)
-                           .buildConfiguration();
             final Object[] invocationArgs =
                     new Object[]{mProxyClass.getName(), mTargetClass.getName(), mArgs, shareGroup,
                                  method.getName(), toNames(parameterTypes),
                                  toNames(targetParameterTypes), isInputCollection,
                                  isOutputCollection};
-            final ContextInvocationConfiguration invocationConfiguration =
-                    withAnnotations(mInvocationConfiguration, method).withArgs(invocationArgs)
-                                                                     .buildConfiguration();
+            final OrderType inputOrder = (isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER;
+            final OrderType outputOrder =
+                    (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER : OrderType.NONE;
             final InvocationContextRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, ClassToken.tokenOf(ProxyInvocation.class));
-            final Routine<Object, Object> routine =
-                    routineBuilder.configure(configuration).invocations(
-                                                                          invocationConfiguration)
+            final Routine<Object, Object> routine = routineBuilder.configure(
+                    builder.withFactoryArgs(invocationArgs)
+                           .withInputOrder(inputOrder)
+                           .withOutputOrder(outputOrder))
+                                                                  .invocations(withAnnotations(
+                                                                          mInvocationConfiguration,
+                                                                          method))
                                                                   .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

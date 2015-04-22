@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import java.util.Arrays;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -29,8 +27,8 @@ import javax.annotation.Nullable;
 public class ContextInvocationConfiguration {
 
     //TODO: see annotations?
-    //TODO: replace withConfiguration, withShareGroup
     //TODO: move withArgs to RoutineConfiguration (withInvocationArgs???)
+    //TODO: check ...
 
     /**
      * Constant identifying an invocation ID computed from the executor class and the input
@@ -44,8 +42,6 @@ public class ContextInvocationConfiguration {
     public static final ContextInvocationConfiguration EMPTY_CONFIGURATION =
             builder().buildConfiguration();
 
-    private final Object[] mArgs;
-
     private final int mInvocationId;
 
     private final ClashResolutionType mResolutionType;
@@ -58,16 +54,14 @@ public class ContextInvocationConfiguration {
      * @param invocationId   the the invocation ID.
      * @param resolutionType the type of resolution.
      * @param strategyType   the cache strategy type.
-     * @param args           the arguments.
      */
     private ContextInvocationConfiguration(final int invocationId,
             @Nullable final ClashResolutionType resolutionType,
-            @Nullable final CacheStrategyType strategyType, @Nullable final Object[] args) {
+            @Nullable final CacheStrategyType strategyType) {
 
         mInvocationId = invocationId;
         mResolutionType = resolutionType;
         mStrategyType = strategyType;
-        mArgs = args;
     }
 
     /**
@@ -133,18 +127,6 @@ public class ContextInvocationConfiguration {
     }
 
     /**
-     * Short for <b><code>builder().withArgs(args)</code></b>.
-     *
-     * @param args the arguments.
-     * @return the context invocation configuration builder.
-     */
-    @Nonnull
-    public static Builder withArgs(@Nullable final Object... args) {
-
-        return builder().withArgs(args);
-    }
-
-    /**
      * Short for <b><code>builder().withId(invocationId)</code></b>.
      *
      * @param invocationId the invocation ID.
@@ -182,16 +164,15 @@ public class ContextInvocationConfiguration {
         }
 
         final ContextInvocationConfiguration that = (ContextInvocationConfiguration) o;
-        return mInvocationId == that.mInvocationId && Arrays.equals(mArgs, that.mArgs)
-                && mResolutionType == that.mResolutionType && mStrategyType == that.mStrategyType;
+        return mInvocationId == that.mInvocationId && mResolutionType == that.mResolutionType
+                && mStrategyType == that.mStrategyType;
     }
 
     @Override
     public int hashCode() {
 
         // auto-generated code
-        int result = mArgs != null ? Arrays.hashCode(mArgs) : 0;
-        result = 31 * result + mInvocationId;
+        int result = mInvocationId;
         result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
         result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
         return result;
@@ -201,23 +182,10 @@ public class ContextInvocationConfiguration {
     public String toString() {
 
         return "ContextInvocationConfiguration{" +
-                "mArgs=" + Arrays.toString(mArgs) +
-                ", mInvocationId=" + mInvocationId +
+                "mInvocationId=" + mInvocationId +
                 ", mResolutionType=" + mResolutionType +
                 ", mStrategyType=" + mStrategyType +
                 '}';
-    }
-
-    /**
-     * Returns the invocation constructor arguments (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the arguments.
-     */
-    public Object[] getArgsOr(@Nullable final Object[] valueIfNotSet) {
-
-        final Object[] args = mArgs;
-        return (args != null) ? args : valueIfNotSet;
     }
 
     /**
@@ -328,8 +296,6 @@ public class ContextInvocationConfiguration {
      */
     public static class Builder {
 
-        private Object[] mArgs;
-
         private int mInvocationId;
 
         private ClashResolutionType mResolutionType;
@@ -355,7 +321,6 @@ public class ContextInvocationConfiguration {
             mInvocationId = initialConfiguration.mInvocationId;
             mResolutionType = initialConfiguration.mResolutionType;
             mStrategyType = initialConfiguration.mStrategyType;
-            mArgs = initialConfiguration.mArgs;
         }
 
         /**
@@ -366,8 +331,8 @@ public class ContextInvocationConfiguration {
         @Nonnull
         public ContextInvocationConfiguration buildConfiguration() {
 
-            return new ContextInvocationConfiguration(mInvocationId, mResolutionType, mStrategyType,
-                                                      mArgs);
+            return new ContextInvocationConfiguration(mInvocationId, mResolutionType,
+                                                      mStrategyType);
         }
 
         /**
@@ -401,13 +366,6 @@ public class ContextInvocationConfiguration {
                 onComplete(strategyType);
             }
 
-            final Object[] args = configuration.mArgs;
-
-            if (args != null) {
-
-                withArgs(args);
-            }
-
             return this;
         }
 
@@ -437,25 +395,6 @@ public class ContextInvocationConfiguration {
         public Builder onComplete(@Nullable final CacheStrategyType strategyType) {
 
             mStrategyType = strategyType;
-            return this;
-        }
-
-        /**
-         * Sets the arguments to be passed to the invocation constructor.
-         * <p/>
-         * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the invocation
-         * constructor arguments, might be employed to check for clashing of invocations or compute
-         * the invocation ID.<br/>
-         * Note also that, the specified objects will be retained, so, they should be immutable or
-         * never change their internal state in order to avoid concurrency issues.
-         *
-         * @param args the arguments.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder withArgs(@Nullable final Object... args) {
-
-            mArgs = args;
             return this;
         }
 

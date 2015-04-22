@@ -30,7 +30,7 @@ public abstract class StatelessInvocation<INPUT, OUTPUT>
         implements Invocation<INPUT, OUTPUT>, InvocationFactory<INPUT, OUTPUT> {
 
     @Nonnull
-    public final Invocation<INPUT, OUTPUT> newInvocation() {
+    public final Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
         return this;
     }

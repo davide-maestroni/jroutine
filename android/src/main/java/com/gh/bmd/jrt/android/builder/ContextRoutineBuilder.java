@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * so, waiting for the outputs right after the routine invocation, will result in a deadlock.<br/>
  * The local context of the invocations will always be the application one.
  * <p/>
- * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
+ * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameters
  * and constructor argument objects might be employed to check for clashing of invocations or
  * compute the invocation ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method

@@ -79,7 +79,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<Void, OUTPUT>(new InvocationFactory<Void, OUTPUT>() {
 
             @Nonnull
-            public Invocation<Void, OUTPUT> newInvocation() {
+            public Invocation<Void, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<Void, OUTPUT>() {
 
@@ -127,7 +127,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            public Invocation<INPUT, OUTPUT> newInvocation() {
+            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
 
@@ -178,7 +178,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            public Invocation<INPUT, OUTPUT> newInvocation() {
+            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
 
@@ -230,7 +230,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            public Invocation<INPUT, OUTPUT> newInvocation() {
+            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
 
@@ -284,7 +284,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            public Invocation<INPUT, OUTPUT> newInvocation() {
+            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
 
@@ -333,7 +333,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            public Invocation<INPUT, OUTPUT> newInvocation() {
+            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
 
@@ -372,7 +372,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<Void, Void>(new InvocationFactory<Void, Void>() {
 
             @Nonnull
-            public Invocation<Void, Void> newInvocation() {
+            public Invocation<Void, Void> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<Void, Void>() {
 
@@ -420,7 +420,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            public Invocation<INPUT, Void> newInvocation() {
+            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, Void>() {
 
@@ -471,7 +471,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            public Invocation<INPUT, Void> newInvocation() {
+            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, Void>() {
 
@@ -523,7 +523,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            public Invocation<INPUT, Void> newInvocation() {
+            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, Void>() {
 
@@ -577,7 +577,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            public Invocation<INPUT, Void> newInvocation() {
+            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, Void>() {
 
@@ -626,7 +626,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            public Invocation<INPUT, Void> newInvocation() {
+            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<INPUT, Void>() {
 

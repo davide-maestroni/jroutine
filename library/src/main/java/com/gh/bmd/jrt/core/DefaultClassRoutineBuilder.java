@@ -257,11 +257,12 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                     mutex = null;
                 }
 
+                final Builder builder = configuration.builderFrom();
                 final InvocationFactory<Object, Object> factory =
-                        Invocations.withArgs(target, method, mutex, isInputCollection,
-                                             isOutputCollection)
-                                   .factoryOf(MethodSingleCallInvocation.class);
-                routine = new DefaultRoutine<Object, Object>(configuration, factory);
+                        Invocations.factoryOf(MethodSingleCallInvocation.class);
+                routine = new DefaultRoutine<Object, Object>(
+                        builder.withFactoryArgs(target, method, mutex, isInputCollection,
+                                                isOutputCollection).buildConfiguration(), factory);
                 routineMap.put(routineInfo, routine);
             }
 

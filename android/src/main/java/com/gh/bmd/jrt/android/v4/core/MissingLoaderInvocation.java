@@ -56,7 +56,7 @@ class MissingLoaderInvocation<INPUT, OUTPUT> extends ContextTemplateInvocation<I
     }
 
     @Nonnull
-    public Invocation<INPUT, OUTPUT> newInvocation() {
+    public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
         return this;
     }

@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -75,9 +76,12 @@ public class RoutineConfiguration {
 
     private final TimeoutActionType mTimeoutActionType;
 
+    private Object[] mFactoryArgs;
+
     /**
      * Constructor.
      *
+     * @param factoryArgs     the invocation factory arguments.
      * @param syncRunner      the runner used for synchronous invocations.
      * @param asyncRunner     the runner used for asynchronous invocations.
      * @param maxInvocations  the maximum number of parallel running invocations. Must be positive.
@@ -99,8 +103,9 @@ public class RoutineConfiguration {
      * @param log             the log instance.
      * @param logLevel        the log level.
      */
-    private RoutineConfiguration(@Nullable final Runner syncRunner,
-            @Nullable final Runner asyncRunner, final int maxInvocations, final int coreInvocations,
+    private RoutineConfiguration(@Nullable final Object[] factoryArgs,
+            @Nullable final Runner syncRunner, @Nullable final Runner asyncRunner,
+            final int maxInvocations, final int coreInvocations,
             @Nullable final TimeDuration availTimeout, @Nullable final TimeDuration readTimeout,
             @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrder,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
@@ -108,6 +113,7 @@ public class RoutineConfiguration {
             @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
             @Nullable final LogLevel logLevel) {
 
+        mFactoryArgs = factoryArgs;
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
         mMaxInvocations = maxInvocations;
@@ -223,6 +229,18 @@ public class RoutineConfiguration {
     public static Builder withCoreInvocations(final int coreInvocations) {
 
         return builder().withCoreInvocations(coreInvocations);
+    }
+
+    /**
+     * Short for <b><code>builder().withFactoryArgs(args)</code></b>.
+     *
+     * @param args the arguments.
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    public static Builder withFactoryArgs(@Nullable final Object... args) {
+
+        return builder().withFactoryArgs(args);
     }
 
     /**
@@ -454,6 +472,18 @@ public class RoutineConfiguration {
     }
 
     /**
+     * Returns the invocation factory arguments (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the arguments.
+     */
+    public Object[] getFactoryArgsOr(@Nullable final Object[] valueIfNotSet) {
+
+        final Object[] args = mFactoryArgs;
+        return (args != null) ? args : valueIfNotSet;
+    }
+
+    /**
      * Returns the input data order (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -621,6 +651,7 @@ public class RoutineConfiguration {
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
+        result = 31 * result + (mFactoryArgs != null ? Arrays.hashCode(mFactoryArgs) : 0);
         return result;
     }
 
@@ -717,7 +748,12 @@ public class RoutineConfiguration {
             return false;
         }
 
-        return mTimeoutActionType == that.mTimeoutActionType;
+        if (mTimeoutActionType != that.mTimeoutActionType) {
+
+            return false;
+        }
+
+        return Arrays.equals(mFactoryArgs, that.mFactoryArgs);
     }
 
     @Override
@@ -728,17 +764,18 @@ public class RoutineConfiguration {
                 ", mAvailTimeout=" + mAvailTimeout +
                 ", mCoreInvocations=" + mCoreInvocations +
                 ", mInputMaxSize=" + mInputMaxSize +
-                ", mInputOrderType=" + mInputOrder +
+                ", mInputOrder=" + mInputOrder +
                 ", mInputTimeout=" + mInputTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
                 ", mMaxInvocations=" + mMaxInvocations +
                 ", mOutputMaxSize=" + mOutputMaxSize +
-                ", mOutputOrderType=" + mOutputOrder +
+                ", mOutputOrder=" + mOutputOrder +
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mReadTimeout=" + mReadTimeout +
                 ", mSyncRunner=" + mSyncRunner +
                 ", mTimeoutActionType=" + mTimeoutActionType +
+                ", mFactoryArgs=" + Arrays.toString(mFactoryArgs) +
                 '}';
     }
 
@@ -790,6 +827,8 @@ public class RoutineConfiguration {
      */
     public static class Builder {
 
+        private Object[] mArgs;
+
         private Runner mAsyncRunner;
 
         private TimeDuration mAvailTimeout;
@@ -839,6 +878,7 @@ public class RoutineConfiguration {
          */
         private Builder(@Nonnull final RoutineConfiguration initialConfiguration) {
 
+            mArgs = initialConfiguration.mFactoryArgs;
             mSyncRunner = initialConfiguration.mSyncRunner;
             mAsyncRunner = initialConfiguration.mAsyncRunner;
             mMaxInvocations = initialConfiguration.mMaxInvocations;
@@ -864,7 +904,7 @@ public class RoutineConfiguration {
         @Nonnull
         public RoutineConfiguration buildConfiguration() {
 
-            return new RoutineConfiguration(mSyncRunner, mAsyncRunner, mMaxInvocations,
+            return new RoutineConfiguration(mArgs, mSyncRunner, mAsyncRunner, mMaxInvocations,
                                             mCoreInvocations, mAvailTimeout, mReadTimeout,
                                             mTimeoutActionType, mInputOrderType, mInputMaxSize,
                                             mInputTimeout, mOutputOrderType, mOutputMaxSize,
@@ -964,6 +1004,24 @@ public class RoutineConfiguration {
             }
 
             mCoreInvocations = coreInvocations;
+            return this;
+        }
+
+        /**
+         * Sets the arguments to be passed to the invocation factory.
+         * <p/>
+         * Note that, in case no constructor taking the specified arguments as parameters is found,
+         * an exception will be thrown.<br/>
+         * Note also that, the specified objects will be retained, so, they should be immutable or
+         * never change their internal state in order to avoid concurrency issues.
+         *
+         * @param args the arguments.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder withFactoryArgs(@Nullable final Object... args) {
+
+            mArgs = (args != null) ? args.clone() : null;
             return this;
         }
 
@@ -1238,6 +1296,13 @@ public class RoutineConfiguration {
 
         private void applyInvocationConfiguration(
                 @Nonnull final RoutineConfiguration configuration) {
+
+            final Object[] args = configuration.mFactoryArgs;
+
+            if (args != null) {
+
+                withFactoryArgs(args);
+            }
 
             final Runner syncRunner = configuration.mSyncRunner;
 

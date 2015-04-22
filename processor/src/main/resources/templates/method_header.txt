@@ -22,7 +22,7 @@
         final com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> factory = new com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}>() {
 
             @javax.annotation.Nonnull
-            public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
+            public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation(@javax.annotation.Nonnull Object... args) {
 
                 return new Invocation${methodCount}();
             }

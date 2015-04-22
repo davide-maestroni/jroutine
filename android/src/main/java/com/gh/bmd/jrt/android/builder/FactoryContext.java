@@ -29,12 +29,11 @@ public interface FactoryContext {
      * If a null instance is returned, the constructor matching the specified arguments will be
      * called by default.
      *
+     * @param <TYPE> the wrapped object type.
      * @param type   the type of the returned instance.
      * @param args   the constructor arguments.
-     * @param <TYPE> the wrapped object type.
      * @return the object instance.
      */
     @Nullable
-    <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
-            @Nonnull final Object... args);
+    <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type, @Nonnull final Object[] args);
 }

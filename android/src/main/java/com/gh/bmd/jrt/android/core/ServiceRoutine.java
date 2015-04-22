@@ -63,7 +63,6 @@ import static com.gh.bmd.jrt.android.service.RoutineService.putParallelInvocatio
 import static com.gh.bmd.jrt.android.service.RoutineService.putValue;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
-import static com.gh.bmd.jrt.invocation.Invocations.withArgs;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -159,9 +158,10 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mLogClass = (logClass != null) ? logClass : log.getClass();
         mLogger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);
-        mRoutine = JRoutine.on(withArgs(mContext, invocationClass, invocationArgs).factoryOf(
-                new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {}))
+        mRoutine = JRoutine.on(new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {})
                            .configure(configuration.builderFrom()
+                                                   .withFactoryArgs(mContext, invocationClass,
+                                                                    invocationArgs)
                                                    .withInputSize(Integer.MAX_VALUE)
                                                    .withInputTimeout(TimeDuration.ZERO)
                                                    .withOutputSize(Integer.MAX_VALUE)

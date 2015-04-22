@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withFactoryArgs;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 
 /**
@@ -150,10 +151,10 @@ public class Downloader {
             // passed to the specific routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
-                    JRoutine.on(Invocations.withArgs(dstFile).factoryOf(WriteFile.class))
-                            .configure(builder().withInputSize(8)
-                                                .withInputTimeout(seconds(30))
-                                                .buildConfiguration())
+                    JRoutine.on(Invocations.factoryOf(WriteFile.class))
+                            .configure(withFactoryArgs(dstFile).withInputSize(8)
+                                                               .withInputTimeout(seconds(30))
+                                                               .buildConfiguration())
                             .buildRoutine();
             downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
         }

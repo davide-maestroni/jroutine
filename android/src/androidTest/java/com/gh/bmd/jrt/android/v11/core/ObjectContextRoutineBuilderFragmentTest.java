@@ -51,10 +51,10 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.withArgs;
 import static com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.withId;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withFactoryArgs;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
@@ -85,7 +85,7 @@ public class ObjectContextRoutineBuilderFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutine.onFragment(fragment, TestArgs.class).invocations(withArgs(17))
+        assertThat(JRoutine.onFragment(fragment, TestArgs.class).configure(withFactoryArgs(17))
                            .method("getId")
                            .callAsync()
                            .eventually()

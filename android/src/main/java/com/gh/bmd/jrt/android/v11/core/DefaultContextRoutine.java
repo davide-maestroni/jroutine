@@ -115,7 +115,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         mClashResolutionType =
                 invocationConfiguration.getResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
         mCacheStrategyType = invocationConfiguration.getStrategyTypeOr(CacheStrategyType.CLEAR);
-        mArgs = invocationConfiguration.getArgsOr(Reflection.NO_ARGS);
+        mArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         mConstructor = findConstructor(invocationClass, mArgs);
         mOrderType = routineConfiguration.getOutputOrderOr(null);
     }

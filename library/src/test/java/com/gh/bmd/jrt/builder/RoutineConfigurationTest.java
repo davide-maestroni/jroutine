@@ -29,6 +29,7 @@ import static com.gh.bmd.jrt.builder.RoutineConfiguration.builderFrom;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withAsyncRunner;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withAvailableTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withCoreInvocations;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withFactoryArgs;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withInputOrder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withInputSize;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withInputTimeout;
@@ -49,6 +50,26 @@ import static org.junit.Assert.fail;
  * Created by davide on 11/22/14.
  */
 public class RoutineConfigurationTest {
+
+    @Test
+    public void tesArgsEquals() {
+
+        assertThat(withFactoryArgs(3).buildConfiguration()).isEqualTo(
+                builder().withFactoryArgs(3).buildConfiguration());
+
+        final RoutineConfiguration configuration = builder().withFactoryArgs((Object[]) null)
+                                                            .withAvailableTimeout(
+                                                                    TimeDuration.millis(100))
+                                                            .withCoreInvocations(27)
+                                                            .withInputOrder(OrderType.PASSING_ORDER)
+                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withLog(new NullLog())
+                                                            .withOutputSize(100)
+                                                            .buildConfiguration();
+        assertThat(configuration).isNotEqualTo(withFactoryArgs(3).buildConfiguration());
+        assertThat(withFactoryArgs(3).buildConfiguration()).isNotEqualTo(
+                withFactoryArgs(27).buildConfiguration());
+    }
 
     @Test
     public void tesAvailableTimeoutEquals() {

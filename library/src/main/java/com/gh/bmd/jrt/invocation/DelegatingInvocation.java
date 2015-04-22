@@ -15,12 +15,9 @@ package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
-
-import static com.gh.bmd.jrt.invocation.Invocations.withArgs;
 
 /**
  * Invocation implementation delegating the execution to another routine.
@@ -65,8 +62,14 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryWith(
             @Nonnull final Routine<INPUT, OUTPUT> routine) {
 
-        return withArgs(routine).factoryOf(
-                new ClassToken<DelegatingInvocation<INPUT, OUTPUT>>() {});
+        return new InvocationFactory<INPUT, OUTPUT>() {
+
+            @Nonnull
+            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+                return new DelegatingInvocation<INPUT, OUTPUT>(routine);
+            }
+        };
     }
 
     public void onAbort(final Throwable reason) {

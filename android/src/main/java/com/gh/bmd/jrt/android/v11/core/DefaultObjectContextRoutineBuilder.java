@@ -53,6 +53,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -514,11 +515,24 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     private void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
+        final Object[] args = configuration.getFactoryArgsOr(null);
+
+        if (args != null) {
+
+            logger = Logger.newLogger(configuration, this);
+            logger.wrn("the specified factory arguments will be ignored: %s",
+                       Arrays.toString(args));
+        }
+
         final OrderType inputOrder = configuration.getInputOrderOr(null);
 
         if (inputOrder != null) {
 
-            logger = Logger.newLogger(configuration, this);
+            if (logger == null) {
+
+                logger = Logger.newLogger(configuration, this);
+            }
+
             logger.wrn("the specified input order will be ignored: %s", inputOrder);
         }
 

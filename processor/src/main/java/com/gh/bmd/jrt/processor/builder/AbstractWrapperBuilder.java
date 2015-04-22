@@ -23,6 +23,7 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
@@ -149,11 +150,24 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     private void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
+        final Object[] args = configuration.getFactoryArgsOr(null);
+
+        if (args != null) {
+
+            logger = Logger.newLogger(configuration, this);
+            logger.wrn("the specified factory arguments will be ignored: %s",
+                       Arrays.toString(args));
+        }
+
         final OrderType inputOrder = configuration.getInputOrderOr(null);
 
         if (inputOrder != null) {
 
-            logger = Logger.newLogger(configuration, this);
+            if (logger == null) {
+
+                logger = Logger.newLogger(configuration, this);
+            }
+
             logger.wrn("the specified input order will be ignored: %s", inputOrder);
         }
 

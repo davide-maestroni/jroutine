@@ -145,7 +145,8 @@ public class ObjectContextRoutineBuilderActivityTest
     public void testConfigurationWarnings() {
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration = builder().withFactoryArgs()
+                                                            .withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(10))
                                                             .withOutputOrder(OrderType.NONE)
@@ -158,14 +159,14 @@ public class ObjectContextRoutineBuilderActivityTest
                 .configure(configuration)
                 .share(withGroup("test"))
                 .boundMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         JRoutine.onActivity(getActivity(), Square.class)
                 .configure(configuration)
                 .share(withGroup("test"))
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
+        assertThat(countLog.getWrnCount()).isEqualTo(14);
     }
 
     public void testDuplicateAnnotationError() {

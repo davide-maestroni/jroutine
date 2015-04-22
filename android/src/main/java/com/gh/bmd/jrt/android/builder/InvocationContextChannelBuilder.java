@@ -42,6 +42,16 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
+     * Tells the builder how to cache the invocation result after its completion. A null value means
+     * that it is up to the framework to choose a default strategy.
+     *
+     * @param strategyType the cache strategy.
+     * @return this builder.
+     */
+    @Nonnull
+    InvocationContextChannelBuilder cache(@Nullable CacheStrategyType strategyType);
+
+    /**
      * Note that only the options related to logs will be employed.
      *
      * @param configuration the routine configuration.
@@ -58,16 +68,6 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
      */
     @Nonnull
     InvocationContextChannelBuilder configure(@Nonnull Builder builder);
-
-    /**
-     * Tells the builder how to cache the invocation result after its completion. A null value means
-     * that it is up to the framework to choose a default strategy.
-     *
-     * @param strategyType the cache strategy.
-     * @return this builder.
-     */
-    @Nonnull
-    InvocationContextChannelBuilder onComplete(@Nullable CacheStrategyType strategyType);
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified input.

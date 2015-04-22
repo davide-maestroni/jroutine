@@ -43,6 +43,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withFactoryArgs;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
@@ -268,18 +269,18 @@ public class StandaloneChannelTest {
 
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration =
-                builder().withSyncRunner(Runners.sequentialRunner())
-                         .withMaxInvocations(3)
-                         .withCoreInvocations(3)
-                         .withAvailableTimeout(seconds(1))
-                         .withInputOrder(OrderType.NONE)
-                         .withInputSize(3)
-                         .withInputTimeout(seconds(1))
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(countLog)
-                         .buildConfiguration();
+                withFactoryArgs().withSyncRunner(Runners.sequentialRunner())
+                                 .withMaxInvocations(3)
+                                 .withCoreInvocations(3)
+                                 .withAvailableTimeout(seconds(1))
+                                 .withInputOrder(OrderType.NONE)
+                                 .withInputSize(3)
+                                 .withInputTimeout(seconds(1))
+                                 .withLogLevel(LogLevel.DEBUG)
+                                 .withLog(countLog)
+                                 .buildConfiguration();
         JRoutine.standalone().configure(configuration).buildChannel();
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
+        assertThat(countLog.getWrnCount()).isEqualTo(8);
     }
 
     @Test

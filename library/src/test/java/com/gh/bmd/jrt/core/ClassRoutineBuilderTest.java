@@ -84,7 +84,8 @@ public class ClassRoutineBuilderTest {
     public void testConfigurationWarnings() {
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration = builder().withFactoryArgs()
+                                                            .withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(1))
                                                             .withOutputOrder(OrderType.NONE)
@@ -94,7 +95,7 @@ public class ClassRoutineBuilderTest {
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.on(TestStatic.class).configure(configuration).boundMethod(TestStatic.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
     @Test

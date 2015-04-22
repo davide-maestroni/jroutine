@@ -138,6 +138,13 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
     }
 
     @Nonnull
+    public InvocationContextChannelBuilder cache(@Nullable final CacheStrategyType strategyType) {
+
+        mCacheStrategyType = strategyType;
+        return this;
+    }
+
+    @Nonnull
     public InvocationContextChannelBuilder configure(
             @Nullable final RoutineConfiguration configuration) {
 
@@ -149,14 +156,6 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
     public InvocationContextChannelBuilder configure(@Nonnull final Builder builder) {
 
         return configure(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public InvocationContextChannelBuilder onComplete(
-            @Nullable final CacheStrategyType strategyType) {
-
-        mCacheStrategyType = strategyType;
-        return this;
     }
 
     public void purge(@Nullable final Object input) {

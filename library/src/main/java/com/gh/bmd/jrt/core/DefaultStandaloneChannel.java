@@ -24,6 +24,7 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -73,6 +74,14 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
      */
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final RoutineConfiguration configuration) {
+
+        final Object[] args = configuration.getFactoryArgsOr(null);
+
+        if (args != null) {
+
+            logger.wrn("the specified factory arguments will be ignored: %s",
+                       Arrays.toString(args));
+        }
 
         final Runner syncRunner = configuration.getSyncRunnerOr(null);
 

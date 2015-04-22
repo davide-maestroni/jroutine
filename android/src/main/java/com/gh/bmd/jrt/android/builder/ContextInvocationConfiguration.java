@@ -115,7 +115,7 @@ public class ContextInvocationConfiguration {
     }
 
     /**
-     * Short for <b><code>builder().onComplete(strategyType)</code></b>.
+     * Short for <b><code>builder().cache(strategyType)</code></b>.
      *
      * @param strategyType the cache strategy type.
      * @return the context invocation configuration builder.

@@ -476,7 +476,8 @@ public class ProcessorTest {
     public void testWrapperBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration = builder().withFactoryArgs()
+                                                            .withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(1))
                                                             .withOutputOrder(OrderType.NONE)
@@ -489,7 +490,7 @@ public class ProcessorTest {
         JRoutineProcessor.on(test).configure(configuration)
                          .buildWrapper(TestWrapper.class)
                          .getOne();
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
     @Test

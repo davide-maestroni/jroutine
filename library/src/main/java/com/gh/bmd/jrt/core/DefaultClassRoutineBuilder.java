@@ -39,6 +39,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -370,11 +371,24 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     protected void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
+        final Object[] args = configuration.getFactoryArgsOr(null);
+
+        if (args != null) {
+
+            logger = Logger.newLogger(configuration, this);
+            logger.wrn("the specified factory arguments will be ignored: %s",
+                       Arrays.toString(args));
+        }
+
         final OrderType inputOrder = configuration.getInputOrderOr(null);
 
         if (inputOrder != null) {
 
-            logger = Logger.newLogger(configuration, this);
+            if (logger == null) {
+
+                logger = Logger.newLogger(configuration, this);
+            }
+
             logger.wrn("the specified input order will be ignored: %s", inputOrder);
         }
 

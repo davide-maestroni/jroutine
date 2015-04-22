@@ -81,7 +81,8 @@ public class ObjectContextRoutineBuilderActivityTest
             return;
         }
 
-        assertThat(JRoutine.onActivity(getActivity(), TestArgs.class).configure(withFactoryArgs(17))
+        assertThat(JRoutine.onActivity(getActivity(), TestArgs.class)
+                           .configure(withFactoryArgs(17))
                            .method("getId")
                            .callAsync()
                            .eventually()
@@ -171,7 +172,8 @@ public class ObjectContextRoutineBuilderActivityTest
         }
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration = builder().withFactoryArgs()
+                                                            .withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(10))
                                                             .withOutputOrder(OrderType.NONE)
@@ -184,14 +186,14 @@ public class ObjectContextRoutineBuilderActivityTest
                 .configure(configuration)
                 .share(withGroup("test"))
                 .boundMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         JRoutine.onActivity(getActivity(), Square.class)
                 .configure(configuration)
                 .share(withGroup("test"))
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
+        assertThat(countLog.getWrnCount()).isEqualTo(14);
     }
 
     public void testDuplicateAnnotationError() {
@@ -392,7 +394,8 @@ public class ObjectContextRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).configure(withReadTimeout(INFINITY))
+            JRoutine.onActivity(getActivity(), TestClass.class)
+                    .configure(withReadTimeout(INFINITY))
                     .buildProxy(TestItf.class)
                     .throwException(null);
 
@@ -404,7 +407,8 @@ public class ObjectContextRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).configure(withReadTimeout(INFINITY))
+            JRoutine.onActivity(getActivity(), TestClass.class)
+                    .configure(withReadTimeout(INFINITY))
                     .buildProxy(TestItf.class)
                     .throwException1(null);
 
@@ -416,7 +420,8 @@ public class ObjectContextRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).configure(withReadTimeout(INFINITY))
+            JRoutine.onActivity(getActivity(), TestClass.class)
+                    .configure(withReadTimeout(INFINITY))
                     .buildProxy(TestItf.class)
                     .throwException2(null);
 

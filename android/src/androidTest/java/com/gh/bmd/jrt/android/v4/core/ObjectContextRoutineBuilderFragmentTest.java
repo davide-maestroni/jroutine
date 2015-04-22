@@ -161,7 +161,8 @@ public class ObjectContextRoutineBuilderFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration = builder().withFactoryArgs()
+                                                            .withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(10))
                                                             .withOutputOrder(OrderType.NONE)
@@ -174,14 +175,14 @@ public class ObjectContextRoutineBuilderFragmentTest
                 .configure(configuration)
                 .share(withGroup("test"))
                 .boundMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         JRoutine.onFragment(fragment, Square.class)
                 .configure(configuration)
                 .share(withGroup("test"))
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
+        assertThat(countLog.getWrnCount()).isEqualTo(14);
     }
 
     public void testDuplicateAnnotationError() {

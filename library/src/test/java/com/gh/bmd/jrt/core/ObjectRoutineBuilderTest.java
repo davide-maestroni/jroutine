@@ -131,7 +131,8 @@ public class ObjectRoutineBuilderTest {
 
         final TestClass test = new TestClass();
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final RoutineConfiguration configuration = builder().withFactoryArgs()
+                                                            .withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(1))
                                                             .withOutputOrder(OrderType.NONE)
@@ -141,11 +142,11 @@ public class ObjectRoutineBuilderTest {
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.on(test).configure(configuration).boundMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         final Square square = new Square();
         JRoutine.on(square).configure(configuration).buildProxy(SquareItf.class).compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
+        assertThat(countLog.getWrnCount()).isEqualTo(14);
     }
 
     @Test

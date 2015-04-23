@@ -1,45 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>JRoutine by davide-maestroni</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
+    <section class="page-header">
+      <h1 class="project-name">JRoutine</h1>
+      <h2 class="project-tagline">Parallel programming on the go</h2>
+      <a href="https://github.com/davide-maestroni/jroutine" class="btn">View on GitHub</a>
+      <a href="https://github.com/davide-maestroni/jroutine/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/davide-maestroni/jroutine/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-      <header>
-        <h1>JRoutine</h1>
-        <p>Parallel programming on the go</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/davide-maestroni/jroutine" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/davide-maestroni/jroutine/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/davide-maestroni/jroutine/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-      <section>
-        <h2>
+    <section class="main-content">
+      <h2>
 <a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h2>
 
 <p>Inspired by the Go routines, this library provides a powerful, flexible, yet familiar concurrency framework, designed to make multi-threads programming simple and funny.</p>
@@ -55,12 +35,12 @@
 <h2>
 <a id="its-reactive" class="anchor" href="#its-reactive" aria-hidden="true"><span class="octicon octicon-link"></span></a>It's reactive!</h2>
 
-<p>The library adheres to <a href="http://www.reactivemanifesto.org/">The Reactive Manifesto</a>. It's responsive, resilient, elastic and "message driven".</p>
+<p>The library adheres to <a href="http://www.reactivemanifesto.org/">The Reactive Manifesto</a>. It's <em>responsive</em>, <em>resilient</em>, <em>elastic</em> and <em>message driven</em>.</p>
 
-<p>It's responsive because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.
-It's resilient because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.
-It's elastic because the needed number of threads is allocated in response to higher loads.
-It's "message driven" because both ouputs and errors are dispatched along the chain of invocations.</p>
+<p>It's <em>responsive</em> because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.<br>
+It's <em>resilient</em> because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.<br>
+It's <em>elastic</em> because the needed number of threads is allocated in response to higher loads.<br>
+It's <em>message driven</em> because both ouputs and errors are dispatched along the chain of invocations.</p>
 
 <h2>
 <a id="why-not-rxjava" class="anchor" href="#why-not-rxjava" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why not RxJava?</h2>
@@ -128,7 +108,7 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>Please have a look at the <a href="https://github.com/davide-maestroni/jroutine/wiki">wiki</a>.</p>
+<p>Please have a look at the <a href="https://github.com/davide-maestroni/jroutine/wiki">Wiki</a>.</p>
 
 <h2>
 <a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
@@ -151,7 +131,7 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <h2>
 <a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>
 
-<p>Please refer to the dedicated <a href="https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions">wiki page</a>.</p>
+<p>Please refer to the dedicated <a href="https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions">Wiki page</a>.</p>
 
 <h2>
 <a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h2>
@@ -192,13 +172,16 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
 
 <p><strong>IT'S OPEN DUDE!</strong></p>
-      </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/davide-maestroni">davide-maestroni</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/davide-maestroni/jroutine">JRoutine</a> is maintained by <a href="https://github.com/davide-maestroni">davide-maestroni</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+
+    </section>
+
+  
   </body>
 </html>
+

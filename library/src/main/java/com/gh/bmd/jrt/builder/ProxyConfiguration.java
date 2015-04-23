@@ -67,9 +67,9 @@ public class ProxyConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public static Builder builderFrom(@Nonnull final ProxyConfiguration initialConfiguration) {
+    public static Builder builderFrom(@Nullable final ProxyConfiguration initialConfiguration) {
 
-        return new Builder(initialConfiguration);
+        return (initialConfiguration == null) ? builder() : new Builder(initialConfiguration);
     }
 
     /**

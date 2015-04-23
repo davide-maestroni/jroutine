@@ -379,7 +379,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             String shareGroup = mProxyConfiguration.getShareGroupOr(null);
             final RoutineConfiguration configuration = mRoutineConfiguration;
-            final Builder builder = RoutineConfiguration.builderFrom(configuration);
+            final Builder builder = configuration.builderFrom();
             final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
 
             if (shareGroupAnnotation != null) {

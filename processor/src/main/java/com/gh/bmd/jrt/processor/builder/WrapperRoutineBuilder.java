@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.processor.builder;
 
-import com.gh.bmd.jrt.builder.ProxyBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
+import com.gh.bmd.jrt.builder.ProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 
@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  * @see com.gh.bmd.jrt.processor.annotation.Wrap
  */
-public interface WrapperRoutineBuilder extends ProxyBuilder {
+public interface WrapperRoutineBuilder extends ProxyRoutineBuilder {
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.

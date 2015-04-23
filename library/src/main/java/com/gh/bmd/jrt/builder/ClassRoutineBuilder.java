@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
-public interface ClassRoutineBuilder extends ProxyBuilder {
+public interface ClassRoutineBuilder extends ProxyRoutineBuilder {
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a

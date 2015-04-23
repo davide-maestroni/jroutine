@@ -6,7 +6,6 @@ import static com.gh.bmd.jrt.builder.ProxyConfiguration.builder;
 import static com.gh.bmd.jrt.builder.ProxyConfiguration.builderFrom;
 import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Share configuration unit tests.
@@ -16,18 +15,14 @@ import static org.junit.Assert.fail;
 public class ProxyConfigurationTest {
 
     @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testBuildFromError() {
+    public void testBuildFrom() {
 
-        try {
+        final ProxyConfiguration configuration =
+                builder().withShareGroup("test").buildConfiguration();
 
-            builderFrom(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
+        assertThat(builderFrom(configuration).buildConfiguration()).isEqualTo(configuration);
+        assertThat(builderFrom(null).buildConfiguration()).isEqualTo(
+                ProxyConfiguration.EMPTY_CONFIGURATION);
     }
 
     @Test

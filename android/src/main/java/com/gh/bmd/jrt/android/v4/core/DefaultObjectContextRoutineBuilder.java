@@ -288,7 +288,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             @Nonnull final Method method) {
 
         final ContextInvocationConfiguration.Builder builder =
-                ContextInvocationConfiguration.notNull(configuration).builderFrom();
+                ContextInvocationConfiguration.builderFrom(configuration);
 
         final Id idAnnotation = method.getAnnotation(Id.class);
 

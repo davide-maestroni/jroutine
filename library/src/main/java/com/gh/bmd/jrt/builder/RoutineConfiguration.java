@@ -180,9 +180,9 @@ public class RoutineConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public static Builder builderFrom(@Nonnull final RoutineConfiguration initialConfiguration) {
+    public static Builder builderFrom(@Nullable final RoutineConfiguration initialConfiguration) {
 
-        return new Builder(initialConfiguration);
+        return (initialConfiguration == null) ? builder() : new Builder(initialConfiguration);
     }
 
     /**

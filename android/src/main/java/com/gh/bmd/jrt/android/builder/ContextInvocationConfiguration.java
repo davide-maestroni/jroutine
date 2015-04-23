@@ -89,9 +89,9 @@ public class ContextInvocationConfiguration {
      */
     @Nonnull
     public static Builder builderFrom(
-            @Nonnull final ContextInvocationConfiguration initialConfiguration) {
+            @Nullable final ContextInvocationConfiguration initialConfiguration) {
 
-        return new Builder(initialConfiguration);
+        return (initialConfiguration == null) ? builder() : new Builder(initialConfiguration);
     }
 
     /**

@@ -21,19 +21,19 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 3/7/15.
  */
-public interface ProxyBuilder extends ConfigurableBuilder {
+public interface ProxyRoutineBuilder extends ConfigurableBuilder {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyBuilder configure(@Nullable RoutineConfiguration configuration);
+    ProxyRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
+    ProxyRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
      * Tells the builder to create a routine using the specified proxy configuration.
@@ -42,7 +42,7 @@ public interface ProxyBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ProxyBuilder members(@Nullable ProxyConfiguration configuration);
+    ProxyRoutineBuilder members(@Nullable ProxyConfiguration configuration);
 
     /**
      * Tells the builder to create a routine using the specified proxy configuration.
@@ -51,5 +51,5 @@ public interface ProxyBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    ProxyBuilder members(@Nonnull ProxyConfiguration.Builder builder);
+    ProxyRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
 }

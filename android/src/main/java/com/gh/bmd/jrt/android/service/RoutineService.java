@@ -31,6 +31,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.core.AbstractRoutine;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -177,7 +178,6 @@ public class RoutineService extends Service {
      * @param bundle          the bundle to fill.
      * @param invocationId    the invocation ID.
      * @param invocationClass the invocation class.
-     * @param invocationArgs  the invocation constructor arguments.
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
@@ -186,13 +186,12 @@ public class RoutineService extends Service {
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, false, invocationId, invocationClass, invocationArgs, configuration,
-                      runnerClass, logClass);
+        putInvocation(bundle, false, invocationId, invocationClass, configuration, runnerClass,
+                      logClass);
     }
 
     /**
@@ -227,7 +226,6 @@ public class RoutineService extends Service {
      * @param bundle          the bundle to fill.
      * @param invocationId    the invocation ID.
      * @param invocationClass the invocation class.
-     * @param invocationArgs  the invocation constructor arguments.
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
@@ -236,13 +234,12 @@ public class RoutineService extends Service {
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, true, invocationId, invocationClass, invocationArgs, configuration,
-                      runnerClass, logClass);
+        putInvocation(bundle, true, invocationId, invocationClass, configuration, runnerClass,
+                      logClass);
     }
 
     /**
@@ -267,7 +264,6 @@ public class RoutineService extends Service {
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -275,6 +271,7 @@ public class RoutineService extends Service {
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
+        final Object[] invocationArgs = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         final int length = invocationArgs.length;
         final ParcelableValue[] argValues = new ParcelableValue[length];
 

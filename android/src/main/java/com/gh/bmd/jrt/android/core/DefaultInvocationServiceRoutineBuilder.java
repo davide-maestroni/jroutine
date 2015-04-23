@@ -14,19 +14,15 @@
 package com.gh.bmd.jrt.android.core;
 
 import android.content.Context;
-import android.os.Looper;
 
 import com.gh.bmd.jrt.android.builder.InvocationServiceRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.Reflection;
-import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.runner.Runner;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,15 +43,7 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
 
     private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
-    private Object[] mArgs = Reflection.NO_ARGS;
-
-    private Class<? extends Log> mLogClass;
-
-    private Looper mLooper;
-
-    private Class<? extends Runner> mRunnerClass;
-
-    private Class<? extends RoutineService> mServiceClass;
+    private ServiceConfiguration mServiceConfiguration;
 
     /**
      * Constructor.
@@ -80,9 +68,9 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mInvocationClass, mArgs,
-                                                 getConfiguration(), mLooper, mRunnerClass,
-                                                 mLogClass);
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, getConfiguration(),
+                                                 ServiceConfiguration.notNull(
+                                                         mServiceConfiguration));
     }
 
     @Nonnull
@@ -104,42 +92,17 @@ class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(
-            @Nullable final Looper looper) {
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> service(
+            @Nullable final ServiceConfiguration configuration) {
 
-        mLooper = looper;
+        mServiceConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(
-            @Nullable final Class<? extends Log> logClass) {
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> service(
+            @Nonnull final ServiceConfiguration.Builder builder) {
 
-        mLogClass = logClass;
-        return this;
-
-    }
-
-    @Nonnull
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
-            @Nullable final Class<? extends Runner> runnerClass) {
-
-        mRunnerClass = runnerClass;
-        return this;
-    }
-
-    @Nonnull
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
-            @Nullable final Class<? extends RoutineService> serviceClass) {
-
-        mServiceClass = serviceClass;
-        return this;
-    }
-
-    @Nonnull
-    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
-
-        mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
-        return this;
+        return service(builder.buildConfiguration());
     }
 }

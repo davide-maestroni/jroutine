@@ -331,7 +331,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             @Nonnull final Method targetMethod) {
 
         String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
-        final Builder builder = RoutineConfiguration.builderFrom(routineConfiguration);
+        final Builder builder = routineConfiguration.builderFrom();
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {

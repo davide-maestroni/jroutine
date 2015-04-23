@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.processor.builder;
 
-import com.gh.bmd.jrt.builder.ProxyBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
+import com.gh.bmd.jrt.builder.ProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 
 import javax.annotation.Nonnull;
@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the interface type.
  */
-public interface WrapperBuilder<TYPE> extends ProxyBuilder {
+public interface WrapperBuilder<TYPE> extends ProxyRoutineBuilder {
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.

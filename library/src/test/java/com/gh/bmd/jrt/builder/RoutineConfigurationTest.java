@@ -95,18 +95,19 @@ public class RoutineConfigurationTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testBuildFromError() {
+    public void testBuildFrom() {
 
-        try {
+        final RoutineConfiguration configuration =
+                builder().withAvailableTimeout(TimeDuration.millis(100))
+                         .withInputOrder(OrderType.PASSING_ORDER)
+                         .withAsyncRunner(Runners.queuedRunner())
+                         .withLog(new NullLog())
+                         .withOutputSize(100)
+                         .buildConfiguration();
 
-            builderFrom(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
+        assertThat(builderFrom(configuration).buildConfiguration()).isEqualTo(configuration);
+        assertThat(builderFrom(null).buildConfiguration()).isEqualTo(
+                RoutineConfiguration.EMPTY_CONFIGURATION);
     }
 
     @Test

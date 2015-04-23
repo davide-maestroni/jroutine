@@ -13,14 +13,9 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import android.os.Looper;
-
-import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.log.Log;
-import com.gh.bmd.jrt.runner.Runner;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,6 +25,12 @@ import javax.annotation.Nullable;
  * <p/>
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.
+ * <p/>
+ * Note that, like the object passed to the service routine input and output channels, the
+ * object factory arguments must comply with the {@link android.os.Parcel#writeValue(Object)}
+ * method. Be aware though, that issues may arise when employing {@link java.io.Serializable}
+ * objects on the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable}
+ * objects instead.
  * <p/>
  * Created by davide on 3/29/15.
  */
@@ -51,6 +52,18 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
+    ObjectServiceRoutineBuilder service(@Nullable ServiceConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ObjectServiceRoutineBuilder service(@Nonnull ServiceConfiguration.Builder builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
     ObjectServiceRoutineBuilder members(@Nullable ProxyConfiguration configuration);
 
     /**
@@ -58,44 +71,4 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
      */
     @Nonnull
     ObjectServiceRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder dispatchingOn(@Nullable Looper looper);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withLogClass(@Nullable Class<? extends Log> logClass);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withRunnerClass(@Nullable Class<? extends Runner> runnerClass);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withServiceClass(
-            @Nullable Class<? extends RoutineService> serviceClass);
-
-    /**
-     * Sets the arguments to be passed to the wrapped instance factory.
-     * <p/>
-     * Note that, like the object passed to the service routine input and output channels, the
-     * specified arguments must comply with the {@link android.os.Parcel#writeValue(Object)} method.
-     * Be aware though, that issues may arise when employing {@link java.io.Serializable} objects on
-     * the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable} objects
-     * instead.
-     *
-     * @param args the arguments.
-     * @return this builder.
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder withArgs(@Nullable Object... args);
 }

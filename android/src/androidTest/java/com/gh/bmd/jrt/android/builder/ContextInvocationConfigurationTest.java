@@ -32,18 +32,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ContextInvocationConfigurationTest extends AndroidTestCase {
 
-    @SuppressWarnings("ConstantConditions")
-    public void testBuildFromError() {
+    public void testBuildFrom() {
 
-        try {
+        final ContextInvocationConfiguration configuration =
+                withId(-1).onClash(ClashResolutionType.ABORT_THAT)
+                          .onComplete(CacheStrategyType.CACHE)
+                          .buildConfiguration();
 
-            builderFrom(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
+        assertThat(builderFrom(configuration).buildConfiguration()).isEqualTo(configuration);
+        assertThat(builderFrom(null).buildConfiguration()).isEqualTo(
+                ContextInvocationConfiguration.EMPTY_CONFIGURATION);
     }
 
     public void testBuilderFromEquals() {

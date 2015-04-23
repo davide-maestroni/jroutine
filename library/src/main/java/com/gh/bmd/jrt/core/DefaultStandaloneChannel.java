@@ -53,7 +53,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
      */
     DefaultStandaloneChannel(@Nonnull final RoutineConfiguration configuration) {
 
-        final Logger logger = Logger.newLogger(configuration, this);
+        final Logger logger = configuration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<DATA> inputChannel =
                 new DefaultResultChannel<DATA>(configuration, abortHandler,

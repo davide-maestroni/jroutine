@@ -141,7 +141,7 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
             if (resolutionType != null) {
 
                 final Logger logger =
-                        Logger.newLogger(RoutineConfiguration.notNull(routineConfiguration), this);
+                        RoutineConfiguration.notNull(routineConfiguration).newLogger(this);
                 logger.wrn("the specified clash resolution type will be ignored: %s",
                            resolutionType);
             }

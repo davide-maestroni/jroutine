@@ -183,12 +183,14 @@ public class ObjectContextRoutineBuilderActivityTest
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.onActivity(getActivity(), TestClass.class)
-                .configure(configuration).members(withShareGroup("test"))
+                .configure(configuration)
+                .members(withShareGroup("test"))
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         JRoutine.onActivity(getActivity(), Square.class)
-                .configure(configuration).members(withShareGroup("test"))
+                .configure(configuration)
+                .members(withShareGroup("test"))
                 .buildProxy(SquareItf.class)
                 .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(14);

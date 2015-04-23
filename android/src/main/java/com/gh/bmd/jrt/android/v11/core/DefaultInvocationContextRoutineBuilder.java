@@ -186,7 +186,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
         if (asyncRunner != null) {
 
-            logger = Logger.newLogger(configuration, this);
+            logger = configuration.newLogger(this);
             logger.wrn("the specified runner will be ignored: %s", asyncRunner);
         }
 
@@ -196,7 +196,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
@@ -208,7 +208,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
@@ -220,7 +220,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
@@ -232,7 +232,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);

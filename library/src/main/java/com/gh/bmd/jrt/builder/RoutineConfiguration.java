@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.builder;
 
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
+import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -808,6 +809,19 @@ public class RoutineConfiguration {
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 ", mFactoryArgs=" + Arrays.toString(mFactoryArgs) +
                 '}';
+    }
+
+    /**
+     * Creates a new logger.
+     *
+     * @param context the context.
+     * @return the new logger.
+     * @throws java.lang.NullPointerException if the specified configuration or context is null.
+     */
+    @Nonnull
+    public Logger newLogger(@Nonnull final Object context) {
+
+        return Logger.newLogger(getLogOr(null), getLogLevelOr(null), context);
     }
 
     /**

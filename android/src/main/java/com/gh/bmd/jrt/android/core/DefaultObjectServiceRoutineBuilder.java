@@ -970,7 +970,8 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
                            .buildConfiguration();
             final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
-                            .configure(configuration).service(mServiceConfiguration)
+                            .configure(configuration)
+                            .service(mServiceConfiguration)
                             .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

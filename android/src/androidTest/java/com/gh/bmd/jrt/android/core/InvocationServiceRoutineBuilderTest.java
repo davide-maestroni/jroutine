@@ -348,7 +348,8 @@ public class InvocationServiceRoutineBuilderTest
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                .configure(configuration).service(withServiceClass(TestService.class))
+                .configure(configuration)
+                .service(withServiceClass(TestService.class))
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(4);
     }

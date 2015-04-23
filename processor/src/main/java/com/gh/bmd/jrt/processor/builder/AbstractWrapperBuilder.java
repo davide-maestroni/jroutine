@@ -154,7 +154,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
         if (args != null) {
 
-            logger = Logger.newLogger(configuration, this);
+            logger = configuration.newLogger(this);
             logger.wrn("the specified factory arguments will be ignored: %s",
                        Arrays.toString(args));
         }
@@ -165,7 +165,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified input order will be ignored: %s", inputOrder);
@@ -177,7 +177,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
@@ -189,7 +189,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
@@ -201,7 +201,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified output order will be ignored: %s", outputOrder);
@@ -213,7 +213,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
@@ -225,7 +225,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);

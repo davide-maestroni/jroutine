@@ -519,7 +519,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         if (args != null) {
 
-            logger = Logger.newLogger(configuration, this);
+            logger = configuration.newLogger(this);
             logger.wrn("the specified factory arguments will be ignored: %s",
                        Arrays.toString(args));
         }
@@ -530,7 +530,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified input order will be ignored: %s", inputOrder);
@@ -542,7 +542,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified output order will be ignored: %s", outputOrder);

@@ -31,8 +31,6 @@ import javax.annotation.Nullable;
  */
 public class ContextInvocationConfiguration {
 
-    //TODO: see annotations?
-    //TODO: move withArgs to RoutineConfiguration (withInvocationArgs???)
     //TODO: add log to builders
 
     /**

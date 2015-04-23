@@ -172,12 +172,14 @@ public class ObjectContextRoutineBuilderFragmentTest
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.onFragment(fragment, TestClass.class)
-                .configure(configuration).members(withShareGroup("test"))
+                .configure(configuration)
+                .members(withShareGroup("test"))
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         JRoutine.onFragment(fragment, Square.class)
-                .configure(configuration).members(withShareGroup("test"))
+                .configure(configuration)
+                .members(withShareGroup("test"))
                 .buildProxy(SquareItf.class)
                 .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(14);

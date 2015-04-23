@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.log;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 
 import java.io.PrintWriter;
@@ -136,21 +135,6 @@ public class Logger {
         }
 
         return new Logger(new Object[]{context}, log, level);
-    }
-
-    /**
-     * Creates a new logger.
-     *
-     * @param configuration the configuration.
-     * @param context       the context.
-     * @return the new logger.
-     * @throws java.lang.NullPointerException if the specified configuration or context is null.
-     */
-    @Nonnull
-    public static Logger newLogger(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Object context) {
-
-        return newLogger(configuration.getLogOr(null), configuration.getLogLevelOr(null), context);
     }
 
     /**

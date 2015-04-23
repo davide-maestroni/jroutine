@@ -167,7 +167,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                           .buildConfiguration())
                            .buildRoutine();
         final Logger logger = mLogger;
-        logger.dbg("building service routine with configuration: %s", routineConfiguration);
+        logger.dbg("building service routine on invocation %s with configurations: %s - %s",
+                   invocationClass.getCanonicalName(), routineConfiguration, serviceConfiguration);
         warn(logger, routineConfiguration);
     }
 

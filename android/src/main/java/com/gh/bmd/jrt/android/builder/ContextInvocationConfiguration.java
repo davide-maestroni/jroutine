@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  */
 public class ContextInvocationConfiguration {
 
-    //TODO: add log to builders
+    //TODO: add log to builders?
 
     /**
      * Constant identifying an invocation ID computed from the executor class and the input

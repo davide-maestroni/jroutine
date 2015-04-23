@@ -118,6 +118,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         mArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         mConstructor = findConstructor(invocationClass, mArgs);
         mOrderType = routineConfiguration.getOutputOrderOr(null);
+        getLogger().dbg("building context routine on invocation %s with configuration: %s",
+                        invocationClass.getCanonicalName(), invocationConfiguration);
     }
 
     @Override

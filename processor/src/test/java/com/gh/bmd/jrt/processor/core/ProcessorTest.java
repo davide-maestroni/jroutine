@@ -48,12 +48,12 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withAsyncRunner;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withSyncRunner;
-import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -143,9 +143,9 @@ public class ProcessorTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne =
-                builder.share(withGroup("1")).buildWrapper(TestClassAsync.class).getOne();
+                builder.members(withShareGroup("1")).buildWrapper(TestClassAsync.class).getOne();
         OutputChannel<Integer> getTwo =
-                builder.share(withGroup("2")).buildWrapper(TestClassAsync.class).getTwo();
+                builder.members(withShareGroup("2")).buildWrapper(TestClassAsync.class).getTwo();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();

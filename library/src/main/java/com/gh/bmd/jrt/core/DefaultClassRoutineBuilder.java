@@ -18,9 +18,9 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
@@ -67,9 +67,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private ProxyConfiguration mProxyConfiguration;
 
-    private ShareConfiguration mShareConfiguration;
+    private RoutineConfiguration mRoutineConfiguration;
 
     /**
      * Constructor.
@@ -136,23 +136,23 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    public ClassRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
+    public ClassRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
 
-        mShareConfiguration = configuration;
+        mProxyConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ClassRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
+    public ClassRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
 
-        return share(builder.buildConfiguration());
+        return members(builder.buildConfiguration());
     }
 
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         return method(RoutineConfiguration.notNull(mRoutineConfiguration),
-                      ShareConfiguration.notNull(mShareConfiguration), method);
+                      ProxyConfiguration.notNull(mProxyConfiguration), method);
     }
 
     @Nonnull
@@ -196,6 +196,17 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     protected Method getAnnotatedMethod(final String name) {
 
         return mMethodMap.get(name);
+    }
+
+    /**
+     * Returns the internal share configuration.
+     *
+     * @return the configuration.
+     */
+    @Nullable
+    protected ProxyConfiguration getProxyConfiguration() {
+
+        return mProxyConfiguration;
     }
 
     /**
@@ -283,17 +294,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     /**
-     * Returns the internal share configuration.
-     *
-     * @return the configuration.
-     */
-    @Nullable
-    protected ShareConfiguration getShareConfiguration() {
-
-        return mShareConfiguration;
-    }
-
-    /**
      * Returns the builder target class.
      *
      * @return the target class.
@@ -319,7 +319,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
      * Returns a routine used to call the specified method.
      *
      * @param routineConfiguration the routine configuration.
-     * @param shareConfiguration   the share configuration.
+     * @param proxyConfiguration   the share configuration.
      * @param targetMethod         the target method.
      * @return the routine.
      * @throws java.lang.NullPointerException if the specified configuration or method are null.
@@ -327,10 +327,10 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
             @Nonnull final RoutineConfiguration routineConfiguration,
-            @Nonnull final ShareConfiguration shareConfiguration,
+            @Nonnull final ProxyConfiguration proxyConfiguration,
             @Nonnull final Method targetMethod) {
 
-        String methodShareGroup = shareConfiguration.getGroupOr(null);
+        String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
         final Builder builder = RoutineConfiguration.builderFrom(routineConfiguration);
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 

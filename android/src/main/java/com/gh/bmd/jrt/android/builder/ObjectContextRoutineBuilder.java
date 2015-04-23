@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
 
@@ -144,13 +144,13 @@ public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder share(@Nullable ShareConfiguration configuration);
+    ObjectContextRoutineBuilder members(@Nullable ProxyConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
+    ObjectContextRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}

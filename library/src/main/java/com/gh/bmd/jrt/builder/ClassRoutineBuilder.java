@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
-public interface ClassRoutineBuilder extends SharableBuilder {
+public interface ClassRoutineBuilder extends ProxyBuilder {
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
@@ -74,13 +74,13 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    ClassRoutineBuilder share(@Nullable ShareConfiguration configuration);
+    ClassRoutineBuilder members(@Nullable ProxyConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ClassRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
+    ClassRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
 
     /**
      * Returns a routine used to call the specified method.

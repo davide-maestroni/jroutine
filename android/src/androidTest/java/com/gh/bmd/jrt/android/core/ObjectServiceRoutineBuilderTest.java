@@ -50,10 +50,10 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
-import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -159,14 +159,12 @@ public class ObjectServiceRoutineBuilderTest
                                                             .withLog(countLog)
                                                             .buildConfiguration();
         JRoutine.onService(getActivity(), TestClass.class)
-                .configure(configuration)
-                .share(withGroup("test"))
+                .configure(configuration).members(withShareGroup("test"))
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         JRoutine.onService(getActivity(), Square.class)
-                .configure(configuration)
-                .share(withGroup("test"))
+                .configure(configuration).members(withShareGroup("test"))
                 .dispatchingOn(Looper.getMainLooper())
                 .buildProxy(SquareItf.class)
                 .compute(3);
@@ -464,7 +462,7 @@ public class ObjectServiceRoutineBuilderTest
                                                              .buildConfiguration();
         final Routine<Object, Object> routine2 = JRoutine.onService(getActivity(), TestClass.class)
                                                          .configure(configuration2)
-                                                         .share(withGroup("test"))
+                                                         .members(withShareGroup("test"))
                                                          .dispatchingOn(Looper.getMainLooper())
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
@@ -821,8 +819,10 @@ public class ObjectServiceRoutineBuilderTest
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.share(withGroup("1")).method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.share(withGroup("2")).method("getTwo").callAsync();
+        OutputChannel<Object> getOne =
+                builder.members(withShareGroup("1")).method("getOne").callAsync();
+        OutputChannel<Object> getTwo =
+                builder.members(withShareGroup("2")).method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();

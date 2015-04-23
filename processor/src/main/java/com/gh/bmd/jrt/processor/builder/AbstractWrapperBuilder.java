@@ -14,9 +14,9 @@
 package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.annotation.ShareGroup;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
@@ -41,9 +41,9 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private ProxyConfiguration mProxyConfiguration;
 
-    private ShareConfiguration mShareConfiguration;
+    private RoutineConfiguration mRoutineConfiguration;
 
     @Nonnull
     public TYPE buildWrapper() {
@@ -61,7 +61,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
             }
 
             final String shareGroup =
-                    ShareConfiguration.notNull(mShareConfiguration).getGroupOr(null);
+                    ProxyConfiguration.notNull(mProxyConfiguration).getShareGroupOr(null);
             final String classShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
             final RoutineConfiguration configuration =
                     RoutineConfiguration.notNull(mRoutineConfiguration);
@@ -103,16 +103,16 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> share(@Nullable final ShareConfiguration configuration) {
+    public WrapperBuilder<TYPE> members(@Nullable final ProxyConfiguration configuration) {
 
-        mShareConfiguration = configuration;
+        mProxyConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> share(@Nonnull final ShareConfiguration.Builder builder) {
+    public WrapperBuilder<TYPE> members(@Nonnull final ProxyConfiguration.Builder builder) {
 
-        return share(builder.buildConfiguration());
+        return members(builder.buildConfiguration());
     }
 
     /**

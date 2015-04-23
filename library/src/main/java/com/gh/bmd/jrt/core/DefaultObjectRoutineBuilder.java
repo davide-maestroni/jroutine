@@ -20,11 +20,11 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -233,17 +233,17 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
+    public ObjectRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
 
-        super.share(configuration);
+        super.members(configuration);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
+    public ObjectRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
 
-        super.share(builder);
+        super.members(builder);
         return this;
     }
 
@@ -291,9 +291,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
-        private final ShareConfiguration mShareConfiguration;
+        private final RoutineConfiguration mRoutineConfiguration;
 
         /**
          * Constructor.
@@ -301,14 +301,14 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         private InterfaceInvocationHandler() {
 
             mRoutineConfiguration = RoutineConfiguration.notNull(getRoutineConfiguration());
-            mShareConfiguration = ShareConfiguration.notNull(getShareConfiguration());
+            mProxyConfiguration = ProxyConfiguration.notNull(getProxyConfiguration());
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
             final OutputChannel<Object> outputChannel =
-                    method(mRoutineConfiguration, mShareConfiguration, method).callAsync(args);
+                    method(mRoutineConfiguration, mProxyConfiguration, method).callAsync(args);
             final Class<?> returnType = method.getReturnType();
 
             if (!Void.class.equals(boxingClass(returnType))) {
@@ -359,9 +359,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      */
     private class ProxyInvocationHandler implements InvocationHandler {
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
-        private final ShareConfiguration mShareConfiguration;
+        private final RoutineConfiguration mRoutineConfiguration;
 
         /**
          * Constructor.
@@ -369,7 +369,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         private ProxyInvocationHandler() {
 
             mRoutineConfiguration = RoutineConfiguration.notNull(getRoutineConfiguration());
-            mShareConfiguration = ShareConfiguration.notNull(getShareConfiguration());
+            mProxyConfiguration = ProxyConfiguration.notNull(getProxyConfiguration());
         }
 
         @Nonnull
@@ -377,7 +377,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 @Nonnull final Method targetMethod, @Nullable final PassMode paramMode,
                 @Nullable final PassMode returnMode) {
 
-            String shareGroup = mShareConfiguration.getGroupOr(null);
+            String shareGroup = mProxyConfiguration.getShareGroupOr(null);
             final RoutineConfiguration configuration = mRoutineConfiguration;
             final Builder builder = RoutineConfiguration.builderFrom(configuration);
             final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);

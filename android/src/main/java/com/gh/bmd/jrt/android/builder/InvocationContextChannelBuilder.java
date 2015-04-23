@@ -13,10 +13,7 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.channel.OutputChannel;
 
 import javax.annotation.Nonnull;
@@ -31,7 +28,7 @@ import javax.annotation.Nullable;
  *
  * @see InvocationContextRoutineBuilder
  */
-public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
+public interface InvocationContextChannelBuilder extends ContextRoutineBuilder {
 
     /**
      * Builds and returns an output channel bound to the routine invocation.
@@ -40,16 +37,6 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
      */
     @Nonnull
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
-
-    /**
-     * Tells the builder how to cache the invocation result after its completion. A null value means
-     * that it is up to the framework to choose a default strategy.
-     *
-     * @param strategyType the cache strategy.
-     * @return this builder.
-     */
-    @Nonnull
-    InvocationContextChannelBuilder cache(@Nullable CacheStrategyType strategyType);
 
     /**
      * Note that only the options related to logs will be employed.
@@ -67,7 +54,27 @@ public interface InvocationContextChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    InvocationContextChannelBuilder configure(@Nonnull Builder builder);
+    InvocationContextChannelBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
+
+    /**
+     * Note that the clash resolution type will be ignored.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     */
+    @Nonnull
+    InvocationContextChannelBuilder invocations(
+            @Nullable ContextInvocationConfiguration configuration);
+
+    /**
+     * Note that the clash resolution type will be ignored.
+     *
+     * @param builder the configuration builder.
+     * @return this builder.
+     */
+    @Nonnull
+    InvocationContextChannelBuilder invocations(
+            @Nonnull ContextInvocationConfiguration.Builder builder);
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified input.

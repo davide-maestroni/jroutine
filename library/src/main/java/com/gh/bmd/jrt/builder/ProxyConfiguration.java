@@ -17,19 +17,25 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Class storing the share configuration.
+ * Class storing the proxy configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
  * <p/>
+ * The configuration has a share group associated. Every method within a specific group is protected
+ * so that shared class members can be safely accessed only from the other methods sharing the same
+ * group name. That means that the invocation of methods within the same group cannot happen in
+ * parallel. In a dual way, methods belonging to different groups can be invoked in parallel but
+ * should not access the same members to avoid concurrency issues.
+ * <p/>
  * Created by davide on 20/04/15.
  */
-public class ShareConfiguration {
+public class ProxyConfiguration {
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
-    public static final ShareConfiguration EMPTY_CONFIGURATION = builder().buildConfiguration();
+    public static final ProxyConfiguration EMPTY_CONFIGURATION = builder().buildConfiguration();
 
     private final String mGroupName;
 
@@ -38,13 +44,13 @@ public class ShareConfiguration {
      *
      * @param groupName the share group name.
      */
-    private ShareConfiguration(@Nullable final String groupName) {
+    private ProxyConfiguration(@Nullable final String groupName) {
 
         mGroupName = groupName;
     }
 
     /**
-     * Returns a share configuration builder.
+     * Returns a proxy configuration builder.
      *
      * @return the builder.
      */
@@ -55,13 +61,13 @@ public class ShareConfiguration {
     }
 
     /**
-     * Returns a share configuration builder initialized with the specified configuration.
+     * Returns a proxy configuration builder initialized with the specified configuration.
      *
      * @param initialConfiguration the initial configuration.
      * @return the builder.
      */
     @Nonnull
-    public static Builder builderFrom(@Nonnull final ShareConfiguration initialConfiguration) {
+    public static Builder builderFrom(@Nonnull final ProxyConfiguration initialConfiguration) {
 
         return new Builder(initialConfiguration);
     }
@@ -69,29 +75,29 @@ public class ShareConfiguration {
     /**
      * Returns the specified configuration or the empty one if the former is null.
      *
-     * @param configuration the share configuration.
+     * @param configuration the proxy configuration.
      * @return the configuration.
      */
     @Nonnull
-    public static ShareConfiguration notNull(@Nullable final ShareConfiguration configuration) {
+    public static ProxyConfiguration notNull(@Nullable final ProxyConfiguration configuration) {
 
         return (configuration != null) ? configuration : EMPTY_CONFIGURATION;
     }
 
     /**
-     * Short for <b><code>builder().withGroup(groupName)</code></b>.
+     * Short for <b><code>builder().withShareGroup(groupName)</code></b>.
      *
      * @param groupName the group name.
-     * @return the share configuration builder.
+     * @return the proxy configuration builder.
      */
     @Nonnull
-    public static Builder withGroup(@Nullable final String groupName) {
+    public static Builder withShareGroup(@Nullable final String groupName) {
 
-        return builder().withGroup(groupName);
+        return builder().withShareGroup(groupName);
     }
 
     /**
-     * Returns a share configuration builder initialized with this configuration.
+     * Returns a proxy configuration builder initialized with this configuration.
      *
      * @return the builder.
      */
@@ -107,7 +113,7 @@ public class ShareConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the group name.
      */
-    public String getGroupOr(@Nullable final String valueIfNotSet) {
+    public String getShareGroupOr(@Nullable final String valueIfNotSet) {
 
         final String groupName = mGroupName;
         return (groupName != null) ? groupName : valueIfNotSet;
@@ -129,12 +135,12 @@ public class ShareConfiguration {
             return true;
         }
 
-        if (!(o instanceof ShareConfiguration)) {
+        if (!(o instanceof ProxyConfiguration)) {
 
             return false;
         }
 
-        final ShareConfiguration that = (ShareConfiguration) o;
+        final ProxyConfiguration that = (ProxyConfiguration) o;
         return !(mGroupName != null ? !mGroupName.equals(that.mGroupName)
                 : that.mGroupName != null);
     }
@@ -142,13 +148,13 @@ public class ShareConfiguration {
     @Override
     public String toString() {
 
-        return "ShareConfiguration{" +
+        return "ProxyConfiguration{" +
                 "mGroupName='" + mGroupName + '\'' +
                 '}';
     }
 
     /**
-     * Builder of share configurations.
+     * Builder of proxy configurations.
      */
     public static class Builder {
 
@@ -167,40 +173,44 @@ public class ShareConfiguration {
          * @param initialConfiguration the initial configuration.
          * @throws java.lang.NullPointerException if the specified configuration instance is null.
          */
-        private Builder(@Nonnull final ShareConfiguration initialConfiguration) {
+        private Builder(@Nonnull final ProxyConfiguration initialConfiguration) {
 
             mGroupName = initialConfiguration.mGroupName;
         }
 
         /**
-         * Builds and return the configuration instance.
-         *
-         * @return the share configuration instance.
-         */
-        @Nonnull
-        public ShareConfiguration buildConfiguration() {
-
-            return new ShareConfiguration(mGroupName);
-        }
-
-        /**
          * Applies the specified configuration to this builder.
          *
-         * @param configuration the share configuration.
+         * @param configuration the proxy configuration.
          * @return this builder.
-         * @throws java.lang.NullPointerException if the specified configuration is null.
          */
         @Nonnull
-        public Builder configure(@Nonnull final ShareConfiguration configuration) {
+        public Builder apply(@Nullable final ProxyConfiguration configuration) {
+
+            if (configuration == null) {
+
+                return this;
+            }
 
             final String groupName = configuration.mGroupName;
 
             if (groupName != null) {
 
-                withGroup(groupName);
+                withShareGroup(groupName);
             }
 
             return this;
+        }
+
+        /**
+         * Builds and return the configuration instance.
+         *
+         * @return the proxy configuration instance.
+         */
+        @Nonnull
+        public ProxyConfiguration buildConfiguration() {
+
+            return new ProxyConfiguration(mGroupName);
         }
 
         /**
@@ -211,7 +221,7 @@ public class ShareConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withGroup(@Nullable final String groupName) {
+        public Builder withShareGroup(@Nullable final String groupName) {
 
             mGroupName = groupName;
             return this;

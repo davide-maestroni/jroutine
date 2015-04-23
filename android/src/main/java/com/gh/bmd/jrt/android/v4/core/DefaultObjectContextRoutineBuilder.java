@@ -32,10 +32,10 @@ import com.gh.bmd.jrt.annotation.Pass.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -61,10 +61,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
@@ -84,9 +84,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
     private ContextInvocationConfiguration mInvocationConfiguration;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private ProxyConfiguration mProxyConfiguration;
 
-    private ShareConfiguration mShareConfiguration;
+    private RoutineConfiguration mRoutineConfiguration;
 
     /**
      * Constructor.
@@ -315,7 +315,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nullable
-    private static String withShareAnnotation(@Nullable final ShareConfiguration shareConfiguration,
+    private static String withShareAnnotation(@Nullable final ProxyConfiguration proxyConfiguration,
             @Nonnull final Method method) {
 
         final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
@@ -325,7 +325,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             return shareGroupAnnotation.value();
         }
 
-        return ShareConfiguration.notNull(shareConfiguration).getGroupOr(null);
+        return ProxyConfiguration.notNull(proxyConfiguration).getShareGroupOr(null);
     }
 
     @Nonnull
@@ -373,7 +373,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         final RoutineConfiguration currentConfiguration =
                 RoutineConfiguration.notNull(configuration);
         final Object[] args = currentConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        final String shareGroup = withShareAnnotation(mShareConfiguration, targetMethod);
+        final String shareGroup = withShareAnnotation(mProxyConfiguration, targetMethod);
         final Builder builder = withTimeoutAnnotation(currentConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name};
         return getBuilder(mContext, classToken).configure(
@@ -425,7 +425,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         final RoutineConfiguration currentConfiguration =
                 RoutineConfiguration.notNull(configuration);
         final Object[] args = currentConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        final String shareGroup = withShareAnnotation(mShareConfiguration, targetMethod);
+        final String shareGroup = withShareAnnotation(mProxyConfiguration, targetMethod);
         final Builder builder = withTimeoutAnnotation(currentConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name,
                                                      toNames(parameterTypes)};
@@ -465,16 +465,16 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
+    public ObjectContextRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
 
-        mShareConfiguration = configuration;
+        mProxyConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
+    public ObjectContextRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
 
-        return share(builder.buildConfiguration());
+        return members(builder.buildConfiguration());
     }
 
     @Nonnull
@@ -602,7 +602,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .share(withGroup(mShareGroup))
+                                   .members(withShareGroup(mShareGroup))
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -686,7 +686,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .share(withGroup(mShareGroup))
+                                   .members(withShareGroup(mShareGroup))
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -953,9 +953,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         private final Class<?> mProxyClass;
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
-        private final ShareConfiguration mShareConfiguration;
+        private final RoutineConfiguration mRoutineConfiguration;
 
         private final Class<?> mTargetClass;
 
@@ -971,7 +971,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
             mRoutineConfiguration = RoutineConfiguration.notNull(builder.mRoutineConfiguration);
-            mShareConfiguration = builder.mShareConfiguration;
+            mProxyConfiguration = builder.mProxyConfiguration;
             mInvocationConfiguration = builder.mInvocationConfiguration;
             mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
             mProxyClass = proxyClass;
@@ -1022,7 +1022,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 returnMode = getReturnMode(method);
             }
 
-            final String shareGroup = withShareAnnotation(mShareConfiguration, method);
+            final String shareGroup = withShareAnnotation(mProxyConfiguration, method);
             final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
             final RoutineConfiguration.Builder builder =
                     withTimeoutAnnotation(mRoutineConfiguration, method);

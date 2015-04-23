@@ -22,13 +22,18 @@ import javax.annotation.Nullable;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
  * <p/>
+ * The configuration is used to set a specific ID to each invocation created by a context routine.
+ * <br/>
+ * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
+ * is, they share the same ID, and to set a specific type of caching of the invocation results.
+ * <p/>
  * Created by davide on 19/04/15.
  */
 public class ContextInvocationConfiguration {
 
     //TODO: see annotations?
     //TODO: move withArgs to RoutineConfiguration (withInvocationArgs???)
-    //TODO: check ...
+    //TODO: add log to builders
 
     /**
      * Constant identifying an invocation ID computed from the executor class and the input
@@ -324,26 +329,18 @@ public class ContextInvocationConfiguration {
         }
 
         /**
-         * Builds and return the configuration instance.
-         *
-         * @return the context invocation configuration instance.
-         */
-        @Nonnull
-        public ContextInvocationConfiguration buildConfiguration() {
-
-            return new ContextInvocationConfiguration(mInvocationId, mResolutionType,
-                                                      mStrategyType);
-        }
-
-        /**
          * Applies the specified configuration to this builder.
          *
          * @param configuration the invocation configuration.
          * @return this builder.
-         * @throws java.lang.NullPointerException if the specified configuration is null.
          */
         @Nonnull
-        public Builder configure(@Nonnull final ContextInvocationConfiguration configuration) {
+        public Builder apply(@Nullable final ContextInvocationConfiguration configuration) {
+
+            if (configuration == null) {
+
+                return this;
+            }
 
             final int invocationId = configuration.mInvocationId;
 
@@ -367,6 +364,18 @@ public class ContextInvocationConfiguration {
             }
 
             return this;
+        }
+
+        /**
+         * Builds and return the configuration instance.
+         *
+         * @return the context invocation configuration instance.
+         */
+        @Nonnull
+        public ContextInvocationConfiguration buildConfiguration() {
+
+            return new ContextInvocationConfiguration(mInvocationId, mResolutionType,
+                                                      mStrategyType);
         }
 
         /**

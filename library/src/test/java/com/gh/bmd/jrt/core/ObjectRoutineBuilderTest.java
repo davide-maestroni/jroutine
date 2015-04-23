@@ -47,10 +47,10 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
-import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -426,7 +426,7 @@ public class ObjectRoutineBuilderTest {
                                                              .buildConfiguration();
         final Routine<Object, Object> routine2 = JRoutine.on(test)
                                                          .configure(configuration2)
-                                                         .share(withGroup("test"))
+                                                         .members(withShareGroup("test"))
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
@@ -857,8 +857,10 @@ public class ObjectRoutineBuilderTest {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.share(withGroup("1")).method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.share(withGroup("2")).method("getTwo").callAsync();
+        OutputChannel<Object> getOne =
+                builder.members(withShareGroup("1")).method("getOne").callAsync();
+        OutputChannel<Object> getTwo =
+                builder.members(withShareGroup("2")).method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();

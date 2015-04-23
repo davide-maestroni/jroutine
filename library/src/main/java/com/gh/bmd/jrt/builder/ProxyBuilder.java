@@ -13,49 +13,43 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.annotation.ShareGroup;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of sharable routines.
+ * Interface defining a builder of proxy routines.
  * <p/>
  * Created by davide on 3/7/15.
- *
- * @see com.gh.bmd.jrt.annotation.ShareGroup
  */
-public interface SharableBuilder extends ConfigurableBuilder {
+public interface ProxyBuilder extends ConfigurableBuilder {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    SharableBuilder configure(@Nullable RoutineConfiguration configuration);
+    ProxyBuilder configure(@Nullable RoutineConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    SharableBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
+    ProxyBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
 
     /**
-     * Tells the builder to create a routine using the specified share configuration.
+     * Tells the builder to create a routine using the specified proxy configuration.
      *
      * @param configuration the configuration.
      * @return this builder.
-     * @see ShareGroup
      */
     @Nonnull
-    SharableBuilder share(@Nullable ShareConfiguration configuration);
+    ProxyBuilder members(@Nullable ProxyConfiguration configuration);
 
     /**
-     * Tells the builder to create a routine using the specified share configuration.
+     * Tells the builder to create a routine using the specified proxy configuration.
      *
      * @param builder the configuration builder.
      * @return this builder.
-     * @see ShareGroup
      */
     @Nonnull
-    SharableBuilder share(@Nonnull ShareConfiguration.Builder builder);
+    ProxyBuilder members(@Nonnull ProxyConfiguration.Builder builder);
 }

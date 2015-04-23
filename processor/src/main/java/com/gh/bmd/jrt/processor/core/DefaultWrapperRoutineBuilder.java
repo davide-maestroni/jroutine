@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.processor.core;
 
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder;
 import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
@@ -36,9 +36,9 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private ProxyConfiguration mProxyConfiguration;
 
-    private ShareConfiguration mShareConfiguration;
+    private RoutineConfiguration mRoutineConfiguration;
 
     /**
      * Constructor.
@@ -90,7 +90,7 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
             builder.configure(configuration);
         }
 
-        return builder.share(mShareConfiguration).buildWrapper();
+        return builder.members(mProxyConfiguration).buildWrapper();
     }
 
     @Nonnull
@@ -107,16 +107,16 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
     }
 
     @Nonnull
-    public WrapperRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
+    public WrapperRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
 
-        mShareConfiguration = configuration;
+        mProxyConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public WrapperRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
+    public WrapperRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
 
-        return share(builder.buildConfiguration());
+        return members(builder.buildConfiguration());
     }
 
     /**

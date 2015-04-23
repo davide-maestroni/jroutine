@@ -106,11 +106,11 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectRoutineBuilder share(@Nullable ShareConfiguration configuration);
+    ObjectRoutineBuilder members(@Nullable ProxyConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
+    ObjectRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
 }

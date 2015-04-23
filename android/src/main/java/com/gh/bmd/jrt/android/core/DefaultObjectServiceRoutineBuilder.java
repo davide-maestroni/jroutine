@@ -26,10 +26,10 @@ import com.gh.bmd.jrt.annotation.Pass.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -56,10 +56,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.builder.ShareConfiguration.withGroup;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
@@ -83,13 +83,13 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
     private Looper mLooper;
 
+    private ProxyConfiguration mProxyConfiguration;
+
     private RoutineConfiguration mRoutineConfiguration;
 
     private Class<? extends Runner> mRunnerClass;
 
     private Class<? extends RoutineService> mServiceClass;
-
-    private ShareConfiguration mShareConfiguration;
 
     /**
      * Constructor.
@@ -290,7 +290,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nullable
-    private static String withShareAnnotation(@Nullable final ShareConfiguration configuration,
+    private static String withShareAnnotation(@Nullable final ProxyConfiguration configuration,
             @Nonnull final Method method) {
 
         final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
@@ -300,7 +300,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             return shareGroupAnnotation.value();
         }
 
-        return ShareConfiguration.notNull(configuration).getGroupOr(null);
+        return ProxyConfiguration.notNull(configuration).getShareGroupOr(null);
     }
 
     @Nonnull
@@ -348,7 +348,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
                        .withArgs(targetClass.getName(), args,
-                                 withShareAnnotation(mShareConfiguration, targetMethod), name)
+                                 withShareAnnotation(mProxyConfiguration, targetMethod), name)
                        .configure(withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
                                OrderType.PASSING_ORDER).buildConfiguration())
                        .withServiceClass(mServiceClass)
@@ -399,7 +399,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
         final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
                        .withArgs(targetClass.getName(), args,
-                                 withShareAnnotation(mShareConfiguration, targetMethod), name,
+                                 withShareAnnotation(mProxyConfiguration, targetMethod), name,
                                  toNames(parameterTypes))
                        .configure(withTimeoutAnnotation(configuration, targetMethod).withInputOrder(
                                OrderType.PASSING_ORDER).buildConfiguration())
@@ -453,16 +453,16 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder share(@Nullable final ShareConfiguration configuration) {
+    public ObjectServiceRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
 
-        mShareConfiguration = configuration;
+        mProxyConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ObjectServiceRoutineBuilder share(@Nonnull final ShareConfiguration.Builder builder) {
+    public ObjectServiceRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
 
-        return share(builder.buildConfiguration());
+        return members(builder.buildConfiguration());
     }
 
     @Nonnull
@@ -555,7 +555,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .share(withGroup(mShareGroup))
+                                   .members(withShareGroup(mShareGroup))
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -639,7 +639,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .share(withGroup(mShareGroup))
+                                   .members(withShareGroup(mShareGroup))
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -908,13 +908,13 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
 
         private final Class<?> mProxyClass;
 
+        private final ProxyConfiguration mProxyConfiguration;
+
         private final RoutineConfiguration mRoutineConfiguration;
 
         private final Class<? extends Runner> mRunnerClass;
 
         private final Class<? extends RoutineService> mServiceClass;
-
-        private final ShareConfiguration mShareConfiguration;
 
         private final Class<?> mTargetClass;
 
@@ -932,7 +932,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             mArgs = builder.mArgs;
             mServiceClass = builder.mServiceClass;
             mRoutineConfiguration = builder.mRoutineConfiguration;
-            mShareConfiguration = builder.mShareConfiguration;
+            mProxyConfiguration = builder.mProxyConfiguration;
             mRunnerClass = builder.mRunnerClass;
             mLogClass = builder.mLogClass;
             mLooper = builder.mLooper;
@@ -995,7 +995,7 @@ class DefaultObjectServiceRoutineBuilder implements ObjectServiceRoutineBuilder 
             final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
                             .withArgs(mProxyClass.getName(), mTargetClass.getName(), mArgs,
-                                      withShareAnnotation(mShareConfiguration, method),
+                                      withShareAnnotation(mProxyConfiguration, method),
                                       method.getName(), toNames(parameterTypes),
                                       toNames(targetParameterTypes), isInputCollection,
                                       isOutputCollection)

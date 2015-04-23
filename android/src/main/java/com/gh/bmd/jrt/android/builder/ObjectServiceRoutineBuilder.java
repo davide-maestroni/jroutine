@@ -17,8 +17,8 @@ import android.os.Looper;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
 
@@ -51,13 +51,13 @@ public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectServiceRoutineBuilder share(@Nullable ShareConfiguration configuration);
+    ObjectServiceRoutineBuilder members(@Nullable ProxyConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectServiceRoutineBuilder share(@Nonnull ShareConfiguration.Builder builder);
+    ObjectServiceRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
 
     /**
      * {@inheritDoc}

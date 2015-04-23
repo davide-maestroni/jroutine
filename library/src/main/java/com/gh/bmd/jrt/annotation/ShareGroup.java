@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.annotation;
 
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -21,6 +23,12 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * the framework as well.
+ * <p/>
  * Through this annotation, it is possible to exclude single methods from this kind of protection by
  * indicating them as having a different share group. Each group has a name associated, and every
  * method within a specific group is protected so that shared class members can be safely accessed
@@ -28,12 +36,6 @@ import java.lang.annotation.Target;
  * methods within the same group cannot happen in parallel. In a dual way, methods belonging to
  * different groups can be invoked in parallel but should not access the same members to avoid
  * concurrency issues.
- * <p/>
- * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
- * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
- * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * the framework as well.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
@@ -53,6 +55,8 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Created by davide on 1/26/15.
+ *
+ * @see ProxyConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

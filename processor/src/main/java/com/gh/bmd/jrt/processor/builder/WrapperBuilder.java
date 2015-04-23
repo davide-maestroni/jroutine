@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.processor.builder;
 
+import com.gh.bmd.jrt.builder.ProxyBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.SharableBuilder;
-import com.gh.bmd.jrt.builder.ShareConfiguration;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the interface type.
  */
-public interface WrapperBuilder<TYPE> extends SharableBuilder {
+public interface WrapperBuilder<TYPE> extends ProxyBuilder {
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
@@ -70,11 +70,11 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    WrapperBuilder<TYPE> share(@Nullable ShareConfiguration configuration);
+    WrapperBuilder<TYPE> members(@Nullable ProxyConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    WrapperBuilder<TYPE> share(@Nonnull ShareConfiguration.Builder builder);
+    WrapperBuilder<TYPE> members(@Nonnull ProxyConfiguration.Builder builder);
 }

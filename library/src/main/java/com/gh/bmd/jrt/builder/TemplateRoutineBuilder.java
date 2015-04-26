@@ -14,11 +14,11 @@
 package com.gh.bmd.jrt.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Empty abstract implementation of a routine builder.
@@ -33,20 +33,23 @@ import javax.annotation.Nullable;
 public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
         implements RoutineBuilder<INPUT, OUTPUT> {
 
-    private RoutineConfiguration mConfiguration;
+    private RoutineConfiguration mConfiguration = RoutineConfiguration.EMPTY_CONFIGURATION;
+
+    private final Configurable<RoutineBuilder<INPUT, OUTPUT>> mConfigurable =
+            new Configurable<RoutineBuilder<INPUT, OUTPUT>>() {
+
+                @Nonnull
+                public RoutineBuilder<INPUT, OUTPUT> configureWith(
+                        @Nonnull final RoutineConfiguration configuration) {
+
+                    return TemplateRoutineBuilder.this.configureWith(configuration);
+                }
+            };
 
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> configure(
-            @Nullable final RoutineConfiguration configuration) {
+    public Builder<RoutineBuilder<INPUT, OUTPUT>> configure() {
 
-        mConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> configure(@Nonnull final Builder builder) {
-
-        return configure(builder.buildConfiguration());
+        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(mConfigurable, mConfiguration);
     }
 
     @Nonnull
@@ -67,6 +70,20 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
         return buildRoutine().invokeSync();
     }
 
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    protected RoutineBuilder<INPUT, OUTPUT> configureWith(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mConfiguration = configuration;
+        return this;
+    }
+
     /**
      * Returns the routine configuration.
      *
@@ -75,6 +92,6 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     @Nonnull
     protected RoutineConfiguration getConfiguration() {
 
-        return RoutineConfiguration.notNull(mConfiguration);
+        return mConfiguration;
     }
 }

@@ -13,12 +13,12 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.ProxyConfiguration.Builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.reflect.Method;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Interface defining a builder of routines wrapping a class method.
@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
-public interface ClassRoutineBuilder extends ProxyRoutineBuilder {
+public interface ClassRoutineBuilder {
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
@@ -53,34 +53,14 @@ public interface ClassRoutineBuilder extends ProxyRoutineBuilder {
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
 
     /**
+     * TODO
+     * <p/>
      * Note that all the options related to the output and input channels will be ignored.
      *
-     * @param configuration the routine configuration.
-     * @return this builder.
+     * @return the configuration builder.
      */
     @Nonnull
-    ClassRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @param builder the routine configuration builder.
-     * @return this builder.
-     */
-    @Nonnull
-    ClassRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ClassRoutineBuilder members(@Nullable ProxyConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ClassRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
+    Builder<? extends ClassRoutineBuilder> configure();
 
     /**
      * Returns a routine used to call the specified method.

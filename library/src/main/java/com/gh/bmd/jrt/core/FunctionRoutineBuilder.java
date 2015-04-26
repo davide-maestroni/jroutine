@@ -30,9 +30,6 @@ import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withInputOrder;
 
 /**
  * Class implementing a builder of routine objects based on function or procedure instances.
@@ -53,7 +50,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     private FunctionRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         super(factory);
-        super.configure(withInputOrder(OrderType.PASSING_ORDER));
+        super.configure().withInputOrder(OrderType.PASSING_ORDER).then();
     }
 
     /**
@@ -644,12 +641,11 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
 
     @Nonnull
     @Override
-    public RoutineBuilder<INPUT, OUTPUT> configure(
-            @Nullable final RoutineConfiguration configuration) {
+    public RoutineBuilder<INPUT, OUTPUT> configureWith(
+            @Nonnull final RoutineConfiguration configuration) {
 
-        return super.configure(RoutineConfiguration.notNull(configuration)
-                                                   .builderFrom()
-                                                   .withInputOrder(OrderType.PASSING_ORDER)
-                                                   .buildConfiguration());
+        return super.configureWith(RoutineConfiguration.builderFrom(configuration)
+                                                       .withInputOrder(OrderType.PASSING_ORDER)
+                                                       .then());
     }
 }

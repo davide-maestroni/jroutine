@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
@@ -24,7 +23,6 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -39,40 +37,35 @@ public class JRoutineTest {
     @Test
     public void testRoutineBuilder() {
 
-        final RoutineConfiguration configuration =
-                builder().withSyncRunner(Runners.sequentialRunner())
-                         .withAsyncRunner(Runners.poolRunner())
-                         .withCoreInvocations(0)
-                         .withMaxInvocations(1)
-                         .withAvailableTimeout(1, TimeUnit.SECONDS)
-                         .withInputSize(2)
-                         .withInputTimeout(1, TimeUnit.SECONDS)
-                         .withOutputSize(2)
-                         .withOutputTimeout(1, TimeUnit.SECONDS)
-                         .withOutputOrder(OrderType.PASSING_ORDER)
-                         .buildConfiguration();
-
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .configure(configuration)
+                           .configure()
+                           .withSyncRunner(Runners.sequentialRunner())
+                           .withAsyncRunner(Runners.poolRunner())
+                           .withCoreInvocations(0)
+                           .withMaxInvocations(1)
+                           .withAvailableTimeout(1, TimeUnit.SECONDS)
+                           .withInputSize(2)
+                           .withInputTimeout(1, TimeUnit.SECONDS)
+                           .withOutputSize(2)
+                           .withOutputTimeout(1, TimeUnit.SECONDS)
+                           .withOutputOrder(OrderType.PASSING_ORDER)
+                           .then()
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
 
-        final RoutineConfiguration configuration1 = builder().withSyncRunner(Runners.queuedRunner())
-                                                             .withAsyncRunner(Runners.poolRunner())
-                                                             .withCoreInvocations(0)
-                                                             .withMaxInvocations(1)
-                                                             .withAvailableTimeout(
-                                                                     TimeDuration.ZERO)
-                                                             .withInputSize(2)
-                                                             .withInputTimeout(TimeDuration.ZERO)
-                                                             .withOutputSize(2)
-                                                             .withOutputTimeout(TimeDuration.ZERO)
-                                                             .withOutputOrder(
-                                                                     OrderType.PASSING_ORDER)
-                                                             .buildConfiguration();
-
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .configure(configuration1)
+                           .configure()
+                           .withSyncRunner(Runners.queuedRunner())
+                           .withAsyncRunner(Runners.poolRunner())
+                           .withCoreInvocations(0)
+                           .withMaxInvocations(1)
+                           .withAvailableTimeout(TimeDuration.ZERO)
+                           .withInputSize(2)
+                           .withInputTimeout(TimeDuration.ZERO)
+                           .withOutputSize(2)
+                           .withOutputTimeout(TimeDuration.ZERO)
+                           .withOutputOrder(OrderType.PASSING_ORDER)
+                           .then()
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
     }

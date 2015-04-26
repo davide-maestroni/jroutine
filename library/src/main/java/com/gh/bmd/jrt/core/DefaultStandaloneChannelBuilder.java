@@ -19,7 +19,6 @@ import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Class implementing a builder of standalone channel objects.
@@ -28,7 +27,7 @@ import javax.annotation.Nullable;
  */
 class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
 
-    private RoutineConfiguration mConfiguration;
+    private RoutineConfiguration mConfiguration = RoutineConfiguration.EMPTY_CONFIGURATION;
 
     /**
      * Avoid direct instantiation.
@@ -40,19 +39,26 @@ class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
     @Nonnull
     public <T> StandaloneChannel<T> buildChannel() {
 
-        return new DefaultStandaloneChannel<T>(RoutineConfiguration.notNull(mConfiguration));
+        return new DefaultStandaloneChannel<T>(mConfiguration);
     }
 
     @Nonnull
-    public StandaloneChannelBuilder configure(@Nullable final RoutineConfiguration configuration) {
+    public Builder<StandaloneChannelBuilder> configure() {
+
+        return new Builder<StandaloneChannelBuilder>(this, mConfiguration);
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public StandaloneChannelBuilder configureWith(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
 
         mConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    public StandaloneChannelBuilder configure(@Nonnull final Builder builder) {
-
-        return configure(builder.buildConfiguration());
     }
 }

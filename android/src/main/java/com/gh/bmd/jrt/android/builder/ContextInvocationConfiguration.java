@@ -32,6 +32,8 @@ import javax.annotation.Nullable;
 public class ContextInvocationConfiguration {
 
     //TODO: add log to builders?
+    // JRoutine.on(tokenOf(Inv.class)).configure(withFactoryArgs(12)).buildRoutine();
+    // JRoutine.on(tokenOf(Inv.class)).configure().withFactoryArgs(12).then().buildRoutine();
 
     /**
      * Constant identifying an invocation ID computed from the executor class and the input

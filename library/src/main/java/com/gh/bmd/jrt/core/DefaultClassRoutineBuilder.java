@@ -19,6 +19,7 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
+import com.gh.bmd.jrt.builder.ProxyConfiguration.Configurable;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -48,7 +49,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 
 /**
@@ -67,9 +67,27 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private ProxyConfiguration mProxyConfiguration;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.EMPTY_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.EMPTY_CONFIGURATION;
+
+    private final Configurable<ClassRoutineBuilder> mConfigurable =
+            new Configurable<ClassRoutineBuilder>() {
+
+                @Nonnull
+                public ClassRoutineBuilder configureWith(
+                        @Nonnull final ProxyConfiguration configuration) {
+
+                    return DefaultClassRoutineBuilder.this.configureWith(configuration);
+                }
+
+                @Nonnull
+                public ClassRoutineBuilder configureWith(
+                        @Nonnull final RoutineConfiguration configuration) {
+
+                    return DefaultClassRoutineBuilder.this.configureWith(configuration);
+                }
+            };
 
     /**
      * Constructor.
@@ -123,36 +141,17 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    public ClassRoutineBuilder configure(@Nullable final RoutineConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> configure() {
 
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ClassRoutineBuilder configure(@Nonnull final Builder builder) {
-
-        return configure(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public ClassRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ClassRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
-
-        return members(builder.buildConfiguration());
+        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(mConfigurable,
+                                                                   mRoutineConfiguration,
+                                                                   mProxyConfiguration);
     }
 
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(RoutineConfiguration.notNull(mRoutineConfiguration),
-                      ProxyConfiguration.notNull(mProxyConfiguration), method);
+        return method(mRoutineConfiguration, mProxyConfiguration, method);
     }
 
     @Nonnull
@@ -185,6 +184,32 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         return method(targetMethod);
     }
 
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    protected ClassRoutineBuilder configureWith(@Nonnull final ProxyConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        mProxyConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    protected ClassRoutineBuilder configureWith(@Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
+
     /**
      * Gets the annotated method associated to the specified name.
      *
@@ -203,7 +228,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
      *
      * @return the configuration.
      */
-    @Nullable
+    @Nonnull
     protected ProxyConfiguration getProxyConfiguration() {
 
         return mProxyConfiguration;
@@ -269,12 +294,13 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                     mutex = null;
                 }
 
-                final Builder builder = configuration.builderFrom();
+                final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                        configuration.builderFrom();
                 final InvocationFactory<Object, Object> factory =
                         Invocations.factoryOf(MethodSingleCallInvocation.class);
                 routine = new DefaultRoutine<Object, Object>(
                         builder.withFactoryArgs(target, method, mutex, isInputCollection,
-                                                isOutputCollection).buildConfiguration(), factory);
+                                                isOutputCollection).then(), factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -287,7 +313,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
      *
      * @return the configuration.
      */
-    @Nullable
+    @Nonnull
     protected RoutineConfiguration getRoutineConfiguration() {
 
         return mRoutineConfiguration;
@@ -331,7 +357,8 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             @Nonnull final Method targetMethod) {
 
         String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
-        final Builder builder = routineConfiguration.builderFrom();
+        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                routineConfiguration.builderFrom();
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {
@@ -359,8 +386,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             builder.onReadTimeout(actionAnnotation.value());
         }
 
-        return getRoutine(builder.buildConfiguration(), methodShareGroup, targetMethod, false,
-                          false);
+        return getRoutine(builder.then(), methodShareGroup, targetMethod, false, false);
     }
 
     /**

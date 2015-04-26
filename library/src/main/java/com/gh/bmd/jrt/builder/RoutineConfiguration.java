@@ -73,6 +73,17 @@ public class RoutineConfiguration {
      */
     public static final int DEFAULT = Integer.MIN_VALUE;
 
+    private static final Configurable<RoutineConfiguration> sDefaultConfigurable =
+            new Configurable<RoutineConfiguration>() {
+
+                @Nonnull
+                public RoutineConfiguration configureWith(
+                        @Nonnull final RoutineConfiguration configuration) {
+
+                    return configuration;
+                }
+            };
+
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
@@ -169,9 +180,9 @@ public class RoutineConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public static Builder builder() {
+    public static Builder<RoutineConfiguration> builder() {
 
-        return new Builder();
+        return new Builder<RoutineConfiguration>(sDefaultConfigurable);
     }
 
     /**
@@ -181,278 +192,11 @@ public class RoutineConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public static Builder builderFrom(@Nullable final RoutineConfiguration initialConfiguration) {
+    public static Builder<RoutineConfiguration> builderFrom(
+            @Nullable final RoutineConfiguration initialConfiguration) {
 
-        return (initialConfiguration == null) ? builder() : new Builder(initialConfiguration);
-    }
-
-    /**
-     * Returns the specified configuration or the empty one if the former is null.
-     *
-     * @param configuration the routine configuration.
-     * @return the configuration.
-     */
-    @Nonnull
-    public static RoutineConfiguration notNull(@Nullable final RoutineConfiguration configuration) {
-
-        return (configuration != null) ? configuration : EMPTY_CONFIGURATION;
-    }
-
-    /**
-     * Short for <b><code>builder().onReadTimeout(action)</code></b>.
-     *
-     * @param action the action type.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder onReadTimeout(@Nullable final TimeoutActionType action) {
-
-        return builder().onReadTimeout(action);
-    }
-
-    /**
-     * Short for <b><code>builder().withAsyncRunner(runner)</code></b>.
-     *
-     * @param runner the runner instance.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withAsyncRunner(@Nullable final Runner runner) {
-
-        return builder().withAsyncRunner(runner);
-    }
-
-    /**
-     * Short for <b><code>builder().withAvailableTimeout(timeout, timeUnit)</code></b>.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public static Builder withAvailableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        return withAvailableTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    /**
-     * Short for <b><code>builder().withAvailableTimeout(timeout)</code></b>.
-     *
-     * @param timeout the timeout.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withAvailableTimeout(@Nullable final TimeDuration timeout) {
-
-        return builder().withAvailableTimeout(timeout);
-    }
-
-    /**
-     * Short for <b><code>builder().withCoreInvocations(coreInvocations)</code></b>.
-     *
-     * @param coreInvocations the max number of instances.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the number is negative.
-     */
-    @Nonnull
-    public static Builder withCoreInvocations(final int coreInvocations) {
-
-        return builder().withCoreInvocations(coreInvocations);
-    }
-
-    /**
-     * Short for <b><code>builder().withFactoryArgs(args)</code></b>.
-     *
-     * @param args the arguments.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withFactoryArgs(@Nullable final Object... args) {
-
-        return builder().withFactoryArgs(args);
-    }
-
-    /**
-     * Short for <b><code>builder().withInputOrder(order)</code></b>.
-     *
-     * @param order the order type.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withInputOrder(@Nullable final OrderType order) {
-
-        return builder().withInputOrder(order);
-    }
-
-    /**
-     * Short for <b><code>builder().withInputSize(inputMaxSize)</code></b>.
-     *
-     * @param inputMaxSize the maximum size.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public static Builder withInputSize(final int inputMaxSize) {
-
-        return builder().withInputSize(inputMaxSize);
-    }
-
-    /**
-     * Short for <b><code>builder().withInputTimeout(timeout, timeUnit)</code></b>.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public static Builder withInputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-        return withInputTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    /**
-     * Short for <b><code>builder().withInputTimeout(timeout)</code></b>.
-     *
-     * @param timeout the timeout.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withInputTimeout(@Nullable final TimeDuration timeout) {
-
-        return builder().withInputTimeout(timeout);
-    }
-
-    /**
-     * Short for <b><code>builder().withLog(log)</code></b>.
-     *
-     * @param log the log instance.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withLog(@Nullable final Log log) {
-
-        return builder().withLog(log);
-    }
-
-    /**
-     * Short for <b><code>builder().withLogLevel(level)</code></b>.
-     *
-     * @param level the log level.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withLogLevel(@Nullable final LogLevel level) {
-
-        return builder().withLogLevel(level);
-    }
-
-    /**
-     * Short for <b><code>builder().withMaxInvocations(maxInvocations)</code></b>.
-     *
-     * @param maxInvocations the max number of instances.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public static Builder withMaxInvocations(final int maxInvocations) {
-
-        return builder().withMaxInvocations(maxInvocations);
-    }
-
-    /**
-     * Short for <b><code>builder().withOutputOrder(order)</code></b>.
-     *
-     * @param order the order type.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withOutputOrder(@Nullable final OrderType order) {
-
-        return builder().withOutputOrder(order);
-    }
-
-    /**
-     * Short for <b><code>builder().withOutputSize(outputMaxSize)</code></b>.
-     *
-     * @param outputMaxSize the maximum size.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public static Builder withOutputSize(final int outputMaxSize) {
-
-        return builder().withOutputSize(outputMaxSize);
-    }
-
-    /**
-     * Short for <b><code>builder().withOutputTimeout(timeout, timeUnit)</code></b>.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public static Builder withOutputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-        return withOutputTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    /**
-     * Short for <b><code>builder().withOutputTimeout(timeout)</code></b>.
-     *
-     * @param timeout the timeout.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withOutputTimeout(@Nullable final TimeDuration timeout) {
-
-        return builder().withOutputTimeout(timeout);
-    }
-
-    /**
-     * Short for <b><code>builder().withReadTimeout(timeout, timeUnit)</code></b>.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return the routine configuration builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public static Builder withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-        return withReadTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    /**
-     * Short for <b><code>builder().withReadTimeout(timeout)</code></b>.
-     *
-     * @param timeout the timeout.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withReadTimeout(@Nullable final TimeDuration timeout) {
-
-        return builder().withReadTimeout(timeout);
-    }
-
-    /**
-     * Short for <b><code>builder().withSyncRunner(runner)</code></b>.
-     *
-     * @param runner the runner instance.
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    public static Builder withSyncRunner(@Nullable final Runner runner) {
-
-        return builder().withSyncRunner(runner);
+        return (initialConfiguration == null) ? builder()
+                : new Builder<RoutineConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
     /**
@@ -461,9 +205,9 @@ public class RoutineConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public Builder builderFrom() {
+    public Builder<RoutineConfiguration> builderFrom() {
 
-        return new Builder(this);
+        return builderFrom(this);
     }
 
     /**
@@ -868,9 +612,22 @@ public class RoutineConfiguration {
     }
 
     /**
+     * TODO
+     *
+     * @param <TYPE>
+     */
+    public interface Configurable<TYPE> {
+
+        @Nonnull
+        TYPE configureWith(@Nonnull RoutineConfiguration configuration);
+    }
+
+    /**
      * Builder of routine configurations.
      */
-    public static class Builder {
+    public static class Builder<TYPE> {
+
+        private final Configurable<? extends TYPE> mConfigurable;
 
         private Object[] mArgs;
 
@@ -906,9 +663,19 @@ public class RoutineConfiguration {
 
         /**
          * Constructor.
+         *
+         * @param configurable the configurable instance.
+         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
-        private Builder() {
+        @SuppressWarnings("ConstantConditions")
+        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
 
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
+
+            mConfigurable = configurable;
             mMaxInvocations = DEFAULT;
             mCoreInvocations = DEFAULT;
             mInputMaxSize = DEFAULT;
@@ -918,27 +685,61 @@ public class RoutineConfiguration {
         /**
          * Constructor.
          *
-         * @param initialConfiguration the initial configuration.
-         * @throws java.lang.NullPointerException if the specified configuration instance is null.
+         * @param configurable         the configurable instance.
+         * @param routineConfiguration the initial configuration.
+         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
-        private Builder(@Nonnull final RoutineConfiguration initialConfiguration) {
+        @SuppressWarnings("ConstantConditions")
+        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
+                @Nonnull final RoutineConfiguration routineConfiguration) {
 
-            mArgs = initialConfiguration.mFactoryArgs;
-            mSyncRunner = initialConfiguration.mSyncRunner;
-            mAsyncRunner = initialConfiguration.mAsyncRunner;
-            mMaxInvocations = initialConfiguration.mMaxInvocations;
-            mCoreInvocations = initialConfiguration.mCoreInvocations;
-            mAvailTimeout = initialConfiguration.mAvailTimeout;
-            mReadTimeout = initialConfiguration.mReadTimeout;
-            mTimeoutActionType = initialConfiguration.mTimeoutActionType;
-            mInputOrderType = initialConfiguration.mInputOrder;
-            mInputMaxSize = initialConfiguration.mInputMaxSize;
-            mInputTimeout = initialConfiguration.mInputTimeout;
-            mOutputOrderType = initialConfiguration.mOutputOrder;
-            mOutputMaxSize = initialConfiguration.mOutputMaxSize;
-            mOutputTimeout = initialConfiguration.mOutputTimeout;
-            mLog = initialConfiguration.mLog;
-            mLogLevel = initialConfiguration.mLogLevel;
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
+
+            mConfigurable = configurable;
+            mArgs = routineConfiguration.mFactoryArgs;
+            mSyncRunner = routineConfiguration.mSyncRunner;
+            mAsyncRunner = routineConfiguration.mAsyncRunner;
+            mMaxInvocations = routineConfiguration.mMaxInvocations;
+            mCoreInvocations = routineConfiguration.mCoreInvocations;
+            mAvailTimeout = routineConfiguration.mAvailTimeout;
+            mReadTimeout = routineConfiguration.mReadTimeout;
+            mTimeoutActionType = routineConfiguration.mTimeoutActionType;
+            mInputOrderType = routineConfiguration.mInputOrder;
+            mInputMaxSize = routineConfiguration.mInputMaxSize;
+            mInputTimeout = routineConfiguration.mInputTimeout;
+            mOutputOrderType = routineConfiguration.mOutputOrder;
+            mOutputMaxSize = routineConfiguration.mOutputMaxSize;
+            mOutputTimeout = routineConfiguration.mOutputTimeout;
+            mLog = routineConfiguration.mLog;
+            mLogLevel = routineConfiguration.mLogLevel;
+        }
+
+        /**
+         * Sets the action to be taken if the timeout elapses before a result can be read from the
+         * output channel.
+         *
+         * @param action the action type.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> onReadTimeout(@Nullable final TimeoutActionType action) {
+
+            mTimeoutActionType = action;
+            return this;
+        }
+
+        /**
+         * TODO
+         *
+         * @return
+         */
+        @Nonnull
+        public TYPE then() {
+
+            return mConfigurable.configureWith(buildConfiguration());
         }
 
         /**
@@ -948,7 +749,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder apply(@Nullable final RoutineConfiguration configuration) {
+        public Builder<TYPE> with(@Nullable final RoutineConfiguration configuration) {
 
             if (configuration == null) {
 
@@ -962,35 +763,6 @@ public class RoutineConfiguration {
         }
 
         /**
-         * Builds and return the configuration instance.
-         *
-         * @return the routine configuration instance.
-         */
-        @Nonnull
-        public RoutineConfiguration buildConfiguration() {
-
-            return new RoutineConfiguration(mArgs, mSyncRunner, mAsyncRunner, mMaxInvocations,
-                                            mCoreInvocations, mAvailTimeout, mReadTimeout,
-                                            mTimeoutActionType, mInputOrderType, mInputMaxSize,
-                                            mInputTimeout, mOutputOrderType, mOutputMaxSize,
-                                            mOutputTimeout, mLog, mLogLevel);
-        }
-
-        /**
-         * Sets the action to be taken if the timeout elapses before a result can be read from the
-         * output channel.
-         *
-         * @param action the action type.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder onReadTimeout(@Nullable final TimeoutActionType action) {
-
-            mTimeoutActionType = action;
-            return this;
-        }
-
-        /**
          * Sets the asynchronous runner instance. A null value means that it is up to the framework
          * to choose a default instance.
          *
@@ -998,7 +770,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withAsyncRunner(@Nullable final Runner runner) {
+        public Builder<TYPE> withAsyncRunner(@Nullable final Runner runner) {
 
             mAsyncRunner = runner;
             return this;
@@ -1014,7 +786,8 @@ public class RoutineConfiguration {
          * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
-        public Builder withAvailableTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        public Builder<TYPE> withAvailableTimeout(final long timeout,
+                @Nonnull final TimeUnit timeUnit) {
 
             return withAvailableTimeout(fromUnit(timeout, timeUnit));
         }
@@ -1027,7 +800,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withAvailableTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withAvailableTimeout(@Nullable final TimeDuration timeout) {
 
             mAvailTimeout = timeout;
             return this;
@@ -1043,7 +816,7 @@ public class RoutineConfiguration {
          * @throws java.lang.IllegalArgumentException if the number is negative.
          */
         @Nonnull
-        public Builder withCoreInvocations(final int coreInvocations) {
+        public Builder<TYPE> withCoreInvocations(final int coreInvocations) {
 
             if ((coreInvocations != DEFAULT) && (coreInvocations < 0)) {
 
@@ -1068,7 +841,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withFactoryArgs(@Nullable final Object... args) {
+        public Builder<TYPE> withFactoryArgs(@Nullable final Object... args) {
 
             mArgs = (args != null) ? args.clone() : null;
             return this;
@@ -1082,7 +855,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withInputOrder(@Nullable final OrderType orderType) {
+        public Builder<TYPE> withInputOrder(@Nullable final OrderType orderType) {
 
             mInputOrderType = orderType;
             return this;
@@ -1098,7 +871,7 @@ public class RoutineConfiguration {
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
         @Nonnull
-        public Builder withInputSize(final int inputMaxSize) {
+        public Builder<TYPE> withInputSize(final int inputMaxSize) {
 
             if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
 
@@ -1120,7 +893,8 @@ public class RoutineConfiguration {
          * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
-        public Builder withInputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        public Builder<TYPE> withInputTimeout(final long timeout,
+                @Nonnull final TimeUnit timeUnit) {
 
             return withInputTimeout(fromUnit(timeout, timeUnit));
         }
@@ -1133,7 +907,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withInputTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withInputTimeout(@Nullable final TimeDuration timeout) {
 
             mInputTimeout = timeout;
             return this;
@@ -1147,7 +921,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withLog(@Nullable final Log log) {
+        public Builder<TYPE> withLog(@Nullable final Log log) {
 
             mLog = log;
             return this;
@@ -1161,7 +935,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withLogLevel(@Nullable final LogLevel level) {
+        public Builder<TYPE> withLogLevel(@Nullable final LogLevel level) {
 
             mLogLevel = level;
             return this;
@@ -1177,7 +951,7 @@ public class RoutineConfiguration {
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
         @Nonnull
-        public Builder withMaxInvocations(final int maxInvocations) {
+        public Builder<TYPE> withMaxInvocations(final int maxInvocations) {
 
             if ((maxInvocations != DEFAULT) && (maxInvocations < 1)) {
 
@@ -1198,7 +972,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withOutputOrder(@Nullable final OrderType orderType) {
+        public Builder<TYPE> withOutputOrder(@Nullable final OrderType orderType) {
 
             mOutputOrderType = orderType;
             return this;
@@ -1214,7 +988,7 @@ public class RoutineConfiguration {
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
         @Nonnull
-        public Builder withOutputSize(final int outputMaxSize) {
+        public Builder<TYPE> withOutputSize(final int outputMaxSize) {
 
             if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
 
@@ -1236,7 +1010,8 @@ public class RoutineConfiguration {
          * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
-        public Builder withOutputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        public Builder<TYPE> withOutputTimeout(final long timeout,
+                @Nonnull final TimeUnit timeUnit) {
 
             return withOutputTimeout(fromUnit(timeout, timeUnit));
         }
@@ -1249,7 +1024,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withOutputTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withOutputTimeout(@Nullable final TimeDuration timeout) {
 
             mOutputTimeout = timeout;
             return this;
@@ -1265,7 +1040,7 @@ public class RoutineConfiguration {
          * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
-        public Builder withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        public Builder<TYPE> withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
             return withReadTimeout(fromUnit(timeout, timeUnit));
         }
@@ -1278,7 +1053,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withReadTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
 
             mReadTimeout = timeout;
             return this;
@@ -1292,7 +1067,7 @@ public class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withSyncRunner(@Nullable final Runner runner) {
+        public Builder<TYPE> withSyncRunner(@Nullable final Runner runner) {
 
             mSyncRunner = runner;
             return this;
@@ -1418,6 +1193,21 @@ public class RoutineConfiguration {
 
                 withLogLevel(logLevel);
             }
+        }
+
+        /**
+         * Builds and return the configuration instance.
+         *
+         * @return the routine configuration instance.
+         */
+        @Nonnull
+        private RoutineConfiguration buildConfiguration() {
+
+            return new RoutineConfiguration(mArgs, mSyncRunner, mAsyncRunner, mMaxInvocations,
+                                            mCoreInvocations, mAvailTimeout, mReadTimeout,
+                                            mTimeoutActionType, mInputOrderType, mInputMaxSize,
+                                            mInputTimeout, mOutputOrderType, mOutputMaxSize,
+                                            mOutputTimeout, mLog, mLogLevel);
         }
     }
 }

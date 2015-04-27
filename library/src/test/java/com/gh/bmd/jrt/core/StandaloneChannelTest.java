@@ -235,11 +235,11 @@ public class StandaloneChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final StandaloneChannel<String> standaloneChannel1 = JRoutine.standalone()
-                                                                     .configure()
+                                                                     .routineConfiguration()
                                                                      .withOutputOrder(
                                                                              OrderType
                                                                                      .PASSING_ORDER)
-                                                                     .then()
+                                                                     .build()
                                                                      .buildChannel();
 
         new Thread() {
@@ -267,8 +267,7 @@ public class StandaloneChannelTest {
     public void testConfigurationWarnings() {
 
         final CountLog countLog = new CountLog();
-        JRoutine.standalone()
-                .configure()
+        JRoutine.standalone().routineConfiguration()
                 .withFactoryArgs()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withMaxInvocations(3)
@@ -278,8 +277,7 @@ public class StandaloneChannelTest {
                 .withInputSize(3)
                 .withInputTimeout(seconds(1))
                 .withLogLevel(LogLevel.DEBUG)
-                .withLog(countLog)
-                .then()
+                .withLog(countLog).build()
                 .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(8);
     }
@@ -432,8 +430,7 @@ public class StandaloneChannelTest {
     public void testOrderType() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<Object> channel = JRoutine.standalone()
-                                                          .configure()
+        final StandaloneChannel<Object> channel = JRoutine.standalone().routineConfiguration()
                                                           .withOutputOrder(OrderType.PASSING_ORDER)
                                                           .withAsyncRunner(Runners.sharedRunner())
                                                           .withOutputSize(1)
@@ -441,8 +438,7 @@ public class StandaloneChannelTest {
                                                                              TimeUnit.MILLISECONDS)
                                                           .withOutputTimeout(seconds(1))
                                                           .withLogLevel(LogLevel.DEBUG)
-                                                          .withLog(new NullLog())
-                                                          .then()
+                                                          .withLog(new NullLog()).build()
                                                           .buildChannel();
         channel.input().pass(-77L);
         assertThat(channel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
@@ -454,11 +450,11 @@ public class StandaloneChannelTest {
         assertThat(standaloneChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
         final StandaloneChannel<Object> standaloneChannel2 = JRoutine.standalone()
-                                                                     .configure()
+                                                                     .routineConfiguration()
                                                                      .withOutputOrder(
                                                                              OrderType
                                                                                      .PASSING_ORDER)
-                                                                     .then()
+                                                                     .build()
                                                                      .buildChannel();
         final StandaloneInput<Object> input2 = standaloneChannel2.input();
 
@@ -515,10 +511,10 @@ public class StandaloneChannelTest {
     public void testReadTimeout() {
 
         final StandaloneChannel<Object> channel1 = JRoutine.standalone()
-                                                           .configure()
+                                                           .routineConfiguration()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(TimeoutActionType.EXIT)
-                                                           .then()
+                                                           .build()
                                                            .buildChannel();
 
         assertThat(channel1.output().readAll()).isEmpty();
@@ -528,10 +524,10 @@ public class StandaloneChannelTest {
     public void testReadTimeout2() {
 
         final StandaloneChannel<Object> channel2 = JRoutine.standalone()
-                                                           .configure()
+                                                           .routineConfiguration()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(TimeoutActionType.ABORT)
-                                                           .then()
+                                                           .build()
                                                            .buildChannel();
 
         try {
@@ -549,11 +545,11 @@ public class StandaloneChannelTest {
     public void testReadTimeout3() {
 
         final StandaloneChannel<Object> channel3 = JRoutine.standalone()
-                                                           .configure()
+                                                           .routineConfiguration()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(
                                                                    TimeoutActionType.DEADLOCK)
-                                                           .then()
+                                                           .build()
                                                            .buildChannel();
 
         try {

@@ -18,7 +18,6 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 
 import com.gh.bmd.jrt.android.v11.core.JRoutine;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -40,7 +39,6 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withFactoryArgs;
 import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.time.TimeDuration.micros;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
@@ -83,10 +81,13 @@ public class AndroidRunnerTest extends AndroidTestCase {
                         result.pass(Looper.myLooper()).pass(Runners.myRunner());
                     }
                 };
-        final Builder builder = withFactoryArgs(this).withAsyncRunner(
-                Runners.threadRunner(new HandlerThread("test")));
-        final OutputChannel<Object> channel =
-                JRoutine.on(ClassToken.tokenOf(invocation)).configure(builder).callAsync();
+        final OutputChannel<Object> channel = JRoutine.on(ClassToken.tokenOf(invocation))
+                                                      .routineConfiguration()
+                                                      .withFactoryArgs(this)
+                                                      .withAsyncRunner(Runners.threadRunner(
+                                                              new HandlerThread("test")))
+                                                      .build()
+                                                      .callAsync();
 
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {
 

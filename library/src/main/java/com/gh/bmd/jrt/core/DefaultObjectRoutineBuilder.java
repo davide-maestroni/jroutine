@@ -21,7 +21,6 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.ProxyConfiguration.Configurable;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
@@ -60,21 +59,24 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     private static final WeakIdentityHashMap<Object, HashMap<Method, Method>> sMethodCache =
             new WeakIdentityHashMap<Object, HashMap<Method, Method>>();
 
-    private Configurable<ObjectRoutineBuilder> mConfigurable =
-            new Configurable<ObjectRoutineBuilder>() {
+    private final ProxyConfiguration.Configurable<ObjectRoutineBuilder> mProxyConfigurable =
+            new ProxyConfiguration.Configurable<ObjectRoutineBuilder>() {
 
                 @Nonnull
-                public ObjectRoutineBuilder configureWith(
-                        @Nonnull final ProxyConfiguration configuration) {
+                public ObjectRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
 
-                    return DefaultObjectRoutineBuilder.this.configureWith(configuration);
+                    return DefaultObjectRoutineBuilder.this.apply(configuration);
                 }
+            };
+
+    private final RoutineConfiguration.Configurable<ObjectRoutineBuilder> mRoutineConfigurable =
+            new RoutineConfiguration.Configurable<ObjectRoutineBuilder>() {
 
                 @Nonnull
-                public ObjectRoutineBuilder configureWith(
+                public ObjectRoutineBuilder apply(
                         @Nonnull final RoutineConfiguration configuration) {
 
-                    return DefaultObjectRoutineBuilder.this.configureWith(configuration);
+                    return DefaultObjectRoutineBuilder.this.apply(configuration);
                 }
             };
 
@@ -203,6 +205,40 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     @Nonnull
+    @Override
+    public ObjectRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
+
+        super.apply(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
+
+        super.apply(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("unchecked")
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxyConfiguration() {
+
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
+                                                                    getProxyConfiguration());
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("unchecked")
+    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> routineConfiguration() {
+
+        return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
+                                                                      getRoutineConfiguration());
+    }
+
+    @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -231,32 +267,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
-    }
-
-    @Nonnull
-    @Override
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> configure() {
-
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mConfigurable,
-                                                                    getRoutineConfiguration(),
-                                                                    getProxyConfiguration());
-    }
-
-    @Nonnull
-    @Override
-    protected ObjectRoutineBuilder configureWith(@Nonnull final ProxyConfiguration configuration) {
-
-        super.configureWith(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    protected ObjectRoutineBuilder configureWith(
-            @Nonnull final RoutineConfiguration configuration) {
-
-        super.configureWith(configuration);
-        return this;
     }
 
     @Nonnull
@@ -423,7 +433,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 builder.onReadTimeout(actionAnnotation.value());
             }
 
-            return getRoutine(builder.then(), shareGroup, targetMethod,
+            return getRoutine(builder.build(), shareGroup, targetMethod,
                               (paramMode == PassMode.COLLECTION),
                               (returnMode == PassMode.COLLECTION));
         }

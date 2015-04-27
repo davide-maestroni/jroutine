@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
 import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 
@@ -25,9 +26,10 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 10/25/14.
  */
-class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
+class DefaultStandaloneChannelBuilder
+        implements StandaloneChannelBuilder, Configurable<StandaloneChannelBuilder> {
 
-    private RoutineConfiguration mConfiguration = RoutineConfiguration.EMPTY_CONFIGURATION;
+    private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Avoid direct instantiation.
@@ -37,21 +39,8 @@ class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
     }
 
     @Nonnull
-    public <T> StandaloneChannel<T> buildChannel() {
-
-        return new DefaultStandaloneChannel<T>(mConfiguration);
-    }
-
-    @Nonnull
-    public Builder<StandaloneChannelBuilder> configure() {
-
-        return new Builder<StandaloneChannelBuilder>(this, mConfiguration);
-    }
-
-    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public StandaloneChannelBuilder configureWith(
-            @Nonnull final RoutineConfiguration configuration) {
+    public StandaloneChannelBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -60,5 +49,17 @@ class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public <T> StandaloneChannel<T> buildChannel() {
+
+        return new DefaultStandaloneChannel<T>(mConfiguration);
+    }
+
+    @Nonnull
+    public Builder<StandaloneChannelBuilder> routineConfiguration() {
+
+        return new Builder<StandaloneChannelBuilder>(this, mConfiguration);
     }
 }

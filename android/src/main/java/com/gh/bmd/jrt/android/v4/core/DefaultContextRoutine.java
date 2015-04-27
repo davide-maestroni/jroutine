@@ -17,9 +17,9 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -87,7 +87,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     DefaultContextRoutine(@Nonnull final WeakReference<Object> context,
             @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
             @Nonnull final RoutineConfiguration routineConfiguration,
-            @Nonnull final ContextInvocationConfiguration invocationConfiguration) {
+            @Nonnull final InvocationConfiguration invocationConfiguration) {
 
         super(routineConfiguration);
 
@@ -107,8 +107,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         }
 
         mContext = context;
-        mInvocationId =
-                invocationConfiguration.getInvocationIdOr(ContextInvocationConfiguration.AUTO);
+        mInvocationId = invocationConfiguration.getInvocationIdOr(InvocationConfiguration.AUTO);
         mClashResolutionType =
                 invocationConfiguration.getResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
         mCacheStrategyType = invocationConfiguration.getStrategyTypeOr(CacheStrategyType.CLEAR);

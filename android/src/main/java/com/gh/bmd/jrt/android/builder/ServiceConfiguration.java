@@ -30,12 +30,23 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 20/04/15.
  */
-public class ServiceConfiguration {
+public final class ServiceConfiguration {
+
+    private static final Configurable<ServiceConfiguration> sDefaultConfigurable =
+            new Configurable<ServiceConfiguration>() {
+
+                @Nonnull
+                public ServiceConfiguration apply(
+                        @Nonnull final ServiceConfiguration configuration) {
+
+                    return configuration;
+                }
+            };
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
-    public static final ServiceConfiguration EMPTY_CONFIGURATION = builder().buildConfiguration();
+    public static final ServiceConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
     private final Class<? extends Log> mLogClass;
 
@@ -70,9 +81,9 @@ public class ServiceConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public static Builder builder() {
+    public static Builder<ServiceConfiguration> builder() {
 
-        return new Builder();
+        return new Builder<ServiceConfiguration>(sDefaultConfigurable);
     }
 
     /**
@@ -82,70 +93,11 @@ public class ServiceConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public static Builder builderFrom(@Nullable final ServiceConfiguration initialConfiguration) {
+    public static Builder<ServiceConfiguration> builderFrom(
+            @Nullable final ServiceConfiguration initialConfiguration) {
 
-        return (initialConfiguration == null) ? builder() : new Builder(initialConfiguration);
-    }
-
-    /**
-     * Short for <b><code>builder().dispatchingOn(looper)</code></b>.
-     *
-     * @param looper the looper instance.
-     * @return the service configuration builder.
-     */
-    @Nonnull
-    public static Builder dispatchingOn(@Nullable final Looper looper) {
-
-        return builder().dispatchingOn(looper);
-    }
-
-    /**
-     * Returns the specified configuration or the empty one if the former is null.
-     *
-     * @param configuration the invocation configuration.
-     * @return the configuration.
-     */
-    @Nonnull
-    public static ServiceConfiguration notNull(@Nullable final ServiceConfiguration configuration) {
-
-        return (configuration != null) ? configuration : EMPTY_CONFIGURATION;
-    }
-
-    /**
-     * Short for <b><code>builder().withLogClass(logClass)</code></b>.
-     *
-     * @param logClass the log class.
-     * @return the service configuration builder.
-     */
-    @Nonnull
-    public static Builder withLogClass(@Nullable final Class<? extends Log> logClass) {
-
-        return builder().withLogClass(logClass);
-    }
-
-    /**
-     * Short for <b><code>builder().withRunnerClass(runnerClass)</code></b>.
-     *
-     * @param runnerClass the runner class.
-     * @return the service configuration builder.
-     */
-    @Nonnull
-    public static Builder withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
-
-        return builder().withRunnerClass(runnerClass);
-    }
-
-    /**
-     * Short for <b><code>builder().withServiceClass(serviceClass)</code></b>.
-     *
-     * @param serviceClass the service class.
-     * @return the service configuration builder.
-     */
-    @Nonnull
-    public static Builder withServiceClass(
-            @Nullable final Class<? extends RoutineService> serviceClass) {
-
-        return builder().withServiceClass(serviceClass);
+        return (initialConfiguration == null) ? builder()
+                : new Builder<ServiceConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
     /**
@@ -154,9 +106,9 @@ public class ServiceConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public Builder builderFrom() {
+    public Builder<ServiceConfiguration> builderFrom() {
 
-        return new Builder(this);
+        return builderFrom(this);
     }
 
     @Override
@@ -269,9 +221,30 @@ public class ServiceConfiguration {
     }
 
     /**
-     * Builder of service configurations.
+     * Interface defining a configurable object.
+     *
+     * @param <TYPE> the configurable object type.
      */
-    public static class Builder {
+    public interface Configurable<TYPE> {
+
+        /**
+         * Applies the specified configuration and returns the configurable instance.
+         *
+         * @param configuration the configuration.
+         * @return the configurable instance.
+         */
+        @Nonnull
+        TYPE apply(@Nonnull ServiceConfiguration configuration);
+    }
+
+    /**
+     * Builder of service configurations.
+     *
+     * @param <TYPE> the configurable object type.
+     */
+    public static class Builder<TYPE> {
+
+        private final Configurable<? extends TYPE> mConfigurable;
 
         private Class<? extends Log> mLogClass;
 
@@ -283,36 +256,80 @@ public class ServiceConfiguration {
 
         /**
          * Constructor.
+         *
+         * @param configurable the configurable instance.
+         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
-        private Builder() {
+        @SuppressWarnings("ConstantConditions")
+        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
 
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
+
+            mConfigurable = configurable;
         }
 
         /**
          * Constructor.
          *
+         * @param configurable         the configurable instance.
          * @param initialConfiguration the initial configuration.
-         * @throws java.lang.NullPointerException if the specified configuration instance is null.
+         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
-        private Builder(@Nonnull final ServiceConfiguration initialConfiguration) {
+        @SuppressWarnings("ConstantConditions")
+        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
+                @Nonnull final ServiceConfiguration initialConfiguration) {
 
-            mLooper = initialConfiguration.mLooper;
-            mServiceClass = initialConfiguration.mServiceClass;
-            mRunnerClass = initialConfiguration.mRunnerClass;
-            mLogClass = initialConfiguration.mLogClass;
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
+
+            mConfigurable = configurable;
+            apply(initialConfiguration);
         }
 
         /**
-         * Applies the specified configuration to this builder.
+         * Applies the configuration and returns the configurable object.
+         *
+         * @return the configurable object.
+         */
+        @Nonnull
+        public TYPE build() {
+
+            return mConfigurable.apply(buildConfiguration());
+        }
+
+        /**
+         * Sets the looper on which the results from the service are dispatched. A null value means
+         * that results will be dispatched on the main thread (as by default).
+         *
+         * @param looper the looper instance.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> dispatchingOn(@Nullable final Looper looper) {
+
+            mLooper = looper;
+            return this;
+        }
+
+        /**
+         * Applies the specified configuration to this builder. A null value means that all the
+         * configuration options need to be set to their default value, otherwise only the set
+         * options will be applied.
          *
          * @param configuration the service configuration.
          * @return this builder.
          */
         @Nonnull
-        public Builder apply(@Nullable final ServiceConfiguration configuration) {
+        public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
 
             if (configuration == null) {
 
+                apply(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -348,31 +365,6 @@ public class ServiceConfiguration {
         }
 
         /**
-         * Builds and return the configuration instance.
-         *
-         * @return the service configuration instance.
-         */
-        @Nonnull
-        public ServiceConfiguration buildConfiguration() {
-
-            return new ServiceConfiguration(mLooper, mServiceClass, mRunnerClass, mLogClass);
-        }
-
-        /**
-         * Sets the looper on which the results from the service are dispatched. A null value means
-         * that results will be dispatched on the main thread (as by default).
-         *
-         * @param looper the looper instance.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder dispatchingOn(@Nullable final Looper looper) {
-
-            mLooper = looper;
-            return this;
-        }
-
-        /**
          * Sets the log class. A null value means that it is up to the framework to choose a default
          * implementation.
          *
@@ -380,7 +372,7 @@ public class ServiceConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withLogClass(@Nullable final Class<? extends Log> logClass) {
+        public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
 
             mLogClass = logClass;
             return this;
@@ -394,7 +386,7 @@ public class ServiceConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
+        public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
 
             mRunnerClass = runnerClass;
             return this;
@@ -408,11 +400,25 @@ public class ServiceConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder withServiceClass(
+        public Builder<TYPE> withServiceClass(
                 @Nullable final Class<? extends RoutineService> serviceClass) {
 
             mServiceClass = serviceClass;
             return this;
+        }
+
+        private void apply(@Nonnull final ServiceConfiguration configuration) {
+
+            mLooper = configuration.mLooper;
+            mServiceClass = configuration.mServiceClass;
+            mRunnerClass = configuration.mRunnerClass;
+            mLogClass = configuration.mLogClass;
+        }
+
+        @Nonnull
+        private ServiceConfiguration buildConfiguration() {
+
+            return new ServiceConfiguration(mLooper, mServiceClass, mRunnerClass, mLogClass);
         }
     }
 }

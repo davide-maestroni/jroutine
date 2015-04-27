@@ -13,48 +13,46 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of routine whose invocation runs in a dedicated service.
+ * Interface defining a builder of routine objects based on an invocation class token.<br/>
+ * The invocation execution will happen in a dedicated service.
  * <p/>
  * The local context of the invocations will be the specific service instance.
  * <p/>
- * Created by davide on 3/29/15.
+ * Note that, like the object passed to the service routine input and output channels, the
+ * invocation factory arguments must comply with the {@link android.os.Parcel#writeValue(Object)}
+ * method. Be aware though, that issues may arise when employing {@link java.io.Serializable}
+ * objects on the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable}
+ * objects instead.
+ * <p/>
+ * Created by davide on 3/7/15.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
-public interface ServiceRoutineBuilder extends ConfigurableBuilder {
+public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
+    RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
+    routineConfiguration();
 
     /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ServiceRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
-
-    /**
-     * Tells the builder to create a routine using the specified service configuration.
+     * Gets the service configuration builder related to this builder instance.<br/>
+     * The configuration options not supported by the builder implementation might be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @param configuration the configuration.
-     * @return this builder.
+     * @return the service configuration builder.
      */
     @Nonnull
-    ServiceRoutineBuilder service(@Nullable ServiceConfiguration configuration);
-
-    /**
-     * Tells the builder to create a routine using the specified service configuration.
-     *
-     * @param builder the configuration builder.
-     * @return this builder.
-     */
-    @Nonnull
-    ServiceRoutineBuilder service(@Nonnull ServiceConfiguration.Builder builder);
+    ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
+    serviceConfiguration();
 }

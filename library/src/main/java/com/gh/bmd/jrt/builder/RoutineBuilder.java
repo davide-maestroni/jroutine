@@ -40,10 +40,13 @@ public interface RoutineBuilder<INPUT, OUTPUT> extends Routine<INPUT, OUTPUT> {
     Routine<INPUT, OUTPUT> buildRoutine();
 
     /**
-     * TODO
+     * Gets the routine configuration builder related to this builder instance.<br/>
+     * The configuration options not supported by the builder implementation might be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @return
+     * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends RoutineBuilder<INPUT, OUTPUT>> configure();
+    Builder<? extends RoutineBuilder<INPUT, OUTPUT>> routineConfiguration();
 }

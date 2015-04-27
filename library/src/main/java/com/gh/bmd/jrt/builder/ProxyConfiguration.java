@@ -13,15 +13,6 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
-import com.gh.bmd.jrt.log.Log;
-import com.gh.bmd.jrt.log.Log.LogLevel;
-import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.time.TimeDuration;
-
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -39,21 +30,13 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 20/04/15.
  */
-public class ProxyConfiguration {
+public final class ProxyConfiguration {
 
     private static final Configurable<ProxyConfiguration> sDefaultConfigurable =
             new Configurable<ProxyConfiguration>() {
 
                 @Nonnull
-                public ProxyConfiguration configureWith(
-                        @Nonnull final RoutineConfiguration configuration) {
-
-                    return ProxyConfiguration.EMPTY_CONFIGURATION;
-                }
-
-                @Nonnull
-                public ProxyConfiguration configureWith(
-                        @Nonnull final ProxyConfiguration configuration) {
+                public ProxyConfiguration apply(@Nonnull final ProxyConfiguration configuration) {
 
                     return configuration;
                 }
@@ -62,7 +45,7 @@ public class ProxyConfiguration {
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
-    public static final ProxyConfiguration EMPTY_CONFIGURATION = builder().buildConfiguration();
+    public static final ProxyConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
     private final String mGroupName;
 
@@ -90,20 +73,15 @@ public class ProxyConfiguration {
     /**
      * Returns a proxy configuration builder initialized with the specified configuration.
      *
-     * @param routineConfiguration the initial routine configuration.
-     * @param proxyConfiguration   the initial proxy configuration.
+     * @param initialConfiguration the initial proxy configuration.
      * @return the builder.
      */
     @Nonnull
     public static Builder<ProxyConfiguration> builderFrom(
-            @Nullable final RoutineConfiguration routineConfiguration,
-            @Nullable final ProxyConfiguration proxyConfiguration) {
+            @Nullable final ProxyConfiguration initialConfiguration) {
 
-        return new Builder<ProxyConfiguration>(sDefaultConfigurable, (routineConfiguration == null)
-                ? RoutineConfiguration.EMPTY_CONFIGURATION : routineConfiguration,
-                                               (proxyConfiguration == null)
-                                                       ? ProxyConfiguration.EMPTY_CONFIGURATION
-                                                       : proxyConfiguration);
+        return (initialConfiguration == null) ? builder()
+                : new Builder<ProxyConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
     /**
@@ -114,7 +92,7 @@ public class ProxyConfiguration {
     @Nonnull
     public Builder builderFrom() {
 
-        return builderFrom(RoutineConfiguration.EMPTY_CONFIGURATION, this);
+        return builderFrom(this);
     }
 
     /**
@@ -164,20 +142,28 @@ public class ProxyConfiguration {
     }
 
     /**
-     * TODO
+     * Interface defining a configurable object.
      *
-     * @param <TYPE>
+     * @param <TYPE> the configurable object type.
      */
-    public interface Configurable<TYPE> extends RoutineConfiguration.Configurable<TYPE> {
+    public interface Configurable<TYPE> {
 
+        /**
+         * Applies the specified configuration and returns the configurable instance.
+         *
+         * @param configuration the configuration.
+         * @return the configurable instance.
+         */
         @Nonnull
-        TYPE configureWith(@Nonnull ProxyConfiguration configuration);
+        TYPE apply(@Nonnull ProxyConfiguration configuration);
     }
 
     /**
      * Builder of proxy configurations.
+     *
+     * @param <TYPE> the configurable object type.
      */
-    public static class Builder<TYPE> extends RoutineConfiguration.Builder<TYPE> {
+    public static final class Builder<TYPE> {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
@@ -189,9 +175,14 @@ public class ProxyConfiguration {
          * @param configurable the configurable instance.
          * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
+        @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
 
-            super(configurable);
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
+
             mConfigurable = configurable;
         }
 
@@ -199,204 +190,37 @@ public class ProxyConfiguration {
          * Constructor.
          *
          * @param configurable         the configurable instance.
-         * @param routineConfiguration the initial routine configuration.
-         * @param proxyConfiguration   the initial proxy configuration.
+         * @param initialConfiguration the initial proxy configuration.
          * @throws java.lang.NullPointerException if any of the specified parameters is null.
          */
+        @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final RoutineConfiguration routineConfiguration,
-                @Nonnull final ProxyConfiguration proxyConfiguration) {
+                @Nonnull final ProxyConfiguration initialConfiguration) {
 
-            super(configurable, routineConfiguration);
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
+
             mConfigurable = configurable;
-            mGroupName = proxyConfiguration.mGroupName;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> onReadTimeout(@Nullable final TimeoutActionType action) {
-
-            super.onReadTimeout(action);
-            return this;
+            apply(initialConfiguration);
         }
 
         /**
-         * TODO
+         * Applies the configuration and returns the configurable object.
          *
-         * @return
+         * @return the configurable object.
          */
         @Nonnull
-        public TYPE then() {
+        public TYPE build() {
 
-            super.then();
-            return mConfigurable.configureWith(buildConfiguration());
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> with(@Nullable final RoutineConfiguration configuration) {
-
-            super.with(configuration);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withAsyncRunner(@Nullable final Runner runner) {
-
-            super.withAsyncRunner(runner);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withAvailableTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
-
-            super.withAvailableTimeout(timeout, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withAvailableTimeout(@Nullable final TimeDuration timeout) {
-
-            super.withAvailableTimeout(timeout);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withCoreInvocations(final int coreInvocations) {
-
-            super.withCoreInvocations(coreInvocations);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withFactoryArgs(@Nullable final Object... args) {
-
-            super.withFactoryArgs(args);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withInputOrder(@Nullable final OrderType orderType) {
-
-            super.withInputOrder(orderType);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withInputSize(final int inputMaxSize) {
-
-            super.withInputSize(inputMaxSize);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withInputTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
-
-            super.withInputTimeout(timeout, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withInputTimeout(@Nullable final TimeDuration timeout) {
-
-            super.withInputTimeout(timeout);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withLog(@Nullable final Log log) {
-
-            super.withLog(log);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withLogLevel(@Nullable final LogLevel level) {
-
-            super.withLogLevel(level);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withMaxInvocations(final int maxInvocations) {
-
-            super.withMaxInvocations(maxInvocations);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withOutputOrder(@Nullable final OrderType orderType) {
-
-            super.withOutputOrder(orderType);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withOutputSize(final int outputMaxSize) {
-
-            super.withOutputSize(outputMaxSize);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withOutputTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
-
-            super.withOutputTimeout(timeout, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withOutputTimeout(@Nullable final TimeDuration timeout) {
-
-            super.withOutputTimeout(timeout);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-            super.withReadTimeout(timeout, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
-
-            super.withReadTimeout(timeout);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Builder<TYPE> withSyncRunner(@Nullable final Runner runner) {
-
-            super.withSyncRunner(runner);
-            return this;
+            return mConfigurable.apply(buildConfiguration());
         }
 
         /**
-         * Applies the specified configuration to this builder.
+         * Applies the specified configuration to this builder. A null value means that all the
+         * configuration options need to be set to their default value, otherwise only the set
+         * options will be applied.
          *
          * @param configuration the proxy configuration.
          * @return this builder.
@@ -406,6 +230,7 @@ public class ProxyConfiguration {
 
             if (configuration == null) {
 
+                apply(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -433,11 +258,11 @@ public class ProxyConfiguration {
             return this;
         }
 
-        /**
-         * Builds and return the configuration instance.
-         *
-         * @return the proxy configuration instance.
-         */
+        private void apply(@Nonnull final ProxyConfiguration configuration) {
+
+            mGroupName = configuration.mGroupName;
+        }
+
         @Nonnull
         private ProxyConfiguration buildConfiguration() {
 

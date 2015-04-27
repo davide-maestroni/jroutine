@@ -26,9 +26,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 1/14/15.
  *
- * @see InvocationContextRoutineBuilder
+ * @see ContextRoutineBuilder
  */
-public interface InvocationContextChannelBuilder extends ContextRoutineBuilder {
+public interface ContextChannelBuilder {
 
     /**
      * Builds and returns an output channel bound to the routine invocation.
@@ -39,42 +39,15 @@ public interface InvocationContextChannelBuilder extends ContextRoutineBuilder {
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
-     * Note that only the options related to logs will be employed.
+     * Gets the invocation configuration builder related to this builder instance.<br/>
+     * The clash resolution type will be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @param configuration the routine configuration.
-     * @return this builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    InvocationContextChannelBuilder configure(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * Note that only the options related to logs will be employed.
-     *
-     * @param builder the routine configuration builder.
-     * @return this builder.
-     */
-    @Nonnull
-    InvocationContextChannelBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
-
-    /**
-     * Note that the clash resolution type will be ignored.
-     *
-     * @param configuration the configuration.
-     * @return this builder.
-     */
-    @Nonnull
-    InvocationContextChannelBuilder invocations(
-            @Nullable ContextInvocationConfiguration configuration);
-
-    /**
-     * Note that the clash resolution type will be ignored.
-     *
-     * @param builder the configuration builder.
-     * @return this builder.
-     */
-    @Nonnull
-    InvocationContextChannelBuilder invocations(
-            @Nonnull ContextInvocationConfiguration.Builder builder);
+    InvocationConfiguration.Builder<? extends ContextChannelBuilder> invocationConfiguration();
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified input.
@@ -101,4 +74,15 @@ public interface InvocationContextChannelBuilder extends ContextRoutineBuilder {
      * Makes the builder destroy all the cached invocation instances.
      */
     void purge();
+
+    /**
+     * Gets the routine configuration builder related to this builder instance.<br/>
+     * Only the options related to logs will be employed.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    RoutineConfiguration.Builder<? extends ContextChannelBuilder> routineConfiguration();
 }

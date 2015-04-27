@@ -19,7 +19,6 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.ProxyConfiguration.Configurable;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -56,7 +55,9 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
  * <p/>
  * Created by davide on 9/21/14.
  */
-class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
+class DefaultClassRoutineBuilder
+        implements ClassRoutineBuilder, RoutineConfiguration.Configurable<ClassRoutineBuilder>,
+        ProxyConfiguration.Configurable<ClassRoutineBuilder> {
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
@@ -67,27 +68,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.EMPTY_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.EMPTY_CONFIGURATION;
-
-    private final Configurable<ClassRoutineBuilder> mConfigurable =
-            new Configurable<ClassRoutineBuilder>() {
-
-                @Nonnull
-                public ClassRoutineBuilder configureWith(
-                        @Nonnull final ProxyConfiguration configuration) {
-
-                    return DefaultClassRoutineBuilder.this.configureWith(configuration);
-                }
-
-                @Nonnull
-                public ClassRoutineBuilder configureWith(
-                        @Nonnull final RoutineConfiguration configuration) {
-
-                    return DefaultClassRoutineBuilder.this.configureWith(configuration);
-                }
-            };
+    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -127,6 +110,32 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        mProxyConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
 
         final Method method = mMethodMap.get(name);
@@ -138,14 +147,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         }
 
         return method(method);
-    }
-
-    @Nonnull
-    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> configure() {
-
-        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(mConfigurable,
-                                                                   mRoutineConfiguration,
-                                                                   mProxyConfiguration);
     }
 
     @Nonnull
@@ -185,29 +186,15 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    protected ClassRoutineBuilder configureWith(@Nonnull final ProxyConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> proxyConfiguration() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
-        return this;
+        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    protected ClassRoutineBuilder configureWith(@Nonnull final RoutineConfiguration configuration) {
+    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> routineConfiguration() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mRoutineConfiguration = configuration;
-        return this;
+        return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     /**
@@ -300,7 +287,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                         Invocations.factoryOf(MethodSingleCallInvocation.class);
                 routine = new DefaultRoutine<Object, Object>(
                         builder.withFactoryArgs(target, method, mutex, isInputCollection,
-                                                isOutputCollection).then(), factory);
+                                                isOutputCollection).build(), factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -386,7 +373,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             builder.onReadTimeout(actionAnnotation.value());
         }
 
-        return getRoutine(builder.then(), methodShareGroup, targetMethod, false, false);
+        return getRoutine(builder.build(), methodShareGroup, targetMethod, false, false);
     }
 
     /**

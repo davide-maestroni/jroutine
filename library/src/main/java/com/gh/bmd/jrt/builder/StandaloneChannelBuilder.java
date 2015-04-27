@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 
 import javax.annotation.Nonnull;
@@ -24,7 +23,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 3/7/15.
  */
-public interface StandaloneChannelBuilder extends Configurable<StandaloneChannelBuilder> {
+public interface StandaloneChannelBuilder {
 
     /**
      * Builds and returns the standalone channel instance.
@@ -35,11 +34,14 @@ public interface StandaloneChannelBuilder extends Configurable<StandaloneChannel
     <T> StandaloneChannel<T> buildChannel();
 
     /**
-     * Note that only options related to the output channel, the asynchronous runner and the logs
-     * will be employed.
+     * Gets the routine configuration builder related to this builder instance.<br/>
+     * Only options related to the output channel, the asynchronous runner and the logs will be
+     * employed.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @return the configuration builder.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<StandaloneChannelBuilder> configure();
+    Builder<? extends StandaloneChannelBuilder> routineConfiguration();
 }

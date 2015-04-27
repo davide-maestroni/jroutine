@@ -86,10 +86,10 @@ public class RoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<String, String> routine =
-                on(ClassToken.tokenOf(DelayedInvocation.class)).configure()
+                on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                                                                .withFactoryArgs(
                                                                        TimeDuration.millis(100))
-                                                               .then()
+                                                               .build()
                                                                .buildRoutine();
 
         final ParameterChannel<String, String> inputChannel = routine.invokeAsync().pass("test1");
@@ -260,7 +260,7 @@ public class RoutineTest {
                     }
                 };
 
-        assertThat(on(closeInvocation).configure().withLogLevel(LogLevel.SILENT).then()
+        assertThat(on(closeInvocation).routineConfiguration().withLogLevel(LogLevel.SILENT).build()
                                       .callAsync("test")
                                       .afterMax(timeout)
                                       .readAll()).isEmpty();
@@ -287,10 +287,10 @@ public class RoutineTest {
                 };
 
         final Routine<String, String> routine = JRoutine.on(ClassToken.tokenOf(abortInvocation))
-                                                        .configure()
+                                                        .routineConfiguration()
                                                         .withFactoryArgs(this, abortReason,
                                                                          semaphore)
-                                                        .then()
+                                                        .build()
                                                         .buildRoutine();
 
         final ParameterChannel<String, String> channel = routine.invokeAsync();
@@ -467,11 +467,11 @@ public class RoutineTest {
                     }
                 };
 
-        final Routine<Integer, Integer> sumRoutine = on(ClassToken.tokenOf(execSum)).configure()
-                                                                                    .withFactoryArgs(
-                                                                                            this)
-                                                                                    .then()
-                                                                                    .buildRoutine();
+        final Routine<Integer, Integer> sumRoutine =
+                on(ClassToken.tokenOf(execSum)).routineConfiguration()
+                                               .withFactoryArgs(this)
+                                               .build()
+                                               .buildRoutine();
 
         final StatelessInvocation<Integer, Integer> invokeSquare =
                 new StatelessInvocation<Integer, Integer>() {
@@ -530,11 +530,11 @@ public class RoutineTest {
                     }
                 };
 
-        final Routine<Integer, Integer> sumRoutine = on(ClassToken.tokenOf(execSum)).configure()
-                                                                                    .withFactoryArgs(
-                                                                                            this)
-                                                                                    .then()
-                                                                                    .buildRoutine();
+        final Routine<Integer, Integer> sumRoutine =
+                on(ClassToken.tokenOf(execSum)).routineConfiguration()
+                                               .withFactoryArgs(this)
+                                               .build()
+                                               .buildRoutine();
 
         final Function1<Integer, Integer> invokeSquare = new Function1<Integer, Integer>() {
 
@@ -579,10 +579,9 @@ public class RoutineTest {
                 };
 
         final Routine<Integer, Integer> squareSumRoutine =
-                on(ClassToken.tokenOf(invokeSquareSum)).configure()
+                on(ClassToken.tokenOf(invokeSquareSum)).routineConfiguration()
                                                        .withFactoryArgs(this, sumRoutine,
-                                                                        squareRoutine)
-                                                       .then()
+                                                                        squareRoutine).build()
                                                        .buildRoutine();
 
         assertThat(
@@ -599,10 +598,8 @@ public class RoutineTest {
         long startTime = System.currentTimeMillis();
 
         final ParameterChannel<String, String> channel =
-                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                        .configure()
-                        .withFactoryArgs(TimeDuration.millis(10))
-                        .then()
+                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
+                        .withFactoryArgs(TimeDuration.millis(10)).build()
                         .invokeAsync();
         channel.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -618,12 +615,10 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final ParameterChannel<String, String> channel1 =
-                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                        .configure()
+                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                         .withFactoryArgs(TimeDuration.millis(10))
                         .withInputOrder(OrderType.PASSING_ORDER)
-                        .withOutputOrder(OrderType.PASSING_ORDER)
-                        .then()
+                        .withOutputOrder(OrderType.PASSING_ORDER).build()
                         .invokeAsync();
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel1.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -638,10 +633,8 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final ParameterChannel<String, String> channel2 =
-                JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
-                        .configure()
-                        .withFactoryArgs(TimeDuration.millis(10), 2)
-                        .then()
+                JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class)).routineConfiguration()
+                        .withFactoryArgs(TimeDuration.millis(10), 2).build()
                         .invokeAsync();
         channel2.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel2.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -659,13 +652,10 @@ public class RoutineTest {
         final RoutineConfiguration configuration =
                 builder().withFactoryArgs(TimeDuration.millis(10), 2)
                          .withInputOrder(OrderType.PASSING_ORDER)
-                         .withOutputOrder(OrderType.PASSING_ORDER)
-                         .then();
+                         .withOutputOrder(OrderType.PASSING_ORDER).build();
         final ParameterChannel<String, String> channel3 =
-                JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
-                        .configure()
-                        .with(configuration)
-                        .then()
+                JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class)).routineConfiguration()
+                        .with(configuration).build()
                         .invokeAsync();
         channel3.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel3.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -679,10 +669,8 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final ParameterChannel<String, String> channel4 =
-                JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
-                        .configure()
-                        .withFactoryArgs(TimeDuration.ZERO, 2)
-                        .then()
+                JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class)).routineConfiguration()
+                        .withFactoryArgs(TimeDuration.ZERO, 2).build()
                         .invokeAsync();
         channel4.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel4.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -698,11 +686,10 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final RoutineConfiguration configuration1 =
-                configuration.builderFrom().withFactoryArgs(TimeDuration.ZERO, 2).then();
+                configuration.builderFrom().withFactoryArgs(TimeDuration.ZERO, 2).build();
         final ParameterChannel<String, String> channel5 =
-                on(ClassToken.tokenOf(DelayedListInvocation.class)).configure()
-                                                                   .with(configuration1)
-                                                                   .then()
+                on(ClassToken.tokenOf(DelayedListInvocation.class)).routineConfiguration()
+                                                                   .with(configuration1).build()
                                                                    .invokeAsync();
         channel5.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel5.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -717,9 +704,9 @@ public class RoutineTest {
 
         final ParameterChannel<String, String> channel6 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
-                        .configure()
+                        .routineConfiguration()
                         .withFactoryArgs(TimeDuration.millis(10))
-                        .then()
+                        .build()
                         .invokeAsync();
         channel6.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel6.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -736,11 +723,10 @@ public class RoutineTest {
 
         final ParameterChannel<String, String> channel7 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
-                        .configure()
+                        .routineConfiguration()
                         .with(configuration.builderFrom()
-                                           .withFactoryArgs(TimeDuration.millis(10))
-                                           .then())
-                        .then()
+                                           .withFactoryArgs(TimeDuration.millis(10)).build())
+                        .build()
                         .invokeAsync();
         channel7.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel7.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -755,9 +741,9 @@ public class RoutineTest {
 
         final ParameterChannel<String, String> channel8 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
-                        .configure()
+                        .routineConfiguration()
                         .withFactoryArgs(TimeDuration.ZERO)
-                        .then()
+                        .build()
                         .invokeAsync();
         channel8.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel8.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -774,9 +760,11 @@ public class RoutineTest {
 
         final ParameterChannel<String, String> channel9 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
-                        .configure()
-                        .with(configuration.builderFrom().withFactoryArgs(TimeDuration.ZERO).then())
-                        .then()
+                        .routineConfiguration()
+                        .with(configuration.builderFrom()
+                                           .withFactoryArgs(TimeDuration.ZERO)
+                                           .build())
+                        .build()
                         .invokeAsync();
         channel9.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel9.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -818,10 +806,8 @@ public class RoutineTest {
         }
 
         final Routine<String, String> abortRoutine =
-                JRoutine.on(ClassToken.tokenOf(DelayedAbortInvocation.class))
-                        .configure()
-                        .withFactoryArgs(TimeDuration.millis(200))
-                        .then()
+                JRoutine.on(ClassToken.tokenOf(DelayedAbortInvocation.class)).routineConfiguration()
+                        .withFactoryArgs(TimeDuration.millis(200)).build()
                         .buildRoutine();
 
         assertThat(abortRoutine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("test");
@@ -902,9 +888,9 @@ public class RoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<String, String> routine1 = JRoutine.on(factoryOf(TestDestroy.class))
-                                                         .configure()
+                                                         .routineConfiguration()
                                                          .withCoreInvocations(0)
-                                                         .then()
+                                                         .build()
                                                          .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -918,9 +904,9 @@ public class RoutineTest {
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine2 = JRoutine.on(factoryOf(TestDiscardException.class))
-                                                         .configure()
+                                                         .routineConfiguration()
                                                          .withCoreInvocations(0)
-                                                         .then()
+                                                         .build()
                                                          .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -993,9 +979,8 @@ public class RoutineTest {
 
         try {
 
-            on(factoryOf(ConstructorException.class)).configure()
-                                                     .withLogLevel(LogLevel.SILENT)
-                                                     .then()
+            on(factoryOf(ConstructorException.class)).routineConfiguration()
+                                                     .withLogLevel(LogLevel.SILENT).build()
                                                      .callSync()
                                                      .readAll();
 
@@ -1042,7 +1027,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultRoutine<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION, null);
+            new DefaultRoutine<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION, null);
 
             fail();
 
@@ -1055,7 +1040,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                    new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                      new TestAbortHandler(),
                                                      Runners.sequentialRunner(), logger);
 
@@ -1070,7 +1055,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                    new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                      new TestAbortHandler(),
                                                      Runners.sequentialRunner(), logger);
 
@@ -1097,7 +1082,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                    new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                      new TestAbortHandler(),
                                                      Runners.sequentialRunner(), logger);
 
@@ -1157,7 +1142,9 @@ public class RoutineTest {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.tokenOf(exceptionOnInit)).configure().withFactoryArgs(this).then()
+                on(ClassToken.tokenOf(exceptionOnInit)).routineConfiguration()
+                                                       .withFactoryArgs(this)
+                                                       .build()
                                                        .buildRoutine();
 
         testException(exceptionRoutine, "test", "test1");
@@ -1184,7 +1171,9 @@ public class RoutineTest {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.tokenOf(exceptionOnInput)).configure().withFactoryArgs(this).then()
+                on(ClassToken.tokenOf(exceptionOnInput)).routineConfiguration()
+                                                        .withFactoryArgs(this)
+                                                        .build()
                                                         .buildRoutine();
 
         testException(exceptionRoutine, "test2", "test2");
@@ -1210,7 +1199,9 @@ public class RoutineTest {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.tokenOf(exceptionOnResult)).configure().withFactoryArgs(this).then()
+                on(ClassToken.tokenOf(exceptionOnResult)).routineConfiguration()
+                                                         .withFactoryArgs(this)
+                                                         .build()
                                                          .buildRoutine();
 
         testException(exceptionRoutine, "test", "test3");
@@ -1227,11 +1218,9 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(PassingInvocation.<String>factoryOf())
-                    .configure()
+            JRoutine.on(PassingInvocation.<String>factoryOf()).routineConfiguration()
                     .withInputSize(1)
-                    .withInputTimeout(TimeDuration.ZERO)
-                    .then()
+                    .withInputTimeout(TimeDuration.ZERO).build()
                     .callAsync("test1", "test2")
                     .readAll();
 
@@ -1304,16 +1293,16 @@ public class RoutineTest {
 
         }
 
-        assertThat(on(test).configure().withReadTimeout(timeout).then()
+        assertThat(on(test).routineConfiguration().withReadTimeout(timeout).build()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
         assertThat(
                 on(test).buildProxy(TestInterfaceAsync.class).getOne().afterMax(timeout).readNext())
                 .isEqualTo(1);
 
-        final TestInterfaceAsync testInterfaceAsync = on(test).configure()
+        final TestInterfaceAsync testInterfaceAsync = on(test).routineConfiguration()
                                                               .withReadTimeout(1, TimeUnit.SECONDS)
-                                                              .then()
+                                                              .build()
                                                               .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
@@ -1330,12 +1319,10 @@ public class RoutineTest {
 
                         result.pass(strings);
                     }
-                }))
-                        .configure()
+                })).routineConfiguration()
                         .withFactoryArgs(this)
                         .withOutputSize(1)
-                        .withOutputTimeout(TimeDuration.ZERO)
-                        .then()
+                        .withOutputTimeout(TimeDuration.ZERO).build()
                         .buildRoutine();
 
         try {
@@ -1357,7 +1344,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                         null, Runners.sharedRunner(), logger);
 
             fail();
@@ -1368,7 +1355,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                         new TestInvocationManager(), null, logger);
 
             fail();
@@ -1379,7 +1366,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                         new TestInvocationManager(),
                                                         Runners.sharedRunner(), null);
 
@@ -1404,7 +1391,7 @@ public class RoutineTest {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(
-                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
             channel.result();
@@ -1420,7 +1407,7 @@ public class RoutineTest {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(
-                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
             channel.after(null);
@@ -1435,7 +1422,7 @@ public class RoutineTest {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(
-                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
             channel.after(1, null);
@@ -1450,7 +1437,7 @@ public class RoutineTest {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(
-                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
@@ -1476,8 +1463,10 @@ public class RoutineTest {
                     }
                 };
 
-        assertThat(
-                JRoutine.on(ClassToken.tokenOf(invocation)).configure().withFactoryArgs(this).then()
+        assertThat(JRoutine.on(ClassToken.tokenOf(invocation))
+                           .routineConfiguration()
+                           .withFactoryArgs(this)
+                           .build()
                            .callAsync("test")
                            .afterMax(TimeDuration.millis(500))
                            .readAll()).containsExactly("test");
@@ -1491,7 +1480,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION, null,
+            new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION, null,
                                              Runners.sharedRunner(), logger);
 
             fail();
@@ -1502,7 +1491,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                              new TestAbortHandler(), null, logger);
 
             fail();
@@ -1513,7 +1502,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                              new TestAbortHandler(), Runners.sharedRunner(), null);
 
             fail();
@@ -1524,7 +1513,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                              new TestAbortHandler(), Runners.sharedRunner(), logger)
                     .after(null);
 
@@ -1536,7 +1525,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+            new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                              new TestAbortHandler(), Runners.sharedRunner(), logger)
                     .after(0, null);
 
@@ -1549,7 +1538,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                    new DefaultResultChannel<Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                      new TestAbortHandler(), Runners.sharedRunner(),
                                                      logger);
 
@@ -1562,11 +1551,9 @@ public class RoutineTest {
         }
 
         final OutputChannel<String> channel =
-                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                        .configure()
+                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                         .withFactoryArgs(TimeDuration.ZERO)
-                        .withLogLevel(LogLevel.SILENT)
-                        .then()
+                        .withLogLevel(LogLevel.SILENT).build()
                         .callSync();
 
         try {
@@ -1642,11 +1629,9 @@ public class RoutineTest {
         }
 
         final Routine<String, String> routine1 =
-                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                        .configure()
+                JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                         .withFactoryArgs(millis(100))
-                        .withLogLevel(LogLevel.SILENT)
-                        .then()
+                        .withLogLevel(LogLevel.SILENT).build()
                         .buildRoutine();
         final Iterator<String> iterator =
                 routine1.callSync("test").afterMax(millis(500)).eventuallyExit().iterator();
@@ -1713,9 +1698,8 @@ public class RoutineTest {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.tokenOf(execSquare)).configure()
-                                                  .withFactoryArgs(this)
-                                                  .then()
+                on(ClassToken.tokenOf(execSquare)).routineConfiguration()
+                                                  .withFactoryArgs(this).build()
                                                   .buildRoutine();
 
         assertThat(squareRoutine.callSync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(
@@ -1748,11 +1732,11 @@ public class RoutineTest {
                     }
                 };
 
-        final Routine<Integer, Integer> sumRoutine = on(ClassToken.tokenOf(execSum)).configure()
-                                                                                    .withFactoryArgs(
-                                                                                            this)
-                                                                                    .then()
-                                                                                    .buildRoutine();
+        final Routine<Integer, Integer> sumRoutine =
+                on(ClassToken.tokenOf(execSum)).routineConfiguration()
+                                               .withFactoryArgs(this)
+                                               .build()
+                                               .buildRoutine();
 
         assertThat(sumRoutine.callSync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(10);
         assertThat(sumRoutine.callAsync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(
@@ -1763,11 +1747,11 @@ public class RoutineTest {
     public void testTimeoutActions() {
 
         final Routine<String, String> routine1 =
-                on(ClassToken.tokenOf(DelayedInvocation.class)).configure()
+                on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                                                                .withFactoryArgs(seconds(1))
                                                                .onReadTimeout(
                                                                        TimeoutActionType.ABORT)
-                                                               .then()
+                                                               .build()
                                                                .buildRoutine();
 
         try {
@@ -1824,12 +1808,11 @@ public class RoutineTest {
         assertThat(routine1.callAsync("test1").checkComplete()).isFalse();
 
         final Routine<String, String> routine2 =
-                on(ClassToken.tokenOf(DelayedInvocation.class)).configure()
+                on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                                                                .withFactoryArgs(seconds(1))
                                                                .onReadTimeout(
                                                                        TimeoutActionType.ABORT)
-                                                               .withReadTimeout(millis(10))
-                                                               .then()
+                                                               .withReadTimeout(millis(10)).build()
                                                                .buildRoutine();
 
         try {
@@ -1886,11 +1869,11 @@ public class RoutineTest {
         assertThat(routine2.callAsync("test1").checkComplete()).isFalse();
 
         final Routine<String, String> routine3 =
-                on(ClassToken.tokenOf(DelayedInvocation.class)).configure()
+                on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                                                                .withFactoryArgs(seconds(1))
                                                                .onReadTimeout(
                                                                        TimeoutActionType.DEADLOCK)
-                                                               .then()
+                                                               .build()
                                                                .buildRoutine();
         final OutputChannel<String> channel3 = routine3.callAsync("test1");
 
@@ -2003,11 +1986,11 @@ public class RoutineTest {
         assertThat(channel3.checkComplete()).isFalse();
 
         final Routine<String, String> routine4 =
-                on(ClassToken.tokenOf(DelayedInvocation.class)).configure()
+                on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                                                                .withFactoryArgs(seconds(1))
                                                                .onReadTimeout(
                                                                        TimeoutActionType.EXIT)
-                                                               .then()
+                                                               .build()
                                                                .buildRoutine();
         final OutputChannel<String> channel4 = routine4.callAsync("test1");
 
@@ -2468,9 +2451,9 @@ public class RoutineTest {
         final TimeDuration timeout = seconds(1);
         final String input = "test";
         final Routine<String, String> routine =
-                on(ClassToken.tokenOf(DelayedInvocation.class)).configure()
+                on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                                                                .withFactoryArgs(TimeDuration.ZERO)
-                                                               .then()
+                                                               .build()
                                                                .buildRoutine();
 
         assertThat(
@@ -2709,10 +2692,10 @@ public class RoutineTest {
         public DelayedChannelInvocation(final TimeDuration delay) {
 
             mDelay = delay;
-            mRoutine = on(ClassToken.tokenOf(DelayedInvocation.class)).configure()
+            mRoutine = on(ClassToken.tokenOf(DelayedInvocation.class)).routineConfiguration()
                                                                       .withFactoryArgs(
                                                                               TimeDuration.ZERO)
-                                                                      .then()
+                                                                      .build()
                                                                       .buildRoutine();
         }
 

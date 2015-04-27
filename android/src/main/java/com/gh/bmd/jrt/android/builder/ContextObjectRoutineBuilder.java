@@ -22,7 +22,6 @@ import com.gh.bmd.jrt.routine.Routine;
 import java.lang.reflect.Method;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Class implementing a builder of routine objects based on methods of a concrete object instance.
@@ -32,7 +31,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by Davide on 4/6/2015.
  */
-public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, ObjectRoutineBuilder {
+public interface ContextObjectRoutineBuilder extends ObjectRoutineBuilder {
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
@@ -144,36 +143,22 @@ public interface ObjectContextRoutineBuilder extends ContextRoutineBuilder, Obje
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder members(@Nullable ProxyConfiguration configuration);
+    ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> proxyConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectContextRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
+    RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> routineConfiguration();
 
     /**
-     * {@inheritDoc}
+     * Gets the invocation configuration builder related to this builder instance.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    ObjectContextRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectContextRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectContextRoutineBuilder invocations(@Nullable ContextInvocationConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectContextRoutineBuilder invocations(
-            @Nonnull ContextInvocationConfiguration.Builder builder);
+    InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder>
+    invocationConfiguration();
 }

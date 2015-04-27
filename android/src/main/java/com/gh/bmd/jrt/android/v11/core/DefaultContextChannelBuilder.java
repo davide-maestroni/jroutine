@@ -18,13 +18,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.ClashResolutionType;
-import com.gh.bmd.jrt.android.builder.InvocationContextChannelBuilder;
-import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextChannelBuilder;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Logger;
@@ -40,23 +39,24 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.withId;
-
 /**
  * Default implementation of an Android channel builder.
  * <p/>
  * Created by davide on 1/14/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class DefaultInvocationContextChannelBuilder implements InvocationContextChannelBuilder {
+class DefaultContextChannelBuilder implements ContextChannelBuilder,
+        InvocationConfiguration.Configurable<ContextChannelBuilder>,
+        RoutineConfiguration.Configurable<ContextChannelBuilder> {
 
     private final WeakReference<Object> mContext;
 
     private final int mInvocationId;
 
-    private ContextInvocationConfiguration mInvocationConfiguration;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -65,8 +65,7 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
      * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the activity is null.
      */
-    DefaultInvocationContextChannelBuilder(@Nonnull final Activity activity,
-            final int invocationId) {
+    DefaultContextChannelBuilder(@Nonnull final Activity activity, final int invocationId) {
 
         this((Object) activity, invocationId);
     }
@@ -78,8 +77,7 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
      * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the fragment is null.
      */
-    DefaultInvocationContextChannelBuilder(@Nonnull final Fragment fragment,
-            final int invocationId) {
+    DefaultContextChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
 
         this((Object) fragment, invocationId);
     }
@@ -92,8 +90,7 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
      * @throws java.lang.NullPointerException if the context is null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultInvocationContextChannelBuilder(@Nonnull final Object context,
-            final int invocationId) {
+    private DefaultContextChannelBuilder(@Nonnull final Object context, final int invocationId) {
 
         if (context == null) {
 
@@ -102,6 +99,34 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
 
         mContext = new WeakReference<Object>(context);
         mInvocationId = invocationId;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ContextChannelBuilder apply(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ContextChannelBuilder apply(
+            @Nonnull final InvocationConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     @Nonnull
@@ -114,7 +139,7 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
             return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf()).callSync();
         }
 
-        final InvocationContextRoutineBuilder<OUTPUT, OUTPUT> builder;
+        final ContextRoutineBuilder<OUTPUT, OUTPUT> builder;
 
         if (context instanceof Activity) {
 
@@ -133,57 +158,34 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
         }
 
         final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
-        final ContextInvocationConfiguration.Builder configurationBuilder = withId(mInvocationId);
-        final ContextInvocationConfiguration invocationConfiguration = mInvocationConfiguration;
+        final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
+        final ClashResolutionType resolutionType =
+                invocationConfiguration.getResolutionTypeOr(null);
 
-        if (invocationConfiguration != null) {
+        if (resolutionType != null) {
 
-            final ClashResolutionType resolutionType =
-                    invocationConfiguration.getResolutionTypeOr(null);
-
-            if (resolutionType != null) {
-
-                final Logger logger =
-                        RoutineConfiguration.notNull(routineConfiguration).newLogger(this);
-                logger.wrn("the specified clash resolution type will be ignored: %s",
-                           resolutionType);
-            }
-
-            configurationBuilder.apply(invocationConfiguration);
+            final Logger logger = routineConfiguration.newLogger(this);
+            logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
         }
 
-        return builder.configure(routineConfiguration)
-                      .invocations(configurationBuilder.onClash(ClashResolutionType.KEEP_THAT))
+        return builder.routineConfiguration()
+                      .with(routineConfiguration)
+                      .build()
+                      .invocationConfiguration()
+                      .withId(mInvocationId)
+                      .with(invocationConfiguration)
+                      .onClash(ClashResolutionType.KEEP_THAT)
+                      .build()
                       .callAsync();
     }
 
     @Nonnull
-    public InvocationContextChannelBuilder configure(
-            @Nullable final RoutineConfiguration configuration) {
+    public InvocationConfiguration.Builder<? extends ContextChannelBuilder>
+    invocationConfiguration() {
 
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public InvocationContextChannelBuilder configure(@Nonnull final Builder builder) {
-
-        return configure(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public InvocationContextChannelBuilder invocations(
-            @Nullable final ContextInvocationConfiguration configuration) {
-
-        mInvocationConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public InvocationContextChannelBuilder invocations(
-            @Nonnull final ContextInvocationConfiguration.Builder builder) {
-
-        return invocations(builder.buildConfiguration());
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this,
+                                                                                    configuration);
     }
 
     public void purge(@Nullable final Object input) {
@@ -250,6 +252,15 @@ class DefaultInvocationContextChannelBuilder implements InvocationContextChannel
             Runners.mainRunner()
                    .run(new PurgeExecution(context, mInvocationId), 0, TimeUnit.MILLISECONDS);
         }
+    }
+
+    @Nonnull
+    public RoutineConfiguration.Builder<? extends ContextChannelBuilder>
+    routineConfiguration() {
+
+        final RoutineConfiguration configuration = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ContextChannelBuilder>(this,
+                                                                                 configuration);
     }
 
     /**

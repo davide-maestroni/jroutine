@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.ProxyConfiguration.Builder;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -85,12 +84,23 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * TODO
+     * Gets the proxy configuration builder related to this builder instance.
      * <p/>
-     * Note that all the options related to the output and input channels will be ignored.
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @return the configuration builder.
+     * @return the proxy configuration builder.
      */
     @Nonnull
-    Builder<? extends ObjectRoutineBuilder> configure();
+    ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxyConfiguration();
+
+    /**
+     * Gets the routine configuration builder related to this builder instance.<br/>
+     * All the options related to the output and input channels will be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> routineConfiguration();
 }

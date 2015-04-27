@@ -31,25 +31,21 @@ import javax.annotation.Nonnull;
  * @param <OUTPUT> the output data type.
  */
 public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
-        implements RoutineBuilder<INPUT, OUTPUT> {
+        implements RoutineBuilder<INPUT, OUTPUT>, Configurable<RoutineBuilder<INPUT, OUTPUT>> {
 
-    private RoutineConfiguration mConfiguration = RoutineConfiguration.EMPTY_CONFIGURATION;
-
-    private final Configurable<RoutineBuilder<INPUT, OUTPUT>> mConfigurable =
-            new Configurable<RoutineBuilder<INPUT, OUTPUT>>() {
-
-                @Nonnull
-                public RoutineBuilder<INPUT, OUTPUT> configureWith(
-                        @Nonnull final RoutineConfiguration configuration) {
-
-                    return TemplateRoutineBuilder.this.configureWith(configuration);
-                }
-            };
+    private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
-    public Builder<RoutineBuilder<INPUT, OUTPUT>> configure() {
+    @SuppressWarnings("ConstantConditions")
+    public RoutineBuilder<INPUT, OUTPUT> apply(@Nonnull final RoutineConfiguration configuration) {
 
-        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(mConfigurable, mConfiguration);
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mConfiguration = configuration;
+        return this;
     }
 
     @Nonnull
@@ -71,17 +67,9 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    protected RoutineBuilder<INPUT, OUTPUT> configureWith(
-            @Nonnull final RoutineConfiguration configuration) {
+    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> routineConfiguration() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mConfiguration = configuration;
-        return this;
+        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
     }
 
     /**

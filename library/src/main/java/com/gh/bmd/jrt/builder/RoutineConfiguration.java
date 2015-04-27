@@ -66,7 +66,9 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide on 11/15/14.
  */
-public class RoutineConfiguration {
+public final class RoutineConfiguration {
+
+    //TODO: build() -> apply(), form(), fill()
 
     /**
      * Constant indicating the default value of an integer attribute.
@@ -77,7 +79,7 @@ public class RoutineConfiguration {
             new Configurable<RoutineConfiguration>() {
 
                 @Nonnull
-                public RoutineConfiguration configureWith(
+                public RoutineConfiguration apply(
                         @Nonnull final RoutineConfiguration configuration) {
 
                     return configuration;
@@ -87,7 +89,7 @@ public class RoutineConfiguration {
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
-    public static final RoutineConfiguration EMPTY_CONFIGURATION = builder().buildConfiguration();
+    public static final RoutineConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
     private final Runner mAsyncRunner;
 
@@ -612,20 +614,28 @@ public class RoutineConfiguration {
     }
 
     /**
-     * TODO
+     * Interface defining a configurable object.
      *
-     * @param <TYPE>
+     * @param <TYPE> the configurable object type.
      */
     public interface Configurable<TYPE> {
 
+        /**
+         * Applies the specified configuration and returns the configurable instance.
+         *
+         * @param configuration the configuration.
+         * @return the configurable instance.
+         */
         @Nonnull
-        TYPE configureWith(@Nonnull RoutineConfiguration configuration);
+        TYPE apply(@Nonnull RoutineConfiguration configuration);
     }
 
     /**
      * Builder of routine configurations.
+     *
+     * @param <TYPE> the configurable object type.
      */
-    public static class Builder<TYPE> {
+    public static final class Builder<TYPE> {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
@@ -686,12 +696,12 @@ public class RoutineConfiguration {
          * Constructor.
          *
          * @param configurable         the configurable instance.
-         * @param routineConfiguration the initial configuration.
+         * @param initialConfiguration the initial configuration.
          * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final RoutineConfiguration routineConfiguration) {
+                @Nonnull final RoutineConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -699,22 +709,18 @@ public class RoutineConfiguration {
             }
 
             mConfigurable = configurable;
-            mArgs = routineConfiguration.mFactoryArgs;
-            mSyncRunner = routineConfiguration.mSyncRunner;
-            mAsyncRunner = routineConfiguration.mAsyncRunner;
-            mMaxInvocations = routineConfiguration.mMaxInvocations;
-            mCoreInvocations = routineConfiguration.mCoreInvocations;
-            mAvailTimeout = routineConfiguration.mAvailTimeout;
-            mReadTimeout = routineConfiguration.mReadTimeout;
-            mTimeoutActionType = routineConfiguration.mTimeoutActionType;
-            mInputOrderType = routineConfiguration.mInputOrder;
-            mInputMaxSize = routineConfiguration.mInputMaxSize;
-            mInputTimeout = routineConfiguration.mInputTimeout;
-            mOutputOrderType = routineConfiguration.mOutputOrder;
-            mOutputMaxSize = routineConfiguration.mOutputMaxSize;
-            mOutputTimeout = routineConfiguration.mOutputTimeout;
-            mLog = routineConfiguration.mLog;
-            mLogLevel = routineConfiguration.mLogLevel;
+            apply(initialConfiguration);
+        }
+
+        /**
+         * Applies the configuration and returns the configurable object.
+         *
+         * @return the configurable object.
+         */
+        @Nonnull
+        public TYPE build() {
+
+            return mConfigurable.apply(buildConfiguration());
         }
 
         /**
@@ -732,18 +738,9 @@ public class RoutineConfiguration {
         }
 
         /**
-         * TODO
-         *
-         * @return
-         */
-        @Nonnull
-        public TYPE then() {
-
-            return mConfigurable.configureWith(buildConfiguration());
-        }
-
-        /**
-         * Applies the specified configuration to this builder.
+         * Applies the specified configuration to this builder. A null value means that all the
+         * configuration options need to be set to their default value, otherwise only the set
+         * options will be applied.
          *
          * @param configuration the routine configuration.
          * @return this builder.
@@ -753,6 +750,7 @@ public class RoutineConfiguration {
 
             if (configuration == null) {
 
+                apply(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -1073,6 +1071,26 @@ public class RoutineConfiguration {
             return this;
         }
 
+        private void apply(@Nonnull final RoutineConfiguration configuration) {
+
+            mArgs = configuration.mFactoryArgs;
+            mSyncRunner = configuration.mSyncRunner;
+            mAsyncRunner = configuration.mAsyncRunner;
+            mMaxInvocations = configuration.mMaxInvocations;
+            mCoreInvocations = configuration.mCoreInvocations;
+            mAvailTimeout = configuration.mAvailTimeout;
+            mReadTimeout = configuration.mReadTimeout;
+            mTimeoutActionType = configuration.mTimeoutActionType;
+            mInputOrderType = configuration.mInputOrder;
+            mInputMaxSize = configuration.mInputMaxSize;
+            mInputTimeout = configuration.mInputTimeout;
+            mOutputOrderType = configuration.mOutputOrder;
+            mOutputMaxSize = configuration.mOutputMaxSize;
+            mOutputTimeout = configuration.mOutputTimeout;
+            mLog = configuration.mLog;
+            mLogLevel = configuration.mLogLevel;
+        }
+
         private void applyChannelConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
             final OrderType inputOrder = configuration.mInputOrder;
@@ -1195,11 +1213,6 @@ public class RoutineConfiguration {
             }
         }
 
-        /**
-         * Builds and return the configuration instance.
-         *
-         * @return the routine configuration instance.
-         */
         @Nonnull
         private RoutineConfiguration buildConfiguration() {
 

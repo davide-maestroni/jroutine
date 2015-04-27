@@ -13,11 +13,11 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.android.routine.ContextRoutine;
+import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Interface defining a builder of routines bound to a context lifecycle.
@@ -28,50 +28,40 @@ import javax.annotation.Nullable;
  * so, waiting for the outputs right after the routine invocation, will result in a deadlock.<br/>
  * The local context of the invocations will always be the application one.
  * <p/>
- * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameters
- * and constructor argument objects might be employed to check for clashing of invocations or
- * compute the invocation ID.<br/>
- * In case the caller cannot guarantee the correct behavior of the aforementioned method
- * implementations, a user defined ID or the <code>ABORT_THAT</code> clash resolution should be used
- * to avoid unexpected results.
- * <p/>
- * Created by Davide on 4/6/2015.
+ * Created by davide on 12/9/14.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
-public interface ContextRoutineBuilder extends ConfigurableBuilder {
+public interface ContextRoutineBuilder<INPUT, OUTPUT>
+        extends RoutineBuilder<INPUT, OUTPUT>, ContextRoutine<INPUT, OUTPUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ContextRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
+    ContextRoutine<INPUT, OUTPUT> buildRoutine();
 
     /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ContextRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
-
-    /**
-     * Sets the specified configuration to this builder by replacing any configuration already set.
-     * <br/>
-     * Note that the configuration options not supported by the builder implementation might be
-     * ignored.
+     * Gets the routine configuration builder related to this builder instance.<br/>
+     * All the options related to the output and input channels size and timeout will be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @param configuration the configuration.
-     * @return this builder.
+     * @return the routine configuration builder.
      */
     @Nonnull
-    ContextRoutineBuilder invocations(@Nullable ContextInvocationConfiguration configuration);
+    RoutineConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
+    routineConfiguration();
 
     /**
-     * Sets the specified configuration to this builder by replacing any configuration already set.
-     * <br/>
-     * Note that the configuration options not supported by the builder implementation might be
-     * ignored.
+     * Gets the invocation configuration builder related to this builder instance.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @param builder the configuration builder.
-     * @return this builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    ContextRoutineBuilder invocations(@Nonnull ContextInvocationConfiguration.Builder builder);
+    InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
+    invocationConfiguration();
 }

@@ -450,7 +450,7 @@ public class RoutineService extends Service {
 
             if (routineState == null) {
 
-                final Builder builder = RoutineConfiguration.builder();
+                final Builder<RoutineConfiguration> builder = RoutineConfiguration.builder();
 
                 if (runnerClass != null) {
 
@@ -485,8 +485,7 @@ public class RoutineService extends Service {
                        .withOutputOrder(outputOrder)
                        .withLogLevel(logLevel);
                 final AndroidRoutine androidRoutine =
-                        new AndroidRoutine(this, builder.buildConfiguration(), invocationClass,
-                                           invocationArgs);
+                        new AndroidRoutine(this, builder.build(), invocationClass, invocationArgs);
                 routineState = new RoutineState(androidRoutine);
                 routineMap.put(routineInfo, routineState);
             }

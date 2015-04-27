@@ -11,18 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v4.core;
+package com.gh.bmd.jrt.android.v11.core;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Fragment;
+import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Logger;
@@ -42,15 +43,31 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
+@TargetApi(VERSION_CODES.HONEYCOMB)
+class DefaultContextRoutineBuilder<INPUT, OUTPUT>
         extends TemplateRoutineBuilder<INPUT, OUTPUT>
-        implements InvocationContextRoutineBuilder<INPUT, OUTPUT> {
+        implements ContextRoutineBuilder<INPUT, OUTPUT>,
+        InvocationConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>> {
 
     private final WeakReference<Object> mContext;
 
     private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
-    private ContextInvocationConfiguration mInvocationConfiguration;
+    private final RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>
+            mRoutineConfigurable =
+            new RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>
+                    () {
+
+                @Nonnull
+                public ContextRoutineBuilder<INPUT, OUTPUT> apply(
+                        @Nonnull final RoutineConfiguration configuration) {
+
+                    return DefaultContextRoutineBuilder.this.apply(configuration);
+                }
+            };
+
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -59,7 +76,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
      * @param classToken the invocation class token.
      * @throws java.lang.NullPointerException if the activity or class token are null.
      */
-    DefaultInvocationContextRoutineBuilder(@Nonnull final FragmentActivity activity,
+    DefaultContextRoutineBuilder(@Nonnull final Activity activity,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) activity, classToken);
@@ -72,7 +89,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
      * @param classToken the invocation class token.
      * @throws java.lang.NullPointerException if the fragment or class token are null.
      */
-    DefaultInvocationContextRoutineBuilder(@Nonnull final Fragment fragment,
+    DefaultContextRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) fragment, classToken);
@@ -86,7 +103,7 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
      * @throws java.lang.NullPointerException if the context or class token are null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultInvocationContextRoutineBuilder(@Nonnull final Object context,
+    private DefaultContextRoutineBuilder(@Nonnull final Object context,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
         if (context == null) {
@@ -99,54 +116,58 @@ class DefaultInvocationContextRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
-    public ContextRoutine<INPUT, OUTPUT> buildRoutine() {
+    public ContextRoutineBuilder<INPUT, OUTPUT> apply(
+            @Nonnull final RoutineConfiguration configuration) {
 
-        final RoutineConfiguration configuration = getConfiguration();
-        warn(configuration);
-        final Builder builder = configuration.builderFrom()
-                                             .withAsyncRunner(Runners.mainRunner())
-                                             .withInputSize(Integer.MAX_VALUE)
-                                             .withInputTimeout(TimeDuration.INFINITY)
-                                             .withOutputSize(Integer.MAX_VALUE)
-                                             .withOutputTimeout(TimeDuration.INFINITY);
-        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass,
-                                                        builder.buildConfiguration(),
-                                                        ContextInvocationConfiguration.notNull(
-                                                                mInvocationConfiguration));
-    }
-
-    @Nonnull
-    @Override
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> configure(
-            @Nullable final RoutineConfiguration configuration) {
-
-        super.configure(configuration);
+        super.apply(configuration);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> configure(
-            @Nonnull final RoutineConfiguration.Builder builder) {
+    public RoutineConfiguration.Builder<? extends
+            ContextRoutineBuilder<INPUT, OUTPUT>> routineConfiguration() {
 
-        super.configure(builder);
-        return this;
+        return new RoutineConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
+                mRoutineConfigurable, getConfiguration());
     }
 
     @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> invocations(
-            @Nullable final ContextInvocationConfiguration configuration) {
+    @SuppressWarnings("ConstantConditions")
+    public ContextRoutineBuilder<INPUT, OUTPUT> apply(
+            @Nonnull final InvocationConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
 
         mInvocationConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public InvocationContextRoutineBuilder<INPUT, OUTPUT> invocations(
-            @Nonnull final ContextInvocationConfiguration.Builder builder) {
+    public ContextRoutine<INPUT, OUTPUT> buildRoutine() {
 
-        mInvocationConfiguration = builder.buildConfiguration();
-        return this;
+        final RoutineConfiguration configuration = getConfiguration();
+        warn(configuration);
+        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                configuration.builderFrom()
+                             .withAsyncRunner(Runners.mainRunner())
+                             .withInputSize(Integer.MAX_VALUE)
+                             .withInputTimeout(TimeDuration.INFINITY)
+                             .withOutputSize(Integer.MAX_VALUE)
+                             .withOutputTimeout(TimeDuration.INFINITY);
+        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, builder.build(),
+                                                        mInvocationConfiguration);
+    }
+
+    @Nonnull
+    public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT,
+                OUTPUT>> invocationConfiguration() {
+
+        return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
+                this, mInvocationConfiguration);
     }
 
     @Override

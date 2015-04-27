@@ -23,7 +23,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
@@ -32,13 +31,15 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * <p/>
  * Created by davide on 3/23/15.
  */
-class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
+class DefaultWrapperRoutineBuilder
+        implements WrapperRoutineBuilder, RoutineConfiguration.Configurable<WrapperRoutineBuilder>,
+        ProxyConfiguration.Configurable<WrapperRoutineBuilder> {
 
     private final WeakReference<?> mTargetReference;
 
-    private ProxyConfiguration mProxyConfiguration;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -57,6 +58,32 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
         }
 
         mTargetReference = new WeakReference<Object>(target);
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public WrapperRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        mProxyConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public WrapperRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
     }
 
     @Nonnull
@@ -82,41 +109,26 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
             throw new IllegalStateException("the target object has been destroyed");
         }
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
         final ObjectWrapperBuilder<TYPE> builder = new ObjectWrapperBuilder<TYPE>(target, itf);
-
-        if (configuration != null) {
-
-            builder.configure(configuration);
-        }
-
-        return builder.members(mProxyConfiguration).buildWrapper();
+        return builder.routineConfiguration()
+                      .with(mRoutineConfiguration)
+                      .build()
+                      .proxyConfiguration()
+                      .with(mProxyConfiguration)
+                      .build()
+                      .buildWrapper();
     }
 
     @Nonnull
-    public WrapperRoutineBuilder configure(@Nullable final RoutineConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> proxyConfiguration() {
 
-        mRoutineConfiguration = configuration;
-        return this;
+        return new ProxyConfiguration.Builder<WrapperRoutineBuilder>(this, mProxyConfiguration);
     }
 
     @Nonnull
-    public WrapperRoutineBuilder configure(@Nonnull final RoutineConfiguration.Builder builder) {
+    public RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> routineConfiguration() {
 
-        return configure(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public WrapperRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public WrapperRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
-
-        return members(builder.buildConfiguration());
+        return new RoutineConfiguration.Builder<WrapperRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     /**

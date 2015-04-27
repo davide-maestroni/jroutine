@@ -22,18 +22,16 @@ import javax.annotation.Nullable;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
  * <p/>
- * The configuration is used to set a specific ID to each invocation created by a context routine.
+ * The configuration is used to set a specific ID to each invocation created by a routine.
  * <br/>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
  * is, they share the same ID, and to set a specific type of caching of the invocation results.
  * <p/>
  * Created by davide on 19/04/15.
  */
-public class ContextInvocationConfiguration {
+public final class InvocationConfiguration {
 
     //TODO: add log to builders?
-    // JRoutine.on(tokenOf(Inv.class)).configure(withFactoryArgs(12)).buildRoutine();
-    // JRoutine.on(tokenOf(Inv.class)).configure().withFactoryArgs(12).then().buildRoutine();
 
     /**
      * Constant identifying an invocation ID computed from the executor class and the input
@@ -41,10 +39,21 @@ public class ContextInvocationConfiguration {
      */
     public static final int AUTO = Integer.MIN_VALUE;
 
+    private static final Configurable<InvocationConfiguration> sDefaultConfigurable =
+            new Configurable<InvocationConfiguration>() {
+
+                @Nonnull
+                public InvocationConfiguration apply(
+                        @Nonnull final InvocationConfiguration configuration) {
+
+                    return configuration;
+                }
+            };
+
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
-    public static final ContextInvocationConfiguration EMPTY_CONFIGURATION =
+    public static final InvocationConfiguration DEFAULT_CONFIGURATION =
             builder().buildConfiguration();
 
     private final int mInvocationId;
@@ -60,7 +69,7 @@ public class ContextInvocationConfiguration {
      * @param resolutionType the type of resolution.
      * @param strategyType   the cache strategy type.
      */
-    private ContextInvocationConfiguration(final int invocationId,
+    private InvocationConfiguration(final int invocationId,
             @Nullable final ClashResolutionType resolutionType,
             @Nullable final CacheStrategyType strategyType) {
 
@@ -70,88 +79,39 @@ public class ContextInvocationConfiguration {
     }
 
     /**
-     * Returns a context invocation configuration builder.
+     * Returns a invocation configuration builder.
      *
      * @return the builder.
      */
     @Nonnull
-    public static Builder builder() {
+    public static Builder<InvocationConfiguration> builder() {
 
-        return new Builder();
+        return new Builder<InvocationConfiguration>(sDefaultConfigurable);
     }
 
     /**
-     * Returns a context invocation configuration builder initialized with the specified
-     * configuration.
+     * Returns a invocation configuration builder initialized with the specified configuration.
      *
-     * @param initialConfiguration the initial configuration.
+     * @param initialConfiguration the initial invocation configuration.
      * @return the builder.
      */
     @Nonnull
-    public static Builder builderFrom(
-            @Nullable final ContextInvocationConfiguration initialConfiguration) {
+    public static Builder<InvocationConfiguration> builderFrom(
+            @Nullable final InvocationConfiguration initialConfiguration) {
 
-        return (initialConfiguration == null) ? builder() : new Builder(initialConfiguration);
+        return (initialConfiguration == null) ? builder()
+                : new Builder<InvocationConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
     /**
-     * Returns the specified configuration or the empty one if the former is null.
-     *
-     * @param configuration the invocation configuration.
-     * @return the configuration.
-     */
-    @Nonnull
-    public static ContextInvocationConfiguration notNull(
-            @Nullable final ContextInvocationConfiguration configuration) {
-
-        return (configuration != null) ? configuration : EMPTY_CONFIGURATION;
-    }
-
-    /**
-     * Short for <b><code>builder().onClash(resolutionType)</code></b>.
-     *
-     * @param resolutionType the type of resolution.
-     * @return the context invocation configuration builder.
-     */
-    @Nonnull
-    public static Builder onClash(@Nullable final ClashResolutionType resolutionType) {
-
-        return builder().onClash(resolutionType);
-    }
-
-    /**
-     * Short for <b><code>builder().cache(strategyType)</code></b>.
-     *
-     * @param strategyType the cache strategy type.
-     * @return the context invocation configuration builder.
-     */
-    @Nonnull
-    public static Builder onComplete(@Nullable final CacheStrategyType strategyType) {
-
-        return builder().onComplete(strategyType);
-    }
-
-    /**
-     * Short for <b><code>builder().withId(invocationId)</code></b>.
-     *
-     * @param invocationId the invocation ID.
-     * @return the context invocation configuration builder.
-     */
-    @Nonnull
-    public static Builder withId(final int invocationId) {
-
-        return builder().withId(invocationId);
-    }
-
-    /**
-     * Returns a context invocation configuration builder initialized with this configuration.
+     * Returns a invocation configuration builder initialized with this configuration.
      *
      * @return the builder.
      */
     @Nonnull
-    public Builder builderFrom() {
+    public Builder<InvocationConfiguration> builderFrom() {
 
-        return new Builder(this);
+        return builderFrom(this);
     }
 
     @Override
@@ -163,12 +123,12 @@ public class ContextInvocationConfiguration {
             return true;
         }
 
-        if (!(o instanceof ContextInvocationConfiguration)) {
+        if (!(o instanceof InvocationConfiguration)) {
 
             return false;
         }
 
-        final ContextInvocationConfiguration that = (ContextInvocationConfiguration) o;
+        final InvocationConfiguration that = (InvocationConfiguration) o;
         return mInvocationId == that.mInvocationId && mResolutionType == that.mResolutionType
                 && mStrategyType == that.mStrategyType;
     }
@@ -186,7 +146,7 @@ public class ContextInvocationConfiguration {
     @Override
     public String toString() {
 
-        return "ContextInvocationConfiguration{" +
+        return "InvocationConfiguration{" +
                 "mInvocationId=" + mInvocationId +
                 ", mResolutionType=" + mResolutionType +
                 ", mStrategyType=" + mStrategyType +
@@ -297,9 +257,28 @@ public class ContextInvocationConfiguration {
     }
 
     /**
-     * Builder of context invocation configurations.
+     * Interface defining a configurable object.
+     *
+     * @param <TYPE> the configurable object type.
      */
-    public static class Builder {
+    public interface Configurable<TYPE> {
+
+        /**
+         * Applies the specified configuration and returns the configurable instance.
+         *
+         * @param configuration the configuration.
+         * @return the configurable instance.
+         */
+        @Nonnull
+        TYPE apply(@Nonnull InvocationConfiguration configuration);
+    }
+
+    /**
+     * Builder of invocation configurations.
+     */
+    public static final class Builder<TYPE> {
+
+        private final Configurable<? extends TYPE> mConfigurable;
 
         private int mInvocationId;
 
@@ -309,36 +288,83 @@ public class ContextInvocationConfiguration {
 
         /**
          * Constructor.
+         *
+         * @param configurable the configurable instance.
+         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
-        private Builder() {
+        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
 
+            mConfigurable = configurable;
             mInvocationId = AUTO;
         }
 
         /**
          * Constructor.
          *
-         * @param initialConfiguration the initial configuration.
-         * @throws java.lang.NullPointerException if the specified configuration instance is null.
+         * @param initialConfiguration the initial invocation configuration.
+         * @throws java.lang.NullPointerException if any of the specified parameters is null.
          */
-        private Builder(@Nonnull final ContextInvocationConfiguration initialConfiguration) {
+        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
+                @Nonnull final InvocationConfiguration initialConfiguration) {
 
-            mInvocationId = initialConfiguration.mInvocationId;
-            mResolutionType = initialConfiguration.mResolutionType;
-            mStrategyType = initialConfiguration.mStrategyType;
+            mConfigurable = configurable;
+            apply(initialConfiguration);
         }
 
         /**
-         * Applies the specified configuration to this builder.
+         * Applies the configuration and returns the configurable object.
+         *
+         * @return the configurable object.
+         */
+        @Nonnull
+        public TYPE build() {
+
+            return mConfigurable.apply(buildConfiguration());
+        }
+
+        /**
+         * Tells the builder how to resolve clashes of invocations. A clash happens when an
+         * invocation of the same type and with the same ID is still running. A null value means
+         * that it is up to the framework to choose a default resolution type.
+         *
+         * @param resolutionType the type of resolution.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> onClash(@Nullable final ClashResolutionType resolutionType) {
+
+            mResolutionType = resolutionType;
+            return this;
+        }
+
+        /**
+         * Tells the builder how to cache the invocation result after its completion. A null value
+         * means that it is up to the framework to choose a default strategy.
+         *
+         * @param strategyType the cache strategy type.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> onComplete(@Nullable final CacheStrategyType strategyType) {
+
+            mStrategyType = strategyType;
+            return this;
+        }
+
+        /**
+         * Applies the specified configuration to this builder. A null value means that all the
+         * configuration options need to be set to their default value, otherwise only the set
+         * options will be applied.
          *
          * @param configuration the invocation configuration.
          * @return this builder.
          */
         @Nonnull
-        public Builder apply(@Nullable final ContextInvocationConfiguration configuration) {
+        public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
 
             if (configuration == null) {
 
+                apply(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -367,57 +393,29 @@ public class ContextInvocationConfiguration {
         }
 
         /**
-         * Builds and return the configuration instance.
-         *
-         * @return the context invocation configuration instance.
-         */
-        @Nonnull
-        public ContextInvocationConfiguration buildConfiguration() {
-
-            return new ContextInvocationConfiguration(mInvocationId, mResolutionType,
-                                                      mStrategyType);
-        }
-
-        /**
-         * Tells the builder how to resolve clashes of invocations. A clash happens when an
-         * invocation of the same type and with the same ID is still running. A null value means
-         * that it is up to the framework to choose a default resolution type.
-         *
-         * @param resolutionType the type of resolution.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder onClash(@Nullable final ClashResolutionType resolutionType) {
-
-            mResolutionType = resolutionType;
-            return this;
-        }
-
-        /**
-         * Tells the builder how to cache the invocation result after its completion. A null value
-         * means that it is up to the framework to choose a default strategy.
-         *
-         * @param strategyType the cache strategy type.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder onComplete(@Nullable final CacheStrategyType strategyType) {
-
-            mStrategyType = strategyType;
-            return this;
-        }
-
-        /**
          * Tells the builder to identify the invocation with the specified ID.
          *
          * @param invocationId the invocation ID.
          * @return this builder.
          */
         @Nonnull
-        public Builder withId(final int invocationId) {
+        public Builder<TYPE> withId(final int invocationId) {
 
             mInvocationId = invocationId;
             return this;
+        }
+
+        private void apply(@Nonnull final InvocationConfiguration configuration) {
+
+            mInvocationId = configuration.mInvocationId;
+            mResolutionType = configuration.mResolutionType;
+            mStrategyType = configuration.mStrategyType;
+        }
+
+        @Nonnull
+        private InvocationConfiguration buildConfiguration() {
+
+            return new InvocationConfiguration(mInvocationId, mResolutionType, mStrategyType);
         }
     }
 }

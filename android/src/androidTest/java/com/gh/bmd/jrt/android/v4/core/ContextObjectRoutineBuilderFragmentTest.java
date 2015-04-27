@@ -11,10 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v11.core;
+package com.gh.bmd.jrt.android.v4.core;
 
 import android.annotation.TargetApi;
-import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -51,12 +50,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.withId;
-import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withFactoryArgs;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,26 +60,24 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 4/7/15.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
-public class ObjectContextRoutineBuilderFragmentTest
+@TargetApi(VERSION_CODES.FROYO)
+public class ContextObjectRoutineBuilderFragmentTest
         extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ObjectContextRoutineBuilderFragmentTest() {
+    public ContextObjectRoutineBuilderFragmentTest() {
 
         super(TestActivity.class);
     }
 
     public void testArgs() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutine.onFragment(fragment, TestArgs.class).configure(withFactoryArgs(17))
+        assertThat(JRoutine.onFragment(fragment, TestArgs.class)
+                           .routineConfiguration()
+                           .withFactoryArgs(17)
+                           .build()
                            .method("getId")
                            .callAsync()
                            .eventually()
@@ -94,17 +86,14 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testAsyncInputProxyRoutine() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final SumItf sumAsync = JRoutine.onFragment(fragment, Sum.class)
-                                        .configure(withReadTimeout(timeout))
+                                        .routineConfiguration()
+                                        .withReadTimeout(timeout)
+                                        .build()
                                         .buildProxy(SumItf.class);
         final StandaloneChannel<Integer> channel3 = JRoutine.standalone().buildChannel();
         channel3.input().pass(7).close();
@@ -129,17 +118,14 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testAsyncOutputProxyRoutine() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final CountItf countAsync = JRoutine.onFragment(fragment, Count.class)
-                                            .configure(withReadTimeout(timeout))
+                                            .routineConfiguration()
+                                            .withReadTimeout(timeout)
+                                            .build()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).readAll()).containsExactly(new int[]{0, 1, 2});
@@ -150,27 +136,21 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testBoundMethod() throws NoSuchMethodException {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final RoutineConfiguration configuration =
-                builder().withSyncRunner(Runners.sequentialRunner())
-                         .withAsyncRunner(Runners.poolRunner())
-                         .withMaxInvocations(1)
-                         .withCoreInvocations(1)
-                         .withAvailableTimeout(1, TimeUnit.SECONDS)
-                         .onReadTimeout(TimeoutActionType.EXIT)
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(new NullLog())
-                         .buildConfiguration();
         final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
-                                                        .configure(configuration)
+                                                        .routineConfiguration()
+                                                        .withSyncRunner(Runners.sequentialRunner())
+                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withMaxInvocations(1)
+                                                        .withCoreInvocations(1)
+                                                        .withAvailableTimeout(1, TimeUnit.SECONDS)
+                                                        .onReadTimeout(TimeoutActionType.EXIT)
+                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .build()
                                                         .boundMethod(TestClass.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -178,13 +158,8 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testConfigurationWarnings() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final CountLog countLog = new CountLog();
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final RoutineConfiguration configuration = builder().withFactoryArgs()
@@ -195,17 +170,24 @@ public class ObjectContextRoutineBuilderFragmentTest
                                                             .withOutputSize(3)
                                                             .withOutputTimeout(seconds(10))
                                                             .withLogLevel(LogLevel.DEBUG)
-                                                            .withLog(countLog)
-                                                            .buildConfiguration();
+                                                            .withLog(countLog).build();
         JRoutine.onFragment(fragment, TestClass.class)
-                .configure(configuration)
-                .members(withShareGroup("test"))
+                .routineConfiguration()
+                .with(configuration)
+                .build()
+                .proxyConfiguration()
+                .withShareGroup("test")
+                .build()
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         JRoutine.onFragment(fragment, Square.class)
-                .configure(configuration)
-                .members(withShareGroup("test"))
+                .routineConfiguration()
+                .with(configuration)
+                .build()
+                .proxyConfiguration()
+                .withShareGroup("test")
+                .build()
                 .buildProxy(SquareItf.class)
                 .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(14);
@@ -213,12 +195,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testDuplicateAnnotationError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -235,13 +212,8 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testException() throws NoSuchMethodException {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine3 =
@@ -262,12 +234,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testInvalidProxyError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -295,12 +262,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testInvalidProxyInputAnnotationError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -415,18 +377,16 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testInvalidProxyMethodError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).configure(withReadTimeout(INFINITY))
+            JRoutine.onFragment(fragment, TestClass.class)
+                    .routineConfiguration()
+                    .withReadTimeout(INFINITY)
+                    .build()
                     .buildProxy(TestItf.class)
                     .throwException(null);
 
@@ -438,7 +398,10 @@ public class ObjectContextRoutineBuilderFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).configure(withReadTimeout(INFINITY))
+            JRoutine.onFragment(fragment, TestClass.class)
+                    .routineConfiguration()
+                    .withReadTimeout(INFINITY)
+                    .build()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
 
@@ -450,7 +413,10 @@ public class ObjectContextRoutineBuilderFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).configure(withReadTimeout(INFINITY))
+            JRoutine.onFragment(fragment, TestClass.class)
+                    .routineConfiguration()
+                    .withReadTimeout(INFINITY)
+                    .build()
                     .buildProxy(TestItf.class)
                     .throwException2(null);
 
@@ -464,12 +430,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testInvalidProxyOutputAnnotationError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -536,24 +497,20 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testMethod() throws NoSuchMethodException {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final RoutineConfiguration configuration2 = builder().withSyncRunner(Runners.queuedRunner())
-                                                             .withAsyncRunner(Runners.poolRunner())
-                                                             .withMaxInvocations(1)
-                                                             .withAvailableTimeout(
-                                                                     TimeDuration.ZERO)
-                                                             .buildConfiguration();
         final Routine<Object, Object> routine2 = JRoutine.onFragment(fragment, TestClass.class)
-                                                         .configure(configuration2)
-                                                         .members(withShareGroup("test"))
+                                                         .routineConfiguration()
+                                                         .withSyncRunner(Runners.queuedRunner())
+                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .withMaxInvocations(1)
+                                                         .withAvailableTimeout(TimeDuration.ZERO)
+                                                         .build()
+                                                         .proxyConfiguration()
+                                                         .withShareGroup("test")
+                                                         .build()
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
@@ -562,20 +519,15 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testMethodBySignature() throws NoSuchMethodException {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final RoutineConfiguration configuration1 = builder().withSyncRunner(Runners.queuedRunner())
-                                                             .withAsyncRunner(Runners.poolRunner())
-                                                             .buildConfiguration();
         final Routine<Object, Object> routine1 = JRoutine.onFragment(fragment, TestClass.class)
-                                                         .configure(configuration1)
+                                                         .routineConfiguration()
+                                                         .withSyncRunner(Runners.queuedRunner())
+                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .build()
                                                          .method("getLong");
 
         assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -583,12 +535,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testMissingBoundMethodError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -605,12 +552,7 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testMissingMethodError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -628,12 +570,7 @@ public class ObjectContextRoutineBuilderFragmentTest
     @SuppressWarnings("ConstantConditions")
     public void testNullPointerError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -651,12 +588,7 @@ public class ObjectContextRoutineBuilderFragmentTest
     @SuppressWarnings("ConstantConditions")
     public void testNullProxyError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -684,16 +616,13 @@ public class ObjectContextRoutineBuilderFragmentTest
     @SuppressWarnings("unchecked")
     public void testProxyAnnotations() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Itf itf = JRoutine.onFragment(fragment, Impl.class)
-                                .configure(withReadTimeout(INFINITY))
+                                .routineConfiguration()
+                                .withReadTimeout(INFINITY)
+                                .build()
                                 .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -908,13 +837,8 @@ public class ObjectContextRoutineBuilderFragmentTest
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testProxyRoutine() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
         final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final SquareItf squareAsync =
@@ -958,23 +882,26 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testShareGroup() throws NoSuchMethodException {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
-                                                     .configure(withReadTimeout(seconds(9)));
+                                                     .routineConfiguration()
+                                                     .withReadTimeout(seconds(9))
+                                                     .build();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne =
-                builder.members(withShareGroup("1")).method("getOne").callAsync();
-        OutputChannel<Object> getTwo =
-                builder.members(withShareGroup("2")).method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.proxyConfiguration()
+                                              .withShareGroup("1")
+                                              .build()
+                                              .method("getOne")
+                                              .callAsync();
+        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+                                              .withShareGroup("2")
+                                              .build()
+                                              .method("getTwo")
+                                              .callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -992,17 +919,16 @@ public class ObjectContextRoutineBuilderFragmentTest
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .configure(withReadTimeout(seconds(10)))
-                           .invocations(withId(0))
+                           .routineConfiguration()
+                           .withReadTimeout(seconds(10))
+                           .build()
+                           .invocationConfiguration()
+                           .withId(0)
+                           .build()
                            .boundMethod("test")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -1010,8 +936,12 @@ public class ObjectContextRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .configure(onReadTimeout(TimeoutActionType.DEADLOCK))
-                    .invocations(withId(1))
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .build()
+                    .invocationConfiguration()
+                    .withId(1)
+                    .build()
                     .boundMethod("test")
                     .callAsync()
                     .readNext();
@@ -1023,8 +953,12 @@ public class ObjectContextRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .configure(withReadTimeout(seconds(10)))
-                           .invocations(withId(2))
+                           .routineConfiguration()
+                           .withReadTimeout(seconds(10))
+                           .build()
+                           .invocationConfiguration()
+                           .withId(2)
+                           .build()
                            .method("getInt")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -1032,8 +966,12 @@ public class ObjectContextRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .configure(onReadTimeout(TimeoutActionType.DEADLOCK))
-                    .invocations(withId(3))
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .build()
+                    .invocationConfiguration()
+                    .withId(3)
+                    .build()
                     .method("getInt")
                     .callAsync()
                     .readNext();
@@ -1045,8 +983,12 @@ public class ObjectContextRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .configure(withReadTimeout(seconds(10)))
-                           .invocations(withId(4))
+                           .routineConfiguration()
+                           .withReadTimeout(seconds(10))
+                           .build()
+                           .invocationConfiguration()
+                           .withId(4)
+                           .build()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -1054,8 +996,12 @@ public class ObjectContextRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .configure(onReadTimeout(TimeoutActionType.DEADLOCK))
-                    .invocations(withId(5))
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .build()
+                    .invocationConfiguration()
+                    .withId(5)
+                    .build()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
                     .readNext();
@@ -1067,16 +1013,24 @@ public class ObjectContextRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .configure(withReadTimeout(seconds(10)))
-                           .invocations(withId(6))
+                           .routineConfiguration()
+                           .withReadTimeout(seconds(10))
+                           .build()
+                           .invocationConfiguration()
+                           .withId(6)
+                           .build()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
 
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .configure(onReadTimeout(TimeoutActionType.DEADLOCK))
-                    .invocations(withId(7))
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .build()
+                    .invocationConfiguration()
+                    .withId(7)
+                    .build()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

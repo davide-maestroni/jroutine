@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.ProxyConfiguration.Builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.reflect.Method;
@@ -53,16 +52,6 @@ public interface ClassRoutineBuilder {
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
 
     /**
-     * TODO
-     * <p/>
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the configuration builder.
-     */
-    @Nonnull
-    Builder<? extends ClassRoutineBuilder> configure();
-
-    /**
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is invoked ignoring a name specified in a
@@ -98,4 +87,25 @@ public interface ClassRoutineBuilder {
     @Nonnull
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
             @Nonnull Class<?>... parameterTypes);
+
+    /**
+     * Gets the proxy configuration builder related to this builder instance.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the proxy configuration builder.
+     */
+    @Nonnull
+    ProxyConfiguration.Builder<? extends ClassRoutineBuilder> proxyConfiguration();
+
+    /**
+     * Gets the routine configuration builder related to this builder instance.<br/>
+     * All the options related to the output and input channels will be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    RoutineConfiguration.Builder<? extends ClassRoutineBuilder> routineConfiguration();
 }

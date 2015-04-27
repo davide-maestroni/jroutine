@@ -27,8 +27,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withFactoryArgs;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 
 /**
@@ -53,13 +51,13 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         // the read connection invocation is stateless so we can just use a single instance of it
-        mReadConnection = JRoutine.on(new ReadConnection()).configure(
+        mReadConnection = JRoutine.on(new ReadConnection()).routineConfiguration()
                 // by setting the maximum number of parallel invocations
                 // we effectively limit the number of parallel downloads
-                builder().withMaxInvocations(maxParallelDownloads)
+                .withMaxInvocations(maxParallelDownloads)
                         // though we need to set a timeout in case the
                         // downloads outnumber it
-                        .withAvailableTimeout(seconds(30)).buildConfiguration()).buildRoutine();
+                .withAvailableTimeout(seconds(30)).build().buildRoutine();
     }
 
     /**
@@ -152,9 +150,11 @@ public class Downloader {
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
                     JRoutine.on(Invocations.factoryOf(WriteFile.class))
-                            .configure(withFactoryArgs(dstFile).withInputSize(8)
-                                                               .withInputTimeout(seconds(30))
-                                                               .buildConfiguration())
+                            .routineConfiguration()
+                            .withFactoryArgs(dstFile)
+                            .withInputSize(8)
+                            .withInputTimeout(seconds(30))
+                            .build()
                             .buildRoutine();
             downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
         }

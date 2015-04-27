@@ -18,7 +18,6 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Class implementing a builder of routine objects based on methods of a concrete object instance.
@@ -34,41 +33,28 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 3/29/15.
  */
-public interface ObjectServiceRoutineBuilder extends ServiceRoutineBuilder, ObjectRoutineBuilder {
+public interface ServiceObjectRoutineBuilder extends ObjectRoutineBuilder {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectServiceRoutineBuilder configure(@Nullable RoutineConfiguration configuration);
+    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxyConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectServiceRoutineBuilder configure(@Nonnull RoutineConfiguration.Builder builder);
+    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> routineConfiguration();
 
     /**
-     * {@inheritDoc}
+     * Gets the service configuration builder related to this builder instance.<br/>
+     * The configuration options not supported by the builder implementation might be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the service configuration builder.
      */
     @Nonnull
-    ObjectServiceRoutineBuilder service(@Nullable ServiceConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder service(@Nonnull ServiceConfiguration.Builder builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder members(@Nullable ProxyConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ObjectServiceRoutineBuilder members(@Nonnull ProxyConfiguration.Builder builder);
+    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> serviceConfiguration();
 }

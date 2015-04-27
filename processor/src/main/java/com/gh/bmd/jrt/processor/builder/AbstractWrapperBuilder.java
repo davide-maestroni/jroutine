@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Abstract implementation of a builder of async wrapper objects.
@@ -36,14 +35,42 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYPE> {
+public abstract class AbstractWrapperBuilder<TYPE>
+        implements WrapperBuilder<TYPE>, RoutineConfiguration.Configurable<WrapperBuilder<TYPE>>,
+        ProxyConfiguration.Configurable<WrapperBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
-    private ProxyConfiguration mProxyConfiguration;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public WrapperBuilder<TYPE> apply(@Nonnull final ProxyConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        mProxyConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public WrapperBuilder<TYPE> apply(@Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
 
     @Nonnull
     public TYPE buildWrapper() {
@@ -60,11 +87,9 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
                 classMap.put(target, classes);
             }
 
-            final String shareGroup =
-                    ProxyConfiguration.notNull(mProxyConfiguration).getShareGroupOr(null);
+            final String shareGroup = mProxyConfiguration.getShareGroupOr(null);
             final String classShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
-            final RoutineConfiguration configuration =
-                    RoutineConfiguration.notNull(mRoutineConfiguration);
+            final RoutineConfiguration configuration = mRoutineConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo = new ClassInfo(token, configuration, classShareGroup);
             final Object instance = classes.get(classInfo);
@@ -90,29 +115,15 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> configure(@Nullable final RoutineConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends WrapperBuilder<TYPE>> proxyConfiguration() {
 
-        mRoutineConfiguration = configuration;
-        return this;
+        return new ProxyConfiguration.Builder<WrapperBuilder<TYPE>>(this, mProxyConfiguration);
     }
 
     @Nonnull
-    public WrapperBuilder<TYPE> configure(@Nonnull final RoutineConfiguration.Builder builder) {
+    public RoutineConfiguration.Builder<? extends WrapperBuilder<TYPE>> routineConfiguration() {
 
-        return configure(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public WrapperBuilder<TYPE> members(@Nullable final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public WrapperBuilder<TYPE> members(@Nonnull final ProxyConfiguration.Builder builder) {
-
-        return members(builder.buildConfiguration());
+        return new RoutineConfiguration.Builder<WrapperBuilder<TYPE>>(this, mRoutineConfiguration);
     }
 
     /**

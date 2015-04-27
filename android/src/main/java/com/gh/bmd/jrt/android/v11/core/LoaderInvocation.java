@@ -24,13 +24,12 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.SparseArray;
 
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -56,8 +55,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 
 /**
  * Invocation implementation employing loaders to perform background operations.
@@ -265,7 +262,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if (((loaderId == ContextInvocationConfiguration.AUTO) || (loaderId == id))
+                if (((loaderId == InvocationConfiguration.AUTO) || (loaderId == id))
                         && loader.areSameInputs(inputs)) {
 
                     loaderManager.destroyLoader(id);
@@ -409,7 +406,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if ((loaderId == ContextInvocationConfiguration.AUTO) || (loaderId == id)) {
+                if ((loaderId == InvocationConfiguration.AUTO) || (loaderId == id)) {
 
                     loaderManager.destroyLoader(id);
                     callbackArray.removeAt(i);
@@ -490,7 +487,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         int loaderId = mLoaderId;
 
-        if (loaderId == ContextInvocationConfiguration.AUTO) {
+        if (loaderId == InvocationConfiguration.AUTO) {
 
             loaderId = mConstructor.getDeclaringClass().hashCode();
 
@@ -718,14 +715,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             logger.dbg("creating new result channel");
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<StandaloneInput<OUTPUT>> channels = mNewChannels;
-            final RoutineConfiguration configuration = builder().withOutputSize(Integer.MAX_VALUE)
-                                                                .withOutputTimeout(
-                                                                        TimeDuration.ZERO)
-                                                                .withLog(logger.getLog())
-                                                                .withLogLevel(logger.getLogLevel())
-                                                                .buildConfiguration();
-            final StandaloneChannel<OUTPUT> channel =
-                    JRoutine.standalone().configure(configuration).buildChannel();
+            final StandaloneChannel<OUTPUT> channel = JRoutine.standalone()
+                                                              .routineConfiguration()
+                                                              .withOutputSize(Integer.MAX_VALUE)
+                                                              .withOutputTimeout(TimeDuration.ZERO)
+                                                              .withLog(logger.getLog())
+                                                              .withLogLevel(logger.getLogLevel())
+                                                              .build()
+                                                              .buildChannel();
             channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));

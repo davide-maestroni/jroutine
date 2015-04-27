@@ -20,10 +20,10 @@ import android.support.v4.app.FragmentActivity;
 import com.gh.bmd.jrt.android.annotation.CacheStrategy;
 import com.gh.bmd.jrt.android.annotation.ClashResolution;
 import com.gh.bmd.jrt.android.annotation.Id;
-import com.gh.bmd.jrt.android.builder.ContextInvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.ContextObjectRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
-import com.gh.bmd.jrt.android.builder.InvocationContextRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.ObjectContextRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
 import com.gh.bmd.jrt.annotation.Bind;
@@ -34,7 +34,6 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
@@ -61,7 +60,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.ProxyConfiguration.withShareGroup;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
@@ -73,7 +71,10 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * <p/>
  * Created by Davide on 4/6/2015.
  */
-class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder {
+class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
+        InvocationConfiguration.Configurable<ContextObjectRoutineBuilder>,
+        ProxyConfiguration.Configurable<ContextObjectRoutineBuilder>,
+        RoutineConfiguration.Configurable<ContextObjectRoutineBuilder> {
 
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
@@ -82,11 +83,12 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
     private final Class<?> mTargetClass;
 
-    private ContextInvocationConfiguration mInvocationConfiguration;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private ProxyConfiguration mProxyConfiguration;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration;
+    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -95,7 +97,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
      * @param targetClass the invocation class token.
      * @throws java.lang.NullPointerException if the activity or class token are null.
      */
-    DefaultObjectContextRoutineBuilder(@Nonnull final FragmentActivity activity,
+    DefaultContextObjectRoutineBuilder(@Nonnull final FragmentActivity activity,
             @Nonnull final Class<?> targetClass) {
 
         this((Object) activity, targetClass);
@@ -108,7 +110,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
      * @param targetClass the invocation class token.
      * @throws java.lang.NullPointerException if the fragment or class token are null.
      */
-    DefaultObjectContextRoutineBuilder(@Nonnull final Fragment fragment,
+    DefaultContextObjectRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> targetClass) {
 
         this((Object) fragment, targetClass);
@@ -122,7 +124,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
      * @throws java.lang.NullPointerException if any of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultObjectContextRoutineBuilder(@Nonnull final Object context,
+    private DefaultContextObjectRoutineBuilder(@Nonnull final Object context,
             @Nonnull final Class<?> targetClass) {
 
         if (context == null) {
@@ -152,6 +154,60 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 bindingSet.add(name);
             }
         }
+    }
+
+    @Nonnull
+    private static InvocationConfiguration configurationWithAnnotations(
+            @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                configuration.builderFrom();
+
+        final Id idAnnotation = method.getAnnotation(Id.class);
+
+        if (idAnnotation != null) {
+
+            builder.withId(idAnnotation.value());
+        }
+
+        final ClashResolution clashAnnotation = method.getAnnotation(ClashResolution.class);
+
+        if (clashAnnotation != null) {
+
+            builder.onClash(clashAnnotation.value());
+        }
+
+        final CacheStrategy cacheAnnotation = method.getAnnotation(CacheStrategy.class);
+
+        if (cacheAnnotation != null) {
+
+            builder.onComplete(cacheAnnotation.value());
+        }
+
+        return builder.build();
+    }
+
+    @Nonnull
+    private static RoutineConfiguration configurationWithTimeout(
+            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
+
+        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                configuration.builderFrom();
+        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+        }
+
+        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.onReadTimeout(actionAnnotation.value());
+        }
+
+        return builder.build();
     }
 
     @Nonnull
@@ -215,7 +271,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    private static <INPUT, OUTPUT> InvocationContextRoutineBuilder<INPUT, OUTPUT> getBuilder(
+    private static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> getBuilder(
             @Nonnull WeakReference<Object> contextReference,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
@@ -268,6 +324,20 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         return target;
     }
 
+    @Nullable
+    private static String groupWithShareAnnotation(
+            @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method) {
+
+        final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+
+        if (shareGroupAnnotation != null) {
+
+            return shareGroupAnnotation.value();
+        }
+
+        return proxyConfiguration.getShareGroupOr(null);
+    }
+
     @Nonnull
     private static String[] toNames(@Nonnull final Class<?>[] classes) {
 
@@ -283,71 +353,42 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    private static ContextInvocationConfiguration.Builder withAnnotations(
-            @Nullable final ContextInvocationConfiguration configuration,
-            @Nonnull final Method method) {
+    @SuppressWarnings("ConstantConditions")
+    public ContextObjectRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
 
-        final ContextInvocationConfiguration.Builder builder =
-                ContextInvocationConfiguration.builderFrom(configuration);
+        if (configuration == null) {
 
-        final Id idAnnotation = method.getAnnotation(Id.class);
-
-        if (idAnnotation != null) {
-
-            builder.withId(idAnnotation.value());
+            throw new NullPointerException("the configuration must not be null");
         }
 
-        final ClashResolution clashAnnotation = method.getAnnotation(ClashResolution.class);
-
-        if (clashAnnotation != null) {
-
-            builder.onClash(clashAnnotation.value());
-        }
-
-        final CacheStrategy cacheAnnotation = method.getAnnotation(CacheStrategy.class);
-
-        if (cacheAnnotation != null) {
-
-            builder.onComplete(cacheAnnotation.value());
-        }
-
-        return builder;
-    }
-
-    @Nullable
-    private static String withShareAnnotation(@Nullable final ProxyConfiguration proxyConfiguration,
-            @Nonnull final Method method) {
-
-        final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
-
-        if (shareGroupAnnotation != null) {
-
-            return shareGroupAnnotation.value();
-        }
-
-        return ProxyConfiguration.notNull(proxyConfiguration).getShareGroupOr(null);
+        mProxyConfiguration = configuration;
+        return this;
     }
 
     @Nonnull
-    private static RoutineConfiguration.Builder withTimeoutAnnotation(
-            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
+    @SuppressWarnings("ConstantConditions")
+    public ContextObjectRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
-        final RoutineConfiguration.Builder builder = configuration.builderFrom();
-        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+        if (configuration == null) {
 
-        if (timeoutAnnotation != null) {
-
-            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            throw new NullPointerException("the configuration must not be null");
         }
 
-        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+        mRoutineConfiguration = configuration;
+        return this;
+    }
 
-        if (actionAnnotation != null) {
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ContextObjectRoutineBuilder apply(@Nonnull final InvocationConfiguration configuration) {
 
-            builder.onReadTimeout(actionAnnotation.value());
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
         }
 
-        return builder;
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     @Nonnull
@@ -363,24 +404,23 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         }
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
-
-        if (configuration != null) {
-
-            warn(configuration);
-        }
-
+        warn(configuration);
         final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
-        final RoutineConfiguration currentConfiguration =
-                RoutineConfiguration.notNull(configuration);
-        final Object[] args = currentConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        final String shareGroup = withShareAnnotation(mProxyConfiguration, targetMethod);
-        final Builder builder = withTimeoutAnnotation(currentConfiguration, targetMethod);
+        final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
+        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name};
-        return getBuilder(mContext, classToken).configure(
-                builder.withFactoryArgs(invocationArgs).withInputOrder(OrderType.PASSING_ORDER))
-                                               .invocations(
-                                                       withAnnotations(mInvocationConfiguration,
-                                                                       targetMethod))
+        final RoutineConfiguration routineConfiguration =
+                configurationWithTimeout(configuration, targetMethod);
+        final InvocationConfiguration invocationConfiguration =
+                configurationWithAnnotations(mInvocationConfiguration, targetMethod);
+        return getBuilder(mContext, classToken).routineConfiguration()
+                                               .with(routineConfiguration)
+                                               .withFactoryArgs(invocationArgs)
+                                               .withInputOrder(OrderType.PASSING_ORDER)
+                                               .build()
+                                               .invocationConfiguration()
+                                               .with(invocationConfiguration)
+                                               .build()
                                                .buildRoutine();
     }
 
@@ -414,26 +454,25 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         }
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
-
-        if (configuration != null) {
-
-            warn(configuration);
-        }
-
+        warn(configuration);
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
-        final RoutineConfiguration currentConfiguration =
-                RoutineConfiguration.notNull(configuration);
-        final Object[] args = currentConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        final String shareGroup = withShareAnnotation(mProxyConfiguration, targetMethod);
-        final Builder builder = withTimeoutAnnotation(currentConfiguration, targetMethod);
+        final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
+        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name,
                                                      toNames(parameterTypes)};
-        return getBuilder(mContext, classToken).configure(
-                builder.withFactoryArgs(invocationArgs).withInputOrder(OrderType.PASSING_ORDER))
-                                               .invocations(
-                                                       withAnnotations(mInvocationConfiguration,
-                                                                       targetMethod))
+        final RoutineConfiguration routineConfiguration =
+                configurationWithTimeout(configuration, targetMethod);
+        final InvocationConfiguration invocationConfiguration =
+                configurationWithAnnotations(mInvocationConfiguration, targetMethod);
+        return getBuilder(mContext, classToken).routineConfiguration()
+                                               .with(routineConfiguration)
+                                               .withFactoryArgs(invocationArgs)
+                                               .withInputOrder(OrderType.PASSING_ORDER)
+                                               .build()
+                                               .invocationConfiguration()
+                                               .with(invocationConfiguration)
+                                               .build()
                                                .buildRoutine();
     }
 
@@ -447,12 +486,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
         }
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
-
-        if (configuration != null) {
-
-            warn(configuration);
-        }
-
+        warn(configuration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this, itf));
         return itf.cast(proxy);
@@ -465,46 +499,27 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder members(@Nullable final ProxyConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> proxyConfiguration() {
 
-        mProxyConfiguration = configuration;
-        return this;
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ContextObjectRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder members(@Nonnull final ProxyConfiguration.Builder builder) {
+    public RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder>
+    routineConfiguration() {
 
-        return members(builder.buildConfiguration());
+        final RoutineConfiguration configuration = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ContextObjectRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
-    public ObjectContextRoutineBuilder configure(
-            @Nullable final RoutineConfiguration configuration) {
+    public InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder>
+    invocationConfiguration() {
 
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectContextRoutineBuilder configure(
-            @Nonnull final RoutineConfiguration.Builder builder) {
-
-        return configure(builder.buildConfiguration());
-    }
-
-    @Nonnull
-    public ObjectContextRoutineBuilder invocations(
-            @Nullable final ContextInvocationConfiguration configuration) {
-
-        mInvocationConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    public ObjectContextRoutineBuilder invocations(
-            @Nonnull final ContextInvocationConfiguration.Builder builder) {
-
-        return invocations(builder.buildConfiguration());
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ContextObjectRoutineBuilder>(this,
+                                                                                configuration);
     }
 
     /**
@@ -602,7 +617,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .members(withShareGroup(mShareGroup))
+                                   .proxyConfiguration()
+                                   .withShareGroup(mShareGroup)
+                                   .build()
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -686,7 +703,9 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             try {
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .members(withShareGroup(mShareGroup))
+                                   .proxyConfiguration()
+                                   .withShareGroup(mShareGroup)
+                                   .build()
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -949,7 +968,7 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
 
         private final WeakReference<Object> mContext;
 
-        private final ContextInvocationConfiguration mInvocationConfiguration;
+        private final InvocationConfiguration mInvocationConfiguration;
 
         private final Class<?> mProxyClass;
 
@@ -965,12 +984,12 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
          * @param builder    the builder instance.
          * @param proxyClass the proxy class.
          */
-        private ProxyInvocationHandler(@Nonnull final DefaultObjectContextRoutineBuilder builder,
+        private ProxyInvocationHandler(@Nonnull final DefaultContextObjectRoutineBuilder builder,
                 @Nonnull final Class<?> proxyClass) {
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
-            mRoutineConfiguration = RoutineConfiguration.notNull(builder.mRoutineConfiguration);
+            mRoutineConfiguration = builder.mRoutineConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mInvocationConfiguration = builder.mInvocationConfiguration;
             mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
@@ -1022,10 +1041,8 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
                 returnMode = getReturnMode(method);
             }
 
-            final String shareGroup = withShareAnnotation(mProxyConfiguration, method);
+            final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
             final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
-            final RoutineConfiguration.Builder builder =
-                    withTimeoutAnnotation(mRoutineConfiguration, method);
             final Object[] invocationArgs =
                     new Object[]{mProxyClass.getName(), mTargetClass.getName(), mArgs, shareGroup,
                                  method.getName(), toNames(parameterTypes),
@@ -1034,15 +1051,21 @@ class DefaultObjectContextRoutineBuilder implements ObjectContextRoutineBuilder 
             final OrderType inputOrder = (isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER;
             final OrderType outputOrder =
                     (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER : OrderType.NONE;
-            final InvocationContextRoutineBuilder<Object, Object> routineBuilder =
+            final ContextRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, ClassToken.tokenOf(ProxyInvocation.class));
-            final Routine<Object, Object> routine = routineBuilder.configure(
-                    builder.withFactoryArgs(invocationArgs)
-                           .withInputOrder(inputOrder)
-                           .withOutputOrder(outputOrder))
-                                                                  .invocations(withAnnotations(
-                                                                          mInvocationConfiguration,
-                                                                          method))
+            final RoutineConfiguration routineConfiguration =
+                    configurationWithTimeout(mRoutineConfiguration, method);
+            final InvocationConfiguration invocationConfiguration =
+                    configurationWithAnnotations(mInvocationConfiguration, method);
+            final Routine<Object, Object> routine = routineBuilder.routineConfiguration()
+                                                                  .with(routineConfiguration)
+                                                                  .withFactoryArgs(invocationArgs)
+                                                                  .withInputOrder(inputOrder)
+                                                                  .withOutputOrder(outputOrder)
+                                                                  .build()
+                                                                  .invocationConfiguration()
+                                                                  .with(invocationConfiguration)
+                                                                  .build()
                                                                   .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

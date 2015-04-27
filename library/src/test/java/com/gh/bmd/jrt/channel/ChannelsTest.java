@@ -41,8 +41,10 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testSelect() {
 
-        final StandaloneChannelBuilder builder =
-                JRoutine.standalone().configure().withOutputOrder(OrderType.PASSING_ORDER).then();
+        final StandaloneChannelBuilder builder = JRoutine.standalone()
+                                                         .routineConfiguration()
+                                                         .withOutputOrder(OrderType.PASSING_ORDER)
+                                                         .build();
         final StandaloneChannel<String> channel1 = builder.buildChannel();
         final StandaloneChannel<String> channel2 = builder.buildChannel();
         final StandaloneChannel<String> channel3 = builder.buildChannel();

@@ -23,8 +23,12 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain wrapper = on(instance).members(withShareGroup(ShareGroup.NONE))
-                                                      .configure(withReadTimeout(TimeDuration.INFINITY))
+                final AsyncMain wrapper = on(instance).proxyConfiguration()
+                                                      .withShareGroup(ShareGroup.NONE)
+                                                      .applied()
+                                                      .routineConfiguration()
+                                                      .withReadTimeout(TimeDuration.INFINITY)
+                                                      .applied()
                                                       .buildWrapper(AsyncMain.class);
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 
@@ -68,7 +72,7 @@
 
                 &commat;Pass(int.class)
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
             }
@@ -88,8 +92,12 @@
 
                 final Main instance = new Main();
                 final AsyncMain wrapper = JRoutine_AsyncMain.on(instance)
-                                                            .members(withShareGroup(ShareGroup.NONE))
-                                                            .configure(withReadTimeout(TimeDuration.INFINITY))
+                                                            .proxyConfiguration()
+                                                            .withShareGroup(ShareGroup.NONE)
+                                                            .applied()
+                                                            .routineConfiguration()
+                                                            .withReadTimeout(TimeDuration.INFINITY)
+                                                            .applied()
                                                             .buildWrapper();
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 
@@ -133,7 +141,7 @@
 
                 &commat;Pass(int.class)
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
             }

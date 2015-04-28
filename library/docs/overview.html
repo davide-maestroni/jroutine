@@ -189,8 +189,12 @@
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder = on(Main.class).members(withShareGroup(ShareGroup.NONE))
-                                                                  .configure(withReadTimeout(TimeDuration.INFINITY));
+                final ClassRoutineBuilder builder = on(Main.class).proxyConfiguration()
+                                                                  .withShareGroup(ShareGroup.NONE)
+                                                                  .applied()
+                                                                  .routineConfiguration()
+                                                                  .withReadTimeout(TimeDuration.INFINITY)
+                                                                  .applied();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.boundMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.boundMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.boundMethod(MEAN);
@@ -247,8 +251,12 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = on(instance).members(withShareGroup(ShareGroup.NONE))
-                                                    .configure(withReadTimeout(TimeDuration.INFINITY))
+                final AsyncMain proxy = on(instance).proxyConfiguration()
+                                                    .withShareGroup(ShareGroup.NONE)
+                                                    .applied()
+                                                    .routineConfiguration()
+                                                    .withReadTimeout(TimeDuration.INFINITY)
+                                                    .applied()
                                                     .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
@@ -291,7 +299,7 @@
 
                 &commat;Pass(int.class)
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
             }

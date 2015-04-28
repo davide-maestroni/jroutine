@@ -540,7 +540,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
+                                   .proxyConfiguration()
+                                   .withShareGroup(mShareGroup)
+                                   .applied()
                                    .boundMethod(mBindingName);
                 mTarget = target;
 
@@ -633,7 +635,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
+                                   .proxyConfiguration()
+                                   .withShareGroup(mShareGroup)
+                                   .applied()
                                    .method(mMethodName, mParameterTypes);
                 mTarget = target;
 
@@ -985,8 +989,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                             .withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
                             .withOutputOrder(
                                     (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
-                                            : OrderType.NONE).applied()
-                            .serviceConfiguration().with(mServiceConfiguration).applied()
+                                            : OrderType.NONE)
+                            .applied()
+                            .serviceConfiguration()
+                            .with(mServiceConfiguration)
+                            .applied()
                             .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

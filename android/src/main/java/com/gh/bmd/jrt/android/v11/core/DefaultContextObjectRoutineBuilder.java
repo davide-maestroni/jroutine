@@ -625,7 +625,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
+                                   .proxyConfiguration()
+                                   .withShareGroup(mShareGroup)
+                                   .applied()
                                    .boundMethod(mBindingName);
                 mTarget = target;
 
@@ -718,7 +720,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
+                                   .proxyConfiguration()
+                                   .withShareGroup(mShareGroup)
+                                   .applied()
                                    .method(mMethodName, mParameterTypes);
                 mTarget = target;
 

@@ -129,7 +129,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .routineConfiguration()
                         .with(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                       .withOutputOrder(OrderType.PASSING_ORDER).applied())
+                                       .withOutputOrder(OrderType.PASSING_ORDER)
+                                       .applied())
                         .applied()
                         .invocationConfiguration()
                         .withId(0)
@@ -149,7 +150,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .routineConfiguration()
                         .with(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                       .withOutputOrder(OrderType.PASSING_ORDER).applied())
+                                       .withOutputOrder(OrderType.PASSING_ORDER)
+                                       .applied())
                         .applied()
                         .invocationConfiguration()
                         .withId(0)
@@ -523,7 +525,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .routineConfiguration()
                         .with(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                       .withOutputOrder(OrderType.PASSING_ORDER).applied())
+                                       .withOutputOrder(OrderType.PASSING_ORDER)
+                                       .applied())
                         .applied()
                         .invocationConfiguration()
                         .withId(0)
@@ -593,14 +596,20 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .applied();
-        JRoutine.onActivity(getActivity(), 0).routineConfiguration().with(configuration).applied()
+        JRoutine.onActivity(getActivity(), 0)
+                .routineConfiguration()
+                .with(configuration)
+                .applied()
                 .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        JRoutine.onFragment(fragment, 0).routineConfiguration().with(configuration).applied()
+        JRoutine.onFragment(fragment, 0)
+                .routineConfiguration()
+                .with(configuration)
+                .applied()
                 .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
@@ -1204,7 +1213,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         try {
 
             new DefaultContextRoutine<String, String>(reference, ToUpperCase.class, null,
-                                                      InvocationConfiguration.DEFAULT_CONFIGURATION);
+                                                      InvocationConfiguration
+                                                              .DEFAULT_CONFIGURATION);
 
             fail();
 

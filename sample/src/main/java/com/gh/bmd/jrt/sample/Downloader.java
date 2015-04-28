@@ -152,7 +152,9 @@ public class Downloader {
                     JRoutine.on(Invocations.factoryOf(WriteFile.class))
                             .routineConfiguration()
                             .withFactoryArgs(dstFile)
-                            .withInputSize(8).withInputTimeout(seconds(30)).applied()
+                            .withInputSize(8)
+                            .withInputTimeout(seconds(30))
+                            .applied()
                             .buildRoutine();
             downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
         }

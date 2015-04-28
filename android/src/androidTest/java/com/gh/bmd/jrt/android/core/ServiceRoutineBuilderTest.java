@@ -265,7 +265,8 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                                                          .withMaxInvocations(2)
                                                          .withAvailableTimeout(1, TimeUnit.SECONDS)
                                                          .withAvailableTimeout(
-                                                                 TimeDuration.millis(200)).applied()
+                                                                 TimeDuration.millis(200))
+                                                         .applied()
                                                          .buildRoutine();
         assertThat(routine4.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)

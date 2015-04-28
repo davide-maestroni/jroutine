@@ -324,10 +324,14 @@ public class ClassRoutineBuilderTest {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration().withShareGroup("1").applied()
+        OutputChannel<Object> getOne = builder.proxyConfiguration()
+                                              .withShareGroup("1")
+                                              .applied()
                                               .method("getOne")
                                               .callAsync();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration().withShareGroup("2").applied()
+        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+                                              .withShareGroup("2")
+                                              .applied()
                                               .method("getTwo")
                                               .callAsync();
 

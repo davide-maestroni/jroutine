@@ -260,8 +260,9 @@ public class RoutineTest {
                     }
                 };
 
-        assertThat(
-                on(closeInvocation).routineConfiguration().withLogLevel(LogLevel.SILENT).applied()
+        assertThat(on(closeInvocation).routineConfiguration()
+                                      .withLogLevel(LogLevel.SILENT)
+                                      .applied()
                                       .callAsync("test")
                                       .afterMax(timeout)
                                       .readAll()).isEmpty();
@@ -290,7 +291,8 @@ public class RoutineTest {
         final Routine<String, String> routine = JRoutine.on(ClassToken.tokenOf(abortInvocation))
                                                         .routineConfiguration()
                                                         .withFactoryArgs(this, abortReason,
-                                                                         semaphore).applied()
+                                                                         semaphore)
+                                                        .applied()
                                                         .buildRoutine();
 
         final ParameterChannel<String, String> channel = routine.invokeAsync();
@@ -581,7 +583,8 @@ public class RoutineTest {
         final Routine<Integer, Integer> squareSumRoutine =
                 on(ClassToken.tokenOf(invokeSquareSum)).routineConfiguration()
                                                        .withFactoryArgs(this, sumRoutine,
-                                                                        squareRoutine).applied()
+                                                                        squareRoutine)
+                                                       .applied()
                                                        .buildRoutine();
 
         assertThat(
@@ -731,7 +734,9 @@ public class RoutineTest {
 
         final ParameterChannel<String, String> channel6 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
-                        .routineConfiguration().withFactoryArgs(TimeDuration.millis(10)).applied()
+                        .routineConfiguration()
+                        .withFactoryArgs(TimeDuration.millis(10))
+                        .applied()
                         .invokeAsync();
         channel6.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel6.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -750,7 +755,8 @@ public class RoutineTest {
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
                         .routineConfiguration()
                         .with(configuration.builderFrom()
-                                           .withFactoryArgs(TimeDuration.millis(10)).applied())
+                                           .withFactoryArgs(TimeDuration.millis(10))
+                                           .applied())
                         .applied()
                         .invokeAsync();
         channel7.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -766,7 +772,9 @@ public class RoutineTest {
 
         final ParameterChannel<String, String> channel8 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
-                        .routineConfiguration().withFactoryArgs(TimeDuration.ZERO).applied()
+                        .routineConfiguration()
+                        .withFactoryArgs(TimeDuration.ZERO)
+                        .applied()
                         .invokeAsync();
         channel8.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel8.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -786,7 +794,8 @@ public class RoutineTest {
                         .routineConfiguration()
                         .with(configuration.builderFrom()
                                            .withFactoryArgs(TimeDuration.ZERO)
-                                           .applied()).applied()
+                                           .applied())
+                        .applied()
                         .invokeAsync();
         channel9.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel9.after(TimeDuration.millis(10).nanosTime()).pass("test2");
@@ -1320,7 +1329,9 @@ public class RoutineTest {
 
         }
 
-        assertThat(on(test).routineConfiguration().withReadTimeout(timeout).applied()
+        assertThat(on(test).routineConfiguration()
+                           .withReadTimeout(timeout)
+                           .applied()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
         assertThat(
@@ -1493,7 +1504,9 @@ public class RoutineTest {
                 };
 
         assertThat(JRoutine.on(ClassToken.tokenOf(invocation))
-                           .routineConfiguration().withFactoryArgs(this).applied()
+                           .routineConfiguration()
+                           .withFactoryArgs(this)
+                           .applied()
                            .callAsync("test")
                            .afterMax(TimeDuration.millis(500))
                            .readAll()).containsExactly("test");

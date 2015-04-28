@@ -66,8 +66,10 @@ public class ObjectRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final Sum sum = new Sum();
-        final SumItf sumAsync =
-                JRoutine.on(sum).routineConfiguration().withReadTimeout(timeout).applied()
+        final SumItf sumAsync = JRoutine.on(sum)
+                                        .routineConfiguration()
+                                        .withReadTimeout(timeout)
+                                        .applied()
                                         .buildProxy(SumItf.class);
         final StandaloneChannel<Integer> channel3 = JRoutine.standalone().buildChannel();
         channel3.input().pass(7).close();
@@ -95,8 +97,10 @@ public class ObjectRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final Count count = new Count();
-        final CountItf countAsync =
-                JRoutine.on(count).routineConfiguration().withReadTimeout(timeout).applied()
+        final CountItf countAsync = JRoutine.on(count)
+                                            .routineConfiguration()
+                                            .withReadTimeout(timeout)
+                                            .applied()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).readAll()).containsExactly(new int[]{0, 1, 2});
@@ -167,12 +171,17 @@ public class ObjectRoutineBuilderTest {
                                                             .withLog(countLog)
                                                             .applied();
         JRoutine.on(test)
-                .routineConfiguration().with(configuration).applied()
+                .routineConfiguration()
+                .with(configuration)
+                .applied()
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         final Square square = new Square();
-        JRoutine.on(square).routineConfiguration().with(configuration).applied()
+        JRoutine.on(square)
+                .routineConfiguration()
+                .with(configuration)
+                .applied()
                 .buildProxy(SquareItf.class)
                 .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(14);
@@ -343,7 +352,10 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(test).routineConfiguration().withReadTimeout(INFINITY).applied()
+            JRoutine.on(test)
+                    .routineConfiguration()
+                    .withReadTimeout(INFINITY)
+                    .applied()
                     .buildProxy(TestItf.class)
                     .throwException(null);
 
@@ -355,7 +367,10 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(test).routineConfiguration().withReadTimeout(INFINITY).applied()
+            JRoutine.on(test)
+                    .routineConfiguration()
+                    .withReadTimeout(INFINITY)
+                    .applied()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
 
@@ -557,7 +572,10 @@ public class ObjectRoutineBuilderTest {
     public void testProxyAnnotations() {
 
         final Impl impl = new Impl();
-        final Itf itf = JRoutine.on(impl).routineConfiguration().withReadTimeout(INFINITY).applied()
+        final Itf itf = JRoutine.on(impl)
+                                .routineConfiguration()
+                                .withReadTimeout(INFINITY)
+                                .applied()
                                 .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -888,10 +906,14 @@ public class ObjectRoutineBuilderTest {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration().withShareGroup("1").applied()
+        OutputChannel<Object> getOne = builder.proxyConfiguration()
+                                              .withShareGroup("1")
+                                              .applied()
                                               .method("getOne")
                                               .callAsync();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration().withShareGroup("2").applied()
+        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+                                              .withShareGroup("2")
+                                              .applied()
                                               .method("getTwo")
                                               .callAsync();
 
@@ -924,7 +946,9 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .applied()
                     .boundMethod("test")
                     .callAsync()
                     .readNext();
@@ -946,7 +970,9 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .applied()
                     .method("getInt")
                     .callAsync()
                     .readNext();
@@ -968,7 +994,9 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .applied()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
                     .readNext();
@@ -989,7 +1017,9 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration()
+                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .applied()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

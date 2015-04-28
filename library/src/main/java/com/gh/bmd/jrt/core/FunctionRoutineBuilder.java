@@ -644,6 +644,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     public RoutineBuilder<INPUT, OUTPUT> apply(@Nonnull final RoutineConfiguration configuration) {
 
         return super.apply(RoutineConfiguration.builderFrom(configuration)
-                                               .withInputOrder(OrderType.PASSING_ORDER).applied());
+                                               .withInputOrder(OrderType.PASSING_ORDER)
+                                               .applied());
     }
 }

@@ -378,9 +378,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .routineConfiguration()
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
-                       .withInputOrder(OrderType.PASSING_ORDER).applied()
+                       .withInputOrder(OrderType.PASSING_ORDER)
+                       .applied()
                        .serviceConfiguration()
-                       .with(serviceConfiguration).applied()
+                       .with(serviceConfiguration)
+                       .applied()
                        .buildRoutine();
     }
 
@@ -425,9 +427,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
                                         toNames(parameterTypes))
-                       .withInputOrder(OrderType.PASSING_ORDER).applied()
+                       .withInputOrder(OrderType.PASSING_ORDER)
+                       .applied()
                        .serviceConfiguration()
-                       .with(serviceConfiguration).applied()
+                       .with(serviceConfiguration)
+                       .applied()
                        .buildRoutine();
     }
 
@@ -494,6 +498,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
+        private Object mTarget;
+
         /**
          * Constructor.
          *
@@ -517,6 +523,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
+            if (mTarget == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
             result.pass(mRoutine.callSync(inputs));
         }
 
@@ -527,10 +538,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .proxyConfiguration()
-                                   .withShareGroup(mShareGroup).applied()
+                final Object target = getInstance(context, mTargetClass, mArgs);
+                mRoutine = JRoutine.on(target)
+                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
                                    .boundMethod(mBindingName);
+                mTarget = target;
 
             } catch (final RoutineException e) {
 
@@ -575,6 +587,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
+        private Object mTarget;
+
         /**
          * Constructor.
          *
@@ -602,6 +616,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
+            if (mTarget == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
             result.pass(mRoutine.callSync(inputs));
         }
 
@@ -612,10 +631,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .proxyConfiguration()
-                                   .withShareGroup(mShareGroup).applied()
+                final Object target = getInstance(context, mTargetClass, mArgs);
+                mRoutine = JRoutine.on(target)
+                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
                                    .method(mMethodName, mParameterTypes);
+                mTarget = target;
 
             } catch (final RoutineException e) {
 
@@ -849,13 +869,15 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                mTarget = getInstance(context, mTargetClass, mArgs);
+                final Object target = getInstance(context, mTargetClass, mArgs);
                 final String shareGroup = mShareGroup;
 
                 if (!ShareGroup.NONE.equals(shareGroup)) {
 
-                    mMutex = getSharedMutex(mTarget, shareGroup);
+                    mMutex = getSharedMutex(target, shareGroup);
                 }
+
+                mTarget = target;
 
             } catch (final RoutineException e) {
 
@@ -905,13 +927,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         }
 
-        public Object invoke(final Object proxy, @Nonnull final Method method,
-                final Object[] args) throws Throwable {
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
+                Throwable {
 
             boolean isParallel = false;
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-            final int length = args.length;
+            final int length = (args != null) ? args.length : 0;
             final boolean[] isAsync = new boolean[length];
             final Class<?>[] targetParameterTypes = new Class<?>[length];
             boolean isInputCollection = false;
@@ -964,8 +986,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                             .withOutputOrder(
                                     (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
                                             : OrderType.NONE).applied()
-                            .serviceConfiguration()
-                            .with(mServiceConfiguration).applied()
+                            .serviceConfiguration().with(mServiceConfiguration).applied()
                             .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

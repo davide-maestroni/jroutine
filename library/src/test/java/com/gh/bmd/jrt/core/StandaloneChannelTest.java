@@ -282,7 +282,8 @@ public class StandaloneChannelTest {
     public void testConfigurationWarnings() {
 
         final CountLog countLog = new CountLog();
-        JRoutine.standalone().routineConfiguration()
+        JRoutine.standalone()
+                .routineConfiguration()
                 .withFactoryArgs()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withMaxInvocations(3)
@@ -291,7 +292,9 @@ public class StandaloneChannelTest {
                 .withInputOrder(OrderType.NONE)
                 .withInputSize(3)
                 .withInputTimeout(seconds(1))
-                .withLogLevel(LogLevel.DEBUG).withLog(countLog).applied()
+                .withLogLevel(LogLevel.DEBUG)
+                .withLog(countLog)
+                .applied()
                 .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(8);
     }

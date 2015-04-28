@@ -45,6 +45,7 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
+import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 
@@ -547,7 +548,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             final Routine<Object, Object> routine =
                     buildRoutine(method, targetMethod, asyncParamMode, asyncReturnMode);
-            return callRoutine(routine, method, args, asyncParamMode, asyncReturnMode);
+            return callRoutine(routine, method, (args != null) ? args : NO_ARGS, asyncParamMode,
+                               asyncReturnMode);
         }
     }
 }

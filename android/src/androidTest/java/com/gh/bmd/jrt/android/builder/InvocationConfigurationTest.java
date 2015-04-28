@@ -84,7 +84,8 @@ public class InvocationConfigurationTest extends AndroidTestCase {
         assertThat(configuration).isNotEqualTo(
                 builder().onClash(ClashResolutionType.ABORT_THIS).applied());
         assertThat(configuration.builderFrom()
-                                .onClash(ClashResolutionType.KEEP_THAT).applied()).isNotEqualTo(
+                                .onClash(ClashResolutionType.KEEP_THAT)
+                                .applied()).isNotEqualTo(
                 builder().onClash(ClashResolutionType.KEEP_THAT).applied());
     }
 

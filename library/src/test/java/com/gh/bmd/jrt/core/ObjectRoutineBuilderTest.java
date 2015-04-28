@@ -164,10 +164,10 @@ public class ObjectRoutineBuilderTest {
                                                             .withOutputSize(3)
                                                             .withOutputTimeout(seconds(1))
                                                             .withLogLevel(LogLevel.DEBUG)
-                                                            .withLog(countLog).applied();
+                                                            .withLog(countLog)
+                                                            .applied();
         JRoutine.on(test)
-                .routineConfiguration()
-                .with(configuration).applied()
+                .routineConfiguration().with(configuration).applied()
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
 
@@ -888,12 +888,10 @@ public class ObjectRoutineBuilderTest {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration()
-                                              .withShareGroup("1").applied()
+        OutputChannel<Object> getOne = builder.proxyConfiguration().withShareGroup("1").applied()
                                               .method("getOne")
                                               .callAsync();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
-                                              .withShareGroup("2").applied()
+        OutputChannel<Object> getTwo = builder.proxyConfiguration().withShareGroup("2").applied()
                                               .method("getTwo")
                                               .callAsync();
 
@@ -926,8 +924,7 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
                     .boundMethod("test")
                     .callAsync()
                     .readNext();
@@ -949,8 +946,7 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
                     .method("getInt")
                     .callAsync()
                     .readNext();
@@ -972,8 +968,7 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
                     .readNext();
@@ -994,8 +989,7 @@ public class ObjectRoutineBuilderTest {
         try {
 
             JRoutine.on(testTimeout)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .routineConfiguration().onReadTimeout(TimeoutActionType.DEADLOCK).applied()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

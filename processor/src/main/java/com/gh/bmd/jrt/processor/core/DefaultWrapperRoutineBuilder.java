@@ -110,10 +110,8 @@ class DefaultWrapperRoutineBuilder
         }
 
         final ObjectWrapperBuilder<TYPE> builder = new ObjectWrapperBuilder<TYPE>(target, itf);
-        return builder.routineConfiguration()
-                      .with(mRoutineConfiguration).applied()
-                      .proxyConfiguration()
-                      .with(mProxyConfiguration).applied()
+        return builder.routineConfiguration().with(mRoutineConfiguration).applied()
+                      .proxyConfiguration().with(mProxyConfiguration).applied()
                       .buildWrapper();
     }
 

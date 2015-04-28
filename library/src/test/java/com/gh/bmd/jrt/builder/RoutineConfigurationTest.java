@@ -46,7 +46,8 @@ public class RoutineConfigurationTest {
                                                             .withInputOrder(OrderType.PASSING_ORDER)
                                                             .withAsyncRunner(Runners.queuedRunner())
                                                             .withLog(new NullLog())
-                                                            .withOutputSize(100).applied();
+                                                            .withOutputSize(100)
+                                                            .applied();
         assertThat(configuration).isNotEqualTo(builder().withFactoryArgs(3).applied());
         assertThat(configuration.builderFrom().withFactoryArgs(27).applied()).isNotEqualTo(
                 builder().withFactoryArgs(27).applied());
@@ -59,7 +60,9 @@ public class RoutineConfigurationTest {
                 builder().withAvailableTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASSING_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog()).withOutputSize(100).applied();
+                         .withLog(new NullLog())
+                         .withOutputSize(100)
+                         .applied();
         assertThat(configuration).isNotEqualTo(
                 builder().withAsyncRunner(Runners.sharedRunner()).applied());
         assertThat(configuration.builderFrom()

@@ -107,7 +107,8 @@ public class ClassRoutineBuilderTest {
     public void testConfigurationWarnings() {
 
         final CountLog countLog = new CountLog();
-        JRoutine.on(TestStatic.class).routineConfiguration()
+        JRoutine.on(TestStatic.class)
+                .routineConfiguration()
                 .withFactoryArgs()
                 .withInputOrder(OrderType.NONE)
                 .withInputSize(3)
@@ -115,7 +116,9 @@ public class ClassRoutineBuilderTest {
                 .withOutputOrder(OrderType.NONE)
                 .withOutputSize(3)
                 .withOutputTimeout(seconds(1))
-                .withLogLevel(LogLevel.DEBUG).withLog(countLog).applied()
+                .withLogLevel(LogLevel.DEBUG)
+                .withLog(countLog)
+                .applied()
                 .boundMethod(TestStatic.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
@@ -255,7 +258,8 @@ public class ClassRoutineBuilderTest {
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
-                                                         .withLog(nullLog).applied()
+                                                         .withLog(nullLog)
+                                                         .applied()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
@@ -265,7 +269,8 @@ public class ClassRoutineBuilderTest {
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
-                                                         .withLog(nullLog).applied()
+                                                         .withLog(nullLog)
+                                                         .applied()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
@@ -276,7 +281,8 @@ public class ClassRoutineBuilderTest {
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
-                                                         .withLog(nullLog).applied()
+                                                         .withLog(nullLog)
+                                                         .applied()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine3.callSync().readAll()).containsExactly(-77L);
@@ -288,7 +294,8 @@ public class ClassRoutineBuilderTest {
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
-                                                         .withLog(nullLog).applied()
+                                                         .withLog(nullLog)
+                                                         .applied()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
@@ -299,7 +306,8 @@ public class ClassRoutineBuilderTest {
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
-                                                         .withLog(new NullLog()).applied()
+                                                         .withLog(new NullLog())
+                                                         .applied()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine5.callSync().readAll()).containsExactly(-77L);
@@ -311,16 +319,15 @@ public class ClassRoutineBuilderTest {
 
         final ClassRoutineBuilder builder = JRoutine.on(TestStatic2.class)
                                                     .routineConfiguration()
-                                                    .withReadTimeout(seconds(2)).applied();
+                                                    .withReadTimeout(seconds(2))
+                                                    .applied();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration()
-                                              .withShareGroup("1").applied()
+        OutputChannel<Object> getOne = builder.proxyConfiguration().withShareGroup("1").applied()
                                               .method("getOne")
                                               .callAsync();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
-                                              .withShareGroup("2").applied()
+        OutputChannel<Object> getTwo = builder.proxyConfiguration().withShareGroup("2").applied()
                                               .method("getTwo")
                                               .callAsync();
 

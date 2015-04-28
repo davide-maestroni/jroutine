@@ -416,9 +416,11 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         return getBuilder(mContext, classToken).routineConfiguration()
                                                .with(routineConfiguration)
                                                .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASSING_ORDER).applied()
+                                               .withInputOrder(OrderType.PASSING_ORDER)
+                                               .applied()
                                                .invocationConfiguration()
-                                               .with(invocationConfiguration).applied()
+                                               .with(invocationConfiguration)
+                                               .applied()
                                                .buildRoutine();
     }
 
@@ -466,9 +468,11 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         return getBuilder(mContext, classToken).routineConfiguration()
                                                .with(routineConfiguration)
                                                .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASSING_ORDER).applied()
+                                               .withInputOrder(OrderType.PASSING_ORDER)
+                                               .applied()
                                                .invocationConfiguration()
-                                               .with(invocationConfiguration).applied()
+                                               .with(invocationConfiguration)
+                                               .applied()
                                                .buildRoutine();
     }
 
@@ -579,6 +583,8 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
+        private Object mTarget;
+
         /**
          * Constructor.
          *
@@ -602,6 +608,11 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         public void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
+            if (mTarget == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
             result.pass(mRoutine.callSync(inputs));
         }
 
@@ -612,10 +623,11 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .proxyConfiguration()
-                                   .withShareGroup(mShareGroup).applied()
+                final Object target = getInstance(context, mTargetClass, mArgs);
+                mRoutine = JRoutine.on(target)
+                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
                                    .boundMethod(mBindingName);
+                mTarget = target;
 
             } catch (final RoutineException e) {
 
@@ -660,6 +672,8 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
+        private Object mTarget;
+
         /**
          * Constructor.
          *
@@ -687,6 +701,11 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         public void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
+            if (mTarget == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
             result.pass(mRoutine.callSync(inputs));
         }
 
@@ -697,10 +716,11 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
-                                   .proxyConfiguration()
-                                   .withShareGroup(mShareGroup).applied()
+                final Object target = getInstance(context, mTargetClass, mArgs);
+                mRoutine = JRoutine.on(target)
+                                   .proxyConfiguration().withShareGroup(mShareGroup).applied()
                                    .method(mMethodName, mParameterTypes);
+                mTarget = target;
 
             } catch (final RoutineException e) {
 
@@ -934,13 +954,15 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
             try {
 
-                mTarget = getInstance(context, mTargetClass, mArgs);
+                final Object target = getInstance(context, mTargetClass, mArgs);
                 final String shareGroup = mShareGroup;
 
                 if (!ShareGroup.NONE.equals(shareGroup)) {
 
-                    mMutex = getSharedMutex(mTarget, shareGroup);
+                    mMutex = getSharedMutex(target, shareGroup);
                 }
+
+                mTarget = target;
 
             } catch (final RoutineException e) {
 
@@ -990,13 +1012,13 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             mProxyClass = proxyClass;
         }
 
-        public Object invoke(final Object proxy, @Nonnull final Method method,
-                final Object[] args) throws Throwable {
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
+                Throwable {
 
             boolean isParallel = false;
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-            final int length = args.length;
+            final int length = (args != null) ? args.length : 0;
             final boolean[] isAsync = new boolean[length];
             final Class<?>[] targetParameterTypes = new Class<?>[length];
             boolean isInputCollection = false;

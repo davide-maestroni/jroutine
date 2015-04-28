@@ -18,7 +18,6 @@ import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -82,118 +81,6 @@ public class Invocations {
             @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
-    }
-
-    /**
-     * Interface defining a function taking no parameters.
-     *
-     * @param <OUTPUT> the result data type.
-     */
-    public interface Function0<OUTPUT> {
-
-        /**
-         * Calls this function.
-         *
-         * @return the result.
-         */
-        OUTPUT call();
-    }
-
-    /**
-     * Interface defining a function taking a single parameter.
-     *
-     * @param <INPUT1> the first parameter type.
-     * @param <OUTPUT> the result data type.
-     */
-    public interface Function1<INPUT1, OUTPUT> {
-
-        /**
-         * Calls this function.
-         *
-         * @param param1 the first parameter.
-         * @return the result.
-         */
-        OUTPUT call(INPUT1 param1);
-    }
-
-    /**
-     * Interface defining a function taking two parameters.
-     *
-     * @param <INPUT1> the first parameter type.
-     * @param <INPUT2> the second parameter type.
-     * @param <OUTPUT> the result data type.
-     */
-    public interface Function2<INPUT1, INPUT2, OUTPUT> {
-
-        /**
-         * Calls this function.
-         *
-         * @param param1 the first parameter.
-         * @param param2 the second parameter.
-         * @return the result.
-         */
-        OUTPUT call(INPUT1 param1, INPUT2 param2);
-    }
-
-    /**
-     * Interface defining a function taking three parameters.
-     *
-     * @param <INPUT1> the first parameter type.
-     * @param <INPUT2> the second parameter type.
-     * @param <INPUT3> the third parameter type.
-     * @param <OUTPUT> the result data type.
-     */
-    public interface Function3<INPUT1, INPUT2, INPUT3, OUTPUT> {
-
-        /**
-         * Calls this function.
-         *
-         * @param param1 the first parameter.
-         * @param param2 the second parameter.
-         * @param param3 the third parameter.
-         * @return the result.
-         */
-        OUTPUT call(INPUT1 param1, INPUT2 param2, INPUT3 param3);
-    }
-
-    /**
-     * Interface defining a function taking four parameters.
-     *
-     * @param <INPUT1> the first parameter type.
-     * @param <INPUT2> the second parameter type.
-     * @param <INPUT3> the third parameter type.
-     * @param <INPUT4> the fourth parameter type.
-     * @param <OUTPUT> the result data type.
-     */
-    public interface Function4<INPUT1, INPUT2, INPUT3, INPUT4, OUTPUT> {
-
-        /**
-         * Calls this function.
-         *
-         * @param param1 the first parameter.
-         * @param param2 the second parameter.
-         * @param param3 the third parameter.
-         * @param param4 the fourth parameter.
-         * @return the result.
-         */
-        OUTPUT call(INPUT1 param1, INPUT2 param2, INPUT3 param3, INPUT4 param4);
-    }
-
-    /**
-     * Interface defining a function taking an undefined number of parameters.
-     *
-     * @param <PARAM>  the parameters type.
-     * @param <OUTPUT> the result data type.
-     */
-    public interface FunctionN<PARAM, OUTPUT> {
-
-        /**
-         * Calls this function.
-         *
-         * @param params the list of parameters.
-         * @return the result.
-         */
-        OUTPUT call(@Nonnull final List<? extends PARAM> params);
     }
 
     /**

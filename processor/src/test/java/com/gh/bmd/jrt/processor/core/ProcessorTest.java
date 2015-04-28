@@ -466,7 +466,7 @@ public class ProcessorTest {
         final TestWrapper testWrapper = JRoutine_TestWrapper.on(test)
                                                             .routineConfiguration()
                                                             .with(configuration)
-                                                            .applied()
+                                                            .apply()
                                                             .buildWrapper();
 
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);

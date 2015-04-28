@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.runner;
 
+import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -24,16 +25,58 @@ import javax.annotation.Nonnull;
  * Each class instance wraps a supporting runner and then provides different runner instances, each
  * one enqueuing executions with a specific priority.
  * <p/>
- * Note that the each execution will age each time an higher priority one takes the precedence, so
- * that older executions slowly increases their priority. Such mechanism has been implemented to
- * avoid starvation of low priority executions. Hence, when assigning priority to different runners,
- * it is important to keep in mind that the difference between two priorities corresponds to the
- * maximum age the lower priority execution will have, before getting the precedence over the higher
+ * Each enqueued execution will age each time an higher priority one takes the precedence, so that
+ * older executions slowly increases their priority. Such mechanism has been implemented to avoid
+ * starvation of low priority executions. Hence, when assigning priority to different runners, it is
+ * important to keep in mind that the difference between two priorities corresponds to the maximum
+ * age the lower priority execution will have, before getting the precedence over the higher
  * priority one.
+ * <p/>
+ * Note that the queue is not share between different instances of this class.
  * <p/>
  * Created by davide on 28/04/15.
  */
 public class PriorityRunner {
+
+    /**
+     * High priority.
+     */
+    public static final int HIGH_PRIORITY = 10;
+
+    /**
+     * Highest priority.
+     */
+    public static final int HIGHEST_PRIORITY = HIGH_PRIORITY << 1;
+
+    /**
+     * Low priority.
+     */
+    public static final int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
+
+    /**
+     * Lowest priority.
+     */
+    public static final int LOW_PRIORITY = -HIGH_PRIORITY;
+
+    /**
+     * Normal priority.
+     */
+    public static final int NORMAL_PRIORITY = 0;
+
+    private static final Comparator<PriorityExecution> PRIORITY_EXECUTION_COMPARATOR =
+            new Comparator<PriorityExecution>() {
+
+                public int compare(final PriorityExecution o1, final PriorityExecution o2) {
+
+                    final int thisPriority = o1.mPriority;
+                    final long thisAge = o1.mAge;
+                    final int thatPriority = o2.mPriority;
+                    final long thatAge = o2.mAge;
+
+                    final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
+                    return (compare == 0) ? compareLong(thatAge, thisAge) : compare;
+                }
+            };
 
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
 
@@ -69,7 +112,7 @@ public class PriorityRunner {
         }
 
         mRunner = wrapped;
-        mQueue = new PriorityBlockingQueue<PriorityExecution>();
+        mQueue = new PriorityBlockingQueue<PriorityExecution>(10, PRIORITY_EXECUTION_COMPARATOR);
     }
 
     private static int compareLong(long x, long y) {
@@ -122,7 +165,7 @@ public class PriorityRunner {
      * Execution implementation providing a comparison based on priority and the wrapped execution
      * age.
      */
-    private static class PriorityExecution implements Execution, Comparable<PriorityExecution> {
+    private static class PriorityExecution implements Execution {
 
         private final long mAge;
 
@@ -143,17 +186,6 @@ public class PriorityRunner {
             mExecution = execution;
             mPriority = priority;
             mAge = age;
-        }
-
-        public int compareTo(@Nonnull final PriorityExecution o) {
-
-            final int thisPriority = mPriority;
-            final long thisAge = mAge;
-            final int thatPriority = o.mPriority;
-            final long thatAge = o.mAge;
-
-            final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
-            return (compare == 0) ? compareLong(thatAge, thisAge) : compare;
         }
 
         public void run() {

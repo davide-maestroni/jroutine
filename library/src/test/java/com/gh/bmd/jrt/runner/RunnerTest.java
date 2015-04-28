@@ -72,8 +72,12 @@ public class RunnerTest {
     @Test
     public void testPriorityRunner() throws InterruptedException {
 
-        testRunner(Runners.priorityRunner(Runners.sharedRunner()).getRunner(0));
-        testRunner(Runners.priorityRunner(Runners.queuedRunner()).getRunner(100));
+        testRunner(Runners.priorityRunner(Runners.sharedRunner())
+                          .getRunner(PriorityRunner.NORMAL_PRIORITY));
+        testRunner(Runners.priorityRunner(Runners.queuedRunner())
+                          .getRunner(PriorityRunner.LOW_PRIORITY));
+        testRunner(new RunnerDecorator(Runners.priorityRunner(Runners.poolRunner())
+                                              .getRunner(PriorityRunner.LOWEST_PRIORITY)));
     }
 
     @Test

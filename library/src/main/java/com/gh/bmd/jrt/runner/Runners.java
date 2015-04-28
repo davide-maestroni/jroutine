@@ -26,8 +26,6 @@ import javax.annotation.Nonnull;
  */
 public class Runners {
 
-    //TODO: priority runner
-
     private static final Object sMutex = new Object();
 
     private static final QueuedRunner sQueuedRunner = new QueuedRunner();
@@ -87,6 +85,18 @@ public class Runners {
     public static Runner poolRunner() {
 
         return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
+    }
+
+    /**
+     * Returns a runner providing ordering of executions based on priority.
+     *
+     * @param wrapped the wrapped runner instance.
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static PriorityRunner priorityRunner(@Nonnull final Runner wrapped) {
+
+        return new PriorityRunner(wrapped);
     }
 
     /**

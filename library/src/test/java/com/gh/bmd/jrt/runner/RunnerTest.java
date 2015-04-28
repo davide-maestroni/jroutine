@@ -70,6 +70,13 @@ public class RunnerTest {
     }
 
     @Test
+    public void testPriorityRunner() throws InterruptedException {
+
+        testRunner(Runners.priorityRunner(Runners.sharedRunner()).getRunner(0));
+        testRunner(Runners.priorityRunner(Runners.queuedRunner()).getRunner(100));
+    }
+
+    @Test
     public void testQueuedRunner() throws InterruptedException {
 
         testRunner(new QueuedRunner());

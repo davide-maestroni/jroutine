@@ -57,11 +57,9 @@ public class ContextRoutineBuilderRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                 .routineConfiguration()
-                .withOutputOrder(OrderType.PASSING_ORDER)
-                .build()
+                .withOutputOrder(OrderType.PASSING_ORDER).applied()
                 .invocationConfiguration()
-                .withId(0)
-                .build()
+                .withId(0).applied()
                 .callAsync("test1", "test2");
 
         final Semaphore semaphore = new Semaphore(0);

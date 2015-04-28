@@ -33,15 +33,13 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultServiceRoutineBuilder<INPUT, OUTPUT>
-        extends TemplateRoutineBuilder<INPUT, OUTPUT>
+class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements ServiceRoutineBuilder<INPUT, OUTPUT>,
         ServiceConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>> {
 
     private final RoutineConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>
             mConfigurable =
-            new RoutineConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>
-                    () {
+            new RoutineConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>() {
 
                 @Nonnull
                 public ServiceRoutineBuilder<INPUT, OUTPUT> apply(
@@ -91,8 +89,9 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT>
     public RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
     routineConfiguration() {
 
-        return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(
-                mConfigurable, getConfiguration());
+        final RoutineConfiguration configuration = getConfiguration();
+        return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(mConfigurable,
+                                                                                      configuration);
     }
 
     @Nonnull
@@ -120,7 +119,8 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT>
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
     serviceConfiguration() {
 
-        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(
-                this, mServiceConfiguration);
+        final ServiceConfiguration configuration = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this,
+                                                                                      configuration);
     }
 }

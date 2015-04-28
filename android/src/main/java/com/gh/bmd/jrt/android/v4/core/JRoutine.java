@@ -189,8 +189,8 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @throws java.lang.NullPointerException     if the specified activity is null.
      */
     @Nonnull
-    public static ContextChannelBuilder onActivity(
-            @Nonnull final FragmentActivity activity, final int invocationId) {
+    public static ContextChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
+            final int invocationId) {
 
         if (invocationId == InvocationConfiguration.AUTO) {
 

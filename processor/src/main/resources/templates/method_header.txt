@@ -35,6 +35,6 @@
                                            .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .withOutputSize(Integer.MAX_VALUE)
                                            .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                                           .build()
+                                           .applied()
                                            .buildRoutine();
     }

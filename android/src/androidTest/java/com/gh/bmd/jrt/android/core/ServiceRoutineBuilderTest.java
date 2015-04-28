@@ -20,6 +20,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationDecorator;
 import com.gh.bmd.jrt.android.invocation.ContextPassingInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
@@ -27,6 +28,7 @@ import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
 import com.gh.bmd.jrt.android.runner.Runners;
+import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -58,8 +60,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide on 12/1/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class ServiceRoutineBuilderTest
-        extends ActivityInstrumentationTestCase2<TestActivity> {
+public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     public ServiceRoutineBuilderTest() {
 
@@ -72,9 +73,7 @@ public class ServiceRoutineBuilderTest
         final Data data = new Data();
         final OutputChannel<Data> channel =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .serviceConfiguration()
-                        .withRunnerClass(MainRunner.class)
-                        .build()
+                        .serviceConfiguration().withRunnerClass(MainRunner.class).applied()
                         .callAsync(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
@@ -131,6 +130,35 @@ public class ServiceRoutineBuilderTest
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public void testConfigurationErrors() {
+
+        final ClassToken<ContextPassingInvocation<Object>> classToken =
+                new ClassToken<ContextPassingInvocation<Object>>() {};
+
+        try {
+
+            new DefaultServiceRoutineBuilder<Object, Object>(getActivity(), classToken).apply(
+                    (RoutineConfiguration) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultServiceRoutineBuilder<Object, Object>(getActivity(), classToken).apply(
+                    (ServiceConfiguration) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     public void testDecorator() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
@@ -141,10 +169,10 @@ public class ServiceRoutineBuilderTest
                                                         .withSyncRunner(Runners.queuedRunner())
                                                         .withInputOrder(OrderType.NONE)
                                                         .withLogLevel(LogLevel.DEBUG)
-                                                        .build()
+                                                        .applied()
                                                         .serviceConfiguration()
                                                         .withLogClass(AndroidLog.class)
-                                                        .build()
+                                                        .applied()
                                                         .buildRoutine();
         assertThat(
                 routine.callSync("1", "2", "3", "4", "5").afterMax(timeout).readAll()).containsOnly(
@@ -158,12 +186,8 @@ public class ServiceRoutineBuilderTest
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
                         .routineConfiguration()
                         .withSyncRunner(Runners.queuedRunner())
-                        .withInputOrder(OrderType.NONE)
-                        .withLogLevel(LogLevel.DEBUG)
-                        .build()
-                        .serviceConfiguration()
-                        .withLogClass(AndroidLog.class)
-                        .build()
+                        .withInputOrder(OrderType.NONE).withLogLevel(LogLevel.DEBUG).applied()
+                        .serviceConfiguration().withLogClass(AndroidLog.class).applied()
                         .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -186,10 +210,10 @@ public class ServiceRoutineBuilderTest
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withOutputOrder(OrderType.NONE)
                                                          .withLogLevel(LogLevel.DEBUG)
-                                                         .build()
+                                                         .applied()
                                                          .serviceConfiguration()
                                                          .withLogClass(AndroidLog.class)
-                                                         .build()
+                                                         .applied()
                                                          .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -211,7 +235,7 @@ public class ServiceRoutineBuilderTest
                                                          .routineConfiguration()
                                                          .withInputOrder(OrderType.PASSING_ORDER)
                                                          .withOutputOrder(OrderType.PASSING_ORDER)
-                                                         .build()
+                                                         .applied()
                                                          .buildRoutine();
         assertThat(routine3.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -235,8 +259,7 @@ public class ServiceRoutineBuilderTest
                                                          .withMaxInvocations(2)
                                                          .withAvailableTimeout(1, TimeUnit.SECONDS)
                                                          .withAvailableTimeout(
-                                                                 TimeDuration.millis(200))
-                                                         .build()
+                                                                 TimeDuration.millis(200)).applied()
                                                          .buildRoutine();
         assertThat(routine4.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -268,10 +291,10 @@ public class ServiceRoutineBuilderTest
                            .routineConfiguration()
                            .withReadTimeout(millis(10))
                            .onReadTimeout(TimeoutActionType.EXIT)
-                           .build()
+                           .applied()
                            .serviceConfiguration()
                            .dispatchingOn(Looper.myLooper())
-                           .build()
+                           .applied()
                            .callAsync("test1")
                            .readAll()).isEmpty();
     }
@@ -285,12 +308,8 @@ public class ServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), classToken)
                     .routineConfiguration()
-                    .withReadTimeout(millis(10))
-                    .onReadTimeout(TimeoutActionType.ABORT)
-                    .build()
-                    .serviceConfiguration()
-                    .dispatchingOn(Looper.myLooper())
-                    .build()
+                    .withReadTimeout(millis(10)).onReadTimeout(TimeoutActionType.ABORT).applied()
+                    .serviceConfiguration().dispatchingOn(Looper.myLooper()).applied()
                     .callAsync("test2")
                     .readAll();
 
@@ -310,12 +329,8 @@ public class ServiceRoutineBuilderTest
 
             JRoutine.onService(getActivity(), classToken)
                     .routineConfiguration()
-                    .withReadTimeout(millis(10))
-                    .onReadTimeout(TimeoutActionType.DEADLOCK)
-                    .build()
-                    .serviceConfiguration()
-                    .dispatchingOn(Looper.myLooper())
-                    .build()
+                    .withReadTimeout(millis(10)).onReadTimeout(TimeoutActionType.DEADLOCK).applied()
+                    .serviceConfiguration().dispatchingOn(Looper.myLooper()).applied()
                     .callAsync("test3")
                     .readAll();
 
@@ -331,9 +346,7 @@ public class ServiceRoutineBuilderTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                        .serviceConfiguration()
-                        .withServiceClass(TestService.class)
-                        .build()
+                        .serviceConfiguration().withServiceClass(TestService.class).applied()
                         .buildRoutine();
         assertThat(
                 routine.callSync("1", "2", "3", "4", "5").afterMax(timeout).readAll()).containsOnly(
@@ -355,12 +368,8 @@ public class ServiceRoutineBuilderTest
                 .withInputTimeout(seconds(1))
                 .withOutputSize(3)
                 .withOutputTimeout(seconds(1))
-                .withLogLevel(LogLevel.DEBUG)
-                .withLog(countLog)
-                .build()
-                .serviceConfiguration()
-                .withServiceClass(TestService.class)
-                .build()
+                .withLogLevel(LogLevel.DEBUG).withLog(countLog).applied()
+                .serviceConfiguration().withServiceClass(TestService.class).applied()
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(4);
     }

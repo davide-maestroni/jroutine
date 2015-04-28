@@ -100,8 +100,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextChannelBuilder apply(
-            @Nonnull final RoutineConfiguration configuration) {
+    public ContextChannelBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -114,8 +113,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextChannelBuilder apply(
-            @Nonnull final InvocationConfiguration configuration) {
+    public ContextChannelBuilder apply(@Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -166,13 +164,11 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
         }
 
         return builder.routineConfiguration()
-                      .with(routineConfiguration)
-                      .build()
+                      .with(routineConfiguration).applied()
                       .invocationConfiguration()
                       .withId(mInvocationId)
                       .with(invocationConfiguration)
-                      .onClash(ClashResolutionType.KEEP_THAT)
-                      .build()
+                      .onClash(ClashResolutionType.KEEP_THAT).applied()
                       .callAsync();
     }
 
@@ -181,8 +177,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     invocationConfiguration() {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this,
-                                                                                    configuration);
+        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, configuration);
     }
 
     public void purge(@Nullable final Object input) {
@@ -252,12 +247,10 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextChannelBuilder>
-    routineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> routineConfiguration() {
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextChannelBuilder>(this,
-                                                                                 configuration);
+        return new RoutineConfiguration.Builder<ContextChannelBuilder>(this, configuration);
     }
 
     /**

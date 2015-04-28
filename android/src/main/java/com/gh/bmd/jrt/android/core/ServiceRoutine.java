@@ -161,8 +161,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                            .withInputTimeout(TimeDuration.ZERO)
                            .withOutputSize(Integer.MAX_VALUE)
                            .withOutputTimeout(TimeDuration.ZERO)
-                           .withLog(log)
-                           .build()
+                           .withLog(log).applied()
                            .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
@@ -322,8 +321,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                   .withOutputTimeout(
                                                                           TimeDuration.ZERO)
                                                                   .withLog(log)
-                                                                  .withLogLevel(logLevel)
-                                                                  .build()
+                                                                  .withLogLevel(logLevel).applied()
                                                                   .buildChannel();
             mStandaloneParamInput = paramChannel.input();
             mStandaloneParamOutput = paramChannel.output();
@@ -342,7 +340,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                             timeoutActionType)
                                                                     .withLog(log)
                                                                     .withLogLevel(logLevel)
-                                                                    .build()
+                                                                    .applied()
                                                                     .buildChannel();
             mStandaloneResultInput = resultChannel.input();
             mStandaloneResultOutput = resultChannel.output();

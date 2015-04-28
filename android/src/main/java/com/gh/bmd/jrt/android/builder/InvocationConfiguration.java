@@ -31,8 +31,6 @@ import javax.annotation.Nullable;
  */
 public final class InvocationConfiguration {
 
-    //TODO: add log to builders?
-
     /**
      * Constant identifying an invocation ID computed from the executor class and the input
      * parameters.
@@ -317,7 +315,7 @@ public final class InvocationConfiguration {
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE build() {
+        public TYPE applied() {
 
             return mConfigurable.apply(buildConfiguration());
         }

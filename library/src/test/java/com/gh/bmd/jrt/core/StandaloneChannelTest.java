@@ -239,7 +239,7 @@ public class StandaloneChannelTest {
                                                                      .withOutputOrder(
                                                                              OrderType
                                                                                      .PASSING_ORDER)
-                                                                     .build()
+                                                                     .applied()
                                                                      .buildChannel();
 
         new Thread() {
@@ -264,6 +264,21 @@ public class StandaloneChannelTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testConfigurationErrors() {
+
+        try {
+
+            new DefaultStandaloneChannelBuilder().apply(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testConfigurationWarnings() {
 
         final CountLog countLog = new CountLog();
@@ -276,8 +291,7 @@ public class StandaloneChannelTest {
                 .withInputOrder(OrderType.NONE)
                 .withInputSize(3)
                 .withInputTimeout(seconds(1))
-                .withLogLevel(LogLevel.DEBUG)
-                .withLog(countLog).build()
+                .withLogLevel(LogLevel.DEBUG).withLog(countLog).applied()
                 .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(8);
     }
@@ -430,7 +444,8 @@ public class StandaloneChannelTest {
     public void testOrderType() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<Object> channel = JRoutine.standalone().routineConfiguration()
+        final StandaloneChannel<Object> channel = JRoutine.standalone()
+                                                          .routineConfiguration()
                                                           .withOutputOrder(OrderType.PASSING_ORDER)
                                                           .withAsyncRunner(Runners.sharedRunner())
                                                           .withOutputSize(1)
@@ -438,7 +453,8 @@ public class StandaloneChannelTest {
                                                                              TimeUnit.MILLISECONDS)
                                                           .withOutputTimeout(seconds(1))
                                                           .withLogLevel(LogLevel.DEBUG)
-                                                          .withLog(new NullLog()).build()
+                                                          .withLog(new NullLog())
+                                                          .applied()
                                                           .buildChannel();
         channel.input().pass(-77L);
         assertThat(channel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
@@ -454,7 +470,7 @@ public class StandaloneChannelTest {
                                                                      .withOutputOrder(
                                                                              OrderType
                                                                                      .PASSING_ORDER)
-                                                                     .build()
+                                                                     .applied()
                                                                      .buildChannel();
         final StandaloneInput<Object> input2 = standaloneChannel2.input();
 
@@ -514,7 +530,7 @@ public class StandaloneChannelTest {
                                                            .routineConfiguration()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(TimeoutActionType.EXIT)
-                                                           .build()
+                                                           .applied()
                                                            .buildChannel();
 
         assertThat(channel1.output().readAll()).isEmpty();
@@ -527,7 +543,7 @@ public class StandaloneChannelTest {
                                                            .routineConfiguration()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(TimeoutActionType.ABORT)
-                                                           .build()
+                                                           .applied()
                                                            .buildChannel();
 
         try {
@@ -549,7 +565,7 @@ public class StandaloneChannelTest {
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(
                                                                    TimeoutActionType.DEADLOCK)
-                                                           .build()
+                                                           .applied()
                                                            .buildChannel();
 
         try {

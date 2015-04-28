@@ -142,7 +142,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             builder.onReadTimeout(actionAnnotation.value());
         }
 
-        return builder.build();
+        return builder.applied();
     }
 
     @Nonnull
@@ -378,11 +378,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .routineConfiguration()
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
-                       .withInputOrder(OrderType.PASSING_ORDER)
-                       .build()
+                       .withInputOrder(OrderType.PASSING_ORDER).applied()
                        .serviceConfiguration()
-                       .with(serviceConfiguration)
-                       .build()
+                       .with(serviceConfiguration).applied()
                        .buildRoutine();
     }
 
@@ -427,11 +425,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
                                         toNames(parameterTypes))
-                       .withInputOrder(OrderType.PASSING_ORDER)
-                       .build()
+                       .withInputOrder(OrderType.PASSING_ORDER).applied()
                        .serviceConfiguration()
-                       .with(serviceConfiguration)
-                       .build()
+                       .with(serviceConfiguration).applied()
                        .buildRoutine();
     }
 
@@ -533,8 +529,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
                                    .proxyConfiguration()
-                                   .withShareGroup(mShareGroup)
-                                   .build()
+                                   .withShareGroup(mShareGroup).applied()
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -619,8 +614,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
                                    .proxyConfiguration()
-                                   .withShareGroup(mShareGroup)
-                                   .build()
+                                   .withShareGroup(mShareGroup).applied()
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -969,11 +963,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                             .withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
                             .withOutputOrder(
                                     (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
-                                            : OrderType.NONE)
-                            .build()
+                                            : OrderType.NONE).applied()
                             .serviceConfiguration()
-                            .with(mServiceConfiguration)
-                            .build()
+                            .with(mServiceConfiguration).applied()
                             .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

@@ -42,10 +42,11 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                             .withServiceClass(TestService.class)
                                                             .withRunnerClass(MainRunner.class)
                                                             .withLogClass(AndroidLog.class)
-                                                            .build();
+                                                            .applied();
 
-        assertThat(builderFrom(configuration).build()).isEqualTo(configuration);
-        assertThat(builderFrom(null).build()).isEqualTo(ServiceConfiguration.DEFAULT_CONFIGURATION);
+        assertThat(builderFrom(configuration).applied()).isEqualTo(configuration);
+        assertThat(builderFrom(null).applied()).isEqualTo(
+                ServiceConfiguration.DEFAULT_CONFIGURATION);
     }
 
     public void testBuilderFromEquals() {
@@ -54,10 +55,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                             .withServiceClass(TestService.class)
                                                             .withRunnerClass(MainRunner.class)
                                                             .withLogClass(AndroidLog.class)
-                                                            .build();
-        assertThat(builder().with(configuration).build()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().build()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().with(null).build()).isEqualTo(
+                                                            .applied();
+        assertThat(builder().with(configuration).applied()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().applied()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().with(null).applied()).isEqualTo(
                 ServiceConfiguration.DEFAULT_CONFIGURATION);
     }
 
@@ -67,10 +68,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                             .withServiceClass(TestService.class)
                                                             .withRunnerClass(MainRunner.class)
                                                             .withLogClass(AndroidLog.class)
-                                                            .build();
-        assertThat(configuration).isNotEqualTo(builder().withLogClass(SystemLog.class).build());
-        assertThat(builder().withLogClass(SystemLog.class).build()).isNotEqualTo(
-                builder().withLogClass(NullLog.class).build());
+                                                            .applied();
+        assertThat(configuration).isNotEqualTo(builder().withLogClass(SystemLog.class).applied());
+        assertThat(builder().withLogClass(SystemLog.class).applied()).isNotEqualTo(
+                builder().withLogClass(NullLog.class).applied());
     }
 
     public void testLooperEquals() {
@@ -79,10 +80,11 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                             .withServiceClass(TestService.class)
                                                             .withRunnerClass(MainRunner.class)
                                                             .withLogClass(AndroidLog.class)
-                                                            .build();
-        assertThat(configuration).isNotEqualTo(builder().dispatchingOn(Looper.myLooper()).build());
-        assertThat(builder().dispatchingOn(Looper.myLooper()).build()).isNotEqualTo(
-                builder().dispatchingOn(Looper.getMainLooper()).build());
+                                                            .applied();
+        assertThat(configuration).isNotEqualTo(
+                builder().dispatchingOn(Looper.myLooper()).applied());
+        assertThat(builder().dispatchingOn(Looper.myLooper()).applied()).isNotEqualTo(
+                builder().dispatchingOn(Looper.getMainLooper()).applied());
     }
 
     public void testRunnerClassEquals() {
@@ -91,10 +93,11 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                             .withServiceClass(TestService.class)
                                                             .withRunnerClass(MainRunner.class)
                                                             .withLogClass(AndroidLog.class)
-                                                            .build();
-        assertThat(configuration).isNotEqualTo(builder().withRunnerClass(TestRunner.class).build());
-        assertThat(builder().withRunnerClass(TestRunner.class).build()).isNotEqualTo(
-                builder().withRunnerClass(MainRunner.class).build());
+                                                            .applied();
+        assertThat(configuration).isNotEqualTo(
+                builder().withRunnerClass(TestRunner.class).applied());
+        assertThat(builder().withRunnerClass(TestRunner.class).applied()).isNotEqualTo(
+                builder().withRunnerClass(MainRunner.class).applied());
     }
 
     public void testServiceClassEquals() {
@@ -103,11 +106,11 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                             .withServiceClass(TestService.class)
                                                             .withRunnerClass(MainRunner.class)
                                                             .withLogClass(AndroidLog.class)
-                                                            .build();
+                                                            .applied();
         assertThat(configuration).isNotEqualTo(
-                builder().withServiceClass(RoutineService.class).build());
-        assertThat(builder().withServiceClass(RoutineService.class).build()).isNotEqualTo(
-                builder().withServiceClass(TestService.class).build());
+                builder().withServiceClass(RoutineService.class).applied());
+        assertThat(builder().withServiceClass(RoutineService.class).applied()).isNotEqualTo(
+                builder().withServiceClass(TestService.class).applied());
     }
 
     public static class TestRunner extends RunnerDecorator {

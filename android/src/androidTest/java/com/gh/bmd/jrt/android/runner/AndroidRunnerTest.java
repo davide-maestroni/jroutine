@@ -85,8 +85,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
                                                       .routineConfiguration()
                                                       .withFactoryArgs(this)
                                                       .withAsyncRunner(Runners.threadRunner(
-                                                              new HandlerThread("test")))
-                                                      .build()
+                                                              new HandlerThread("test"))).applied()
                                                       .callAsync();
 
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {

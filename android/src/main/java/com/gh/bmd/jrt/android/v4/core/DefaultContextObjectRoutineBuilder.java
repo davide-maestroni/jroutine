@@ -184,7 +184,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             builder.onComplete(cacheAnnotation.value());
         }
 
-        return builder.build();
+        return builder.applied();
     }
 
     @Nonnull
@@ -207,7 +207,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             builder.onReadTimeout(actionAnnotation.value());
         }
 
-        return builder.build();
+        return builder.applied();
     }
 
     @Nonnull
@@ -416,11 +416,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         return getBuilder(mContext, classToken).routineConfiguration()
                                                .with(routineConfiguration)
                                                .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASSING_ORDER)
-                                               .build()
+                                               .withInputOrder(OrderType.PASSING_ORDER).applied()
                                                .invocationConfiguration()
-                                               .with(invocationConfiguration)
-                                               .build()
+                                               .with(invocationConfiguration).applied()
                                                .buildRoutine();
     }
 
@@ -468,11 +466,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         return getBuilder(mContext, classToken).routineConfiguration()
                                                .with(routineConfiguration)
                                                .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASSING_ORDER)
-                                               .build()
+                                               .withInputOrder(OrderType.PASSING_ORDER).applied()
                                                .invocationConfiguration()
-                                               .with(invocationConfiguration)
-                                               .build()
+                                               .with(invocationConfiguration).applied()
                                                .buildRoutine();
     }
 
@@ -618,8 +614,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
                                    .proxyConfiguration()
-                                   .withShareGroup(mShareGroup)
-                                   .build()
+                                   .withShareGroup(mShareGroup).applied()
                                    .boundMethod(mBindingName);
 
             } catch (final RoutineException e) {
@@ -704,8 +699,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
                 mRoutine = JRoutine.on(getInstance(context, mTargetClass, mArgs))
                                    .proxyConfiguration()
-                                   .withShareGroup(mShareGroup)
-                                   .build()
+                                   .withShareGroup(mShareGroup).applied()
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final RoutineException e) {
@@ -1062,10 +1056,10 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                                                                   .withFactoryArgs(invocationArgs)
                                                                   .withInputOrder(inputOrder)
                                                                   .withOutputOrder(outputOrder)
-                                                                  .build()
+                                                                  .applied()
                                                                   .invocationConfiguration()
                                                                   .with(invocationConfiguration)
-                                                                  .build()
+                                                                  .applied()
                                                                   .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();

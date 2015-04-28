@@ -721,7 +721,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                                                               .withOutputTimeout(TimeDuration.ZERO)
                                                               .withLog(logger.getLog())
                                                               .withLogLevel(logger.getLogLevel())
-                                                              .build()
+                                                              .applied()
                                                               .buildChannel();
             channels.add(channel.input());
             internalLoader.setInvocationCount(

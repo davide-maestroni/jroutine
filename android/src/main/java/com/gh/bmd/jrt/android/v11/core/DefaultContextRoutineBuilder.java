@@ -44,8 +44,7 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class DefaultContextRoutineBuilder<INPUT, OUTPUT>
-        extends TemplateRoutineBuilder<INPUT, OUTPUT>
+class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements ContextRoutineBuilder<INPUT, OUTPUT>,
         InvocationConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>> {
 
@@ -55,8 +54,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT>
 
     private final RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>
             mRoutineConfigurable =
-            new RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>
-                    () {
+            new RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>() {
 
                 @Nonnull
                 public ContextRoutineBuilder<INPUT, OUTPUT> apply(
@@ -158,16 +156,17 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT>
                              .withInputTimeout(TimeDuration.INFINITY)
                              .withOutputSize(Integer.MAX_VALUE)
                              .withOutputTimeout(TimeDuration.INFINITY);
-        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, builder.build(),
+        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass,
+                                                        builder.applied(),
                                                         mInvocationConfiguration);
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT,
-                OUTPUT>> invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
+    invocationConfiguration() {
 
-        return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
-                this, mInvocationConfiguration);
+        return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,
+                                                                                         mInvocationConfiguration);
     }
 
     @Override

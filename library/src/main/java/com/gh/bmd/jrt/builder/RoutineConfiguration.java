@@ -68,8 +68,6 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  */
 public final class RoutineConfiguration {
 
-    //TODO: build() -> apply(), form(), fill()
-
     /**
      * Constant indicating the default value of an integer attribute.
      */
@@ -718,7 +716,7 @@ public final class RoutineConfiguration {
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE build() {
+        public TYPE applied() {
 
             return mConfigurable.apply(buildConfiguration());
         }

@@ -212,7 +212,7 @@ public final class ProxyConfiguration {
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE build() {
+        public TYPE applied() {
 
             return mConfigurable.apply(buildConfiguration());
         }

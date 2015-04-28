@@ -433,7 +433,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 builder.onReadTimeout(actionAnnotation.value());
             }
 
-            return getRoutine(builder.build(), shareGroup, targetMethod,
+            return getRoutine(builder.applied(), shareGroup, targetMethod,
                               (paramMode == PassMode.COLLECTION),
                               (returnMode == PassMode.COLLECTION));
         }

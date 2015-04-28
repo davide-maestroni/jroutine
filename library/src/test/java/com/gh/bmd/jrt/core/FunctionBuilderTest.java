@@ -138,7 +138,7 @@ public class FunctionBuilderTest {
         assertThat(JRoutine.onFunction(function4)
                            .routineConfiguration()
                            .withInputOrder(OrderType.NONE)
-                           .build()
+                           .applied()
                            .callAsync("test1", "test2", "test3", "test4")
                            .eventually()
                            .readNext()).isEqualTo("test1 test2 test3 test4");

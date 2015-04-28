@@ -57,7 +57,7 @@ public class Downloader {
                 .withMaxInvocations(maxParallelDownloads)
                         // though we need to set a timeout in case the
                         // downloads outnumber it
-                .withAvailableTimeout(seconds(30)).applied().buildRoutine();
+                .withAvailableTimeout(seconds(30)).apply().buildRoutine();
     }
 
     /**
@@ -154,7 +154,7 @@ public class Downloader {
                             .withFactoryArgs(dstFile)
                             .withInputSize(8)
                             .withInputTimeout(seconds(30))
-                            .applied()
+                            .apply()
                             .buildRoutine();
             downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
         }

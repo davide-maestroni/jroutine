@@ -57,10 +57,10 @@ public class ContextRoutineBuilderRotationTest
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                 .routineConfiguration()
                 .withOutputOrder(OrderType.PASSING_ORDER)
-                .applied()
+                .apply()
                 .invocationConfiguration()
                 .withId(0)
-                .applied()
+                .apply()
                 .callAsync("test1", "test2");
 
         final Semaphore semaphore = new Semaphore(0);

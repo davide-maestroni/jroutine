@@ -191,10 +191,10 @@
 
                 final ClassRoutineBuilder builder = on(Main.class).proxyConfiguration()
                                                                   .withShareGroup(ShareGroup.NONE)
-                                                                  .applied()
+                                                                  .apply()
                                                                   .routineConfiguration()
                                                                   .withReadTimeout(TimeDuration.INFINITY)
-                                                                  .applied();
+                                                                  .apply();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.boundMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.boundMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.boundMethod(MEAN);
@@ -253,10 +253,10 @@
                 final Main instance = new Main();
                 final AsyncMain proxy = on(instance).proxyConfiguration()
                                                     .withShareGroup(ShareGroup.NONE)
-                                                    .applied()
+                                                    .apply()
                                                     .routineConfiguration()
                                                     .withReadTimeout(TimeDuration.INFINITY)
-                                                    .applied()
+                                                    .apply()
                                                     .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 

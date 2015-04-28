@@ -485,8 +485,7 @@ public class RoutineService extends Service {
                        .withOutputOrder(outputOrder)
                        .withLogLevel(logLevel);
                 final AndroidRoutine androidRoutine =
-                        new AndroidRoutine(this, builder.applied(), invocationClass,
-                                           invocationArgs);
+                        new AndroidRoutine(this, builder.apply(), invocationClass, invocationArgs);
                 routineState = new RoutineState(androidRoutine);
                 routineMap.put(routineInfo, routineState);
             }

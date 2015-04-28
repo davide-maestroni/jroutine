@@ -25,10 +25,10 @@
                 final Main instance = new Main();
                 final AsyncMain wrapper = on(instance).proxyConfiguration()
                                                       .withShareGroup(ShareGroup.NONE)
-                                                      .applied()
+                                                      .apply()
                                                       .routineConfiguration()
                                                       .withReadTimeout(TimeDuration.INFINITY)
-                                                      .applied()
+                                                      .apply()
                                                       .buildWrapper(AsyncMain.class);
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 
@@ -94,10 +94,10 @@
                 final AsyncMain wrapper = JRoutine_AsyncMain.on(instance)
                                                             .proxyConfiguration()
                                                             .withShareGroup(ShareGroup.NONE)
-                                                            .applied()
+                                                            .apply()
                                                             .routineConfiguration()
                                                             .withReadTimeout(TimeDuration.INFINITY)
-                                                            .applied()
+                                                            .apply()
                                                             .buildWrapper();
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 

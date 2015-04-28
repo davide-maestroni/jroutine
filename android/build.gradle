@@ -61,7 +61,7 @@ dependencies {
     } else {
         compile project(':library')
     }
-    compile 'com.android.support:support-v4:22.1.0' // Travis does not support an higher version
+    compile 'com.android.support:support-v4:22.0.0' // Travis does not support an higher version
 
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }

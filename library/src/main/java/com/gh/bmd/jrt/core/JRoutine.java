@@ -231,10 +231,9 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified function.<br/> TODO
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
+     * Returns a routine builder based on the specified function.<br/>
+     * The function will be called only once when the invocation completes, so, all the inputs will
+     * be ignored.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -252,9 +251,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
+     * The inputs will be passed to the function each time the needed number of parameters is
+     * reached. Also, when the invocation completes, in case any input is still pending, null
+     * objects are eventually added to reach the correct number of parameters.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -273,9 +272,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
+     * The inputs will be passed to the function each time the needed number of parameters is
+     * reached. Also, when the invocation completes, in case any input is still pending, null
+     * objects are eventually added to reach the correct number of parameters.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -297,9 +296,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
+     * The inputs will be passed to the function each time the needed number of parameters is
+     * reached. Also, when the invocation completes, in case any input is still pending, null
+     * objects are eventually added to reach the correct number of parameters.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -322,9 +321,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
+     * The inputs will be passed to the function each time the needed number of parameters is
+     * reached. Also, when the invocation completes, in case any input is still pending, null
+     * objects are eventually added to reach the correct number of parameters.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -348,9 +347,7 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
+     * All the inputs will be passed to the function only when the invocation completes.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *

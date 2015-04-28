@@ -153,8 +153,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
                              .withInputTimeout(TimeDuration.INFINITY)
                              .withOutputSize(Integer.MAX_VALUE)
                              .withOutputTimeout(TimeDuration.INFINITY);
-        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass,
-                                                        builder.applied(),
+        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, builder.apply(),
                                                         mInvocationConfiguration);
     }
 

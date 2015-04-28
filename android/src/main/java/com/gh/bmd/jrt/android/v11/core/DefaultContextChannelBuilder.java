@@ -168,12 +168,12 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
 
         return builder.routineConfiguration()
                       .with(routineConfiguration)
-                      .applied()
+                      .apply()
                       .invocationConfiguration()
                       .withId(mInvocationId)
                       .with(invocationConfiguration)
                       .onClash(ClashResolutionType.KEEP_THAT)
-                      .applied()
+                      .apply()
                       .callAsync();
     }
 

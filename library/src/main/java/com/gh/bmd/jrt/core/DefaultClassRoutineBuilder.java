@@ -287,7 +287,7 @@ class DefaultClassRoutineBuilder
                         Invocations.factoryOf(MethodSingleCallInvocation.class);
                 routine = new DefaultRoutine<Object, Object>(
                         builder.withFactoryArgs(target, method, mutex, isInputCollection,
-                                                isOutputCollection).applied(), factory);
+                                                isOutputCollection).apply(), factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -373,7 +373,7 @@ class DefaultClassRoutineBuilder
             builder.onReadTimeout(actionAnnotation.value());
         }
 
-        return getRoutine(builder.applied(), methodShareGroup, targetMethod, false, false);
+        return getRoutine(builder.apply(), methodShareGroup, targetMethod, false, false);
     }
 
     /**

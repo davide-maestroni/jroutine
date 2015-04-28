@@ -162,7 +162,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                            .withOutputSize(Integer.MAX_VALUE)
                            .withOutputTimeout(TimeDuration.ZERO)
                            .withLog(log)
-                           .applied()
+                           .apply()
                            .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
@@ -323,7 +323,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                           TimeDuration.ZERO)
                                                                   .withLog(log)
                                                                   .withLogLevel(logLevel)
-                                                                  .applied()
+                                                                  .apply()
                                                                   .buildChannel();
             mStandaloneParamInput = paramChannel.input();
             mStandaloneParamOutput = paramChannel.output();
@@ -342,7 +342,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                             timeoutActionType)
                                                                     .withLog(log)
                                                                     .withLogLevel(logLevel)
-                                                                    .applied()
+                                                                    .apply()
                                                                     .buildChannel();
             mStandaloneResultInput = resultChannel.input();
             mStandaloneResultOutput = resultChannel.output();

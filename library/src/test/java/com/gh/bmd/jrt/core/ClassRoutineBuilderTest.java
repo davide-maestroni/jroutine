@@ -58,7 +58,7 @@ public class ClassRoutineBuilderTest {
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .applied()
+                                                        .apply()
                                                         .boundMethod(TestStatic.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -118,7 +118,7 @@ public class ClassRoutineBuilderTest {
                 .withOutputTimeout(seconds(1))
                 .withLogLevel(LogLevel.DEBUG)
                 .withLog(countLog)
-                .applied()
+                .apply()
                 .boundMethod(TestStatic.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
@@ -183,10 +183,10 @@ public class ClassRoutineBuilderTest {
                                                          .withMaxInvocations(1)
                                                          .withCoreInvocations(0)
                                                          .withAvailableTimeout(1, TimeUnit.SECONDS)
-                                                         .applied()
+                                                         .apply()
                                                          .proxyConfiguration()
                                                          .withShareGroup("test")
-                                                         .applied()
+                                                         .apply()
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
@@ -203,7 +203,7 @@ public class ClassRoutineBuilderTest {
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withAvailableTimeout(TimeDuration.ZERO)
-                                                         .applied()
+                                                         .apply()
                                                          .method("getLong");
 
         assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -259,7 +259,7 @@ public class ClassRoutineBuilderTest {
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .applied()
+                                                         .apply()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
@@ -270,7 +270,7 @@ public class ClassRoutineBuilderTest {
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .applied()
+                                                         .apply()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
@@ -282,7 +282,7 @@ public class ClassRoutineBuilderTest {
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .applied()
+                                                         .apply()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine3.callSync().readAll()).containsExactly(-77L);
@@ -295,7 +295,7 @@ public class ClassRoutineBuilderTest {
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(nullLog)
-                                                         .applied()
+                                                         .apply()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
@@ -307,7 +307,7 @@ public class ClassRoutineBuilderTest {
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(new NullLog())
-                                                         .applied()
+                                                         .apply()
                                                          .boundMethod(TestStatic.GET);
 
         assertThat(routine5.callSync().readAll()).containsExactly(-77L);
@@ -320,18 +320,18 @@ public class ClassRoutineBuilderTest {
         final ClassRoutineBuilder builder = JRoutine.on(TestStatic2.class)
                                                     .routineConfiguration()
                                                     .withReadTimeout(seconds(2))
-                                                    .applied();
+                                                    .apply();
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.proxyConfiguration()
                                               .withShareGroup("1")
-                                              .applied()
+                                              .apply()
                                               .method("getOne")
                                               .callAsync();
         OutputChannel<Object> getTwo = builder.proxyConfiguration()
                                               .withShareGroup("2")
-                                              .applied()
+                                              .apply()
                                               .method("getTwo")
                                               .callAsync();
 

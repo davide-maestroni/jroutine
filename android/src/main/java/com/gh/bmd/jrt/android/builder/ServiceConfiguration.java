@@ -297,7 +297,7 @@ public final class ServiceConfiguration {
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE applied() {
+        public TYPE apply() {
 
             return mConfigurable.apply(buildConfiguration());
         }

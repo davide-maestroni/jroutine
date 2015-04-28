@@ -36,7 +36,6 @@ import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.Invocations.Function1;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 import com.gh.bmd.jrt.invocation.StatelessInvocation;
@@ -537,14 +536,16 @@ public class RoutineTest {
                                                .apply()
                                                .buildRoutine();
 
-        final Function1<Integer, Integer> invokeSquare = new Function1<Integer, Integer>() {
+        final StatelessInvocation<Integer, Integer> invokeSquare =
+                new StatelessInvocation<Integer, Integer>() {
 
-            public Integer call(final Integer param1) {
+                    public void onInput(final Integer integer,
+                            @Nonnull final ResultChannel<Integer> result) {
 
-                final int input = param1;
-                return input * input;
-            }
-        };
+                        final int input = integer;
+                        result.pass(input * input);
+                    }
+                };
 
         final Routine<Integer, Integer> squareRoutine = JRoutine.on(invokeSquare).buildRoutine();
 

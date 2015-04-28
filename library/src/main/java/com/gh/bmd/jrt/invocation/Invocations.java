@@ -13,11 +13,13 @@
  */
 package com.gh.bmd.jrt.invocation;
 
+import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -35,6 +37,67 @@ public class Invocations {
      */
     protected Invocations() {
 
+    }
+
+    /**
+     * Builds and returns a new invocation factory calling the specified function.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws java.lang.NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryCalling(
+            @Nonnull final Function<OUTPUT> function) {
+
+        if (function == null) {
+
+            throw new NullPointerException("the function must not be null");
+        }
+
+        return new InvocationFactory<Object, OUTPUT>() {
+
+            @Nonnull
+            public Invocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+                return new SingleCallInvocation<Object, OUTPUT>() {
+
+                    @Override
+                    public void onCall(@Nonnull final List<?> objects,
+                            @Nonnull final ResultChannel<OUTPUT> result) {
+
+                        result.pass(function.call(objects.toArray(new Object[objects.size()])));
+                    }
+                };
+            }
+        };
+    }
+
+    /**
+     * Builds and returns a new invocation factory creating instances of the specified class token.
+     * <p/>
+     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
+     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * and all the variables captured in the closure.
+     *
+     * @param invocationToken the invocation class token.
+     * @param <INPUT>         the input data type.
+     * @param <OUTPUT>        the output data type.
+     * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+     *                                            parameters was found.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
+            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken) {
+
+        return factoryOf(invocationToken.getRawClass());
     }
 
     /**
@@ -61,26 +124,19 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new invocation factory creating instances of the specified class token.
-     * <p/>
-     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
-     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
-     * and all the variables captured in the closure.
+     * Interface defining a function taking an undefined number of parameters.
      *
-     * @param invocationToken the invocation class token.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
-     * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
+     * @param <OUTPUT> the result data type.
      */
-    @Nonnull
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken) {
+    public interface Function<OUTPUT> {
 
-        return factoryOf(invocationToken.getRawClass());
+        /**
+         * Calls this function.
+         *
+         * @param params the array of parameters.
+         * @return the result.
+         */
+        OUTPUT call(@Nonnull Object... params);
     }
 
     /**

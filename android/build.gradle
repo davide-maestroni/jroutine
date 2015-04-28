@@ -24,12 +24,12 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '21.1.2' // Travis does not support an higher version
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1' // Travis does not support an higher version
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 100
         versionName version
     }
@@ -61,7 +61,7 @@ dependencies {
     } else {
         compile project(':library')
     }
-    compile 'com.android.support:support-v4:21.0.3' // Travis does not support an higher version
+    compile 'com.android.support:support-v4:22.1.1' // Travis does not support an higher version
 
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }

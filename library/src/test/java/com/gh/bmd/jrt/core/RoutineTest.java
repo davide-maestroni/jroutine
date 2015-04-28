@@ -66,7 +66,6 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.core.JRoutine.on;
-import static com.gh.bmd.jrt.core.JRoutine.onFunction;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
@@ -547,7 +546,7 @@ public class RoutineTest {
             }
         };
 
-        final Routine<Integer, Integer> squareRoutine = onFunction(invokeSquare).buildRoutine();
+        final Routine<Integer, Integer> squareRoutine = JRoutine.on(invokeSquare).buildRoutine();
 
         final TemplateInvocation<Integer, Integer> invokeSquareSum =
                 new TemplateInvocation<Integer, Integer>() {

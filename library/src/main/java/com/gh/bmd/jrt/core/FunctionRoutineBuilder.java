@@ -26,6 +26,8 @@ import com.gh.bmd.jrt.invocation.Invocations.Function3;
 import com.gh.bmd.jrt.invocation.Invocations.Function4;
 import com.gh.bmd.jrt.invocation.Invocations.FunctionN;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
+import com.gh.bmd.jrt.invocation.StatelessInvocation;
+import com.gh.bmd.jrt.invocation.TemplateInvocation;
 
 import java.util.List;
 
@@ -65,7 +67,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <OUTPUT> FunctionRoutineBuilder<Void, OUTPUT> fromFunction(
+    static <OUTPUT> FunctionRoutineBuilder<Void, OUTPUT> from(
             @Nonnull final Function0<? extends OUTPUT> function) {
 
         if (function == null) {
@@ -84,14 +86,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     @SuppressWarnings("unchecked")
                     public void onCall(@Nonnull final List<? extends Void> inputs,
                             @Nonnull final ResultChannel<OUTPUT> result) {
-
-                        if (inputs.size() != 0) {
-
-                            throw new IllegalArgumentException(
-                                    "[" + function.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 0");
-                        }
 
                         result.pass(function.call());
                     }
@@ -113,7 +107,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <INPUT, INPUT1 extends INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+    static <INPUT, INPUT1 extends INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> from(
             @Nonnull final Function1<INPUT1, ? extends OUTPUT> function) {
 
         if (function == null) {
@@ -121,29 +115,12 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
             throw new NullPointerException("the function must not be null");
         }
 
-        return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
+        return new FunctionRoutineBuilder<INPUT, OUTPUT>(new StatelessInvocation<INPUT, OUTPUT>() {
 
-            @Nonnull
-            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+            @SuppressWarnings("unchecked")
+            public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
-                return new SingleCallInvocation<INPUT, OUTPUT>() {
-
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                            @Nonnull final ResultChannel<OUTPUT> result) {
-
-                        if (inputs.size() != 1) {
-
-                            throw new IllegalArgumentException(
-                                    "[" + function.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 1");
-                        }
-
-                        result.pass(function.call((INPUT1) inputs.get(0)));
-                    }
-                };
+                result.pass(function.call((INPUT1) input));
             }
         });
     }
@@ -164,7 +141,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, OUTPUT>
-    FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+    FunctionRoutineBuilder<INPUT, OUTPUT> from(
             @Nonnull final Function2<INPUT1, INPUT2, ? extends OUTPUT> function) {
 
         if (function == null) {
@@ -177,22 +154,49 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
             @Nonnull
             public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-                return new SingleCallInvocation<INPUT, OUTPUT>() {
+                return new TemplateInvocation<INPUT, OUTPUT>() {
+
+                    private final Object[] mInputs = new Object[2];
+
+                    private int mIndex;
+
+                    @Override
+                    public void onInit() {
+
+                        mIndex = 0;
+                    }
 
                     @Override
                     @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
+                    public void onInput(final INPUT input,
                             @Nonnull final ResultChannel<OUTPUT> result) {
 
-                        if (inputs.size() != 2) {
+                        final Object[] inputs = mInputs;
+                        inputs[mIndex] = input;
 
-                            throw new IllegalArgumentException(
-                                    "[" + function.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 2");
+                        if (++mIndex > 1) {
+
+                            mIndex = 0;
+                            result.pass(function.call((INPUT1) inputs[0], (INPUT2) inputs[1]));
+                        }
+                    }
+
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+
+                        final int index = mIndex;
+                        final Object[] inputs = mInputs;
+
+                        if (index > 0) {
+
+                            for (int i = index; i < inputs.length; i++) {
+
+                                inputs[i] = null;
+                            }
                         }
 
-                        result.pass(function.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1)));
+                        result.pass(function.call((INPUT1) inputs[0], (INPUT2) inputs[1]));
                     }
                 };
             }
@@ -216,7 +220,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT, OUTPUT>
-    FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+    FunctionRoutineBuilder<INPUT, OUTPUT> from(
             @Nonnull final Function3<INPUT1, INPUT2, INPUT3, ? extends OUTPUT> function) {
 
         if (function == null) {
@@ -229,23 +233,51 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
             @Nonnull
             public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-                return new SingleCallInvocation<INPUT, OUTPUT>() {
+                return new TemplateInvocation<INPUT, OUTPUT>() {
+
+                    private final Object[] mInputs = new Object[3];
+
+                    private int mIndex;
+
+                    @Override
+                    public void onInit() {
+
+                        mIndex = 0;
+                    }
 
                     @Override
                     @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
+                    public void onInput(final INPUT input,
                             @Nonnull final ResultChannel<OUTPUT> result) {
 
-                        if (inputs.size() != 3) {
+                        final Object[] inputs = mInputs;
+                        inputs[mIndex] = input;
 
-                            throw new IllegalArgumentException(
-                                    "[" + function.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 3");
+                        if (++mIndex > 2) {
+
+                            mIndex = 0;
+                            result.pass(function.call((INPUT1) inputs[0], (INPUT2) inputs[1],
+                                                      (INPUT3) inputs[2]));
+                        }
+                    }
+
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+
+                        final int index = mIndex;
+                        final Object[] inputs = mInputs;
+
+                        if (index > 0) {
+
+                            for (int i = index; i < inputs.length; i++) {
+
+                                inputs[i] = null;
+                            }
                         }
 
-                        result.pass(function.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
-                                                  (INPUT3) inputs.get(2)));
+                        result.pass(function.call((INPUT1) inputs[0], (INPUT2) inputs[1],
+                                                  (INPUT3) inputs[2]));
                     }
                 };
             }
@@ -270,7 +302,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT, INPUT4
-            extends INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+            extends INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> from(
             @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, ? extends OUTPUT> function) {
 
         if (function == null) {
@@ -283,23 +315,51 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
             @Nonnull
             public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-                return new SingleCallInvocation<INPUT, OUTPUT>() {
+                return new TemplateInvocation<INPUT, OUTPUT>() {
+
+                    private final Object[] mInputs = new Object[4];
+
+                    private int mIndex;
+
+                    @Override
+                    public void onInit() {
+
+                        mIndex = 0;
+                    }
 
                     @Override
                     @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
+                    public void onInput(final INPUT input,
                             @Nonnull final ResultChannel<OUTPUT> result) {
 
-                        if (inputs.size() != 4) {
+                        final Object[] inputs = mInputs;
+                        inputs[mIndex] = input;
 
-                            throw new IllegalArgumentException(
-                                    "[" + function.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 4");
+                        if (++mIndex > 3) {
+
+                            mIndex = 0;
+                            result.pass(function.call((INPUT1) inputs[0], (INPUT2) inputs[1],
+                                                      (INPUT3) inputs[2], (INPUT4) inputs[3]));
+                        }
+                    }
+
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+
+                        final int index = mIndex;
+                        final Object[] inputs = mInputs;
+
+                        if (index > 0) {
+
+                            for (int i = index; i < inputs.length; i++) {
+
+                                inputs[i] = null;
+                            }
                         }
 
-                        result.pass(function.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
-                                                  (INPUT3) inputs.get(2), (INPUT4) inputs.get(3)));
+                        result.pass(function.call((INPUT1) inputs[0], (INPUT2) inputs[1],
+                                                  (INPUT3) inputs[2], (INPUT4) inputs[3]));
                     }
                 };
             }
@@ -319,7 +379,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+    static <INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> from(
             @Nonnull final FunctionN<INPUT, ? extends OUTPUT> function) {
 
         if (function == null) {
@@ -340,299 +400,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                             @Nonnull final ResultChannel<OUTPUT> result) {
 
                         result.pass(function.call(inputs));
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * Returns a new builder based on the specified procedure.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    static FunctionRoutineBuilder<Void, Void> fromProcedure(
-            @Nonnull final Function0<Void> procedure) {
-
-        if (procedure == null) {
-
-            throw new NullPointerException("the procedure must not be null");
-        }
-
-        return new FunctionRoutineBuilder<Void, Void>(new InvocationFactory<Void, Void>() {
-
-            @Nonnull
-            public Invocation<Void, Void> newInvocation(@Nonnull final Object... args) {
-
-                return new SingleCallInvocation<Void, Void>() {
-
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends Void> inputs,
-                            @Nonnull final ResultChannel<Void> result) {
-
-                        if (inputs.size() != 0) {
-
-                            throw new IllegalArgumentException(
-                                    "[" + procedure.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 0");
-                        }
-
-                        procedure.call();
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * Returns a new builder based on the specified procedure.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    static <INPUT, INPUT1 extends INPUT> FunctionRoutineBuilder<INPUT, Void> fromProcedure(
-            @Nonnull final Function1<INPUT1, Void> procedure) {
-
-        if (procedure == null) {
-
-            throw new NullPointerException("the procedure must not be null");
-        }
-
-        return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
-
-            @Nonnull
-            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
-
-                return new SingleCallInvocation<INPUT, Void>() {
-
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                            @Nonnull final ResultChannel<Void> result) {
-
-                        if (inputs.size() != 1) {
-
-                            throw new IllegalArgumentException(
-                                    "[" + procedure.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 1");
-                        }
-
-                        procedure.call((INPUT1) inputs.get(0));
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * Returns a new builder based on the specified procedure.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @param <INPUT1>  the first parameter type.
-     * @param <INPUT2>  the second parameter type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT> FunctionRoutineBuilder<INPUT,
-            Void> fromProcedure(
-            @Nonnull final Function2<INPUT1, INPUT2, Void> procedure) {
-
-        if (procedure == null) {
-
-            throw new NullPointerException("the procedure must not be null");
-        }
-
-        return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
-
-            @Nonnull
-            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
-
-                return new SingleCallInvocation<INPUT, Void>() {
-
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                            @Nonnull final ResultChannel<Void> result) {
-
-                        if (inputs.size() != 2) {
-
-                            throw new IllegalArgumentException(
-                                    "[" + procedure.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 2");
-                        }
-
-                        procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1));
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * Returns a new builder based on the specified procedure.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @param <INPUT1>  the first parameter type.
-     * @param <INPUT2>  the second parameter type.
-     * @param <INPUT3>  the third parameter type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT>
-    FunctionRoutineBuilder<INPUT, Void> fromProcedure(
-            @Nonnull final Function3<INPUT1, INPUT2, INPUT3, Void> procedure) {
-
-        if (procedure == null) {
-
-            throw new NullPointerException("the procedure must not be null");
-        }
-
-        return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
-
-            @Nonnull
-            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
-
-                return new SingleCallInvocation<INPUT, Void>() {
-
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                            @Nonnull final ResultChannel<Void> result) {
-
-                        if (inputs.size() != 3) {
-
-                            throw new IllegalArgumentException(
-                                    "[" + procedure.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 3");
-                        }
-
-                        procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
-                                       (INPUT3) inputs.get(2));
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * Returns a new builder based on the specified procedure.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @param <INPUT1>  the first parameter type.
-     * @param <INPUT2>  the second parameter type.
-     * @param <INPUT3>  the third parameter type.
-     * @param <INPUT4>  the fourth parameter type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT, INPUT4
-            extends INPUT> FunctionRoutineBuilder<INPUT, Void> fromProcedure(
-            @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, Void> procedure) {
-
-        if (procedure == null) {
-
-            throw new NullPointerException("the procedure must not be null");
-        }
-
-        return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
-
-            @Nonnull
-            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
-
-                return new SingleCallInvocation<INPUT, Void>() {
-
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                            @Nonnull final ResultChannel<Void> result) {
-
-                        if (inputs.size() != 4) {
-
-                            throw new IllegalArgumentException(
-                                    "[" + procedure.getClass().getCanonicalName() +
-                                            "] wrong number of input parameters: was "
-                                            + inputs.size() + " while expected 4");
-                        }
-
-                        procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
-                                       (INPUT3) inputs.get(2), (INPUT4) inputs.get(3));
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * Returns a new builder based on the specified procedure.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    static <INPUT> FunctionRoutineBuilder<INPUT, Void> fromProcedure(
-            @Nonnull final FunctionN<INPUT, Void> procedure) {
-
-        if (procedure == null) {
-
-            throw new NullPointerException("the procedure must not be null");
-        }
-
-        return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
-
-            @Nonnull
-            public Invocation<INPUT, Void> newInvocation(@Nonnull final Object... args) {
-
-                return new SingleCallInvocation<INPUT, Void>() {
-
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                            @Nonnull final ResultChannel<Void> result) {
-
-                        procedure.call(inputs);
                     }
                 };
             }

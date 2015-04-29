@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
@@ -37,6 +38,7 @@ import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
+import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
@@ -67,6 +69,7 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.core.JRoutine.on;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
+import static com.gh.bmd.jrt.invocation.Invocations.factoryWith;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
@@ -1284,12 +1287,23 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() {
 
-        final Routine<String, String> routine =
-                on(factoryOf(DelayedInvocation.class)).routineConfiguration()
-                                                      .withFactoryArgs(seconds(1))
-                                                      .withMaxInvocations(1)
-                                                      .apply()
-                                                      .buildRoutine();
+        final Routine<Object, String> routine = on(factoryWith(new Function<String>() {
+
+            public String call(@Nonnull final Object... params) {
+
+                try {
+
+                    seconds(1).sleepAtLeast();
+
+                } catch (final InterruptedException e) {
+
+                    throw new InvocationInterruptedException(e);
+                }
+
+                return params[0].toString();
+            }
+        })).routineConfiguration().withMaxInvocations(1).apply().buildRoutine();
+
         routine.callAsync("test1");
 
         try {

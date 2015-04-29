@@ -38,31 +38,6 @@ import javax.annotation.Nonnull;
  */
 public class PriorityRunner {
 
-    /**
-     * High priority.
-     */
-    public static final int HIGH_PRIORITY = 10;
-
-    /**
-     * Highest priority.
-     */
-    public static final int HIGHEST_PRIORITY = HIGH_PRIORITY << 1;
-
-    /**
-     * Low priority.
-     */
-    public static final int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
-
-    /**
-     * Lowest priority.
-     */
-    public static final int LOW_PRIORITY = -HIGH_PRIORITY;
-
-    /**
-     * Normal priority.
-     */
-    public static final int NORMAL_PRIORITY = 0;
-
     private static final Comparator<PriorityExecution> PRIORITY_EXECUTION_COMPARATOR =
             new Comparator<PriorityExecution>() {
 
@@ -133,6 +108,73 @@ public class PriorityRunner {
     }
 
     /**
+     * Interface exposing constants which can be used as a common set of priorities.<br/>
+     * Note that, since the priority value can be any in an integer range, it is always possible to
+     * customize the values so to create a personalized set.
+     */
+    public interface AgingPriority {
+
+        /**
+         * High priority.
+         */
+        int HIGH_PRIORITY = 10;
+
+        /**
+         * Highest priority.
+         */
+        int HIGHEST_PRIORITY = HIGH_PRIORITY << 1;
+
+        /**
+         * Low priority.
+         */
+        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
+
+        /**
+         * Lowest priority.
+         */
+        int LOW_PRIORITY = -HIGH_PRIORITY;
+
+        /**
+         * Normal priority.
+         */
+        int NORMAL_PRIORITY = 0;
+    }
+
+    /**
+     * Interface exposing constants which can be used as a set of priorities ignoring the aging of
+     * executions.<br/>
+     * Note that, since the priority value can be any in an integer range, it is always possible to
+     * customize the values so to create a personalized set.
+     */
+    public interface NotAgingPriority {
+
+        /**
+         * Highest priority.
+         */
+        int HIGHEST_PRIORITY = Integer.MAX_VALUE;
+
+        /**
+         * High priority.
+         */
+        int HIGH_PRIORITY = HIGHEST_PRIORITY >> 1;
+
+        /**
+         * Low priority.
+         */
+        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
+
+        /**
+         * Lowest priority.
+         */
+        int LOW_PRIORITY = -HIGH_PRIORITY;
+
+        /**
+         * Normal priority.
+         */
+        int NORMAL_PRIORITY = 0;
+    }
+
+    /**
      * Execution implementation delaying the enqueuing of the priority execution.
      */
     private static class DelayedExecution implements Execution {
@@ -141,6 +183,12 @@ public class PriorityRunner {
 
         private final PriorityBlockingQueue<PriorityExecution> mQueue;
 
+        /**
+         * Constructor.
+         *
+         * @param queue     the queue.
+         * @param execution the priority execution.
+         */
         private DelayedExecution(@Nonnull final PriorityBlockingQueue<PriorityExecution> queue,
                 @Nonnull final PriorityExecution execution) {
 

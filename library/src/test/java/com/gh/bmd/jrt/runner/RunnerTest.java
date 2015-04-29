@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.runner;
 
+import com.gh.bmd.jrt.runner.PriorityRunner.AgingPriority;
+import com.gh.bmd.jrt.runner.PriorityRunner.NotAgingPriority;
 import com.gh.bmd.jrt.time.Time;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -73,11 +75,16 @@ public class RunnerTest {
     public void testPriorityRunner() throws InterruptedException {
 
         testRunner(Runners.priorityRunner(Runners.sharedRunner())
-                          .getRunner(PriorityRunner.NORMAL_PRIORITY));
+                          .getRunner(AgingPriority.NORMAL_PRIORITY));
         testRunner(Runners.priorityRunner(Runners.queuedRunner())
-                          .getRunner(PriorityRunner.LOW_PRIORITY));
+                          .getRunner(AgingPriority.LOW_PRIORITY));
         testRunner(new RunnerDecorator(Runners.priorityRunner(Runners.poolRunner())
-                                              .getRunner(PriorityRunner.LOWEST_PRIORITY)));
+                                              .getRunner(AgingPriority.LOWEST_PRIORITY)));
+
+        final PriorityRunner priorityRunner = Runners.priorityRunner(Runners.sharedRunner());
+        testRunner(priorityRunner.getRunner(NotAgingPriority.NORMAL_PRIORITY));
+        testRunner(priorityRunner.getRunner(NotAgingPriority.LOW_PRIORITY));
+        testRunner(new RunnerDecorator(priorityRunner.getRunner(NotAgingPriority.LOWEST_PRIORITY)));
     }
 
     @Test

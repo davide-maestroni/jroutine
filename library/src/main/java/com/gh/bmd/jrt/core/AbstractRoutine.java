@@ -21,8 +21,8 @@ import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Logger;
+import com.gh.bmd.jrt.routine.InvocationDeadlockException;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.routine.RoutineDeadlockException;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
@@ -355,7 +355,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     mLogger.wrn("routine instance not available after timeout [#%d]: %s",
                                 mMaxInvocations, mAvailTimeout);
-                    throw new RoutineDeadlockException(
+                    throw new InvocationDeadlockException(
                             "deadlock while waiting for an available invocation instance");
                 }
 

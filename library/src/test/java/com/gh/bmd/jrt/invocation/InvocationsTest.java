@@ -39,7 +39,7 @@ public class InvocationsTest {
     public void testFunction() {
 
         final Routine<Object, String> routine =
-                JRoutine.on(Invocations.factoryCalling(new Function<String>() {
+                JRoutine.on(Invocations.factoryWith(new Function<String>() {
 
                     public String call(@Nonnull final Object... params) {
 
@@ -95,7 +95,7 @@ public class InvocationsTest {
 
         try {
 
-            Invocations.factoryCalling(null);
+            Invocations.factoryWith(null);
 
             fail();
 
@@ -119,7 +119,7 @@ public class InvocationsTest {
         }
     }
 
-    private static class TestInvocation extends StatelessInvocation<Object, Object> {
+    private static class TestInvocation extends FilterInvocation<Object, Object> {
 
         public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
 

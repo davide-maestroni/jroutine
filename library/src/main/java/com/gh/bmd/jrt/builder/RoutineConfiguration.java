@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.builder;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
+import com.gh.bmd.jrt.routine.InvocationDeadlockException;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -52,7 +53,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, a
- * {@link com.gh.bmd.jrt.routine.RoutineDeadlockException} will be thrown.
+ * {@link InvocationDeadlockException} will be thrown.
  * <p/>
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached

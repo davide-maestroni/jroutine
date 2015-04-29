@@ -34,15 +34,16 @@ import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.DelegatingInvocation;
+import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
-import com.gh.bmd.jrt.invocation.StatelessInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.log.NullLog;
+import com.gh.bmd.jrt.routine.InvocationDeadlockException;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -151,8 +152,8 @@ public class RoutineTest {
         assertThat(channel1.isOpen()).isFalse();
 
 
-        final StatelessInvocation<String, String> abortInvocation =
-                new StatelessInvocation<String, String>() {
+        final FilterInvocation<String, String> abortInvocation =
+                new FilterInvocation<String, String>() {
 
                     public void onInput(final String s,
                             @Nonnull final ResultChannel<String> result) {
@@ -191,8 +192,8 @@ public class RoutineTest {
             assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
         }
 
-        final StatelessInvocation<String, String> abortInvocation2 =
-                new StatelessInvocation<String, String>() {
+        final FilterInvocation<String, String> abortInvocation2 =
+                new FilterInvocation<String, String>() {
 
                     public void onInput(final String s,
                             @Nonnull final ResultChannel<String> result) {
@@ -220,8 +221,8 @@ public class RoutineTest {
 
         final AtomicBoolean isFailed = new AtomicBoolean(false);
         final Semaphore semaphore = new Semaphore(0);
-        final StatelessInvocation<String, String> closeInvocation =
-                new StatelessInvocation<String, String>() {
+        final FilterInvocation<String, String> closeInvocation =
+                new FilterInvocation<String, String>() {
 
                     public void onInput(final String s,
                             @Nonnull final ResultChannel<String> result) {
@@ -473,8 +474,8 @@ public class RoutineTest {
                                                .apply()
                                                .buildRoutine();
 
-        final StatelessInvocation<Integer, Integer> invokeSquare =
-                new StatelessInvocation<Integer, Integer>() {
+        final FilterInvocation<Integer, Integer> invokeSquare =
+                new FilterInvocation<Integer, Integer>() {
 
                     public void onInput(final Integer integer,
                             @Nonnull final ResultChannel<Integer> result) {
@@ -536,8 +537,8 @@ public class RoutineTest {
                                                .apply()
                                                .buildRoutine();
 
-        final StatelessInvocation<Integer, Integer> invokeSquare =
-                new StatelessInvocation<Integer, Integer>() {
+        final FilterInvocation<Integer, Integer> invokeSquare =
+                new FilterInvocation<Integer, Integer>() {
 
                     public void onInput(final Integer integer,
                             @Nonnull final ResultChannel<Integer> result) {
@@ -1278,6 +1279,28 @@ public class RoutineTest {
         outputChannel.abort();
         outputChannel.afterMax(INFINITY).checkComplete();
         assertThat(TestLifecycle.sIsError).isFalse();
+    }
+
+    @Test
+    public void testInvocationNotAvailable() {
+
+        final Routine<String, String> routine =
+                on(factoryOf(DelayedInvocation.class)).routineConfiguration()
+                                                      .withFactoryArgs(seconds(1))
+                                                      .withMaxInvocations(1)
+                                                      .apply()
+                                                      .buildRoutine();
+        routine.callAsync("test1");
+
+        try {
+
+            routine.callAsync("test2").eventually().readNext();
+
+            fail();
+
+        } catch (final InvocationDeadlockException ignored) {
+
+        }
     }
 
     @Test

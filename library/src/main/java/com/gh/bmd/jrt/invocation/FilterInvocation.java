@@ -19,17 +19,17 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Abstract implementation of an invocation that does not retain an internal variable state.
+ * Abstract implementation of an invocation filtering each input and transforming it in output data.
+ * <p/>
+ * Note that the implementing class must not retain an internal variable state.
  * <p/>
  * Created by davide on 2/14/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class StatelessInvocation<INPUT, OUTPUT>
+public abstract class FilterInvocation<INPUT, OUTPUT>
         implements Invocation<INPUT, OUTPUT>, InvocationFactory<INPUT, OUTPUT> {
-
-    //TODO: filter invocation??
 
     @Nonnull
     public final Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {

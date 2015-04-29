@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.invocation.StatelessInvocation;
+import com.gh.bmd.jrt.invocation.FilterInvocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 10/17/14.
  */
-public class ReadConnection extends StatelessInvocation<URI, Chunk> {
+public class ReadConnection extends FilterInvocation<URI, Chunk> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 

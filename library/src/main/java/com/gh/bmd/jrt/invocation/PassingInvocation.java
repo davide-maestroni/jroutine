@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
  *
  * @param <DATA> the data type.
  */
-public class PassingInvocation<DATA> extends StatelessInvocation<DATA, DATA> {
+public class PassingInvocation<DATA> extends FilterInvocation<DATA, DATA> {
 
     private static final PassingInvocation<Object> sInvocation = new PassingInvocation<Object>();
 

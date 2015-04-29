@@ -40,44 +40,6 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new invocation factory calling the specified function.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryCalling(
-            @Nonnull final Function<OUTPUT> function) {
-
-        if (function == null) {
-
-            throw new NullPointerException("the function must not be null");
-        }
-
-        return new InvocationFactory<Object, OUTPUT>() {
-
-            @Nonnull
-            public Invocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-                return new SingleCallInvocation<Object, OUTPUT>() {
-
-                    @Override
-                    public void onCall(@Nonnull final List<?> objects,
-                            @Nonnull final ResultChannel<OUTPUT> result) {
-
-                        result.pass(function.call(objects.toArray(new Object[objects.size()])));
-                    }
-                };
-            }
-        };
-    }
-
-    /**
      * Builds and returns a new invocation factory creating instances of the specified class token.
      * <p/>
      * Note that class tokens of inner and anonymous class can be passed as well. Remember however
@@ -124,9 +86,28 @@ public class Invocations {
     }
 
     /**
+     * Builds and returns a new factory of invocations calling the specified function.<br/>
+     * Remember to force the input order type, in case the function parameter position needs to be
+     * preserved.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws java.lang.NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryWith(
+            @Nonnull final Function<OUTPUT> function) {
+
+        return new FunctionInvocationFactory<OUTPUT>(function);
+    }
+
+    /**
      * Interface defining a function taking an undefined number of parameters.
      *
-     * @param <OUTPUT> the result data type.
+     * @param <OUTPUT> the output data type.
      */
     public interface Function<OUTPUT> {
 
@@ -198,6 +179,48 @@ public class Invocations {
 
                 throw new InvocationException(t);
             }
+        }
+    }
+
+    /**
+     * Implementation of a factory of invocations calling a specific function.
+     *
+     * @param <OUTPUT> the output data type.
+     */
+    private static class FunctionInvocationFactory<OUTPUT>
+            implements InvocationFactory<Object, OUTPUT> {
+
+        private final Function<OUTPUT> mFunction;
+
+        /**
+         * Constructor.
+         *
+         * @param function the function instance.
+         * @throws java.lang.NullPointerException if the specified function is null.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private FunctionInvocationFactory(@Nonnull final Function<OUTPUT> function) {
+
+            if (function == null) {
+
+                throw new NullPointerException("the function must not be null");
+            }
+
+            mFunction = function;
+        }
+
+        @Nonnull
+        public Invocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+            return new SingleCallInvocation<Object, OUTPUT>() {
+
+                @Override
+                public void onCall(@Nonnull final List<?> objects,
+                        @Nonnull final ResultChannel<OUTPUT> result) {
+
+                    result.pass(mFunction.call(objects.toArray()));
+                }
+            };
         }
     }
 }

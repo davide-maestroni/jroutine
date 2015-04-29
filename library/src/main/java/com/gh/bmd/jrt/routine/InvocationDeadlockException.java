@@ -23,14 +23,14 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/20/14.
  */
-public class RoutineDeadlockException extends DeadlockException {
+public class InvocationDeadlockException extends DeadlockException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public RoutineDeadlockException(@Nullable final String message) {
+    public InvocationDeadlockException(@Nullable final String message) {
 
         super(message);
     }

@@ -28,7 +28,7 @@
             }
         };
         return com.gh.bmd.jrt.core.JRoutine.on(factory)
-                                           .withConfiguration()
+                                           .withRoutineConfiguration()
                                            .with(configuration)
                                            ${routineBuilderOptions}
                                            .withInputMaxSize(Integer.MAX_VALUE)

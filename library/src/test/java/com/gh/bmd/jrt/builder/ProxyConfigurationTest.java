@@ -16,38 +16,38 @@ public class ProxyConfigurationTest {
     @Test
     public void testBuildFrom() {
 
-        final ProxyConfiguration configuration = builder().withShareGroup("test").apply();
+        final ProxyConfiguration configuration = builder().withShareGroup("test").set();
 
-        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().apply().hashCode()).isEqualTo(
+        assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().set().hashCode()).isEqualTo(
                 configuration.hashCode());
-        assertThat(builderFrom(null).apply()).isEqualTo(ProxyConfiguration.DEFAULT_CONFIGURATION);
+        assertThat(builderFrom(null).set()).isEqualTo(ProxyConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
     public void testBuilderFromEquals() {
 
-        final ProxyConfiguration configuration = builder().withShareGroup("test").apply();
-        assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+        final ProxyConfiguration configuration = builder().withShareGroup("test").set();
+        assertThat(builder().with(configuration).set()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().with(null).set()).isEqualTo(
                 ProxyConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
     public void testShareGroupEquals() {
 
-        final ProxyConfiguration configuration = builder().withShareGroup("group").apply();
-        assertThat(configuration).isNotEqualTo(builder().withShareGroup("test").apply());
-        assertThat(configuration.builderFrom().withShareGroup("test").apply()).isEqualTo(
-                builder().withShareGroup("test").apply());
-        assertThat(configuration).isNotEqualTo(builder().withShareGroup("test").apply());
+        final ProxyConfiguration configuration = builder().withShareGroup("group").set();
+        assertThat(configuration).isNotEqualTo(builder().withShareGroup("test").set());
+        assertThat(configuration.builderFrom().withShareGroup("test").set()).isEqualTo(
+                builder().withShareGroup("test").set());
+        assertThat(configuration).isNotEqualTo(builder().withShareGroup("test").set());
     }
 
     @Test
     public void testToString() {
 
-        assertThat(builder().withShareGroup("testGroupName123").apply().toString()).contains(
+        assertThat(builder().withShareGroup("testGroupName123").set().toString()).contains(
                 "testGroupName123");
     }
 }

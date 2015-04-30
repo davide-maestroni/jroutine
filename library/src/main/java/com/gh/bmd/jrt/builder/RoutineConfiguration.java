@@ -78,7 +78,7 @@ public final class RoutineConfiguration {
             new Configurable<RoutineConfiguration>() {
 
                 @Nonnull
-                public RoutineConfiguration apply(
+                public RoutineConfiguration setConfiguration(
                         @Nonnull final RoutineConfiguration configuration) {
 
                     return configuration;
@@ -620,13 +620,13 @@ public final class RoutineConfiguration {
     public interface Configurable<TYPE> {
 
         /**
-         * Applies the specified configuration and returns the configurable instance.
+         * Sets the specified configuration and returns the configurable instance.
          *
          * @param configuration the configuration.
          * @return the configurable instance.
          */
         @Nonnull
-        TYPE apply(@Nonnull RoutineConfiguration configuration);
+        TYPE setConfiguration(@Nonnull RoutineConfiguration configuration);
     }
 
     /**
@@ -708,18 +708,18 @@ public final class RoutineConfiguration {
             }
 
             mConfigurable = configurable;
-            apply(initialConfiguration);
+            setConfiguration(initialConfiguration);
         }
 
         /**
-         * Applies the configuration and returns the configurable object.
+         * Sets the configuration and returns the configurable object.
          *
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE apply() {
+        public TYPE set() {
 
-            return mConfigurable.apply(buildConfiguration());
+            return mConfigurable.setConfiguration(buildConfiguration());
         }
 
         /**
@@ -735,7 +735,7 @@ public final class RoutineConfiguration {
 
             if (configuration == null) {
 
-                apply(DEFAULT_CONFIGURATION);
+                setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -1070,26 +1070,6 @@ public final class RoutineConfiguration {
             return this;
         }
 
-        private void apply(@Nonnull final RoutineConfiguration configuration) {
-
-            mArgs = configuration.mFactoryArgs;
-            mSyncRunner = configuration.mSyncRunner;
-            mAsyncRunner = configuration.mAsyncRunner;
-            mMaxInvocations = configuration.mMaxInvocations;
-            mCoreInvocations = configuration.mCoreInvocations;
-            mAvailTimeout = configuration.mAvailTimeout;
-            mReadTimeout = configuration.mReadTimeout;
-            mTimeoutActionType = configuration.mTimeoutActionType;
-            mInputOrderType = configuration.mInputOrderType;
-            mInputMaxSize = configuration.mInputMaxSize;
-            mInputTimeout = configuration.mInputTimeout;
-            mOutputOrderType = configuration.mOutputOrderType;
-            mOutputMaxSize = configuration.mOutputMaxSize;
-            mOutputTimeout = configuration.mOutputTimeout;
-            mLog = configuration.mLog;
-            mLogLevel = configuration.mLogLevel;
-        }
-
         private void applyChannelConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
             final OrderType inputOrderType = configuration.mInputOrderType;
@@ -1220,6 +1200,26 @@ public final class RoutineConfiguration {
                                             mTimeoutActionType, mInputOrderType, mInputMaxSize,
                                             mInputTimeout, mOutputOrderType, mOutputMaxSize,
                                             mOutputTimeout, mLog, mLogLevel);
+        }
+
+        private void setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+
+            mArgs = configuration.mFactoryArgs;
+            mSyncRunner = configuration.mSyncRunner;
+            mAsyncRunner = configuration.mAsyncRunner;
+            mMaxInvocations = configuration.mMaxInvocations;
+            mCoreInvocations = configuration.mCoreInvocations;
+            mAvailTimeout = configuration.mAvailTimeout;
+            mReadTimeout = configuration.mReadTimeout;
+            mTimeoutActionType = configuration.mTimeoutActionType;
+            mInputOrderType = configuration.mInputOrderType;
+            mInputMaxSize = configuration.mInputMaxSize;
+            mInputTimeout = configuration.mInputTimeout;
+            mOutputOrderType = configuration.mOutputOrderType;
+            mOutputMaxSize = configuration.mOutputMaxSize;
+            mOutputTimeout = configuration.mOutputTimeout;
+            mLog = configuration.mLog;
+            mLogLevel = configuration.mLogLevel;
         }
     }
 }

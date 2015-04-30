@@ -36,7 +36,8 @@ public final class ProxyConfiguration {
             new Configurable<ProxyConfiguration>() {
 
                 @Nonnull
-                public ProxyConfiguration apply(@Nonnull final ProxyConfiguration configuration) {
+                public ProxyConfiguration setConfiguration(
+                        @Nonnull final ProxyConfiguration configuration) {
 
                     return configuration;
                 }
@@ -149,13 +150,13 @@ public final class ProxyConfiguration {
     public interface Configurable<TYPE> {
 
         /**
-         * Applies the specified configuration and returns the configurable instance.
+         * Sets the specified configuration and returns the configurable instance.
          *
          * @param configuration the configuration.
          * @return the configurable instance.
          */
         @Nonnull
-        TYPE apply(@Nonnull ProxyConfiguration configuration);
+        TYPE setConfiguration(@Nonnull ProxyConfiguration configuration);
     }
 
     /**
@@ -203,18 +204,18 @@ public final class ProxyConfiguration {
             }
 
             mConfigurable = configurable;
-            apply(initialConfiguration);
+            setConfiguration(initialConfiguration);
         }
 
         /**
-         * Applies the configuration and returns the configurable object.
+         * Sets the configuration and returns the configurable object.
          *
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE apply() {
+        public TYPE set() {
 
-            return mConfigurable.apply(buildConfiguration());
+            return mConfigurable.setConfiguration(buildConfiguration());
         }
 
         /**
@@ -230,7 +231,7 @@ public final class ProxyConfiguration {
 
             if (configuration == null) {
 
-                apply(DEFAULT_CONFIGURATION);
+                setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -258,15 +259,15 @@ public final class ProxyConfiguration {
             return this;
         }
 
-        private void apply(@Nonnull final ProxyConfiguration configuration) {
-
-            mGroupName = configuration.mGroupName;
-        }
-
         @Nonnull
         private ProxyConfiguration buildConfiguration() {
 
             return new ProxyConfiguration(mGroupName);
+        }
+
+        private void setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+
+            mGroupName = configuration.mGroupName;
         }
     }
 }

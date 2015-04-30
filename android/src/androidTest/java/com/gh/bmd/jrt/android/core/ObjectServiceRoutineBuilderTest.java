@@ -73,9 +73,9 @@ public class ObjectServiceRoutineBuilderTest
     public void testArgs() {
 
         assertThat(JRoutine.onService(getActivity(), TestArgs.class)
-                           .withConfiguration()
+                           .withRoutineConfiguration()
                            .withFactoryArgs(17)
-                           .apply()
+                           .set()
                            .method("getId")
                            .callAsync()
                            .eventually()
@@ -86,9 +86,9 @@ public class ObjectServiceRoutineBuilderTest
 
         final TimeDuration timeout = seconds(10);
         final SumItf sumAsync = JRoutine.onService(getActivity(), Sum.class)
-                                        .withConfiguration()
+                                        .withRoutineConfiguration()
                                         .withReadTimeout(timeout)
-                                        .apply()
+                                        .set()
                                         .buildProxy(SumItf.class);
         final StandaloneChannel<Integer> channel3 = JRoutine.standalone().buildChannel();
         channel3.input().pass(7).close();
@@ -115,9 +115,9 @@ public class ObjectServiceRoutineBuilderTest
 
         final TimeDuration timeout = seconds(10);
         final CountItf countAsync = JRoutine.onService(getActivity(), Count.class)
-                                            .withConfiguration()
+                                            .withRoutineConfiguration()
                                             .withReadTimeout(timeout)
-                                            .apply()
+                                            .set()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).readAll()).containsExactly(new int[]{0, 1, 2});
@@ -130,7 +130,7 @@ public class ObjectServiceRoutineBuilderTest
 
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine = JRoutine.onService(getActivity(), TestClass.class)
-                                                        .withConfiguration()
+                                                        .withRoutineConfiguration()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withMaxInvocations(1)
@@ -140,7 +140,7 @@ public class ObjectServiceRoutineBuilderTest
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .apply()
+                                                        .set()
                                                         .boundMethod(TestClass.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -151,7 +151,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).apply(
+            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
                     (RoutineConfiguration) null);
 
             fail();
@@ -162,7 +162,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).apply(
+            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -173,7 +173,7 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).apply(
+            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
                     (ServiceConfiguration) null);
 
             fail();
@@ -194,24 +194,24 @@ public class ObjectServiceRoutineBuilderTest
                                                             .withOutputTimeout(seconds(10))
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
-                                                            .apply();
+                                                            .set();
         JRoutine.onService(getActivity(), TestClass.class)
-                .withConfiguration()
+                .withRoutineConfiguration()
                 .with(configuration)
-                .apply()
-                .withProxy()
+                .set()
+                .withProxyConfiguration()
                 .withShareGroup("test")
-                .apply()
+                .set()
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         JRoutine.onService(getActivity(), Square.class)
-                .withConfiguration()
+                .withRoutineConfiguration()
                 .with(configuration)
-                .apply()
-                .withProxy()
+                .set()
+                .withProxyConfiguration()
                 .withShareGroup("test")
-                .apply()
+                .set()
                 .buildProxy(SquareItf.class)
                 .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(12);
@@ -391,9 +391,9 @@ public class ObjectServiceRoutineBuilderTest
         try {
 
             JRoutine.onService(getActivity(), TestClass.class)
-                    .withConfiguration()
+                    .withRoutineConfiguration()
                     .withReadTimeout(INFINITY)
-                    .apply()
+                    .set()
                     .buildProxy(TestItf.class)
                     .throwException(null);
 
@@ -406,9 +406,9 @@ public class ObjectServiceRoutineBuilderTest
         try {
 
             JRoutine.onService(getActivity(), TestClass.class)
-                    .withConfiguration()
+                    .withRoutineConfiguration()
                     .withReadTimeout(INFINITY)
-                    .apply()
+                    .set()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
 
@@ -421,9 +421,9 @@ public class ObjectServiceRoutineBuilderTest
         try {
 
             JRoutine.onService(getActivity(), TestClass.class)
-                    .withConfiguration()
+                    .withRoutineConfiguration()
                     .withReadTimeout(INFINITY)
-                    .apply()
+                    .set()
                     .buildProxy(TestItf.class)
                     .throwException2(null);
 
@@ -508,15 +508,15 @@ public class ObjectServiceRoutineBuilderTest
 
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine2 = JRoutine.onService(getActivity(), TestClass.class)
-                                                         .withConfiguration()
+                                                         .withRoutineConfiguration()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withAvailableTimeout(TimeDuration.ZERO)
-                                                         .apply()
-                                                         .withProxy()
+                                                         .set()
+                                                         .withProxyConfiguration()
                                                          .withShareGroup("test")
-                                                         .apply()
+                                                         .set()
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
@@ -527,10 +527,10 @@ public class ObjectServiceRoutineBuilderTest
 
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 = JRoutine.onService(getActivity(), TestClass.class)
-                                                         .withConfiguration()
+                                                         .withRoutineConfiguration()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
-                                                         .apply()
+                                                         .set()
                                                          .method("getLong");
 
         assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -604,9 +604,9 @@ public class ObjectServiceRoutineBuilderTest
     public void testProxyAnnotations() {
 
         final Itf itf = JRoutine.onService(getActivity(), Impl.class)
-                                .withConfiguration()
+                                .withRoutineConfiguration()
                                 .withReadTimeout(INFINITY)
-                                .apply()
+                                .set()
                                 .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -864,19 +864,25 @@ public class ObjectServiceRoutineBuilderTest
     public void testShareGroup() throws NoSuchMethodException {
 
         final ObjectRoutineBuilder builder = JRoutine.onService(getActivity(), TestClass2.class)
-                                                     .withConfiguration()
+                                                     .withRoutineConfiguration()
                                                      .withReadTimeout(seconds(9))
-                                                     .apply()
-                                                     .withService()
+                                                     .set()
+                                                     .withServiceConfiguration()
                                                      .withServiceClass(TestService.class)
-                                                     .apply();
+                                                     .set();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne =
-                builder.withProxy().withShareGroup("1").apply().method("getOne").callAsync();
-        OutputChannel<Object> getTwo =
-                builder.withProxy().withShareGroup("2").apply().method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.withProxyConfiguration()
+                                              .withShareGroup("1")
+                                              .set()
+                                              .method("getOne")
+                                              .callAsync();
+        OutputChannel<Object> getTwo = builder.withProxyConfiguration()
+                                              .withShareGroup("2")
+                                              .set()
+                                              .method("getTwo")
+                                              .callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -895,9 +901,9 @@ public class ObjectServiceRoutineBuilderTest
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
-                           .withConfiguration()
+                           .withRoutineConfiguration()
                            .withReadTimeout(seconds(10))
-                           .apply()
+                           .set()
                            .boundMethod("test")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -905,9 +911,9 @@ public class ObjectServiceRoutineBuilderTest
         try {
 
             JRoutine.onService(getActivity(), TestTimeout.class)
-                    .withConfiguration()
+                    .withRoutineConfiguration()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
-                    .apply()
+                    .set()
                     .boundMethod("test")
                     .callAsync()
                     .readNext();
@@ -919,9 +925,9 @@ public class ObjectServiceRoutineBuilderTest
         }
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
-                           .withConfiguration()
+                           .withRoutineConfiguration()
                            .withReadTimeout(seconds(10))
-                           .apply()
+                           .set()
                            .method("getInt")
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -929,9 +935,9 @@ public class ObjectServiceRoutineBuilderTest
         try {
 
             JRoutine.onService(getActivity(), TestTimeout.class)
-                    .withConfiguration()
+                    .withRoutineConfiguration()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
-                    .apply()
+                    .set()
                     .method("getInt")
                     .callAsync()
                     .readNext();
@@ -943,9 +949,9 @@ public class ObjectServiceRoutineBuilderTest
         }
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
-                           .withConfiguration()
+                           .withRoutineConfiguration()
                            .withReadTimeout(seconds(10))
-                           .apply()
+                           .set()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
                            .readNext()).isEqualTo(31);
@@ -953,9 +959,9 @@ public class ObjectServiceRoutineBuilderTest
         try {
 
             JRoutine.onService(getActivity(), TestTimeout.class)
-                    .withConfiguration()
+                    .withRoutineConfiguration()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
-                    .apply()
+                    .set()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
                     .readNext();
@@ -967,18 +973,18 @@ public class ObjectServiceRoutineBuilderTest
         }
 
         assertThat(JRoutine.onService(getActivity(), TestTimeout.class)
-                           .withConfiguration()
+                           .withRoutineConfiguration()
                            .withReadTimeout(seconds(10))
-                           .apply()
+                           .set()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
 
         try {
 
             JRoutine.onService(getActivity(), TestTimeout.class)
-                    .withConfiguration()
+                    .withRoutineConfiguration()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
-                    .apply()
+                    .set()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

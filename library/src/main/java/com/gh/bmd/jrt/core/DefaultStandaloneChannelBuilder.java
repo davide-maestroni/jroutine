@@ -39,8 +39,21 @@ class DefaultStandaloneChannelBuilder
     }
 
     @Nonnull
+    public <T> StandaloneChannel<T> buildChannel() {
+
+        return new DefaultStandaloneChannel<T>(mConfiguration);
+    }
+
+    @Nonnull
+    public Builder<StandaloneChannelBuilder> withRoutineConfiguration() {
+
+        return new Builder<StandaloneChannelBuilder>(this, mConfiguration);
+    }
+
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public StandaloneChannelBuilder apply(@Nonnull final RoutineConfiguration configuration) {
+    public StandaloneChannelBuilder setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -49,17 +62,5 @@ class DefaultStandaloneChannelBuilder
 
         mConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    public <T> StandaloneChannel<T> buildChannel() {
-
-        return new DefaultStandaloneChannel<T>(mConfiguration);
-    }
-
-    @Nonnull
-    public Builder<StandaloneChannelBuilder> withConfiguration() {
-
-        return new Builder<StandaloneChannelBuilder>(this, mConfiguration);
     }
 }

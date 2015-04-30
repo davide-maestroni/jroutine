@@ -13,29 +13,27 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.builder.ProxyConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of routine objects.
+ * Interface defining a configurable builder of proxy routines.
  * <p/>
- * Note that when the invocation is started directly from the builder, a new routine instance is
- * implicitly created.
- * <p/>
- * Created by davide on 11/11/14.
+ * Created by davide on 01/05/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <TYPE> the builder type.
  */
-public interface RoutineBuilder<INPUT, OUTPUT>
-        extends ConfigurableBuilder<RoutineBuilder<INPUT, OUTPUT>>, Routine<INPUT, OUTPUT> {
+public interface ProxyConfigurableBuilder<TYPE> {
 
     /**
-     * Builds and returns the routine.
+     * Gets the proxy configuration builder related to this builder instance.
+     * The configuration options not supported by the builder implementation might be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
      *
-     * @return the newly created routine instance.
+     * @return the proxy configuration builder.
      */
     @Nonnull
-    Routine<INPUT, OUTPUT> buildRoutine();
+    Builder<? extends TYPE> withProxyConfiguration();
 }

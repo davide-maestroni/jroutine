@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
@@ -33,8 +33,9 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface ContextRoutineBuilder<INPUT, OUTPUT>
-        extends RoutineBuilder<INPUT, OUTPUT>, ContextRoutine<INPUT, OUTPUT> {
+public interface ContextRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT>,
+        ContextConfigurableBuilder<ContextRoutineBuilder<INPUT, OUTPUT>>,
+        ContextRoutine<INPUT, OUTPUT> {
 
     /**
      * {@inheritDoc}
@@ -43,25 +44,11 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT>
     ContextRoutine<INPUT, OUTPUT> buildRoutine();
 
     /**
-     * Gets the routine configuration builder related to this builder instance.<br/>
-     * All the options related to the output and input channels size and timeout will be ignored.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
+     * Note that all the options related to the output and input channels size and timeout will be
+     * ignored.
      *
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    withConfiguration();
-
-    /**
-     * Gets the invocation configuration builder related to this builder instance.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the invocation configuration builder.
-     */
-    @Nonnull
-    InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    withInvocation();
+    Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration();
 }

@@ -57,10 +57,10 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
             new RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>() {
 
                 @Nonnull
-                public ContextRoutineBuilder<INPUT, OUTPUT> apply(
+                public ContextRoutineBuilder<INPUT, OUTPUT> setConfiguration(
                         @Nonnull final RoutineConfiguration configuration) {
 
-                    return DefaultContextRoutineBuilder.this.apply(configuration);
+                    return DefaultContextRoutineBuilder.this.setConfiguration(configuration);
                 }
             };
 
@@ -114,37 +114,6 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ContextRoutineBuilder<INPUT, OUTPUT> apply(
-            @Nonnull final RoutineConfiguration configuration) {
-
-        super.apply(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfiguration.Builder<? extends
-            ContextRoutineBuilder<INPUT, OUTPUT>> withConfiguration() {
-
-        return new RoutineConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
-                mRoutineConfigurable, getConfiguration());
-    }
-
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ContextRoutineBuilder<INPUT, OUTPUT> apply(
-            @Nonnull final InvocationConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
     public ContextRoutine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = getConfiguration();
@@ -156,7 +125,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
                              .withInputTimeout(TimeDuration.INFINITY)
                              .withOutputMaxSize(Integer.MAX_VALUE)
                              .withOutputTimeout(TimeDuration.INFINITY);
-        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, builder.apply(),
+        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, builder.set(),
                                                         mInvocationConfiguration);
     }
 
@@ -182,8 +151,39 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ContextRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ContextRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfiguration.Builder<? extends
+            ContextRoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration() {
+
+        return new RoutineConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
+                mRoutineConfigurable, getConfiguration());
+    }
+
+    @Nonnull
     public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    withInvocation() {
+    withInvocationConfiguration() {
 
 
         return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,

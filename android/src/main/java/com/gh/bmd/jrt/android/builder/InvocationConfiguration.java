@@ -41,7 +41,7 @@ public final class InvocationConfiguration {
             new Configurable<InvocationConfiguration>() {
 
                 @Nonnull
-                public InvocationConfiguration apply(
+                public InvocationConfiguration setConfiguration(
                         @Nonnull final InvocationConfiguration configuration) {
 
                     return configuration;
@@ -263,13 +263,13 @@ public final class InvocationConfiguration {
     public interface Configurable<TYPE> {
 
         /**
-         * Applies the specified configuration and returns the configurable instance.
+         * Sets the specified configuration and returns the configurable instance.
          *
          * @param configuration the configuration.
          * @return the configurable instance.
          */
         @Nonnull
-        TYPE apply(@Nonnull InvocationConfiguration configuration);
+        TYPE setConfiguration(@Nonnull InvocationConfiguration configuration);
     }
 
     /**
@@ -307,18 +307,18 @@ public final class InvocationConfiguration {
                 @Nonnull final InvocationConfiguration initialConfiguration) {
 
             mConfigurable = configurable;
-            apply(initialConfiguration);
+            setConfiguration(initialConfiguration);
         }
 
         /**
-         * Applies the configuration and returns the configurable object.
+         * Sets the configuration and returns the configurable object.
          *
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE apply() {
+        public TYPE set() {
 
-            return mConfigurable.apply(buildConfiguration());
+            return mConfigurable.setConfiguration(buildConfiguration());
         }
 
         /**
@@ -334,7 +334,7 @@ public final class InvocationConfiguration {
 
             if (configuration == null) {
 
-                apply(DEFAULT_CONFIGURATION);
+                setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -405,17 +405,17 @@ public final class InvocationConfiguration {
             return this;
         }
 
-        private void apply(@Nonnull final InvocationConfiguration configuration) {
-
-            mInvocationId = configuration.mInvocationId;
-            mResolutionType = configuration.mResolutionType;
-            mStrategyType = configuration.mStrategyType;
-        }
-
         @Nonnull
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mInvocationId, mResolutionType, mStrategyType);
+        }
+
+        private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {
+
+            mInvocationId = configuration.mInvocationId;
+            mResolutionType = configuration.mResolutionType;
+            mStrategyType = configuration.mStrategyType;
         }
     }
 }

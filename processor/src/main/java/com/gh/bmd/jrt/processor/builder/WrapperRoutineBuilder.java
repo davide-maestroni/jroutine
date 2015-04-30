@@ -13,8 +13,9 @@
  */
 package com.gh.bmd.jrt.processor.builder;
 
-import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -34,7 +35,8 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  * @see com.gh.bmd.jrt.processor.annotation.Wrap
  */
-public interface WrapperRoutineBuilder {
+public interface WrapperRoutineBuilder extends ConfigurableBuilder<WrapperRoutineBuilder>,
+        ProxyConfigurableBuilder<WrapperRoutineBuilder> {
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
@@ -101,23 +103,10 @@ public interface WrapperRoutineBuilder {
     <TYPE> TYPE buildWrapper(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * Gets the routine configuration builder related to this builder instance.<br/>
-     * All the options related to the output and input channels will be ignored.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
+     * Note that all the options related to the output and input channels will be ignored.
      *
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> withConfiguration();
-
-    /**
-     * Gets the proxy configuration builder related to this builder instance.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the proxy configuration builder.
-     */
-    @Nonnull
-    ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> withProxy();
+    Builder<? extends WrapperRoutineBuilder> withRoutineConfiguration();
 }

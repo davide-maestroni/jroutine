@@ -102,32 +102,6 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ContextChannelBuilder apply(@Nonnull final RoutineConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ContextChannelBuilder apply(@Nonnull final InvocationConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
     public <OUTPUT> OutputChannel<OUTPUT> buildChannel() {
 
         final Object context = mContext.get();
@@ -166,14 +140,14 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
             logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
         }
 
-        return builder.withConfiguration()
+        return builder.withRoutineConfiguration()
                       .with(routineConfiguration)
-                      .apply()
-                      .withInvocation()
+                      .set()
+                      .withInvocationConfiguration()
                       .withId(mInvocationId)
                       .with(invocationConfiguration)
                       .withClashResolution(ClashResolutionType.KEEP_THAT)
-                      .apply()
+                      .set()
                       .callAsync();
     }
 
@@ -244,17 +218,47 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> withConfiguration() {
+    public InvocationConfiguration.Builder<? extends ContextChannelBuilder>
+    withInvocationConfiguration() {
+
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, configuration);
+    }
+
+    @Nonnull
+    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutineConfiguration
+            () {
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
         return new RoutineConfiguration.Builder<ContextChannelBuilder>(this, configuration);
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation() {
+    @SuppressWarnings("ConstantConditions")
+    public ContextChannelBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, configuration);
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ContextChannelBuilder setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
     }
 
     /**

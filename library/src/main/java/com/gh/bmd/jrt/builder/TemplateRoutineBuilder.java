@@ -36,19 +36,6 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> apply(@Nonnull final RoutineConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return buildRoutine().invokeAsync();
@@ -67,7 +54,21 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     }
 
     @Nonnull
-    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withConfiguration() {
+    @SuppressWarnings("ConstantConditions")
+    public RoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration() {
 
         return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
     }

@@ -42,10 +42,10 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
             new RoutineConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>() {
 
                 @Nonnull
-                public ServiceRoutineBuilder<INPUT, OUTPUT> apply(
+                public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
                         @Nonnull final RoutineConfiguration configuration) {
 
-                    return DefaultServiceRoutineBuilder.this.apply(configuration);
+                    return DefaultServiceRoutineBuilder.this.setConfiguration(configuration);
                 }
             };
 
@@ -76,28 +76,15 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
-    public ServiceRoutineBuilder<INPUT, OUTPUT> apply(
-            @Nonnull final RoutineConfiguration configuration) {
+    public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        super.apply(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withConfiguration() {
-
-
-        final RoutineConfiguration configuration = getConfiguration();
-        return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(mConfigurable,
-                                                                                      configuration);
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, getConfiguration(),
+                                                 mServiceConfiguration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ServiceRoutineBuilder<INPUT, OUTPUT> apply(
+    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
             @Nonnull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
@@ -110,15 +97,29 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public Routine<INPUT, OUTPUT> buildRoutine() {
+    @Override
+    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, getConfiguration(),
-                                                 mServiceConfiguration);
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
+    withRoutineConfiguration() {
+
+
+        final RoutineConfiguration configuration = getConfiguration();
+        return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(mConfigurable,
+                                                                                      configuration);
     }
 
     @Nonnull
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withService() {
+    withServiceConfiguration() {
+
 
         final ServiceConfiguration configuration = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this,

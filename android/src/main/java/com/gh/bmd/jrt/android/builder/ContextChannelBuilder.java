@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 
@@ -28,7 +29,8 @@ import javax.annotation.Nullable;
  *
  * @see ContextRoutineBuilder
  */
-public interface ContextChannelBuilder {
+public interface ContextChannelBuilder extends ConfigurableBuilder<ContextChannelBuilder>,
+        ContextConfigurableBuilder<ContextChannelBuilder> {
 
     /**
      * Builds and returns an output channel bound to the routine invocation.
@@ -65,24 +67,18 @@ public interface ContextChannelBuilder {
     void purge();
 
     /**
-     * Gets the routine configuration builder related to this builder instance.<br/>
-     * Only the options related to logs will be employed.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    RoutineConfiguration.Builder<? extends ContextChannelBuilder> withConfiguration();
-
-    /**
-     * Gets the invocation configuration builder related to this builder instance.<br/>
-     * The clash resolution type will be ignored.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
+     * Note that the clash resolution type will be ignored.
      *
      * @return the invocation configuration builder.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation();
+    InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocationConfiguration();
+
+    /**
+     * Note that only the options related to logs will be employed.
+     *
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutineConfiguration();
 }

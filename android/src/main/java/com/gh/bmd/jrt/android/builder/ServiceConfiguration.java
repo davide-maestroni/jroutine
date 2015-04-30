@@ -36,7 +36,7 @@ public final class ServiceConfiguration {
             new Configurable<ServiceConfiguration>() {
 
                 @Nonnull
-                public ServiceConfiguration apply(
+                public ServiceConfiguration setConfiguration(
                         @Nonnull final ServiceConfiguration configuration) {
 
                     return configuration;
@@ -228,13 +228,13 @@ public final class ServiceConfiguration {
     public interface Configurable<TYPE> {
 
         /**
-         * Applies the specified configuration and returns the configurable instance.
+         * Sets the specified configuration and returns the configurable instance.
          *
          * @param configuration the configuration.
          * @return the configurable instance.
          */
         @Nonnull
-        TYPE apply(@Nonnull ServiceConfiguration configuration);
+        TYPE setConfiguration(@Nonnull ServiceConfiguration configuration);
     }
 
     /**
@@ -288,18 +288,18 @@ public final class ServiceConfiguration {
             }
 
             mConfigurable = configurable;
-            apply(initialConfiguration);
+            setConfiguration(initialConfiguration);
         }
 
         /**
-         * Applies the configuration and returns the configurable object.
+         * Sets the configuration and returns the configurable object.
          *
          * @return the configurable object.
          */
         @Nonnull
-        public TYPE apply() {
+        public TYPE set() {
 
-            return mConfigurable.apply(buildConfiguration());
+            return mConfigurable.setConfiguration(buildConfiguration());
         }
 
         /**
@@ -315,7 +315,7 @@ public final class ServiceConfiguration {
 
             if (configuration == null) {
 
-                apply(DEFAULT_CONFIGURATION);
+                setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
@@ -407,18 +407,18 @@ public final class ServiceConfiguration {
             return this;
         }
 
-        private void apply(@Nonnull final ServiceConfiguration configuration) {
+        @Nonnull
+        private ServiceConfiguration buildConfiguration() {
+
+            return new ServiceConfiguration(mLooper, mServiceClass, mRunnerClass, mLogClass);
+        }
+
+        private void setConfiguration(@Nonnull final ServiceConfiguration configuration) {
 
             mLooper = configuration.mLooper;
             mServiceClass = configuration.mServiceClass;
             mRunnerClass = configuration.mRunnerClass;
             mLogClass = configuration.mLogClass;
-        }
-
-        @Nonnull
-        private ServiceConfiguration buildConfiguration() {
-
-            return new ServiceConfiguration(mLooper, mServiceClass, mRunnerClass, mLogClass);
         }
     }
 }

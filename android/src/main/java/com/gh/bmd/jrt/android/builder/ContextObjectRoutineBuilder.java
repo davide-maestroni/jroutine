@@ -31,7 +31,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by Davide on 4/6/2015.
  */
-public interface ContextObjectRoutineBuilder extends ObjectRoutineBuilder {
+public interface ContextObjectRoutineBuilder
+        extends ObjectRoutineBuilder, ContextConfigurableBuilder<ContextObjectRoutineBuilder> {
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
@@ -143,21 +144,11 @@ public interface ContextObjectRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> withConfiguration();
+    ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> withProxyConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> withProxy();
-
-    /**
-     * Gets the invocation configuration builder related to this builder instance.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the invocation configuration builder.
-     */
-    @Nonnull
-    InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder> withInvocation();
+    RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> withRoutineConfiguration();
 }

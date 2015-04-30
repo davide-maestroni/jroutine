@@ -53,10 +53,10 @@ public class InvocationsTest {
                         return builder.toString();
                     }
                 }))
-                        .withConfiguration()
+                        .withRoutineConfiguration()
                         .withInputOrder(OrderType.PASSING_ORDER)
                         .withReadTimeout(TimeDuration.seconds(1))
-                        .apply()
+                        .set()
                         .buildRoutine();
         assertThat(routine.callAsync("test1", "test2", "test3", "test4").readNext()).isEqualTo(
                 "test1, test2, test3, test4");

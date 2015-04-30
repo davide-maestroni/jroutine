@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.builder.RoutineBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
@@ -35,23 +35,12 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT> {
+public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT>,
+        ServiceConfigurableBuilder<ServiceRoutineBuilder<INPUT, OUTPUT>> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withConfiguration();
-
-    /**
-     * Gets the service configuration builder related to this builder instance.<br/>
-     * The configuration options not supported by the builder implementation might be ignored.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the service configuration builder.
-     */
-    @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withService();
+    Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration();
 }

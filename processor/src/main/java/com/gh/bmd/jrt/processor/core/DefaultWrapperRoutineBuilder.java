@@ -61,32 +61,6 @@ class DefaultWrapperRoutineBuilder
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public WrapperRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public WrapperRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
     public <TYPE> TYPE buildWrapper(@Nonnull final Class<TYPE> itf) {
 
         return buildWrapper(ClassToken.tokenOf(itf));
@@ -110,23 +84,51 @@ class DefaultWrapperRoutineBuilder
         }
 
         final ObjectWrapperBuilder<TYPE> builder = new ObjectWrapperBuilder<TYPE>(target, itf);
-        return builder.withConfiguration()
+        return builder.withRoutineConfiguration()
                       .with(mRoutineConfiguration)
-                      .apply()
-                      .withProxy()
+                      .set()
+                      .withProxyConfiguration()
                       .with(mProxyConfiguration)
-                      .apply()
+                      .set()
                       .buildWrapper();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> withConfiguration() {
+    public RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> withRoutineConfiguration
+            () {
 
         return new RoutineConfiguration.Builder<WrapperRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> withProxy() {
+    @SuppressWarnings("ConstantConditions")
+    public WrapperRoutineBuilder setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public WrapperRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        mProxyConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> withProxyConfiguration() {
 
         return new ProxyConfiguration.Builder<WrapperRoutineBuilder>(this, mProxyConfiguration);
     }

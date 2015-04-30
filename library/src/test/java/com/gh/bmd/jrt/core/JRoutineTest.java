@@ -38,7 +38,7 @@ public class JRoutineTest {
     public void testRoutineBuilder() {
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .withConfiguration()
+                           .withRoutineConfiguration()
                            .withSyncRunner(Runners.sequentialRunner())
                            .withAsyncRunner(Runners.poolRunner())
                            .withCoreInvocations(0)
@@ -49,12 +49,12 @@ public class JRoutineTest {
                            .withOutputMaxSize(2)
                            .withOutputTimeout(1, TimeUnit.SECONDS)
                            .withOutputOrder(OrderType.PASSING_ORDER)
-                           .apply()
+                           .set()
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .withConfiguration()
+                           .withRoutineConfiguration()
                            .withSyncRunner(Runners.queuedRunner())
                            .withAsyncRunner(Runners.poolRunner())
                            .withCoreInvocations(0)
@@ -65,7 +65,7 @@ public class JRoutineTest {
                            .withOutputMaxSize(2)
                            .withOutputTimeout(TimeDuration.ZERO)
                            .withOutputOrder(OrderType.PASSING_ORDER)
-                           .apply()
+                           .set()
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
     }

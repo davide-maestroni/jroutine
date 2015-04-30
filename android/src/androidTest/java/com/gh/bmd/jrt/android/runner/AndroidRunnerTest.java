@@ -82,11 +82,11 @@ public class AndroidRunnerTest extends AndroidTestCase {
                     }
                 };
         final OutputChannel<Object> channel = JRoutine.on(ClassToken.tokenOf(invocation))
-                                                      .withConfiguration()
+                                                      .withRoutineConfiguration()
                                                       .withFactoryArgs(this)
                                                       .withAsyncRunner(Runners.threadRunner(
                                                               new HandlerThread("test")))
-                                                      .apply()
+                                                      .set()
                                                       .callAsync();
 
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {

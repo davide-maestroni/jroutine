@@ -23,12 +23,12 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain wrapper = on(instance).proxyConfiguration()
+                final AsyncMain wrapper = on(instance).withProxyConfiguration()
                                                       .withShareGroup(ShareGroup.NONE)
-                                                      .apply()
-                                                      .routineConfiguration()
+                                                      .set()
+                                                      .withRoutineConfiguration()
                                                       .withReadTimeout(TimeDuration.INFINITY)
-                                                      .apply()
+                                                      .set()
                                                       .buildWrapper(AsyncMain.class);
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 
@@ -92,12 +92,12 @@
 
                 final Main instance = new Main();
                 final AsyncMain wrapper = JRoutine_AsyncMain.on(instance)
-                                                            .proxyConfiguration()
+                                                            .withProxyConfiguration()
                                                             .withShareGroup(ShareGroup.NONE)
-                                                            .apply()
-                                                            .routineConfiguration()
+                                                            .set()
+                                                            .withRoutineConfiguration()
                                                             .withReadTimeout(TimeDuration.INFINITY)
-                                                            .apply()
+                                                            .set()
                                                             .buildWrapper();
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 

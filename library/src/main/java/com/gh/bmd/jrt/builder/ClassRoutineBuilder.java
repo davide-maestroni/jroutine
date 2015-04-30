@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.reflect.Method;
@@ -32,7 +33,8 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
-public interface ClassRoutineBuilder {
+public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBuilder>,
+        ProxyConfigurableBuilder<ClassRoutineBuilder> {
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
@@ -89,23 +91,10 @@ public interface ClassRoutineBuilder {
             @Nonnull Class<?>... parameterTypes);
 
     /**
-     * Gets the routine configuration builder related to this builder instance.<br/>
-     * All the options related to the output and input channels will be ignored.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
+     * Note that all the options related to the output and input channels will be ignored.
      *
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withConfiguration();
-
-    /**
-     * Gets the proxy configuration builder related to this builder instance.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the proxy configuration builder.
-     */
-    @Nonnull
-    ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy();
+    Builder<? extends ClassRoutineBuilder> withRoutineConfiguration();
 }

@@ -37,10 +37,10 @@ public class InvocationConfigurationTest extends AndroidTestCase {
                                                                                .ABORT_THAT)
                                                                .withCacheStrategy(
                                                                        CacheStrategyType.CACHE)
-                                                               .apply();
+                                                               .set();
 
-        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-        assertThat(builderFrom(null).apply()).isEqualTo(
+        assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
+        assertThat(builderFrom(null).set()).isEqualTo(
                 InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
@@ -52,10 +52,10 @@ public class InvocationConfigurationTest extends AndroidTestCase {
                                                                                .ABORT_THAT)
                                                                .withCacheStrategy(
                                                                        CacheStrategyType.CACHE)
-                                                               .apply();
-        assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+                                                               .set();
+        assertThat(builder().with(configuration).set()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().with(null).set()).isEqualTo(
                 InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
@@ -67,13 +67,13 @@ public class InvocationConfigurationTest extends AndroidTestCase {
                                                                                .ABORT_THAT)
                                                                .withCacheStrategy(
                                                                        CacheStrategyType.CACHE)
-                                                               .apply();
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
-                builder().withCacheStrategy(CacheStrategyType.CLEAR).apply());
+                builder().withCacheStrategy(CacheStrategyType.CLEAR).set());
         assertThat(configuration.builderFrom()
                                 .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-                                .apply()).isNotEqualTo(
-                builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR).apply());
+                                .set()).isNotEqualTo(
+                builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR).set());
     }
 
     public void testClashResolutionEquals() {
@@ -84,13 +84,13 @@ public class InvocationConfigurationTest extends AndroidTestCase {
                                                                                .ABORT_THAT)
                                                                .withCacheStrategy(
                                                                        CacheStrategyType.CACHE)
-                                                               .apply();
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
-                builder().withClashResolution(ClashResolutionType.ABORT_THIS).apply());
+                builder().withClashResolution(ClashResolutionType.ABORT_THIS).set());
         assertThat(configuration.builderFrom()
                                 .withClashResolution(ClashResolutionType.KEEP_THAT)
-                                .apply()).isNotEqualTo(
-                builder().withClashResolution(ClashResolutionType.KEEP_THAT).apply());
+                                .set()).isNotEqualTo(
+                builder().withClashResolution(ClashResolutionType.KEEP_THAT).set());
     }
 
     public void testIdEquals() {
@@ -101,9 +101,9 @@ public class InvocationConfigurationTest extends AndroidTestCase {
                                                                                .ABORT_THAT)
                                                                .withCacheStrategy(
                                                                        CacheStrategyType.CACHE)
-                                                               .apply();
-        assertThat(configuration).isNotEqualTo(builder().withId(3).apply());
-        assertThat(configuration.builderFrom().withId(27).apply()).isNotEqualTo(
-                builder().withId(27).apply());
+                                                               .set();
+        assertThat(configuration).isNotEqualTo(builder().withId(3).set());
+        assertThat(configuration.builderFrom().withId(27).set()).isNotEqualTo(
+                builder().withId(27).set());
     }
 }

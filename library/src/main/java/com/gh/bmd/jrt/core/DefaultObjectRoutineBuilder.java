@@ -64,9 +64,10 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             new ProxyConfiguration.Configurable<ObjectRoutineBuilder>() {
 
                 @Nonnull
-                public ObjectRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
+                public ObjectRoutineBuilder setConfiguration(
+                        @Nonnull final ProxyConfiguration configuration) {
 
-                    return DefaultObjectRoutineBuilder.this.apply(configuration);
+                    return DefaultObjectRoutineBuilder.this.setConfiguration(configuration);
                 }
             };
 
@@ -74,10 +75,10 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             new RoutineConfiguration.Configurable<ObjectRoutineBuilder>() {
 
                 @Nonnull
-                public ObjectRoutineBuilder apply(
+                public ObjectRoutineBuilder setConfiguration(
                         @Nonnull final RoutineConfiguration configuration) {
 
-                    return DefaultObjectRoutineBuilder.this.apply(configuration);
+                    return DefaultObjectRoutineBuilder.this.setConfiguration(configuration);
                 }
             };
 
@@ -206,40 +207,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    @Override
-    public ObjectRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
-
-        super.apply(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
-
-        super.apply(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("unchecked")
-    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withConfiguration() {
-
-        return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
-                                                                      getRoutineConfiguration());
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("unchecked")
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy() {
-
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
-                                                                    getProxyConfiguration());
-    }
-
-    @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -268,6 +235,41 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("unchecked")
+    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withRoutineConfiguration() {
+
+        return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
+                                                                      getRoutineConfiguration());
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("unchecked")
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxyConfiguration() {
+
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
+                                                                    getProxyConfiguration());
     }
 
     @Nonnull
@@ -434,7 +436,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 builder.withReadTimeoutAction(actionAnnotation.value());
             }
 
-            return getRoutine(builder.apply(), shareGroup, targetMethod,
+            return getRoutine(builder.set(), shareGroup, targetMethod,
                               (paramMode == PassMode.COLLECTION),
                               (returnMode == PassMode.COLLECTION));
         }

@@ -110,32 +110,6 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder apply(@Nonnull final ProxyConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mRoutineConfiguration = configuration;
-        return this;
-    }
-
-    @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
 
         final Method method = mMethodMap.get(name);
@@ -186,13 +160,39 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withConfiguration() {
+    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withRoutineConfiguration() {
 
         return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy() {
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        mProxyConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxyConfiguration() {
 
         return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
     }
@@ -287,7 +287,7 @@ class DefaultClassRoutineBuilder
                         Invocations.factoryOf(MethodSingleCallInvocation.class);
                 routine = new DefaultRoutine<Object, Object>(
                         builder.withFactoryArgs(target, method, mutex, isInputCollection,
-                                                isOutputCollection).apply(), factory);
+                                                isOutputCollection).set(), factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -373,7 +373,7 @@ class DefaultClassRoutineBuilder
             builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
-        return getRoutine(builder.apply(), methodShareGroup, targetMethod, false, false);
+        return getRoutine(builder.set(), methodShareGroup, targetMethod, false, false);
     }
 
     /**

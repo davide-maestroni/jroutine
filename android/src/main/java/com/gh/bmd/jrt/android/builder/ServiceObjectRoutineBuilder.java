@@ -33,28 +33,24 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 3/29/15.
  */
-public interface ServiceObjectRoutineBuilder extends ObjectRoutineBuilder {
+public interface ServiceObjectRoutineBuilder
+        extends ObjectRoutineBuilder, ServiceConfigurableBuilder<ServiceObjectRoutineBuilder> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withConfiguration();
+    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxyConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy();
+    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withRoutineConfiguration();
 
     /**
-     * Gets the service configuration builder related to this builder instance.<br/>
-     * The configuration options not supported by the builder implementation might be ignored.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the service configuration builder.
+     * {@inheritDoc}
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withService();
+    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withServiceConfiguration();
 }

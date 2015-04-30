@@ -83,7 +83,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         assertThat(JRoutine.onFragment(fragment, TestArgs.class)
-                           .routineConfiguration()
+                           .withConfiguration()
                            .withFactoryArgs(17)
                            .apply()
                            .method("getId")
@@ -104,7 +104,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final SumItf sumAsync = JRoutine.onFragment(fragment, Sum.class)
-                                        .routineConfiguration()
+                                        .withConfiguration()
                                         .withReadTimeout(timeout)
                                         .apply()
                                         .buildProxy(SumItf.class);
@@ -141,7 +141,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final CountItf countAsync = JRoutine.onFragment(fragment, Count.class)
-                                            .routineConfiguration()
+                                            .withConfiguration()
                                             .withReadTimeout(timeout)
                                             .apply()
                                             .buildProxy(CountItf.class);
@@ -164,13 +164,14 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
-                                                        .routineConfiguration()
+                                                        .withConfiguration()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withMaxInvocations(1)
                                                         .withCoreInvocations(1)
                                                         .withAvailableTimeout(1, TimeUnit.SECONDS)
-                                                        .onReadTimeout(TimeoutActionType.EXIT)
+                                                        .withReadTimeoutAction(
+                                                                TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
                                                         .apply()
@@ -238,29 +239,29 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                           R.id.test_fragment);
         final RoutineConfiguration configuration = builder().withFactoryArgs()
                                                             .withInputOrder(OrderType.NONE)
-                                                            .withInputSize(3)
+                                                            .withInputMaxSize(3)
                                                             .withInputTimeout(seconds(10))
                                                             .withOutputOrder(OrderType.NONE)
-                                                            .withOutputSize(3)
+                                                            .withOutputMaxSize(3)
                                                             .withOutputTimeout(seconds(10))
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .apply();
         JRoutine.onFragment(fragment, TestClass.class)
-                .routineConfiguration()
+                .withConfiguration()
                 .with(configuration)
                 .apply()
-                .proxyConfiguration()
+                .withProxy()
                 .withShareGroup("test")
                 .apply()
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
 
         JRoutine.onFragment(fragment, Square.class)
-                .routineConfiguration()
+                .withConfiguration()
                 .with(configuration)
                 .apply()
-                .proxyConfiguration()
+                .withProxy()
                 .withShareGroup("test")
                 .apply()
                 .buildProxy(SquareItf.class)
@@ -484,7 +485,7 @@ public class ContextObjectRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestClass.class)
-                    .routineConfiguration()
+                    .withConfiguration()
                     .withReadTimeout(INFINITY)
                     .apply()
                     .buildProxy(TestItf.class)
@@ -499,7 +500,7 @@ public class ContextObjectRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestClass.class)
-                    .routineConfiguration()
+                    .withConfiguration()
                     .withReadTimeout(INFINITY)
                     .apply()
                     .buildProxy(TestItf.class)
@@ -514,7 +515,7 @@ public class ContextObjectRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestClass.class)
-                    .routineConfiguration()
+                    .withConfiguration()
                     .withReadTimeout(INFINITY)
                     .apply()
                     .buildProxy(TestItf.class)
@@ -612,13 +613,13 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine2 = JRoutine.onFragment(fragment, TestClass.class)
-                                                         .routineConfiguration()
+                                                         .withConfiguration()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withAvailableTimeout(TimeDuration.ZERO)
                                                          .apply()
-                                                         .proxyConfiguration()
+                                                         .withProxy()
                                                          .withShareGroup("test")
                                                          .apply()
                                                          .method(TestClass.class.getMethod(
@@ -639,7 +640,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 = JRoutine.onFragment(fragment, TestClass.class)
-                                                         .routineConfiguration()
+                                                         .withConfiguration()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .apply()
@@ -760,7 +761,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Itf itf = JRoutine.onFragment(fragment, Impl.class)
-                                .routineConfiguration()
+                                .withConfiguration()
                                 .withReadTimeout(INFINITY)
                                 .apply()
                                 .buildProxy(Itf.class);
@@ -1036,22 +1037,16 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
-                                                     .routineConfiguration()
+                                                     .withConfiguration()
                                                      .withReadTimeout(seconds(9))
                                                      .apply();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration()
-                                              .withShareGroup("1")
-                                              .apply()
-                                              .method("getOne")
-                                              .callAsync();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
-                                              .withShareGroup("2")
-                                              .apply()
-                                              .method("getTwo")
-                                              .callAsync();
+        OutputChannel<Object> getOne =
+                builder.withProxy().withShareGroup("1").apply().method("getOne").callAsync();
+        OutputChannel<Object> getTwo =
+                builder.withProxy().withShareGroup("2").apply().method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1078,10 +1073,10 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .routineConfiguration()
+                           .withConfiguration()
                            .withReadTimeout(seconds(10))
                            .apply()
-                           .invocationConfiguration()
+                           .withInvocation()
                            .withId(0)
                            .apply()
                            .boundMethod("test")
@@ -1091,10 +1086,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .withConfiguration()
+                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .apply()
-                    .invocationConfiguration()
+                    .withInvocation()
                     .withId(1)
                     .apply()
                     .boundMethod("test")
@@ -1108,10 +1103,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .routineConfiguration()
+                           .withConfiguration()
                            .withReadTimeout(seconds(10))
                            .apply()
-                           .invocationConfiguration()
+                           .withInvocation()
                            .withId(2)
                            .apply()
                            .method("getInt")
@@ -1121,10 +1116,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .withConfiguration()
+                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .apply()
-                    .invocationConfiguration()
+                    .withInvocation()
                     .withId(3)
                     .apply()
                     .method("getInt")
@@ -1138,10 +1133,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .routineConfiguration()
+                           .withConfiguration()
                            .withReadTimeout(seconds(10))
                            .apply()
-                           .invocationConfiguration()
+                           .withInvocation()
                            .withId(4)
                            .apply()
                            .method(TestTimeout.class.getMethod("getInt"))
@@ -1151,10 +1146,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .withConfiguration()
+                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .apply()
-                    .invocationConfiguration()
+                    .withInvocation()
                     .withId(5)
                     .apply()
                     .method(TestTimeout.class.getMethod("getInt"))
@@ -1168,10 +1163,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .routineConfiguration()
+                           .withConfiguration()
                            .withReadTimeout(seconds(10))
                            .apply()
-                           .invocationConfiguration()
+                           .withInvocation()
                            .withId(6)
                            .apply()
                            .buildProxy(TestTimeoutItf.class)
@@ -1180,10 +1175,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .routineConfiguration()
-                    .onReadTimeout(TimeoutActionType.DEADLOCK)
+                    .withConfiguration()
+                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .apply()
-                    .invocationConfiguration()
+                    .withInvocation()
                     .withId(7)
                     .apply()
                     .buildProxy(TestTimeoutItf.class)

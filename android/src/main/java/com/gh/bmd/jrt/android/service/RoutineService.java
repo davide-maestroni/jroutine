@@ -293,8 +293,8 @@ public class RoutineService extends Service {
             bundle.putSerializable(KEY_AVAILABLE_UNIT, availTimeout.unit);
         }
 
-        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderOr(null));
-        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderOr(null));
+        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderTypeOr(null));
+        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderTypeOr(null));
         bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
         bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevelOr(null));
@@ -435,16 +435,16 @@ public class RoutineService extends Service {
             final TimeUnit timeUnit = (TimeUnit) data.getSerializable(KEY_AVAILABLE_UNIT);
             final TimeDuration availTimeout =
                     (timeUnit != null) ? TimeDuration.fromUnit(timeout, timeUnit) : null;
-            final OrderType inputOrder = (OrderType) data.getSerializable(KEY_INPUT_ORDER);
-            final OrderType outputOrder = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
+            final OrderType inputOrderType = (OrderType) data.getSerializable(KEY_INPUT_ORDER);
+            final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
             final Class<? extends Runner> runnerClass =
                     (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
             final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
             final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
             final RoutineInfo routineInfo =
-                    new RoutineInfo(invocationClass, invocationArgs, inputOrder, outputOrder,
-                                    runnerClass, logClass, logLevel);
+                    new RoutineInfo(invocationClass, invocationArgs, inputOrderType,
+                                    outputOrderType, runnerClass, logClass, logLevel);
             final HashMap<RoutineInfo, RoutineState> routineMap = mRoutineMap;
             RoutineState routineState = routineMap.get(routineInfo);
 
@@ -481,8 +481,8 @@ public class RoutineService extends Service {
                 builder.withCoreInvocations(coreInvocations)
                        .withMaxInvocations(maxInvocations)
                        .withAvailableTimeout(availTimeout)
-                       .withInputOrder(inputOrder)
-                       .withOutputOrder(outputOrder)
+                       .withInputOrder(inputOrderType)
+                       .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
                 final AndroidRoutine androidRoutine =
                         new AndroidRoutine(this, builder.apply(), invocationClass, invocationArgs);

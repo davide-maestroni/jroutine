@@ -108,12 +108,13 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         mContext = context;
         mInvocationId = invocationConfiguration.getInvocationIdOr(InvocationConfiguration.AUTO);
-        mClashResolutionType =
-                invocationConfiguration.getResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
-        mCacheStrategyType = invocationConfiguration.getStrategyTypeOr(CacheStrategyType.CLEAR);
+        mClashResolutionType = invocationConfiguration.getClashResolutionTypeOr(
+                ClashResolutionType.ABORT_THAT_INPUT);
+        mCacheStrategyType =
+                invocationConfiguration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
         mArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         mConstructor = findConstructor(invocationClass, mArgs);
-        mOrderType = routineConfiguration.getOutputOrderOr(null);
+        mOrderType = routineConfiguration.getOutputOrderTypeOr(null);
         getLogger().dbg("building context routine on invocation %s with configuration: %s",
                         invocationClass.getCanonicalName(), invocationConfiguration);
     }

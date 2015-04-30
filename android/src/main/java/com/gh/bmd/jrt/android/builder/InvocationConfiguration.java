@@ -152,6 +152,32 @@ public final class InvocationConfiguration {
     }
 
     /**
+     * Returns the type of cache strategy (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the cache strategy type.
+     */
+    public CacheStrategyType getCacheStrategyTypeOr(
+            @Nullable final CacheStrategyType valueIfNotSet) {
+
+        final CacheStrategyType strategyType = mStrategyType;
+        return (strategyType != null) ? strategyType : valueIfNotSet;
+    }
+
+    /**
+     * Returns the type of clash resolution (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the clash resolution type.
+     */
+    public ClashResolutionType getClashResolutionTypeOr(
+            @Nullable final ClashResolutionType valueIfNotSet) {
+
+        final ClashResolutionType resolutionType = mResolutionType;
+        return (resolutionType != null) ? resolutionType : valueIfNotSet;
+    }
+
+    /**
      * Returns the invocation ID (AUTO by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -161,31 +187,6 @@ public final class InvocationConfiguration {
 
         final int invocationId = mInvocationId;
         return (invocationId != AUTO) ? invocationId : valueIfNotSet;
-    }
-
-    /**
-     * Returns the type of clash resolution (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the clash resolution type.
-     */
-    public ClashResolutionType getResolutionTypeOr(
-            @Nullable final ClashResolutionType valueIfNotSet) {
-
-        final ClashResolutionType resolutionType = mResolutionType;
-        return (resolutionType != null) ? resolutionType : valueIfNotSet;
-    }
-
-    /**
-     * Returns the type of cache strategy (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the cache strategy type.
-     */
-    public CacheStrategyType getStrategyTypeOr(@Nullable final CacheStrategyType valueIfNotSet) {
-
-        final CacheStrategyType strategyType = mStrategyType;
-        return (strategyType != null) ? strategyType : valueIfNotSet;
     }
 
     /**
@@ -321,35 +322,6 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Tells the builder how to resolve clashes of invocations. A clash happens when an
-         * invocation of the same type and with the same ID is still running. A null value means
-         * that it is up to the framework to choose a default resolution type.
-         *
-         * @param resolutionType the type of resolution.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> onClash(@Nullable final ClashResolutionType resolutionType) {
-
-            mResolutionType = resolutionType;
-            return this;
-        }
-
-        /**
-         * Tells the builder how to cache the invocation result after its completion. A null value
-         * means that it is up to the framework to choose a default strategy.
-         *
-         * @param strategyType the cache strategy type.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> onComplete(@Nullable final CacheStrategyType strategyType) {
-
-            mStrategyType = strategyType;
-            return this;
-        }
-
-        /**
          * Applies the specified configuration to this builder. A null value means that all the
          * configuration options need to be set to their default value, otherwise only the set
          * options will be applied.
@@ -377,16 +349,46 @@ public final class InvocationConfiguration {
 
             if (resolutionType != null) {
 
-                onClash(resolutionType);
+                withClashResolution(resolutionType);
             }
 
             final CacheStrategyType strategyType = configuration.mStrategyType;
 
             if (strategyType != null) {
 
-                onComplete(strategyType);
+                withCacheStrategy(strategyType);
             }
 
+            return this;
+        }
+
+        /**
+         * Tells the builder how to cache the invocation result after its completion. A null value
+         * means that it is up to the framework to choose a default strategy.
+         *
+         * @param strategyType the cache strategy type.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withCacheStrategy(@Nullable final CacheStrategyType strategyType) {
+
+            mStrategyType = strategyType;
+            return this;
+        }
+
+        /**
+         * Tells the builder how to resolve clashes of invocations. A clash happens when an
+         * invocation of the same type and with the same ID is still running. A null value means
+         * that it is up to the framework to choose a default resolution type.
+         *
+         * @param resolutionType the type of resolution.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withClashResolution(
+                @Nullable final ClashResolutionType resolutionType) {
+
+            mResolutionType = resolutionType;
             return this;
         }
 

@@ -89,16 +89,6 @@ public interface ClassRoutineBuilder {
             @Nonnull Class<?>... parameterTypes);
 
     /**
-     * Gets the proxy configuration builder related to this builder instance.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the proxy configuration builder.
-     */
-    @Nonnull
-    ProxyConfiguration.Builder<? extends ClassRoutineBuilder> proxyConfiguration();
-
-    /**
      * Gets the routine configuration builder related to this builder instance.<br/>
      * All the options related to the output and input channels will be ignored.
      * <p/>
@@ -107,5 +97,15 @@ public interface ClassRoutineBuilder {
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ClassRoutineBuilder> routineConfiguration();
+    RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withConfiguration();
+
+    /**
+     * Gets the proxy configuration builder related to this builder instance.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the proxy configuration builder.
+     */
+    @Nonnull
+    ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy();
 }

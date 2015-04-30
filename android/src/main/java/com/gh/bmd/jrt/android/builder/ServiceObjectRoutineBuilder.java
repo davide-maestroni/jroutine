@@ -39,13 +39,13 @@ public interface ServiceObjectRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxyConfiguration();
+    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> routineConfiguration();
+    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy();
 
     /**
      * Gets the service configuration builder related to this builder instance.<br/>
@@ -56,5 +56,5 @@ public interface ServiceObjectRoutineBuilder extends ObjectRoutineBuilder {
      * @return the service configuration builder.
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> serviceConfiguration();
+    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withService();
 }

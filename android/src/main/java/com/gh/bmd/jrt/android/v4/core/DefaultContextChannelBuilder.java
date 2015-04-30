@@ -155,7 +155,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
         final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ClashResolutionType resolutionType =
-                invocationConfiguration.getResolutionTypeOr(null);
+                invocationConfiguration.getClashResolutionTypeOr(null);
 
         if (resolutionType != null) {
 
@@ -163,23 +163,15 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
             logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
         }
 
-        return builder.routineConfiguration()
+        return builder.withConfiguration()
                       .with(routineConfiguration)
                       .apply()
-                      .invocationConfiguration()
+                      .withInvocation()
                       .withId(mInvocationId)
                       .with(invocationConfiguration)
-                      .onClash(ClashResolutionType.KEEP_THAT)
+                      .withClashResolution(ClashResolutionType.KEEP_THAT)
                       .apply()
                       .callAsync();
-    }
-
-    @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextChannelBuilder>
-    invocationConfiguration() {
-
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, configuration);
     }
 
     public void purge(@Nullable final Object input) {
@@ -249,10 +241,17 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> routineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> withConfiguration() {
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
         return new RoutineConfiguration.Builder<ContextChannelBuilder>(this, configuration);
+    }
+
+    @Nonnull
+    public InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation() {
+
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, configuration);
     }
 
     /**

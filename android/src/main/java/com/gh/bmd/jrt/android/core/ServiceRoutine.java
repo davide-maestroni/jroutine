@@ -145,7 +145,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mContext = context.getApplicationContext();
         mInvocationClass = invocationClass;
         mRoutineConfiguration = routineConfiguration;
-        mLooper = serviceConfiguration.getLooperOr(Looper.getMainLooper());
+        mLooper = serviceConfiguration.getReceivingLooperOr(Looper.getMainLooper());
         mServiceClass = serviceConfiguration.getServiceClassOr(RoutineService.class);
         mRunnerClass = (runnerClass != null) ? runnerClass
                 : (asyncRunner != null) ? asyncRunner.getClass() : null;
@@ -154,12 +154,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                    routineConfiguration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);
         mRoutine = JRoutine.on(new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {})
-                           .routineConfiguration()
+                           .withConfiguration()
                            .with(routineConfiguration)
                            .withFactoryArgs(mContext, invocationClass, invocationArgs)
-                           .withInputSize(Integer.MAX_VALUE)
+                           .withInputMaxSize(Integer.MAX_VALUE)
                            .withInputTimeout(TimeDuration.ZERO)
-                           .withOutputSize(Integer.MAX_VALUE)
+                           .withOutputMaxSize(Integer.MAX_VALUE)
                            .withOutputTimeout(TimeDuration.ZERO)
                            .withLog(log)
                            .apply()
@@ -179,7 +179,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final RoutineConfiguration configuration) {
 
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 
@@ -193,7 +193,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
-        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
+        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (outputSize != RoutineConfiguration.DEFAULT) {
 
@@ -314,11 +314,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mLogger = logger;
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
-            final OrderType inputOrder = configuration.getInputOrderOr(null);
+            final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
             final StandaloneChannel<INPUT> paramChannel = JRoutine.standalone()
-                                                                  .routineConfiguration()
-                                                                  .withOutputOrder(inputOrder)
-                                                                  .withOutputSize(Integer.MAX_VALUE)
+                                                                  .withConfiguration()
+                                                                  .withOutputOrder(inputOrderType)
+                                                                  .withOutputMaxSize(
+                                                                          Integer.MAX_VALUE)
                                                                   .withOutputTimeout(
                                                                           TimeDuration.ZERO)
                                                                   .withLog(log)
@@ -327,18 +328,19 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                   .buildChannel();
             mStandaloneParamInput = paramChannel.input();
             mStandaloneParamOutput = paramChannel.output();
-            final OrderType outputOrder = configuration.getOutputOrderOr(null);
+            final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
             final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType = configuration.getReadTimeoutActionOr(null);
             final StandaloneChannel<OUTPUT> resultChannel = JRoutine.standalone()
-                                                                    .routineConfiguration()
-                                                                    .withOutputOrder(outputOrder)
-                                                                    .withOutputSize(
+                                                                    .withConfiguration()
+                                                                    .withOutputOrder(
+                                                                            outputOrderType)
+                                                                    .withOutputMaxSize(
                                                                             Integer.MAX_VALUE)
                                                                     .withOutputTimeout(
                                                                             TimeDuration.ZERO)
                                                                     .withReadTimeout(readTimeout)
-                                                                    .onReadTimeout(
+                                                                    .withReadTimeoutAction(
                                                                             timeoutActionType)
                                                                     .withLog(log)
                                                                     .withLogLevel(logLevel)

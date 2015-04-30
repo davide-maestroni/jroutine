@@ -188,7 +188,7 @@ public final class ServiceConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
      */
-    public Looper getLooperOr(@Nullable final Looper valueIfNotSet) {
+    public Looper getReceivingLooperOr(@Nullable final Looper valueIfNotSet) {
 
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
@@ -303,20 +303,6 @@ public final class ServiceConfiguration {
         }
 
         /**
-         * Sets the looper on which the results from the service are dispatched. A null value means
-         * that results will be dispatched on the main thread (as by default).
-         *
-         * @param looper the looper instance.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> dispatchingOn(@Nullable final Looper looper) {
-
-            mLooper = looper;
-            return this;
-        }
-
-        /**
          * Applies the specified configuration to this builder. A null value means that all the
          * configuration options need to be set to their default value, otherwise only the set
          * options will be applied.
@@ -337,7 +323,7 @@ public final class ServiceConfiguration {
 
             if (looper != null) {
 
-                dispatchingOn(looper);
+                withReceivingLooper(looper);
             }
 
             final Class<? extends RoutineService> serviceClass = configuration.mServiceClass;
@@ -375,6 +361,20 @@ public final class ServiceConfiguration {
         public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
 
             mLogClass = logClass;
+            return this;
+        }
+
+        /**
+         * Sets the looper on which the results from the service are dispatched. A null value means
+         * that results will be dispatched on the main thread (as by default).
+         *
+         * @param looper the looper instance.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withReceivingLooper(@Nullable final Looper looper) {
+
+            mLooper = looper;
             return this;
         }
 

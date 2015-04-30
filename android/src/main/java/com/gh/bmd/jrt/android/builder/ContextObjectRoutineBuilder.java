@@ -143,13 +143,13 @@ public interface ContextObjectRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> proxyConfiguration();
+    RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> withConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> routineConfiguration();
+    ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> withProxy();
 
     /**
      * Gets the invocation configuration builder related to this builder instance.
@@ -159,6 +159,5 @@ public interface ContextObjectRoutineBuilder extends ObjectRoutineBuilder {
      * @return the invocation configuration builder.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder>
-    invocationConfiguration();
+    InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder> withInvocation();
 }

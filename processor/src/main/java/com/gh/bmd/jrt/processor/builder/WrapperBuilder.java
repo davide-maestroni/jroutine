@@ -47,16 +47,6 @@ public interface WrapperBuilder<TYPE> {
     TYPE buildWrapper();
 
     /**
-     * Gets the proxy configuration builder related to this builder instance.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the proxy configuration builder.
-     */
-    @Nonnull
-    ProxyConfiguration.Builder<? extends WrapperBuilder<TYPE>> proxyConfiguration();
-
-    /**
      * Gets the routine configuration builder related to this builder instance.<br/>
      * All the options related to the output and input channels will be ignored.
      * <p/>
@@ -65,5 +55,15 @@ public interface WrapperBuilder<TYPE> {
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends WrapperBuilder<TYPE>> routineConfiguration();
+    RoutineConfiguration.Builder<? extends WrapperBuilder<TYPE>> withConfiguration();
+
+    /**
+     * Gets the proxy configuration builder related to this builder instance.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the proxy configuration builder.
+     */
+    @Nonnull
+    ProxyConfiguration.Builder<? extends WrapperBuilder<TYPE>> withProxy();
 }

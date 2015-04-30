@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.processor.annotation.Wrap;
+import com.gh.bmd.jrt.processor.builder.WrapperBuilder;
 import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
@@ -65,7 +66,7 @@ public class ProcessorTest {
 
         final TestList<String> testList = new TestList<String>();
         final WrapperRoutineBuilder builder = JRoutineProcessor.on(testList)
-                                                               .routineConfiguration()
+                                                               .withConfiguration()
                                                                .withAsyncRunner(
                                                                        Runners.queuedRunner())
                                                                .apply();
@@ -97,7 +98,7 @@ public class ProcessorTest {
         final ClassToken<TestInterfaceWrapper> token =
                 ClassToken.tokenOf(TestInterfaceWrapper.class);
         final TestInterfaceWrapper testWrapper = JRoutineProcessor.on(test)
-                                                                  .routineConfiguration()
+                                                                  .withConfiguration()
                                                                   .withSyncRunner(
                                                                           Runners.sequentialRunner())
                                                                   .apply()
@@ -137,19 +138,17 @@ public class ProcessorTest {
     public void testShareGroup() {
 
         final TestClass2 test = new TestClass2();
-        final WrapperRoutineBuilder builder = JRoutineProcessor.on(test)
-                                                               .routineConfiguration()
-                                                               .withReadTimeout(seconds(2))
-                                                               .apply();
+        final WrapperRoutineBuilder builder =
+                JRoutineProcessor.on(test).withConfiguration().withReadTimeout(seconds(2)).apply();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Integer> getOne = builder.proxyConfiguration()
+        OutputChannel<Integer> getOne = builder.withProxy()
                                                .withShareGroup("1")
                                                .apply()
                                                .buildWrapper(TestClassAsync.class)
                                                .getOne();
-        OutputChannel<Integer> getTwo = builder.proxyConfiguration()
+        OutputChannel<Integer> getTwo = builder.withProxy()
                                                .withShareGroup("2")
                                                .apply()
                                                .buildWrapper(TestClassAsync.class)
@@ -175,7 +174,7 @@ public class ProcessorTest {
 
         final Impl impl = new Impl();
         final Itf itf = JRoutineProcessor.on(impl)
-                                         .routineConfiguration()
+                                         .withConfiguration()
                                          .withReadTimeout(INFINITY)
                                          .apply()
                                          .buildWrapper(Itf.class);
@@ -394,7 +393,7 @@ public class ProcessorTest {
 
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutineProcessor.on(testTimeout)
-                                    .routineConfiguration()
+                                    .withConfiguration()
                                     .withReadTimeout(seconds(1))
                                     .apply()
                                     .buildWrapper(TestTimeoutItf.class)
@@ -403,8 +402,8 @@ public class ProcessorTest {
         try {
 
             JRoutineProcessor.on(testTimeout)
-                             .routineConfiguration()
-                             .onReadTimeout(TimeoutActionType.DEADLOCK)
+                             .withConfiguration()
+                             .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                              .apply()
                              .buildWrapper(TestTimeoutItf.class)
                              .getInt();
@@ -423,7 +422,7 @@ public class ProcessorTest {
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
         final TestWrapper testWrapper = JRoutineProcessor.on(test)
-                                                         .routineConfiguration()
+                                                         .withConfiguration()
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(runner)
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -463,11 +462,9 @@ public class ProcessorTest {
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .apply();
-        final TestWrapper testWrapper = JRoutine_TestWrapper.on(test)
-                                                            .routineConfiguration()
-                                                            .with(configuration)
-                                                            .apply()
-                                                            .buildWrapper();
+        final WrapperBuilder<TestWrapper> builder = JRoutine_TestWrapper.on(test);
+        final TestWrapper testWrapper =
+                builder.withConfiguration().with(configuration).apply().buildWrapper();
 
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
         assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
@@ -488,7 +485,7 @@ public class ProcessorTest {
         assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
 
         assertThat(JRoutineProcessor.on(test)
-                                    .routineConfiguration()
+                                    .withConfiguration()
                                     .with(configuration)
                                     .apply()
                                     .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
@@ -501,13 +498,13 @@ public class ProcessorTest {
         final CountLog countLog = new CountLog();
         final TestClass test = new TestClass();
         JRoutineProcessor.on(test)
-                         .routineConfiguration()
+                         .withConfiguration()
                          .withFactoryArgs()
                          .withInputOrder(OrderType.NONE)
-                         .withInputSize(3)
+                         .withInputMaxSize(3)
                          .withInputTimeout(seconds(1))
                          .withOutputOrder(OrderType.NONE)
-                         .withOutputSize(3)
+                         .withOutputMaxSize(3)
                          .withOutputTimeout(seconds(1))
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(countLog)
@@ -530,14 +527,14 @@ public class ProcessorTest {
                          .withLog(log)
                          .apply();
         final TestWrapper testWrapper = JRoutineProcessor.on(test)
-                                                         .routineConfiguration()
+                                                         .withConfiguration()
                                                          .with(configuration)
                                                          .apply()
                                                          .buildWrapper(ClassToken.tokenOf(
                                                                  TestWrapper.class));
 
         assertThat(JRoutineProcessor.on(test)
-                                    .routineConfiguration()
+                                    .withConfiguration()
                                     .with(configuration)
                                     .apply()
                                     .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(

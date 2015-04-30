@@ -114,14 +114,14 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
                        availableTimeout);
         }
 
-        final OrderType inputOrder = configuration.getInputOrderOr(null);
+        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
 
-        if (inputOrder != null) {
+        if (inputOrderType != null) {
 
-            logger.wrn("the specified input order will be ignored: %s", inputOrder);
+            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 

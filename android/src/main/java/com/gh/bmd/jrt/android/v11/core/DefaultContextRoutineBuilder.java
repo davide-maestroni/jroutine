@@ -124,7 +124,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     @Nonnull
     @Override
     public RoutineConfiguration.Builder<? extends
-            ContextRoutineBuilder<INPUT, OUTPUT>> routineConfiguration() {
+            ContextRoutineBuilder<INPUT, OUTPUT>> withConfiguration() {
 
         return new RoutineConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
                 mRoutineConfigurable, getConfiguration());
@@ -152,20 +152,12 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         final RoutineConfiguration.Builder<RoutineConfiguration> builder =
                 configuration.builderFrom()
                              .withAsyncRunner(Runners.mainRunner())
-                             .withInputSize(Integer.MAX_VALUE)
+                             .withInputMaxSize(Integer.MAX_VALUE)
                              .withInputTimeout(TimeDuration.INFINITY)
-                             .withOutputSize(Integer.MAX_VALUE)
+                             .withOutputMaxSize(Integer.MAX_VALUE)
                              .withOutputTimeout(TimeDuration.INFINITY);
         return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, builder.apply(),
                                                         mInvocationConfiguration);
-    }
-
-    @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    invocationConfiguration() {
-
-        return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,
-                                                                                         mInvocationConfiguration);
     }
 
     @Override
@@ -189,6 +181,15 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         buildRoutine().purge(inputs);
     }
 
+    @Nonnull
+    public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
+    withInvocation() {
+
+
+        return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,
+                                                                                         mInvocationConfiguration);
+    }
+
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *
@@ -206,7 +207,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
             logger.wrn("the specified runner will be ignored: %s", asyncRunner);
         }
 
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 
@@ -230,7 +231,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
-        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
+        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (outputSize != RoutineConfiguration.DEFAULT) {
 

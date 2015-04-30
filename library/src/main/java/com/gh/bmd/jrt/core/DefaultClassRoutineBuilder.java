@@ -186,15 +186,15 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> proxyConfiguration() {
+    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withConfiguration() {
 
-        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
+        return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> routineConfiguration() {
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy() {
 
-        return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
+        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
     }
 
     /**
@@ -355,9 +355,9 @@ class DefaultClassRoutineBuilder
 
         warn(routineConfiguration);
         builder.withInputOrder(OrderType.PASSING_ORDER)
-               .withInputSize(Integer.MAX_VALUE)
+               .withInputMaxSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
-               .withOutputSize(Integer.MAX_VALUE)
+               .withOutputMaxSize(Integer.MAX_VALUE)
                .withOutputTimeout(TimeDuration.ZERO);
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
@@ -370,7 +370,7 @@ class DefaultClassRoutineBuilder
 
         if (actionAnnotation != null) {
 
-            builder.onReadTimeout(actionAnnotation.value());
+            builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
         return getRoutine(builder.apply(), methodShareGroup, targetMethod, false, false);
@@ -393,19 +393,19 @@ class DefaultClassRoutineBuilder
                        Arrays.toString(args));
         }
 
-        final OrderType inputOrder = configuration.getInputOrderOr(null);
+        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
 
-        if (inputOrder != null) {
+        if (inputOrderType != null) {
 
             if (logger == null) {
 
                 logger = configuration.newLogger(this);
             }
 
-            logger.wrn("the specified input order will be ignored: %s", inputOrder);
+            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 
@@ -429,19 +429,19 @@ class DefaultClassRoutineBuilder
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
-        final OrderType outputOrder = configuration.getOutputOrderOr(null);
+        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
 
-        if (outputOrder != null) {
+        if (outputOrderType != null) {
 
             if (logger == null) {
 
                 logger = configuration.newLogger(this);
             }
 
-            logger.wrn("the specified output order will be ignored: %s", outputOrder);
+            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
 
-        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
+        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (outputSize != RoutineConfiguration.DEFAULT) {
 

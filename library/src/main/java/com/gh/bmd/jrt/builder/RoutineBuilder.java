@@ -48,5 +48,5 @@ public interface RoutineBuilder<INPUT, OUTPUT> extends Routine<INPUT, OUTPUT> {
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends RoutineBuilder<INPUT, OUTPUT>> routineConfiguration();
+    Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withConfiguration();
 }

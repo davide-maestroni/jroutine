@@ -235,7 +235,7 @@ public class StandaloneChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final StandaloneChannel<String> standaloneChannel1 = JRoutine.standalone()
-                                                                     .routineConfiguration()
+                                                                     .withConfiguration()
                                                                      .withOutputOrder(
                                                                              OrderType
                                                                                      .PASSING_ORDER)
@@ -283,14 +283,14 @@ public class StandaloneChannelTest {
 
         final CountLog countLog = new CountLog();
         JRoutine.standalone()
-                .routineConfiguration()
+                .withConfiguration()
                 .withFactoryArgs()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withMaxInvocations(3)
                 .withCoreInvocations(3)
                 .withAvailableTimeout(seconds(1))
                 .withInputOrder(OrderType.NONE)
-                .withInputSize(3)
+                .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))
                 .withLogLevel(LogLevel.DEBUG)
                 .withLog(countLog)
@@ -448,10 +448,10 @@ public class StandaloneChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final StandaloneChannel<Object> channel = JRoutine.standalone()
-                                                          .routineConfiguration()
+                                                          .withConfiguration()
                                                           .withOutputOrder(OrderType.PASSING_ORDER)
                                                           .withAsyncRunner(Runners.sharedRunner())
-                                                          .withOutputSize(1)
+                                                          .withOutputMaxSize(1)
                                                           .withOutputTimeout(1,
                                                                              TimeUnit.MILLISECONDS)
                                                           .withOutputTimeout(seconds(1))
@@ -469,7 +469,7 @@ public class StandaloneChannelTest {
         assertThat(standaloneChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
         final StandaloneChannel<Object> standaloneChannel2 = JRoutine.standalone()
-                                                                     .routineConfiguration()
+                                                                     .withConfiguration()
                                                                      .withOutputOrder(
                                                                              OrderType
                                                                                      .PASSING_ORDER)
@@ -530,9 +530,10 @@ public class StandaloneChannelTest {
     public void testReadTimeout() {
 
         final StandaloneChannel<Object> channel1 = JRoutine.standalone()
-                                                           .routineConfiguration()
+                                                           .withConfiguration()
                                                            .withReadTimeout(millis(10))
-                                                           .onReadTimeout(TimeoutActionType.EXIT)
+                                                           .withReadTimeoutAction(
+                                                                   TimeoutActionType.EXIT)
                                                            .apply()
                                                            .buildChannel();
 
@@ -543,9 +544,10 @@ public class StandaloneChannelTest {
     public void testReadTimeout2() {
 
         final StandaloneChannel<Object> channel2 = JRoutine.standalone()
-                                                           .routineConfiguration()
+                                                           .withConfiguration()
                                                            .withReadTimeout(millis(10))
-                                                           .onReadTimeout(TimeoutActionType.ABORT)
+                                                           .withReadTimeoutAction(
+                                                                   TimeoutActionType.ABORT)
                                                            .apply()
                                                            .buildChannel();
 
@@ -564,9 +566,9 @@ public class StandaloneChannelTest {
     public void testReadTimeout3() {
 
         final StandaloneChannel<Object> channel3 = JRoutine.standalone()
-                                                           .routineConfiguration()
+                                                           .withConfiguration()
                                                            .withReadTimeout(millis(10))
-                                                           .onReadTimeout(
+                                                           .withReadTimeoutAction(
                                                                    TimeoutActionType.DEADLOCK)
                                                            .apply()
                                                            .buildChannel();

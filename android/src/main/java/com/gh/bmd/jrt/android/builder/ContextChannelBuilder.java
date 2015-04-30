@@ -39,17 +39,6 @@ public interface ContextChannelBuilder {
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
-     * Gets the invocation configuration builder related to this builder instance.<br/>
-     * The clash resolution type will be ignored.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the invocation configuration builder.
-     */
-    @Nonnull
-    InvocationConfiguration.Builder<? extends ContextChannelBuilder> invocationConfiguration();
-
-    /**
      * Makes the builder destroy the cached invocation instances with the specified input.
      *
      * @param input the input.
@@ -84,5 +73,16 @@ public interface ContextChannelBuilder {
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextChannelBuilder> routineConfiguration();
+    RoutineConfiguration.Builder<? extends ContextChannelBuilder> withConfiguration();
+
+    /**
+     * Gets the invocation configuration builder related to this builder instance.<br/>
+     * The clash resolution type will be ignored.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the invocation configuration builder.
+     */
+    @Nonnull
+    InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation();
 }

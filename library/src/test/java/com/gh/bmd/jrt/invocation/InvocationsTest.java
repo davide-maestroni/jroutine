@@ -53,7 +53,7 @@ public class InvocationsTest {
                         return builder.toString();
                     }
                 }))
-                        .routineConfiguration()
+                        .withConfiguration()
                         .withInputOrder(OrderType.PASSING_ORDER)
                         .withReadTimeout(TimeDuration.seconds(1))
                         .apply()

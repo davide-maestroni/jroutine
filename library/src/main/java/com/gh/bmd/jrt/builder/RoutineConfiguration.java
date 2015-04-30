@@ -98,7 +98,7 @@ public final class RoutineConfiguration {
 
     private final int mInputMaxSize;
 
-    private final OrderType mInputOrder;
+    private final OrderType mInputOrderType;
 
     private final TimeDuration mInputTimeout;
 
@@ -110,7 +110,7 @@ public final class RoutineConfiguration {
 
     private final int mOutputMaxSize;
 
-    private final OrderType mOutputOrder;
+    private final OrderType mOutputOrderType;
 
     private final TimeDuration mOutputTimeout;
 
@@ -136,11 +136,11 @@ public final class RoutineConfiguration {
      * @param readTimeout     the action to be taken if the timeout elapses before a readable result
      *                        is available.
      * @param actionType      the timeout for an invocation instance to produce a result.
-     * @param inputOrder      the order in which input data are collected from the input channel.
+     * @param inputOrderType  the order in which input data are collected from the input channel.
      * @param inputMaxSize    the maximum number of buffered input data. Must be positive.
      * @param inputTimeout    the maximum timeout while waiting for an input to be passed to the
      *                        input channel.
-     * @param outputOrder     the order in which output data are collected from the result channel.
+     * @param outputOrderType the order in which output data are collected from the result channel.
      * @param outputMaxSize   the maximum number of buffered output data. Must be positive.
      * @param outputTimeout   the maximum timeout while waiting for an output to be passed to the
      *                        result channel.
@@ -151,9 +151,9 @@ public final class RoutineConfiguration {
             @Nullable final Runner syncRunner, @Nullable final Runner asyncRunner,
             final int maxInvocations, final int coreInvocations,
             @Nullable final TimeDuration availTimeout, @Nullable final TimeDuration readTimeout,
-            @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrder,
+            @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
-            @Nullable final OrderType outputOrder, final int outputMaxSize,
+            @Nullable final OrderType outputOrderType, final int outputMaxSize,
             @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
             @Nullable final LogLevel logLevel) {
 
@@ -165,10 +165,10 @@ public final class RoutineConfiguration {
         mAvailTimeout = availTimeout;
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
-        mInputOrder = inputOrder;
+        mInputOrderType = inputOrderType;
         mInputMaxSize = inputMaxSize;
         mInputTimeout = inputTimeout;
-        mOutputOrder = outputOrder;
+        mOutputOrderType = outputOrderType;
         mOutputMaxSize = outputMaxSize;
         mOutputTimeout = outputTimeout;
         mLog = log;
@@ -261,27 +261,27 @@ public final class RoutineConfiguration {
     }
 
     /**
-     * Returns the input data order (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the order type.
-     */
-    public OrderType getInputOrderOr(@Nullable final OrderType valueIfNotSet) {
-
-        final OrderType orderedInput = mInputOrder;
-        return (orderedInput != null) ? orderedInput : valueIfNotSet;
-    }
-
-    /**
      * Returns the maximum number of buffered input data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
      */
-    public int getInputSizeOr(final int valueIfNotSet) {
+    public int getInputMaxSizeOr(final int valueIfNotSet) {
 
         final int inputMaxSize = mInputMaxSize;
         return (inputMaxSize != DEFAULT) ? inputMaxSize : valueIfNotSet;
+    }
+
+    /**
+     * Returns the input data order (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the order type.
+     */
+    public OrderType getInputOrderTypeOr(@Nullable final OrderType valueIfNotSet) {
+
+        final OrderType inputOrderType = mInputOrderType;
+        return (inputOrderType != null) ? inputOrderType : valueIfNotSet;
     }
 
     /**
@@ -334,27 +334,27 @@ public final class RoutineConfiguration {
     }
 
     /**
-     * Returns the output data order (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the order type.
-     */
-    public OrderType getOutputOrderOr(@Nullable final OrderType valueIfNotSet) {
-
-        final OrderType orderedOutput = mOutputOrder;
-        return (orderedOutput != null) ? orderedOutput : valueIfNotSet;
-    }
-
-    /**
      * Returns the maximum number of buffered output data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
      */
-    public int getOutputSizeOr(final int valueIfNotSet) {
+    public int getOutputMaxSizeOr(final int valueIfNotSet) {
 
         final int outputMaxSize = mOutputMaxSize;
         return (outputMaxSize != DEFAULT) ? outputMaxSize : valueIfNotSet;
+    }
+
+    /**
+     * Returns the output data order (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the order type.
+     */
+    public OrderType getOutputOrderTypeOr(@Nullable final OrderType valueIfNotSet) {
+
+        final OrderType outputOrderType = mOutputOrderType;
+        return (outputOrderType != null) ? outputOrderType : valueIfNotSet;
     }
 
     /**
@@ -417,13 +417,13 @@ public final class RoutineConfiguration {
         result = 31 * result + (mAvailTimeout != null ? mAvailTimeout.hashCode() : 0);
         result = 31 * result + mCoreInvocations;
         result = 31 * result + mInputMaxSize;
-        result = 31 * result + (mInputOrder != null ? mInputOrder.hashCode() : 0);
+        result = 31 * result + (mInputOrderType != null ? mInputOrderType.hashCode() : 0);
         result = 31 * result + (mInputTimeout != null ? mInputTimeout.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
         result = 31 * result + mMaxInvocations;
         result = 31 * result + mOutputMaxSize;
-        result = 31 * result + (mOutputOrder != null ? mOutputOrder.hashCode() : 0);
+        result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
@@ -481,7 +481,7 @@ public final class RoutineConfiguration {
             return false;
         }
 
-        if (mInputOrder != that.mInputOrder) {
+        if (mInputOrderType != that.mInputOrderType) {
 
             return false;
         }
@@ -502,7 +502,7 @@ public final class RoutineConfiguration {
             return false;
         }
 
-        if (mOutputOrder != that.mOutputOrder) {
+        if (mOutputOrderType != that.mOutputOrderType) {
 
             return false;
         }
@@ -541,13 +541,13 @@ public final class RoutineConfiguration {
                 ", mAvailTimeout=" + mAvailTimeout +
                 ", mCoreInvocations=" + mCoreInvocations +
                 ", mInputMaxSize=" + mInputMaxSize +
-                ", mInputOrder=" + mInputOrder +
+                ", mInputOrderType=" + mInputOrderType +
                 ", mInputTimeout=" + mInputTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
                 ", mMaxInvocations=" + mMaxInvocations +
                 ", mOutputMaxSize=" + mOutputMaxSize +
-                ", mOutputOrder=" + mOutputOrder +
+                ", mOutputOrderType=" + mOutputOrderType +
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mReadTimeout=" + mReadTimeout +
                 ", mSyncRunner=" + mSyncRunner +
@@ -723,20 +723,6 @@ public final class RoutineConfiguration {
         }
 
         /**
-         * Sets the action to be taken if the timeout elapses before a result can be read from the
-         * output channel.
-         *
-         * @param action the action type.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> onReadTimeout(@Nullable final TimeoutActionType action) {
-
-            mTimeoutActionType = action;
-            return this;
-        }
-
-        /**
          * Applies the specified configuration to this builder. A null value means that all the
          * configuration options need to be set to their default value, otherwise only the set
          * options will be applied.
@@ -845,6 +831,28 @@ public final class RoutineConfiguration {
         }
 
         /**
+         * Sets the maximum number of data that the input channel can retain before they are
+         * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
+         * framework to choose a default size.
+         *
+         * @param inputMaxSize the maximum size.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the number is less than 1.
+         */
+        @Nonnull
+        public Builder<TYPE> withInputMaxSize(final int inputMaxSize) {
+
+            if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
+
+                throw new IllegalArgumentException(
+                        "the input buffer size cannot be 0 or negative: " + inputMaxSize);
+            }
+
+            mInputMaxSize = inputMaxSize;
+            return this;
+        }
+
+        /**
          * Sets the order in which input data are collected from the input channel. A null value
          * means that it is up to the framework to choose a default order type.
          *
@@ -855,28 +863,6 @@ public final class RoutineConfiguration {
         public Builder<TYPE> withInputOrder(@Nullable final OrderType orderType) {
 
             mInputOrderType = orderType;
-            return this;
-        }
-
-        /**
-         * Sets the maximum number of data that the input channel can retain before they are
-         * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default size.
-         *
-         * @param inputMaxSize the maximum size.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the number is less than 1.
-         */
-        @Nonnull
-        public Builder<TYPE> withInputSize(final int inputMaxSize) {
-
-            if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
-
-                throw new IllegalArgumentException(
-                        "the input buffer size cannot be 0 or negative: " + inputMaxSize);
-            }
-
-            mInputMaxSize = inputMaxSize;
             return this;
         }
 
@@ -962,6 +948,28 @@ public final class RoutineConfiguration {
         }
 
         /**
+         * Sets the maximum number of data that the result channel can retain before they are
+         * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
+         * framework to choose a default size.
+         *
+         * @param outputMaxSize the maximum size.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the number is less than 1.
+         */
+        @Nonnull
+        public Builder<TYPE> withOutputMaxSize(final int outputMaxSize) {
+
+            if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
+
+                throw new IllegalArgumentException(
+                        "the output buffer size cannot be 0 or negative: " + outputMaxSize);
+            }
+
+            mOutputMaxSize = outputMaxSize;
+            return this;
+        }
+
+        /**
          * Sets the order in which output data are collected from the result channel. A null value
          * means that it is up to the framework to choose a default order type.
          *
@@ -972,28 +980,6 @@ public final class RoutineConfiguration {
         public Builder<TYPE> withOutputOrder(@Nullable final OrderType orderType) {
 
             mOutputOrderType = orderType;
-            return this;
-        }
-
-        /**
-         * Sets the maximum number of data that the result channel can retain before they are
-         * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default size.
-         *
-         * @param outputMaxSize the maximum size.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the number is less than 1.
-         */
-        @Nonnull
-        public Builder<TYPE> withOutputSize(final int outputMaxSize) {
-
-            if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
-
-                throw new IllegalArgumentException(
-                        "the output buffer size cannot be 0 or negative: " + outputMaxSize);
-            }
-
-            mOutputMaxSize = outputMaxSize;
             return this;
         }
 
@@ -1057,6 +1043,20 @@ public final class RoutineConfiguration {
         }
 
         /**
+         * Sets the action to be taken if the timeout elapses before a result can be read from the
+         * output channel.
+         *
+         * @param actionType the action type.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withReadTimeoutAction(@Nullable final TimeoutActionType actionType) {
+
+            mTimeoutActionType = actionType;
+            return this;
+        }
+
+        /**
          * Sets the synchronous runner instance. A null value means that it is up to the framework
          * to choose a default instance.
          *
@@ -1080,10 +1080,10 @@ public final class RoutineConfiguration {
             mAvailTimeout = configuration.mAvailTimeout;
             mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
-            mInputOrderType = configuration.mInputOrder;
+            mInputOrderType = configuration.mInputOrderType;
             mInputMaxSize = configuration.mInputMaxSize;
             mInputTimeout = configuration.mInputTimeout;
-            mOutputOrderType = configuration.mOutputOrder;
+            mOutputOrderType = configuration.mOutputOrderType;
             mOutputMaxSize = configuration.mOutputMaxSize;
             mOutputTimeout = configuration.mOutputTimeout;
             mLog = configuration.mLog;
@@ -1092,18 +1092,18 @@ public final class RoutineConfiguration {
 
         private void applyChannelConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
-            final OrderType inputOrder = configuration.mInputOrder;
+            final OrderType inputOrderType = configuration.mInputOrderType;
 
-            if (inputOrder != null) {
+            if (inputOrderType != null) {
 
-                withInputOrder(inputOrder);
+                withInputOrder(inputOrderType);
             }
 
             final int inputSize = configuration.mInputMaxSize;
 
             if (inputSize != DEFAULT) {
 
-                withInputSize(inputSize);
+                withInputMaxSize(inputSize);
             }
 
             final TimeDuration inputTimeout = configuration.mInputTimeout;
@@ -1113,18 +1113,18 @@ public final class RoutineConfiguration {
                 withInputTimeout(inputTimeout);
             }
 
-            final OrderType outputOrder = configuration.mOutputOrder;
+            final OrderType outputOrderType = configuration.mOutputOrderType;
 
-            if (outputOrder != null) {
+            if (outputOrderType != null) {
 
-                withOutputOrder(outputOrder);
+                withOutputOrder(outputOrderType);
             }
 
             final int outputSize = configuration.mOutputMaxSize;
 
             if (outputSize != DEFAULT) {
 
-                withOutputSize(outputSize);
+                withOutputMaxSize(outputSize);
             }
 
             final TimeDuration outputTimeout = configuration.mOutputTimeout;
@@ -1191,7 +1191,7 @@ public final class RoutineConfiguration {
 
             if (timeoutActionType != null) {
 
-                onReadTimeout(timeoutActionType);
+                withReadTimeoutAction(timeoutActionType);
             }
         }
 

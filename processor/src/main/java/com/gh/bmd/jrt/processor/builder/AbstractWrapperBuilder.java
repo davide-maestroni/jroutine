@@ -115,15 +115,15 @@ public abstract class AbstractWrapperBuilder<TYPE>
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends WrapperBuilder<TYPE>> proxyConfiguration() {
+    public RoutineConfiguration.Builder<? extends WrapperBuilder<TYPE>> withConfiguration() {
 
-        return new ProxyConfiguration.Builder<WrapperBuilder<TYPE>>(this, mProxyConfiguration);
+        return new RoutineConfiguration.Builder<WrapperBuilder<TYPE>>(this, mRoutineConfiguration);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends WrapperBuilder<TYPE>> routineConfiguration() {
+    public ProxyConfiguration.Builder<? extends WrapperBuilder<TYPE>> withProxy() {
 
-        return new RoutineConfiguration.Builder<WrapperBuilder<TYPE>>(this, mRoutineConfiguration);
+        return new ProxyConfiguration.Builder<WrapperBuilder<TYPE>>(this, mProxyConfiguration);
     }
 
     /**
@@ -170,19 +170,19 @@ public abstract class AbstractWrapperBuilder<TYPE>
                        Arrays.toString(args));
         }
 
-        final OrderType inputOrder = configuration.getInputOrderOr(null);
+        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
 
-        if (inputOrder != null) {
+        if (inputOrderType != null) {
 
             if (logger == null) {
 
                 logger = configuration.newLogger(this);
             }
 
-            logger.wrn("the specified input order will be ignored: %s", inputOrder);
+            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 
@@ -206,19 +206,19 @@ public abstract class AbstractWrapperBuilder<TYPE>
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
-        final OrderType outputOrder = configuration.getOutputOrderOr(null);
+        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
 
-        if (outputOrder != null) {
+        if (outputOrderType != null) {
 
             if (logger == null) {
 
                 logger = configuration.newLogger(this);
             }
 
-            logger.wrn("the specified output order will be ignored: %s", outputOrder);
+            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
 
-        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
+        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (outputSize != RoutineConfiguration.DEFAULT) {
 

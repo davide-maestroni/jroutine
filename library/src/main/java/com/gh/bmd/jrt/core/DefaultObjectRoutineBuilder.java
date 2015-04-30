@@ -224,19 +224,19 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @Nonnull
     @Override
     @SuppressWarnings("unchecked")
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxyConfiguration() {
+    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withConfiguration() {
 
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
-                                                                    getProxyConfiguration());
+        return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
+                                                                      getRoutineConfiguration());
     }
 
     @Nonnull
     @Override
     @SuppressWarnings("unchecked")
-    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> routineConfiguration() {
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy() {
 
-        return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
-                                                                      getRoutineConfiguration());
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
+                                                                    getProxyConfiguration());
     }
 
     @Nonnull
@@ -414,11 +414,11 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             warn(configuration);
             builder.withInputOrder(
                     (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
-                   .withInputSize(Integer.MAX_VALUE)
+                   .withInputMaxSize(Integer.MAX_VALUE)
                    .withInputTimeout(TimeDuration.ZERO)
                    .withOutputOrder((returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
                                             : OrderType.NONE)
-                   .withOutputSize(Integer.MAX_VALUE)
+                   .withOutputMaxSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
             final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
@@ -431,7 +431,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             if (actionAnnotation != null) {
 
-                builder.onReadTimeout(actionAnnotation.value());
+                builder.withReadTimeoutAction(actionAnnotation.value());
             }
 
             return getRoutine(builder.apply(), shareGroup, targetMethod,

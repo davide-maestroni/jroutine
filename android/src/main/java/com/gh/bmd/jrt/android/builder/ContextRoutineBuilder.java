@@ -52,7 +52,7 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT>
      */
     @Nonnull
     RoutineConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    routineConfiguration();
+    withConfiguration();
 
     /**
      * Gets the invocation configuration builder related to this builder instance.
@@ -63,5 +63,5 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT>
      */
     @Nonnull
     InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    invocationConfiguration();
+    withInvocation();
 }

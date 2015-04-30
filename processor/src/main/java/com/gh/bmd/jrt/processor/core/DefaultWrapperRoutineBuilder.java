@@ -110,25 +110,25 @@ class DefaultWrapperRoutineBuilder
         }
 
         final ObjectWrapperBuilder<TYPE> builder = new ObjectWrapperBuilder<TYPE>(target, itf);
-        return builder.routineConfiguration()
+        return builder.withConfiguration()
                       .with(mRoutineConfiguration)
                       .apply()
-                      .proxyConfiguration()
+                      .withProxy()
                       .with(mProxyConfiguration)
                       .apply()
                       .buildWrapper();
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> proxyConfiguration() {
+    public RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> withConfiguration() {
 
-        return new ProxyConfiguration.Builder<WrapperRoutineBuilder>(this, mProxyConfiguration);
+        return new RoutineConfiguration.Builder<WrapperRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> routineConfiguration() {
+    public ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> withProxy() {
 
-        return new RoutineConfiguration.Builder<WrapperRoutineBuilder>(this, mRoutineConfiguration);
+        return new ProxyConfiguration.Builder<WrapperRoutineBuilder>(this, mProxyConfiguration);
     }
 
     /**

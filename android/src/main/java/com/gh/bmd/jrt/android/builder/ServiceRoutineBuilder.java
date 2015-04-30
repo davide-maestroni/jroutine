@@ -42,7 +42,7 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      */
     @Nonnull
     RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    routineConfiguration();
+    withConfiguration();
 
     /**
      * Gets the service configuration builder related to this builder instance.<br/>
@@ -53,6 +53,5 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return the service configuration builder.
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    serviceConfiguration();
+    ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withService();
 }

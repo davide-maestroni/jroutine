@@ -43,5 +43,5 @@ public interface StandaloneChannelBuilder {
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends StandaloneChannelBuilder> routineConfiguration();
+    Builder<? extends StandaloneChannelBuilder> withConfiguration();
 }

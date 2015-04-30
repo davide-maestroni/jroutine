@@ -101,16 +101,6 @@ public interface WrapperRoutineBuilder {
     <TYPE> TYPE buildWrapper(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * Gets the proxy configuration builder related to this builder instance.
-     * <p/>
-     * Note that the builder will be initialized with the current configuration.
-     *
-     * @return the proxy configuration builder.
-     */
-    @Nonnull
-    ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> proxyConfiguration();
-
-    /**
      * Gets the routine configuration builder related to this builder instance.<br/>
      * All the options related to the output and input channels will be ignored.
      * <p/>
@@ -119,5 +109,15 @@ public interface WrapperRoutineBuilder {
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> routineConfiguration();
+    RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> withConfiguration();
+
+    /**
+     * Gets the proxy configuration builder related to this builder instance.
+     * <p/>
+     * Note that the builder will be initialized with the current configuration.
+     *
+     * @return the proxy configuration builder.
+     */
+    @Nonnull
+    ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> withProxy();
 }

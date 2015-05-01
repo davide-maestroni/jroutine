@@ -64,22 +64,22 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
             mTarget = target;
         }
 
-        @javax.annotation.Nonnull
         @Override
+        @javax.annotation.Nonnull
         protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }
 
-        @javax.annotation.Nonnull
         @Override
+        @javax.annotation.Nonnull
         protected Object getTarget() {
 
             return mTarget;
         }
 
-        @javax.annotation.Nonnull
         @Override
+        @javax.annotation.Nonnull
         protected ${interfaceFullName} newWrapper(
                 @javax.annotation.Nonnull final String shareGroup,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {

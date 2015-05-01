@@ -52,12 +52,11 @@ public class Downloader {
 
         // the read connection invocation is stateless so we can just use a single instance of it
         mReadConnection = JRoutine.on(new ReadConnection()).withRoutineConfiguration()
-                // by setting the maximum number of parallel invocations
-                // we effectively limit the number of parallel downloads
+                // by setting the maximum number of parallel invocations we effectively limit the
+                // number of parallel downloads...
                 .withMaxInvocations(maxParallelDownloads)
-                        // though we need to set a timeout in case the
-                        // downloads outnumber it
-                .withAvailableTimeout(seconds(30)).set().buildRoutine();
+                        // ...though we need to set a timeout in case the downloads outnumber it
+                .withAvailableInvocationTimeout(seconds(30)).set().buildRoutine();
     }
 
     /**

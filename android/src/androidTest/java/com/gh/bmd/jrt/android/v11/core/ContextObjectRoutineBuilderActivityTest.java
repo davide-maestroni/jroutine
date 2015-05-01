@@ -156,7 +156,8 @@ public class ContextObjectRoutineBuilderActivityTest
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withMaxInvocations(1)
                                                         .withCoreInvocations(1)
-                                                        .withAvailableTimeout(1, TimeUnit.SECONDS)
+                                                        .withAvailableInvocationTimeout(1,
+                                                                                        TimeUnit.SECONDS)
                                                         .withReadTimeoutAction(
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -579,7 +580,8 @@ public class ContextObjectRoutineBuilderActivityTest
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
-                                                         .withAvailableTimeout(TimeDuration.ZERO)
+                                                         .withAvailableInvocationTimeout(
+                                                                 TimeDuration.ZERO)
                                                          .set()
                                                          .withProxyConfiguration()
                                                          .withShareGroup("test")

@@ -92,7 +92,7 @@ public final class RoutineConfiguration {
 
     private final Runner mAsyncRunner;
 
-    private final TimeDuration mAvailTimeout;
+    private final TimeDuration mAvailableTimeout;
 
     private final int mCoreInvocations;
 
@@ -125,32 +125,32 @@ public final class RoutineConfiguration {
     /**
      * Constructor.
      *
-     * @param factoryArgs     the invocation factory arguments.
-     * @param syncRunner      the runner used for synchronous invocations.
-     * @param asyncRunner     the runner used for asynchronous invocations.
-     * @param maxInvocations  the maximum number of parallel running invocations. Must be positive.
-     * @param coreInvocations the maximum number of retained invocation instances. Must be 0 or a
-     *                        positive number.
-     * @param availTimeout    the maximum timeout while waiting for an invocation instance to be
-     *                        available.
-     * @param readTimeout     the action to be taken if the timeout elapses before a readable result
-     *                        is available.
-     * @param actionType      the timeout for an invocation instance to produce a result.
-     * @param inputOrderType  the order in which input data are collected from the input channel.
-     * @param inputMaxSize    the maximum number of buffered input data. Must be positive.
-     * @param inputTimeout    the maximum timeout while waiting for an input to be passed to the
-     *                        input channel.
-     * @param outputOrderType the order in which output data are collected from the result channel.
-     * @param outputMaxSize   the maximum number of buffered output data. Must be positive.
-     * @param outputTimeout   the maximum timeout while waiting for an output to be passed to the
-     *                        result channel.
-     * @param log             the log instance.
-     * @param logLevel        the log level.
+     * @param factoryArgs      the invocation factory arguments.
+     * @param syncRunner       the runner used for synchronous invocations.
+     * @param asyncRunner      the runner used for asynchronous invocations.
+     * @param maxInvocations   the maximum number of parallel running invocations. Must be positive.
+     * @param coreInvocations  the maximum number of retained invocation instances. Must be 0 or a
+     *                         positive number.
+     * @param availableTimeout the maximum timeout while waiting for an invocation instance to be
+     *                         available.
+     * @param readTimeout      the action to be taken if the timeout elapses before a readable
+     *                         result is available.
+     * @param actionType       the timeout for an invocation instance to produce a result.
+     * @param inputOrderType   the order in which input data are collected from the input channel.
+     * @param inputMaxSize     the maximum number of buffered input data. Must be positive.
+     * @param inputTimeout     the maximum timeout while waiting for an input to be passed to the
+     *                         input channel.
+     * @param outputOrderType  the order in which output data are collected from the result channel.
+     * @param outputMaxSize    the maximum number of buffered output data. Must be positive.
+     * @param outputTimeout    the maximum timeout while waiting for an output to be passed to the
+     *                         result channel.
+     * @param log              the log instance.
+     * @param logLevel         the log level.
      */
     private RoutineConfiguration(@Nullable final Object[] factoryArgs,
             @Nullable final Runner syncRunner, @Nullable final Runner asyncRunner,
             final int maxInvocations, final int coreInvocations,
-            @Nullable final TimeDuration availTimeout, @Nullable final TimeDuration readTimeout,
+            @Nullable final TimeDuration availableTimeout, @Nullable final TimeDuration readTimeout,
             @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
             @Nullable final OrderType outputOrderType, final int outputMaxSize,
@@ -162,7 +162,7 @@ public final class RoutineConfiguration {
         mAsyncRunner = asyncRunner;
         mMaxInvocations = maxInvocations;
         mCoreInvocations = coreInvocations;
-        mAvailTimeout = availTimeout;
+        mAvailableTimeout = availableTimeout;
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
         mInputOrderType = inputOrderType;
@@ -230,10 +230,11 @@ public final class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getAvailTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getAvailableInvocationTimeoutOr(
+            @Nullable final TimeDuration valueIfNotSet) {
 
-        final TimeDuration availTimeout = mAvailTimeout;
-        return (availTimeout != null) ? availTimeout : valueIfNotSet;
+        final TimeDuration availableTimeout = mAvailableTimeout;
+        return (availableTimeout != null) ? availableTimeout : valueIfNotSet;
     }
 
     /**
@@ -414,7 +415,7 @@ public final class RoutineConfiguration {
 
         // auto-generated code
         int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
-        result = 31 * result + (mAvailTimeout != null ? mAvailTimeout.hashCode() : 0);
+        result = 31 * result + (mAvailableTimeout != null ? mAvailableTimeout.hashCode() : 0);
         result = 31 * result + mCoreInvocations;
         result = 31 * result + mInputMaxSize;
         result = 31 * result + (mInputOrderType != null ? mInputOrderType.hashCode() : 0);
@@ -475,8 +476,8 @@ public final class RoutineConfiguration {
             return false;
         }
 
-        if (mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)
-                : that.mAvailTimeout != null) {
+        if (mAvailableTimeout != null ? !mAvailableTimeout.equals(that.mAvailableTimeout)
+                : that.mAvailableTimeout != null) {
 
             return false;
         }
@@ -538,7 +539,7 @@ public final class RoutineConfiguration {
 
         return "RoutineConfiguration{" +
                 "mAsyncRunner=" + mAsyncRunner +
-                ", mAvailTimeout=" + mAvailTimeout +
+                ", mAvailableTimeout=" + mAvailableTimeout +
                 ", mCoreInvocations=" + mCoreInvocations +
                 ", mInputMaxSize=" + mInputMaxSize +
                 ", mInputOrderType=" + mInputOrderType +
@@ -642,7 +643,7 @@ public final class RoutineConfiguration {
 
         private Runner mAsyncRunner;
 
-        private TimeDuration mAvailTimeout;
+        private TimeDuration mAvailableTimeout;
 
         private int mCoreInvocations;
 
@@ -769,10 +770,10 @@ public final class RoutineConfiguration {
          * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
-        public Builder<TYPE> withAvailableTimeout(final long timeout,
+        public Builder<TYPE> withAvailableInvocationTimeout(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
-            return withAvailableTimeout(fromUnit(timeout, timeUnit));
+            return withAvailableInvocationTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -783,9 +784,9 @@ public final class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withAvailableTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withAvailableInvocationTimeout(@Nullable final TimeDuration timeout) {
 
-            mAvailTimeout = timeout;
+            mAvailableTimeout = timeout;
             return this;
         }
 
@@ -1153,11 +1154,11 @@ public final class RoutineConfiguration {
                 withCoreInvocations(coreInvocations);
             }
 
-            final TimeDuration availTimeout = configuration.mAvailTimeout;
+            final TimeDuration availTimeout = configuration.mAvailableTimeout;
 
             if (availTimeout != null) {
 
-                withAvailableTimeout(availTimeout);
+                withAvailableInvocationTimeout(availTimeout);
             }
 
             final TimeDuration readTimeout = configuration.mReadTimeout;
@@ -1196,7 +1197,7 @@ public final class RoutineConfiguration {
         private RoutineConfiguration buildConfiguration() {
 
             return new RoutineConfiguration(mArgs, mSyncRunner, mAsyncRunner, mMaxInvocations,
-                                            mCoreInvocations, mAvailTimeout, mReadTimeout,
+                                            mCoreInvocations, mAvailableTimeout, mReadTimeout,
                                             mTimeoutActionType, mInputOrderType, mInputMaxSize,
                                             mInputTimeout, mOutputOrderType, mOutputMaxSize,
                                             mOutputTimeout, mLog, mLogLevel);
@@ -1209,7 +1210,7 @@ public final class RoutineConfiguration {
             mAsyncRunner = configuration.mAsyncRunner;
             mMaxInvocations = configuration.mMaxInvocations;
             mCoreInvocations = configuration.mCoreInvocations;
-            mAvailTimeout = configuration.mAvailTimeout;
+            mAvailableTimeout = configuration.mAvailableTimeout;
             mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mInputOrderType = configuration.mInputOrderType;

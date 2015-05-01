@@ -265,8 +265,11 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                                                          .withRoutineConfiguration()
                                                          .withCoreInvocations(0)
                                                          .withMaxInvocations(2)
-                                                         .withAvailableTimeout(1, TimeUnit.SECONDS)
-                                                         .withAvailableTimeout(
+                                                         .withAvailableInvocationTimeout(1,
+                                                                                         TimeUnit.SECONDS)
+
+
+                                                         .withAvailableInvocationTimeout(
                                                                  TimeDuration.millis(200))
                                                          .set()
                                                          .buildRoutine();

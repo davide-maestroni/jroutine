@@ -288,7 +288,7 @@ public class StandaloneChannelTest {
                 .withSyncRunner(Runners.sequentialRunner())
                 .withMaxInvocations(3)
                 .withCoreInvocations(3)
-                .withAvailableTimeout(seconds(1))
+                .withAvailableInvocationTimeout(seconds(1))
                 .withInputOrder(OrderType.NONE)
                 .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))

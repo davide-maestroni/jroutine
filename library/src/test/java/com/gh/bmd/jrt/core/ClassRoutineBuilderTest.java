@@ -184,7 +184,8 @@ public class ClassRoutineBuilderTest {
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withCoreInvocations(0)
-                                                         .withAvailableTimeout(1, TimeUnit.SECONDS)
+                                                         .withAvailableInvocationTimeout(1,
+                                                                                         TimeUnit.SECONDS)
                                                          .set()
                                                          .withProxyConfiguration()
                                                          .withShareGroup("test")
@@ -204,7 +205,8 @@ public class ClassRoutineBuilderTest {
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
-                                                         .withAvailableTimeout(TimeDuration.ZERO)
+                                                         .withAvailableInvocationTimeout(
+                                                                 TimeDuration.ZERO)
                                                          .set()
                                                          .method("getLong");
 

@@ -110,7 +110,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
         mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInvocationsOr(DEFAULT_CORE_INVOCATIONS);
-        mAvailTimeout = configuration.getAvailTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
+        mAvailTimeout = configuration.getAvailableInvocationTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
         mLogger = configuration.newLogger(this);
         mLogger.dbg("building routine with configuration: %s", configuration);
     }

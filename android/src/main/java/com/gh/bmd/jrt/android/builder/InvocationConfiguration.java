@@ -291,7 +291,13 @@ public final class InvocationConfiguration {
          * @param configurable the configurable instance.
          * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
+        @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
+
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
 
             mConfigurable = configurable;
             mInvocationId = AUTO;
@@ -303,8 +309,14 @@ public final class InvocationConfiguration {
          * @param initialConfiguration the initial invocation configuration.
          * @throws java.lang.NullPointerException if any of the specified parameters is null.
          */
+        @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
                 @Nonnull final InvocationConfiguration initialConfiguration) {
+
+            if (configurable == null) {
+
+                throw new NullPointerException("the configurable instance must no be null");
+            }
 
             mConfigurable = configurable;
             setConfiguration(initialConfiguration);

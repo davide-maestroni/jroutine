@@ -1376,7 +1376,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testInvocationNotAvailable() {
+    public void testInvocationNotAvailable() throws InterruptedException {
 
         final Routine<Object, String> routine = JRoutine.on(factoryWith(new Function<String>() {
 
@@ -1396,6 +1396,7 @@ public class RoutineTest {
         })).withRoutineConfiguration().withMaxInvocations(1).set().buildRoutine();
 
         routine.callAsync("test1");
+        millis(100).sleepAtLeast();
 
         try {
 

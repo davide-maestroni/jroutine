@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.android.builder;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 
+import com.gh.bmd.jrt.android.builder.ServiceConfiguration.Builder;
 import com.gh.bmd.jrt.android.core.TestService;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
@@ -47,6 +48,30 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         assertThat(builderFrom(configuration).set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set()).isEqualTo(ServiceConfiguration.DEFAULT_CONFIGURATION);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testBuildNullPointerError() {
+
+        try {
+
+            new Builder<Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new Builder<Object>(null, ServiceConfiguration.DEFAULT_CONFIGURATION);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testBuilderFromEquals() {

@@ -918,7 +918,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testDestroy() {
+    public void testDestroyAsync() {
 
         final TimeDuration timeout = seconds(1);
         final Routine<String, String> routine1 = JRoutine.on(factoryOf(TestDestroy.class))
@@ -1001,6 +1001,96 @@ public class RoutineTest {
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
         assertThat(routine6.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        routine6.purge();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+    }
+
+    @Test
+    public void testDestroySync() {
+
+        final TimeDuration timeout = seconds(1);
+        final Routine<String, String> routine1 = JRoutine.on(factoryOf(TestDestroy.class))
+                                                         .withRoutineConfiguration()
+                                                         .withCoreInvocations(0)
+                                                         .set()
+                                                         .buildRoutine();
+        assertThat(routine1.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine1.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine1.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine2 = JRoutine.on(factoryOf(TestDiscardException.class))
+                                                         .withRoutineConfiguration()
+                                                         .withCoreInvocations(0)
+                                                         .set()
+                                                         .buildRoutine();
+        assertThat(routine2.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine2.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine2.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine3 =
+                JRoutine.on(factoryOf(TestDestroyDiscard.class)).buildRoutine();
+        assertThat(routine3.callParallel("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
+                .isTrue();
+        assertThat(routine3.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
+        assertThat(routine3.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine4 =
+                JRoutine.on(factoryOf(TestDestroyDiscardException.class)).buildRoutine();
+        assertThat(routine4.callParallel("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
+                .isTrue();
+        assertThat(routine4.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
+        assertThat(routine4.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine5 =
+                JRoutine.on(factoryOf(TestDestroy.class)).buildRoutine();
+        assertThat(routine5.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine5.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine5.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        routine5.purge();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine6 =
+                JRoutine.on(factoryOf(TestDestroyException.class)).buildRoutine();
+
+        assertThat(routine6.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine6.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine6.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
         routine6.purge();

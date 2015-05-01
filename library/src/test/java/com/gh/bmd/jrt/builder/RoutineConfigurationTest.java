@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logs;
@@ -104,6 +105,31 @@ public class RoutineConfigurationTest {
 
         assertThat(builderFrom(configuration).set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set()).isEqualTo(RoutineConfiguration.DEFAULT_CONFIGURATION);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testBuildNullPointerError() {
+
+        try {
+
+            new Builder<Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new Builder<Object>(null, RoutineConfiguration.DEFAULT_CONFIGURATION);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test

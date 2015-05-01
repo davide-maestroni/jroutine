@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.builder;
 
 import android.test.AndroidTestCase;
 
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 
@@ -42,6 +43,30 @@ public class InvocationConfigurationTest extends AndroidTestCase {
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set()).isEqualTo(
                 InvocationConfiguration.DEFAULT_CONFIGURATION);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testBuildNullPointerError() {
+
+        try {
+
+            new Builder<Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new Builder<Object>(null, InvocationConfiguration.DEFAULT_CONFIGURATION);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testBuilderFromEquals() {

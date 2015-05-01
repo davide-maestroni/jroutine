@@ -1,10 +1,13 @@
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.ProxyConfiguration.Builder;
+
 import org.junit.Test;
 
 import static com.gh.bmd.jrt.builder.ProxyConfiguration.builder;
 import static com.gh.bmd.jrt.builder.ProxyConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Proxy configuration unit tests.
@@ -22,6 +25,31 @@ public class ProxyConfigurationTest {
         assertThat(configuration.builderFrom().set().hashCode()).isEqualTo(
                 configuration.hashCode());
         assertThat(builderFrom(null).set()).isEqualTo(ProxyConfiguration.DEFAULT_CONFIGURATION);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testBuildNullPointerError() {
+
+        try {
+
+            new Builder<Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new Builder<Object>(null, ProxyConfiguration.DEFAULT_CONFIGURATION);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test

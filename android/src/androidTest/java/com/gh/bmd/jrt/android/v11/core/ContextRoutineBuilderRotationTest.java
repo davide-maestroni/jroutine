@@ -18,7 +18,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
+import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -161,7 +161,7 @@ public class ContextRoutineBuilderRotationTest
 
     }
 
-    private static class Delay extends ContextTemplateInvocation<Data, Data> {
+    private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -170,7 +170,7 @@ public class ContextRoutineBuilderRotationTest
         }
     }
 
-    private static class ToUpperCase extends ContextTemplateInvocation<String, String> {
+    private static class ToUpperCase extends TemplateContextInvocation<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {

@@ -24,6 +24,8 @@ import com.gh.bmd.jrt.android.builder.ContextObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -109,7 +111,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <pre>
  *     <code>
  *
- *         public class LoadResource extends ContextTemplateInvocation&lt;URI, MyResource&gt; {
+ *         public class LoadResource extends TemplateContextInvocation&lt;URI, MyResource&gt; {
  *
  *             private Routine&lt;URI, MyResource&gt; mRoutine;
  *
@@ -148,54 +150,82 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
      *
-     * @param activity    the invocation activity context.
-     * @param targetClass the wrapped object class.
+     * @param activity the invocation activity context.
+     * @param target   the wrapped object class.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static ContextObjectRoutineBuilder onActivity(@Nonnull final Activity activity,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> target) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
             throw new UnsupportedOperationException(
-                    "this method is supported only with API level >= " +
+                    "this method is supported only for API level >= " +
                             VERSION_CODES.HONEYCOMB
                             + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        return new DefaultContextObjectRoutineBuilder(activity, targetClass);
+        return new DefaultContextObjectRoutineBuilder(activity, target);
     }
 
     /**
      * Returns a builder of routines bound to the specified activity.<br/>
-     * Note that the specified invocation class must be static and have a default constructor.<br/>
-     * Note also that the built routine results will be always dispatched in the main UI thread,
-     * thus waiting for the outputs immediately after its invocation in the main thread will result
-     * in a deadlock.
+     * Note that the built routine results will be always dispatched in the main UI thread, thus
+     * waiting for the outputs immediately after its invocation in the main thread will result in a
+     * deadlock.
      *
-     * @param activity   the invocation activity context.
-     * @param classToken the invocation class token.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
+     * @param activity the invocation activity context.
+     * @param factory  the invocation factory.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.NullPointerException if the specified activity or factory are null.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onActivity(
+            @Nonnull final Activity activity,
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            throw new UnsupportedOperationException(
+                    "this method is supported only for API level >= " +
+                            VERSION_CODES.HONEYCOMB
+                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
+        }
+
+        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(activity, factory);
+    }
+
+    /**
+     * Returns a builder of routines bound to the specified activity.<br/>
+     * Note that the built routine results will be always dispatched in the main UI thread, thus
+     * waiting for the outputs immediately after its invocation in the main thread will result in a
+     * deadlock.
+     *
+     * @param activity the invocation activity context.
+     * @param token    the invocation class token.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if the specified activity or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onActivity(
             @Nonnull final Activity activity,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> token) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
             throw new UnsupportedOperationException(
-                    "this method is supported only with API level >= " +
+                    "this method is supported only for API level >= " +
                             VERSION_CODES.HONEYCOMB
                             + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(activity, classToken);
+        return onActivity(activity, ContextInvocations.factoryOf(token));
     }
 
     /**
@@ -205,30 +235,29 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * creation, the output will be aborted with a
      * {@link com.gh.bmd.jrt.android.builder.InvocationMissingException}.
      *
-     * @param activity     the invocation activity context.
-     * @param invocationId the invocation ID.
+     * @param activity the invocation activity context.
+     * @param id       the invocation ID.
      * @return the channel builder instance.
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      * @throws java.lang.NullPointerException     if the specified activity is null.
      */
     @Nonnull
-    public static ContextChannelBuilder onActivity(@Nonnull final Activity activity,
-            final int invocationId) {
+    public static ContextChannelBuilder onActivity(@Nonnull final Activity activity, final int id) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
             throw new UnsupportedOperationException(
-                    "this method is supported only with API level >= " +
+                    "this method is supported only for API level >= " +
                             VERSION_CODES.HONEYCOMB
                             + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        if (invocationId == InvocationConfiguration.AUTO) {
+        if (id == InvocationConfiguration.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultContextChannelBuilder(activity, invocationId);
+        return new DefaultContextChannelBuilder(activity, id);
     }
 
     /**
@@ -237,38 +266,58 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
      *
-     * @param fragment    the invocation fragment context.
-     * @param targetClass the wrapped object class.
+     * @param fragment the invocation fragment context.
+     * @param target   the wrapped object class.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static ContextObjectRoutineBuilder onFragment(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> target) {
 
-        return new DefaultContextObjectRoutineBuilder(fragment, targetClass);
+        return new DefaultContextObjectRoutineBuilder(fragment, target);
     }
 
     /**
      * Returns a builder of routines bound to the specified fragment.<br/>
-     * Note that the specified invocation class must be static and have a default constructor.<br/>
-     * Note also that the built routine results will be always dispatched in the main UI thread,
-     * thus waiting for the outputs immediately after its invocation in the main thread will result
-     * in a deadlock.
+     * Note that the built routine results will be always dispatched in the main UI thread, thus
+     * waiting for the outputs immediately after its invocation in the main thread will result in a
+     * deadlock.
      *
-     * @param fragment   the invocation fragment context.
-     * @param classToken the invocation class token.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
+     * @param fragment the invocation fragment context.
+     * @param factory  the invocation factory.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.NullPointerException if the specified activity or factory are null.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onFragment(
+            @Nonnull final Fragment fragment,
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
+
+        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(fragment, factory);
+    }
+
+    /**
+     * Returns a builder of routines bound to the specified fragment.<br/>
+     * Note that the built routine results will be always dispatched in the main UI thread, thus
+     * waiting for the outputs immediately after its invocation in the main thread will result in a
+     * deadlock.
+     *
+     * @param fragment the invocation fragment context.
+     * @param token    the invocation class token.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if the specified fragment or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onFragment(
             @Nonnull final Fragment fragment,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> token) {
 
-        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
+        return onFragment(fragment, ContextInvocations.factoryOf(token));
     }
 
     /**
@@ -278,21 +327,20 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * creation, the output will be aborted with a
      * {@link com.gh.bmd.jrt.android.builder.InvocationMissingException}.
      *
-     * @param fragment     the invocation fragment context.
-     * @param invocationId the invocation ID.
+     * @param fragment the invocation fragment context.
+     * @param id       the invocation ID.
      * @return the channel builder instance.
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      * @throws java.lang.NullPointerException     if the specified fragment is null.
      */
     @Nonnull
-    public static ContextChannelBuilder onFragment(@Nonnull final Fragment fragment,
-            final int invocationId) {
+    public static ContextChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
 
-        if (invocationId == InvocationConfiguration.AUTO) {
+        if (id == InvocationConfiguration.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultContextChannelBuilder(fragment, invocationId);
+        return new DefaultContextChannelBuilder(fragment, id);
     }
 }

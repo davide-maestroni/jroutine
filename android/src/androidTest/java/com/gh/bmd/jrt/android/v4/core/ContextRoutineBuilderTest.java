@@ -25,9 +25,10 @@ import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.InvocationMissingException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextPassingInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
+import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
+import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -39,6 +40,7 @@ import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.Reflection;
+import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -54,6 +56,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryWith;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -287,6 +291,21 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         result3.checkComplete();
     }
 
+    public void testActivityFunction() {
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
+        final Function<String> function = new Function<String>() {
+
+            public String call(@Nonnull final Object... params) {
+
+                return params[0].toString().toUpperCase();
+            }
+        };
+        final Routine<Object, String> routine =
+                JRoutine.onActivity(getActivity(), factoryWith(function)).buildRoutine();
+        assertThat(routine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("TEST");
+    }
+
     public void testActivityInputs() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
@@ -318,11 +337,13 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         try {
 
             JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class))
-                    .buildRoutine();
+                    .callAsync()
+                    .eventually()
+                    .readAll();
 
             fail();
 
-        } catch (final IllegalArgumentException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
     }
@@ -691,13 +712,13 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
     @SuppressWarnings("ConstantConditions")
     public void testConfigurationErrors() {
 
-        final ClassToken<ContextPassingInvocation<Object>> classToken =
-                new ClassToken<ContextPassingInvocation<Object>>() {};
+        final ContextInvocationFactory<Object, Object> factory =
+                PassingContextInvocation.factoryOf();
 
         try {
 
             new DefaultContextRoutineBuilder<Object, Object>(getActivity(),
-                                                             classToken).setConfiguration(
+                                                             factory).setConfiguration(
                     (RoutineConfiguration) null);
 
             fail();
@@ -709,7 +730,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         try {
 
             new DefaultContextRoutineBuilder<Object, Object>(getActivity(),
-                                                             classToken).setConfiguration(
+                                                             factory).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -828,6 +849,24 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         assertThat(channel2.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
     }
 
+    public void testFragmentFunction() {
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Function<String> function = new Function<String>() {
+
+            public String call(@Nonnull final Object... params) {
+
+                return params[0].toString().toUpperCase();
+            }
+        };
+        final Routine<Object, String> routine =
+                JRoutine.onFragment(fragment, factoryWith(function)).buildRoutine();
+        assertThat(routine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("TEST");
+    }
+
     public void testFragmentInputs() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
@@ -864,11 +903,13 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         try {
 
             JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class))
-                    .buildRoutine();
+                    .callAsync()
+                    .eventually()
+                    .readAll();
 
             fail();
 
-        } catch (final IllegalArgumentException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
     }
@@ -1084,15 +1125,14 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
     public void testInvocations() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final ClassToken<StringPassingInvocation> token1 =
-                ClassToken.tokenOf(StringPassingInvocation.class);
-        final Routine<String, String> routine1 = JRoutine.onActivity(getActivity(), token1)
-                                                         .withRoutineConfiguration()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withLog(Logs.androidLog())
-                                                         .withLogLevel(LogLevel.WARNING)
-                                                         .set()
-                                                         .buildRoutine();
+        final Routine<String, String> routine1 =
+                JRoutine.onActivity(getActivity(), PassingContextInvocation.<String>factoryOf())
+                        .withRoutineConfiguration()
+                        .withSyncRunner(Runners.queuedRunner())
+                        .withLog(Logs.androidLog())
+                        .withLogLevel(LogLevel.WARNING)
+                        .set()
+                        .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
@@ -1131,10 +1171,10 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new LoaderInvocation<String, String>(null, 0, ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE,
-                                                 ToUpperCase.class.getDeclaredConstructor(),
-                                                 Reflection.NO_ARGS, null, logger);
+            new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), 0,
+                                                 ClashResolutionType.KEEP_THAT,
+                                                 CacheStrategyType.CACHE, Reflection.NO_ARGS, null,
+                                                 logger);
 
             fail();
 
@@ -1144,9 +1184,9 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new LoaderInvocation<String, String>(reference, 0, ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE, null, Reflection.NO_ARGS,
-                                                 null, logger);
+            new LoaderInvocation<String, String>(reference, null, 0, ClashResolutionType.KEEP_THAT,
+                                                 CacheStrategyType.CACHE, Reflection.NO_ARGS, null,
+                                                 logger);
 
             fail();
 
@@ -1156,10 +1196,9 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new LoaderInvocation<String, String>(null, 0, ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE,
-                                                 ToUpperCase.class.getDeclaredConstructor(), null,
-                                                 null, logger);
+            new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), 0,
+                                                 ClashResolutionType.KEEP_THAT,
+                                                 CacheStrategyType.CACHE, null, null, logger);
 
             fail();
 
@@ -1169,10 +1208,10 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new LoaderInvocation<String, String>(reference, 0, ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE,
-                                                 ToUpperCase.class.getDeclaredConstructor(),
-                                                 Reflection.NO_ARGS, null, null);
+            new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class), 0,
+                                                 ClashResolutionType.KEEP_THAT,
+                                                 CacheStrategyType.CACHE, Reflection.NO_ARGS, null,
+                                                 null);
 
             fail();
 
@@ -1188,7 +1227,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new DefaultContextRoutine<String, String>(null, ToUpperCase.class,
+            new DefaultContextRoutine<String, String>(null, factoryOf(ToUpperCase.class),
                                                       RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                       InvocationConfiguration
                                                               .DEFAULT_CONFIGURATION);
@@ -1214,7 +1253,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new DefaultContextRoutine<String, String>(reference, ToUpperCase.class, null,
+            new DefaultContextRoutine<String, String>(reference, factoryOf(ToUpperCase.class), null,
                                                       InvocationConfiguration
                                                               .DEFAULT_CONFIGURATION);
 
@@ -1226,7 +1265,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new DefaultContextRoutine<String, String>(reference, ToUpperCase.class,
+            new DefaultContextRoutine<String, String>(reference, factoryOf(ToUpperCase.class),
                                                       RoutineConfiguration.DEFAULT_CONFIGURATION,
                                                       null);
 
@@ -1237,7 +1276,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static class Abort extends ContextTemplateInvocation<Data, Data> {
+    private static class Abort extends TemplateContextInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -1302,7 +1341,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
     }
 
-    private static class Delay extends ContextTemplateInvocation<Data, Data> {
+    private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -1312,14 +1351,14 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
     }
 
     @SuppressWarnings("unused")
-    private static class ErrorInvocation extends ContextTemplateInvocation<String, String> {
+    private static class ErrorInvocation extends TemplateContextInvocation<String, String> {
 
         private ErrorInvocation(final int ignored) {
 
         }
     }
 
-    private static class PurgeContextInvocation extends ContextPassingInvocation<String> {
+    private static class PurgeContextInvocation extends TemplateContextInvocation<String, String> {
 
         private static final Semaphore sSemaphore = new Semaphore(0);
 
@@ -1335,14 +1374,16 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
             super.onDestroy();
             sSemaphore.release();
         }
-    }
 
-    private static class StringPassingInvocation extends ContextPassingInvocation<String> {
+        @Override
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
+            result.pass(s);
+        }
     }
 
     private static class StringSingleCallInvocation
-            extends ContextSingleCallInvocation<String, String> {
+            extends SingleCallContextInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,
@@ -1352,7 +1393,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static class ToUpperCase extends ContextTemplateInvocation<String, String> {
+    private static class ToUpperCase extends TemplateContextInvocation<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {

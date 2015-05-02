@@ -15,20 +15,20 @@ package com.gh.bmd.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.invocation.TemplateInvocation;
+import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 
 import javax.annotation.Nonnull;
 
 /**
- * Template invocation implementing an Android invocation.
+ * Single call invocation implementing an Android invocation.
  * <p/>
  * Created by davide on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class ContextTemplateInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT>
-        implements ContextInvocation<INPUT, OUTPUT> {
+public abstract class SingleCallContextInvocation<INPUT, OUTPUT>
+        extends SingleCallInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
 
     private Context mContext;
 

@@ -25,7 +25,7 @@ import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
+import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassMode;
@@ -575,7 +575,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class BoundMethodInvocation<INPUT, OUTPUT>
-            extends ContextSingleCallInvocation<INPUT, OUTPUT> {
+            extends SingleCallContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -664,7 +664,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class MethodSignatureInvocation<INPUT, OUTPUT>
-            extends ContextSingleCallInvocation<INPUT, OUTPUT> {
+            extends SingleCallContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -755,7 +755,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends ContextSingleCallInvocation<Object, Object> {
+    private static class ProxyInvocation extends SingleCallContextInvocation<Object, Object> {
 
         private final Object[] mArgs;
 

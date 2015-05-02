@@ -18,12 +18,11 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -47,7 +46,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     private final WeakReference<Object> mContext;
 
-    private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
+    private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
     private final RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>
             mRoutineConfigurable =
@@ -67,47 +66,52 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     /**
      * Constructor.
      *
-     * @param activity   the context activity.
-     * @param classToken the invocation class token.
+     * @param activity the context activity.
+     * @param factory  the invocation factory.
      * @throws java.lang.NullPointerException if the activity or class token are null.
      */
     DefaultContextRoutineBuilder(@Nonnull final FragmentActivity activity,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
-        this((Object) activity, classToken);
+        this((Object) activity, factory);
     }
 
     /**
      * Constructor.
      *
-     * @param fragment   the context fragment.
-     * @param classToken the invocation class token.
+     * @param fragment the context fragment.
+     * @param factory  the invocation factory.
      * @throws java.lang.NullPointerException if the fragment or class token are null.
      */
     DefaultContextRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
-        this((Object) fragment, classToken);
+        this((Object) fragment, factory);
     }
 
     /**
      * Constructor.
      *
-     * @param context    the context instance.
-     * @param classToken the invocation class token.
+     * @param context the context instance.
+     * @param factory the invocation factory.
      * @throws java.lang.NullPointerException if the context or class token are null.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultContextRoutineBuilder(@Nonnull final Object context,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         if (context == null) {
 
             throw new NullPointerException("the routine context must not be null");
         }
 
+        if (factory == null) {
+
+            throw new NullPointerException("the context invocation factory must not be null");
+        }
+
         mContext = new WeakReference<Object>(context);
-        mInvocationClass = classToken.getRawClass();
+        mFactory = factory;
     }
 
     @Nonnull
@@ -122,7 +126,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
                              .withInputTimeout(TimeDuration.INFINITY)
                              .withOutputMaxSize(Integer.MAX_VALUE)
                              .withOutputTimeout(TimeDuration.INFINITY);
-        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, builder.set(),
+        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mFactory, builder.set(),
                                                         mInvocationConfiguration);
     }
 

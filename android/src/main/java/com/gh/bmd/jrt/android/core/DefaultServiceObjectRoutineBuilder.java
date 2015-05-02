@@ -18,7 +18,7 @@ import android.content.Context;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
+import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassMode;
@@ -490,7 +490,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class BoundMethodInvocation<INPUT, OUTPUT>
-            extends ContextSingleCallInvocation<INPUT, OUTPUT> {
+            extends SingleCallContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -579,7 +579,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class MethodSignatureInvocation<INPUT, OUTPUT>
-            extends ContextSingleCallInvocation<INPUT, OUTPUT> {
+            extends SingleCallContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -670,7 +670,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends ContextSingleCallInvocation<Object, Object> {
+    private static class ProxyInvocation extends SingleCallContextInvocation<Object, Object> {
 
         private final Object[] mArgs;
 

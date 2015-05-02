@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class ContextDelegatingInvocation<INPUT, OUTPUT> extends DelegatingInvocation<INPUT, OUTPUT>
+public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvocation<INPUT, OUTPUT>
         implements ContextInvocation<INPUT, OUTPUT> {
 
     /**
@@ -36,7 +36,7 @@ public class ContextDelegatingInvocation<INPUT, OUTPUT> extends DelegatingInvoca
      *
      * @param routine the routine used to execute this invocation.
      */
-    public ContextDelegatingInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+    public DelegatingContextInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
 
         super(routine);
     }

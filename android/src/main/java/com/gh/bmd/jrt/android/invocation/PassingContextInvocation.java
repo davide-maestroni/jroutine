@@ -24,9 +24,30 @@ import javax.annotation.Nonnull;
  *
  * @param <DATA> the data type.
  */
-public class ContextPassingInvocation<DATA> extends ContextTemplateInvocation<DATA, DATA> {
+public class PassingContextInvocation<DATA> extends FilterContextInvocation<DATA, DATA> {
 
-    @Override
+    private static final PassingContextInvocation<Object> sInvocation =
+            new PassingContextInvocation<Object>();
+
+    /**
+     * Avoid instantiation.
+     */
+    private PassingContextInvocation() {
+
+    }
+
+    /**
+     * Returns a factory of passing invocations.
+     *
+     * @param <DATA> the data type.
+     * @return the factory.
+     */
+    @SuppressWarnings("unchecked")
+    public static <DATA> ContextInvocationFactory<DATA, DATA> factoryOf() {
+
+        return (ContextInvocationFactory<DATA, DATA>) sInvocation;
+    }
+
     public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {
 
         result.pass(input);

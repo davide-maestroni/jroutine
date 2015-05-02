@@ -22,9 +22,10 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationDecorator;
-import com.gh.bmd.jrt.android.invocation.ContextPassingInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextSingleCallInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextTemplateInvocation;
+import com.gh.bmd.jrt.android.invocation.FilterContextInvocation;
+import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
+import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
+import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
 import com.gh.bmd.jrt.android.runner.Runners;
@@ -45,13 +46,13 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -108,8 +109,8 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
     @SuppressWarnings("ConstantConditions")
     public void testBuilderError() {
 
-        final ClassToken<ContextPassingInvocation<String>> classToken =
-                new ClassToken<ContextPassingInvocation<String>>() {};
+        final ClassToken<PassingContextInvocation<String>> classToken =
+                new ClassToken<PassingContextInvocation<String>>() {};
 
         try {
 
@@ -123,7 +124,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            JRoutine.onService(getActivity(), (ClassToken<ContextPassingInvocation<String>>) null);
+            JRoutine.onService(getActivity(), (ClassToken<PassingContextInvocation<String>>) null);
 
             fail();
 
@@ -135,8 +136,8 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
     @SuppressWarnings("ConstantConditions")
     public void testConfigurationErrors() {
 
-        final ClassToken<ContextPassingInvocation<Object>> classToken =
-                new ClassToken<ContextPassingInvocation<Object>>() {};
+        final ClassToken<PassingContextInvocation<Object>> classToken =
+                new ClassToken<PassingContextInvocation<Object>>() {};
 
         try {
 
@@ -265,10 +266,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                                                          .withRoutineConfiguration()
                                                          .withCoreInvocations(0)
                                                          .withMaxInvocations(2)
-                                                         .withAvailableInvocationTimeout(1,
-                                                                                         TimeUnit.SECONDS)
-
-
+                                                         .withAvailableInvocationTimeout(1, SECONDS)
                                                          .withAvailableInvocationTimeout(
                                                                  TimeDuration.millis(200))
                                                          .set()
@@ -297,8 +295,8 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
     public void testReadTimeout() {
 
-        final ClassToken<ContextPassingInvocation<String>> classToken =
-                new ClassToken<ContextPassingInvocation<String>>() {};
+        final ClassToken<PassingContextInvocation<String>> classToken =
+                new ClassToken<PassingContextInvocation<String>>() {};
         assertThat(JRoutine.onService(getActivity(), classToken)
                            .withRoutineConfiguration()
                            .withReadTimeout(millis(10))
@@ -313,8 +311,8 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
     public void testReadTimeout2() {
 
-        final ClassToken<ContextPassingInvocation<String>> classToken =
-                new ClassToken<ContextPassingInvocation<String>>() {};
+        final ClassToken<PassingContextInvocation<String>> classToken =
+                new ClassToken<PassingContextInvocation<String>>() {};
 
         try {
 
@@ -338,8 +336,8 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
     public void testReadTimeout3() {
 
-        final ClassToken<ContextPassingInvocation<String>> classToken =
-                new ClassToken<ContextPassingInvocation<String>>() {};
+        final ClassToken<PassingContextInvocation<String>> classToken =
+                new ClassToken<PassingContextInvocation<String>>() {};
 
         try {
 
@@ -400,7 +398,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         assertThat(countLog.getWrnCount()).isEqualTo(4);
     }
 
-    private static class Abort extends ContextTemplateInvocation<Data, Data> {
+    private static class Abort extends TemplateContextInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -487,7 +485,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static class Delay extends ContextTemplateInvocation<Data, Data> {
+    private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -562,8 +560,14 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static class MyParcelableInvocation extends ContextPassingInvocation<MyParcelable> {
+    private static class MyParcelableInvocation
+            extends FilterContextInvocation<MyParcelable, MyParcelable> {
 
+        public void onInput(final MyParcelable myParcelable,
+                @Nonnull final ResultChannel<MyParcelable> result) {
+
+            result.pass(myParcelable);
+        }
     }
 
     private static class PassingDecorator<DATA> extends ContextInvocationDecorator<DATA, DATA> {
@@ -574,12 +578,16 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static class StringPassingInvocation extends ContextPassingInvocation<String> {
+    private static class StringPassingInvocation extends FilterContextInvocation<String, String> {
 
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            result.pass(s);
+        }
     }
 
     private static class StringSingleCallInvocation
-            extends ContextSingleCallInvocation<String, String> {
+            extends SingleCallContextInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,

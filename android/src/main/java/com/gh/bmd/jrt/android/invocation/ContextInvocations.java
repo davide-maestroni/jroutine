@@ -52,8 +52,6 @@ public class ContextInvocations {
      * @param <INPUT>         the input data type.
      * @param <OUTPUT>        the output data type.
      * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
@@ -76,8 +74,6 @@ public class ContextInvocations {
      * @param <INPUT>         the input data type.
      * @param <OUTPUT>        the output data type.
      * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
@@ -88,7 +84,7 @@ public class ContextInvocations {
 
     /**
      * Builds and returns a new factory of context invocations calling the specified function. The
-     * function class will be used as invocation tag<br/>
+     * function class will be used as invocation type.<br/>
      * Remember to force the input order type, in case the function parameter position needs to be
      * preserved.
      * <p/>
@@ -117,26 +113,25 @@ public class ContextInvocations {
 
         private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
-        private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
+        private final String mInvocationType;
 
         /**
          * Constructor.
          *
          * @param invocationClass the invocation class.
-         * @throws NullPointerException is the specified class is null.
          */
         private DefaultContextInvocationFactory(
                 @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass) {
 
             mFactory = Invocations.factoryOf(
                     (Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass);
-            mInvocationClass = invocationClass;
+            mInvocationType = invocationClass.getName();
         }
 
         @Nonnull
-        public Object getInvocationTag() {
+        public String getInvocationType() {
 
-            return mInvocationClass;
+            return mInvocationType;
         }
 
         @Nonnull
@@ -156,6 +151,8 @@ public class ContextInvocations {
 
         private final Function<OUTPUT> mFunction;
 
+        private final String mInvocationType;
+
         /**
          * Constructor.
          *
@@ -171,12 +168,13 @@ public class ContextInvocations {
             }
 
             mFunction = function;
+            mInvocationType = function.getClass().getName();
         }
 
         @Nonnull
-        public Object getInvocationTag() {
+        public String getInvocationType() {
 
-            return mFunction.getClass();
+            return mInvocationType;
         }
 
         @Nonnull

@@ -291,8 +291,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             return JRoutine.onFragment((Fragment) context, classToken);
         }
 
-        throw new IllegalArgumentException(
-                "invalid context type: " + context.getClass().getCanonicalName());
+        throw new IllegalArgumentException("invalid context type: " + context.getClass().getName());
     }
 
     @Nonnull
@@ -377,7 +376,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         return getBuilder(mContext, classToken).withRoutineConfiguration()
                                                .with(routineConfiguration)
                                                .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASSING_ORDER)
+                                               .withInputOrder(OrderType.PASS_ORDER)
                                                .set()
                                                .withInvocationConfiguration()
                                                .with(invocationConfiguration)
@@ -429,7 +428,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         return getBuilder(mContext, classToken).withRoutineConfiguration()
                                                .with(routineConfiguration)
                                                .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASSING_ORDER)
+                                               .withInputOrder(OrderType.PASS_ORDER)
                                                .set()
                                                .withInvocationConfiguration()
                                                .with(invocationConfiguration)
@@ -443,7 +442,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
+                    "the specified class is not an interface: " + itf.getName());
         }
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
@@ -1072,10 +1071,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                                  method.getName(), toNames(parameterTypes),
                                  toNames(targetParameterTypes), isInputCollection,
                                  isOutputCollection};
-            final OrderType inputOrderType =
-                    (isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER;
+            final OrderType inputOrderType = (isParallel) ? OrderType.NONE : OrderType.PASS_ORDER;
             final OrderType outputOrderType =
-                    (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER : OrderType.NONE;
+                    (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER : OrderType.NONE;
             final ContextRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, ClassToken.tokenOf(ProxyInvocation.class));
             final RoutineConfiguration routineConfiguration =

@@ -645,8 +645,8 @@ public class RoutineTest {
                 JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
                         .withRoutineConfiguration()
                         .withFactoryArgs(millis(10))
-                        .withInputOrder(OrderType.PASSING_ORDER)
-                        .withOutputOrder(OrderType.PASSING_ORDER)
+                        .withInputOrder(OrderType.PASS_ORDER)
+                        .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .invokeAsync();
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -682,9 +682,8 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final RoutineConfiguration configuration = builder().withFactoryArgs(millis(10), 2)
-                                                            .withInputOrder(OrderType.PASSING_ORDER)
-                                                            .withOutputOrder(
-                                                                    OrderType.PASSING_ORDER)
+                                                            .withInputOrder(OrderType.PASS_ORDER)
+                                                            .withOutputOrder(OrderType.PASS_ORDER)
                                                             .set();
         final ParameterChannel<String, String> channel3 =
                 JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
@@ -915,6 +914,21 @@ public class RoutineTest {
                 "test4");
         routine4.purge();
         assertThat(TestDestroy.getInstanceCount()).isZero();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testDelegationError() {
+
+        try {
+
+            DelegatingInvocation.factoryWith(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test

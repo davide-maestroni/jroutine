@@ -28,15 +28,13 @@ import javax.annotation.Nonnull;
 public interface ContextInvocationFactory<INPUT, OUTPUT> extends InvocationFactory<INPUT, OUTPUT> {
 
     /**
-     * Returns the tag identifying the created invocations. Normally, the returned object will be
-     * the invocation class, though, there is no limitation about the specific object used as tag.
-     * Note, however, that the returned object will be used to compute the invocation ID and to
-     * detect clashing of invocation instances.
+     * Returns the type identifying the created invocations.<br/>
+     * Note that the returned string will be used to detect clashing of invocation instances.
      *
-     * @return the invocation tag.
+     * @return the invocation type.
      */
     @Nonnull
-    Object getInvocationTag();
+    String getInvocationType();
 
     /**
      * Creates and return a new context invocation instance.

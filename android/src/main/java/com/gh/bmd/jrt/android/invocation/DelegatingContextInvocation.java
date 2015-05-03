@@ -41,6 +41,47 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
         super(routine);
     }
 
+    /**
+     * Returns a factory of delegating invocations.
+     *
+     * @param routine        the routine used to execute this invocation.
+     * @param invocationType the invocation type.
+     * @param <INPUT>        the input data type.
+     * @param <OUTPUT>       the output data type.
+     * @return the factory.
+     * @throws java.lang.NullPointerException if any of the parameters is null.
+     */
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryWith(
+            @Nonnull final Routine<INPUT, OUTPUT> routine, @Nonnull final String invocationType) {
+
+        if (routine == null) {
+
+            throw new NullPointerException("the routine must not be null");
+        }
+
+        if (invocationType == null) {
+
+            throw new NullPointerException("the invocation type must not be null");
+        }
+
+        return new ContextInvocationFactory<INPUT, OUTPUT>() {
+
+            @Nonnull
+            public String getInvocationType() {
+
+                return invocationType;
+            }
+
+            @Nonnull
+            public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+                return new DelegatingContextInvocation<INPUT, OUTPUT>(routine);
+            }
+        };
+    }
+
     public void onContext(@Nonnull final Context context) {
 
     }

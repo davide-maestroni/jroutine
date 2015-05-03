@@ -148,8 +148,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .with(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                       .withOutputOrder(OrderType.PASSING_ORDER)
+                        .with(builder().withInputOrder(OrderType.PASS_ORDER)
+                                       .withOutputOrder(OrderType.PASS_ORDER)
                                        .set())
                         .set()
                         .withInvocationConfiguration()
@@ -174,8 +174,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .with(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                       .withOutputOrder(OrderType.PASSING_ORDER)
+                        .with(builder().withInputOrder(OrderType.PASS_ORDER)
+                                       .withOutputOrder(OrderType.PASS_ORDER)
                                        .set())
                         .set()
                         .withInvocationConfiguration()
@@ -631,8 +631,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .with(builder().withInputOrder(OrderType.PASSING_ORDER)
-                                       .withOutputOrder(OrderType.PASSING_ORDER)
+                        .with(builder().withInputOrder(OrderType.PASS_ORDER)
+                                       .withOutputOrder(OrderType.PASS_ORDER)
                                        .set())
                         .set()
                         .withInvocationConfiguration()
@@ -657,8 +657,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .withInputOrder(OrderType.PASSING_ORDER)
-                        .withOutputOrder(OrderType.PASSING_ORDER)
+                        .withInputOrder(OrderType.PASS_ORDER)
+                        .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .withInvocationConfiguration()
                         .withId(0)
@@ -903,8 +903,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .withInputOrder(OrderType.PASSING_ORDER)
-                        .withOutputOrder(OrderType.PASSING_ORDER)
+                        .withInputOrder(OrderType.PASS_ORDER)
+                        .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .withInvocationConfiguration()
                         .withId(0)
@@ -931,8 +931,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .withInputOrder(OrderType.PASSING_ORDER)
-                        .withOutputOrder(OrderType.PASSING_ORDER)
+                        .withInputOrder(OrderType.PASS_ORDER)
+                        .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .withInvocationConfiguration()
                         .withId(0)
@@ -975,7 +975,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                         .withId(0)
                         .set()
                         .withRoutineConfiguration()
-                        .withOutputOrder(OrderType.PASSING_ORDER)
+                        .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
@@ -1242,8 +1242,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .withInputOrder(OrderType.PASSING_ORDER)
-                        .withOutputOrder(OrderType.PASSING_ORDER)
+                        .withInputOrder(OrderType.PASS_ORDER)
+                        .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .withInvocationConfiguration()
                         .withId(0)
@@ -1270,8 +1270,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ContextRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutineConfiguration()
-                        .withInputOrder(OrderType.PASSING_ORDER)
-                        .withOutputOrder(OrderType.PASSING_ORDER)
+                        .withInputOrder(OrderType.PASS_ORDER)
+                        .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .withInvocationConfiguration()
                         .withId(0)
@@ -1373,14 +1373,13 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         }
 
         final Logger logger = Logger.newLogger(null, null, this);
+        final InvocationConfiguration configuration = InvocationConfiguration.DEFAULT_CONFIGURATION;
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
 
         try {
 
-            new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), 0,
-                                                 ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE, Reflection.NO_ARGS, null,
-                                                 logger);
+            new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class),
+                                                 Reflection.NO_ARGS, configuration, null, logger);
 
             fail();
 
@@ -1390,9 +1389,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new LoaderInvocation<String, String>(reference, null, 0, ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE, Reflection.NO_ARGS, null,
-                                                 logger);
+            new LoaderInvocation<String, String>(reference, null, Reflection.NO_ARGS, configuration,
+                                                 null, logger);
 
             fail();
 
@@ -1402,9 +1400,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), 0,
-                                                 ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE, null, null, logger);
+            new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class), null,
+                                                 configuration, null, logger);
 
             fail();
 
@@ -1414,10 +1411,19 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         try {
 
-            new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class), 0,
-                                                 ClashResolutionType.KEEP_THAT,
-                                                 CacheStrategyType.CACHE, Reflection.NO_ARGS, null,
-                                                 null);
+            new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class),
+                                                 Reflection.NO_ARGS, null, null, logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class),
+                                                 Reflection.NO_ARGS, configuration, null, null);
 
             fail();
 
@@ -1434,14 +1440,14 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
             return;
         }
 
+        final InvocationConfiguration configuration = InvocationConfiguration.DEFAULT_CONFIGURATION;
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
 
         try {
 
             new DefaultContextRoutine<String, String>(null, factoryOf(ToUpperCase.class),
                                                       RoutineConfiguration.DEFAULT_CONFIGURATION,
-                                                      InvocationConfiguration
-                                                              .DEFAULT_CONFIGURATION);
+                                                      configuration);
 
             fail();
 
@@ -1453,8 +1459,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
             new DefaultContextRoutine<String, String>(reference, null,
                                                       RoutineConfiguration.DEFAULT_CONFIGURATION,
-                                                      InvocationConfiguration
-                                                              .DEFAULT_CONFIGURATION);
+                                                      configuration);
 
             fail();
 
@@ -1465,8 +1470,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         try {
 
             new DefaultContextRoutine<String, String>(reference, factoryOf(ToUpperCase.class), null,
-                                                      InvocationConfiguration
-                                                              .DEFAULT_CONFIGURATION);
+                                                      configuration);
 
             fail();
 

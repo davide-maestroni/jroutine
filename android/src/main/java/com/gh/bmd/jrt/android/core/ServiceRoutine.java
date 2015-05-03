@@ -145,7 +145,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mContext = context.getApplicationContext();
         mInvocationClass = invocationClass;
         mRoutineConfiguration = routineConfiguration;
-        mLooper = serviceConfiguration.getReceivingLooperOr(Looper.getMainLooper());
+        mLooper = serviceConfiguration.getReceiverLooperOr(Looper.getMainLooper());
         mServiceClass = serviceConfiguration.getServiceClassOr(RoutineService.class);
         mRunnerClass = (runnerClass != null) ? runnerClass
                 : (asyncRunner != null) ? asyncRunner.getClass() : null;
@@ -166,7 +166,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                            .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
-                   invocationClass.getCanonicalName(), routineConfiguration, serviceConfiguration);
+                   invocationClass.getName(), routineConfiguration, serviceConfiguration);
         warn(logger, routineConfiguration);
     }
 

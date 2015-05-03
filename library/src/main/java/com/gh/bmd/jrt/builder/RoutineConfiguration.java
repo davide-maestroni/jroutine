@@ -576,11 +576,11 @@ public final class RoutineConfiguration {
     public enum OrderType {
 
         /**
-         * Passing order.<br/>
+         * Pass order.<br/>
          * Data are returned in the same order as they are passed to the channel, independently from
          * the specific delay.
          */
-        PASSING_ORDER,
+        PASS_ORDER,
         /**
          * No order.<br/>
          * There is no guarantee about the data order.

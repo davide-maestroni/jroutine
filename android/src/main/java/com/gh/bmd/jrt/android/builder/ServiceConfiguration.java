@@ -188,7 +188,7 @@ public final class ServiceConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
      */
-    public Looper getReceivingLooperOr(@Nullable final Looper valueIfNotSet) {
+    public Looper getReceiverLooperOr(@Nullable final Looper valueIfNotSet) {
 
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
@@ -323,7 +323,7 @@ public final class ServiceConfiguration {
 
             if (looper != null) {
 
-                withReceivingLooper(looper);
+                withReceiverLooper(looper);
             }
 
             final Class<? extends RoutineService> serviceClass = configuration.mServiceClass;
@@ -372,7 +372,7 @@ public final class ServiceConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withReceivingLooper(@Nullable final Looper looper) {
+        public Builder<TYPE> withReceiverLooper(@Nullable final Looper looper) {
 
             mLooper = looper;
             return this;

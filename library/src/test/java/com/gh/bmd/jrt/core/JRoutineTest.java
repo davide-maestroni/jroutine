@@ -48,7 +48,7 @@ public class JRoutineTest {
                            .withInputTimeout(1, TimeUnit.SECONDS)
                            .withOutputMaxSize(2)
                            .withOutputTimeout(1, TimeUnit.SECONDS)
-                           .withOutputOrder(OrderType.PASSING_ORDER)
+                           .withOutputOrder(OrderType.PASS_ORDER)
                            .set()
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
@@ -64,7 +64,7 @@ public class JRoutineTest {
                            .withInputTimeout(TimeDuration.ZERO)
                            .withOutputMaxSize(2)
                            .withOutputTimeout(TimeDuration.ZERO)
-                           .withOutputOrder(OrderType.PASSING_ORDER)
+                           .withOutputOrder(OrderType.PASS_ORDER)
                            .set()
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");

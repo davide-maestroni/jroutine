@@ -54,7 +54,7 @@ public class InvocationsTest {
                     }
                 }))
                         .withRoutineConfiguration()
-                        .withInputOrder(OrderType.PASSING_ORDER)
+                        .withInputOrder(OrderType.PASS_ORDER)
                         .withReadTimeout(TimeDuration.seconds(1))
                         .set()
                         .buildRoutine();

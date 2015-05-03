@@ -48,11 +48,11 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the async passing mode associated to the specified method parameter.
+     * Gets the async pass mode associated to the specified method parameter.
      *
      * @param method the target method.
      * @param index  the index of the parameter.
-     * @return the async passing mode.
+     * @return the async pass mode.
      */
     @Nullable
     public static PassMode getParamMode(@Nonnull final Method method, final int index) {
@@ -101,7 +101,7 @@ public class RoutineBuilders {
                         boxingClass(parameterType.getComponentType()))) {
 
                     throw new IllegalArgumentException(
-                            "[" + method + "] the async input array with passing mode "
+                            "[" + method + "] the async input array with pass mode "
                                     + PassMode.PARALLEL + " does not match the bound type: "
                                     + paramClass.getCanonicalName());
                 }
@@ -109,7 +109,7 @@ public class RoutineBuilders {
                 if (length > 1) {
 
                     throw new IllegalArgumentException(
-                            "[" + method + "] an async input with passing mode " + PassMode.PARALLEL
+                            "[" + method + "] an async input with pass mode " + PassMode.PARALLEL
                                     + " cannot be applied to a method taking " + length +
                                     " input parameters");
 
@@ -120,7 +120,7 @@ public class RoutineBuilders {
             } else {
 
                 throw new IllegalArgumentException("[" + method + "] cannot automatically choose a "
-                                                           + "passing mode for an output of type: "
+                                                           + "pass mode for an output of type: "
                                                            + parameterType.getCanonicalName());
             }
 
@@ -129,7 +129,7 @@ public class RoutineBuilders {
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with passing mode " + PassMode.OBJECT
+                        "[" + method + "] an async input with pass mode " + PassMode.OBJECT
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
@@ -138,14 +138,14 @@ public class RoutineBuilders {
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with passing mode " + PassMode.COLLECTION
+                        "[" + method + "] an async input with pass mode " + PassMode.COLLECTION
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
             if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with passing mode " + PassMode.COLLECTION
+                        "[" + method + "] an async input with pass mode " + PassMode.COLLECTION
                                 + " must be bound to an array or a superclass of "
                                 + List.class.getCanonicalName());
             }
@@ -153,7 +153,7 @@ public class RoutineBuilders {
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with passing mode " + PassMode.COLLECTION +
+                        "[" + method + "] an async input with pass mode " + PassMode.COLLECTION +
                                 " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
@@ -163,7 +163,7 @@ public class RoutineBuilders {
             if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with passing mode " + PassMode.PARALLEL
+                        "[" + method + "] an async input with pass mode " + PassMode.PARALLEL
                                 + " must be an array or implement an "
                                 + Iterable.class.getCanonicalName());
             }
@@ -172,15 +172,15 @@ public class RoutineBuilders {
                     boxingClass(parameterType.getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] the async input array with passing mode "
-                                + PassMode.PARALLEL + " does not match the bound type: "
+                        "[" + method + "] the async input array with pass mode " + PassMode.PARALLEL
+                                + " does not match the bound type: "
                                 + paramClass.getCanonicalName());
             }
 
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with passing mode " + PassMode.PARALLEL
+                        "[" + method + "] an async input with pass mode " + PassMode.PARALLEL
                                 + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
@@ -190,10 +190,10 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the async passing mode of the return type of the specified method.
+     * Gets the async pass mode of the return type of the specified method.
      *
      * @param method the target method.
-     * @return the async passing mode.
+     * @return the async pass mode.
      */
     @Nullable
     public static PassMode getReturnMode(@Nonnull final Method method) {
@@ -218,7 +218,7 @@ public class RoutineBuilders {
                         returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
 
                     throw new IllegalArgumentException(
-                            "[" + method + "] the async output array with passing mode "
+                            "[" + method + "] the async output array with pass mode "
                                     + PassMode.PARALLEL + " does not match the bound type: "
                                     + returnClass.getCanonicalName());
                 }
@@ -241,7 +241,7 @@ public class RoutineBuilders {
             } else {
 
                 throw new IllegalArgumentException("[" + method + "] cannot automatically choose a "
-                                                           + "passing mode for an input of type: "
+                                                           + "pass mode for an input of type: "
                                                            + returnType.getCanonicalName());
             }
 
@@ -251,7 +251,7 @@ public class RoutineBuilders {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with passing mode " + PassMode.OBJECT
+                        "[" + method + "] an async output with pass mode " + PassMode.OBJECT
                                 + " must be a superclass of " + channelClassName);
             }
 
@@ -261,7 +261,7 @@ public class RoutineBuilders {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with passing mode " + PassMode.OBJECT
+                        "[" + method + "] an async output with pass mode " + PassMode.OBJECT
                                 + " must be a superclass of " + channelClassName);
             }
 
@@ -270,7 +270,7 @@ public class RoutineBuilders {
             if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(returnClass)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with passing mode " + PassMode.COLLECTION
+                        "[" + method + "] an async output with pass mode " + PassMode.COLLECTION
                                 + " must be bound to an array or a type implementing an "
                                 + Iterable.class.getCanonicalName());
             }
@@ -280,9 +280,9 @@ public class RoutineBuilders {
             if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with passing mode " + PassMode.PARALLEL
-                                + " must be an array or a superclass " +
-                                "of " + List.class.getCanonicalName());
+                        "[" + method + "] an async output with pass mode " + PassMode.PARALLEL
+                                + " must be an array or a superclass of "
+                                + List.class.getCanonicalName());
             }
 
             final Class<?> returnClass = annotation.value();
@@ -291,7 +291,7 @@ public class RoutineBuilders {
                     returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] the async output array with passing mode "
+                        "[" + method + "] the async output array with pass mode "
                                 + PassMode.PARALLEL + " does not match the bound type: "
                                 + returnClass.getCanonicalName());
             }

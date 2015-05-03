@@ -126,7 +126,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
         } else {
 
             throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getCanonicalName());
+                    "invalid context type: " + context.getClass().getName());
         }
 
         final RoutineConfiguration routineConfiguration = mRoutineConfiguration;

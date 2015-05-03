@@ -57,7 +57,7 @@ public class ContextRoutineBuilderRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                 .withRoutineConfiguration()
-                .withOutputOrder(OrderType.PASSING_ORDER)
+                .withOutputOrder(OrderType.PASS_ORDER)
                 .set()
                 .withInvocationConfiguration()
                 .withId(0)

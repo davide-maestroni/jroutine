@@ -121,7 +121,7 @@ public abstract class ClassToken<TYPE> {
 
                 throw new IllegalStateException(
                         "the class does not correctly extend a class token: "
-                                + getClass().getCanonicalName());
+                                + getClass().getName());
             }
         }
 
@@ -155,7 +155,7 @@ public abstract class ClassToken<TYPE> {
 
                 throw new IllegalStateException(
                         "the class does not correctly extend a class token: "
-                                + getClass().getCanonicalName());
+                                + getClass().getName());
             }
         }
 

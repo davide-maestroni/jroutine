@@ -242,8 +242,8 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
                                                          .withRoutineConfiguration()
-                                                         .withInputOrder(OrderType.PASSING_ORDER)
-                                                         .withOutputOrder(OrderType.PASSING_ORDER)
+                                                         .withInputOrder(OrderType.PASS_ORDER)
+                                                         .withOutputOrder(OrderType.PASS_ORDER)
                                                          .set()
                                                          .buildRoutine();
         assertThat(routine3.callSync("1", "2", "3", "4", "5")
@@ -303,7 +303,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                            .withReadTimeoutAction(TimeoutActionType.EXIT)
                            .set()
                            .withServiceConfiguration()
-                           .withReceivingLooper(Looper.myLooper())
+                           .withReceiverLooper(Looper.myLooper())
                            .set()
                            .callAsync("test1")
                            .readAll()).isEmpty();
@@ -322,7 +322,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                     .withReadTimeoutAction(TimeoutActionType.ABORT)
                     .set()
                     .withServiceConfiguration()
-                    .withReceivingLooper(Looper.myLooper())
+                    .withReceiverLooper(Looper.myLooper())
                     .set()
                     .callAsync("test2")
                     .readAll();
@@ -347,7 +347,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .withServiceConfiguration()
-                    .withReceivingLooper(Looper.myLooper())
+                    .withReceiverLooper(Looper.myLooper())
                     .set()
                     .callAsync("test3")
                     .readAll();

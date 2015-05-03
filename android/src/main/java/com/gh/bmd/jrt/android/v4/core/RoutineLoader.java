@@ -49,7 +49,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
     private final ContextInvocation<INPUT, OUTPUT> mInvocation;
 
-    private final Object mInvocationTag;
+    private final String mInvocationType;
 
     private final Logger mLogger;
 
@@ -62,19 +62,19 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     /**
      * Constructor.
      *
-     * @param context       used to retrieve the application context.
-     * @param invocation    the invocation instance.
-     * @param invocationTag the invocation tag.
-     * @param args          the invocation constructor arguments.
-     * @param inputs        the input data.
-     * @param order         the data order.
-     * @param logger        the logger instance.
+     * @param context        used to retrieve the application context.
+     * @param invocation     the invocation instance.
+     * @param invocationType the invocation type.
+     * @param args           the invocation factory arguments.
+     * @param inputs         the input data.
+     * @param order          the data order.
+     * @param logger         the logger instance.
      * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
             @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation,
-            @Nonnull final Object invocationTag, @Nonnull final Object[] args,
+            @Nonnull final String invocationType, @Nonnull final Object[] args,
             @Nonnull final List<? extends INPUT> inputs, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
 
@@ -85,15 +85,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             throw new NullPointerException("the invocation instance must not be null");
         }
 
-        if (invocationTag == null) {
+        if (invocationType == null) {
 
-            throw new NullPointerException("the invocation tag must not be null");
+            throw new NullPointerException("the invocation type must not be null");
         }
 
         if (args == null) {
 
-            throw new NullPointerException(
-                    "the invocation constructor array of arguments must not be null");
+            throw new NullPointerException("the array of arguments must not be null");
         }
 
         if (inputs == null) {
@@ -102,7 +101,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         mInvocation = invocation;
-        mInvocationTag = invocationTag;
+        mInvocationType = invocationType;
         mArgs = args;
         mInputs = inputs;
         mOrderType = order;
@@ -259,14 +258,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Returns the loader invocation tag.
+     * Returns the loader invocation type.
      *
-     * @return the invocation tag.
+     * @return the invocation type.
      */
     @Nonnull
-    Object getInvocationTag() {
+    String getInvocationType() {
 
-        return mInvocationTag;
+        return mInvocationType;
     }
 
     /**

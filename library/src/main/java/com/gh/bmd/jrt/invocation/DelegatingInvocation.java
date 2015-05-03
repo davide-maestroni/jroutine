@@ -57,10 +57,17 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the factory.
+     * @throws java.lang.NullPointerException if the specified routine is null.
      */
     @Nonnull
+    @SuppressWarnings("ConstantConditions")
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryWith(
             @Nonnull final Routine<INPUT, OUTPUT> routine) {
+
+        if (routine == null) {
+
+            throw new NullPointerException("the routine must not be null");
+        }
 
         return new InvocationFactory<INPUT, OUTPUT>() {
 

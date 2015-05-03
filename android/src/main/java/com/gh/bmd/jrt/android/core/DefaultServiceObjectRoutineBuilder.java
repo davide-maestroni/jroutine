@@ -339,7 +339,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .withRoutineConfiguration()
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
-                       .withInputOrder(OrderType.PASSING_ORDER)
+                       .withInputOrder(OrderType.PASS_ORDER)
                        .set()
                        .withServiceConfiguration()
                        .with(serviceConfiguration)
@@ -388,7 +388,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
                                         toNames(parameterTypes))
-                       .withInputOrder(OrderType.PASSING_ORDER)
+                       .withInputOrder(OrderType.PASS_ORDER)
                        .set()
                        .withServiceConfiguration()
                        .with(serviceConfiguration)
@@ -402,7 +402,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
+                    "the specified class is not an interface: " + itf.getName());
         }
 
         warn(mServiceConfiguration.getLogClassOr(null), mRoutineConfiguration);
@@ -990,9 +990,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                              method.getName(), toNames(parameterTypes),
                                              toNames(targetParameterTypes), isInputCollection,
                                              isOutputCollection)
-                            .withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASSING_ORDER)
+                            .withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASS_ORDER)
                             .withOutputOrder(
-                                    (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
+                                    (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER
                                             : OrderType.NONE)
                             .set()
                             .withServiceConfiguration()

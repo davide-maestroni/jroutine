@@ -18,8 +18,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.routine.ContextRoutine;
@@ -58,9 +56,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
     private final Object[] mArgs;
 
-    private final CacheStrategyType mCacheStrategyType;
-
-    private final ClashResolutionType mClashResolutionType;
+    private final InvocationConfiguration mConfiguration;
 
     private final WeakReference<Object> mContext;
 
@@ -76,7 +72,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
      * @param context                 the context reference.
      * @param factory                 the invocation factory.
      * @param routineConfiguration    the routine configuration.
-     * @param invocationConfiguration the routine configuration.
+     * @param invocationConfiguration the invocation configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      * @throws java.lang.NullPointerException     if any of the specified non-null parameter is
      *                                            null.
@@ -106,15 +102,12 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         mContext = context;
         mFactory = factory;
+        mConfiguration = invocationConfiguration;
         mInvocationId = invocationConfiguration.getInvocationIdOr(InvocationConfiguration.AUTO);
-        mClashResolutionType = invocationConfiguration.getClashResolutionTypeOr(
-                ClashResolutionType.ABORT_THAT_INPUT);
-        mCacheStrategyType =
-                invocationConfiguration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
         mArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         mOrderType = routineConfiguration.getOutputOrderTypeOr(null);
-        getLogger().dbg("building context routine on invocation tag %s with configuration: %s",
-                        factory.getInvocationTag(), invocationConfiguration);
+        getLogger().dbg("building context routine with invocation type %s and configuration: %s",
+                        factory.getInvocationType(), invocationConfiguration);
     }
 
     @Override
@@ -126,8 +119,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         if (context.get() != null) {
 
             Runners.mainRunner()
-                   .run(new PurgeExecution(context, mInvocationId, mFactory.getInvocationTag(),
-                                           mArgs), 0, TimeUnit.MILLISECONDS);
+                   .run(new PurgeExecution(context, mFactory.getInvocationType(), mArgs,
+                                           mInvocationId), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -160,9 +153,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         if (async) {
 
-            return new LoaderInvocation<INPUT, OUTPUT>(mContext, mFactory, mInvocationId,
-                                                       mClashResolutionType, mCacheStrategyType,
-                                                       mArgs, mOrderType, logger);
+            return new LoaderInvocation<INPUT, OUTPUT>(mContext, mFactory, mArgs, mConfiguration,
+                                                       mOrderType, logger);
         }
 
         final Object context = mContext.get();
@@ -187,14 +179,14 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         } else {
 
             throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getCanonicalName());
+                    "invalid context type: " + context.getClass().getName());
         }
 
         try {
 
             final ContextInvocationFactory<INPUT, OUTPUT> factory = mFactory;
-            logger.dbg("creating a new invocation instance with tag: %s",
-                       factory.getInvocationTag());
+            logger.dbg("creating a new invocation instance of type: %s",
+                       factory.getInvocationType());
             final ContextInvocation<INPUT, OUTPUT> invocation = factory.newInvocation(mArgs);
             invocation.onContext(appContext);
             return invocation;
@@ -219,8 +211,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
             final List<INPUT> inputList = Collections.singletonList(input);
             final PurgeInputsExecution<INPUT> execution =
-                    new PurgeInputsExecution<INPUT>(context, mInvocationId,
-                                                    mFactory.getInvocationTag(), mArgs, inputList);
+                    new PurgeInputsExecution<INPUT>(context, mFactory.getInvocationType(), mArgs,
+                                                    mInvocationId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -234,8 +226,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
             final List<INPUT> inputList =
                     (inputs == null) ? Collections.<INPUT>emptyList() : Arrays.asList(inputs);
             final PurgeInputsExecution<INPUT> execution =
-                    new PurgeInputsExecution<INPUT>(context, mInvocationId,
-                                                    mFactory.getInvocationTag(), mArgs, inputList);
+                    new PurgeInputsExecution<INPUT>(context, mFactory.getInvocationType(), mArgs,
+                                                    mInvocationId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -263,8 +255,8 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
             }
 
             final PurgeInputsExecution<INPUT> execution =
-                    new PurgeInputsExecution<INPUT>(context, mInvocationId,
-                                                    mFactory.getInvocationTag(), mArgs, inputList);
+                    new PurgeInputsExecution<INPUT>(context, mFactory.getInvocationType(), mArgs,
+                                                    mInvocationId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -278,25 +270,26 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         private final Object[] mInvocationArgs;
 
-        private final Object mInvocationClass;
-
         private final int mInvocationId;
+
+        private final String mInvocationType;
 
         /**
          * Constructor.
          *
          * @param context        the context reference.
+         * @param invocationType the invocation type.
+         * @param invocationArgs the invocation factory arguments.
          * @param invocationId   the invocation ID.
-         * @param invocationTag  the invocation tag.
-         * @param invocationArgs the invocation constructor arguments.
          */
-        private PurgeExecution(@Nonnull final WeakReference<Object> context, final int invocationId,
-                @Nonnull final Object invocationTag, @Nonnull final Object[] invocationArgs) {
+        private PurgeExecution(@Nonnull final WeakReference<Object> context,
+                @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs,
+                final int invocationId) {
 
             mContext = context;
-            mInvocationId = invocationId;
-            mInvocationClass = invocationTag;
+            mInvocationType = invocationType;
             mInvocationArgs = invocationArgs;
+            mInvocationId = invocationId;
         }
 
         public void run() {
@@ -305,7 +298,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoaders(context, mInvocationId, mInvocationClass,
+                LoaderInvocation.purgeLoaders(context, mInvocationId, mInvocationType,
                                               mInvocationArgs);
             }
         }
@@ -324,27 +317,27 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         private final Object[] mInvocationArgs;
 
-        private final Object mInvocationClass;
-
         private final int mInvocationId;
+
+        private final String mInvocationType;
 
         /**
          * Constructor.
          *
          * @param context        the context reference.
+         * @param invocationType the invocation type.
+         * @param invocationArgs the invocation factory arguments.
          * @param invocationId   the invocation ID.
-         * @param invocationTag  the invocation tag.
-         * @param invocationArgs the invocation constructor arguments.
          * @param inputs         the list of inputs.
          */
         private PurgeInputsExecution(@Nonnull final WeakReference<Object> context,
-                final int invocationId, @Nonnull final Object invocationTag,
-                @Nonnull final Object[] invocationArgs, @Nonnull final List<INPUT> inputs) {
+                @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs,
+                final int invocationId, @Nonnull final List<INPUT> inputs) {
 
             mContext = context;
-            mInvocationId = invocationId;
-            mInvocationClass = invocationTag;
+            mInvocationType = invocationType;
             mInvocationArgs = invocationArgs;
+            mInvocationId = invocationId;
             mInputs = inputs;
         }
 
@@ -354,7 +347,7 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mInvocationId, mInvocationClass,
+                LoaderInvocation.purgeLoader(context, mInvocationId, mInvocationType,
                                              mInvocationArgs, mInputs);
             }
         }

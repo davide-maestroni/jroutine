@@ -72,8 +72,7 @@ class DefaultWrapperRoutineBuilder
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getRawClass()
-                                                                     .getCanonicalName());
+                    "the specified class is not an interface: " + itf.getRawClass().getName());
         }
 
         final Object target = mTargetReference.get();

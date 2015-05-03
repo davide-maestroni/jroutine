@@ -33,10 +33,12 @@ import javax.annotation.Nullable;
 public abstract class FilterContextInvocation<INPUT, OUTPUT>
         implements ContextInvocation<INPUT, OUTPUT>, ContextInvocationFactory<INPUT, OUTPUT> {
 
-    @Nonnull
-    public final Object getInvocationTag() {
+    private final String mInvocationType = getClass().getName();
 
-        return getClass();
+    @Nonnull
+    public final String getInvocationType() {
+
+        return mInvocationType;
     }
 
     @Nonnull

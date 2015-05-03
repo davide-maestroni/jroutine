@@ -118,7 +118,7 @@ public @interface Pass {
     Class<?> value();
 
     /**
-     * Asynchronous passing mode.<br/>
+     * Asynchronous pass mode.<br/>
      * The type indicates in which way a parameter is passed to the wrapped method or the result
      * is passed outside.
      */
@@ -155,10 +155,10 @@ public @interface Pass {
         /**
          * Automatic mode.<br/>
          * The mode is automatically assigned based to the parameter or return type. Namely: if the
-         * parameters match the COLLECTION passing mode, they are assigned it; if they match the
-         * OBJECT mode, they are assigned the latter; finally the PARALLEL conditions are checked.
+         * parameters match the COLLECTION pass mode, they are assigned it; if they match the OBJECT
+         * mode, they are assigned the latter; finally the PARALLEL conditions are checked.
          * <p/>
-         * Dually, if the return type matches the PARALLEL passing mode, it is assigned it; if it
+         * Dually, if the return type matches the PARALLEL pass mode, it is assigned it; if it
          * matches the COLLECTION mode, it is assigned the latter; finally the OBJECT conditions are
          * checked.
          */

@@ -29,13 +29,13 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvocation<INPUT, OUTPUT>
+final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvocation<INPUT, OUTPUT>
         implements InvocationFactory<INPUT, OUTPUT> {
 
     /**
-     * The invocation tag.
+     * The invocation type.
      */
-    static final Object TAG = MissingLoaderInvocation.class;
+    static final String TYPE = MissingLoaderInvocation.class.getCanonicalName();
 
     private static final MissingLoaderInvocation<Object, Object> sInvocation =
             new MissingLoaderInvocation<Object, Object>();

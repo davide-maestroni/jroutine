@@ -212,7 +212,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
+                    "the specified class is not an interface: " + itf.getName());
         }
 
         final InvocationHandler handler;
@@ -415,10 +415,10 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             warn(configuration);
             builder.withInputOrder(
-                    (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
+                    (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASS_ORDER)
                    .withInputMaxSize(Integer.MAX_VALUE)
                    .withInputTimeout(TimeDuration.ZERO)
-                   .withOutputOrder((returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER
+                   .withOutputOrder((returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER
                                             : OrderType.NONE)
                    .withOutputMaxSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);

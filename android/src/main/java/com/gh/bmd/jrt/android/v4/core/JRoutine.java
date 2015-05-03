@@ -38,8 +38,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * so that waiting for the outputs right after the routine invocation will result in a deadlock.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
- * objects and the invocation constructor arguments, might be employed to check for clashing of
- * invocations or compute the invocation ID.<br/>
+ * objects and the invocation factory arguments, might be employed to check for clashing of
+ * invocation instances or compute the invocation ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or an input independent clash resolution should be used to
  * avoid unexpected results.

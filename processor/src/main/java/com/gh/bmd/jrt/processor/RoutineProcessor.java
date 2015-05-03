@@ -405,10 +405,9 @@ public class RoutineProcessor extends AbstractProcessor {
             @Nullable final PassMode returnMode) {
 
         return ".withInputOrder(" + OrderType.class.getCanonicalName() + "." + (
-                (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
+                (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASS_ORDER)
                 + ").withOutputOrder(" + OrderType.class.getCanonicalName() + "." + (
-                (returnMode == PassMode.COLLECTION) ? OrderType.PASSING_ORDER : OrderType.NONE)
-                + ")";
+                (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER : OrderType.NONE) + ")";
     }
 
     private String buildSizedArray(final TypeMirror returnType) {
@@ -681,7 +680,7 @@ public class RoutineProcessor extends AbstractProcessor {
                         getBoxedType(targetMirror))) {
 
                     throw new IllegalArgumentException(
-                            "[" + methodElement + "] the async input array with passing mode "
+                            "[" + methodElement + "] the async input array with pass mode "
                                     + PassMode.PARALLEL + " does not match the bound type: "
                                     + targetMirror);
                 }
@@ -689,10 +688,9 @@ public class RoutineProcessor extends AbstractProcessor {
                 if (length > 1) {
 
                     throw new IllegalArgumentException(
-                            "[" + methodElement + "] an async input with passing mode "
-                                    + PassMode.PARALLEL +
-                                    " cannot be applied to a method taking " + length +
-                                    " input parameters");
+                            "[" + methodElement + "] an async input with pass mode "
+                                    + PassMode.PARALLEL + " cannot be applied to a method taking "
+                                    + length + " input parameters");
                 }
 
                 passMode = PassMode.PARALLEL;
@@ -701,7 +699,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement + "] cannot automatically choose a "
-                                + "passing mode for an output of type: " + targetParameter);
+                                + "pass mode for an output of type: " + targetParameter);
             }
 
         } else if (passMode == PassMode.OBJECT) {
@@ -709,8 +707,8 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with passing mode "
-                                + PassMode.OBJECT + " must implement an " + outputChannelElement);
+                        "[" + methodElement + "] an async input with pass mode " + PassMode.OBJECT
+                                + " must implement an " + outputChannelElement);
             }
 
         } else if (passMode == PassMode.COLLECTION) {
@@ -718,7 +716,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with passing mode "
+                        "[" + methodElement + "] an async input with pass mode "
                                 + PassMode.COLLECTION + " must implement an "
                                 + outputChannelElement);
             }
@@ -727,7 +725,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     && !typeUtils.isAssignable(listElement.asType(), targetMirror)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with passing mode "
+                        "[" + methodElement + "] an async input with pass mode "
                                 + PassMode.COLLECTION
                                 + " must be bound to an array or a superclass of " + listElement);
             }
@@ -735,10 +733,9 @@ public class RoutineProcessor extends AbstractProcessor {
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with passing mode "
-                                + PassMode.COLLECTION +
-                                " cannot be applied to a method taking " + length
-                                + " input parameters");
+                        "[" + methodElement + "] an async input with pass mode "
+                                + PassMode.COLLECTION + " cannot be applied to a method taking "
+                                + length + " input parameters");
             }
 
         } else { // PassMode.PARALLEL
@@ -747,9 +744,8 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetTypeErasure, iterableElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with passing mode "
-                                + PassMode.PARALLEL + " must be an array or implement an "
-                                + iterableElement);
+                        "[" + methodElement + "] an async input with pass mode " + PassMode.PARALLEL
+                                + " must be an array or implement an " + iterableElement);
             }
 
             if ((targetType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
@@ -757,7 +753,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     getBoxedType(targetMirror))) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] the async input array with passing mode "
+                        "[" + methodElement + "] the async input array with pass mode "
                                 + PassMode.PARALLEL + " does not match the bound type: "
                                 + targetMirror);
             }
@@ -765,9 +761,8 @@ public class RoutineProcessor extends AbstractProcessor {
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with passing mode "
-                                + PassMode.PARALLEL +
-                                " cannot be applied to a method taking " + length
+                        "[" + methodElement + "] an async input with pass mode " + PassMode.PARALLEL
+                                + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
         }
@@ -801,7 +796,7 @@ public class RoutineProcessor extends AbstractProcessor {
                         getBoxedType(((ArrayType) returnType).getComponentType()))) {
 
                     throw new IllegalArgumentException(
-                            "[" + methodElement + "] the async output array with passing mode "
+                            "[" + methodElement + "] the async output array with pass mode "
                                     + PassMode.PARALLEL + " does not match the bound type: "
                                     + targetMirror);
                 }
@@ -824,7 +819,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement + "] cannot automatically choose a "
-                                + "passing mode for an input of type: " + returnType);
+                                + "pass mode for an input of type: " + returnType);
             }
 
         } else if (passMode == PassMode.OBJECT) {
@@ -832,9 +827,8 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with passing mode "
-                                + PassMode.OBJECT + " must be a superclass of "
-                                + outputChannelElement);
+                        "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
+                                + " must be a superclass of " + outputChannelElement);
             }
 
         } else if (passMode == PassMode.COLLECTION) {
@@ -842,16 +836,15 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with passing mode "
-                                + PassMode.OBJECT + " must be a superclass of "
-                                + outputChannelElement);
+                        "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
+                                + " must be a superclass of " + outputChannelElement);
             }
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
                     && !typeUtils.isAssignable(targetMirror, iterableElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with passing mode "
+                        "[" + methodElement + "] an async output with pass mode "
                                 + PassMode.COLLECTION
                                 + " must be bound to an array or a type implementing an "
                                 + iterableElement);
@@ -863,7 +856,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     listElement.asType(), returnTypeErasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with passing mode "
+                        "[" + methodElement + "] an async output with pass mode "
                                 + PassMode.PARALLEL + " must be an array or a superclass of "
                                 + listElement);
             }
@@ -873,7 +866,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     getBoxedType(((ArrayType) returnType).getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] the async output array with passing mode "
+                        "[" + methodElement + "] the async output array with pass mode "
                                 + PassMode.PARALLEL + " does not match the bound type: "
                                 + targetMirror);
             }

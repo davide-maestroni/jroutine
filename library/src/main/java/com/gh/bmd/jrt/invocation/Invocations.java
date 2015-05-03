@@ -52,8 +52,6 @@ public class Invocations {
      * @param <INPUT>         the input data type.
      * @param <OUTPUT>        the output data type.
      * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
@@ -75,8 +73,6 @@ public class Invocations {
      * @param <INPUT>         the input data type.
      * @param <OUTPUT>        the output data type.
      * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(

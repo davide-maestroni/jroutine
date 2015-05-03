@@ -88,21 +88,18 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     /**
      * Constructor.
      *
-     * @param context        the context reference.
-     * @param factory        the invocation factory.
-     * @param loaderId       the loader ID.
-     * @param resolutionType the clash resolution type.
-     * @param strategyType   the result cache strategy type.
-     * @param args           the invocation constructor arguments.
-     * @param order          the input data order.
-     * @param logger         the logger instance.
+     * @param context       the context reference.
+     * @param factory       the invocation factory.
+     * @param args          the invocation factory arguments.
+     * @param configuration the invocation configuration.
+     * @param order         the input data order.
+     * @param logger        the logger instance.
      * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory, final int loaderId,
-            @Nullable final ClashResolutionType resolutionType,
-            @Nullable final CacheStrategyType strategyType, @Nonnull final Object[] args,
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
+            @Nonnull final Object[] args, @Nonnull final InvocationConfiguration configuration,
             @Nullable final OrderType order, @Nonnull final Logger logger) {
 
         if (context == null) {
@@ -117,16 +114,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         if (args == null) {
 
-            throw new NullPointerException(
-                    "the invocation constructor array of arguments must not be null");
+            throw new NullPointerException("the array of arguments must not be null");
         }
 
         mContext = context;
         mFactory = factory;
-        mLoaderId = loaderId;
+        mLoaderId = configuration.getInvocationIdOr(InvocationConfiguration.AUTO);
         mClashResolutionType =
-                (resolutionType == null) ? ClashResolutionType.ABORT_THAT_INPUT : resolutionType;
-        mCacheStrategyType = (strategyType == null) ? CacheStrategyType.CLEAR : strategyType;
+                configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
+        mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
         mArgs = args;
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
@@ -163,7 +159,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         } else {
 
             throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getCanonicalName());
+                    "invalid context type: " + context.getClass().getName());
         }
 
         int i = 0;
@@ -201,13 +197,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      *
      * @param context        the context.
      * @param loaderId       the loader ID.
-     * @param invocationTag  the invocation tag.
-     * @param invocationArgs the invocation constructor arguments.
+     * @param invocationType the invocation type.
+     * @param invocationArgs the invocation factory arguments.
      * @param inputs         the invocation inputs.
      */
     @SuppressWarnings("unchecked")
     static void purgeLoader(@Nonnull final Object context, final int loaderId,
-            @Nonnull final Object invocationTag, @Nonnull final Object[] invocationArgs,
+            @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs,
             @Nonnull final List<?> inputs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -233,7 +229,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         } else {
 
             throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getCanonicalName());
+                    "invalid context type: " + context.getClass().getName());
         }
 
         int i = 0;
@@ -251,7 +247,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             final RoutineLoader<Object, Object> loader =
                     (RoutineLoader<Object, Object>) callbacks.mLoader;
 
-            if (loader.getInvocationTag().equals(invocationTag) && Arrays.equals(
+            if (loader.getInvocationType().equals(invocationType) && Arrays.equals(
                     loader.getInvocationArgs(), invocationArgs) && (loader.getInvocationCount()
                     == 0)) {
 
@@ -309,7 +305,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         } else {
 
             throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getCanonicalName());
+                    "invalid context type: " + context.getClass().getName());
         }
 
         int i = 0;
@@ -349,11 +345,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      *
      * @param context        the context.
      * @param loaderId       the loader ID.
-     * @param invocationTag  the invocation tag.
-     * @param invocationArgs the invocation constructor arguments.
+     * @param invocationType the invocation type.
+     * @param invocationArgs the invocation factory arguments.
      */
     static void purgeLoaders(@Nonnull final Object context, final int loaderId,
-            @Nonnull final Object invocationTag, @Nonnull final Object[] invocationArgs) {
+            @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -378,7 +374,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         } else {
 
             throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getCanonicalName());
+                    "invalid context type: " + context.getClass().getName());
         }
 
         int i = 0;
@@ -395,7 +391,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<?, ?> loader = callbacks.mLoader;
 
-            if (loader.getInvocationTag().equals(invocationTag) && Arrays.equals(
+            if (loader.getInvocationType().equals(invocationType) && Arrays.equals(
                     loader.getInvocationArgs(), invocationArgs) && (loader.getInvocationCount()
                     == 0)) {
 
@@ -477,14 +473,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         } else {
 
             throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getCanonicalName());
+                    "invalid context type: " + context.getClass().getName());
         }
 
         int loaderId = mLoaderId;
 
         if (loaderId == InvocationConfiguration.AUTO) {
 
-            loaderId = mFactory.getInvocationTag().hashCode();
+            loaderId = mFactory.getInvocationType().hashCode();
 
             for (final Object arg : mArgs) {
 
@@ -570,8 +566,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         try {
 
-            logger.dbg("creating a new invocation instance with tag [%d]: %s", loaderId,
-                       factory.getInvocationTag());
+            logger.dbg("creating a new invocation instance of type [%d]: %s", loaderId,
+                       factory.getInvocationType());
             invocation = factory.newInvocation(args);
             invocation.onContext(loaderContext.getApplicationContext());
 
@@ -588,7 +584,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
                 : new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation,
-                                                   factory.getInvocationTag(), args, inputs,
+                                                   factory.getInvocationType(), args, inputs,
                                                    mOrderType, logger);
         return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
     }
@@ -607,20 +603,19 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         if (loader.getClass() != RoutineLoader.class) {
 
-            logger.err("clashing invocation ID [%d]: %s", loaderId,
-                       loader.getClass().getCanonicalName());
+            logger.err("clashing invocation ID [%d]: %s", loaderId, loader.getClass().getName());
             throw new InvocationClashException(loaderId);
         }
 
         final RoutineLoader<INPUT, OUTPUT> routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
-        final Object invocationTag = mFactory.getInvocationTag();
+        final String invocationType = mFactory.getInvocationType();
 
-        if (!MissingLoaderInvocation.TAG.equals(invocationTag) && (
-                !routineLoader.getInvocationTag().equals(invocationTag) || !Arrays.equals(
+        if (!MissingLoaderInvocation.TYPE.equals(invocationType) && (
+                !routineLoader.getInvocationType().equals(invocationType) || !Arrays.equals(
                         routineLoader.getInvocationArgs(), mArgs))) {
 
             logger.wrn("clashing invocation ID [%d]: %s", loaderId,
-                       routineLoader.getInvocationTag());
+                       routineLoader.getInvocationType());
             throw new InvocationClashException(loaderId);
         }
 

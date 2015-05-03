@@ -86,7 +86,7 @@ class DefaultClassRoutineBuilder
         if (targetClass.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the target class must not be an interface: " + targetClass.getCanonicalName());
+                    "the target class must not be an interface: " + targetClass.getName());
         }
 
         mTargetClass = targetClass;
@@ -354,7 +354,7 @@ class DefaultClassRoutineBuilder
         }
 
         warn(routineConfiguration);
-        builder.withInputOrder(OrderType.PASSING_ORDER)
+        builder.withInputOrder(OrderType.PASS_ORDER)
                .withInputMaxSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
                .withOutputMaxSize(Integer.MAX_VALUE)

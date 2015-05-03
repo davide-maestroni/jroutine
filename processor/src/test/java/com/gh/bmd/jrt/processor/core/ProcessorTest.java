@@ -29,9 +29,9 @@ import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
-import com.gh.bmd.jrt.processor.annotation.Wrap;
-import com.gh.bmd.jrt.processor.builder.WrapperBuilder;
-import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
+import com.gh.bmd.jrt.processor.annotation.Proxy;
+import com.gh.bmd.jrt.processor.builder.ProxyBuilder;
+import com.gh.bmd.jrt.processor.builder.ProxyRoutineBuilder;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -62,27 +62,27 @@ import static org.junit.Assert.fail;
 public class ProcessorTest {
 
     @Test
-    public void testGenericWrapperCache() {
+    public void testGenericProxyCache() {
 
         final TestList<String> testList = new TestList<String>();
-        final WrapperRoutineBuilder builder = JRoutineProcessor.on(testList)
-                                                               .withRoutineConfiguration()
-                                                               .withAsyncRunner(
-                                                                       Runners.queuedRunner())
-                                                               .set();
+        final ProxyRoutineBuilder builder = JRoutineProcessor.on(testList)
+                                                             .withRoutineConfiguration()
+                                                             .withAsyncRunner(
+                                                                     Runners.queuedRunner())
+                                                             .set();
 
         final TestListItf<String> testListItf1 =
-                builder.buildWrapper(new ClassToken<TestListItf<String>>() {});
+                builder.buildProxy(new ClassToken<TestListItf<String>>() {});
         testListItf1.add("test");
 
         assertThat(testListItf1.get(0)).isEqualTo("test");
-        assertThat(builder.buildWrapper(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+        assertThat(builder.buildProxy(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
                 testListItf1);
 
         final TestListItf<Integer> testListItf2 =
-                builder.buildWrapper(new ClassToken<TestListItf<Integer>>() {});
+                builder.buildProxy(new ClassToken<TestListItf<Integer>>() {});
         assertThat(testListItf2).isSameAs(testListItf1);
-        assertThat(builder.buildWrapper(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+        assertThat(builder.buildProxy(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
                 testListItf2);
 
         testListItf2.add(3);
@@ -95,16 +95,15 @@ public class ProcessorTest {
     public void testInterface() {
 
         final TestClass test = new TestClass();
-        final ClassToken<TestInterfaceWrapper> token =
-                ClassToken.tokenOf(TestInterfaceWrapper.class);
-        final TestInterfaceWrapper testWrapper = JRoutineProcessor.on(test)
-                                                                  .withRoutineConfiguration()
-                                                                  .withSyncRunner(
-                                                                          Runners.sequentialRunner())
-                                                                  .set()
-                                                                  .buildWrapper(token);
+        final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
+        final TestInterfaceProxy testProxy = JRoutineProcessor.on(test)
+                                                              .withRoutineConfiguration()
+                                                              .withSyncRunner(
+                                                                      Runners.sequentialRunner())
+                                                              .set()
+                                                              .buildProxy(token);
 
-        assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
+        assertThat(testProxy.getOne().readNext()).isEqualTo(1);
     }
 
     @Test
@@ -115,7 +114,7 @@ public class ProcessorTest {
 
         try {
 
-            JRoutineProcessor.on(test).buildWrapper((Class<?>) null);
+            JRoutineProcessor.on(test).buildProxy((Class<?>) null);
 
             fail();
 
@@ -125,7 +124,7 @@ public class ProcessorTest {
 
         try {
 
-            JRoutineProcessor.on(test).buildWrapper((ClassToken<?>) null);
+            JRoutineProcessor.on(test).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -135,25 +134,175 @@ public class ProcessorTest {
     }
 
     @Test
+    public void testProxy() {
+
+        final NullLog log = new NullLog();
+        final Runner runner = Runners.poolRunner();
+        final TestClass test = new TestClass();
+        final TestProxy testProxy = JRoutineProcessor.on(test)
+                                                     .withRoutineConfiguration()
+                                                     .withSyncRunner(Runners.sequentialRunner())
+                                                     .withAsyncRunner(runner)
+                                                     .withLogLevel(LogLevel.DEBUG)
+                                                     .withLog(log)
+                                                     .set()
+                                                     .buildProxy(
+                                                             ClassToken.tokenOf(TestProxy.class));
+
+        assertThat(testProxy.getOne().readNext()).isEqualTo(1);
+        assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
+        assertThat(testProxy.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
+                            .readAll()).containsOnly("1", "2", "3");
+        assertThat(testProxy.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
+        assertThat(testProxy.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+        assertThat(testProxy.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+
+        final ArrayList<String> list = new ArrayList<String>();
+        assertThat(testProxy.getList(Collections.singletonList(list))).containsExactly(list);
+
+        final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().pass(3).close();
+        assertThat(testProxy.getString(standaloneChannel.output())).isEqualTo("3");
+    }
+
+    @Test
+    public void testProxyBuilder() {
+
+        final NullLog log = new NullLog();
+        final Runner runner = Runners.poolRunner();
+        final TestClass test = new TestClass();
+        final RoutineConfiguration configuration =
+                builder().withSyncRunner(Runners.sequentialRunner())
+                         .withAsyncRunner(runner)
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(log)
+                         .set();
+        final ProxyBuilder<TestProxy> builder = JRoutine_TestProxy.on(test);
+        final TestProxy testProxy =
+                builder.withRoutineConfiguration().with(configuration).set().buildProxy();
+
+        assertThat(testProxy.getOne().readNext()).isEqualTo(1);
+        assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
+        assertThat(testProxy.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
+                            .readAll()).containsOnly("1", "2", "3");
+        assertThat(testProxy.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
+        assertThat(testProxy.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+        assertThat(testProxy.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+
+        final ArrayList<String> list = new ArrayList<String>();
+        assertThat(testProxy.getList(Collections.singletonList(list))).containsExactly(list);
+
+        final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().pass(3).close();
+        assertThat(testProxy.getString(standaloneChannel.output())).isEqualTo("3");
+
+        assertThat(JRoutineProcessor.on(test)
+                                    .withRoutineConfiguration()
+                                    .with(configuration)
+                                    .set()
+                                    .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
+                testProxy);
+    }
+
+    @Test
+    public void testProxyBuilderWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final TestClass test = new TestClass();
+        JRoutineProcessor.on(test)
+                         .withRoutineConfiguration()
+                         .withFactoryArgs()
+                         .withInputOrder(OrderType.NONE)
+                         .withInputMaxSize(3)
+                         .withInputTimeout(seconds(1))
+                         .withOutputOrder(OrderType.NONE)
+                         .withOutputMaxSize(3)
+                         .withOutputTimeout(seconds(1))
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(countLog)
+                         .set()
+                         .buildProxy(TestProxy.class)
+                         .getOne();
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
+    }
+
+    @Test
+    public void testProxyCache() {
+
+        final NullLog log = new NullLog();
+        final Runner runner = Runners.poolRunner();
+        final TestClass test = new TestClass();
+        final RoutineConfiguration configuration =
+                builder().withSyncRunner(Runners.sequentialRunner())
+                         .withAsyncRunner(runner)
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(log)
+                         .set();
+        final TestProxy testProxy = JRoutineProcessor.on(test)
+                                                     .withRoutineConfiguration()
+                                                     .with(configuration)
+                                                     .set()
+                                                     .buildProxy(
+                                                             ClassToken.tokenOf(TestProxy.class));
+
+        assertThat(JRoutineProcessor.on(test)
+                                    .withRoutineConfiguration()
+                                    .with(configuration)
+                                    .set()
+                                    .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
+                testProxy);
+    }
+
+    @Test
+    public void testProxyError() {
+
+        final TestClass test = new TestClass();
+
+        try {
+
+            JRoutineProcessor.on(test).buildProxy(TestClass.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutineProcessor.on(test).buildProxy(ClassToken.tokenOf(TestClass.class));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testShareGroup() {
 
         final TestClass2 test = new TestClass2();
-        final WrapperRoutineBuilder builder = JRoutineProcessor.on(test)
-                                                               .withRoutineConfiguration()
-                                                               .withReadTimeout(seconds(2))
-                                                               .set();
+        final ProxyRoutineBuilder builder = JRoutineProcessor.on(test)
+                                                             .withRoutineConfiguration()
+                                                             .withReadTimeout(seconds(2))
+                                                             .set();
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne = builder.withProxyConfiguration()
                                                .withShareGroup("1")
                                                .set()
-                                               .buildWrapper(TestClassAsync.class)
+                                               .buildProxy(TestClassAsync.class)
                                                .getOne();
         OutputChannel<Integer> getTwo = builder.withProxyConfiguration()
                                                .withShareGroup("2")
                                                .set()
-                                               .buildWrapper(TestClassAsync.class)
+                                               .buildProxy(TestClassAsync.class)
                                                .getTwo();
 
         assertThat(getOne.checkComplete()).isTrue();
@@ -162,8 +311,8 @@ public class ProcessorTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.buildWrapper(TestClassAsync.class).getOne();
-        getTwo = builder.buildWrapper(TestClassAsync.class).getTwo();
+        getOne = builder.buildProxy(TestClassAsync.class).getOne();
+        getTwo = builder.buildProxy(TestClassAsync.class).getTwo();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -179,7 +328,7 @@ public class ProcessorTest {
                                          .withRoutineConfiguration()
                                          .withReadTimeout(INFINITY)
                                          .set()
-                                         .buildWrapper(Itf.class);
+                                         .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
         final StandaloneChannel<Character> channel1 = JRoutine.standalone().buildChannel();
@@ -398,7 +547,7 @@ public class ProcessorTest {
                                     .withRoutineConfiguration()
                                     .withReadTimeout(seconds(1))
                                     .set()
-                                    .buildWrapper(TestTimeoutItf.class)
+                                    .buildProxy(TestTimeoutItf.class)
                                     .getInt()).containsExactly(31);
 
         try {
@@ -407,7 +556,7 @@ public class ProcessorTest {
                              .withRoutineConfiguration()
                              .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                              .set()
-                             .buildWrapper(TestTimeoutItf.class)
+                             .buildProxy(TestTimeoutItf.class)
                              .getInt();
 
             fail();
@@ -417,159 +566,7 @@ public class ProcessorTest {
         }
     }
 
-    @Test
-    public void testWrapper() {
-
-        final NullLog log = new NullLog();
-        final Runner runner = Runners.poolRunner();
-        final TestClass test = new TestClass();
-        final TestWrapper testWrapper = JRoutineProcessor.on(test)
-                                                         .withRoutineConfiguration()
-                                                         .withSyncRunner(Runners.sequentialRunner())
-                                                         .withAsyncRunner(runner)
-                                                         .withLogLevel(LogLevel.DEBUG)
-                                                         .withLog(log)
-                                                         .set()
-                                                         .buildWrapper(ClassToken.tokenOf(
-                                                                 TestWrapper.class));
-
-        assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
-        assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
-        assertThat(testWrapper.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
-                              .readAll()).containsOnly("1", "2", "3");
-        assertThat(testWrapper.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
-        assertThat(testWrapper.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
-        assertThat(
-                testWrapper.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
-
-        final ArrayList<String> list = new ArrayList<String>();
-        assertThat(testWrapper.getList(Collections.singletonList(list))).containsExactly(list);
-
-        final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().pass(3).close();
-        assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
-    }
-
-    @Test
-    public void testWrapperBuilder() {
-
-        final NullLog log = new NullLog();
-        final Runner runner = Runners.poolRunner();
-        final TestClass test = new TestClass();
-        final RoutineConfiguration configuration =
-                builder().withSyncRunner(Runners.sequentialRunner())
-                         .withAsyncRunner(runner)
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(log)
-                         .set();
-        final WrapperBuilder<TestWrapper> builder = JRoutine_TestWrapper.on(test);
-        final TestWrapper testWrapper =
-                builder.withRoutineConfiguration().with(configuration).set().buildWrapper();
-
-        assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
-        assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
-        assertThat(testWrapper.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
-                              .readAll()).containsOnly("1", "2", "3");
-        assertThat(testWrapper.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
-        assertThat(testWrapper.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
-        assertThat(
-                testWrapper.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
-
-        final ArrayList<String> list = new ArrayList<String>();
-        assertThat(testWrapper.getList(Collections.singletonList(list))).containsExactly(list);
-
-        final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().pass(3).close();
-        assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
-
-        assertThat(JRoutineProcessor.on(test)
-                                    .withRoutineConfiguration()
-                                    .with(configuration)
-                                    .set()
-                                    .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
-                testWrapper);
-    }
-
-    @Test
-    public void testWrapperBuilderWarnings() {
-
-        final CountLog countLog = new CountLog();
-        final TestClass test = new TestClass();
-        JRoutineProcessor.on(test)
-                         .withRoutineConfiguration()
-                         .withFactoryArgs()
-                         .withInputOrder(OrderType.NONE)
-                         .withInputMaxSize(3)
-                         .withInputTimeout(seconds(1))
-                         .withOutputOrder(OrderType.NONE)
-                         .withOutputMaxSize(3)
-                         .withOutputTimeout(seconds(1))
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(countLog)
-                         .set()
-                         .buildWrapper(TestWrapper.class)
-                         .getOne();
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
-    }
-
-    @Test
-    public void testWrapperCache() {
-
-        final NullLog log = new NullLog();
-        final Runner runner = Runners.poolRunner();
-        final TestClass test = new TestClass();
-        final RoutineConfiguration configuration =
-                builder().withSyncRunner(Runners.sequentialRunner())
-                         .withAsyncRunner(runner)
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(log)
-                         .set();
-        final TestWrapper testWrapper = JRoutineProcessor.on(test)
-                                                         .withRoutineConfiguration()
-                                                         .with(configuration)
-                                                         .set()
-                                                         .buildWrapper(ClassToken.tokenOf(
-                                                                 TestWrapper.class));
-
-        assertThat(JRoutineProcessor.on(test)
-                                    .withRoutineConfiguration()
-                                    .with(configuration)
-                                    .set()
-                                    .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
-                testWrapper);
-    }
-
-    @Test
-    public void testWrapperError() {
-
-        final TestClass test = new TestClass();
-
-        try {
-
-            JRoutineProcessor.on(test).buildWrapper(TestClass.class);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutineProcessor.on(test).buildWrapper(ClassToken.tokenOf(TestClass.class));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Wrap(Impl.class)
+    @Proxy(Impl.class)
     public interface Itf {
 
         @Bind("a")
@@ -849,7 +846,7 @@ public class ProcessorTest {
         void set2(@Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
     }
 
-    @Wrap(TestClass2.class)
+    @Proxy(TestClass2.class)
     public interface TestClassAsync {
 
         @Pass(int.class)
@@ -865,15 +862,15 @@ public class ProcessorTest {
         int getOne();
     }
 
-    @Wrap(TestClassInterface.class)
-    public interface TestInterfaceWrapper {
+    @Proxy(TestClassInterface.class)
+    public interface TestInterfaceProxy {
 
         @Timeout(300)
         @Pass(int.class)
         OutputChannel<Integer> getOne();
     }
 
-    @Wrap(TestList.class)
+    @Proxy(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);
@@ -889,16 +886,8 @@ public class ProcessorTest {
         List<TYPE> getList(int i);
     }
 
-    @Wrap(TestTimeout.class)
-    public interface TestTimeoutItf {
-
-        @Pass(int.class)
-        @TimeoutAction(TimeoutActionType.ABORT)
-        List<Integer> getInt();
-    }
-
-    @Wrap(TestClass.class)
-    public interface TestWrapper {
+    @Proxy(TestClass.class)
+    public interface TestProxy {
 
         @Timeout(300)
         @Pass(List.class)
@@ -929,6 +918,14 @@ public class ProcessorTest {
 
         @Timeout(300)
         String getString(@Pass(int.class) OutputChannel<Integer> i);
+    }
+
+    @Proxy(TestTimeout.class)
+    public interface TestTimeoutItf {
+
+        @Pass(int.class)
+        @TimeoutAction(TimeoutActionType.ABORT)
+        List<Integer> getInt();
     }
 
     @SuppressWarnings("unused")

@@ -29,15 +29,15 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 /**
- * Abstract implementation of a builder of async wrapper objects.
+ * Abstract implementation of a builder of async proxy objects.
  * <p/>
  * Created by davide on 2/26/15.
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractWrapperBuilder<TYPE>
-        implements WrapperBuilder<TYPE>, RoutineConfiguration.Configurable<WrapperBuilder<TYPE>>,
-        ProxyConfiguration.Configurable<WrapperBuilder<TYPE>> {
+public abstract class AbstractProxyBuilder<TYPE>
+        implements ProxyBuilder<TYPE>, RoutineConfiguration.Configurable<ProxyBuilder<TYPE>>,
+        ProxyConfiguration.Configurable<ProxyBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
@@ -47,7 +47,7 @@ public abstract class AbstractWrapperBuilder<TYPE>
     private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
-    public TYPE buildWrapper() {
+    public TYPE buildProxy() {
 
         synchronized (sClassMap) {
 
@@ -77,7 +77,7 @@ public abstract class AbstractWrapperBuilder<TYPE>
 
             try {
 
-                final TYPE newInstance = newWrapper(classShareGroup, configuration);
+                final TYPE newInstance = newProxy(classShareGroup, configuration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -89,15 +89,14 @@ public abstract class AbstractWrapperBuilder<TYPE>
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends WrapperBuilder<TYPE>> withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ProxyBuilder<TYPE>> withRoutineConfiguration() {
 
-        return new RoutineConfiguration.Builder<WrapperBuilder<TYPE>>(this, mRoutineConfiguration);
+        return new RoutineConfiguration.Builder<ProxyBuilder<TYPE>>(this, mRoutineConfiguration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public WrapperBuilder<TYPE> setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+    public ProxyBuilder<TYPE> setConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -110,7 +109,7 @@ public abstract class AbstractWrapperBuilder<TYPE>
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public WrapperBuilder<TYPE> setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+    public ProxyBuilder<TYPE> setConfiguration(@Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -122,15 +121,15 @@ public abstract class AbstractWrapperBuilder<TYPE>
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends WrapperBuilder<TYPE>> withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> withProxyConfiguration() {
 
-        return new ProxyConfiguration.Builder<WrapperBuilder<TYPE>>(this, mProxyConfiguration);
+        return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, mProxyConfiguration);
     }
 
     /**
-     * Returns the builder wrapper class token.
+     * Returns the builder proxy class token.
      *
-     * @return the wrapper class token.
+     * @return the proxy class token.
      */
     @Nonnull
     protected abstract ClassToken<TYPE> getInterfaceToken();
@@ -144,14 +143,14 @@ public abstract class AbstractWrapperBuilder<TYPE>
     protected abstract Object getTarget();
 
     /**
-     * Creates and return a new wrapper instance.
+     * Creates and return a new proxy instance.
      *
      * @param shareGroup    the share group name.
      * @param configuration the routine configuration.
-     * @return the wrapper instance.
+     * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newWrapper(@Nonnull final String shareGroup,
+    protected abstract TYPE newProxy(@Nonnull final String shareGroup,
             @Nonnull final RoutineConfiguration configuration);
 
     /**
@@ -245,7 +244,7 @@ public abstract class AbstractWrapperBuilder<TYPE>
     }
 
     /**
-     * Class used as key to identify a specific wrapper instance.
+     * Class used as key to identify a specific proxy instance.
      */
     private static class ClassInfo {
 
@@ -258,7 +257,7 @@ public abstract class AbstractWrapperBuilder<TYPE>
         /**
          * Constructor.
          *
-         * @param token         the wrapper interface token.
+         * @param token         the proxy interface token.
          * @param configuration the routine configuration.
          * @param shareGroup    the share group name.
          */

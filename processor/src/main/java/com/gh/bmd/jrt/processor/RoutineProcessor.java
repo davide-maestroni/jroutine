@@ -22,7 +22,7 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.processor.annotation.Wrap;
+import com.gh.bmd.jrt.processor.annotation.Proxy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,7 +61,7 @@ import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
 /**
- * Annotation processor used to generate wrapper classes enabling method asynchronous invocations.
+ * Annotation processor used to generate proxy classes enabling method asynchronous invocations.
  * <p/>
  * Created by davide on 11/3/14.
  */
@@ -122,7 +122,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
 
-        return Collections.singleton(Wrap.class.getCanonicalName());
+        return Collections.singleton(Proxy.class.getName());
     }
 
     @Override
@@ -186,11 +186,11 @@ public class RoutineProcessor extends AbstractProcessor {
             return false;
         }
 
-        final TypeElement annotationElement = getTypeFromName(Wrap.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Proxy.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
         for (final Element element : ElementFilter.typesIn(
-                roundEnvironment.getElementsAnnotatedWith(Wrap.class))) {
+                roundEnvironment.getElementsAnnotatedWith(Proxy.class))) {
 
             final TypeElement classElement = (TypeElement) element;
             final List<ExecutableElement> methodElements =
@@ -211,8 +211,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (targetElement != null) {
 
-                createWrapper(classElement, getTypeFromName(targetElement.toString()),
-                              methodElements);
+                createProxy(classElement, getTypeFromName(targetElement.toString()),
+                            methodElements);
             }
         }
 
@@ -431,7 +431,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @SuppressWarnings("PointlessBooleanExpression")
-    private void createWrapper(@Nonnull final TypeElement element,
+    private void createProxy(@Nonnull final TypeElement element,
             @Nonnull final TypeElement targetElement,
             @Nonnull final List<ExecutableElement> methodElements) {
 

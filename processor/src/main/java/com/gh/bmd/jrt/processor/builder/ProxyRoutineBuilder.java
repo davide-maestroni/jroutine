@@ -33,13 +33,13 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
- * @see com.gh.bmd.jrt.processor.annotation.Wrap
+ * @see com.gh.bmd.jrt.processor.annotation.Proxy
  */
-public interface WrapperRoutineBuilder extends ConfigurableBuilder<WrapperRoutineBuilder>,
-        ProxyConfigurableBuilder<WrapperRoutineBuilder> {
+public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBuilder>,
+        ProxyConfigurableBuilder<ProxyRoutineBuilder> {
 
     /**
-     * Returns a wrapper object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
@@ -47,12 +47,12 @@ public interface WrapperRoutineBuilder extends ConfigurableBuilder<WrapperRoutin
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
-     * The wrapping object is created through code generation based on the interfaces annotated
-     * with {@link com.gh.bmd.jrt.processor.annotation.Wrap}. The generated class will share the
-     * same package of the specified interface and will have a name of the type:
+     * The proxy object is created through code generation based on the interfaces annotated with
+     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
+     * package of the specified interface and will have a name of the type:
      * JRoutine_&lt;itf_simple_name&gt;
      * <br/>
-     * It is actually possible to avoid the use of reflection for the wrapper instantiation by
+     * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
      * however, that, since the class is generated, a generic IDE may highlight an error even if the
      * compilation is successful.
@@ -62,16 +62,16 @@ public interface WrapperRoutineBuilder extends ConfigurableBuilder<WrapperRoutin
      *
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
-     * @return the wrapping object.
+     * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
-    <TYPE> TYPE buildWrapper(@Nonnull Class<TYPE> itf);
+    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
 
     /**
-     * Returns a wrapper object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
@@ -79,12 +79,12 @@ public interface WrapperRoutineBuilder extends ConfigurableBuilder<WrapperRoutin
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
-     * The wrapping object is created through code generation based on the interfaces annotated
-     * with {@link com.gh.bmd.jrt.processor.annotation.Wrap}. The generated class will share the
-     * same package of the specified interface and will have a name of the type:
+     * The proxy object is created through code generation based on the interfaces annotated with
+     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
+     * package of the specified interface and will have a name of the type:
      * JRoutine_&lt;itf_simple_name&gt;
      * <br/>
-     * It is actually possible to avoid the use of reflection for the wrapper instantiation by
+     * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
      * however, that, since the class is generated, a generic IDE may highlight an error even if the
      * compilation is successful.
@@ -94,13 +94,13 @@ public interface WrapperRoutineBuilder extends ConfigurableBuilder<WrapperRoutin
      *
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
-     * @return the wrapping object.
+     * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
-    <TYPE> TYPE buildWrapper(@Nonnull ClassToken<TYPE> itf);
+    <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -108,5 +108,5 @@ public interface WrapperRoutineBuilder extends ConfigurableBuilder<WrapperRoutin
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends WrapperRoutineBuilder> withRoutineConfiguration();
+    Builder<? extends ProxyRoutineBuilder> withRoutineConfiguration();
 }

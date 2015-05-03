@@ -19,21 +19,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate interfaces used as templates to generate wrapper classes
+ * This annotation is used to indicate interfaces used as templates to generate proxy classes
  * enabling asynchronous calls to the target instance methods.
  * <p/>
- * The target class is specified in the annotation attribute. A wrapper class implementing the
- * annotated interface will be generated in the interface package and its name will be obtained by
- * prepending "JRoutine_" to the interface simple name.<br/>
+ * The target class is specified in the annotation attribute. A proxy class implementing the
+ * annotated interface will be generated within the interface package and its name will be obtained
+ * by prepending "JRoutine_" to the interface simple name.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
  * annotations defined for each interface method.
  * <p/>
- * Special care must be taken when dealing with wrappers of generic classes. First of all, the
- * wrapper interface must declare the same generic types as the wrapped class or interface.
- * Additionally, the generic parameters must be declared as Object in order for the wrapper
- * interface methods to match the target ones.<br/>
+ * Special care must be taken when dealing with proxies of generic classes. First of all, the
+ * proxy interface must declare the same generic types as the wrapped class or interface.
+ * Additionally, the generic parameters must be declared as <code>Object</code> in order for the
+ * proxy interface methods to match the target ones.<br/>
  * Be also aware that it is responsibility of the caller to ensure that the same instance is not
  * wrapped around two different generic interfaces.<br/>
  * For example, a class of the type:
@@ -60,7 +60,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *             &#64;Wrap(MyList.class)
+ *             &#64;Proxy(MyList.class)
  *             public interface MyListAsync&lt;TYPE&gt; {
  *
  *                 void add(Object element);
@@ -95,12 +95,12 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Wrap {
+public @interface Proxy {
 
     /**
-     * The list of wrapped classes.
+     * The wrapped class.
      *
-     * @return the wrapped classes.
+     * @return the class.
      */
     Class<?> value();
 }

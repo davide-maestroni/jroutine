@@ -16,8 +16,8 @@ package com.gh.bmd.jrt.processor.core;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder;
-import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
+import com.gh.bmd.jrt.processor.builder.AbstractProxyBuilder;
+import com.gh.bmd.jrt.processor.builder.ProxyRoutineBuilder;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -27,13 +27,13 @@ import javax.annotation.Nonnull;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
- * Default implementation of a wrapper builder.
+ * Default implementation of a proxy builder.
  * <p/>
  * Created by davide on 3/23/15.
  */
-class DefaultWrapperRoutineBuilder
-        implements WrapperRoutineBuilder, RoutineConfiguration.Configurable<WrapperRoutineBuilder>,
-        ProxyConfiguration.Configurable<WrapperRoutineBuilder> {
+class DefaultProxyRoutineBuilder
+        implements ProxyRoutineBuilder, RoutineConfiguration.Configurable<ProxyRoutineBuilder>,
+        ProxyConfiguration.Configurable<ProxyRoutineBuilder> {
 
     private final WeakReference<?> mTargetReference;
 
@@ -50,7 +50,7 @@ class DefaultWrapperRoutineBuilder
      * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultWrapperRoutineBuilder(@Nonnull final Object target) {
+    DefaultProxyRoutineBuilder(@Nonnull final Object target) {
 
         if (target == null) {
 
@@ -61,13 +61,13 @@ class DefaultWrapperRoutineBuilder
     }
 
     @Nonnull
-    public <TYPE> TYPE buildWrapper(@Nonnull final Class<TYPE> itf) {
+    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
-        return buildWrapper(ClassToken.tokenOf(itf));
+        return buildProxy(ClassToken.tokenOf(itf));
     }
 
     @Nonnull
-    public <TYPE> TYPE buildWrapper(@Nonnull final ClassToken<TYPE> itf) {
+    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
         if (!itf.isInterface()) {
 
@@ -82,27 +82,25 @@ class DefaultWrapperRoutineBuilder
             throw new IllegalStateException("the target object has been destroyed");
         }
 
-        final ObjectWrapperBuilder<TYPE> builder = new ObjectWrapperBuilder<TYPE>(target, itf);
+        final ObjectProxyBuilder<TYPE> builder = new ObjectProxyBuilder<TYPE>(target, itf);
         return builder.withRoutineConfiguration()
                       .with(mRoutineConfiguration)
                       .set()
                       .withProxyConfiguration()
                       .with(mProxyConfiguration)
                       .set()
-                      .buildWrapper();
+                      .buildProxy();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends WrapperRoutineBuilder> withRoutineConfiguration
-            () {
+    public RoutineConfiguration.Builder<? extends ProxyRoutineBuilder> withRoutineConfiguration() {
 
-        return new RoutineConfiguration.Builder<WrapperRoutineBuilder>(this, mRoutineConfiguration);
+        return new RoutineConfiguration.Builder<ProxyRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public WrapperRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+    public ProxyRoutineBuilder setConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -115,7 +113,7 @@ class DefaultWrapperRoutineBuilder
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public WrapperRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+    public ProxyRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -127,17 +125,17 @@ class DefaultWrapperRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends WrapperRoutineBuilder> withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxyConfiguration() {
 
-        return new ProxyConfiguration.Builder<WrapperRoutineBuilder>(this, mProxyConfiguration);
+        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, mProxyConfiguration);
     }
 
     /**
-     * Wrapper builder implementation.
+     * Proxy builder implementation.
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectWrapperBuilder<TYPE> extends AbstractWrapperBuilder<TYPE> {
+    private static class ObjectProxyBuilder<TYPE> extends AbstractProxyBuilder<TYPE> {
 
         private final ClassToken<TYPE> mInterfaceToken;
 
@@ -147,9 +145,9 @@ class DefaultWrapperRoutineBuilder
          * Constructor.
          *
          * @param target         the target object instance.
-         * @param interfaceToken the wrapper interface token.
+         * @param interfaceToken the proxy interface token.
          */
-        private ObjectWrapperBuilder(@Nonnull final Object target,
+        private ObjectProxyBuilder(@Nonnull final Object target,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mTarget = target;
@@ -172,7 +170,7 @@ class DefaultWrapperRoutineBuilder
 
         @Nonnull
         @Override
-        protected TYPE newWrapper(@Nonnull final String shareGroup,
+        protected TYPE newProxy(@Nonnull final String shareGroup,
                 @Nonnull final RoutineConfiguration configuration) {
 
             try {

@@ -20,17 +20,17 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of async wrapper objects.
+ * Interface defining a builder of async proxy objects.
  * <p/>
  * Created by davide on 3/7/15.
  *
  * @param <TYPE> the interface type.
  */
-public interface WrapperBuilder<TYPE> extends ConfigurableBuilder<WrapperBuilder<TYPE>>,
-        ProxyConfigurableBuilder<WrapperBuilder<TYPE>> {
+public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYPE>>,
+        ProxyConfigurableBuilder<ProxyBuilder<TYPE>> {
 
     /**
-     * Returns a wrapper object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
@@ -38,15 +38,15 @@ public interface WrapperBuilder<TYPE> extends ConfigurableBuilder<WrapperBuilder
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
-     * The wrapping object is created through code generation based on the interfaces annotated
-     * with {@link com.gh.bmd.jrt.processor.annotation.Wrap}.<br/>
+     * The proxy object is created through code generation based on the interfaces annotated with
+     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *
-     * @return the wrapping object.
+     * @return the proxy object.
      */
     @Nonnull
-    TYPE buildWrapper();
+    TYPE buildProxy();
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -54,5 +54,5 @@ public interface WrapperBuilder<TYPE> extends ConfigurableBuilder<WrapperBuilder
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends WrapperBuilder<TYPE>> withRoutineConfiguration();
+    Builder<? extends ProxyBuilder<TYPE>> withRoutineConfiguration();
 }

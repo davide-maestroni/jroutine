@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.processor.core;
 
-import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
+import com.gh.bmd.jrt.processor.builder.ProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
- * @see com.gh.bmd.jrt.processor.annotation.Wrap
+ * @see com.gh.bmd.jrt.processor.annotation.Proxy
  */
 public class JRoutineProcessor {
 
@@ -54,8 +54,8 @@ public class JRoutineProcessor {
      * @throws java.lang.NullPointerException if the specified target is null.
      */
     @Nonnull
-    public static WrapperRoutineBuilder on(@Nonnull final Object target) {
+    public static ProxyRoutineBuilder on(@Nonnull final Object target) {
 
-        return new DefaultWrapperRoutineBuilder(target);
+        return new DefaultProxyRoutineBuilder(target);
     }
 }

@@ -13,7 +13,7 @@
 </p>
 <b>Example 1:</b> via code generation.
 <p>
-    This approach allows the asynchronous invocation of an object methods by creating a wrapper object.<br/>
+    This approach allows the asynchronous invocation of an object methods by creating a proxy object.<br/>
     In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.
 </p>
 <pre>
@@ -23,14 +23,14 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain wrapper = on(instance).withProxyConfiguration()
-                                                      .withShareGroup(ShareGroup.NONE)
-                                                      .set()
-                                                      .withRoutineConfiguration()
-                                                      .withReadTimeout(TimeDuration.INFINITY)
-                                                      .set()
-                                                      .buildWrapper(AsyncMain.class);
-                final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
+                final AsyncMain proxy = on(instance).withProxyConfiguration()
+                                                    .withShareGroup(ShareGroup.NONE)
+                                                    .set()
+                                                    .withRoutineConfiguration()
+                                                    .withReadTimeout(TimeDuration.INFINITY)
+                                                    .set()
+                                                    .buildProxy(AsyncMain.class);
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);
 
@@ -64,7 +64,7 @@
                 return Math.sqrt((double) sum / values.size());
             }
 
-            &commat;Wrap(Main.class)
+            &commat;Proxy(Main.class)
             public interface AsyncMain {
 
                 &commat;Pass(int.class)
@@ -91,15 +91,15 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain wrapper = JRoutine_AsyncMain.on(instance)
-                                                            .withProxyConfiguration()
-                                                            .withShareGroup(ShareGroup.NONE)
-                                                            .set()
-                                                            .withRoutineConfiguration()
-                                                            .withReadTimeout(TimeDuration.INFINITY)
-                                                            .set()
-                                                            .buildWrapper();
-                final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
+                final AsyncMain proxy = JRoutine_AsyncMain.on(instance)
+                                                          .withProxyConfiguration()
+                                                          .withShareGroup(ShareGroup.NONE)
+                                                          .set()
+                                                          .withRoutineConfiguration()
+                                                          .withReadTimeout(TimeDuration.INFINITY)
+                                                          .set()
+                                                          .buildProxy();
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);
 
@@ -133,7 +133,7 @@
                 return Math.sqrt((double) sum / values.size());
             }
 
-            &commat;Wrap(Main.class)
+            &commat;Proxy(Main.class)
             public interface AsyncMain {
 
                 &commat;Pass(int.class)

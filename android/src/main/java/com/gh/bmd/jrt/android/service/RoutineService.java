@@ -27,7 +27,6 @@ import android.os.RemoteException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
-import com.gh.bmd.jrt.android.invocation.InvocationFactoryService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -307,6 +306,19 @@ public class RoutineService extends Service {
         bundle.putParcelable(KEY_DATA_VALUE, new ParcelableValue(value));
     }
 
+    /**
+     * Returns a context invocation factory instance creating invocations of the specified type.
+     *
+     * @param invocationClass the invocation class.
+     * @return the context invocation factory.
+     */
+    @Nonnull
+    public ContextInvocationFactory<Object, Object> getInvocationFactory(
+            @Nonnull Class<? extends ContextInvocation<Object, Object>> invocationClass) {
+
+        return ContextInvocations.factoryOf(invocationClass);
+    }
+
     @Override
     public void onDestroy() {
 
@@ -484,18 +496,8 @@ public class RoutineService extends Service {
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
 
-                final ContextInvocationFactory<Object, Object> factory;
-
-                if (this instanceof InvocationFactoryService) {
-
-                    factory = new ServiceInvocationFactory((InvocationFactoryService) this,
-                                                           invocationClass);
-
-                } else {
-
-                    factory = ContextInvocations.factoryOf(invocationClass);
-                }
-
+                final ContextInvocationFactory<Object, Object> factory =
+                        getInvocationFactory(invocationClass);
                 final AndroidRoutine androidRoutine =
                         new AndroidRoutine(this, builder.set(), factory, invocationArgs);
                 routineState = new RoutineState(androidRoutine);
@@ -822,42 +824,6 @@ public class RoutineService extends Service {
         public int releaseInvocation() {
 
             return --mInvocationCount;
-        }
-    }
-
-    /**
-     * Context invocation factory based on the service implementation.
-     */
-    private static class ServiceInvocationFactory
-            implements ContextInvocationFactory<Object, Object> {
-
-        private final InvocationFactoryService mFactory;
-
-        private final Class<? extends ContextInvocation<Object, Object>> mInvocationClass;
-
-        /**
-         * Constructor.
-         *
-         * @param factoryService  the factory.
-         * @param invocationClass the invocation class.
-         */
-        private ServiceInvocationFactory(@Nonnull final InvocationFactoryService factoryService,
-                @Nonnull final Class<? extends ContextInvocation<Object, Object>> invocationClass) {
-
-            mFactory = factoryService;
-            mInvocationClass = invocationClass;
-        }
-
-        @Nonnull
-        public String getInvocationType() {
-
-            return mInvocationClass.getName();
-        }
-
-        @Nonnull
-        public ContextInvocation<Object, Object> newInvocation(@Nonnull final Object... args) {
-
-            return mFactory.newInvocation(mInvocationClass, args);
         }
     }
 

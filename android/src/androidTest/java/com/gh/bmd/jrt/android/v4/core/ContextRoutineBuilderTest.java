@@ -26,6 +26,7 @@ import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionTyp
 import com.gh.bmd.jrt.android.builder.InvocationMissingException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.DelegatingContextInvocation;
 import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
 import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
@@ -35,6 +36,7 @@ import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
@@ -289,6 +291,34 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         }
 
         result3.checkComplete();
+    }
+
+    public void testActivityDelegation() {
+
+        final TimeDuration timeout = seconds(1);
+        final Routine<Object, Object> routine1 =
+                JRoutine.onActivity(getActivity(), PassingContextInvocation.factoryOf())
+                        .buildRoutine();
+        final ContextInvocationFactory<Object, Object> factory =
+                DelegatingContextInvocation.factoryWith(routine1, "test_routine");
+        final Routine<Object, Object> routine2 =
+                JRoutine.onActivity(getActivity(), factory).buildRoutine();
+
+        assertThat(routine2.callAsync("test1").afterMax(timeout).readAll()).containsExactly(
+                "test1");
+
+        final ParameterChannel<Object, Object> channel =
+                routine2.invokeAsync().after(timeout).pass("test2");
+        channel.now().abort(new IllegalArgumentException());
+
+        try {
+
+            channel.result().readNext();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     public void testActivityFunction() {
@@ -606,7 +636,7 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         assertThat(result2.readNext()).isSameAs(data1);
     }
 
-    public void testAndroidChannelBuilderWarnings() {
+    public void testChannelBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
@@ -632,43 +662,6 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                 .with(configuration)
                 .set()
                 .buildChannel();
-        assertThat(countLog.getWrnCount()).isEqualTo(10);
-    }
-
-    public void testAndroidRoutineBuilderWarnings() {
-
-        final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
-                                                            .withInputMaxSize(3)
-                                                            .withInputTimeout(seconds(10))
-                                                            .withOutputMaxSize(3)
-                                                            .withOutputTimeout(seconds(10))
-                                                            .withLogLevel(LogLevel.DEBUG)
-                                                            .withLog(countLog)
-                                                            .set();
-        JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                .withRoutineConfiguration()
-                .with(configuration)
-                .set()
-                .withInvocationConfiguration()
-                .withId(0)
-                .withClashResolution(ClashResolutionType.KEEP_THAT)
-                .set()
-                .buildRoutine();
-        assertThat(countLog.getWrnCount()).isEqualTo(5);
-
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                .withRoutineConfiguration()
-                .with(configuration)
-                .set()
-                .withInvocationConfiguration()
-                .withId(0)
-                .withClashResolution(ClashResolutionType.KEEP_THAT)
-                .set()
-                .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
 
@@ -847,6 +840,36 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         assertThat(channel1.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
         assertThat(channel2.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
+    }
+
+    public void testFragmentDelegation() {
+
+        final TimeDuration timeout = seconds(1);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<Object, Object> routine1 =
+                JRoutine.onFragment(fragment, PassingContextInvocation.factoryOf()).buildRoutine();
+        final ContextInvocationFactory<Object, Object> factory =
+                DelegatingContextInvocation.factoryWith(routine1, "test_routine");
+        final Routine<Object, Object> routine2 =
+                JRoutine.onFragment(fragment, factory).buildRoutine();
+
+        assertThat(routine2.callAsync("test1").afterMax(timeout).readAll()).containsExactly(
+                "test1");
+
+        final ParameterChannel<Object, Object> channel =
+                routine2.invokeAsync().after(timeout).pass("test2");
+        channel.now().abort(new IllegalArgumentException());
+
+        try {
+
+            channel.result().readNext();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     public void testFragmentFunction() {
@@ -1224,6 +1247,43 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testRoutineBuilderWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
+                                                            .withInputMaxSize(3)
+                                                            .withInputTimeout(seconds(10))
+                                                            .withOutputMaxSize(3)
+                                                            .withOutputTimeout(seconds(10))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .set();
+        JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                .withRoutineConfiguration()
+                .with(configuration)
+                .set()
+                .withInvocationConfiguration()
+                .withId(0)
+                .withClashResolution(ClashResolutionType.KEEP_THAT)
+                .set()
+                .buildRoutine();
+        assertThat(countLog.getWrnCount()).isEqualTo(5);
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                .withRoutineConfiguration()
+                .with(configuration)
+                .set()
+                .withInvocationConfiguration()
+                .withId(0)
+                .withClashResolution(ClashResolutionType.KEEP_THAT)
+                .set()
+                .buildRoutine();
+        assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
 
     @SuppressWarnings("ConstantConditions")

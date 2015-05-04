@@ -1357,6 +1357,41 @@ public class RoutineTest {
     }
 
     @Test
+    public void testInitInvocationException() {
+
+        final ExceptionRoutine routine =
+                new ExceptionRoutine(RoutineConfiguration.DEFAULT_CONFIGURATION);
+
+        try {
+
+            routine.callAsync().afterMax(seconds(1)).readAll();
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @Test
+    public void testInitInvocationNull() {
+
+        final NullRoutine routine = new NullRoutine(RoutineConfiguration.DEFAULT_CONFIGURATION);
+
+        try {
+
+            routine.callAsync().afterMax(seconds(1)).readAll();
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Test
     public void testInputTimeout() {
 
         try {
@@ -2996,6 +3031,37 @@ public class RoutineTest {
             final ArrayList<String> list = mList;
             result.after(mDelay).pass(list);
             list.clear();
+        }
+    }
+
+    private static class ExceptionRoutine extends AbstractRoutine<Object, Object> {
+
+        protected ExceptionRoutine(@Nonnull final RoutineConfiguration configuration) {
+
+            super(configuration);
+        }
+
+        @Nonnull
+        @Override
+        protected Invocation<Object, Object> newInvocation(final boolean async) {
+
+            throw new IllegalStateException();
+        }
+    }
+
+    private static class NullRoutine extends AbstractRoutine<Object, Object> {
+
+        protected NullRoutine(@Nonnull final RoutineConfiguration configuration) {
+
+            super(configuration);
+        }
+
+        @Nonnull
+        @Override
+        @SuppressWarnings("ConstantConditions")
+        protected Invocation<Object, Object> newInvocation(final boolean async) {
+
+            return null;
         }
     }
 

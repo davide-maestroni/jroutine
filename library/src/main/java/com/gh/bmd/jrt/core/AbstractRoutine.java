@@ -362,15 +362,14 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 final boolean async = mAsync;
                 final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
                         (async) ? mAsyncInvocations : mSyncInvocations;
+                final Invocation<INPUT, OUTPUT> invocation;
 
                 if (!invocations.isEmpty()) {
 
-                    final Invocation<INPUT, OUTPUT> invocation = invocations.removeFirst();
+                    invocation = invocations.removeFirst();
                     mLogger.dbg("reusing %ssync invocation instance [%d/%d]: %s",
                                 (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
                                 invocation);
-                    ++mRunningCount;
-                    return invocation;
 
                 } else {
 
@@ -379,23 +378,28 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     if (!fallbackInvocations.isEmpty()) {
 
-                        final Invocation<INPUT, OUTPUT> invocation =
+                        final Invocation<INPUT, OUTPUT> convertInvocation =
                                 fallbackInvocations.removeFirst();
                         mLogger.dbg("converting %ssync invocation instance [%d/%d]: %s",
                                     (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
-                                    invocation);
-                        final Invocation<INPUT, OUTPUT> convertInvocation =
-                                convertInvocation(async, invocation);
-                        ++mRunningCount;
-                        return convertInvocation;
+                                    convertInvocation);
+                        invocation = convertInvocation(async, convertInvocation);
+
+                    } else {
+
+                        mLogger.dbg("creating %ssync invocation instance [1/%d]",
+                                    (async) ? "a" : "", mCoreInvocations);
+                        invocation = newInvocation(async);
                     }
                 }
 
-                mLogger.dbg("creating %ssync invocation instance [1/%d]", (async) ? "a" : "",
-                            mCoreInvocations);
-                final Invocation<INPUT, OUTPUT> newInvocation = newInvocation(async);
+                if (invocation == null) {
+
+                    throw new NullPointerException("null invocation returned");
+                }
+
                 ++mRunningCount;
-                return newInvocation;
+                return invocation;
             }
         }
 

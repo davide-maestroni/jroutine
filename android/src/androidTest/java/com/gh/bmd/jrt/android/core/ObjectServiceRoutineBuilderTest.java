@@ -129,14 +129,14 @@ public class ObjectServiceRoutineBuilderTest
     public void testBoundMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(10);
+        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine = JRoutine.onService(getActivity(), TestClass.class)
                                                         .withRoutineConfiguration()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withMaxInvocations(1)
                                                         .withCoreInvocations(1)
-                                                        .withAvailInvocationTimeout(1,
-                                                                                    TimeUnit.SECONDS)
+                                                        .withAvailInvocationTimeout(1, timeUnit)
                                                         .withReadTimeoutAction(
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)

@@ -32,14 +32,12 @@ public class InvocationConfigurationTest extends AndroidTestCase {
 
     public void testBuildFrom() {
 
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final InvocationConfiguration configuration = builder().withId(-1)
-                                                               .withClashResolution(
-                                                                       ClashResolutionType
-                                                                               .ABORT_THAT)
-                                                               .withCacheStrategy(
-                                                                       CacheStrategyType.CACHE)
+                                                               .withClashResolution(resolutionType)
+                                                               .withCacheStrategy(strategyType)
                                                                .set();
-
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set()).isEqualTo(
                 InvocationConfiguration.DEFAULT_CONFIGURATION);
@@ -71,12 +69,11 @@ public class InvocationConfigurationTest extends AndroidTestCase {
 
     public void testBuilderFromEquals() {
 
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final InvocationConfiguration configuration = builder().withId(-1)
-                                                               .withClashResolution(
-                                                                       ClashResolutionType
-                                                                               .ABORT_THAT)
-                                                               .withCacheStrategy(
-                                                                       CacheStrategyType.CACHE)
+                                                               .withClashResolution(resolutionType)
+                                                               .withCacheStrategy(strategyType)
                                                                .set();
         assertThat(builder().with(configuration).set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
@@ -86,12 +83,11 @@ public class InvocationConfigurationTest extends AndroidTestCase {
 
     public void testCacheStrategyEquals() {
 
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final InvocationConfiguration configuration = builder().withId(-1)
-                                                               .withClashResolution(
-                                                                       ClashResolutionType
-                                                                               .ABORT_THAT)
-                                                               .withCacheStrategy(
-                                                                       CacheStrategyType.CACHE)
+                                                               .withClashResolution(resolutionType)
+                                                               .withCacheStrategy(strategyType)
                                                                .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withCacheStrategy(CacheStrategyType.CLEAR).set());
@@ -103,12 +99,11 @@ public class InvocationConfigurationTest extends AndroidTestCase {
 
     public void testClashResolutionEquals() {
 
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final InvocationConfiguration configuration = builder().withId(-1)
-                                                               .withClashResolution(
-                                                                       ClashResolutionType
-                                                                               .ABORT_THAT)
-                                                               .withCacheStrategy(
-                                                                       CacheStrategyType.CACHE)
+                                                               .withClashResolution(resolutionType)
+                                                               .withCacheStrategy(strategyType)
                                                                .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withClashResolution(ClashResolutionType.ABORT_THIS).set());
@@ -120,12 +115,11 @@ public class InvocationConfigurationTest extends AndroidTestCase {
 
     public void testIdEquals() {
 
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final InvocationConfiguration configuration = builder().withId(-1)
-                                                               .withClashResolution(
-                                                                       ClashResolutionType
-                                                                               .ABORT_THAT)
-                                                               .withCacheStrategy(
-                                                                       CacheStrategyType.CACHE)
+                                                               .withClashResolution(resolutionType)
+                                                               .withCacheStrategy(strategyType)
                                                                .set();
         assertThat(configuration).isNotEqualTo(builder().withId(3).set());
         assertThat(configuration.builderFrom().withId(27).set()).isNotEqualTo(

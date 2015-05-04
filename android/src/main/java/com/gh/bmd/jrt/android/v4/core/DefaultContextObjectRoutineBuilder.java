@@ -25,6 +25,7 @@ import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
@@ -76,8 +77,16 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         ProxyConfiguration.Configurable<ContextObjectRoutineBuilder>,
         RoutineConfiguration.Configurable<ContextObjectRoutineBuilder> {
 
+    private static final BoundMethodInvocationFactory<Object, Object> sBoundMethodFactory =
+            new BoundMethodInvocationFactory<Object, Object>();
+
+    private static final MethodInvocationFactory<Object, Object> sMethodFactory =
+            new MethodInvocationFactory<Object, Object>();
+
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
+
+    private static final ProxyInvocationFactory sProxyFactory = new ProxyInvocationFactory();
 
     private final WeakReference<Object> mContext;
 
@@ -210,32 +219,6 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         return builder.set();
     }
 
-    @Nonnull
-    private static Class<?>[] forNames(@Nonnull final String[] names) throws
-            ClassNotFoundException {
-
-        final int length = names.length;
-        final Class<?>[] classes = new Class[length];
-        final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
-
-        for (int i = 0; i < length; i++) {
-
-            final String name = names[i];
-            final Class<?> primitiveClass = classMap.get(name);
-
-            if (primitiveClass != null) {
-
-                classes[i] = primitiveClass;
-
-            } else {
-
-                classes[i] = Class.forName(name);
-            }
-        }
-
-        return classes;
-    }
-
     @Nullable
     private static Method getAnnotatedMethod(@Nonnull final Class<?> targetClass,
             @Nonnull final String name) {
@@ -273,7 +256,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     @Nonnull
     private static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> getBuilder(
             @Nonnull WeakReference<Object> contextReference,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         final Object context = contextReference.get();
 
@@ -284,11 +267,11 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
         if (context instanceof FragmentActivity) {
 
-            return JRoutine.onActivity((FragmentActivity) context, classToken);
+            return JRoutine.onActivity((FragmentActivity) context, factory);
 
         } else if (context instanceof Fragment) {
 
-            return JRoutine.onFragment((Fragment) context, classToken);
+            return JRoutine.onFragment((Fragment) context, factory);
         }
 
         throw new IllegalArgumentException("invalid context type: " + context.getClass().getName());
@@ -338,20 +321,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static String[] toNames(@Nonnull final Class<?>[] classes) {
-
-        final int length = classes.length;
-        final String[] names = new String[length];
-
-        for (int i = 0; i < length; i++) {
-
-            names[i] = classes[i].getName();
-        }
-
-        return names;
-    }
-
-    @Nonnull
+    @SuppressWarnings("unchecked")
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
 
         final Class<?> targetClass = mTargetClass;
@@ -365,29 +335,50 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
         final RoutineConfiguration configuration = mRoutineConfiguration;
         warn(configuration);
-        final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
         final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name};
+        final Object[] invocationArgs = new Object[]{targetClass, args, shareGroup, name};
+        final BoundMethodInvocationFactory<INPUT, OUTPUT> factory =
+                (BoundMethodInvocationFactory<INPUT, OUTPUT>) sBoundMethodFactory;
         final RoutineConfiguration routineConfiguration =
                 configurationWithTimeout(configuration, targetMethod);
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(mInvocationConfiguration, targetMethod);
-        return getBuilder(mContext, classToken).withRoutineConfiguration()
-                                               .with(routineConfiguration)
-                                               .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASS_ORDER)
-                                               .set()
-                                               .withInvocationConfiguration()
-                                               .with(invocationConfiguration)
-                                               .set()
-                                               .buildRoutine();
+        return getBuilder(mContext, factory).withRoutineConfiguration()
+                                            .with(routineConfiguration)
+                                            .withFactoryArgs(invocationArgs)
+                                            .withInputOrder(OrderType.PASS_ORDER)
+                                            .set()
+                                            .withInvocationConfiguration()
+                                            .with(invocationConfiguration)
+                                            .set()
+                                            .buildRoutine();
     }
 
     @Nonnull
+    @SuppressWarnings("unchecked")
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(method.getName(), method.getParameterTypes());
+        final RoutineConfiguration configuration = mRoutineConfiguration;
+        warn(configuration);
+        final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
+        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
+        final Object[] invocationArgs = new Object[]{mTargetClass, args, shareGroup, method};
+        final MethodInvocationFactory<INPUT, OUTPUT> factory =
+                (MethodInvocationFactory<INPUT, OUTPUT>) sMethodFactory;
+        final RoutineConfiguration routineConfiguration =
+                configurationWithTimeout(configuration, method);
+        final InvocationConfiguration invocationConfiguration =
+                configurationWithAnnotations(mInvocationConfiguration, method);
+        return getBuilder(mContext, factory).withRoutineConfiguration()
+                                            .with(routineConfiguration)
+                                            .withFactoryArgs(invocationArgs)
+                                            .withInputOrder(OrderType.PASS_ORDER)
+                                            .set()
+                                            .withInvocationConfiguration()
+                                            .with(invocationConfiguration)
+                                            .set()
+                                            .buildRoutine();
     }
 
     @Nonnull
@@ -413,27 +404,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             }
         }
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
-        warn(configuration);
-        final MethodSignatureToken<INPUT, OUTPUT> classToken =
-                new MethodSignatureToken<INPUT, OUTPUT>();
-        final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
-        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] invocationArgs = new Object[]{targetClass.getName(), args, shareGroup, name,
-                                                     toNames(parameterTypes)};
-        final RoutineConfiguration routineConfiguration =
-                configurationWithTimeout(configuration, targetMethod);
-        final InvocationConfiguration invocationConfiguration =
-                configurationWithAnnotations(mInvocationConfiguration, targetMethod);
-        return getBuilder(mContext, classToken).withRoutineConfiguration()
-                                               .with(routineConfiguration)
-                                               .withFactoryArgs(invocationArgs)
-                                               .withInputOrder(OrderType.PASS_ORDER)
-                                               .set()
-                                               .withInvocationConfiguration()
-                                               .with(invocationConfiguration)
-                                               .set()
-                                               .buildRoutine();
+        return method(targetMethod);
     }
 
     @Nonnull
@@ -448,7 +419,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         final RoutineConfiguration configuration = mRoutineConfiguration;
         warn(configuration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                                                    new ProxyInvocationHandler(this, itf));
+                                                    new ProxyInvocationHandler(this));
         return itf.cast(proxy);
     }
 
@@ -591,17 +562,17 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetClassName the target object class name.
-         * @param args            the factory constructor arguments.
-         * @param shareGroup      the share group name.
-         * @param name            the binding name.
+         * @param targetClass the target object class.
+         * @param args        the factory constructor arguments.
+         * @param shareGroup  the share group name.
+         * @param name        the binding name.
          */
         @SuppressWarnings("unchecked")
-        public BoundMethodInvocation(@Nonnull final String targetClassName,
+        public BoundMethodInvocation(@Nonnull final Class<?> targetClass,
                 @Nonnull final Object[] args, @Nullable final String shareGroup,
-                @Nonnull final String name) throws ClassNotFoundException {
+                @Nonnull final String name) {
 
-            mTargetClass = Class.forName(targetClassName);
+            mTargetClass = targetClass;
             mArgs = args;
             mShareGroup = shareGroup;
             mBindingName = name;
@@ -646,14 +617,26 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     /**
-     * Class token of a {@link BoundMethodInvocation}.
+     * Factory of {@link BoundMethodInvocation}s.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class BoundMethodToken<INPUT, OUTPUT>
-            extends ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> {
+    private static class BoundMethodInvocationFactory<INPUT, OUTPUT>
+            implements ContextInvocationFactory<INPUT, OUTPUT> {
 
+        @Nonnull
+        public String getInvocationType() {
+
+            return BoundMethodInvocation.class.getName();
+        }
+
+        @Nonnull
+        public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+            return new BoundMethodInvocation<INPUT, OUTPUT>((Class<?>) args[0], (Object[]) args[1],
+                                                            (String) args[2], (String) args[3]);
+        }
     }
 
     /**
@@ -662,14 +645,12 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class MethodSignatureInvocation<INPUT, OUTPUT>
+    private static class MethodInvocation<INPUT, OUTPUT>
             extends SingleCallContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
-        private final String mMethodName;
-
-        private final Class<?>[] mParameterTypes;
+        private final Method mMethod;
 
         private final String mShareGroup;
 
@@ -682,24 +663,19 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetClassName the target object class name.
-         * @param args            the factory constructor arguments.
-         * @param shareGroup      the share group name.
-         * @param name            the method name.
-         * @param parameterTypes  the method parameter type names.
-         * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
+         * @param targetClass the target object class.
+         * @param args        the factory constructor arguments.
+         * @param shareGroup  the share group name.
+         * @param method      the method.
          */
         @SuppressWarnings("unchecked")
-        public MethodSignatureInvocation(@Nonnull final String targetClassName,
-                @Nonnull final Object[] args, @Nullable final String shareGroup,
-                @Nonnull final String name, @Nonnull final String[] parameterTypes) throws
-                ClassNotFoundException {
+        public MethodInvocation(@Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
+                @Nullable final String shareGroup, @Nonnull final Method method) {
 
-            mTargetClass = Class.forName(targetClassName);
+            mTargetClass = targetClass;
             mArgs = args;
             mShareGroup = shareGroup;
-            mMethodName = name;
-            mParameterTypes = forNames(parameterTypes);
+            mMethod = method;
         }
 
         @Override
@@ -726,7 +702,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                                    .withProxyConfiguration()
                                    .withShareGroup(mShareGroup)
                                    .set()
-                                   .method(mMethodName, mParameterTypes);
+                                   .method(mMethod);
                 mTarget = target;
 
             } catch (final RoutineException e) {
@@ -741,14 +717,26 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     /**
-     * Class token of a {@link MethodSignatureInvocation}.
+     * Factory of {@link MethodInvocation}s.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class MethodSignatureToken<INPUT, OUTPUT>
-            extends ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> {
+    private static class MethodInvocationFactory<INPUT, OUTPUT>
+            implements ContextInvocationFactory<INPUT, OUTPUT> {
 
+        @Nonnull
+        public String getInvocationType() {
+
+            return MethodInvocation.class.getName();
+        }
+
+        @Nonnull
+        public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+            return new MethodInvocation<INPUT, OUTPUT>((Class<?>) args[0], (Object[]) args[1],
+                                                       (String) args[2], (Method) args[3]);
+        }
     }
 
     /**
@@ -762,11 +750,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
         private final boolean mIsOutputCollection;
 
-        private final String mMethodName;
-
-        private final Class<?>[] mParameterTypes;
-
-        private final Class<?> mProxyClass;
+        private final Method mMethod;
 
         private final String mShareGroup;
 
@@ -781,32 +765,24 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param proxyClassName       the proxy class name.
-         * @param targetClassName      the target object class name.
+         * @param targetClass          the target object class.
          * @param args                 the factory constructor arguments.
          * @param shareGroup           the share group name.
-         * @param name                 the method name.
-         * @param parameterTypes       the method parameter type names.
-         * @param targetParameterTypes the target method parameter type names.
+         * @param method               the method.
+         * @param targetParameterTypes the target method parameter types.
          * @param isInputCollection    whether the input is a collection.
          * @param isOutputCollection   whether the output is a collection.
-         * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
-        @SuppressWarnings("unchecked")
-        public ProxyInvocation(@Nonnull final String proxyClassName,
-                @Nonnull final String targetClassName, @Nonnull final Object[] args,
-                @Nullable final String shareGroup, @Nonnull final String name,
-                @Nonnull final String[] parameterTypes,
-                @Nonnull final String[] targetParameterTypes, final boolean isInputCollection,
-                final boolean isOutputCollection) throws ClassNotFoundException {
+        public ProxyInvocation(@Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
+                @Nullable final String shareGroup, @Nonnull final Method method,
+                @Nonnull final Class<?>[] targetParameterTypes, final boolean isInputCollection,
+                final boolean isOutputCollection) {
 
-            mProxyClass = Class.forName(proxyClassName);
-            mTargetClass = Class.forName(targetClassName);
+            mTargetClass = targetClass;
             mArgs = args;
             mShareGroup = shareGroup;
-            mMethodName = name;
-            mParameterTypes = forNames(parameterTypes);
-            mTargetParameterTypes = forNames(targetParameterTypes);
+            mMethod = method;
+            mTargetParameterTypes = targetParameterTypes;
             mIsInputCollection = isInputCollection;
             mIsOutputCollection = isOutputCollection;
             mMutex = this;
@@ -858,9 +834,8 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
             try {
 
-                final Class<?>[] parameterTypes = mParameterTypes;
+                final Method method = mMethod;
                 final Class<?>[] targetParameterTypes = mTargetParameterTypes;
-                final Method method = mProxyClass.getMethod(mMethodName, parameterTypes);
                 final Method targetMethod = getTargetMethod(method, targetParameterTypes);
                 final Class<?> returnType = targetMethod.getReturnType();
                 final Pass annotation = method.getAnnotation(Pass.class);
@@ -983,6 +958,27 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     /**
+     * Factory of {@link ProxyInvocation}s.
+     */
+    private static class ProxyInvocationFactory
+            implements ContextInvocationFactory<Object, Object> {
+
+        @Nonnull
+        public String getInvocationType() {
+
+            return ProxyInvocation.class.getName();
+        }
+
+        @Nonnull
+        public ContextInvocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+
+            return new ProxyInvocation((Class<?>) args[0], (Object[]) args[1], (String) args[2],
+                                       (Method) args[3], (Class<?>[]) args[4], (Boolean) args[5],
+                                       (Boolean) args[6]);
+        }
+    }
+
+    /**
      * Invocation handler adapting a different interface to the target object instance.
      */
     private static class ProxyInvocationHandler implements InvocationHandler {
@@ -993,8 +989,6 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final Class<?> mProxyClass;
-
         private final ProxyConfiguration mProxyConfiguration;
 
         private final RoutineConfiguration mRoutineConfiguration;
@@ -1004,11 +998,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param builder    the builder instance.
-         * @param proxyClass the proxy class.
+         * @param builder the builder instance.
          */
-        private ProxyInvocationHandler(@Nonnull final DefaultContextObjectRoutineBuilder builder,
-                @Nonnull final Class<?> proxyClass) {
+        private ProxyInvocationHandler(@Nonnull final DefaultContextObjectRoutineBuilder builder) {
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
@@ -1016,7 +1008,6 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             mProxyConfiguration = builder.mProxyConfiguration;
             mInvocationConfiguration = builder.mInvocationConfiguration;
             mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-            mProxyClass = proxyClass;
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -1067,15 +1058,13 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
             final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
             final Object[] invocationArgs =
-                    new Object[]{mProxyClass.getName(), mTargetClass.getName(), mArgs, shareGroup,
-                                 method.getName(), toNames(parameterTypes),
-                                 toNames(targetParameterTypes), isInputCollection,
-                                 isOutputCollection};
+                    new Object[]{mTargetClass, mArgs, shareGroup, method, targetParameterTypes,
+                                 isInputCollection, isOutputCollection};
             final OrderType inputOrderType = (isParallel) ? OrderType.NONE : OrderType.PASS_ORDER;
             final OrderType outputOrderType =
                     (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER : OrderType.NONE;
             final ContextRoutineBuilder<Object, Object> routineBuilder =
-                    getBuilder(mContext, ClassToken.tokenOf(ProxyInvocation.class));
+                    getBuilder(mContext, sProxyFactory);
             final RoutineConfiguration routineConfiguration =
                     configurationWithTimeout(mRoutineConfiguration, method);
             final InvocationConfiguration invocationConfiguration =

@@ -82,7 +82,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
 
     /**
-     * Returns a builder of routines running in a service based on the specified context.
+     * Returns a builder of routines running in a service based on the specified context.<br/>
+     * In order to customize the invocation creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.invocation.InvocationFactoryService} as the invocation service.
      * <p/>
      * Note that the built routine results will be dispatched in the looper specified through the
      * builder, thus, waiting for the outputs on the very same looper thread, immediately after its

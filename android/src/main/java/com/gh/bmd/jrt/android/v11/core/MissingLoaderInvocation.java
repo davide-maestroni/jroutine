@@ -14,10 +14,10 @@
 package com.gh.bmd.jrt.android.v11.core;
 
 import com.gh.bmd.jrt.android.builder.InvocationMissingException;
+import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.invocation.Invocation;
-import com.gh.bmd.jrt.invocation.InvocationFactory;
 
 import javax.annotation.Nonnull;
 
@@ -30,12 +30,12 @@ import javax.annotation.Nonnull;
  * @param <OUTPUT> the output data type.
  */
 final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvocation<INPUT, OUTPUT>
-        implements InvocationFactory<INPUT, OUTPUT> {
+        implements ContextInvocationFactory<INPUT, OUTPUT> {
 
     /**
      * The invocation type.
      */
-    static final String TYPE = MissingLoaderInvocation.class.getCanonicalName();
+    static final String TYPE = MissingLoaderInvocation.class.getName();
 
     private static final MissingLoaderInvocation<Object, Object> sInvocation =
             new MissingLoaderInvocation<Object, Object>();
@@ -55,13 +55,19 @@ final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvoca
      * @return the factory.
      */
     @SuppressWarnings("unchecked")
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf() {
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf() {
 
-        return (InvocationFactory<INPUT, OUTPUT>) sInvocation;
+        return (ContextInvocationFactory<INPUT, OUTPUT>) sInvocation;
     }
 
     @Nonnull
-    public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+    public String getInvocationType() {
+
+        return TYPE;
+    }
+
+    @Nonnull
+    public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
         return this;
     }

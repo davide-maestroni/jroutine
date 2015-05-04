@@ -25,7 +25,6 @@ import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionTyp
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 
@@ -116,12 +115,14 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
         if (context instanceof Activity) {
 
             final Activity activity = (Activity) context;
-            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>());
+            builder = JRoutine.onActivity(activity,
+                                          MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf());
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>());
+            builder = JRoutine.onFragment(fragment,
+                                          MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf());
 
         } else {
 
@@ -259,16 +260,6 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
 
         mRoutineConfiguration = configuration;
         return this;
-    }
-
-    /**
-     * Missing loader invocation token.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class MissingToken<DATA>
-            extends ClassToken<MissingLoaderInvocation<DATA, DATA>> {
-
     }
 
     /**

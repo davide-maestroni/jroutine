@@ -359,7 +359,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                             "deadlock while waiting for an available invocation instance");
                 }
 
-                ++mRunningCount;
                 final boolean async = mAsync;
                 final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
                         (async) ? mAsyncInvocations : mSyncInvocations;
@@ -370,6 +369,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                     mLogger.dbg("reusing %ssync invocation instance [%d/%d]: %s",
                                 (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
                                 invocation);
+                    ++mRunningCount;
                     return invocation;
 
                 } else {
@@ -384,13 +384,18 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                         mLogger.dbg("converting %ssync invocation instance [%d/%d]: %s",
                                     (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
                                     invocation);
-                        return convertInvocation(async, invocation);
+                        final Invocation<INPUT, OUTPUT> convertInvocation =
+                                convertInvocation(async, invocation);
+                        ++mRunningCount;
+                        return convertInvocation;
                     }
                 }
 
                 mLogger.dbg("creating %ssync invocation instance [1/%d]", (async) ? "a" : "",
                             mCoreInvocations);
-                return newInvocation(async);
+                final Invocation<INPUT, OUTPUT> newInvocation = newInvocation(async);
+                ++mRunningCount;
+                return newInvocation;
             }
         }
 

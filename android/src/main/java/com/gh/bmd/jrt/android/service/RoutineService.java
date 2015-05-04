@@ -25,6 +25,9 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.ContextInvocations;
+import com.gh.bmd.jrt.android.invocation.InvocationFactoryService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -42,7 +45,6 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -334,7 +336,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no data");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no data");
+                    "[" + getClass().getName() + "] the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -344,8 +346,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation ID");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
-                            + " ID");
+                    "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
         synchronized (mMutex) {
@@ -356,7 +357,7 @@ public class RoutineService extends Service {
 
                 mLogger.err("the service message has no invalid invocation ID: %d", invocationId);
                 throw new IllegalArgumentException(
-                        "[" + getClass().getCanonicalName() + "] the service message has invalid "
+                        "[" + getClass().getName() + "] the service message has invalid "
                                 + "invocation ID: " + invocationId);
             }
 
@@ -373,7 +374,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no data");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no data");
+                    "[" + getClass().getName() + "] the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -383,8 +384,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation ID");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation "
-                            + "ID");
+                    "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
         final Class<? extends ContextInvocation<Object, Object>> invocationClass =
@@ -395,8 +395,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation class");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
-                            + " class");
+                    "[" + getClass().getName() + "] the service message has no invocation class");
         }
 
         final Parcelable[] parcelableArgs = data.getParcelableArray(KEY_INVOCATION_ARGS);
@@ -405,7 +404,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation arguments");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
+                    "[" + getClass().getName() + "] the service message has no invocation"
                             + " arguments");
         }
 
@@ -425,7 +424,7 @@ public class RoutineService extends Service {
 
                 mLogger.err("an invocation with the same ID is already running: %d", invocationId);
                 throw new IllegalArgumentException(
-                        "[" + getClass().getCanonicalName() + "] an invocation with the same ID is"
+                        "[" + getClass().getName() + "] an invocation with the same ID is"
                                 + " already running: " + invocationId);
             }
 
@@ -484,8 +483,21 @@ public class RoutineService extends Service {
                        .withInputOrder(inputOrderType)
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
+
+                final ContextInvocationFactory<Object, Object> factory;
+
+                if (this instanceof InvocationFactoryService) {
+
+                    factory = new ServiceInvocationFactory((InvocationFactoryService) this,
+                                                           invocationClass);
+
+                } else {
+
+                    factory = ContextInvocations.factoryOf(invocationClass);
+                }
+
                 final AndroidRoutine androidRoutine =
-                        new AndroidRoutine(this, builder.set(), invocationClass, invocationArgs);
+                        new AndroidRoutine(this, builder.set(), factory, invocationArgs);
                 routineState = new RoutineState(androidRoutine);
                 routineMap.put(routineInfo, routineState);
             }
@@ -506,26 +518,26 @@ public class RoutineService extends Service {
 
         private final Object[] mArgs;
 
-        private final Constructor<? extends ContextInvocation<Object, Object>> mConstructor;
-
         private final Context mContext;
+
+        private final ContextInvocationFactory<Object, Object> mFactory;
 
         /**
          * Constructor.
          *
-         * @param context         the routine context.
-         * @param configuration   the routine configuration.
-         * @param invocationClass the invocation class.
-         * @param invocationArgs  the invocation constructor arguments.
+         * @param context        the routine context.
+         * @param configuration  the routine configuration.
+         * @param factory        the invocation factory.
+         * @param invocationArgs the invocation constructor arguments.
          */
         private AndroidRoutine(@Nonnull final Context context,
                 @Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<? extends ContextInvocation<Object, Object>> invocationClass,
+                @Nonnull final ContextInvocationFactory<Object, Object> factory,
                 @Nonnull final Object[] invocationArgs) {
 
             super(configuration);
             mContext = context;
-            mConstructor = findConstructor(invocationClass, invocationArgs);
+            mFactory = factory;
             mArgs = invocationArgs;
         }
 
@@ -537,10 +549,9 @@ public class RoutineService extends Service {
 
             try {
 
-                final Constructor<? extends ContextInvocation<Object, Object>> constructor =
-                        mConstructor;
-                logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-                final ContextInvocation<Object, Object> invocation = constructor.newInstance(mArgs);
+                final ContextInvocationFactory<Object, Object> factory = mFactory;
+                logger.dbg("creating a new instance of type: %s", factory.getInvocationType());
+                final ContextInvocation<Object, Object> invocation = factory.newInvocation(mArgs);
                 invocation.onContext(mContext);
                 return invocation;
 
@@ -811,6 +822,42 @@ public class RoutineService extends Service {
         public int releaseInvocation() {
 
             return --mInvocationCount;
+        }
+    }
+
+    /**
+     * Context invocation factory based on the service implementation.
+     */
+    private static class ServiceInvocationFactory
+            implements ContextInvocationFactory<Object, Object> {
+
+        private final InvocationFactoryService mFactory;
+
+        private final Class<? extends ContextInvocation<Object, Object>> mInvocationClass;
+
+        /**
+         * Constructor.
+         *
+         * @param factoryService  the factory.
+         * @param invocationClass the invocation class.
+         */
+        private ServiceInvocationFactory(@Nonnull final InvocationFactoryService factoryService,
+                @Nonnull final Class<? extends ContextInvocation<Object, Object>> invocationClass) {
+
+            mFactory = factoryService;
+            mInvocationClass = invocationClass;
+        }
+
+        @Nonnull
+        public String getInvocationType() {
+
+            return mInvocationClass.getName();
+        }
+
+        @Nonnull
+        public ContextInvocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+
+            return mFactory.newInvocation(mInvocationClass, args);
         }
     }
 

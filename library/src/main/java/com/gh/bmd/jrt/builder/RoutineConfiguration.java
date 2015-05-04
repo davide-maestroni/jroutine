@@ -230,8 +230,7 @@ public final class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getAvailableInvocationTimeoutOr(
-            @Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getAvailInvocationTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration availableTimeout = mAvailableTimeout;
         return (availableTimeout != null) ? availableTimeout : valueIfNotSet;
@@ -770,10 +769,10 @@ public final class RoutineConfiguration {
          * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
-        public Builder<TYPE> withAvailableInvocationTimeout(final long timeout,
+        public Builder<TYPE> withAvailInvocationTimeout(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
-            return withAvailableInvocationTimeout(fromUnit(timeout, timeUnit));
+            return withAvailInvocationTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -784,7 +783,7 @@ public final class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withAvailableInvocationTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withAvailInvocationTimeout(@Nullable final TimeDuration timeout) {
 
             mAvailableTimeout = timeout;
             return this;
@@ -1158,7 +1157,7 @@ public final class RoutineConfiguration {
 
             if (availTimeout != null) {
 
-                withAvailableInvocationTimeout(availTimeout);
+                withAvailInvocationTimeout(availTimeout);
             }
 
             final TimeDuration readTimeout = configuration.mReadTimeout;

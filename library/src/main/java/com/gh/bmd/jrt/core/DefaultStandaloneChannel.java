@@ -106,7 +106,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
             logger.wrn("the specified core invocations will be ignored: %d", coreInvocations);
         }
 
-        final TimeDuration availableTimeout = configuration.getAvailableInvocationTimeoutOr(null);
+        final TimeDuration availableTimeout = configuration.getAvailInvocationTimeoutOr(null);
 
         if (availableTimeout != null) {
 

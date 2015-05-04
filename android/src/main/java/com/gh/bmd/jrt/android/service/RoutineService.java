@@ -286,7 +286,7 @@ public class RoutineService extends Service {
                       configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
                       configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT));
-        final TimeDuration availTimeout = configuration.getAvailableInvocationTimeoutOr(null);
+        final TimeDuration availTimeout = configuration.getAvailInvocationTimeoutOr(null);
 
         if (availTimeout != null) {
 
@@ -491,7 +491,7 @@ public class RoutineService extends Service {
 
                 builder.withCoreInvocations(coreInvocations)
                        .withMaxInvocations(maxInvocations)
-                       .withAvailableInvocationTimeout(availTimeout)
+                       .withAvailInvocationTimeout(availTimeout)
                        .withInputOrder(inputOrderType)
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);

@@ -56,7 +56,7 @@ public class Downloader {
                 // number of parallel downloads...
                 .withMaxInvocations(maxParallelDownloads)
                         // ...though we need to set a timeout in case the downloads outnumber it
-                .withAvailableInvocationTimeout(seconds(30)).set().buildRoutine();
+                .withAvailInvocationTimeout(seconds(30)).set().buildRoutine();
     }
 
     /**

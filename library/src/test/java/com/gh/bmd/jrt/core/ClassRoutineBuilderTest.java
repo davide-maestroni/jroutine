@@ -178,14 +178,14 @@ public class ClassRoutineBuilderTest {
     public void testMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
+        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
                                                          .withRoutineConfiguration()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withCoreInvocations(0)
-                                                         .withAvailableInvocationTimeout(1,
-                                                                                         TimeUnit.SECONDS)
+                                                         .withAvailInvocationTimeout(1, timeUnit)
                                                          .set()
                                                          .withProxyConfiguration()
                                                          .withShareGroup("test")
@@ -205,7 +205,7 @@ public class ClassRoutineBuilderTest {
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
-                                                         .withAvailableInvocationTimeout(
+                                                         .withAvailInvocationTimeout(
                                                                  TimeDuration.ZERO)
                                                          .set()
                                                          .method("getLong");

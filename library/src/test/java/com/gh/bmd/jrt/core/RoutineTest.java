@@ -68,7 +68,7 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
-import static com.gh.bmd.jrt.invocation.Invocations.factoryWith;
+import static com.gh.bmd.jrt.invocation.Invocations.factoryOn;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
@@ -1427,7 +1427,7 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() throws InterruptedException {
 
-        final Routine<Object, String> routine = JRoutine.on(factoryWith(new Function<String>() {
+        final Routine<Object, String> routine = JRoutine.on(factoryOn(new Function<String>() {
 
             public String call(@Nonnull final Object... params) {
 

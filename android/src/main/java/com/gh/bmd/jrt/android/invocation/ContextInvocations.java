@@ -20,6 +20,7 @@ import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -83,8 +84,9 @@ public class ContextInvocations {
     }
 
     /**
-     * Builds and returns a new factory of context invocations calling the specified function. The
-     * function class will be used as invocation type.<br/>
+     * Builds and returns a new factory of context invocations calling the specified function.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must be static.<br/>
+     * The function class will be used as invocation type.<br/>
      * Remember to force the input order type, in case the function parameter position needs to be
      * preserved.
      * <p/>
@@ -93,10 +95,11 @@ public class ContextInvocations {
      * @param function the function instance.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
+     * @throws java.lang.IllegalArgumentException if the class of the specified function is not
+     *                                            static.
      */
     @Nonnull
-    public static <OUTPUT> ContextInvocationFactory<Object, OUTPUT> factoryWith(
+    public static <OUTPUT> ContextInvocationFactory<Object, OUTPUT> factoryOn(
             @Nonnull final Function<OUTPUT> function) {
 
         return new FunctionContextInvocationFactory<OUTPUT>(function);
@@ -157,18 +160,21 @@ public class ContextInvocations {
          * Constructor.
          *
          * @param function the function instance.
-         * @throws NullPointerException if the specified function is null.
          */
         @SuppressWarnings("ConstantConditions")
         private FunctionContextInvocationFactory(@Nonnull final Function<OUTPUT> function) {
 
-            if (function == null) {
+            final Class<? extends Function> functionClass = function.getClass();
 
-                throw new NullPointerException("the function must not be null");
+            if ((functionClass.getEnclosingClass() != null) && !Modifier.isStatic(
+                    functionClass.getModifiers())) {
+
+                throw new IllegalArgumentException(
+                        "the function class must be static: " + functionClass.getName());
             }
 
             mFunction = function;
-            mInvocationType = function.getClass().getName();
+            mInvocationType = functionClass.getName();
         }
 
         @Nonnull

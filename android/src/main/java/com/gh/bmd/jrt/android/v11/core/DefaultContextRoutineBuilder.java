@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Modifier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,7 +72,8 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      *
      * @param activity the context activity.
      * @param factory  the invocation factory.
-     * @throws java.lang.NullPointerException if the activity or class token are null.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     DefaultContextRoutineBuilder(@Nonnull final Activity activity,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
@@ -84,7 +86,8 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      *
      * @param fragment the context fragment.
      * @param factory  the invocation factory.
-     * @throws java.lang.NullPointerException if the fragment or class token are null.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     DefaultContextRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
@@ -97,7 +100,8 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      *
      * @param context the context instance.
      * @param factory the invocation factory.
-     * @throws java.lang.NullPointerException if the context or class token are null.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultContextRoutineBuilder(@Nonnull final Object context,
@@ -108,9 +112,13 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
             throw new NullPointerException("the routine context must not be null");
         }
 
-        if (factory == null) {
+        final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
 
-            throw new NullPointerException("the context invocation factory must not be null");
+        if ((factoryClass.getEnclosingClass() != null) && !Modifier.isStatic(
+                factoryClass.getModifiers())) {
+
+            throw new IllegalArgumentException(
+                    "the factory class must be static: " + factoryClass.getName());
         }
 
         mContext = new WeakReference<Object>(context);
@@ -189,10 +197,9 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
     withInvocationConfiguration() {
 
-
-        final InvocationConfiguration configuration = mInvocationConfiguration;
+        final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,
-                                                                                         configuration);
+                                                                                         config);
     }
 
     /**

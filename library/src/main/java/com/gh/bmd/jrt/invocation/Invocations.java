@@ -91,10 +91,9 @@ public class Invocations {
      * @param function the function instance.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
-    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryWith(
+    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryOn(
             @Nonnull final Function<OUTPUT> function) {
 
         return new FunctionInvocationFactory<OUTPUT>(function);
@@ -133,7 +132,6 @@ public class Invocations {
          * Constructor.
          *
          * @param invocationClass the invocation class.
-         * @throws java.lang.NullPointerException is the specified class is null.
          */
         @SuppressWarnings("ConstantConditions")
         private DefaultInvocationFactory(
@@ -192,7 +190,6 @@ public class Invocations {
          * Constructor.
          *
          * @param function the function instance.
-         * @throws java.lang.NullPointerException if the specified function is null.
          */
         @SuppressWarnings("ConstantConditions")
         private FunctionInvocationFactory(@Nonnull final Function<OUTPUT> function) {

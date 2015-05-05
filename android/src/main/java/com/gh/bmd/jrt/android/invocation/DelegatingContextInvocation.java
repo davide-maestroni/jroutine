@@ -49,7 +49,6 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
      * @param <INPUT>        the input data type.
      * @param <OUTPUT>       the output data type.
      * @return the factory.
-     * @throws java.lang.NullPointerException if any of the parameters is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")

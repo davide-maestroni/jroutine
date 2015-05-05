@@ -161,7 +161,6 @@ public class JRoutine {
      * @return the routine builder instance.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
@@ -180,7 +179,6 @@ public class JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
@@ -198,7 +196,6 @@ public class JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
@@ -216,7 +213,6 @@ public class JRoutine {
      * @return the routine builder instance.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {

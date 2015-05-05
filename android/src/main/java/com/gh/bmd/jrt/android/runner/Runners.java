@@ -42,7 +42,6 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      *
      * @param looper the looper instance.
      * @return the runner instance.
-     * @throws java.lang.NullPointerException if the specified looper is null.
      */
     @Nonnull
     public static Runner looperRunner(@Nonnull final Looper looper) {
@@ -60,7 +59,6 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      * @param sameThreadRunner the runner to be used when the specified looper is called on its own
      *                         thread. If null, the invocation will be posted on the same looper.
      * @return the runner instance.
-     * @throws java.lang.NullPointerException if the specified looper is null.
      */
     @Nonnull
     public static Runner looperRunner(@Nonnull final Looper looper,
@@ -133,7 +131,6 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      *
      * @param thread the thread.
      * @return the runner instance.
-     * @throws java.lang.NullPointerException if the specified thread is null.
      */
     @Nonnull
     public static Runner threadRunner(@Nonnull final HandlerThread thread) {

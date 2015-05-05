@@ -96,7 +96,6 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> onService(
@@ -120,7 +119,6 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * @param context     the routine context.
      * @param targetClass the wrapped object class.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static ServiceObjectRoutineBuilder onService(@Nonnull final Context context,

@@ -561,7 +561,6 @@ public final class RoutineConfiguration {
      *
      * @param context the context.
      * @return the new logger.
-     * @throws java.lang.NullPointerException if the specified configuration or context is null.
      */
     @Nonnull
     public Logger newLogger(@Nonnull final Object context) {
@@ -674,7 +673,6 @@ public final class RoutineConfiguration {
          * Constructor.
          *
          * @param configurable the configurable instance.
-         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
@@ -696,7 +694,6 @@ public final class RoutineConfiguration {
          *
          * @param configurable         the configurable instance.
          * @param initialConfiguration the initial configuration.
-         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
@@ -766,7 +763,6 @@ public final class RoutineConfiguration {
          * @param timeUnit the timeout time unit.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
         public Builder<TYPE> withAvailInvocationTimeout(final long timeout,
@@ -873,7 +869,6 @@ public final class RoutineConfiguration {
          * @param timeUnit the timeout time unit.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
         public Builder<TYPE> withInputTimeout(final long timeout,
@@ -990,7 +985,6 @@ public final class RoutineConfiguration {
          * @param timeUnit the timeout time unit.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
         public Builder<TYPE> withOutputTimeout(final long timeout,
@@ -1020,7 +1014,6 @@ public final class RoutineConfiguration {
          * @param timeUnit the timeout time unit.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         * @throws java.lang.NullPointerException     if the specified time unit is null.
          */
         @Nonnull
         public Builder<TYPE> withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {

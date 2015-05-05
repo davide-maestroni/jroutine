@@ -35,7 +35,6 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT,
      * Constructor.
      *
      * @param factory the invocation factory.
-     * @throws java.lang.NullPointerException if the factory is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {

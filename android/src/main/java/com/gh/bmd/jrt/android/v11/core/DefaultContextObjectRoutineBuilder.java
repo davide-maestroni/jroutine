@@ -104,7 +104,6 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      *
      * @param activity    the context activity.
      * @param targetClass the invocation class token.
-     * @throws java.lang.NullPointerException if the activity or class token are null.
      */
     DefaultContextObjectRoutineBuilder(@Nonnull final Activity activity,
             @Nonnull final Class<?> targetClass) {
@@ -117,7 +116,6 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      *
      * @param fragment    the context fragment.
      * @param targetClass the invocation class token.
-     * @throws java.lang.NullPointerException if the fragment or class token are null.
      */
     DefaultContextObjectRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> targetClass) {
@@ -130,7 +128,6 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      *
      * @param context     the routine context.
      * @param targetClass the target object class.
-     * @throws java.lang.NullPointerException if any of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultContextObjectRoutineBuilder(@Nonnull final Object context,
@@ -433,16 +430,16 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     public ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder>
     withProxyConfiguration() {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ContextObjectRoutineBuilder>(this, configuration);
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
     public RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder>
     withRoutineConfiguration() {
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextObjectRoutineBuilder>(this, configuration);
+        final RoutineConfiguration config = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
@@ -491,9 +488,8 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     public InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder>
     withInvocationConfiguration() {
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextObjectRoutineBuilder>(this,
-                                                                                configuration);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
     }
 
     /**

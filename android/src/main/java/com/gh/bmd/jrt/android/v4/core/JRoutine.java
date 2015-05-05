@@ -146,7 +146,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param activity the invocation activity context.
      * @param target   the wrapped object class.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static ContextObjectRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
@@ -157,6 +156,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
 
     /**
      * Returns a builder of routines bound to the specified activity.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must be static.<br/>
      * Note that the built routine results will be always dispatched in the main UI thread, thus
      * waiting for the outputs immediately after its invocation in the main thread will result in a
      * deadlock.
@@ -166,7 +166,8 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified activity or factory are null.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onActivity(
@@ -187,7 +188,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified activity or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onActivity(
@@ -208,7 +208,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param id       the invocation ID.
      * @return the channel builder instance.
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
-     * @throws java.lang.NullPointerException     if the specified activity is null.
      */
     @Nonnull
     public static ContextChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
@@ -231,7 +230,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param fragment the invocation fragment context.
      * @param target   the wrapped object class.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static ContextObjectRoutineBuilder onFragment(@Nonnull final Fragment fragment,
@@ -242,6 +240,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
 
     /**
      * Returns a builder of routines bound to the specified fragment.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must be static.<br/>
      * Note that the built routine results will be always dispatched in the main UI thread, thus
      * waiting for the outputs immediately after its invocation in the main thread will result in a
      * deadlock.
@@ -251,7 +250,8 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified activity or factory are null.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onFragment(
@@ -272,7 +272,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified fragment or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onFragment(
@@ -293,7 +292,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @param id       the invocation ID.
      * @return the channel builder instance.
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
-     * @throws java.lang.NullPointerException     if the specified fragment is null.
      */
     @Nonnull
     public static ContextChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {

@@ -122,7 +122,6 @@ public class Logger {
      * @param level   the log level.
      * @param context the context.
      * @return the new logger.
-     * @throws java.lang.NullPointerException if the specified context is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -142,7 +141,6 @@ public class Logger {
      *
      * @param throwable the throwable instance.
      * @return the printed stack trace.
-     * @throws java.lang.NullPointerException if the specified throwable is null.
      */
     @Nonnull
     public static String printStackTrace(@Nonnull final Throwable throwable) {

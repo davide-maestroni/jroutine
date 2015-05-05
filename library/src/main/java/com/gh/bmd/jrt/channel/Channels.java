@@ -47,7 +47,6 @@ public class Channels {
      * @param <OUTPUT> the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @throws java.lang.NullPointerException     if the specified list is null.
      */
     @Nonnull
     public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> select(

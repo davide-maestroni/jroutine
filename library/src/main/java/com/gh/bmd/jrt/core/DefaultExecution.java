@@ -54,7 +54,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      * @param inputs  the input iterator.
      * @param result  the result channel.
      * @param logger  the logger instance.
-     * @throws java.lang.NullPointerException if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultExecution(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,

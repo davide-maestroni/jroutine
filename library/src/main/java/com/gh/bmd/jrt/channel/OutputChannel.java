@@ -45,7 +45,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException        if this channel is already bound to a
      *                                                consumer.
-     * @throws java.lang.NullPointerException         if the specified timeout is null.
      */
     @Nonnull
     OutputChannel<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
@@ -75,7 +74,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @param consumer the consumer instance.
      * @return this channel.
      * @throws java.lang.IllegalStateException if this channel is already bound to a consumer.
-     * @throws java.lang.NullPointerException  if the specified consumer is null.
      */
     @Nonnull
     OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
@@ -203,7 +201,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
      * @throws java.lang.IllegalStateException              if this channel is already bound to a
      *                                                      consumer.
-     * @throws java.lang.NullPointerException               if the specified collection is null.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #eventually()

@@ -42,7 +42,6 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *
      * @param configuration the routine configuration.
      * @param factory       the invocation factory.
-     * @throws java.lang.NullPointerException if at least one of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultRoutine(@Nonnull final RoutineConfiguration configuration,

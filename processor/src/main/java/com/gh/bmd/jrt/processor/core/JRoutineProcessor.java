@@ -51,7 +51,6 @@ public class JRoutineProcessor {
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified target is null.
      */
     @Nonnull
     public static ProxyRoutineBuilder on(@Nonnull final Object target) {

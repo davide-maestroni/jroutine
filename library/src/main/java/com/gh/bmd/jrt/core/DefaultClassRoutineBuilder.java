@@ -79,7 +79,6 @@ class DefaultClassRoutineBuilder
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected, or the specified class represents an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     DefaultClassRoutineBuilder(@Nonnull final Class<?> targetClass) {
 
@@ -100,7 +99,6 @@ class DefaultClassRoutineBuilder
      * @param target the target object.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     DefaultClassRoutineBuilder(@Nonnull final Object target) {
 
@@ -335,7 +333,6 @@ class DefaultClassRoutineBuilder
      * @param proxyConfiguration   the share configuration.
      * @param targetMethod         the target method.
      * @return the routine.
-     * @throws java.lang.NullPointerException if the specified configuration or method are null.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(

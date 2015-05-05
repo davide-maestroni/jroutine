@@ -87,7 +87,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      *
      * @param context     the routine context.
      * @param targetClass the target object class.
-     * @throws java.lang.NullPointerException if any of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
@@ -463,24 +462,24 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     withProxyConfiguration() {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, configuration);
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
     public RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     withRoutineConfiguration() {
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ServiceObjectRoutineBuilder>(this, configuration);
+        final RoutineConfiguration config = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
     public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     withServiceConfiguration() {
 
-        final ServiceConfiguration configuration = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, configuration);
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     /**

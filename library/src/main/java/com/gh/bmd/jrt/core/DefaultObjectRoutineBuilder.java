@@ -88,7 +88,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      * @param target the target object instance.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     DefaultObjectRoutineBuilder(@Nonnull final Object target) {
 

@@ -76,7 +76,6 @@ public class PriorityRunner {
      * Constructor.
      *
      * @param wrapped the wrapped instance.
-     * @throws NullPointerException if the specified instance is null.
      */
     @SuppressWarnings("ConstantConditions")
     PriorityRunner(@Nonnull final Runner wrapped) {

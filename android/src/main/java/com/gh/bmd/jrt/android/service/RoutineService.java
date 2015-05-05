@@ -135,7 +135,6 @@ public class RoutineService extends Service {
      *
      * @param message the message.
      * @return the exception or null.
-     * @throws java.lang.NullPointerException if the specified message is null.
      */
     @Nullable
     public static Throwable getAbortError(@Nonnull final Message message) {
@@ -156,7 +155,6 @@ public class RoutineService extends Service {
      *
      * @param message the message.
      * @return the value or null.
-     * @throws java.lang.NullPointerException if the specified message is null.
      */
     @Nullable
     public static Object getValue(@Nonnull final Message message) {
@@ -182,7 +180,6 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
@@ -230,7 +227,6 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
@@ -841,7 +837,6 @@ public class RoutineService extends Service {
          *
          * @param invocation the routine invocation.
          * @param messenger  the output messenger.
-         * @throws java.lang.NullPointerException if the specified messenger is null.
          */
         @SuppressWarnings("ConstantConditions")
         private ServiceOutputConsumer(@Nonnull final RoutineInvocation invocation,
@@ -977,7 +972,6 @@ public class RoutineService extends Service {
          * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException        if the channel is already closed or
          *                                                already bound to a consumer.
-         * @throws java.lang.NullPointerException         if the specified consumer is null.
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 

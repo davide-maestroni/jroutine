@@ -37,7 +37,6 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
      * Constructor.
      *
      * @param routine the routine used to execute this invocation.
-     * @throws java.lang.NullPointerException if the specified routine is null.
      */
     @SuppressWarnings("ConstantConditions")
     public DelegatingInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
@@ -57,7 +56,6 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the factory.
-     * @throws java.lang.NullPointerException if the specified routine is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")

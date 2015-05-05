@@ -47,7 +47,6 @@ class DefaultProxyRoutineBuilder
      * @param target the target object.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultProxyRoutineBuilder(@Nonnull final Object target) {

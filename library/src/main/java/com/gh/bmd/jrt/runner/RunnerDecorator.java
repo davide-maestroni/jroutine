@@ -30,7 +30,6 @@ public class RunnerDecorator implements Runner {
      * Constructor.
      *
      * @param wrapped the wrapped instance.
-     * @throws java.lang.NullPointerException if the specified instance is null.
      */
     @SuppressWarnings("ConstantConditions")
     public RunnerDecorator(@Nonnull final Runner wrapped) {

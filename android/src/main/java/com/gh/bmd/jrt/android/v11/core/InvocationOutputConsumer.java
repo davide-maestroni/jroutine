@@ -64,7 +64,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
      *
      * @param loader the loader instance.
      * @param logger the logger instance.
-     * @throws java.lang.NullPointerException if any of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
     InvocationOutputConsumer(@Nonnull final RoutineLoader<?, OUTPUT> loader,

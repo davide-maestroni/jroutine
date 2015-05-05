@@ -60,7 +60,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      *
      * @param context    the routine context.
      * @param classToken the invocation class token.
-     * @throws java.lang.NullPointerException if the context or the class token are null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final Context context,
@@ -110,19 +109,16 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     public RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
     withRoutineConfiguration() {
 
-
-        final RoutineConfiguration configuration = getConfiguration();
+        final RoutineConfiguration config = getConfiguration();
         return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(mConfigurable,
-                                                                                      configuration);
+                                                                                      config);
     }
 
     @Nonnull
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
     withServiceConfiguration() {
 
-
-        final ServiceConfiguration configuration = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this,
-                                                                                      configuration);
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this, config);
     }
 }

@@ -53,7 +53,6 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
@@ -78,7 +77,6 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class token is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);

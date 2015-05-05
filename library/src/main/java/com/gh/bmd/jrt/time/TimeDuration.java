@@ -48,7 +48,6 @@ public class TimeDuration extends Time {
      * @param duration the time value.
      * @param unit     the time unit.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
-     * @throws java.lang.NullPointerException     if the time unit is null.
      */
     protected TimeDuration(final long duration, @Nonnull final TimeUnit unit) {
 
@@ -86,7 +85,6 @@ public class TimeDuration extends Time {
      * @param unit the time unit.
      * @return the time instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
-     * @throws java.lang.NullPointerException     if the time unit is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -280,7 +278,6 @@ public class TimeDuration extends Time {
      *
      * @param target the target thread.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
-     * @throws java.lang.NullPointerException if the time unit is null.
      */
     public void join(@Nonnull final Thread target) throws InterruptedException {
 
@@ -407,7 +404,6 @@ public class TimeDuration extends Time {
      *
      * @param target the target object.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
-     * @throws java.lang.NullPointerException if the target object is null.
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
             justification = "this is just a wrapper on an Object.wait() call")
@@ -435,7 +431,6 @@ public class TimeDuration extends Time {
      * @param milliTime the starting system time in milliseconds.
      * @return whether the wait happened at all.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
-     * @throws java.lang.NullPointerException if the target object is null.
      * @see java.lang.System#currentTimeMillis()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
@@ -473,7 +468,6 @@ public class TimeDuration extends Time {
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the wait happened at all.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
-     * @throws java.lang.NullPointerException if the target object is null.
      * @see java.lang.System#nanoTime()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
@@ -511,7 +505,6 @@ public class TimeDuration extends Time {
      * @param check  the check to verify.
      * @return whether the check became true before the timeout elapsed.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
-     * @throws java.lang.NullPointerException if the target object or the specified check are null.
      */
     public boolean waitTrue(@Nonnull final Object target, @Nonnull final Check check) throws
             InterruptedException {

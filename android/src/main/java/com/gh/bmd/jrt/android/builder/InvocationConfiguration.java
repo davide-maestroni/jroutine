@@ -289,7 +289,6 @@ public final class InvocationConfiguration {
          * Constructor.
          *
          * @param configurable the configurable instance.
-         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
@@ -307,7 +306,6 @@ public final class InvocationConfiguration {
          * Constructor.
          *
          * @param initialConfiguration the initial invocation configuration.
-         * @throws java.lang.NullPointerException if any of the specified parameters is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,

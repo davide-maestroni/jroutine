@@ -69,7 +69,6 @@ public interface ContextObjectRoutineBuilder
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws java.lang.NullPointerException if the specified method is null.
      */
     @Nonnull
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
@@ -90,7 +89,6 @@ public interface ContextObjectRoutineBuilder
      * @param parameterTypes the method parameter types.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
-     * @throws java.lang.NullPointerException     if one of the parameter is null.
      */
     @Nonnull
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
@@ -113,7 +111,6 @@ public interface ContextObjectRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class token is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
@@ -135,7 +132,6 @@ public interface ContextObjectRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class token is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);

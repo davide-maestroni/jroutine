@@ -174,7 +174,6 @@ public final class ProxyConfiguration {
          * Constructor.
          *
          * @param configurable the configurable instance.
-         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
@@ -192,7 +191,6 @@ public final class ProxyConfiguration {
          *
          * @param configurable         the configurable instance.
          * @param initialConfiguration the initial proxy configuration.
-         * @throws java.lang.NullPointerException if any of the specified parameters is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,

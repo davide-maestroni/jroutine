@@ -102,8 +102,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @param routineConfiguration the routine configuration.
      * @param serviceConfiguration the service configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
-     * @throws java.lang.NullPointerException     if any of the specified non-null parameters is
-     *                                            null.
      */
     ServiceRoutine(@Nonnull final Context context,
             @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,

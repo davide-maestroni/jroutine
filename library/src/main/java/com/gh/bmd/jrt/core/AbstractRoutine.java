@@ -100,7 +100,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      * Constructor.
      *
      * @param configuration the routine configuration.
-     * @throws java.lang.NullPointerException if the specified configuration is null.
      */
     @SuppressWarnings("ConstantConditions")
     protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {

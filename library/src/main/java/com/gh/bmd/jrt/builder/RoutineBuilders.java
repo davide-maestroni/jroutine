@@ -307,7 +307,6 @@ public class RoutineBuilders {
      * @param target     the target object instance.
      * @param shareGroup the share group name.
      * @return the cached mutex.
-     * @throws java.lang.NullPointerException if the specified target or group name are null.
      */
     @Nonnull
     public static Object getSharedMutex(@Nonnull final Object target,

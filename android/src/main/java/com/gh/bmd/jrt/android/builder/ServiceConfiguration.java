@@ -258,7 +258,6 @@ public final class ServiceConfiguration {
          * Constructor.
          *
          * @param configurable the configurable instance.
-         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
@@ -276,7 +275,6 @@ public final class ServiceConfiguration {
          *
          * @param configurable         the configurable instance.
          * @param initialConfiguration the initial configuration.
-         * @throws java.lang.NullPointerException if the specified configurable instance is null.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,

@@ -59,7 +59,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryWith;
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOn;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,6 +75,17 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
     public ContextRoutineBuilderTest() {
 
         super(TestActivity.class);
+    }
+
+    private static Function<String> getFunction() {
+
+        return new Function<String>() {
+
+            public String call(@Nonnull final Object... params) {
+
+                return params[0].toString().toUpperCase();
+            }
+        };
     }
 
     public void testActivityAbort() {
@@ -324,15 +335,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
     public void testActivityFunction() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final Function<String> function = new Function<String>() {
-
-            public String call(@Nonnull final Object... params) {
-
-                return params[0].toString().toUpperCase();
-            }
-        };
         final Routine<Object, String> routine =
-                JRoutine.onActivity(getActivity(), factoryWith(function)).buildRoutine();
+                JRoutine.onActivity(getActivity(), factoryOn(getFunction())).buildRoutine();
         assertThat(routine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("TEST");
     }
 
@@ -878,15 +882,8 @@ public class ContextRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Function<String> function = new Function<String>() {
-
-            public String call(@Nonnull final Object... params) {
-
-                return params[0].toString().toUpperCase();
-            }
-        };
         final Routine<Object, String> routine =
-                JRoutine.onFragment(fragment, factoryWith(function)).buildRoutine();
+                JRoutine.onFragment(fragment, factoryOn(getFunction())).buildRoutine();
         assertThat(routine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("TEST");
     }
 

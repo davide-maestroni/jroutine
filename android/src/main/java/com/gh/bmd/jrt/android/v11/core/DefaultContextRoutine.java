@@ -77,8 +77,6 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
      * @param routineConfiguration    the routine configuration.
      * @param invocationConfiguration the invocation configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
-     * @throws java.lang.NullPointerException     if any of the specified non-null parameter is
-     *                                            null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultContextRoutine(@Nonnull final WeakReference<Object> context,

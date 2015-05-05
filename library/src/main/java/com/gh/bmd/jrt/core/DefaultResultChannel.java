@@ -115,7 +115,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * @param handler       the abort handler.
      * @param runner        the runner instance.
      * @param logger        the logger instance.
-     * @throws java.lang.NullPointerException if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultResultChannel(@Nonnull final RoutineConfiguration configuration,

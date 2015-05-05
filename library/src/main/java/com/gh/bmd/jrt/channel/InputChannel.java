@@ -40,7 +40,6 @@ public interface InputChannel<INPUT> extends Channel {
      * @return this channel.
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException        if this channel is already closed.
-     * @throws java.lang.NullPointerException         if the specified delay is null.
      */
     @Nonnull
     InputChannel<INPUT> after(@Nonnull TimeDuration delay);

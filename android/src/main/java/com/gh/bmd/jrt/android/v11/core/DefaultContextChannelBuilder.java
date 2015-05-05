@@ -62,7 +62,6 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
      *
      * @param activity     the context activity.
      * @param invocationId the invocation ID.
-     * @throws java.lang.NullPointerException if the activity is null.
      */
     DefaultContextChannelBuilder(@Nonnull final Activity activity, final int invocationId) {
 
@@ -74,7 +73,6 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
      *
      * @param fragment     the context fragment.
      * @param invocationId the invocation ID.
-     * @throws java.lang.NullPointerException if the fragment is null.
      */
     DefaultContextChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
 
@@ -86,7 +84,6 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
      *
      * @param context      the context instance.
      * @param invocationId the invocation ID.
-     * @throws java.lang.NullPointerException if the context is null.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultContextChannelBuilder(@Nonnull final Object context, final int invocationId) {
@@ -222,16 +219,16 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     public InvocationConfiguration.Builder<? extends ContextChannelBuilder>
     withInvocationConfiguration() {
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, configuration);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, config);
     }
 
     @Nonnull
     public RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutineConfiguration
             () {
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextChannelBuilder>(this, configuration);
+        final RoutineConfiguration config = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ContextChannelBuilder>(this, config);
     }
 
     @Nonnull

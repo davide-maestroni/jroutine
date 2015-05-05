@@ -11,9 +11,10 @@ android:
     # The SDK version
     - android-22
 
-# Env matrix
+# Env configuration
 env:
-  GRADLE_OPTS="$GRADLE_OPTS -d"
+  global:
+    - GRADLE_OPTS="$GRADLE_OPTS -d"
   matrix:
     - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi
     - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a

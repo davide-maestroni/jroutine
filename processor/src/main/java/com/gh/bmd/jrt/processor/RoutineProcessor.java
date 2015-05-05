@@ -468,7 +468,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement methodElement : methodElements) {
 
                 ++count;
-                writeMethod(writer, targetElement, methodElement, count);
+                writeMethod(writer, element, targetElement, methodElement, count);
             }
 
             writer.append(mFooter);
@@ -987,7 +987,8 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement targetElement,
+    private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement element,
+            @Nonnull final TypeElement targetElement,
             @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();
@@ -1089,9 +1090,24 @@ public class RoutineProcessor extends AbstractProcessor {
         final String resultClassName = getBoxedType(targetReturnType).toString();
         String methodHeader;
         methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
+        methodHeader = methodHeader.replace("${classFullName}", targetElement.asType().toString());
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
+        methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
                                             buildRoutineOptions(asyncParamMode, asyncReturnMode));
+
+        final ShareGroup shareGroupAnnotation = methodElement.getAnnotation(ShareGroup.class);
+
+        if (shareGroupAnnotation != null) {
+
+            methodHeader = methodHeader.replace("${shareGroup}",
+                                                "\"" + shareGroupAnnotation.value() + "\"");
+
+        } else {
+
+            methodHeader = methodHeader.replace("${shareGroup}", "\"null\"");
+        }
+
         writer.append(methodHeader);
         method = method.replace("${resultClassName}", resultClassName);
         method = method.replace("${resultRawClass}", targetReturnType.toString());
@@ -1132,6 +1148,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 methodInvocation.replace("${classFullName}", targetElement.asType().toString());
         methodInvocation = methodInvocation.replace("${resultClassName}", resultClassName);
         methodInvocation = methodInvocation.replace("${methodCount}", Integer.toString(count));
+        methodInvocation = methodInvocation.replace("${genericTypes}", buildGenericTypes(element));
         methodInvocation = methodInvocation.replace("${methodName}", methodElement.getSimpleName());
         methodInvocation =
                 methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
@@ -1149,18 +1166,6 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetMethod.getParameters().size()));
             methodInvocation =
                     methodInvocation.replace("${paramValues}", buildParamValues(targetMethod));
-        }
-
-        final ShareGroup shareGroupAnnotation = methodElement.getAnnotation(ShareGroup.class);
-
-        if (shareGroupAnnotation != null) {
-
-            methodInvocation = methodInvocation.replace("${shareGroup}",
-                                                        "\"" + shareGroupAnnotation.value() + "\"");
-
-        } else {
-
-            methodInvocation = methodInvocation.replace("${shareGroup}", "\"null\"");
         }
 
         writer.append(methodInvocation);

@@ -16,18 +16,19 @@
 
     private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
 
+    private static class InvocationFactory${methodCount} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
+
+        @javax.annotation.Nonnull
+        public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation(@javax.annotation.Nonnull Object... args) {
+
+            return new Invocation${methodCount}();
+        }
+    }
+
     private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
             final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-        final com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> factory = new com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}>() {
-
-            @javax.annotation.Nonnull
-            public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation(@javax.annotation.Nonnull Object... args) {
-
-                return new Invocation${methodCount}();
-            }
-        };
-        return com.gh.bmd.jrt.core.JRoutine.on(factory)
+        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}())
                                            .withRoutineConfiguration()
                                            .with(configuration)
                                            ${routineBuilderOptions}

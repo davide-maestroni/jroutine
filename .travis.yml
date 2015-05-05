@@ -13,8 +13,6 @@ android:
 
 # Env configuration
 env:
-  global:
-    - GRADLE_OPTS="$GRADLE_OPTS -d"
   matrix:
     - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi
     - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
@@ -27,6 +25,7 @@ before_install:
 before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+script: ./gradlew -d build connectedCheck
 
 # Code coverage
 after_success:

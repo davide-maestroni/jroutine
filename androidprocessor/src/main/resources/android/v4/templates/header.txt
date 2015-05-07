@@ -1,0 +1,178 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// GENERATED CODE - PLEASE DO NOT EDIT
+
+package ${packageName};
+
+public final class JRoutineProxyV4_${interfaceName}${genericTypes} implements ${interfaceFullName} {
+
+    private final java.lang.ref.WeakReference<Object> mContext;
+
+    private final String mShareGroup;
+
+    private final Class<?> mTargetClass;
+
+    public JRoutineProxyV4_${interfaceName}(@javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity,
+            @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+
+        this((Object) activity, targetClass, shareGroup, routineConfiguration, invocationConfiguration);
+    }
+
+    public JRoutineProxyV4_${interfaceName}(@javax.annotation.Nonnull final android.support.v4.app.Fragment fragment,
+            @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+
+        this((Object) fragment, targetClass, shareGroup, routineConfiguration, invocationConfiguration);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private JRoutineProxyV4_${interfaceName}(@javax.annotation.Nonnull final Object context,
+            @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+
+        if (context == null) {
+
+            throw new NullPointerException("the invocation context must not be null");
+        }
+
+        if (targetClass == null) {
+
+            throw new NullPointerException("the target class must not be null");
+        }
+
+        mContext = new java.lang.ref.WeakReference<Object>(context);
+        mTargetClass = targetClass;
+        mShareGroup = (shareGroup != null) ? shareGroup : com.gh.bmd.jrt.annotation.ShareGroup.ALL;
+        ${routineFieldsInit}
+    }
+
+    @javax.annotation.Nonnull
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onActivity(@javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity, @javax.annotation.Nonnull final Class<?> targetClass) {
+
+        return new ${interfaceName}ContextProxyBuilder${genericTypes}(activity, targetClass);
+    }
+
+    @javax.annotation.Nonnull
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onFragment(@javax.annotation.Nonnull final android.support.v4.app.Fragment fragment, @javax.annotation.Nonnull final Class<?> targetClass) {
+
+        return new ${interfaceName}ContextProxyBuilder${genericTypes}(fragment, targetClass);
+    }
+
+    @javax.annotation.Nonnull
+    private static <OUTPUT> com.gh.bmd.jrt.android.builder.ContextRoutineBuilder<Object, OUTPUT> getBuilder(@javax.annotation.Nonnull final java.lang.ref.WeakReference<Object> contextReference,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, OUTPUT> factory) {
+
+        final Object context = contextReference.get();
+
+        if (context == null) {
+
+            throw new IllegalStateException("the routine context has been destroyed");
+        }
+
+        if (context instanceof android.support.v4.app.FragmentActivity) {
+
+            return com.gh.bmd.jrt.android.v4.core.JRoutine.onActivity((android.support.v4.app.FragmentActivity) context, factory);
+
+        } else if (context instanceof android.support.v4.app.Fragment) {
+
+            return com.gh.bmd.jrt.android.v4.core.JRoutine.onFragment((android.support.v4.app.Fragment) context, factory);
+        }
+
+        throw new IllegalArgumentException("invalid context type: " + context.getClass().getName());
+    }
+
+    @javax.annotation.Nonnull
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    private static Object getInstance(@javax.annotation.Nonnull final android.content.Context context,
+            @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] args)
+            throws IllegalAccessException, java.lang.reflect.InvocationTargetException, InstantiationException {
+
+        Object target = null;
+
+        if (context instanceof com.gh.bmd.jrt.android.builder.FactoryContext) {
+
+            // the context here is always the application
+            synchronized (context) {
+
+                target = ((com.gh.bmd.jrt.android.builder.FactoryContext) context).geInstance(targetClass, args);
+            }
+        }
+
+        if (target == null) {
+
+            target = com.gh.bmd.jrt.common.Reflection.findConstructor(targetClass, args).newInstance(args);
+
+        } else if (!targetClass.isInstance(target)) {
+
+            throw new InstantiationException();
+        }
+
+        return target;
+    }
+
+    @javax.annotation.Nullable
+    private static Object getMutex(@javax.annotation.Nonnull final Object target,
+            @javax.annotation.Nullable final String shareGroup) {
+
+        if (com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
+
+            return null;
+        }
+
+        return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(target, shareGroup);
+    }
+
+    private static class ${interfaceName}ContextProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder<${interfaceFullName}> {
+
+        private final Object mContext;
+
+        private final Class<?> mTargetClass;
+
+        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+
+        private ${interfaceName}ContextProxyBuilder(@javax.annotation.Nonnull final Object context, @javax.annotation.Nonnull final Class<?> targetClass) {
+
+            mContext = context;
+            mTargetClass = targetClass;
+        }
+
+        @Override
+        @javax.annotation.Nonnull
+        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
+
+            return mToken;
+        }
+
+        @Override
+        @javax.annotation.Nonnull
+        protected Class<?> getTargetClass() {
+
+            return mTargetClass;
+        }
+
+        @Override
+        @javax.annotation.Nonnull
+        protected ${interfaceFullName} newProxy(
+                @javax.annotation.Nonnull final String shareGroup,
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+
+            return new JRoutineProxyV4_${interfaceName}${genericTypes}(mContext, mTargetClass, shareGroup, routineConfiguration, invocationConfiguration);
+        }
+    }

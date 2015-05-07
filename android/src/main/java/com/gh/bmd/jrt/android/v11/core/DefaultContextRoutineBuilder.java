@@ -210,7 +210,6 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     private void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
-
         final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
 
         if (asyncRunner != null) {

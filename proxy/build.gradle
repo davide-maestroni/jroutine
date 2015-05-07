@@ -1,0 +1,91 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'findbugs'
+apply from: '../extra.gradle'
+
+group = project.getProperty('groupName')
+version = project.getProperty('releaseVersion')
+archivesBaseName = "${project.parent.name}-${project.name}"
+javaCompatibility = JavaVersion.VERSION_1_6
+
+def mainProject = project.parent.subprojects.find { it.name.equals('library') };
+def processorProject = project.parent.subprojects.find { it.name.equals('processor') };
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    if (!version.contains('PREVIEW') && mainProject.hasProperty('releaseVersion')) {
+        compile "com.github.davide-maestroni:jroutine:${toVersionRange(mainProject.getProperty('releaseVersion'))}"
+    } else {
+        compile project(':library')
+    }
+    if (!version.contains('PREVIEW') && processorProject.hasProperty('releaseVersion')) {
+        compile "com.github.davide-maestroni:jroutine-processor:${toVersionRange(processorProject.getProperty('releaseVersion'))}"
+    } else {
+        compile project(':processor')
+    }
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:1.7.1'
+}
+
+task('jacocoTest', dependsOn: 'test') {
+    description = 'Runs the tests and generates the JaCoCo report files.'
+} << {
+    tasks.jacocoTestReport.execute()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // Coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
+
+javadoc {
+    title = "${archivesBaseName} ${version}"
+    options.links('http://docs.oracle.com/javase/7/docs/api/')
+    options.overview("${project.projectDir}/docs/overview.html")
+    options.windowTitle("Javadoc - ${archivesBaseName}")
+}
+
+findbugs {
+    toolVersion = '3.0.0'
+    effort = 'max'
+    reportLevel = 'low'
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+tasks.findbugsTest.onlyIf { false }
+
+artifacts {
+    archives task('sourcesJar', type: Jar) {
+        description 'Generates sources Jar'
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    archives task('javadocJar', type: Jar, dependsOn: 'javadoc') {
+        description 'Generates Javadoc Jar'
+        classifier = 'javadoc'
+        from 'build/docs/javadoc'
+    }
+}

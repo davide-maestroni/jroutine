@@ -30,7 +30,7 @@ android {
     defaultConfig {
         minSdkVersion 4
         targetSdkVersion 21 // Travis does not support an higher version
-        versionCode 100
+        versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
 

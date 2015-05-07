@@ -225,7 +225,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                 .withShareGroup("test")
                 .set()
                 .boundMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         JRoutine.onFragment(fragment, Square.class)
                 .withRoutineConfiguration()
@@ -236,7 +236,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                 .set()
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(14);
+        assertThat(countLog.getWrnCount()).isEqualTo(12);
     }
 
     public void testDuplicateAnnotationError() {

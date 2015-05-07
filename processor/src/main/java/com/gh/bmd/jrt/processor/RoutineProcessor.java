@@ -27,8 +27,10 @@ import com.gh.bmd.jrt.processor.annotation.Proxy;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -60,6 +62,8 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations.
  * <p/>
@@ -67,19 +71,23 @@ import javax.tools.JavaFileObject;
  */
 public class RoutineProcessor extends AbstractProcessor {
 
+    protected static final String NEW_LINE = System.getProperty("line.separator");
+
     private static final boolean DEBUG = false;
 
-    private static final String NEW_LINE = System.getProperty("line.separator");
+    private final byte[] mByteBuffer = new byte[2048];
 
-    private boolean mDisabled;
+    protected TypeElement iterableElement;
+
+    protected TypeElement listElement;
+
+    protected TypeMirror objectType;
+
+    protected TypeElement outputChannelElement;
 
     private String mFooter;
 
     private String mHeader;
-
-    private TypeElement mIterableElement;
-
-    private TypeElement mListElement;
 
     private String mMethodArray;
 
@@ -115,9 +123,13 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodVoid;
 
-    private TypeMirror mObjectType;
+    @Nonnull
+    protected static String printStackTrace(@Nonnull final Throwable throwable) {
 
-    private TypeElement mOutputChannelElement;
+        final StringWriter writer = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(writer));
+        return writer.toString();
+    }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
@@ -137,90 +149,74 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        final byte[] buffer = new byte[2048];
 
-        try {
-
-            mHeader = parseTemplate("/templates/header.txt", buffer);
-            mMethodHeader = parseTemplate("/templates/method_header.txt", buffer);
-            mMethodArray = parseTemplate("/templates/method_array.txt", buffer);
-            mMethodAsync = parseTemplate("/templates/method_async.txt", buffer);
-            mMethodList = parseTemplate("/templates/method_list.txt", buffer);
-            mMethodResult = parseTemplate("/templates/method_result.txt", buffer);
-            mMethodVoid = parseTemplate("/templates/method_void.txt", buffer);
-            mMethodParallelArray = parseTemplate("/templates/method_parallel_array.txt", buffer);
-            mMethodParallelAsync = parseTemplate("/templates/method_parallel_async.txt", buffer);
-            mMethodParallelList = parseTemplate("/templates/method_parallel_list.txt", buffer);
-            mMethodParallelResult = parseTemplate("/templates/method_parallel_result.txt", buffer);
-            mMethodParallelVoid = parseTemplate("/templates/method_parallel_void.txt", buffer);
-            mMethodInvocation = parseTemplate("/templates/method_invocation.txt", buffer);
-            mMethodInvocationCollection =
-                    parseTemplate("/templates/method_invocation_collection.txt", buffer);
-            mMethodInvocationVoid = parseTemplate("/templates/method_invocation_void.txt", buffer);
-            mMethodArrayInvocation =
-                    parseTemplate("/templates/method_array_invocation.txt", buffer);
-            mMethodArrayInvocationCollection =
-                    parseTemplate("/templates/method_array_invocation_collection.txt", buffer);
-            mMethodArrayInvocationVoid =
-                    parseTemplate("/templates/method_array_invocation_void.txt", buffer);
-            mFooter = parseTemplate("/templates/footer.txt", buffer);
-
-            mOutputChannelElement = getTypeFromName(OutputChannel.class.getCanonicalName());
-            mIterableElement = getTypeFromName(Iterable.class.getCanonicalName());
-            mListElement = getTypeFromName(List.class.getCanonicalName());
-            mObjectType = getTypeFromName(Object.class.getCanonicalName()).asType();
-
-
-        } catch (final IOException ex) {
-
-            mDisabled = true;
-        }
+        outputChannelElement = getTypeFromName(OutputChannel.class.getCanonicalName());
+        iterableElement = getTypeFromName(Iterable.class.getCanonicalName());
+        listElement = getTypeFromName(List.class.getCanonicalName());
+        objectType = getTypeFromName(Object.class.getCanonicalName()).asType();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean process(final Set<? extends TypeElement> typeElements,
             final RoundEnvironment roundEnvironment) {
 
-        if (roundEnvironment.processingOver() || mDisabled) {
+        if (roundEnvironment.processingOver()) {
 
             return false;
         }
 
-        final TypeElement annotationElement = getTypeFromName(Proxy.class.getCanonicalName());
-        final TypeMirror annotationType = annotationElement.asType();
+        try {
 
-        for (final Element element : ElementFilter.typesIn(
-                roundEnvironment.getElementsAnnotatedWith(Proxy.class))) {
+            for (final String supportedAnnotation : getSupportedAnnotationTypes()) {
 
-            final TypeElement classElement = (TypeElement) element;
-            final List<ExecutableElement> methodElements =
-                    ElementFilter.methodsIn(element.getEnclosedElements());
+                final TypeElement annotationElement = getTypeFromName(supportedAnnotation);
+                final TypeMirror annotationType = annotationElement.asType();
+                final Class<? extends Annotation> annotationClass =
+                        (Class<? extends Annotation>) Class.forName(supportedAnnotation);
 
-            for (final TypeMirror typeMirror : classElement.getInterfaces()) {
+                for (final Element element : ElementFilter.typesIn(
+                        roundEnvironment.getElementsAnnotatedWith(annotationClass))) {
 
-                final Element superElement = processingEnv.getTypeUtils().asElement(typeMirror);
+                    final TypeElement classElement = (TypeElement) element;
+                    final List<ExecutableElement> methodElements =
+                            ElementFilter.methodsIn(element.getEnclosedElements());
 
-                if (superElement != null) {
+                    for (final TypeMirror typeMirror : classElement.getInterfaces()) {
 
-                    mergeParentMethods(methodElements,
-                                       ElementFilter.methodsIn(superElement.getEnclosedElements()));
+                        final Element superElement =
+                                processingEnv.getTypeUtils().asElement(typeMirror);
+
+                        if (superElement != null) {
+
+                            mergeParentMethods(methodElements, ElementFilter.methodsIn(
+                                    superElement.getEnclosedElements()));
+                        }
+                    }
+
+                    final Object targetElement = getElementValue(element, annotationType, "value");
+
+                    if (targetElement != null) {
+
+                        createProxy(annotationClass, classElement,
+                                    getTypeFromName(targetElement.toString()), methodElements);
+                    }
                 }
             }
 
-            final Object targetElement = getElementValue(element, annotationType, "value");
+        } catch (final ClassNotFoundException e) {
 
-            if (targetElement != null) {
-
-                createProxy(classElement, getTypeFromName(targetElement.toString()),
-                            methodElements);
-            }
+            processingEnv.getMessager()
+                         .printMessage(Kind.ERROR,
+                                       "Annotation class not found; " + printStackTrace(e));
+            throw new RuntimeException(e);
         }
 
         return false;
     }
 
     @Nonnull
-    private String buildCollectionParamValues(
+    protected String buildCollectionParamValues(
             @Nonnull final ExecutableElement targetMethodElement) {
 
         final VariableElement targetParameter = targetMethodElement.getParameters().get(0);
@@ -228,7 +224,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildGenericTypes(@Nonnull final TypeElement element) {
+    protected String buildGenericTypes(@Nonnull final TypeElement element) {
 
         final List<? extends TypeParameterElement> typeParameters = element.getTypeParameters();
 
@@ -253,10 +249,10 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildInputParams(@Nonnull final ExecutableElement methodElement) {
+    protected String buildInputParams(@Nonnull final ExecutableElement methodElement) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeElement outputChannelElement = mOutputChannelElement;
+        final TypeElement outputChannelElement = this.outputChannelElement;
         final StringBuilder builder = new StringBuilder();
 
         for (final VariableElement variableElement : methodElement.getParameters()) {
@@ -280,7 +276,8 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private String buildOutputOptions(final ExecutableElement methodElement) {
+    @Nonnull
+    protected String buildOutputOptions(@Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
         final Timeout timeoutAnnotation = methodElement.getAnnotation(Timeout.class);
@@ -320,7 +317,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildParamTypes(@Nonnull final ExecutableElement methodElement) {
+    protected String buildParamTypes(@Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -341,7 +338,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildParamValues(@Nonnull final ExecutableElement targetMethodElement) {
+    protected String buildParamValues(@Nonnull final ExecutableElement targetMethodElement) {
 
         int count = 0;
         final StringBuilder builder = new StringBuilder();
@@ -364,7 +361,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private CharSequence buildParams(@Nonnull final ExecutableElement methodElement) {
+    protected CharSequence buildParams(@Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -382,7 +379,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildRoutineFieldsInit(final int size) {
+    protected String buildRoutineFieldsInit(final int size) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -401,7 +398,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildRoutineOptions(@Nullable final PassMode paramMode,
+    protected String buildRoutineOptions(@Nullable final PassMode paramMode,
             @Nullable final PassMode returnMode) {
 
         return ".withInputOrder(" + OrderType.class.getCanonicalName() + "." + (
@@ -410,7 +407,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER : OrderType.NONE) + ")";
     }
 
-    private String buildSizedArray(final TypeMirror returnType) {
+    @Nonnull
+    protected String buildSizedArray(@Nonnull final TypeMirror returnType) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -430,172 +428,7 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    @SuppressWarnings("PointlessBooleanExpression")
-    private void createProxy(@Nonnull final TypeElement element,
-            @Nonnull final TypeElement targetElement,
-            @Nonnull final List<ExecutableElement> methodElements) {
-
-        Writer writer = null;
-
-        try {
-
-            final String packageName = getPackage(element).getQualifiedName().toString();
-            final String interfaceName = element.getSimpleName().toString();
-            final Filer filer = processingEnv.getFiler();
-
-            if (!DEBUG) {
-
-                final JavaFileObject sourceFile =
-                        filer.createSourceFile(packageName + ".JRoutine_" + interfaceName);
-                writer = sourceFile.openWriter();
-
-            } else {
-
-                writer = new StringWriter();
-            }
-
-            String header;
-            header = mHeader.replace("${packageName}", packageName);
-            header = header.replace("${genericTypes}", buildGenericTypes(element));
-            header = header.replace("${classFullName}", targetElement.asType().toString());
-            header = header.replace("${interfaceName}", interfaceName);
-            header = header.replace("${interfaceFullName}", element.asType().toString());
-            header = header.replace("${routineFieldsInit}",
-                                    buildRoutineFieldsInit(methodElements.size()));
-            writer.append(header);
-            int count = 0;
-
-            for (final ExecutableElement methodElement : methodElements) {
-
-                ++count;
-                writeMethod(writer, element, targetElement, methodElement, count);
-            }
-
-            writer.append(mFooter);
-
-        } catch (final IOException ignored) {
-
-        } finally {
-
-            if (writer != null) {
-
-                try {
-
-                    writer.close();
-
-                } catch (final IOException ignored) {
-
-                }
-            }
-        }
-
-        if (DEBUG) {
-
-            System.out.println(writer.toString());
-        }
-    }
-
-    @Nonnull
-    private ExecutableElement findMatchingMethod(@Nonnull final ExecutableElement methodElement,
-            @Nonnull final TypeElement targetElement) {
-
-        String methodName = methodElement.getSimpleName().toString();
-        ExecutableElement targetMethod = null;
-        final Bind asyncAnnotation = methodElement.getAnnotation(Bind.class);
-
-        if (asyncAnnotation != null) {
-
-            methodName = asyncAnnotation.value();
-
-            for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                    targetElement.getEnclosedElements())) {
-
-                final Bind targetAsyncAnnotation = targetMethodElement.getAnnotation(Bind.class);
-
-                if ((targetAsyncAnnotation != null) && methodName.equals(
-                        targetAsyncAnnotation.value())) {
-
-                    targetMethod = targetMethodElement;
-
-                    break;
-                }
-            }
-        }
-
-        if (targetMethod == null) {
-
-            final Types typeUtils = processingEnv.getTypeUtils();
-            final TypeElement asyncAnnotationElement =
-                    getTypeFromName(Pass.class.getCanonicalName());
-            final TypeMirror asyncAnnotationType = asyncAnnotationElement.asType();
-            final List<? extends VariableElement> interfaceTypeParameters =
-                    methodElement.getParameters();
-            final int length = interfaceTypeParameters.size();
-
-            for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                    targetElement.getEnclosedElements())) {
-
-                if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
-
-                    continue;
-                }
-
-                final List<? extends VariableElement> classTypeParameters =
-                        targetMethodElement.getParameters();
-
-                if (length == classTypeParameters.size()) {
-
-                    boolean matches = true;
-
-                    for (int i = 0; i < length; i++) {
-
-                        Object value = null;
-                        final VariableElement variableElement = interfaceTypeParameters.get(i);
-
-                        if (variableElement.getAnnotation(Pass.class) != null) {
-
-                            value = getElementValue(variableElement, asyncAnnotationType, "value");
-                        }
-
-                        if (value != null) {
-
-                            if (!typeUtils.isSameType((TypeMirror) value, typeUtils.erasure(
-                                    classTypeParameters.get(i).asType()))) {
-
-                                matches = false;
-                                break;
-                            }
-
-                        } else {
-
-                            if (!typeUtils.isSameType(variableElement.asType(), typeUtils.erasure(
-                                    classTypeParameters.get(i).asType()))) {
-
-                                matches = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (matches) {
-
-                        targetMethod = targetMethodElement;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (targetMethod == null) {
-
-            throw new IllegalArgumentException(
-                    "[" + methodElement + "] cannot find matching method in target class");
-        }
-
-        return targetMethod;
-    }
-
-    private TypeMirror getBoxedType(final TypeMirror type) {
+    protected TypeMirror getBoxedType(@Nullable final TypeMirror type) {
 
         if ((type != null) && (type.getKind().isPrimitive() || (type.getKind() == TypeKind.VOID))) {
 
@@ -606,7 +439,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nullable
-    private Object getElementValue(@Nonnull final Element element,
+    protected Object getElementValue(@Nonnull final Element element,
             @Nonnull final TypeMirror annotationType, @Nonnull final String valueName) {
 
         AnnotationValue value = null;
@@ -635,20 +468,266 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private PackageElement getPackage(@Nonnull final TypeElement element) {
+    protected String getFooterTemplate() throws IOException {
+
+        if (mFooter == null) {
+
+            mFooter = parseTemplate("/templates/footer.txt");
+        }
+
+        return mFooter;
+    }
+
+    @Nonnull
+    protected String getHeaderTemplate() throws IOException {
+
+        if (mHeader == null) {
+
+            mHeader = parseTemplate("/templates/header.txt");
+        }
+
+        return mHeader;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodArrayInvocationCollectionTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodArrayInvocationCollection == null) {
+
+            mMethodArrayInvocationCollection =
+                    parseTemplate("/templates/method_array_invocation_collection.txt");
+        }
+
+        return mMethodArrayInvocationCollection;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodArrayInvocationTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodArrayInvocation == null) {
+
+            mMethodArrayInvocation = parseTemplate("/templates/method_array_invocation.txt");
+        }
+
+        return mMethodArrayInvocation;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodArrayInvocationVoidTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodArrayInvocationVoid == null) {
+
+            mMethodArrayInvocationVoid =
+                    parseTemplate("/templates/method_array_invocation_void.txt");
+        }
+
+        return mMethodArrayInvocationVoid;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodArrayTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodArray == null) {
+
+            mMethodArray = parseTemplate("/templates/method_array.txt");
+        }
+
+        return mMethodArray;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodAsyncTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodAsync == null) {
+
+            mMethodAsync = parseTemplate("/templates/method_async.txt");
+        }
+
+        return mMethodAsync;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodHeaderTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodHeader == null) {
+
+            mMethodHeader = parseTemplate("/templates/method_header.txt");
+        }
+
+        return mMethodHeader;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodInvocationCollectionTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodInvocationCollection == null) {
+
+            mMethodInvocationCollection =
+                    parseTemplate("/templates/method_invocation_collection.txt");
+        }
+
+        return mMethodInvocationCollection;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodInvocationTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodInvocation == null) {
+
+            mMethodInvocation = parseTemplate("/templates/method_invocation.txt");
+        }
+
+        return mMethodInvocation;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodInvocationVoidTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodInvocationVoid == null) {
+
+            mMethodInvocationVoid = parseTemplate("/templates/method_invocation_void.txt");
+        }
+
+        return mMethodInvocationVoid;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodListTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodList == null) {
+
+            mMethodList = parseTemplate("/templates/method_list.txt");
+        }
+
+        return mMethodList;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodParallelArrayTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodParallelArray == null) {
+
+            mMethodParallelArray = parseTemplate("/templates/method_parallel_array.txt");
+        }
+
+        return mMethodParallelArray;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodParallelAsyncTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodParallelAsync == null) {
+
+            mMethodParallelAsync = parseTemplate("/templates/method_parallel_async.txt");
+        }
+
+        return mMethodParallelAsync;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodParallelListTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodParallelList == null) {
+
+            mMethodParallelList = parseTemplate("/templates/method_parallel_list.txt");
+        }
+
+        return mMethodParallelList;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodParallelResultTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodParallelResult == null) {
+
+            mMethodParallelResult = parseTemplate("/templates/method_parallel_result.txt");
+        }
+
+        return mMethodParallelResult;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodParallelVoidTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodParallelVoid == null) {
+
+            mMethodParallelVoid = parseTemplate("/templates/method_parallel_void.txt");
+        }
+
+        return mMethodParallelVoid;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodResultTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodResult == null) {
+
+            mMethodResult = parseTemplate("/templates/method_result.txt");
+        }
+
+        return mMethodResult;
+    }
+
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodVoidTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodVoid == null) {
+
+            mMethodVoid = parseTemplate("/templates/method_void.txt");
+        }
+
+        return mMethodVoid;
+    }
+
+    @Nonnull
+    protected PackageElement getPackage(@Nonnull final TypeElement element) {
 
         return processingEnv.getElementUtils().getPackageOf(element);
     }
 
     @Nonnull
-    private PassMode getParamMode(@Nonnull final ExecutableElement methodElement,
+    protected PassMode getParamMode(@Nonnull final ExecutableElement methodElement,
             @Nonnull final Pass passAnnotation, @Nonnull final VariableElement targetParameter,
             final int length) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeElement outputChannelElement = mOutputChannelElement;
-        final TypeElement iterableElement = mIterableElement;
-        final TypeElement listElement = mListElement;
+        final TypeElement outputChannelElement = this.outputChannelElement;
+        final TypeElement iterableElement = this.iterableElement;
+        final TypeElement listElement = this.listElement;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
         final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
@@ -771,13 +850,13 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private PassMode getReturnMode(@Nonnull final Pass annotation,
+    protected PassMode getReturnMode(@Nonnull final Pass annotation,
             @Nonnull final ExecutableElement methodElement) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeElement outputChannelElement = mOutputChannelElement;
-        final TypeElement iterableElement = mIterableElement;
-        final TypeElement listElement = mListElement;
+        final TypeElement outputChannelElement = this.outputChannelElement;
+        final TypeElement iterableElement = this.iterableElement;
+        final TypeElement listElement = this.listElement;
         final TypeMirror returnType = methodElement.getReturnType();
         final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
         final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
@@ -876,12 +955,22 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private TypeElement getTypeFromName(@Nonnull final String typeName) {
+    @SuppressWarnings("UnusedParameters")
+    protected String getSourceName(@Nonnull final Class<? extends Annotation> annotationClass,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
+
+        final String packageName = getPackage(element).getQualifiedName().toString();
+        final String interfaceName = element.getSimpleName().toString();
+        return packageName + ".JRoutineProxy_" + interfaceName;
+    }
+
+    @Nonnull
+    protected TypeElement getTypeFromName(@Nonnull final String typeName) {
 
         return processingEnv.getElementUtils().getTypeElement(normalizeTypeName(typeName));
     }
 
-    private boolean haveSameParameters(@Nonnull final ExecutableElement firstMethodElement,
+    protected boolean haveSameParameters(@Nonnull final ExecutableElement firstMethodElement,
             @Nonnull final ExecutableElement secondMethodElement) {
 
         final List<? extends VariableElement> firstTypeParameters =
@@ -911,6 +1000,220 @@ public class RoutineProcessor extends AbstractProcessor {
         return true;
     }
 
+    @Nonnull
+    protected String normalizeTypeName(@Nonnull final String typeName) {
+
+        if (typeName.endsWith(".class")) {
+
+            return typeName.substring(0, typeName.length() - ".class".length());
+        }
+
+        return typeName;
+    }
+
+    @Nonnull
+    @SuppressFBWarnings(value = "UI_INHERITANCE_UNSAFE_GETRESOURCE",
+            justification = "inheritance of the processor class must be supported")
+    protected String parseTemplate(@Nonnull final String path) throws IOException {
+
+        final byte[] buffer = mByteBuffer;
+        final InputStream resourceStream = getClass().getResourceAsStream(path);
+
+        try {
+
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            int length;
+
+            while ((length = resourceStream.read(buffer)) > 0) {
+
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.flush();
+            return outputStream.toString("UTF-8");
+
+        } finally {
+
+            try {
+
+                resourceStream.close();
+
+            } catch (final IOException ignored) {
+
+            }
+        }
+    }
+
+    @SuppressWarnings("PointlessBooleanExpression")
+    private void createProxy(@Nonnull final Class<? extends Annotation> annotationClass,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement,
+            @Nonnull final List<ExecutableElement> methodElements) {
+
+        Writer writer = null;
+
+        try {
+
+            final String packageName = getPackage(element).getQualifiedName().toString();
+            final String interfaceName = element.getSimpleName().toString();
+            final Filer filer = processingEnv.getFiler();
+
+            if (!DEBUG) {
+
+                final JavaFileObject sourceFile = filer.createSourceFile(
+                        getSourceName(annotationClass, element, targetElement));
+                writer = sourceFile.openWriter();
+
+            } else {
+
+                writer = new StringWriter();
+            }
+
+            String header;
+            header = getHeaderTemplate().replace("${packageName}", packageName);
+            header = header.replace("${genericTypes}", buildGenericTypes(element));
+            header = header.replace("${classFullName}", targetElement.asType().toString());
+            header = header.replace("${interfaceName}", interfaceName);
+            header = header.replace("${interfaceFullName}", element.asType().toString());
+            header = header.replace("${routineFieldsInit}",
+                                    buildRoutineFieldsInit(methodElements.size()));
+            writer.append(header);
+            int count = 0;
+
+            for (final ExecutableElement methodElement : methodElements) {
+
+                ++count;
+                writeMethod(writer, annotationClass, element, targetElement, methodElement, count);
+            }
+
+            writer.append(getFooterTemplate());
+
+        } catch (final IOException e) {
+
+            processingEnv.getMessager()
+                         .printMessage(Kind.ERROR,
+                                       "IOException while writing template; " + printStackTrace(e));
+            throw new RuntimeException(e);
+
+        } finally {
+
+            if (writer != null) {
+
+                try {
+
+                    writer.close();
+
+                } catch (final IOException ignored) {
+
+                }
+            }
+        }
+
+        if (DEBUG) {
+
+            System.out.println(writer.toString());
+        }
+    }
+
+    @Nonnull
+    private ExecutableElement findMatchingMethod(@Nonnull final ExecutableElement methodElement,
+            @Nonnull final TypeElement targetElement) {
+
+        String methodName = methodElement.getSimpleName().toString();
+        ExecutableElement targetMethod = null;
+        final Bind asyncAnnotation = methodElement.getAnnotation(Bind.class);
+
+        if (asyncAnnotation != null) {
+
+            methodName = asyncAnnotation.value();
+
+            for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
+                    targetElement.getEnclosedElements())) {
+
+                final Bind targetAsyncAnnotation = targetMethodElement.getAnnotation(Bind.class);
+
+                if ((targetAsyncAnnotation != null) && methodName.equals(
+                        targetAsyncAnnotation.value())) {
+
+                    targetMethod = targetMethodElement;
+
+                    break;
+                }
+            }
+        }
+
+        if (targetMethod == null) {
+
+            final Types typeUtils = processingEnv.getTypeUtils();
+            final TypeElement asyncAnnotationElement =
+                    getTypeFromName(Pass.class.getCanonicalName());
+            final TypeMirror asyncAnnotationType = asyncAnnotationElement.asType();
+            final List<? extends VariableElement> interfaceTypeParameters =
+                    methodElement.getParameters();
+            final int length = interfaceTypeParameters.size();
+
+            for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
+                    targetElement.getEnclosedElements())) {
+
+                if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
+
+                    continue;
+                }
+
+                final List<? extends VariableElement> classTypeParameters =
+                        targetMethodElement.getParameters();
+
+                if (length == classTypeParameters.size()) {
+
+                    boolean matches = true;
+
+                    for (int i = 0; i < length; i++) {
+
+                        Object value = null;
+                        final VariableElement variableElement = interfaceTypeParameters.get(i);
+
+                        if (variableElement.getAnnotation(Pass.class) != null) {
+
+                            value = getElementValue(variableElement, asyncAnnotationType, "value");
+                        }
+
+                        if (value != null) {
+
+                            if (!typeUtils.isSameType((TypeMirror) value, typeUtils.erasure(
+                                    classTypeParameters.get(i).asType()))) {
+
+                                matches = false;
+                                break;
+                            }
+
+                        } else {
+
+                            if (!typeUtils.isSameType(variableElement.asType(), typeUtils.erasure(
+                                    classTypeParameters.get(i).asType()))) {
+
+                                matches = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (matches) {
+
+                        targetMethod = targetMethodElement;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (targetMethod == null) {
+
+            throw new IllegalArgumentException(
+                    "[" + methodElement + "] cannot find matching method in target class");
+        }
+
+        return targetMethod;
+    }
+
     private void mergeParentMethods(@Nonnull final List<ExecutableElement> methods,
             @Nonnull final List<ExecutableElement> parentMethods) {
 
@@ -938,63 +1241,15 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    @Nonnull
-    private String normalizeTypeName(@Nonnull final String typeName) {
-
-        if (typeName.endsWith(".class")) {
-
-            return typeName.substring(0, typeName.length() - ".class".length());
-        }
-
-        return typeName;
-    }
-
-    @Nonnull
-    private String parseTemplate(@Nonnull final String path, @Nonnull final byte[] buffer) throws
-            IOException {
-
-        final InputStream resourceStream = RoutineProcessor.class.getResourceAsStream(path);
-
-        try {
-
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int length;
-
-            while ((length = resourceStream.read(buffer)) > 0) {
-
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.flush();
-            return outputStream.toString("UTF-8");
-
-        } catch (final IOException ex) {
-
-            processingEnv.getMessager()
-                         .printMessage(Kind.ERROR,
-                                       "IOException while reading " + path + " template");
-            throw ex;
-
-        } finally {
-
-            try {
-
-                resourceStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
-        }
-    }
-
-    private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement element,
-            @Nonnull final TypeElement targetElement,
+    private void writeMethod(@Nonnull final Writer writer,
+            @Nonnull final Class<? extends Annotation> annotationClass,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement,
             @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeElement outputChannelElement = mOutputChannelElement;
-        final TypeElement listElement = mListElement;
-        final TypeMirror objectType = mObjectType;
+        final TypeElement outputChannelElement = this.outputChannelElement;
+        final TypeElement listElement = this.listElement;
+        final TypeMirror objectType = this.objectType;
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
@@ -1030,7 +1285,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 targetReturnType = ((ArrayType) returnType).getComponentType();
                 method = ((asyncParamMode == PassMode.PARALLEL) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(),
-                        outputChannelElement.asType())) ? mMethodParallelArray : mMethodArray;
+                        outputChannelElement.asType())) ? getMethodParallelArrayTemplate(
+                        methodElement, count) : getMethodArrayTemplate(methodElement, count);
 
             } else if (typeUtils.isAssignable(listElement.asType(), returnTypeErasure)) {
 
@@ -1048,7 +1304,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 method = ((asyncParamMode == PassMode.PARALLEL) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(),
-                        outputChannelElement.asType())) ? mMethodParallelList : mMethodList;
+                        outputChannelElement.asType())) ? getMethodParallelListTemplate(
+                        methodElement, count) : getMethodListTemplate(methodElement, count);
 
             } else if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
@@ -1066,7 +1323,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 method = ((asyncParamMode == PassMode.PARALLEL) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(),
-                        outputChannelElement.asType())) ? mMethodParallelAsync : mMethodAsync;
+                        outputChannelElement.asType())) ? getMethodParallelAsyncTemplate(
+                        methodElement, count) : getMethodAsyncTemplate(methodElement, count);
 
             } else {
 
@@ -1077,19 +1335,22 @@ public class RoutineProcessor extends AbstractProcessor {
 
             method = ((asyncParamMode == PassMode.PARALLEL) && !typeUtils.isAssignable(
                     methodElement.getParameters().get(0).asType(), outputChannelElement.asType()))
-                    ? mMethodParallelVoid : mMethodVoid;
+                    ? getMethodParallelVoidTemplate(methodElement, count)
+                    : getMethodVoidTemplate(methodElement, count);
 
         } else {
 
             targetReturnType = methodElement.getReturnType();
             method = ((asyncParamMode == PassMode.PARALLEL) && !typeUtils.isAssignable(
                     methodElement.getParameters().get(0).asType(), outputChannelElement.asType()))
-                    ? mMethodParallelResult : mMethodResult;
+                    ? getMethodParallelResultTemplate(methodElement, count)
+                    : getMethodResultTemplate(methodElement, count);
         }
 
         final String resultClassName = getBoxedType(targetReturnType).toString();
         String methodHeader;
-        methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
+        methodHeader = getMethodHeaderTemplate(methodElement, count).replace("${resultClassName}",
+                                                                             resultClassName);
         methodHeader = methodHeader.replace("${classFullName}", targetElement.asType().toString());
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
         methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
@@ -1105,7 +1366,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else {
 
-            methodHeader = methodHeader.replace("${shareGroup}", "\"null\"");
+            methodHeader = methodHeader.replace("${shareGroup}", "mShareGroup");
         }
 
         writer.append(methodHeader);
@@ -1129,9 +1390,10 @@ public class RoutineProcessor extends AbstractProcessor {
                 targetMethod.getParameters().get(0).asType().getKind() == TypeKind.ARRAY)) {
 
             final ArrayType arrayType = (ArrayType) targetMethod.getParameters().get(0).asType();
-            methodInvocation = (isVoid) ? mMethodArrayInvocationVoid
-                    : (asyncReturnMode == PassMode.COLLECTION) ? mMethodArrayInvocationCollection
-                            : mMethodArrayInvocation;
+            methodInvocation = (isVoid) ? getMethodArrayInvocationVoidTemplate(methodElement, count)
+                    : (asyncReturnMode == PassMode.COLLECTION)
+                            ? getMethodArrayInvocationCollectionTemplate(methodElement, count)
+                            : getMethodArrayInvocationTemplate(methodElement, count);
             methodInvocation = methodInvocation.replace("${componentType}",
                                                         arrayType.getComponentType().toString());
             methodInvocation = methodInvocation.replace("${boxedType}", getBoxedType(
@@ -1139,9 +1401,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else {
 
-            methodInvocation = (isVoid) ? mMethodInvocationVoid
-                    : (asyncReturnMode == PassMode.COLLECTION) ? mMethodInvocationCollection
-                            : mMethodInvocation;
+            methodInvocation = (isVoid) ? getMethodInvocationVoidTemplate(methodElement, count)
+                    : (asyncReturnMode == PassMode.COLLECTION)
+                            ? getMethodInvocationCollectionTemplate(methodElement, count)
+                            : getMethodInvocationTemplate(methodElement, count);
         }
 
         methodInvocation =

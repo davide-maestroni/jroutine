@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.android.proxy;
 
+import com.gh.bmd.jrt.android.proxy.v11.annotation.ProxyV11;
+import com.gh.bmd.jrt.android.proxy.v4.annotation.ProxyV4;
 import com.gh.bmd.jrt.processor.RoutineProcessor;
 
 import java.io.IOException;
@@ -31,10 +33,8 @@ import javax.lang.model.element.TypeElement;
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
 
-    private static final HashSet<String> SUPPORTED_ANNOTATIONS = new HashSet<String>(
-            Arrays.asList(com.gh.bmd.jrt.android.proxy.v4.annotation.ContextProxy.class.getName(),
-                          com.gh.bmd.jrt.android.proxy.v11.annotation.ContextProxy.class.getName
-                                  ()));
+    private static final HashSet<String> SUPPORTED_ANNOTATIONS =
+            new HashSet<String>(Arrays.asList(ProxyV4.class.getName(), ProxyV11.class.getName()));
 
     private Class<? extends Annotation> mCurrentAnnotationClass;
 
@@ -87,7 +87,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
 
-        if (annotationClass == com.gh.bmd.jrt.android.proxy.v4.annotation.ContextProxy.class) {
+        if (annotationClass == ProxyV4.class) {
 
             if (mHeaderV4 == null) {
 
@@ -96,8 +96,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             return mHeaderV4;
 
-        } else if (annotationClass
-                == com.gh.bmd.jrt.android.proxy.v11.annotation.ContextProxy.class) {
+        } else if (annotationClass == ProxyV11.class) {
 
             if (mHeaderV11 == null) {
 
@@ -162,7 +161,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             mMethodHeader = parseTemplate("/android/templates/method_header.txt");
         }
 
-        return mMethodHeader;
+        return mMethodHeader.replace("${invocationBuilderOptions}",
+                                     buildInvocationOptions(methodElement));
     }
 
     @Nonnull
@@ -216,16 +216,58 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final String interfaceName = element.getSimpleName().toString();
         String prefix = "";
 
-        if (annotationClass == com.gh.bmd.jrt.android.proxy.v4.annotation.ContextProxy.class) {
+        if (annotationClass == ProxyV4.class) {
 
             prefix = ".JRoutineProxyV4_";
 
-        } else if (annotationClass
-                == com.gh.bmd.jrt.android.proxy.v11.annotation.ContextProxy.class) {
+        } else if (annotationClass == ProxyV11.class) {
 
             prefix = ".JRoutineProxyV11_";
         }
 
         return packageName + prefix + interfaceName;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String buildInvocationOptions(final ExecutableElement methodElement) throws
+            IOException {
+
+        // We need to avoid explicit dependency on the android module...
+        final StringBuilder builder = new StringBuilder();
+        final TypeElement idAnnotationElement =
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.Id");
+        final Integer id =
+                (Integer) getElementValue(methodElement, idAnnotationElement.asType(), "value");
+
+        if (id != null) {
+
+            builder.append(".withId(").append(id).append(")");
+        }
+
+        final TypeElement clashAnnotationElement =
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.ClashResolution");
+        final Object resolutionType =
+                getElementValue(methodElement, clashAnnotationElement.asType(), "value");
+
+        if (resolutionType != null) {
+
+            builder.append(
+                    ".withClashResolution(com.gh.bmd.jrt.android.builder.InvocationConfiguration"
+                            + ".ClashResolutionType.").append(resolutionType).append(")");
+        }
+
+        final TypeElement cacheAnnotationElement =
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.CacheStrategy");
+        final Object strategyType =
+                getElementValue(methodElement, cacheAnnotationElement.asType(), "value");
+
+        if (strategyType != null) {
+
+            builder.append(
+                    ".withCacheStrategy(com.gh.bmd.jrt.android.builder.InvocationConfiguration"
+                            + ".CacheStrategyType.").append(strategyType).append(")");
+        }
+
+        return builder.toString();
     }
 }

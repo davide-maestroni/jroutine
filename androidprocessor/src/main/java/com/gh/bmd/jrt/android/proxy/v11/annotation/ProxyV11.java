@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v4.annotation;
+package com.gh.bmd.jrt.android.proxy.v11.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface ContextProxy {
+public @interface ProxyV11 {
 
     /**
      * The wrapped class.

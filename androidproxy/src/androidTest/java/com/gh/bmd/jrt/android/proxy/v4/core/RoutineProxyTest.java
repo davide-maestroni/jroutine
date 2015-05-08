@@ -4,9 +4,13 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.gh.bmd.jrt.android.annotation.CacheStrategy;
+import com.gh.bmd.jrt.android.annotation.ClashResolution;
+import com.gh.bmd.jrt.android.annotation.Id;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
-import com.gh.bmd.jrt.android.proxy.v4.annotation.ContextProxy;
-import com.gh.bmd.jrt.android.runner.Runners;
+import com.gh.bmd.jrt.android.proxy.v4.annotation.ProxyV4;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -57,7 +61,7 @@ public class RoutineProxyTest extends ActivityInstrumentationTestCase2<TestActiv
         assertThat(testListItf2.getList(1)).containsExactly(3);
     }
 
-    @ContextProxy(TestList.class)
+    @ProxyV4(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);

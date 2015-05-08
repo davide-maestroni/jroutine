@@ -1082,7 +1082,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement methodElement : methodElements) {
 
                 ++count;
-                writeMethod(writer, annotationClass, element, targetElement, methodElement, count);
+                writeMethod(writer, element, targetElement, methodElement, count);
             }
 
             writer.append(getFooterTemplate());
@@ -1241,9 +1241,8 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeMethod(@Nonnull final Writer writer,
-            @Nonnull final Class<? extends Annotation> annotationClass,
-            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement,
+    private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement element,
+            @Nonnull final TypeElement targetElement,
             @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();

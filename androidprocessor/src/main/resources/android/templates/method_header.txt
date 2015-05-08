@@ -48,6 +48,7 @@
                                            .set()
                                            .withInvocationConfiguration()
                                            .with(invocationConfiguration)
+                                           ${invocationBuilderOptions}
                                            .set()
                                            .buildRoutine();
     }

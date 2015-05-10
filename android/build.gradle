@@ -63,6 +63,7 @@ findbugs {
 }
 
 tasks.withType(Javadoc) {
-    options.links('http://docs.oracle.com/javase/7/docs/api/', 'http://davide-maestroni.github.io/jroutine/docs/jroutine/')
+    options.links('http://docs.oracle.com/javase/7/docs/api/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/library/')
     options.overview("${project.projectDir}/docs/overview.html")
 }

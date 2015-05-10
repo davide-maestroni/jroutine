@@ -32,6 +32,8 @@ import javax.annotation.Nonnull;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
+ * Default implementation of a proxy builder.
+ * <p/>
  * Created by davide on 06/05/15.
  */
 class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,

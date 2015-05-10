@@ -14,6 +14,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
+apply plugin: 'android-apt'
 apply plugin: 'com.github.kt3k.coveralls'
 apply from: '../extra.gradle'
 
@@ -58,6 +59,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:21.0.3' // Travis does not support an higher version
 
+    apt project(':androidprocessor')
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }
 conditionalDependency('proxy', group)
@@ -69,5 +71,9 @@ findbugs {
 }
 
 tasks.withType(Javadoc) {
-    options.links('http://docs.oracle.com/javase/7/docs/api/', 'http://davide-maestroni.github.io/jroutine/docs/jroutine/')
+    options.links('http://docs.oracle.com/javase/7/docs/api/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/library/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/android/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/proxy/')
+    options.overview("${project.projectDir}/docs/overview.html")
 }

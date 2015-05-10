@@ -1,0 +1,152 @@
+<html>
+<head>
+    <title>jroutine-androidproxy</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine">Parallel programming on the go.</a>
+<p>
+    Java annotation proxy code generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/android">jroutine-android</a> library.
+</p>
+<h2>Usage examples</h2>
+<p>
+    The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
+</p>
+<b>Example 1:</b> via code generation.
+<p>
+    This approach allows the asynchronous invocation of an object methods by creating a proxy object.<br/>
+    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final Main instance = new Main();
+                final AsyncMain proxy = on(instance).withProxy()
+                                                    .withShareGroup(ShareGroup.NONE)
+                                                    .set()
+                                                    .withRoutine()
+                                                    .withReadTimeout(TimeDuration.INFINITY)
+                                                    .set()
+                                                    .buildProxy(AsyncMain.class);
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
+
+                System.out.println(rms);
+
+                System.exit(0);
+            }
+
+            public int parseArg(final String arg) {
+
+                return Integer.parseInt(arg);
+            }
+
+            public int square(final int value) {
+
+                return value * value;
+            }
+
+            public double squareRootMean(final List&lt;Integer&gt; values) {
+
+                if (values.isEmpty()) {
+
+                    return 0;
+                }
+
+                int sum = 0;
+
+                for (final int value : values) {
+
+                    sum += value;
+                }
+
+                return Math.sqrt((double) sum / values.size());
+            }
+
+            &commat;Proxy(Main.class)
+            public interface AsyncMain {
+
+                &commat;Pass(int.class)
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
+
+                &commat;Pass(int.class)
+                OutputChannel&lt;Integer&gt; square(
+                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+
+                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via code generation (again).
+<p>
+    It is possible to completely avoid the use of reflection by slightly modifying the example above.<br/>
+    Note that, since the <i>JRoutineProxy_XXX</i> class is generated, a generic IDE may highlight an error even if the compilation is successful.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final Main instance = new Main();
+                final AsyncMain proxy = JRoutineProxy_AsyncMain.on(instance)
+                                                               .withProxy()
+                                                               .withShareGroup(ShareGroup.NONE)
+                                                               .set()
+                                                               .withRoutine()
+                                                               .withReadTimeout(TimeDuration.INFINITY)
+                                                               .set()
+                                                               .buildProxy();
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
+
+                System.out.println(rms);
+
+                System.exit(0);
+            }
+
+            public int parseArg(final String arg) {
+
+                return Integer.parseInt(arg);
+            }
+
+            public int square(final int value) {
+
+                return value * value;
+            }
+
+            public double squareRootMean(final List&lt;Integer&gt; values) {
+
+                if (values.isEmpty()) {
+
+                    return 0;
+                }
+
+                int sum = 0;
+
+                for (final int value : values) {
+
+                    sum += value;
+                }
+
+                return Math.sqrt((double) sum / values.size());
+            }
+
+            &commat;Proxy(Main.class)
+            public interface AsyncMain {
+
+                &commat;Pass(int.class)
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
+
+                &commat;Pass(int.class)
+                OutputChannel&lt;Integer&gt; square(
+                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+
+                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

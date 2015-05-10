@@ -54,5 +54,5 @@ public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYP
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends ProxyBuilder<TYPE>> withRoutineConfiguration();
+    Builder<? extends ProxyBuilder<TYPE>> withRoutine();
 }

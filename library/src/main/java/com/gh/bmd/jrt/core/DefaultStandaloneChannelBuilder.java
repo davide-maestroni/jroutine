@@ -45,7 +45,7 @@ class DefaultStandaloneChannelBuilder
     }
 
     @Nonnull
-    public Builder<StandaloneChannelBuilder> withRoutineConfiguration() {
+    public Builder<StandaloneChannelBuilder> withRoutine() {
 
         return new Builder<StandaloneChannelBuilder>(this, mConfiguration);
     }

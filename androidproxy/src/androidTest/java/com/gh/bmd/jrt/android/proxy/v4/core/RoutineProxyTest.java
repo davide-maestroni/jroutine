@@ -1,16 +1,24 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.gh.bmd.jrt.android.proxy.v4.core;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.annotation.CacheStrategy;
-import com.gh.bmd.jrt.android.annotation.ClashResolution;
-import com.gh.bmd.jrt.android.annotation.Id;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
-import com.gh.bmd.jrt.android.proxy.v4.annotation.ProxyV4;
+import com.gh.bmd.jrt.android.proxy.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -37,7 +45,7 @@ public class RoutineProxyTest extends ActivityInstrumentationTestCase2<TestActiv
 
         final ContextProxyRoutineBuilder builder =
                 JRoutineProxy.onActivity(getActivity(), TestList.class)
-                             .withRoutineConfiguration()
+                             .withRoutine()
                              .withReadTimeout(TimeDuration.seconds(10))
                              .set();
 
@@ -61,7 +69,7 @@ public class RoutineProxyTest extends ActivityInstrumentationTestCase2<TestActiv
         assertThat(testListItf2.getList(1)).containsExactly(3);
     }
 
-    @ProxyV4(TestList.class)
+    @V4Proxy(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);

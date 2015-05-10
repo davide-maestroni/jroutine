@@ -26,7 +26,6 @@ import javax.annotation.Nonnull;
  */
 public interface ContextConfigurableBuilder<TYPE> {
 
-
     /**
      * Gets the invocation configuration builder related to this builder instance.
      * The configuration options not supported by the builder implementation might be ignored.
@@ -36,5 +35,5 @@ public interface ContextConfigurableBuilder<TYPE> {
      * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends TYPE> withInvocationConfiguration();
+    Builder<? extends TYPE> withInvocation();
 }

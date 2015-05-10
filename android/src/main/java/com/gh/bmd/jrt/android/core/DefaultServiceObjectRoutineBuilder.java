@@ -335,12 +335,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
-                       .withRoutineConfiguration()
+                       .withRoutine()
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
                        .withInputOrder(OrderType.PASS_ORDER)
                        .set()
-                       .withServiceConfiguration()
+                       .withService()
                        .with(serviceConfiguration)
                        .set()
                        .buildRoutine();
@@ -383,13 +383,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 new MethodSignatureToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
-                       .withRoutineConfiguration()
+                       .withRoutine()
                        .with(configurationWithTimeout(routineConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
                                         toNames(parameterTypes))
                        .withInputOrder(OrderType.PASS_ORDER)
                        .set()
-                       .withServiceConfiguration()
+                       .withService()
                        .with(serviceConfiguration)
                        .set()
                        .buildRoutine();
@@ -459,24 +459,21 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
-    withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
-    withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
         return new RoutineConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
-    withServiceConfiguration() {
+    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withService() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
@@ -543,7 +540,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxyConfiguration()
+                                   .withProxy()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .boundMethod(mBindingName);
@@ -638,7 +635,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxyConfiguration()
+                                   .withProxy()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .method(mMethodName, mParameterTypes);
@@ -982,7 +979,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
             final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
-                            .withRoutineConfiguration()
+                            .withRoutine()
                             .with(configurationWithTimeout(mRoutineConfiguration, method))
                             .withFactoryArgs(mProxyClass.getName(), mTargetClass.getName(), mArgs,
                                              groupWithShareAnnotation(mProxyConfiguration, method),
@@ -994,7 +991,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                     (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER
                                             : OrderType.NONE)
                             .set()
-                            .withServiceConfiguration()
+                            .withService()
                             .with(mServiceConfiguration)
                             .set()
                             .buildRoutine();

@@ -239,7 +239,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @Nonnull
     @Override
     @SuppressWarnings("unchecked")
-    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withRoutine() {
 
         return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
                                                                       getRoutineConfiguration());
@@ -265,7 +265,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @Nonnull
     @Override
     @SuppressWarnings("unchecked")
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy() {
 
         return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
                                                                     getProxyConfiguration());

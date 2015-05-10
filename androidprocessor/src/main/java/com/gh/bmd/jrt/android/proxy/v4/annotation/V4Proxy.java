@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface ProxyV4 {
+public @interface V4Proxy {
 
     /**
      * The wrapped class.

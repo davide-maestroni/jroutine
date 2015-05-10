@@ -13,16 +13,14 @@
  */
 package com.gh.bmd.jrt.android.proxy;
 
-import com.gh.bmd.jrt.android.proxy.v11.annotation.ProxyV11;
-import com.gh.bmd.jrt.android.proxy.v4.annotation.ProxyV4;
+import com.gh.bmd.jrt.android.proxy.v11.annotation.V11Proxy;
+import com.gh.bmd.jrt.android.proxy.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.processor.RoutineProcessor;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.lang.model.element.ExecutableElement;
@@ -33,8 +31,9 @@ import javax.lang.model.element.TypeElement;
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
 
-    private static final HashSet<String> SUPPORTED_ANNOTATIONS =
-            new HashSet<String>(Arrays.asList(ProxyV4.class.getName(), ProxyV11.class.getName()));
+    @SuppressWarnings({"RedundantTypeArguments", "unchecked"})
+    private static final List<Class<? extends Annotation>> ANNOTATION_CLASSES =
+            Arrays.asList(V4Proxy.class, V11Proxy.class);
 
     private Class<? extends Annotation> mCurrentAnnotationClass;
 
@@ -56,13 +55,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private String mMethodInvocationVoid;
 
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
-
-        return Collections.unmodifiableSet(SUPPORTED_ANNOTATIONS);
-    }
-
     @Nonnull
+    @Override
     protected String buildRoutineFieldsInit(final int size) {
 
         final StringBuilder builder = new StringBuilder();
@@ -82,12 +76,13 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @Nonnull
+    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getHeaderTemplate() throws IOException {
 
         final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
 
-        if (annotationClass == ProxyV4.class) {
+        if (annotationClass == V4Proxy.class) {
 
             if (mHeaderV4 == null) {
 
@@ -96,7 +91,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             return mHeaderV4;
 
-        } else if (annotationClass == ProxyV11.class) {
+        } else if (annotationClass == V11Proxy.class) {
 
             if (mHeaderV11 == null) {
 
@@ -138,6 +133,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @Nonnull
+    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getMethodArrayInvocationVoidTemplate(
             @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
@@ -152,6 +148,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @Nonnull
+    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getMethodHeaderTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
@@ -166,6 +163,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @Nonnull
+    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getMethodInvocationCollectionTemplate(
             @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
@@ -180,6 +178,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @Nonnull
+    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getMethodInvocationTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
@@ -193,6 +192,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @Nonnull
+    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getMethodInvocationVoidTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
@@ -216,16 +216,23 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final String interfaceName = element.getSimpleName().toString();
         String prefix = "";
 
-        if (annotationClass == ProxyV4.class) {
+        if (annotationClass == V4Proxy.class) {
 
             prefix = ".JRoutineProxyV4_";
 
-        } else if (annotationClass == ProxyV11.class) {
+        } else if (annotationClass == V11Proxy.class) {
 
             prefix = ".JRoutineProxyV11_";
         }
 
         return packageName + prefix + interfaceName;
+    }
+
+    @Nonnull
+    @Override
+    protected List<Class<? extends Annotation>> getSupportedAnnotationClasses() {
+
+        return ANNOTATION_CLASSES;
     }
 
     @SuppressWarnings("unchecked")

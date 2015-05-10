@@ -50,5 +50,5 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration();
+    Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>> withRoutine();
 }

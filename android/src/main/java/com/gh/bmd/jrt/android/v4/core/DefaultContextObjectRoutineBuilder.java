@@ -340,12 +340,12 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                 configurationWithTimeout(configuration, targetMethod);
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(mInvocationConfiguration, targetMethod);
-        return getBuilder(mContext, factory).withRoutineConfiguration()
+        return getBuilder(mContext, factory).withRoutine()
                                             .with(routineConfiguration)
                                             .withFactoryArgs(invocationArgs)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
-                                            .withInvocationConfiguration()
+                                            .withInvocation()
                                             .with(invocationConfiguration)
                                             .set()
                                             .buildRoutine();
@@ -366,12 +366,12 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                 configurationWithTimeout(configuration, method);
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(mInvocationConfiguration, method);
-        return getBuilder(mContext, factory).withRoutineConfiguration()
+        return getBuilder(mContext, factory).withRoutine()
                                             .with(routineConfiguration)
                                             .withFactoryArgs(invocationArgs)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
-                                            .withInvocationConfiguration()
+                                            .withInvocation()
                                             .with(invocationConfiguration)
                                             .set()
                                             .buildRoutine();
@@ -426,16 +426,14 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder>
-    withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder>
-    withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
         return new RoutineConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
@@ -484,8 +482,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder>
-    withInvocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder> withInvocation() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
@@ -581,7 +578,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxyConfiguration()
+                                   .withProxy()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .boundMethod(mBindingName);
@@ -681,7 +678,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxyConfiguration()
+                                   .withProxy()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .method(mMethod);
@@ -1051,13 +1048,13 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                     configurationWithTimeout(mRoutineConfiguration, method);
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
-            final Routine<Object, Object> routine = routineBuilder.withRoutineConfiguration()
+            final Routine<Object, Object> routine = routineBuilder.withRoutine()
                                                                   .with(routineConfiguration)
                                                                   .withFactoryArgs(invocationArgs)
                                                                   .withInputOrder(inputOrderType)
                                                                   .withOutputOrder(outputOrderType)
                                                                   .set()
-                                                                  .withInvocationConfiguration()
+                                                                  .withInvocation()
                                                                   .with(invocationConfiguration)
                                                                   .set()
                                                                   .buildRoutine();

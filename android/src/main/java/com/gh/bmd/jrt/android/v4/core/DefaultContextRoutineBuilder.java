@@ -184,7 +184,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     @Nonnull
     @Override
     public RoutineConfiguration.Builder<? extends
-            ContextRoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration() {
+            ContextRoutineBuilder<INPUT, OUTPUT>> withRoutine() {
 
         return new RoutineConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
                 mRoutineConfigurable, getConfiguration());
@@ -192,7 +192,8 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     @Nonnull
     public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    withInvocationConfiguration() {
+    withInvocation() {
+
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,

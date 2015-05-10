@@ -89,7 +89,7 @@ public abstract class AbstractProxyBuilder<TYPE>
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ProxyBuilder<TYPE>> withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ProxyBuilder<TYPE>> withRoutine() {
 
         return new RoutineConfiguration.Builder<ProxyBuilder<TYPE>>(this, mRoutineConfiguration);
     }
@@ -121,7 +121,7 @@ public abstract class AbstractProxyBuilder<TYPE>
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> withProxy() {
 
         return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, mProxyConfiguration);
     }

@@ -140,11 +140,11 @@ public interface ContextObjectRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> withProxyConfiguration();
+    ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> withProxy();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> withRoutineConfiguration();
+    RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> withRoutine();
 }

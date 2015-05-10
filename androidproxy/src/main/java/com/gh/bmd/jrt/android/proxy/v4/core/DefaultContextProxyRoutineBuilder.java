@@ -121,36 +121,34 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
         final ObjectContextProxyBuilder<TYPE> builder =
                 new ObjectContextProxyBuilder<TYPE>(context, mTargetClass, itf);
-        return builder.withRoutineConfiguration()
+        return builder.withRoutine()
                       .with(mRoutineConfiguration)
                       .set()
-                      .withProxyConfiguration()
+                      .withProxy()
                       .with(mProxyConfiguration)
                       .set()
-                      .withInvocationConfiguration()
+                      .withInvocation()
                       .with(mInvocationConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public Builder<? extends ContextProxyRoutineBuilder> withInvocationConfiguration() {
+    public Builder<? extends ContextProxyRoutineBuilder> withInvocation() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder>
-    withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder>
-    withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
         return new RoutineConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);

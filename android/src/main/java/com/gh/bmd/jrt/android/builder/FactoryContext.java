@@ -35,5 +35,6 @@ public interface FactoryContext {
      * @return the object instance.
      */
     @Nullable
-    <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type, @Nonnull final Object[] args);
+    <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
+            @Nonnull final Object... args);
 }

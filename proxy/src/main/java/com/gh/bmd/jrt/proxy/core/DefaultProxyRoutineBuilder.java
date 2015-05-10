@@ -80,17 +80,17 @@ class DefaultProxyRoutineBuilder
         }
 
         final ObjectProxyBuilder<TYPE> builder = new ObjectProxyBuilder<TYPE>(target, itf);
-        return builder.withRoutineConfiguration()
+        return builder.withRoutine()
                       .with(mRoutineConfiguration)
                       .set()
-                      .withProxyConfiguration()
+                      .withProxy()
                       .with(mProxyConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ProxyRoutineBuilder> withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ProxyRoutineBuilder> withRoutine() {
 
         return new RoutineConfiguration.Builder<ProxyRoutineBuilder>(this, mRoutineConfiguration);
     }
@@ -122,7 +122,7 @@ class DefaultProxyRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxy() {
 
         return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, mProxyConfiguration);
     }

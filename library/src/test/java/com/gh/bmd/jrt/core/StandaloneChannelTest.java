@@ -235,7 +235,7 @@ public class StandaloneChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final StandaloneChannel<String> standaloneChannel1 = JRoutine.standalone()
-                                                                     .withRoutineConfiguration()
+                                                                     .withRoutine()
                                                                      .withOutputOrder(
                                                                              OrderType.PASS_ORDER)
                                                                      .set()
@@ -282,7 +282,7 @@ public class StandaloneChannelTest {
 
         final CountLog countLog = new CountLog();
         JRoutine.standalone()
-                .withRoutineConfiguration()
+                .withRoutine()
                 .withFactoryArgs()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withMaxInvocations(3)
@@ -447,7 +447,7 @@ public class StandaloneChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final StandaloneChannel<Object> channel = JRoutine.standalone()
-                                                          .withRoutineConfiguration()
+                                                          .withRoutine()
                                                           .withOutputOrder(OrderType.PASS_ORDER)
                                                           .withAsyncRunner(Runners.sharedRunner())
                                                           .withOutputMaxSize(1)
@@ -468,7 +468,7 @@ public class StandaloneChannelTest {
         assertThat(standaloneChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
         final StandaloneChannel<Object> standaloneChannel2 = JRoutine.standalone()
-                                                                     .withRoutineConfiguration()
+                                                                     .withRoutine()
                                                                      .withOutputOrder(
                                                                              OrderType.PASS_ORDER)
                                                                      .set()
@@ -528,7 +528,7 @@ public class StandaloneChannelTest {
     public void testReadTimeout() {
 
         final StandaloneChannel<Object> channel1 = JRoutine.standalone()
-                                                           .withRoutineConfiguration()
+                                                           .withRoutine()
                                                            .withReadTimeout(millis(10))
                                                            .withReadTimeoutAction(
                                                                    TimeoutActionType.EXIT)
@@ -542,7 +542,7 @@ public class StandaloneChannelTest {
     public void testReadTimeout2() {
 
         final StandaloneChannel<Object> channel2 = JRoutine.standalone()
-                                                           .withRoutineConfiguration()
+                                                           .withRoutine()
                                                            .withReadTimeout(millis(10))
                                                            .withReadTimeoutAction(
                                                                    TimeoutActionType.ABORT)
@@ -564,7 +564,7 @@ public class StandaloneChannelTest {
     public void testReadTimeout3() {
 
         final StandaloneChannel<Object> channel3 = JRoutine.standalone()
-                                                           .withRoutineConfiguration()
+                                                           .withRoutine()
                                                            .withReadTimeout(millis(10))
                                                            .withReadTimeoutAction(
                                                                    TimeoutActionType.DEADLOCK)

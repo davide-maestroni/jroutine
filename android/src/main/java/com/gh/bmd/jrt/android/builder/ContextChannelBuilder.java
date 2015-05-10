@@ -72,7 +72,7 @@ public interface ContextChannelBuilder extends ConfigurableBuilder<ContextChanne
      * @return the invocation configuration builder.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation();
 
     /**
      * Note that only the options related to logs will be employed.
@@ -80,5 +80,5 @@ public interface ContextChannelBuilder extends ConfigurableBuilder<ContextChanne
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutineConfiguration();
+    RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutine();
 }

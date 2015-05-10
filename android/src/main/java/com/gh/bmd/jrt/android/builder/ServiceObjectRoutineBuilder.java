@@ -40,17 +40,17 @@ public interface ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxyConfiguration();
+    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withRoutineConfiguration();
+    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withRoutine();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withServiceConfiguration();
+    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withService();
 }

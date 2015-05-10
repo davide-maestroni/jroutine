@@ -68,7 +68,7 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     }
 
     @Nonnull
-    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration() {
+    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withRoutine() {
 
         return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
     }

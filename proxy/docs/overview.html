@@ -23,10 +23,10 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = on(instance).withProxyConfiguration()
+                final AsyncMain proxy = on(instance).withProxy()
                                                     .withShareGroup(ShareGroup.NONE)
                                                     .set()
-                                                    .withRoutineConfiguration()
+                                                    .withRoutine()
                                                     .withReadTimeout(TimeDuration.INFINITY)
                                                     .set()
                                                     .buildProxy(AsyncMain.class);
@@ -92,10 +92,10 @@
 
                 final Main instance = new Main();
                 final AsyncMain proxy = JRoutine_AsyncMain.on(instance)
-                                                          .withProxyConfiguration()
+                                                          .withProxy()
                                                           .withShareGroup(ShareGroup.NONE)
                                                           .set()
-                                                          .withRoutineConfiguration()
+                                                          .withRoutine()
                                                           .withReadTimeout(TimeDuration.INFINITY)
                                                           .set()
                                                           .buildProxy();

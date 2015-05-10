@@ -42,5 +42,5 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * {@inheritDoc}
      */
     @Nonnull
-    Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withRoutineConfiguration();
+    Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withRoutine();
 }

@@ -37,7 +37,7 @@
 
         final Object[] args = routineConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.common.Reflection.NO_ARGS);
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}())
-                                           .withRoutineConfiguration()
+                                           .withRoutine()
                                            .with(routineConfiguration)
                                            ${routineBuilderOptions}
                                            .withFactoryArgs(mTargetClass, ${shareGroup}, args)
@@ -46,7 +46,7 @@
                                            .withOutputMaxSize(Integer.MAX_VALUE)
                                            .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .set()
-                                           .withInvocationConfiguration()
+                                           .withInvocation()
                                            .with(invocationConfiguration)
                                            ${invocationBuilderOptions}
                                            .set()

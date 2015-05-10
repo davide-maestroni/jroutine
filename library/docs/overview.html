@@ -189,10 +189,10 @@
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder = on(Main.class).withProxyConfiguration()
+                final ClassRoutineBuilder builder = on(Main.class).withProxy()
                                                                   .withShareGroup(ShareGroup.NONE)
                                                                   .set()
-                                                                  .withRoutineConfiguration()
+                                                                  .withRoutine()
                                                                   .withReadTimeout(TimeDuration.INFINITY)
                                                                   .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.boundMethod(PARSE);
@@ -251,10 +251,10 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = on(instance).withProxyConfiguration()
+                final AsyncMain proxy = on(instance).withProxy()
                                                     .withShareGroup(ShareGroup.NONE)
                                                     .set()
-                                                    .withRoutineConfiguration()
+                                                    .withRoutine()
                                                     .withReadTimeout(TimeDuration.INFINITY)
                                                     .set()
                                                     .buildProxy(AsyncMain.class);

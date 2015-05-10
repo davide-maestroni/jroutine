@@ -53,7 +53,7 @@ public class ClassRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine = JRoutine.on(TestStatic.class)
-                                                        .withRoutineConfiguration()
+                                                        .withRoutine()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -110,7 +110,7 @@ public class ClassRoutineBuilderTest {
 
         final CountLog countLog = new CountLog();
         JRoutine.on(TestStatic.class)
-                .withRoutineConfiguration()
+                .withRoutine()
                 .withFactoryArgs()
                 .withInputOrder(OrderType.NONE)
                 .withInputMaxSize(3)
@@ -180,14 +180,14 @@ public class ClassRoutineBuilderTest {
         final TimeDuration timeout = seconds(1);
         final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withCoreInvocations(0)
                                                          .withAvailInvocationTimeout(1, timeUnit)
                                                          .set()
-                                                         .withProxyConfiguration()
+                                                         .withProxy()
                                                          .withShareGroup("test")
                                                          .set()
                                                          .method(TestStatic.class.getMethod(
@@ -201,7 +201,7 @@ public class ClassRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
@@ -258,7 +258,7 @@ public class ClassRoutineBuilderTest {
 
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -269,7 +269,7 @@ public class ClassRoutineBuilderTest {
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -281,7 +281,7 @@ public class ClassRoutineBuilderTest {
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutine.on(TestStatic.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -294,7 +294,7 @@ public class ClassRoutineBuilderTest {
         assertThat(routine2).isNotEqualTo(routine3);
 
         final Routine<Object, Object> routine4 = JRoutine.on(TestStatic.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
@@ -306,7 +306,7 @@ public class ClassRoutineBuilderTest {
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutine.on(TestStatic.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
@@ -321,23 +321,15 @@ public class ClassRoutineBuilderTest {
     @Test
     public void testShareGroup() throws NoSuchMethodException {
 
-        final ClassRoutineBuilder builder = JRoutine.on(TestStatic2.class)
-                                                    .withRoutineConfiguration()
-                                                    .withReadTimeout(seconds(2))
-                                                    .set();
+        final ClassRoutineBuilder builder =
+                JRoutine.on(TestStatic2.class).withRoutine().withReadTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.withProxyConfiguration()
-                                              .withShareGroup("1")
-                                              .set()
-                                              .method("getOne")
-                                              .callAsync();
-        OutputChannel<Object> getTwo = builder.withProxyConfiguration()
-                                              .withShareGroup("2")
-                                              .set()
-                                              .method("getTwo")
-                                              .callAsync();
+        OutputChannel<Object> getOne =
+                builder.withProxy().withShareGroup("1").set().method("getOne").callAsync();
+        OutputChannel<Object> getTwo =
+                builder.withProxy().withShareGroup("2").set().method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();

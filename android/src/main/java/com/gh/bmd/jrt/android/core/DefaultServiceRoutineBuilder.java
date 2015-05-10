@@ -107,7 +107,8 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     @Nonnull
     @Override
     public RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withRoutineConfiguration() {
+    withRoutine() {
+
 
         final RoutineConfiguration config = getConfiguration();
         return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(mConfigurable,
@@ -116,7 +117,8 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     @Nonnull
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withServiceConfiguration() {
+    withService() {
+
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this, config);

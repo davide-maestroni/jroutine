@@ -158,7 +158,7 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withRoutineConfiguration() {
+    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withRoutine() {
 
         return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
     }
@@ -190,7 +190,7 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy() {
 
         return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
     }

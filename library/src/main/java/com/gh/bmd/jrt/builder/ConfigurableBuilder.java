@@ -35,5 +35,5 @@ public interface ConfigurableBuilder<TYPE> {
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends TYPE> withRoutineConfiguration();
+    Builder<? extends TYPE> withRoutine();
 }

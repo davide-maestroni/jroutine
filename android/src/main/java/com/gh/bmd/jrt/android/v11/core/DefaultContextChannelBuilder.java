@@ -138,10 +138,10 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
             logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
         }
 
-        return builder.withRoutineConfiguration()
+        return builder.withRoutine()
                       .with(routineConfiguration)
                       .set()
-                      .withInvocationConfiguration()
+                      .withInvocation()
                       .withId(mInvocationId)
                       .with(invocationConfiguration)
                       .withClashResolution(ClashResolutionType.KEEP_THAT)
@@ -216,16 +216,14 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextChannelBuilder>
-    withInvocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, config);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutineConfiguration
-            () {
+    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
         return new RoutineConfiguration.Builder<ContextChannelBuilder>(this, config);

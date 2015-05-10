@@ -74,7 +74,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final Data data = new Data();
         final OutputChannel<Data> channel =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .withServiceConfiguration()
+                        .withService()
                         .withRunnerClass(MainRunner.class)
                         .set()
                         .callAsync(data);
@@ -170,12 +170,12 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ClassToken<PassingDecorator<String>> token =
                 ClassToken.tokenOf(new PassingDecorator<String>());
         final Routine<String, String> routine = JRoutine.onService(getActivity(), token)
-                                                        .withRoutineConfiguration()
+                                                        .withRoutine()
                                                         .withSyncRunner(Runners.queuedRunner())
                                                         .withInputOrder(OrderType.NONE)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .set()
-                                                        .withServiceConfiguration()
+                                                        .withService()
                                                         .withLogClass(AndroidLog.class)
                                                         .set()
                                                         .buildRoutine();
@@ -189,12 +189,12 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                        .withRoutineConfiguration()
+                        .withRoutine()
                         .withSyncRunner(Runners.queuedRunner())
                         .withInputOrder(OrderType.NONE)
                         .withLogLevel(LogLevel.DEBUG)
                         .set()
-                        .withServiceConfiguration()
+                        .withService()
                         .withLogClass(AndroidLog.class)
                         .set()
                         .buildRoutine();
@@ -215,12 +215,12 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ClassToken<StringSingleCallInvocation> token =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withOutputOrder(OrderType.NONE)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .set()
-                                                         .withServiceConfiguration()
+                                                         .withService()
                                                          .withLogClass(AndroidLog.class)
                                                          .set()
                                                          .buildRoutine();
@@ -241,7 +241,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ClassToken<StringSingleCallInvocation> token =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withInputOrder(OrderType.PASS_ORDER)
                                                          .withOutputOrder(OrderType.PASS_ORDER)
                                                          .set()
@@ -263,7 +263,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ClassToken<StringSingleCallInvocation> token =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
         final Routine<String, String> routine4 = JRoutine.onService(getActivity(), token)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withCoreInvocations(0)
                                                          .withMaxInvocations(2)
                                                          .withAvailInvocationTimeout(1, SECONDS)
@@ -298,11 +298,11 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final ClassToken<PassingContextInvocation<String>> classToken =
                 new ClassToken<PassingContextInvocation<String>>() {};
         assertThat(JRoutine.onService(getActivity(), classToken)
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withReadTimeout(millis(10))
                            .withReadTimeoutAction(TimeoutActionType.EXIT)
                            .set()
-                           .withServiceConfiguration()
+                           .withService()
                            .withReceiverLooper(Looper.myLooper())
                            .set()
                            .callAsync("test1")
@@ -317,11 +317,11 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         try {
 
             JRoutine.onService(getActivity(), classToken)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeout(millis(10))
                     .withReadTimeoutAction(TimeoutActionType.ABORT)
                     .set()
-                    .withServiceConfiguration()
+                    .withService()
                     .withReceiverLooper(Looper.myLooper())
                     .set()
                     .callAsync("test2")
@@ -342,11 +342,11 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         try {
 
             JRoutine.onService(getActivity(), classToken)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeout(millis(10))
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withServiceConfiguration()
+                    .withService()
                     .withReceiverLooper(Looper.myLooper())
                     .set()
                     .callAsync("test3")
@@ -364,7 +364,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                        .withServiceConfiguration()
+                        .withService()
                         .withServiceClass(TestService.class)
                         .set()
                         .buildRoutine();
@@ -383,7 +383,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
 
         final CountLog countLog = new CountLog();
         JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                .withRoutineConfiguration()
+                .withRoutine()
                 .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))
                 .withOutputMaxSize(3)
@@ -391,7 +391,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                 .withLogLevel(LogLevel.DEBUG)
                 .withLog(countLog)
                 .set()
-                .withServiceConfiguration()
+                .withService()
                 .withServiceClass(TestService.class)
                 .set()
                 .buildRoutine();

@@ -106,5 +106,5 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends ProxyRoutineBuilder> withRoutineConfiguration();
+    Builder<? extends ProxyRoutineBuilder> withRoutine();
 }

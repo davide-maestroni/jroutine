@@ -152,7 +152,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                    routineConfiguration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);
         mRoutine = JRoutine.on(new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {})
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .with(routineConfiguration)
                            .withFactoryArgs(mContext, invocationClass, invocationArgs)
                            .withInputMaxSize(Integer.MAX_VALUE)
@@ -314,7 +314,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final LogLevel logLevel = logger.getLogLevel();
             final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
             final StandaloneChannel<INPUT> paramChannel = JRoutine.standalone()
-                                                                  .withRoutineConfiguration()
+                                                                  .withRoutine()
                                                                   .withOutputOrder(inputOrderType)
                                                                   .withOutputMaxSize(
                                                                           Integer.MAX_VALUE)
@@ -330,7 +330,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType = configuration.getReadTimeoutActionOr(null);
             final StandaloneChannel<OUTPUT> resultChannel = JRoutine.standalone()
-                                                                    .withRoutineConfiguration()
+                                                                    .withRoutine()
                                                                     .withOutputOrder(
                                                                             outputOrderType)
                                                                     .withOutputMaxSize(

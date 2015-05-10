@@ -42,13 +42,166 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
+Project.metaClass.conditionalDependency = { String name, String group ->
+
+    def dependsOnProject = project.parent.subprojects.find { it.name.equals(name) };
+    dependencies {
+        if (!project.version.contains('PREVIEW') && dependsOnProject.hasProperty('releaseVersion')) {
+            compile group: group, name: dependsOnProject.getProperty('archivesBaseName'), version: toVersionRange(dependsOnProject.getProperty('releaseVersion'))
+        } else {
+            compile project(":${name}")
+        }
+    }
+}
 
 afterEvaluate { project ->
 
-    if (project.hasProperty('uploadEnabled')) {
+    if (isJavaProject(project)) {
+
+        if (project.plugins.hasPlugin('jacoco')) {
+            project.task('jacocoTest', dependsOn: 'test') {
+                description = 'Runs the tests and generates the JaCoCo report files.'
+            } << {
+                tasks.jacocoTestReport.execute()
+            }
+        }
+
+        if (project.plugins.hasPlugin('findbugs')) {
+            project.tasks.withType(FindBugs) {
+                effort = 'max'
+                reportLevel = 'low'
+                reports {
+                    xml.enabled = false
+                    html.enabled = true
+                }
+            }
+
+            project.tasks.findbugsTest.onlyIf { false }
+        }
+
+        project.javadoc {
+            title = "${archivesBaseName} ${version}"
+            options.links('http://docs.oracle.com/javase/7/docs/api/')
+            options.windowTitle("Javadoc - ${archivesBaseName}")
+            options.setMemberLevel(JavadocMemberLevel.PUBLIC)
+        }
+
+        project.artifacts {
+            archives task('sourcesJar', type: Jar) {
+                description 'Generates sources Jar'
+                classifier = 'sources'
+                from sourceSets.main.allSource
+            }
+
+            archives task('javadocJar', type: Jar, dependsOn: 'javadoc') {
+                description 'Generates Javadoc Jar'
+                classifier = 'javadoc'
+                from 'build/docs/javadoc'
+            }
+        }
+    }
+
+    if (isAndroidProject(project)) {
+
+        if (project.plugins.hasPlugin('jacoco')) {
+            project.task('jacocoTest', dependsOn: 'connectedCheck') {
+                description = 'Runs the tests and generates the JaCoCo report files.'
+            } << {
+                tasks.createDebugCoverageReport.execute()
+            }
+
+            project.task('jacocoTestReport', dependsOn: 'assemble') {
+                description = 'Generates the JaCoCo report files.'
+            } << {
+                tasks.createDebugCoverageReport.execute()
+            }
+        }
+
+        project.task('jar', dependsOn: 'jarRelease')
+
+        project.android.libraryVariants.all { variant ->
+
+            def buildTypeName = variant.buildType.name
+
+            if (buildTypeName.equals("debug")) {
+                if (project.plugins.hasPlugin('findbugs')) {
+                    project.task('findbugsMain', type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
+                        classes = fileTree(variant.javaCompile.destinationDir).filter {
+                            !it.name.startsWith('R\$') && !it.name.equals('R.class')
+                        }
+                        source = variant.javaCompile.source
+                        classpath = files(variant.javaCompile.classpath.files)
+                        effort = 'max'
+                        reportLevel = 'low'
+                        reports {
+                            xml.enabled = false
+                            html.enabled = true
+                        }
+                    }
+                }
+
+                // Skip debug builds.
+                return
+            }
+
+            def variantName = variant.name.capitalize()
+            addJavadocTask(project, variant, "javadoc${variantName}")
+
+            if (variantName.equalsIgnoreCase('release')) {
+                addJavadocTask(project, variant, 'javadoc')
+            }
+
+            project.artifacts {
+                archives project.task("sourcesJar${variantName}", type: Jar) {
+                    description "Generates sources Jar from the ${variantName} build"
+                    classifier = 'sources'
+                    from variant.sourceSets.java.srcDirs
+                }
+
+                archives project.task("javadocJar${variantName}", type: Jar, dependsOn: "javadoc${variantName}") {
+                    description "Generates Javadoc Jar from the ${variantName} build"
+                    classifier = 'javadoc'
+                    from 'build/docs/javadoc'
+                }
+
+                archives project.task("jar${variantName}", type: Jar, dependsOn: variant.javaCompile) {
+                    description "Generates Jar from the ${variantName} build"
+                    from variant.javaCompile.destinationDir
+                    exclude '**/BuildConfig.class'
+                    exclude '**/R*.class'
+                }
+            }
+        }
+    }
+
+    def exportDir = new File(project.buildDir, "javadoc")
+    if (project.hasProperty('exportDir')) {
+        exportDir = file(project.getProperty('exportDir'))
+    }
+
+    project.task('exportJavadoc', type: Copy, dependsOn: 'javadoc') {
+        from project.tasks.javadoc.destinationDir.getPath()
+        into "${exportDir.getPath()}/${project.name}"
+    }
+
+    if (project.hasProperty('repoUser') && project.hasProperty('repoName')) {
 
         signing {
             sign configurations.archives
+        }
+
+        def repoUser = project.getProperty('repoUser')
+        def repoName = project.getProperty('repoName')
+        def repoDescription = ""
+
+        if (project.hasProperty('repoDescription')) {
+            repoDescription = project.getProperty('repoDescription')
+        }
+
+        def userName = ""
+
+        if (project.hasProperty('userName')) {
+            userName = project.getProperty('userName')
         }
 
         uploadArchives {
@@ -65,7 +218,6 @@ afterEvaluate { project ->
                     }
 
                     if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
-
                         repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
                             authentication(userName: sonatypeUsername, password: sonatypePassword)
                         }
@@ -74,13 +226,13 @@ afterEvaluate { project ->
                     pom.project {
                         name = archivesBaseName
                         packaging = 'jar'
-                        description = 'Parallel programming on the go'
-                        url = 'http://davide-maestroni.github.io/jroutine/'
+                        description = repoDescription
+                        url = "http://${repoUser}.github.io/${repoName}/"
 
                         scm {
-                            url = 'git@github.com:davide-maestroni/jroutine.git'
-                            connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
-                            developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                            url = "git@github.com:${repoUser}/${repoName}.git"
+                            connection = "scm:git:git@github.com:${repoUser}/${repoName}.git"
+                            developerConnection = "scm:git:git@github.com:${repoUser}/${repoName}.git"
                         }
 
                         licenses {
@@ -93,13 +245,43 @@ afterEvaluate { project ->
 
                         developers {
                             developer {
-                                id = 'davide-maestroni'
-                                name = 'Davide Maestroni'
+                                id = repoUser
+                                name = userName
                             }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+def isJavaProject(project) {
+
+    project.plugins.hasPlugin('java')
+}
+
+def isAndroidProject(project) {
+
+    project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')
+}
+
+def addJavadocTask(project, variant, taskName) {
+
+    def variantName = variant.name.capitalize()
+
+    project.task(taskName, type: Javadoc, dependsOn: "assemble${variantName}") {
+        description "Generates Javadoc from the ${variantName} build"
+        source = variant.javaCompile.source
+        ext.androidJar =
+                "${project.android.sdkDirectory}/platforms/${project.android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        title = "${project.archivesBaseName} ${project.version}"
+        options.links('http://docs.oracle.com/javase/7/docs/api/')
+        options.linksOffline('http://developer.android.com/reference/', "${project.android.sdkDirectory}/docs/reference/")
+        options.windowTitle("Javadoc - ${project.archivesBaseName}")
+        options.setMemberLevel(JavadocMemberLevel.PUBLIC)
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
     }
 }

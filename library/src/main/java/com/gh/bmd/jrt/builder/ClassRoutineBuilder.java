@@ -94,5 +94,5 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends ClassRoutineBuilder> withRoutineConfiguration();
+    Builder<? extends ClassRoutineBuilder> withRoutine();
 }

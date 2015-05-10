@@ -15,6 +15,8 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ContextConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -24,8 +26,9 @@ import javax.annotation.Nonnull;
 /**
  * Created by davide on 06/05/15.
  */
-public interface ContextProxyRoutineBuilder
-        extends ContextConfigurableBuilder<ContextProxyRoutineBuilder> {
+public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextProxyRoutineBuilder>,
+        ProxyConfigurableBuilder<ContextProxyRoutineBuilder>,
+        ContextConfigurableBuilder<ContextProxyRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
@@ -53,7 +56,7 @@ public interface ContextProxyRoutineBuilder
      * @param <TYPE> the interface type.
      * @return the proxy object.
      * @throws IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
+     *                                  interface.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
@@ -84,7 +87,7 @@ public interface ContextProxyRoutineBuilder
      * @param <TYPE> the interface type.
      * @return the proxy object.
      * @throws IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
+     *                                  interface.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
@@ -93,14 +96,13 @@ public interface ContextProxyRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ContextProxyRoutineBuilder>
-    withInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends ContextProxyRoutineBuilder> withInvocation();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxyConfiguration();
+    ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxy();
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -108,5 +110,5 @@ public interface ContextProxyRoutineBuilder
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutineConfiguration();
+    RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine();
 }

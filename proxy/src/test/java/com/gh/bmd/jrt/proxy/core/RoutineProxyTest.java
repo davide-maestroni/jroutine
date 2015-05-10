@@ -66,7 +66,7 @@ public class RoutineProxyTest {
 
         final TestList<String> testList = new TestList<String>();
         final ProxyRoutineBuilder builder = JRoutineProxy.on(testList)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withAsyncRunner(Runners.queuedRunner())
                                                          .set();
 
@@ -96,7 +96,7 @@ public class RoutineProxyTest {
         final TestClass test = new TestClass();
         final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
         final TestInterfaceProxy testProxy = JRoutineProxy.on(test)
-                                                          .withRoutineConfiguration()
+                                                          .withRoutine()
                                                           .withSyncRunner(
                                                                   Runners.sequentialRunner())
                                                           .set()
@@ -139,7 +139,7 @@ public class RoutineProxyTest {
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
         final TestProxy testProxy = JRoutineProxy.on(test)
-                                                 .withRoutineConfiguration()
+                                                 .withRoutine()
                                                  .withSyncRunner(Runners.sequentialRunner())
                                                  .withAsyncRunner(runner)
                                                  .withLogLevel(LogLevel.DEBUG)
@@ -178,8 +178,7 @@ public class RoutineProxyTest {
                          .withLog(log)
                          .set();
         final ProxyBuilder<TestProxy> builder = JRoutineProxy_TestProxy.on(test);
-        final TestProxy testProxy =
-                builder.withRoutineConfiguration().with(configuration).set().buildProxy();
+        final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);
         assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
@@ -199,7 +198,7 @@ public class RoutineProxyTest {
         assertThat(testProxy.getString(standaloneChannel.output())).isEqualTo("3");
 
         assertThat(JRoutineProxy.on(test)
-                                .withRoutineConfiguration()
+                                .withRoutine()
                                 .with(configuration)
                                 .set()
                                 .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -212,7 +211,7 @@ public class RoutineProxyTest {
         final CountLog countLog = new CountLog();
         final TestClass test = new TestClass();
         JRoutineProxy.on(test)
-                     .withRoutineConfiguration()
+                     .withRoutine()
                      .withFactoryArgs()
                      .withInputOrder(OrderType.NONE)
                      .withInputMaxSize(3)
@@ -241,13 +240,13 @@ public class RoutineProxyTest {
                          .withLog(log)
                          .set();
         final TestProxy testProxy = JRoutineProxy.on(test)
-                                                 .withRoutineConfiguration()
+                                                 .withRoutine()
                                                  .with(configuration)
                                                  .set()
                                                  .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
         assertThat(JRoutineProxy.on(test)
-                                .withRoutineConfiguration()
+                                .withRoutine()
                                 .with(configuration)
                                 .set()
                                 .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -285,16 +284,16 @@ public class RoutineProxyTest {
 
         final TestClass2 test = new TestClass2();
         final ProxyRoutineBuilder builder =
-                JRoutineProxy.on(test).withRoutineConfiguration().withReadTimeout(seconds(2)).set();
+                JRoutineProxy.on(test).withRoutine().withReadTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Integer> getOne = builder.withProxyConfiguration()
+        OutputChannel<Integer> getOne = builder.withProxy()
                                                .withShareGroup("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
-        OutputChannel<Integer> getTwo = builder.withProxyConfiguration()
+        OutputChannel<Integer> getTwo = builder.withProxy()
                                                .withShareGroup("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
@@ -320,7 +319,7 @@ public class RoutineProxyTest {
 
         final Impl impl = new Impl();
         final Itf itf = JRoutineProxy.on(impl)
-                                     .withRoutineConfiguration()
+                                     .withRoutine()
                                      .withReadTimeout(INFINITY)
                                      .set()
                                      .buildProxy(Itf.class);
@@ -539,7 +538,7 @@ public class RoutineProxyTest {
 
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutineProxy.on(testTimeout)
-                                .withRoutineConfiguration()
+                                .withRoutine()
                                 .withReadTimeout(seconds(1))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
@@ -548,7 +547,7 @@ public class RoutineProxyTest {
         try {
 
             JRoutineProxy.on(testTimeout)
-                         .withRoutineConfiguration()
+                         .withRoutine()
                          .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                          .set()
                          .buildProxy(TestTimeoutItf.class)

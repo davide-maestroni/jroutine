@@ -1,3 +1,16 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
@@ -12,7 +25,6 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
@@ -82,6 +94,27 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
     }
 
     @Nonnull
+    public InvocationConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withInvocation() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
+    }
+
+    @Nonnull
+    public ProxyConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withProxy() {
+
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
+    }
+
+    @Nonnull
+    public RoutineConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withRoutine() {
+
+        final RoutineConfiguration config = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
+    }
+
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
     public ContextProxyBuilder<TYPE> setConfiguration(
             @Nonnull final InvocationConfiguration configuration) {
@@ -121,30 +154,6 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
 
         mProxyConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextProxyBuilder<TYPE>>
-    withInvocationConfiguration() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
-    }
-
-    @Nonnull
-    public ProxyConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withProxyConfiguration
-            () {
-
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
-    }
-
-    @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextProxyBuilder<TYPE>>
-    withRoutineConfiguration() {
-
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
     }
 
     /**
@@ -298,17 +307,6 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
         }
 
         @Override
-        public int hashCode() {
-
-            // auto-generated code
-            int result = mInvocationConfiguration.hashCode();
-            result = 31 * result + mRoutineConfiguration.hashCode();
-            result = 31 * result + mShareGroup.hashCode();
-            result = 31 * result + mType.hashCode();
-            return result;
-        }
-
-        @Override
         public boolean equals(final Object o) {
 
             // auto-generated code
@@ -326,6 +324,17 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
             return mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
                     && mRoutineConfiguration.equals(classInfo.mRoutineConfiguration)
                     && mShareGroup.equals(classInfo.mShareGroup) && mType.equals(classInfo.mType);
+        }
+
+        @Override
+        public int hashCode() {
+
+            // auto-generated code
+            int result = mInvocationConfiguration.hashCode();
+            result = 31 * result + mRoutineConfiguration.hashCode();
+            result = 31 * result + mShareGroup.hashCode();
+            result = 31 * result + mType.hashCode();
+            return result;
         }
     }
 }

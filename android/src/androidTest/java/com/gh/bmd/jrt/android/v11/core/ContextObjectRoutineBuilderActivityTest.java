@@ -79,7 +79,7 @@ public class ContextObjectRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestArgs.class)
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withFactoryArgs(17)
                            .set()
                            .method("getId")
@@ -97,7 +97,7 @@ public class ContextObjectRoutineBuilderActivityTest
 
         final TimeDuration timeout = seconds(10);
         final SumItf sumAsync = JRoutine.onActivity(getActivity(), Sum.class)
-                                        .withRoutineConfiguration()
+                                        .withRoutine()
                                         .withReadTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
@@ -131,7 +131,7 @@ public class ContextObjectRoutineBuilderActivityTest
 
         final TimeDuration timeout = seconds(10);
         final CountItf countAsync = JRoutine.onActivity(getActivity(), Count.class)
-                                            .withRoutineConfiguration()
+                                            .withRoutine()
                                             .withReadTimeout(timeout)
                                             .set()
                                             .buildProxy(CountItf.class);
@@ -152,7 +152,7 @@ public class ContextObjectRoutineBuilderActivityTest
         final TimeDuration timeout = seconds(10);
         final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine = JRoutine.onActivity(getActivity(), TestClass.class)
-                                                        .withRoutineConfiguration()
+                                                        .withRoutine()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withMaxInvocations(1)
@@ -229,20 +229,20 @@ public class ContextObjectRoutineBuilderActivityTest
                                                             .withLog(countLog)
                                                             .set();
         JRoutine.onActivity(getActivity(), TestClass.class)
-                .withRoutineConfiguration()
+                .withRoutine()
                 .with(configuration)
                 .set()
-                .withProxyConfiguration()
+                .withProxy()
                 .withShareGroup("test")
                 .set()
                 .boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         JRoutine.onActivity(getActivity(), Square.class)
-                .withRoutineConfiguration()
+                .withRoutine()
                 .with(configuration)
                 .set()
-                .withProxyConfiguration()
+                .withProxy()
                 .withShareGroup("test")
                 .set()
                 .buildProxy(SquareItf.class)
@@ -449,7 +449,7 @@ public class ContextObjectRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestClass.class)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
@@ -464,7 +464,7 @@ public class ContextObjectRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestClass.class)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
@@ -479,7 +479,7 @@ public class ContextObjectRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestClass.class)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
@@ -576,14 +576,14 @@ public class ContextObjectRoutineBuilderActivityTest
 
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine2 = JRoutine.onActivity(getActivity(), TestClass.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withAvailInvocationTimeout(
                                                                  TimeDuration.ZERO)
                                                          .set()
-                                                         .withProxyConfiguration()
+                                                         .withProxy()
                                                          .withShareGroup("test")
                                                          .set()
                                                          .method(TestClass.class.getMethod(
@@ -602,7 +602,7 @@ public class ContextObjectRoutineBuilderActivityTest
 
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 = JRoutine.onActivity(getActivity(), TestClass.class)
-                                                         .withRoutineConfiguration()
+                                                         .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .set()
@@ -704,7 +704,7 @@ public class ContextObjectRoutineBuilderActivityTest
         }
 
         final Itf itf = JRoutine.onActivity(getActivity(), Impl.class)
-                                .withRoutineConfiguration()
+                                .withRoutine()
                                 .withReadTimeout(INFINITY)
                                 .set()
                                 .buildProxy(Itf.class);
@@ -974,22 +974,16 @@ public class ContextObjectRoutineBuilderActivityTest
         }
 
         final ObjectRoutineBuilder builder = JRoutine.onActivity(getActivity(), TestClass2.class)
-                                                     .withRoutineConfiguration()
+                                                     .withRoutine()
                                                      .withReadTimeout(seconds(9))
                                                      .set();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.withProxyConfiguration()
-                                              .withShareGroup("1")
-                                              .set()
-                                              .method("getOne")
-                                              .callAsync();
-        OutputChannel<Object> getTwo = builder.withProxyConfiguration()
-                                              .withShareGroup("2")
-                                              .set()
-                                              .method("getTwo")
-                                              .callAsync();
+        OutputChannel<Object> getOne =
+                builder.withProxy().withShareGroup("1").set().method("getOne").callAsync();
+        OutputChannel<Object> getTwo =
+                builder.withProxy().withShareGroup("2").set().method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1013,10 +1007,10 @@ public class ContextObjectRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocationConfiguration()
+                           .withInvocation()
                            .withId(0)
                            .set()
                            .boundMethod("test")
@@ -1026,10 +1020,10 @@ public class ContextObjectRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocationConfiguration()
+                    .withInvocation()
                     .withId(1)
                     .set()
                     .boundMethod("test")
@@ -1043,10 +1037,10 @@ public class ContextObjectRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocationConfiguration()
+                           .withInvocation()
                            .withId(2)
                            .set()
                            .method("getInt")
@@ -1056,10 +1050,10 @@ public class ContextObjectRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocationConfiguration()
+                    .withInvocation()
                     .withId(3)
                     .set()
                     .method("getInt")
@@ -1073,10 +1067,10 @@ public class ContextObjectRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocationConfiguration()
+                           .withInvocation()
                            .withId(4)
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
@@ -1086,10 +1080,10 @@ public class ContextObjectRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocationConfiguration()
+                    .withInvocation()
                     .withId(5)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
@@ -1103,10 +1097,10 @@ public class ContextObjectRoutineBuilderActivityTest
         }
 
         assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocationConfiguration()
+                           .withInvocation()
                            .withId(6)
                            .set()
                            .buildProxy(TestTimeoutItf.class)
@@ -1115,10 +1109,10 @@ public class ContextObjectRoutineBuilderActivityTest
         try {
 
             JRoutine.onActivity(getActivity(), TestTimeout.class)
-                    .withRoutineConfiguration()
+                    .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocationConfiguration()
+                    .withInvocation()
                     .withId(7)
                     .set()
                     .buildProxy(TestTimeoutItf.class)

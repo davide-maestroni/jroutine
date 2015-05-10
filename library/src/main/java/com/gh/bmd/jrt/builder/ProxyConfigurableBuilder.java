@@ -35,5 +35,5 @@ public interface ProxyConfigurableBuilder<TYPE> {
      * @return the proxy configuration builder.
      */
     @Nonnull
-    Builder<? extends TYPE> withProxyConfiguration();
+    Builder<? extends TYPE> withProxy();
 }

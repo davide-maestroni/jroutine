@@ -38,7 +38,7 @@ public class JRoutineTest {
     public void testRoutineBuilder() {
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withSyncRunner(Runners.sequentialRunner())
                            .withAsyncRunner(Runners.poolRunner())
                            .withCoreInvocations(0)
@@ -54,7 +54,7 @@ public class JRoutineTest {
                            .readAll()).containsExactly("test1", "test2");
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                           .withRoutineConfiguration()
+                           .withRoutine()
                            .withSyncRunner(Runners.queuedRunner())
                            .withAsyncRunner(Runners.poolRunner())
                            .withCoreInvocations(0)

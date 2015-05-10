@@ -184,7 +184,8 @@ afterEvaluate { project ->
         into "${exportDir.getPath()}/${project.name}"
     }
 
-    if (project.hasProperty('repoUser') && project.hasProperty('repoName')) {
+    if (project.hasProperty('uploadEnabled') && project.hasProperty('repoUser')
+            && project.hasProperty('repoName')) {
 
         signing {
             sign configurations.archives

@@ -23,7 +23,11 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import javax.annotation.Nonnull;
 
 /**
+ * Interface defining a builder of async proxy objects, bound to a context lifecycle.
+ * <p/>
  * Created by davide on 06/05/15.
+ *
+ * @param <TYPE> the interface type.
  */
 public interface ContextProxyBuilder<TYPE> extends ConfigurableBuilder<ContextProxyBuilder<TYPE>>,
         ProxyConfigurableBuilder<ContextProxyBuilder<TYPE>>,
@@ -34,12 +38,15 @@ public interface ContextProxyBuilder<TYPE> extends ConfigurableBuilder<ContextPr
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
-     * annotations.<br/>
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass},
+     * as well as {@link com.gh.bmd.jrt.android.annotation.Id},
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}.<br/>
+     * {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} or
+     * {@link com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

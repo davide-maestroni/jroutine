@@ -11,24 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v4.annotation;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Created by davide on 06/05/15.
+ * Classes and interfaces related to processor routine builders, specific to the Android platform.
+ * <p/>
+ * Created by davide on 5/10/15.
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
-public @interface V4Proxy {
-
-    /**
-     * The wrapped class.
-     *
-     * @return the class.
-     */
-    Class<?> value();
-}
+package com.gh.bmd.jrt.android.proxy.builder;

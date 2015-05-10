@@ -24,6 +24,12 @@ import com.gh.bmd.jrt.common.ClassToken;
 import javax.annotation.Nonnull;
 
 /**
+ * Interface defining a builder of routines wrapping an object instance, bound to a context
+ * lifecycle.
+ * <p/>
+ * Note that only instance methods can be asynchronously invoked through the routines created by
+ * this builder.
+ * <p/>
  * Created by davide on 06/05/15.
  */
 public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextProxyRoutineBuilder>,
@@ -35,19 +41,23 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
-     * annotations.<br/>
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass},
+     * as well as {@link com.gh.bmd.jrt.android.annotation.Id},
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
-     * package of the specified interface and will have a name of the type:
-     * JRoutine_&lt;itf_simple_name&gt;
+     * {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} or
+     * {@link com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy}. The generated class will
+     * share the same package of the specified interface and will have a name of the type:
+     * JRoutineV4Proxy_&lt;itf_simple_name&gt; or JRoutineV11Proxy_&lt;itf_simple_name&gt;
      * <br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
-     * however, that, since the class is generated, a generic IDE may highlight an error even if the
-     * compilation is successful.
+     * explicitly calling the <code>JRoutineV4Proxy_&lt;itf_simple_name&gt;.onXXX()</code> or
+     * <code>JRoutineV11Proxy_&lt;itf_simple_name&gt;.onXXX()</code> methods. Note, however, that,
+     * since the class is generated, a generic IDE may highlight an error even if the compilation is
+     * successful.
      * <br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * artifact to the specific project dependencies.
@@ -66,19 +76,23 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
-     * annotations.<br/>
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass},
+     * as well as {@link com.gh.bmd.jrt.android.annotation.Id},
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
-     * package of the specified interface and will have a name of the type:
-     * JRoutine_&lt;itf_simple_name&gt;
+     * {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} or
+     * {@link com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy}. The generated class will
+     * share the same package of the specified interface and will have a name of the type:
+     * JRoutineV4Proxy_&lt;itf_simple_name&gt; or JRoutineV11Proxy_&lt;itf_simple_name&gt;
      * <br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
-     * however, that, since the class is generated, a generic IDE may highlight an error even if the
-     * compilation is successful.
+     * explicitly calling the <code>JRoutineV4Proxy_&lt;itf_simple_name&gt;.onXXX()</code> or
+     * <code>JRoutineV11Proxy_&lt;itf_simple_name&gt;.onXXX()</code> methods. Note, however, that,
+     * since the class is generated, a generic IDE may highlight an error even if the compilation is
+     * successful.
      * <br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * artifact to the specific project dependencies.

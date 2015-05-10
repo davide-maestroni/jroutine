@@ -27,13 +27,6 @@ import javax.annotation.Nonnull;
  * this builder.
  * <p/>
  * Created by davide on 3/7/15.
- *
- * @see com.gh.bmd.jrt.annotation.Bind
- * @see com.gh.bmd.jrt.annotation.Pass
- * @see com.gh.bmd.jrt.annotation.ShareGroup
- * @see com.gh.bmd.jrt.annotation.Timeout
- * @see com.gh.bmd.jrt.annotation.TimeoutAction
- * @see com.gh.bmd.jrt.processor.annotation.Proxy
  */
 public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBuilder>,
         ProxyConfigurableBuilder<ProxyRoutineBuilder> {
@@ -50,10 +43,10 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
      * package of the specified interface and will have a name of the type:
-     * JRoutine_&lt;itf_simple_name&gt;
+     * JRoutineProxy_&lt;itf_simple_name&gt;
      * <br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
+     * explicitly calling the <code>JRoutineProxy_&lt;itf_simple_name&gt;.on()</code> method. Note,
      * however, that, since the class is generated, a generic IDE may highlight an error even if the
      * compilation is successful.
      * <br/>
@@ -81,10 +74,10 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
      * package of the specified interface and will have a name of the type:
-     * JRoutine_&lt;itf_simple_name&gt;
+     * JRoutineProxy_&lt;itf_simple_name&gt;
      * <br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
+     * explicitly calling the <code>JRoutineProxy_&lt;itf_simple_name&gt;.on()</code> method. Note,
      * however, that, since the class is generated, a generic IDE may highlight an error even if the
      * compilation is successful.
      * <br/>

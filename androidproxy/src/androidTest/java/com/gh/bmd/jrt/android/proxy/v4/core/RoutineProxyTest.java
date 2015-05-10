@@ -17,8 +17,8 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
-import com.gh.bmd.jrt.android.proxy.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.channel.OutputChannel;

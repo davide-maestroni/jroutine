@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy;
+package com.gh.bmd.jrt.android.processor;
 
-import com.gh.bmd.jrt.android.proxy.v11.annotation.V11Proxy;
-import com.gh.bmd.jrt.android.proxy.v4.annotation.V4Proxy;
+import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
+import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.processor.RoutineProcessor;
 
 import java.io.IOException;
@@ -27,6 +27,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
 /**
+ * Annotation processor used to generate proxy classes enabling method asynchronous invocations,
+ * bound to a context lifecycle.
+ * <p/>
  * Created by davide on 06/05/15.
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
@@ -218,11 +221,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         if (annotationClass == V4Proxy.class) {
 
-            prefix = ".JRoutineProxyV4_";
+            prefix = ".JRoutineV4Proxy_";
 
         } else if (annotationClass == V11Proxy.class) {
 
-            prefix = ".JRoutineProxyV11_";
+            prefix = ".JRoutineV11Proxy_";
         }
 
         return packageName + prefix + interfaceName;

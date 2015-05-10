@@ -254,7 +254,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
                 final String packageName =
                         (classPackage != null) ? classPackage.getName() + "." : "";
                 final String className =
-                        packageName + "JRoutineProxyV11_" + interfaceClass.getSimpleName();
+                        packageName + "JRoutineV11Proxy_" + interfaceClass.getSimpleName();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), context, targetClass, shareGroup,
                                         routineConfiguration, invocationConfiguration);

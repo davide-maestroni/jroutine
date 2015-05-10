@@ -30,7 +30,11 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 /**
+ * Abstract implementation of a builder of async proxy objects, bound to a context lifecycle.
+ * <p/>
  * Created by davide on 06/05/15.
+ *
+ * @param <TYPE> the interface type.
  */
 public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyBuilder<TYPE>,
         RoutineConfiguration.Configurable<ContextProxyBuilder<TYPE>>,

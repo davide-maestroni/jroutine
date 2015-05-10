@@ -1108,7 +1108,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror iterableType = this.iterableType;
         final TypeMirror listType = this.listType;
         final TypeMirror returnType = methodElement.getReturnType();
-        final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
+        final TypeMirror erasure = typeUtils.erasure(returnType);
         final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
@@ -1118,7 +1118,7 @@ public class RoutineProcessor extends AbstractProcessor {
         if (passMode == PassMode.AUTO) {
 
             if ((returnType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(listType,
-                                                                                   returnTypeErasure)) {
+                                                                                   erasure)) {
 
                 if ((returnType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
                         getBoxedType(targetMirror),
@@ -1132,7 +1132,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 passMode = PassMode.PARALLEL;
 
-            } else if (typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
+            } else if (typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 if ((targetMirror != null) && ((targetMirror.getKind() == TypeKind.ARRAY)
                         || typeUtils.isAssignable(targetMirror, iterableType))) {
@@ -1153,7 +1153,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else if (passMode == PassMode.OBJECT) {
 
-            if (!typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
+            if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
@@ -1162,7 +1162,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else if (passMode == PassMode.COLLECTION) {
 
-            if (!typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
+            if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
@@ -1182,7 +1182,7 @@ public class RoutineProcessor extends AbstractProcessor {
         } else { // PassMode.PARALLEL
 
             if ((returnType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(listType,
-                                                                                    returnTypeErasure)) {
+                                                                                    erasure)) {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement + "] an async output with pass mode "

@@ -38,5 +38,5 @@ findbugs {
 }
 
 javadoc {
-    options.links('http://docs.oracle.com/javase/7/docs/api/') //TODO: jroutine
+    options.overview("${project.projectDir}/docs/overview.html")
 }

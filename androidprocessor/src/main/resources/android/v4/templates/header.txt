@@ -16,7 +16,7 @@
 
 package ${packageName};
 
-public final class JRoutineProxyV4_${interfaceName}${genericTypes} implements ${interfaceFullName} {
+public final class JRoutineV4Proxy_${interfaceName}${genericTypes} implements ${interfaceFullName} {
 
     private final java.lang.ref.WeakReference<Object> mContext;
 
@@ -24,7 +24,7 @@ public final class JRoutineProxyV4_${interfaceName}${genericTypes} implements ${
 
     private final Class<?> mTargetClass;
 
-    public JRoutineProxyV4_${interfaceName}(@javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity,
+    public JRoutineV4Proxy_${interfaceName}(@javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity,
             @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
@@ -32,7 +32,7 @@ public final class JRoutineProxyV4_${interfaceName}${genericTypes} implements ${
         this((Object) activity, targetClass, shareGroup, routineConfiguration, invocationConfiguration);
     }
 
-    public JRoutineProxyV4_${interfaceName}(@javax.annotation.Nonnull final android.support.v4.app.Fragment fragment,
+    public JRoutineV4Proxy_${interfaceName}(@javax.annotation.Nonnull final android.support.v4.app.Fragment fragment,
             @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
@@ -41,7 +41,7 @@ public final class JRoutineProxyV4_${interfaceName}${genericTypes} implements ${
     }
 
     @SuppressWarnings("ConstantConditions")
-    private JRoutineProxyV4_${interfaceName}(@javax.annotation.Nonnull final Object context,
+    private JRoutineV4Proxy_${interfaceName}(@javax.annotation.Nonnull final Object context,
             @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
@@ -173,6 +173,6 @@ public final class JRoutineProxyV4_${interfaceName}${genericTypes} implements ${
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
 
-            return new JRoutineProxyV4_${interfaceName}${genericTypes}(mContext, mTargetClass, shareGroup, routineConfiguration, invocationConfiguration);
+            return new JRoutineV4Proxy_${interfaceName}${genericTypes}(mContext, mTargetClass, shareGroup, routineConfiguration, invocationConfiguration);
         }
     }

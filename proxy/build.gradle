@@ -27,8 +27,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:1.7.1'
 }
-conditionalDependency('library', 'com.github.davide-maestroni')
-conditionalDependency('processor', 'com.github.davide-maestroni')
+conditionalDependency('library', group)
+conditionalDependency('processor', group)
 
 jacocoTestReport {
     reports {
@@ -42,6 +42,8 @@ findbugs {
 }
 
 javadoc {
-    options.links('http://docs.oracle.com/javase/7/docs/api/') //TODO: jroutine
     options.overview("${project.projectDir}/docs/overview.html")
+    options.links('http://docs.oracle.com/javase/7/docs/api/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/library/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/processor/')
 }

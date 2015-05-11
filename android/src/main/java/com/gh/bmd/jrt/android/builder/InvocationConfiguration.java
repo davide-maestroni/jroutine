@@ -22,8 +22,7 @@ import javax.annotation.Nullable;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
  * <p/>
- * The configuration is used to set a specific ID to each invocation created by a routine.
- * <br/>
+ * The configuration is used to set a specific ID to each invocation created by a routine.<br/>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
  * is, they share the same ID, and to set a specific type of caching of the invocation results.
  * <p/>

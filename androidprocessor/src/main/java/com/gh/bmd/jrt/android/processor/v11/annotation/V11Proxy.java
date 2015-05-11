@@ -24,7 +24,9 @@ import java.lang.annotation.Target;
  * <p/>
  * The target class is specified in the annotation attribute. A proxy class implementing the
  * annotated interface will be generated within the interface package and its name will be obtained
- * by prepending "JRoutineV4Proxy_" to the interface simple name.<br/>
+ * by prepending "JRoutineV11Proxy_" to the interface simple name. In case the specific interface is
+ * not a top class, the simple name of the outer classes will be prepended to the interface one.
+ * <br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}, as

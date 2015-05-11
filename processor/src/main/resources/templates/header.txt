@@ -24,7 +24,8 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
 
     @SuppressWarnings("ConstantConditions")
     public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final ${classFullName} wrapped,
-            final String shareGroup, @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+            @javax.annotation.Nullable final String shareGroup,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
 

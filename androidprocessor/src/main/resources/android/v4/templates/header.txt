@@ -25,7 +25,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
     private final Class<?> mTargetClass;
 
     public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity,
-            @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
+            @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final String shareGroup,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
 
@@ -33,7 +33,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
     }
 
     public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final android.support.v4.app.Fragment fragment,
-            @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
+            @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final String shareGroup,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
 
@@ -42,7 +42,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
 
     @SuppressWarnings("ConstantConditions")
     private ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final Object context,
-            @javax.annotation.Nonnull final Class<?> targetClass, final String shareGroup,
+            @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final String shareGroup,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
 
@@ -63,19 +63,24 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onActivity(@javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity, @javax.annotation.Nonnull final Class<?> targetClass) {
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onActivity(
+            @javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity,
+            @javax.annotation.Nonnull final Class<?> targetClass) {
 
         return new ${classNameSuffix}ContextProxyBuilder${genericTypes}(activity, targetClass);
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onFragment(@javax.annotation.Nonnull final android.support.v4.app.Fragment fragment, @javax.annotation.Nonnull final Class<?> targetClass) {
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onFragment(
+            @javax.annotation.Nonnull final android.support.v4.app.Fragment fragment,
+            @javax.annotation.Nonnull final Class<?> targetClass) {
 
         return new ${classNameSuffix}ContextProxyBuilder${genericTypes}(fragment, targetClass);
     }
 
     @javax.annotation.Nonnull
-    private static <OUTPUT> com.gh.bmd.jrt.android.builder.ContextRoutineBuilder<Object, OUTPUT> getBuilder(@javax.annotation.Nonnull final java.lang.ref.WeakReference<Object> contextReference,
+    private static <OUTPUT> com.gh.bmd.jrt.android.builder.ContextRoutineBuilder<Object, OUTPUT> getBuilder(
+            @javax.annotation.Nonnull final java.lang.ref.WeakReference<Object> contextReference,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, OUTPUT> factory) {
 
         final Object context = contextReference.get();

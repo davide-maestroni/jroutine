@@ -20,7 +20,8 @@
 
         private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
-        private Invocation${methodCount}(final java.lang.ref.WeakReference<${classFullName}> wrapped, final Object mutex) {
+        private Invocation${methodCount}(@javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped,
+                @javax.annotation.Nullable final Object mutex) {
 
             mWrapped = wrapped;
             mMutex = (mutex != null) ? mutex : this;

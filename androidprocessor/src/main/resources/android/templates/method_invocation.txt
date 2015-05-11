@@ -27,7 +27,7 @@
         private ${classFullName} mTarget;
 
         private ContextInvocation${methodCount}(@javax.annotation.Nonnull final Class<?> targetClass,
-                final String shareGroup, @javax.annotation.Nonnull final Object[] args) {
+                @javax.annotation.Nullable final String shareGroup, @javax.annotation.Nonnull final Object[] args) {
 
             mTargetClass = targetClass;
             mShareGroup = shareGroup;

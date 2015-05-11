@@ -56,7 +56,7 @@ dependencies {
 
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }
-conditionalDependency('library', group)
+addConditionalDependency('library', group)
 
 findbugs {
     toolVersion '3.0.0'

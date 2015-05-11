@@ -42,12 +42,13 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
-Project.metaClass.conditionalDependency = { String name, String group ->
+Project.metaClass.addConditionalDependency = { String name, String group ->
 
     def dependsOnProject = parent.subprojects.find { it.name.equals(name) };
+    def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
     dependencies {
-        if (!version.contains('PREVIEW') && dependsOnProject.hasProperty('releaseVersion')) {
-            compile group: group, name: dependsOnProject.getProperty('archivesBaseName'), version: toVersionRange(dependsOnProject.getProperty('releaseVersion'))
+        if (!dependsOnVersion.contains('PREVIEW')) {
+            compile group: group, name: dependsOnProject.getProperty('archivesBaseName'), version: toVersionRange(dependsOnVersion)
         } else {
             compile project(":${name}")
         }

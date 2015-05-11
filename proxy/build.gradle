@@ -27,8 +27,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:1.7.1'
 }
-conditionalDependency('library', group)
-conditionalDependency('processor', group)
+addConditionalDependency('library', group)
+addConditionalDependency('processor', group)
 
 jacocoTestReport {
     reports {

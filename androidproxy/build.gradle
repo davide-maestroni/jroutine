@@ -62,9 +62,9 @@ dependencies {
     apt project(':androidprocessor')
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }
-conditionalDependency('proxy', group)
-conditionalDependency('android', group)
-conditionalDependency('androidprocessor', group)
+addConditionalDependency('proxy', group)
+addConditionalDependency('android', group)
+addConditionalDependency('androidprocessor', group)
 
 findbugs {
     toolVersion '3.0.0'

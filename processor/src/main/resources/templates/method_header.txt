@@ -25,8 +25,9 @@
         }
     }
 
+    @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
-            final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}())
                                            .withRoutine()

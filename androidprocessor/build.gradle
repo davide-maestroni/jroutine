@@ -24,7 +24,7 @@ javaCompatibility = JavaVersion.VERSION_1_6
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
-conditionalDependency('processor', 'com.github.davide-maestroni')
+addConditionalDependency('processor', group)
 
 jacocoTestReport {
     reports {

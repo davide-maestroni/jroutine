@@ -287,7 +287,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                        typeUtils.erasure(variableElement.asType())) && (
                     variableElement.getAnnotation(Pass.class) != null)) {
 
-                builder.append("(com.gh.bmd.jrt.channel.OutputChannel)");
+                builder.append("(com.gh.bmd.jrt.channel.OutputChannel<? extends Object>)");
 
             } else {
 

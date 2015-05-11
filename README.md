@@ -50,7 +50,7 @@ What the library has to offer is:
 * ***Memory optimization***: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption
 * ***Data streaming***: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution
 * ***Real processing abort***: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener
-* ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential sequence of operations
+* ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential array of operations
 * ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation
 * ***Nice handling of Android configuration changes***: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments
 * ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service

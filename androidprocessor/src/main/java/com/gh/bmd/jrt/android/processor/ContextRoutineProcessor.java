@@ -80,20 +80,20 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @Nonnull
     @Override
-    protected String getGeneratedClassPrefix() {
+    protected String getGeneratedClassSuffix() {
 
         final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
 
         if (annotationClass == V4Proxy.class) {
 
-            return V4Proxy.CLASS_NAME_PREFIX;
+            return V4Proxy.CLASS_NAME_SUFFIX;
 
         } else if (annotationClass == V11Proxy.class) {
 
-            return V11Proxy.CLASS_NAME_PREFIX;
+            return V11Proxy.CLASS_NAME_SUFFIX;
         }
 
-        return super.getGeneratedClassPrefix();
+        return super.getGeneratedClassSuffix();
     }
 
     @Nonnull

@@ -24,9 +24,9 @@ import java.lang.annotation.Target;
  * <p/>
  * The target class is specified in the annotation attribute. A proxy class implementing the
  * annotated interface will be generated within the interface package and its name will be obtained
- * by prepending "JRoutineV4Proxy_" to the interface simple name. In case the specific interface is
- * not a top class, the simple name of the outer classes will be prepended to the interface one.
- * <br/>
+ * by appending "{@value #CLASS_NAME_SUFFIX}" to the interface simple name. In case the specific
+ * interface is not a top class, the simple name of the outer classes will be prepended to the
+ * interface one.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}, as
@@ -41,9 +41,9 @@ import java.lang.annotation.Target;
 public @interface V4Proxy {
 
     /**
-     * Constant indicating the generated class name prefix.
+     * Constant indicating the generated class name suffix.
      */
-    String CLASS_NAME_PREFIX = "JRoutineV4Proxy_";
+    String CLASS_NAME_SUFFIX = "_V4Proxy";
 
     /**
      * The wrapped class.

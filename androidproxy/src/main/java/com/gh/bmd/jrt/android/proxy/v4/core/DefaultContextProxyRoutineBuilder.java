@@ -256,16 +256,16 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
                 final Package classPackage = interfaceClass.getPackage();
                 final String packageName =
                         (classPackage != null) ? classPackage.getName() + "." : "";
-                String classNameSuffix = interfaceClass.getSimpleName();
+                String classNamePrefix = interfaceClass.getSimpleName();
                 Class<?> enclosingClass = interfaceClass.getEnclosingClass();
 
                 while (enclosingClass != null) {
 
-                    classNameSuffix = enclosingClass.getSimpleName() + classNameSuffix;
+                    classNamePrefix = enclosingClass.getSimpleName() + classNamePrefix;
                     enclosingClass = enclosingClass.getEnclosingClass();
                 }
 
-                final String className = packageName + V4Proxy.CLASS_NAME_PREFIX + classNameSuffix;
+                final String className = packageName + classNamePrefix + V4Proxy.CLASS_NAME_SUFFIX;
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), context, targetClass, shareGroup,
                                         routineConfiguration, invocationConfiguration);

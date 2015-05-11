@@ -201,8 +201,8 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final ContextProxyBuilder<TestProxy> builder =
-                JRoutineV11Proxy_RoutineProxyActivityTestTestProxy.onActivity(getActivity(),
-                                                                              TestClass.class);
+                RoutineProxyActivityTestTestProxy_V11Proxy.onActivity(getActivity(),
+                                                                      TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);

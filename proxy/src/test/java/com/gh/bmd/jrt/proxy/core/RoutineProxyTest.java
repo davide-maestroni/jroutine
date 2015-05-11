@@ -177,7 +177,7 @@ public class RoutineProxyTest {
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final ProxyBuilder<TestProxy> builder = JRoutineProxy_RoutineProxyTestTestProxy.on(test);
+        final ProxyBuilder<TestProxy> builder = RoutineProxyTestTestProxy_Proxy.on(test);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);

@@ -568,24 +568,13 @@ public class RoutineProcessor extends AbstractProcessor {
     /**
      * Returns the prefix of the generated class name.
      *
+     * @param element       the annotated element.
+     * @param targetElement the target element.
      * @return the name prefix.
      */
     @Nonnull
-    protected String getGeneratedClassPrefix() {
-
-        return Proxy.CLASS_NAME_PREFIX;
-    }
-
-    /**
-     * Returns the suffix of the generated class name.
-     *
-     * @param element       the annotated element.
-     * @param targetElement the target element.
-     * @return the name suffix.
-     */
-    @Nonnull
     @SuppressWarnings("UnusedParameters")
-    protected String getGeneratedClassSuffix(@Nonnull final TypeElement element,
+    protected String getGeneratedClassPrefix(@Nonnull final TypeElement element,
             @Nonnull final TypeElement targetElement) {
 
         String classNameSuffix = element.getSimpleName().toString();
@@ -598,6 +587,17 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return classNameSuffix;
+    }
+
+    /**
+     * Returns the suffix of the generated class name.
+     *
+     * @return the name suffix.
+     */
+    @Nonnull
+    protected String getGeneratedClassSuffix() {
+
+        return Proxy.CLASS_NAME_SUFFIX;
     }
 
     /**
@@ -1253,8 +1253,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
         final String packageName = getPackage(element).getQualifiedName().toString();
-        return packageName + "." + getGeneratedClassPrefix() +
-                getGeneratedClassSuffix(element, targetElement);
+        return packageName + "." + getGeneratedClassPrefix(element, targetElement)
+                + getGeneratedClassSuffix();
     }
 
     /**
@@ -1399,9 +1399,9 @@ public class RoutineProcessor extends AbstractProcessor {
 
             String header;
             header = getHeaderTemplate().replace("${packageName}", packageName);
-            header = header.replace("${classNamePrefix}", getGeneratedClassPrefix());
-            header = header.replace("${classNameSuffix}",
-                                    getGeneratedClassSuffix(element, targetElement));
+            header = header.replace("${classNamePrefix}",
+                                    getGeneratedClassPrefix(element, targetElement));
+            header = header.replace("${classNameSuffix}", getGeneratedClassSuffix());
             header = header.replace("${genericTypes}", buildGenericTypes(element));
             header = header.replace("${classFullName}", targetElement.asType().toString());
             header = header.replace("${interfaceFullName}", element.asType().toString());

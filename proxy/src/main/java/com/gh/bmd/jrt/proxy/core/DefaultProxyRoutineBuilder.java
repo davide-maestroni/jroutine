@@ -178,16 +178,16 @@ class DefaultProxyRoutineBuilder
                 final Package classPackage = interfaceClass.getPackage();
                 final String packageName =
                         (classPackage != null) ? classPackage.getName() + "." : "";
-                String classNameSuffix = interfaceClass.getSimpleName();
+                String classNamePrefix = interfaceClass.getSimpleName();
                 Class<?> enclosingClass = interfaceClass.getEnclosingClass();
 
                 while (enclosingClass != null) {
 
-                    classNameSuffix = enclosingClass.getSimpleName() + classNameSuffix;
+                    classNamePrefix = enclosingClass.getSimpleName() + classNamePrefix;
                     enclosingClass = enclosingClass.getEnclosingClass();
                 }
 
-                final String className = packageName + Proxy.CLASS_NAME_PREFIX + classNameSuffix;
+                final String className = packageName + classNamePrefix + Proxy.CLASS_NAME_SUFFIX;
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), target, shareGroup,
                                         configuration);

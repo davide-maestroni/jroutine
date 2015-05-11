@@ -51,14 +51,17 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      * {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} or
      * {@link com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy}. The generated class will
      * share the same package of the specified interface and will have a name of the type:
-     * JRoutineV4Proxy_&lt;itf_simple_name&gt; or JRoutineV11Proxy_&lt;itf_simple_name&gt;<br/>
+     * "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v4.annotation
+     * .V4Proxy#CLASS_NAME_SUFFIX}" or "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
+     * .processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
      * In case the specific interface is not a top class, the simple name of the outer classes will
      * be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>JRoutineV4Proxy_&lt;itf_simple_name&gt;.onXXX()</code> or
-     * <code>JRoutineV11Proxy_&lt;itf_simple_name&gt;.onXXX()</code> methods. Note, however, that,
-     * since the class is generated, a generic IDE may highlight an error even if the compilation is
-     * successful.<br/>
+     * explicitly calling the <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
+     * .processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> or
+     * <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v11.annotation
+     * .V11Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> methods. Note, however, that, since the class is
+     * generated, a generic IDE may highlight an error even if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * artifact to the specific project dependencies.
      *
@@ -86,14 +89,17 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      * {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} or
      * {@link com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy}. The generated class will
      * share the same package of the specified interface and will have a name of the type:
-     * JRoutineV4Proxy_&lt;itf_simple_name&gt; or JRoutineV11Proxy_&lt;itf_simple_name&gt;<br/>
+     * "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v4.annotation
+     * .V4Proxy#CLASS_NAME_SUFFIX}" or "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
+     * .processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
      * In case the specific interface is not a top class, the simple name of the outer classes will
      * be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>JRoutineV4Proxy_&lt;itf_simple_name&gt;.onXXX()</code> or
-     * <code>JRoutineV11Proxy_&lt;itf_simple_name&gt;.onXXX()</code> methods. Note, however, that,
-     * since the class is generated, a generic IDE may highlight an error even if the compilation is
-     * successful.<br/>
+     * explicitly calling the <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
+     * .processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> or
+     * <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v11.annotation
+     * .V11Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> methods. Note, however, that, since the class is
+     * generated, a generic IDE may highlight an error even if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * artifact to the specific project dependencies.
      *

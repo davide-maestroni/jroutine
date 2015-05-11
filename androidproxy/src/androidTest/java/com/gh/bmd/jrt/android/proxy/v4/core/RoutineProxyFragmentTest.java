@@ -191,8 +191,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final ContextProxyBuilder<TestProxy> builder =
-                JRoutineV4Proxy_RoutineProxyFragmentTestTestProxy.onFragment(fragment,
-                                                                             TestClass.class);
+                RoutineProxyFragmentTestTestProxy_V4Proxy.onFragment(fragment, TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);

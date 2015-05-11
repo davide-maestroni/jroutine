@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.proxy.v4.core;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.WindowManager.LayoutParams;
 
 import com.gh.bmd.jrt.android.proxy.R;
 
@@ -31,5 +32,6 @@ public class TestActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.test_v4_layout);
+        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }

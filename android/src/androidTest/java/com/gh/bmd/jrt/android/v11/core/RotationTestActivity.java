@@ -17,6 +17,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.view.WindowManager.LayoutParams;
 
 import com.gh.bmd.jrt.android.R;
 
@@ -34,7 +35,6 @@ public class RotationTestActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.test_v11_layout);
-
-        getLoaderManager();
+        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }

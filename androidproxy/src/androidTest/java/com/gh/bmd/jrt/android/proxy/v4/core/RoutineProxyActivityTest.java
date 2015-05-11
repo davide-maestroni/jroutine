@@ -255,7 +255,7 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ContextProxyRoutineBuilder builder =
                 JRoutineProxy.onActivity(getActivity(), TestClass2.class)
                              .withRoutine()
-                             .withReadTimeout(seconds(2))
+                             .withReadTimeout(seconds(10))
                              .set();
 
         long startTime = System.currentTimeMillis();
@@ -508,7 +508,7 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(JRoutineProxy.onActivity(getActivity(), TestTimeout.class)
                                 .withRoutine()
-                                .withReadTimeout(seconds(1))
+                                .withReadTimeout(seconds(10))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).containsExactly(31);
@@ -828,7 +828,7 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
     @V4Proxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
-        @Timeout(300)
+        @Timeout(3000)
         @Pass(int.class)
         OutputChannel<Integer> getOne();
     }
@@ -852,34 +852,34 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
     @V4Proxy(TestClass.class)
     public interface TestProxy {
 
-        @Timeout(300)
+        @Timeout(3000)
         @Pass(List.class)
         Iterable<Iterable> getList(@Pass(List.class) List<? extends List<String>> i);
 
-        @Timeout(300)
+        @Timeout(3000)
         @Pass(int.class)
         OutputChannel<Integer> getOne();
 
-        @Timeout(300)
+        @Timeout(3000)
         String getString(@Pass(int.class) int... i);
 
-        @Timeout(300)
+        @Timeout(3000)
         @Pass(String.class)
         OutputChannel<String> getString(@Pass(int.class) HashSet<Integer> i);
 
-        @Timeout(300)
+        @Timeout(3000)
         @Pass(String.class)
         List<String> getString(@Pass(int.class) List<Integer> i);
 
-        @Timeout(300)
+        @Timeout(3000)
         @Pass(String.class)
         Iterable<String> getString(@Pass(int.class) Iterable<Integer> i);
 
-        @Timeout(300)
+        @Timeout(3000)
         @Pass(String.class)
         String[] getString(@Pass(int.class) Collection<Integer> i);
 
-        @Timeout(300)
+        @Timeout(3000)
         String getString(@Pass(int.class) OutputChannel<Integer> i);
     }
 

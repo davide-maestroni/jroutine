@@ -34,7 +34,7 @@ import javax.lang.model.element.TypeElement;
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
 
-    @SuppressWarnings({"RedundantTypeArguments", "unchecked"})
+    @SuppressWarnings("unchecked")
     private static final List<Class<? extends Annotation>> ANNOTATION_CLASSES =
             Arrays.asList(V4Proxy.class, V11Proxy.class);
 

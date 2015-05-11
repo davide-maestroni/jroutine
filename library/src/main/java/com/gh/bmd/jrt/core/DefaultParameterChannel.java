@@ -94,7 +94,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      * @param runner        the runner instance.
      * @param logger        the logger instance.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
-     * @throws java.lang.NullPointerException     if one of the parameters is null.
      */
     DefaultParameterChannel(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final InvocationManager<INPUT, OUTPUT> manager, @Nonnull final Runner runner,
@@ -102,7 +101,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
-        mMaxInput = configuration.getInputSizeOr(Integer.MAX_VALUE);
+        mMaxInput = configuration.getInputMaxSizeOr(Integer.MAX_VALUE);
         mInputTimeout = configuration.getInputTimeoutOr(ZERO);
 
         if (mInputTimeout == null) {
@@ -117,7 +116,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
-        mInputQueue = (configuration.getInputOrderOr(OrderType.NONE) == OrderType.NONE)
+        mInputQueue = (configuration.getInputOrderTypeOr(OrderType.NONE) == OrderType.NONE)
                 ? new SimpleNestedQueue<INPUT>() : new OrderedNestedQueue<INPUT>();
         mHasInputs = new Check() {
 

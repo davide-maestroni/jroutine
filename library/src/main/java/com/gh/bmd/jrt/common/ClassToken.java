@@ -43,7 +43,6 @@ public abstract class ClassToken<TYPE> {
      * @param object the object.
      * @param <TYPE> the class type.
      * @return the newly created token.
-     * @throws java.lang.NullPointerException if the object is null.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
@@ -58,7 +57,6 @@ public abstract class ClassToken<TYPE> {
      * @param rawClass the raw class.
      * @param <TYPE>   the class type.
      * @return the newly created token.
-     * @throws java.lang.NullPointerException if the raw class is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -121,7 +119,7 @@ public abstract class ClassToken<TYPE> {
 
                 throw new IllegalStateException(
                         "the class does not correctly extend a class token: "
-                                + getClass().getCanonicalName());
+                                + getClass().getName());
             }
         }
 
@@ -155,7 +153,7 @@ public abstract class ClassToken<TYPE> {
 
                 throw new IllegalStateException(
                         "the class does not correctly extend a class token: "
-                                + getClass().getCanonicalName());
+                                + getClass().getName());
             }
         }
 
@@ -192,7 +190,6 @@ public abstract class ClassToken<TYPE> {
      * @return whether this token raw class is equal to or is a superclass.
      * @throws java.lang.IllegalStateException if this class does not correctly extend a class
      *                                         token.
-     * @throws java.lang.NullPointerException  if the other class token is null.
      */
     public final boolean isAssignableFrom(@Nonnull final ClassToken<?> other) {
 

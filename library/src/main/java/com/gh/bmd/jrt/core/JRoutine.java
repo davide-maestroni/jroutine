@@ -21,12 +21,6 @@ import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
-import com.gh.bmd.jrt.invocation.Invocations.Function0;
-import com.gh.bmd.jrt.invocation.Invocations.Function1;
-import com.gh.bmd.jrt.invocation.Invocations.Function2;
-import com.gh.bmd.jrt.invocation.Invocations.Function3;
-import com.gh.bmd.jrt.invocation.Invocations.Function4;
-import com.gh.bmd.jrt.invocation.Invocations.FunctionN;
 
 import javax.annotation.Nonnull;
 
@@ -167,7 +161,6 @@ public class JRoutine {
      * @return the routine builder instance.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
@@ -186,7 +179,6 @@ public class JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
@@ -204,7 +196,6 @@ public class JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
@@ -222,286 +213,11 @@ public class JRoutine {
      * @return the routine builder instance.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {
 
         return new DefaultObjectRoutineBuilder(target);
-    }
-
-    /**
-     * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
-     */
-    @Nonnull
-    public static <OUTPUT> RoutineBuilder<Void, OUTPUT> onFunction(
-            @Nonnull final Function0<? extends OUTPUT> function) {
-
-        return FunctionRoutineBuilder.fromFunction(function);
-    }
-
-    /**
-     * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> onFunction(
-            @Nonnull final Function1<INPUT, ? extends OUTPUT> function) {
-
-        return FunctionRoutineBuilder.fromFunction(function);
-    }
-
-    /**
-     * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <INPUT>  the input data type.
-     * @param <INPUT1> the first parameter type.
-     * @param <INPUT2> the second parameter type.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
-     */
-    @Nonnull
-    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, OUTPUT>
-    RoutineBuilder<INPUT, OUTPUT> onFunction(
-            @Nonnull final Function2<INPUT1, INPUT2, ? extends OUTPUT> function) {
-
-        return FunctionRoutineBuilder.fromFunction(function);
-    }
-
-    /**
-     * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <INPUT>  the input data type.
-     * @param <INPUT1> the first parameter type.
-     * @param <INPUT2> the second parameter type.
-     * @param <INPUT3> the third parameter type.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
-     */
-    @Nonnull
-    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT,
-            OUTPUT> RoutineBuilder<INPUT, OUTPUT> onFunction(
-            @Nonnull final Function3<INPUT1, INPUT2, INPUT3, ? extends OUTPUT> function) {
-
-        return FunctionRoutineBuilder.fromFunction(function);
-    }
-
-    /**
-     * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <INPUT>  the input data type.
-     * @param <INPUT1> the first parameter type.
-     * @param <INPUT2> the second parameter type.
-     * @param <INPUT3> the third parameter type.
-     * @param <INPUT4> the fourth parameter type.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
-     */
-    @Nonnull
-    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT,
-            INPUT4 extends INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> onFunction(
-            @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, ? extends OUTPUT> function) {
-
-        return FunctionRoutineBuilder.fromFunction(function);
-    }
-
-    /**
-     * Returns a routine builder based on the specified function.<br/>
-     * The inputs will be passed to the function only when the invocation completes, so, it is up to
-     * the caller to verify that the correct number of parameters is passed to the input channel in
-     * order to avoid unexpected behaviors.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified function is null.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> onFunction(
-            @Nonnull final FunctionN<INPUT, ? extends OUTPUT> function) {
-
-        return FunctionRoutineBuilder.fromFunction(function);
-    }
-
-    /**
-     * Returns a routine builder based on the specified procedure.<br/>
-     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
-     * to the caller to verify that the correct number of parameters is passed to the input channel
-     * in order to avoid unexpected behaviors.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    public static RoutineBuilder<Void, Void> onProcedure(@Nonnull final Function0<Void> procedure) {
-
-        return FunctionRoutineBuilder.fromProcedure(procedure);
-    }
-
-    /**
-     * Returns a routine builder based on the specified procedure.<br/>
-     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
-     * to the caller to verify that the correct number of parameters is passed to the input channel
-     * in order to avoid unexpected behaviors.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @param <INPUT1>  the first parameter type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    public static <INPUT, INPUT1 extends INPUT> RoutineBuilder<INPUT, Void> onProcedure(
-            @Nonnull final Function1<INPUT1, Void> procedure) {
-
-        return FunctionRoutineBuilder.fromProcedure(procedure);
-    }
-
-    /**
-     * Returns a routine builder based on the specified procedure.<br/>
-     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
-     * to the caller to verify that the correct number of parameters is passed to the input channel
-     * in order to avoid unexpected behaviors.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @param <INPUT1>  the first parameter type.
-     * @param <INPUT2>  the second parameter type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT> RoutineBuilder<INPUT, Void>
-    onProcedure(
-            @Nonnull final Function2<INPUT1, INPUT2, Void> procedure) {
-
-        return FunctionRoutineBuilder.fromProcedure(procedure);
-    }
-
-    /**
-     * Returns a routine builder based on the specified procedure.<br/>
-     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
-     * to the caller to verify that the correct number of parameters is passed to the input channel
-     * in order to avoid unexpected behaviors.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @param <INPUT1>  the first parameter type.
-     * @param <INPUT2>  the second parameter type.
-     * @param <INPUT3>  the third parameter type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT>
-    RoutineBuilder<INPUT, Void> onProcedure(
-            @Nonnull final Function3<INPUT1, INPUT2, INPUT3, Void> procedure) {
-
-        return FunctionRoutineBuilder.fromProcedure(procedure);
-    }
-
-    /**
-     * Returns a routine builder based on the specified procedure.<br/>
-     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
-     * to the caller to verify that the correct number of parameters is passed to the input channel
-     * in order to avoid unexpected behaviors.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @param <INPUT1>  the first parameter type.
-     * @param <INPUT2>  the second parameter type.
-     * @param <INPUT3>  the third parameter type.
-     * @param <INPUT4>  the fourth parameter type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT,
-            INPUT4 extends INPUT> RoutineBuilder<INPUT, Void> onProcedure(
-            @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, Void> procedure) {
-
-        return FunctionRoutineBuilder.fromProcedure(procedure);
-    }
-
-    /**
-     * Returns a routine builder based on the specified procedure.<br/>
-     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
-     * to the caller to verify that the correct number of parameters is passed to the input channel
-     * in order to avoid unexpected behaviors.<br/>
-     * The procedure output will be discarded.
-     * <p/>
-     * Note that the procedure object must be stateless in order to avoid concurrency issues.
-     *
-     * @param procedure the procedure instance.
-     * @param <INPUT>   the input data type.
-     * @return the builder instance.
-     * @throws java.lang.NullPointerException if the specified procedure is null.
-     */
-    @Nonnull
-    public static <INPUT> RoutineBuilder<INPUT, Void> onProcedure(
-            @Nonnull final FunctionN<INPUT, Void> procedure) {
-
-        return FunctionRoutineBuilder.fromProcedure(procedure);
     }
 
     /**

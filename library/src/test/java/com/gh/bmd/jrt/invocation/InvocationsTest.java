@@ -13,8 +13,13 @@
  */
 package com.gh.bmd.jrt.invocation;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.core.JRoutine;
+import com.gh.bmd.jrt.invocation.Invocations.Function;
+import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.time.TimeDuration;
 
 import org.junit.Test;
 
@@ -31,11 +36,40 @@ import static org.junit.Assert.fail;
 public class InvocationsTest {
 
     @Test
+    public void testFunction() {
+
+        final Routine<Object, String> routine =
+                JRoutine.on(Invocations.factoryOn(new Function<String>() {
+
+                    public String call(@Nonnull final Object... params) {
+
+                        final StringBuilder builder = new StringBuilder(String.valueOf(params[0]));
+
+                        for (int i = 1; i < params.length; i++) {
+
+                            builder.append(", ").append(params[i]);
+                        }
+
+                        return builder.toString();
+                    }
+                }))
+                        .withRoutine()
+                        .withInputOrder(OrderType.PASS_ORDER)
+                        .withReadTimeout(TimeDuration.seconds(1))
+                        .set()
+                        .buildRoutine();
+        assertThat(routine.callAsync("test1", "test2", "test3", "test4").readNext()).isEqualTo(
+                "test1, test2, test3, test4");
+        assertThat(routine.callParallel("test1", "test2", "test3", "test4").readAll()).containsOnly(
+                "test1", "test2", "test3", "test4");
+    }
+
+    @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testInvocationFactory() {
 
         final InvocationFactory<Object, Object> factory =
-                Invocations.withArgs((Object[]) null).factoryOf(TestInvocation.class);
+                Invocations.factoryOf(TestInvocation.class);
 
         assertThat(factory.newInvocation()).isExactlyInstanceOf(TestInvocation.class);
     }
@@ -47,6 +81,21 @@ public class InvocationsTest {
         try {
 
             Invocations.factoryOf((Class<TestInvocation>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullFunctionError() {
+
+        try {
+
+            Invocations.factoryOn(null);
 
             fail();
 
@@ -70,7 +119,7 @@ public class InvocationsTest {
         }
     }
 
-    private static class TestInvocation extends StatelessInvocation<Object, Object> {
+    private static class TestInvocation extends FilterInvocation<Object, Object> {
 
         public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
 

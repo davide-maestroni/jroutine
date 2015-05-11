@@ -11,8 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.builder.core.BuilderConstants
-
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
@@ -24,13 +22,13 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '21.1.2' // Travis does not support an higher version
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1' // Travis does not support an higher version
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 21
-        versionCode 100
+        targetSdkVersion 21 // Travis does not support an higher version
+        versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
 
@@ -52,94 +50,20 @@ android {
     }
 }
 
-def mainProject = project.parent.subprojects.find { it.name.equals('library') };
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    if (!version.contains('PREVIEW') && mainProject.hasProperty('releaseVersion')) {
-        compile "com.github.davide-maestroni:jroutine:${toVersionRange(mainProject.getProperty('releaseVersion'))}"
-    } else {
-        compile project(':library')
-    }
     compile 'com.android.support:support-v4:21.0.3' // Travis does not support an higher version
 
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }
+addConditionalDependency('library', group)
 
-task('jacocoTest', dependsOn: 'connectedCheck') {
-    description = 'Runs the tests and generates the JaCoCo report files.'
-} << {
-    tasks.createDebugCoverageReport.execute()
+findbugs {
+    toolVersion '3.0.0'
 }
 
-task('jacocoTestReport', dependsOn: 'createDebugCoverageReport') {
-    description = 'Generates the JaCoCo report files.'
-}
-
-task('jar', dependsOn: 'jarRelease')
-task('javadoc', dependsOn: 'javadocRelease')
-
-android.libraryVariants.all { variant ->
-
-    def buildTypeName = variant.buildType.name
-
-    if (buildTypeName.equals(BuilderConstants.DEBUG)) {
-
-        task('findbugsMain', type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
-            classes = fileTree(variant.javaCompile.destinationDir).filter {
-                !it.name.startsWith('R\$') && !it.name.equals('R.class')
-            }
-            source = variant.javaCompile.source
-            classpath = files(variant.javaCompile.classpath.files)
-            effort = 'max'
-            reportLevel = 'low'
-            reports {
-                xml.enabled = false
-                html.enabled = true
-            }
-        }
-
-        // Skip debug builds.
-        return
-    }
-
-    def variantName = variant.name.capitalize()
-
-    task("javadoc${variantName}", type: Javadoc, dependsOn: "assemble${variantName}") {
-        description "Generates Javadoc from the ${variantName} build"
-        source = variant.javaCompile.source
-        ext.androidJar =
-                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-        title = "${archivesBaseName} ${version}"
-        options.links('http://docs.oracle.com/javase/7/docs/api/', 'http://davide-maestroni.github.io/jroutine/docs/jroutine/')
-        options.linksOffline('http://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/")
-        options.overview("${project.projectDir}/docs/overview.html")
-        options.windowTitle("Javadoc - ${archivesBaseName}")
-        options.setMemberLevel(JavadocMemberLevel.PUBLIC)
-        exclude '**/BuildConfig.java'
-        exclude '**/R.java'
-    }
-
-    artifacts {
-
-        archives task("sourcesJar${variantName}", type: Jar) {
-            description "Generates sources Jar from the ${variantName} build"
-            classifier = 'sources'
-            from variant.sourceSets.java.srcDirs
-        }
-
-        archives task("javadocJar${variantName}", type: Jar, dependsOn: "javadoc${variantName}") {
-            description "Generates Javadoc Jar from the ${variantName} build"
-            classifier = 'javadoc'
-            from 'build/docs/javadoc'
-        }
-
-        archives task("jar${variantName}", type: Jar, dependsOn: variant.javaCompile) {
-            description "Generates Jar from the ${variantName} build"
-            from variant.javaCompile.destinationDir
-            exclude '**/BuildConfig.class'
-            exclude '**/R*.class'
-        }
-    }
+tasks.withType(Javadoc) {
+    options.overview("${project.projectDir}/docs/overview.html")
+    options.links('http://docs.oracle.com/javase/7/docs/api/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/library/')
 }

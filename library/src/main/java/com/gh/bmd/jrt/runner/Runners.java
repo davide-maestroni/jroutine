@@ -88,6 +88,18 @@ public class Runners {
     }
 
     /**
+     * Returns a runner providing ordering of executions based on priority.
+     *
+     * @param wrapped the wrapped runner instance.
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static PriorityRunner priorityRunner(@Nonnull final Runner wrapped) {
+
+        return new PriorityRunner(wrapped);
+    }
+
+    /**
      * Returns the shared instance of a queued synchronous runner.
      *
      * @return the runner instance.

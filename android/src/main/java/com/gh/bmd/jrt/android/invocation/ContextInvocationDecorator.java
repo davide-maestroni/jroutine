@@ -37,7 +37,6 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
      * Constructor.
      *
      * @param invocation the wrapped invocation.
-     * @throws java.lang.NullPointerException if the specified invocation is null.
      */
     @SuppressWarnings("ConstantConditions")
     public ContextInvocationDecorator(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {

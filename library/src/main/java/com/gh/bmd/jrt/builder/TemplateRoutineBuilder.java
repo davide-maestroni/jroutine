@@ -13,11 +13,12 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Empty abstract implementation of a routine builder.
@@ -30,9 +31,9 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
-        implements RoutineBuilder<INPUT, OUTPUT> {
+        implements RoutineBuilder<INPUT, OUTPUT>, Configurable<RoutineBuilder<INPUT, OUTPUT>> {
 
-    private RoutineConfiguration mConfiguration;
+    private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
@@ -53,11 +54,23 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     }
 
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
+    @SuppressWarnings("ConstantConditions")
+    public RoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withRoutine() {
+
+        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
     }
 
     /**
@@ -68,6 +81,6 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     @Nonnull
     protected RoutineConfiguration getConfiguration() {
 
-        return RoutineConfiguration.notNull(mConfiguration);
+        return mConfiguration;
     }
 }

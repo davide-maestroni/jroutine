@@ -17,5 +17,5 @@
     @SuppressWarnings({"unchecked", "RedundantCast"})
     public void ${methodName}(${paramTypes}) {
 
-        this.mRoutine${methodCount}.${invokeMethod}()${inputParams}.result();
+        this.mRoutine${methodCount}.${invokeMethod}()${inputParams}.result().checkComplete();
     }

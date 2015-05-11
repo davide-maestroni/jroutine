@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.log;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 
 import java.io.PrintWriter;
@@ -123,7 +122,6 @@ public class Logger {
      * @param level   the log level.
      * @param context the context.
      * @return the new logger.
-     * @throws java.lang.NullPointerException if the specified context is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -139,26 +137,10 @@ public class Logger {
     }
 
     /**
-     * Creates a new logger.
-     *
-     * @param configuration the configuration.
-     * @param context       the context.
-     * @return the new logger.
-     * @throws java.lang.NullPointerException if the specified configuration or context is null.
-     */
-    @Nonnull
-    public static Logger newLogger(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Object context) {
-
-        return newLogger(configuration.getLogOr(null), configuration.getLogLevelOr(null), context);
-    }
-
-    /**
      * Prints the stack trace of the specified throwable into a string.
      *
      * @param throwable the throwable instance.
      * @return the printed stack trace.
-     * @throws java.lang.NullPointerException if the specified throwable is null.
      */
     @Nonnull
     public static String printStackTrace(@Nonnull final Throwable throwable) {

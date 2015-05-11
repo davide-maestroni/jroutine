@@ -16,7 +16,6 @@ package com.gh.bmd.jrt.builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Interface defining a builder of routine objects.
@@ -29,7 +28,8 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder, Routine<INPUT, OUTPUT> {
+public interface RoutineBuilder<INPUT, OUTPUT>
+        extends ConfigurableBuilder<RoutineBuilder<INPUT, OUTPUT>>, Routine<INPUT, OUTPUT> {
 
     /**
      * Builds and returns the routine.
@@ -38,10 +38,4 @@ public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder, Rout
      */
     @Nonnull
     Routine<INPUT, OUTPUT> buildRoutine();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nullable RoutineConfiguration configuration);
 }

@@ -24,7 +24,6 @@ import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.runner.Execution;
@@ -40,7 +39,6 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withAsyncRunner;
 import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.time.TimeDuration.micros;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
@@ -83,16 +81,18 @@ public class AndroidRunnerTest extends AndroidTestCase {
                         result.pass(Looper.myLooper()).pass(Runners.myRunner());
                     }
                 };
-        final OutputChannel<Object> channel =
-                JRoutine.on(Invocations.withArgs(this).factoryOf(ClassToken.tokenOf(invocation)))
-                        .withConfiguration(
-                                withAsyncRunner(Runners.threadRunner(new HandlerThread("test"))))
-                        .callAsync();
+        final OutputChannel<Object> channel = JRoutine.on(ClassToken.tokenOf(invocation))
+                                                      .withRoutine()
+                                                      .withFactoryArgs(this)
+                                                      .withAsyncRunner(Runners.threadRunner(
+                                                              new HandlerThread("test")))
+                                                      .set()
+                                                      .callAsync();
 
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {
 
             @Nonnull
-            public Invocation<Object, Object> newInvocation() {
+            public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
 
                 return new SingleCallInvocation<Object, Object>() {
 

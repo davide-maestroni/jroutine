@@ -19,7 +19,6 @@ import android.content.Context;
 import android.os.Build.VERSION_CODES;
 
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -35,8 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 
 /**
  * Loader implementation performing the routine invocation.
@@ -55,6 +52,8 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
     private final ContextInvocation<INPUT, OUTPUT> mInvocation;
 
+    private final String mInvocationType;
+
     private final Logger mLogger;
 
     private final OrderType mOrderType;
@@ -66,19 +65,20 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     /**
      * Constructor.
      *
-     * @param context    used to retrieve the application context.
-     * @param invocation the invocation instance.
-     * @param args       the invocation constructor arguments.
-     * @param inputs     the input data.
-     * @param order      the data order.
-     * @param logger     the logger instance.
-     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
+     * @param context        used to retrieve the application context.
+     * @param invocation     the invocation instance.
+     * @param invocationType the invocation type.
+     * @param args           the invocation factory arguments.
+     * @param inputs         the input data.
+     * @param order          the data order.
+     * @param logger         the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
             @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation,
-            @Nonnull final Object[] args, @Nonnull final List<? extends INPUT> inputs,
-            @Nullable final OrderType order, @Nonnull final Logger logger) {
+            @Nonnull final String invocationType, @Nonnull final Object[] args,
+            @Nonnull final List<? extends INPUT> inputs, @Nullable final OrderType order,
+            @Nonnull final Logger logger) {
 
         super(context);
 
@@ -87,10 +87,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             throw new NullPointerException("the invocation instance must not be null");
         }
 
+        if (invocationType == null) {
+
+            throw new NullPointerException("the invocation type must not be null");
+        }
+
         if (args == null) {
 
-            throw new NullPointerException(
-                    "the invocation constructor array of arguments must not be null");
+            throw new NullPointerException("the array of arguments must not be null");
         }
 
         if (inputs == null) {
@@ -99,6 +103,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         mInvocation = invocation;
+        mInvocationType = invocationType;
         mArgs = args;
         mInputs = inputs;
         mOrderType = order;
@@ -255,14 +260,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Returns the type of the loader invocation.
+     * Returns the loader invocation type.
      *
-     * @return the invocation class.
+     * @return the invocation type.
      */
     @Nonnull
-    Class<?> getInvocationType() {
+    String getInvocationType() {
 
-        return mInvocation.getClass();
+        return mInvocationType;
     }
 
     /**
@@ -284,15 +289,15 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
          */
         private LoaderResultChannel(@Nullable final OrderType order, @Nonnull final Logger logger) {
 
-            final RoutineConfiguration configuration = builder().withOutputOrder(order)
-                                                                .withOutputSize(Integer.MAX_VALUE)
-                                                                .withOutputTimeout(
-                                                                        TimeDuration.ZERO)
-                                                                .withLog(logger.getLog())
-                                                                .withLogLevel(logger.getLogLevel())
-                                                                .buildConfiguration();
-            mStandaloneChannel =
-                    JRoutine.standalone().withConfiguration(configuration).buildChannel();
+            mStandaloneChannel = JRoutine.standalone()
+                                         .withRoutine()
+                                         .withOutputOrder(order)
+                                         .withOutputMaxSize(Integer.MAX_VALUE)
+                                         .withOutputTimeout(TimeDuration.ZERO)
+                                         .withLog(logger.getLog())
+                                         .withLogLevel(logger.getLogLevel())
+                                         .set()
+                                         .buildChannel();
             mStandaloneInput = mStandaloneChannel.input();
         }
 

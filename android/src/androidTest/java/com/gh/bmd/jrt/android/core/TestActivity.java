@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.android.core;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.WindowManager.LayoutParams;
 
 import com.gh.bmd.jrt.android.R;
 
@@ -32,6 +33,7 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.test_layout);
+        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         startService(new Intent(this, TestService.class));
     }

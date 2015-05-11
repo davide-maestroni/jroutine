@@ -24,6 +24,7 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -52,7 +53,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
      */
     DefaultStandaloneChannel(@Nonnull final RoutineConfiguration configuration) {
 
-        final Logger logger = Logger.newLogger(configuration, this);
+        final Logger logger = configuration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<DATA> inputChannel =
                 new DefaultResultChannel<DATA>(configuration, abortHandler,
@@ -73,6 +74,14 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
      */
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final RoutineConfiguration configuration) {
+
+        final Object[] args = configuration.getFactoryArgsOr(null);
+
+        if (args != null) {
+
+            logger.wrn("the specified factory arguments will be ignored: %s",
+                       Arrays.toString(args));
+        }
 
         final Runner syncRunner = configuration.getSyncRunnerOr(null);
 
@@ -97,7 +106,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
             logger.wrn("the specified core invocations will be ignored: %d", coreInvocations);
         }
 
-        final TimeDuration availableTimeout = configuration.getAvailTimeoutOr(null);
+        final TimeDuration availableTimeout = configuration.getAvailInvocationTimeoutOr(null);
 
         if (availableTimeout != null) {
 
@@ -105,14 +114,14 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
                        availableTimeout);
         }
 
-        final OrderType inputOrder = configuration.getInputOrderOr(null);
+        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
 
-        if (inputOrder != null) {
+        if (inputOrderType != null) {
 
-            logger.wrn("the specified input order will be ignored: %s", inputOrder);
+            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 

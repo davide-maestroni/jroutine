@@ -13,61 +13,34 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import android.os.Looper;
-
-import com.gh.bmd.jrt.android.service.RoutineService;
-import com.gh.bmd.jrt.log.Log;
-import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.builder.RoutineBuilder;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of routine whose invocation runs in a dedicated service.
+ * Interface defining a builder of routine objects based on an invocation class token.<br/>
+ * The invocation execution will happen in a dedicated service.
  * <p/>
  * The local context of the invocations will be the specific service instance.
  * <p/>
- * Created by davide on 3/29/15.
+ * Note that, like the object passed to the service routine input and output channels, the
+ * invocation factory arguments must comply with the {@link android.os.Parcel#writeValue(Object)}
+ * method. Be aware though, that issues may arise when employing {@link java.io.Serializable}
+ * objects on the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable}
+ * objects instead.
+ * <p/>
+ * Created by davide on 3/7/15.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
-public interface ServiceRoutineBuilder {
+public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT>,
+        ServiceConfigurableBuilder<ServiceRoutineBuilder<INPUT, OUTPUT>> {
 
     /**
-     * Sets the looper on which the results from the service are dispatched. A null value means that
-     * results will be dispatched on the main thread (as by default).
-     *
-     * @param looper the looper instance.
-     * @return this builder.
+     * {@inheritDoc}
      */
     @Nonnull
-    ServiceRoutineBuilder dispatchingOn(@Nullable Looper looper);
-
-    /**
-     * Sets the log class. A null value means that it is up to the framework to choose a default
-     * implementation.
-     *
-     * @param logClass the log class.
-     * @return this builder.
-     */
-    @Nonnull
-    ServiceRoutineBuilder withLogClass(@Nullable Class<? extends Log> logClass);
-
-    /**
-     * Sets the runner class. A null value means that it is up to the framework to choose a default
-     * implementation.
-     *
-     * @param runnerClass the runner class.
-     * @return this builder.
-     */
-    @Nonnull
-    ServiceRoutineBuilder withRunnerClass(@Nullable Class<? extends Runner> runnerClass);
-
-    /**
-     * Sets the class of the service executing the built routine. A null value means that it is up
-     * to the framework to choose the default service class.
-     *
-     * @param serviceClass the service class.
-     * @return this builder.
-     */
-    @Nonnull
-    ServiceRoutineBuilder withServiceClass(@Nullable Class<? extends RoutineService> serviceClass);
+    Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withRoutine();
 }

@@ -16,26 +16,28 @@
 
     private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
 
+    private static class InvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
+
+        @javax.annotation.Nonnull
+        public com.gh.bmd.jrt.invocation.Invocation newInvocation(@javax.annotation.Nonnull Object... args) {
+
+            return new Invocation${methodCount}${genericTypes}((java.lang.ref.WeakReference<${classFullName}>) args[0], args[1]);
+        }
+    }
+
+    @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
-            final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-        final com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> factory = new com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}>() {
-
-            @javax.annotation.Nonnull
-            public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
-
-                return new Invocation${methodCount}();
-            }
-        };
-        final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration =
-                configuration.builderFrom()
-                             ${routineBuilderOptions}
-                             .withInputSize(Integer.MAX_VALUE)
-                             .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                             .withOutputSize(Integer.MAX_VALUE)
-                             .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                             .buildConfiguration();
-        return com.gh.bmd.jrt.core.JRoutine.on(factory)
-                                           .withConfiguration(routineConfiguration)
+        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}())
+                                           .withRoutine()
+                                           .with(configuration)
+                                           ${routineBuilderOptions}
+                                           .withFactoryArgs(mWrapped, getMutex(${shareGroup}))
+                                           .withInputMaxSize(Integer.MAX_VALUE)
+                                           .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withOutputMaxSize(Integer.MAX_VALUE)
+                                           .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                                           .set()
                                            .buildRoutine();
     }

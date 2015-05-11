@@ -89,7 +89,7 @@ public class Reflection {
             if (constructor == null) {
 
                 throw new IllegalArgumentException(
-                        "no suitable constructor found for type: " + type.getCanonicalName());
+                        "no suitable constructor found for type: " + type.getName());
             }
         }
 

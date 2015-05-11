@@ -27,6 +27,6 @@ public class ExceptionTest {
     @Test
     public void testExceptions() {
 
-        assertThat(new RoutineDeadlockException("")).hasNoCause();
+        assertThat(new InvocationDeadlockException("")).hasNoCause();
     }
 }

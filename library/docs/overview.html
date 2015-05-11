@@ -3,7 +3,7 @@
     <title>jroutine</title>
 </head>
 <body>
-<a href="https://github.com/davide-maestroni/jroutine">Parallel programming on the go.</a>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
@@ -189,8 +189,12 @@
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder = on(Main.class).withShareGroup(Share.NONE)
-                                                                  .withConfiguration(withReadTimeout(TimeDuration.INFINITY));
+                final ClassRoutineBuilder builder = on(Main.class).withProxy()
+                                                                  .withShareGroup(ShareGroup.NONE)
+                                                                  .set()
+                                                                  .withRoutine()
+                                                                  .withReadTimeout(TimeDuration.INFINITY)
+                                                                  .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.boundMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.boundMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.boundMethod(MEAN);
@@ -247,8 +251,12 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = on(instance).withShareGroup(Share.NONE)
-                                                    .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
+                final AsyncMain proxy = on(instance).withProxy()
+                                                    .withShareGroup(ShareGroup.NONE)
+                                                    .set()
+                                                    .withRoutine()
+                                                    .withReadTimeout(TimeDuration.INFINITY)
+                                                    .set()
                                                     .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
@@ -291,7 +299,7 @@
 
                 &commat;Pass(int.class)
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
             }

@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.gh.bmd.jrt.android.proxy">
+
+    <application
+        android:name=".app.TestApp"
+        android:label="@string/lib_name">
+        <activity
+            android:name="com.gh.bmd.jrt.android.proxy.v4.core.TestActivity"
+            android:label="test">
+        </activity>
+        <activity
+            android:name="com.gh.bmd.jrt.android.proxy.v11.core.TestActivity"
+            android:label="test">
+        </activity>
+    </application>
+
+</manifest>

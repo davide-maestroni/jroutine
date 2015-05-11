@@ -25,12 +25,15 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.core.AbstractRoutine;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -41,7 +44,6 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -133,7 +135,6 @@ public class RoutineService extends Service {
      *
      * @param message the message.
      * @return the exception or null.
-     * @throws java.lang.NullPointerException if the specified message is null.
      */
     @Nullable
     public static Throwable getAbortError(@Nonnull final Message message) {
@@ -154,7 +155,6 @@ public class RoutineService extends Service {
      *
      * @param message the message.
      * @return the value or null.
-     * @throws java.lang.NullPointerException if the specified message is null.
      */
     @Nullable
     public static Object getValue(@Nonnull final Message message) {
@@ -177,22 +177,19 @@ public class RoutineService extends Service {
      * @param bundle          the bundle to fill.
      * @param invocationId    the invocation ID.
      * @param invocationClass the invocation class.
-     * @param invocationArgs  the invocation constructor arguments.
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, false, invocationId, invocationClass, invocationArgs, configuration,
-                      runnerClass, logClass);
+        putInvocation(bundle, false, invocationId, invocationClass, configuration, runnerClass,
+                      logClass);
     }
 
     /**
@@ -227,22 +224,19 @@ public class RoutineService extends Service {
      * @param bundle          the bundle to fill.
      * @param invocationId    the invocation ID.
      * @param invocationClass the invocation class.
-     * @param invocationArgs  the invocation constructor arguments.
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, true, invocationId, invocationClass, invocationArgs, configuration,
-                      runnerClass, logClass);
+        putInvocation(bundle, true, invocationId, invocationClass, configuration, runnerClass,
+                      logClass);
     }
 
     /**
@@ -267,7 +261,6 @@ public class RoutineService extends Service {
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -275,6 +268,7 @@ public class RoutineService extends Service {
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
+        final Object[] invocationArgs = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         final int length = invocationArgs.length;
         final ParcelableValue[] argValues = new ParcelableValue[length];
 
@@ -288,7 +282,7 @@ public class RoutineService extends Service {
                       configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
                       configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT));
-        final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
+        final TimeDuration availTimeout = configuration.getAvailInvocationTimeoutOr(null);
 
         if (availTimeout != null) {
 
@@ -296,8 +290,8 @@ public class RoutineService extends Service {
             bundle.putSerializable(KEY_AVAILABLE_UNIT, availTimeout.unit);
         }
 
-        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderOr(null));
-        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderOr(null));
+        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderTypeOr(null));
+        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderTypeOr(null));
         bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
         bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevelOr(null));
@@ -306,6 +300,19 @@ public class RoutineService extends Service {
     private static void putValue(@Nonnull final Bundle bundle, @Nullable final Object value) {
 
         bundle.putParcelable(KEY_DATA_VALUE, new ParcelableValue(value));
+    }
+
+    /**
+     * Returns a context invocation factory instance creating invocations of the specified type.
+     *
+     * @param invocationClass the invocation class.
+     * @return the context invocation factory.
+     */
+    @Nonnull
+    public ContextInvocationFactory<Object, Object> getInvocationFactory(
+            @Nonnull Class<? extends ContextInvocation<Object, Object>> invocationClass) {
+
+        return ContextInvocations.factoryOf(invocationClass);
     }
 
     @Override
@@ -337,7 +344,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no data");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no data");
+                    "[" + getClass().getName() + "] the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -347,8 +354,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation ID");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
-                            + " ID");
+                    "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
         synchronized (mMutex) {
@@ -359,7 +365,7 @@ public class RoutineService extends Service {
 
                 mLogger.err("the service message has no invalid invocation ID: %d", invocationId);
                 throw new IllegalArgumentException(
-                        "[" + getClass().getCanonicalName() + "] the service message has invalid "
+                        "[" + getClass().getName() + "] the service message has invalid "
                                 + "invocation ID: " + invocationId);
             }
 
@@ -376,7 +382,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no data");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no data");
+                    "[" + getClass().getName() + "] the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -386,8 +392,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation ID");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation "
-                            + "ID");
+                    "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
         final Class<? extends ContextInvocation<Object, Object>> invocationClass =
@@ -398,8 +403,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation class");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
-                            + " class");
+                    "[" + getClass().getName() + "] the service message has no invocation class");
         }
 
         final Parcelable[] parcelableArgs = data.getParcelableArray(KEY_INVOCATION_ARGS);
@@ -408,7 +412,7 @@ public class RoutineService extends Service {
 
             mLogger.err("the service message has no invocation arguments");
             throw new IllegalArgumentException(
-                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
+                    "[" + getClass().getName() + "] the service message has no invocation"
                             + " arguments");
         }
 
@@ -428,7 +432,7 @@ public class RoutineService extends Service {
 
                 mLogger.err("an invocation with the same ID is already running: %d", invocationId);
                 throw new IllegalArgumentException(
-                        "[" + getClass().getCanonicalName() + "] an invocation with the same ID is"
+                        "[" + getClass().getName() + "] an invocation with the same ID is"
                                 + " already running: " + invocationId);
             }
 
@@ -438,22 +442,22 @@ public class RoutineService extends Service {
             final TimeUnit timeUnit = (TimeUnit) data.getSerializable(KEY_AVAILABLE_UNIT);
             final TimeDuration availTimeout =
                     (timeUnit != null) ? TimeDuration.fromUnit(timeout, timeUnit) : null;
-            final OrderType inputOrder = (OrderType) data.getSerializable(KEY_INPUT_ORDER);
-            final OrderType outputOrder = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
+            final OrderType inputOrderType = (OrderType) data.getSerializable(KEY_INPUT_ORDER);
+            final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
             final Class<? extends Runner> runnerClass =
                     (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
             final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
             final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
             final RoutineInfo routineInfo =
-                    new RoutineInfo(invocationClass, invocationArgs, inputOrder, outputOrder,
-                                    runnerClass, logClass, logLevel);
+                    new RoutineInfo(invocationClass, invocationArgs, inputOrderType,
+                                    outputOrderType, runnerClass, logClass, logLevel);
             final HashMap<RoutineInfo, RoutineState> routineMap = mRoutineMap;
             RoutineState routineState = routineMap.get(routineInfo);
 
             if (routineState == null) {
 
-                final Builder builder = RoutineConfiguration.builder();
+                final Builder<RoutineConfiguration> builder = RoutineConfiguration.builder();
 
                 if (runnerClass != null) {
 
@@ -483,13 +487,15 @@ public class RoutineService extends Service {
 
                 builder.withCoreInvocations(coreInvocations)
                        .withMaxInvocations(maxInvocations)
-                       .withAvailableTimeout(availTimeout)
-                       .withInputOrder(inputOrder)
-                       .withOutputOrder(outputOrder)
+                       .withAvailInvocationTimeout(availTimeout)
+                       .withInputOrder(inputOrderType)
+                       .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
+
+                final ContextInvocationFactory<Object, Object> factory =
+                        getInvocationFactory(invocationClass);
                 final AndroidRoutine androidRoutine =
-                        new AndroidRoutine(this, builder.buildConfiguration(), invocationClass,
-                                           invocationArgs);
+                        new AndroidRoutine(this, builder.set(), factory, invocationArgs);
                 routineState = new RoutineState(androidRoutine);
                 routineMap.put(routineInfo, routineState);
             }
@@ -510,26 +516,26 @@ public class RoutineService extends Service {
 
         private final Object[] mArgs;
 
-        private final Constructor<? extends ContextInvocation<Object, Object>> mConstructor;
-
         private final Context mContext;
+
+        private final ContextInvocationFactory<Object, Object> mFactory;
 
         /**
          * Constructor.
          *
-         * @param context         the routine context.
-         * @param configuration   the routine configuration.
-         * @param invocationClass the invocation class.
-         * @param invocationArgs  the invocation constructor arguments.
+         * @param context        the routine context.
+         * @param configuration  the routine configuration.
+         * @param factory        the invocation factory.
+         * @param invocationArgs the invocation constructor arguments.
          */
         private AndroidRoutine(@Nonnull final Context context,
                 @Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<? extends ContextInvocation<Object, Object>> invocationClass,
+                @Nonnull final ContextInvocationFactory<Object, Object> factory,
                 @Nonnull final Object[] invocationArgs) {
 
             super(configuration);
             mContext = context;
-            mConstructor = findConstructor(invocationClass, invocationArgs);
+            mFactory = factory;
             mArgs = invocationArgs;
         }
 
@@ -541,10 +547,9 @@ public class RoutineService extends Service {
 
             try {
 
-                final Constructor<? extends ContextInvocation<Object, Object>> constructor =
-                        mConstructor;
-                logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-                final ContextInvocation<Object, Object> invocation = constructor.newInstance(mArgs);
+                final ContextInvocationFactory<Object, Object> factory = mFactory;
+                logger.dbg("creating a new instance of type: %s", factory.getInvocationType());
+                final ContextInvocation<Object, Object> invocation = factory.newInvocation(mArgs);
                 invocation.onContext(mContext);
                 return invocation;
 
@@ -832,7 +837,6 @@ public class RoutineService extends Service {
          *
          * @param invocation the routine invocation.
          * @param messenger  the output messenger.
-         * @throws java.lang.NullPointerException if the specified messenger is null.
          */
         @SuppressWarnings("ConstantConditions")
         private ServiceOutputConsumer(@Nonnull final RoutineInvocation invocation,
@@ -968,7 +972,6 @@ public class RoutineService extends Service {
          * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException        if the channel is already closed or
          *                                                already bound to a consumer.
-         * @throws java.lang.NullPointerException         if the specified consumer is null.
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 

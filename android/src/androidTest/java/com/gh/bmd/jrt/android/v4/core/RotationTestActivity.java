@@ -17,6 +17,7 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.WindowManager.LayoutParams;
 
 import com.gh.bmd.jrt.android.R;
 
@@ -34,6 +35,7 @@ public class RotationTestActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.test_v4_layout);
+        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         getSupportLoaderManager();
     }

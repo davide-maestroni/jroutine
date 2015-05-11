@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -38,6 +39,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -46,7 +48,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 
 /**
@@ -54,7 +55,9 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
  * <p/>
  * Created by davide on 9/21/14.
  */
-class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
+class DefaultClassRoutineBuilder
+        implements ClassRoutineBuilder, RoutineConfiguration.Configurable<ClassRoutineBuilder>,
+        ProxyConfiguration.Configurable<ClassRoutineBuilder> {
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
@@ -65,9 +68,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private RoutineConfiguration mConfiguration;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
-    private String mShareGroup;
+    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -76,14 +79,13 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected, or the specified class represents an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     DefaultClassRoutineBuilder(@Nonnull final Class<?> targetClass) {
 
         if (targetClass.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the target class must not be an interface: " + targetClass.getCanonicalName());
+                    "the target class must not be an interface: " + targetClass.getName());
         }
 
         mTargetClass = targetClass;
@@ -97,7 +99,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
      * @param target the target object.
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     DefaultClassRoutineBuilder(@Nonnull final Object target) {
 
@@ -118,6 +119,12 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         }
 
         return method(method);
+    }
+
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+
+        return method(mRoutineConfiguration, mProxyConfiguration, method);
     }
 
     @Nonnull
@@ -151,24 +158,41 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withRoutine() {
 
-        return method(RoutineConfiguration.notNull(mConfiguration), mShareGroup, method);
+        return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
     }
 
     @Nonnull
-    public ClassRoutineBuilder withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder setConfiguration(@Nonnull final RoutineConfiguration configuration) {
 
-        mConfiguration = configuration;
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mRoutineConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ClassRoutineBuilder withShareGroup(@Nullable final String group) {
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
 
-        mShareGroup = group;
+        if (configuration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        mProxyConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy() {
+
+        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
     }
 
     /**
@@ -185,14 +209,14 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     /**
-     * Returns the internal configuration.
+     * Returns the internal share configuration.
      *
      * @return the configuration.
      */
-    @Nullable
-    protected RoutineConfiguration getConfiguration() {
+    @Nonnull
+    protected ProxyConfiguration getProxyConfiguration() {
 
-        return mConfiguration;
+        return mProxyConfiguration;
     }
 
     /**
@@ -255,11 +279,13 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                     mutex = null;
                 }
 
+                final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                        configuration.builderFrom();
                 final InvocationFactory<Object, Object> factory =
-                        Invocations.withArgs(target, method, mutex, isInputCollection,
-                                             isOutputCollection)
-                                   .factoryOf(MethodSingleCallInvocation.class);
-                routine = new DefaultRoutine<Object, Object>(configuration, factory);
+                        Invocations.factoryOf(MethodSingleCallInvocation.class);
+                routine = new DefaultRoutine<Object, Object>(
+                        builder.withFactoryArgs(target, method, mutex, isInputCollection,
+                                                isOutputCollection).set(), factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -268,14 +294,14 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     /**
-     * Returns the share group name.
+     * Returns the internal routine configuration.
      *
-     * @return the share group name.
+     * @return the configuration.
      */
-    @Nullable
-    protected String getShareGroup() {
+    @Nonnull
+    protected RoutineConfiguration getRoutineConfiguration() {
 
-        return mShareGroup;
+        return mRoutineConfiguration;
     }
 
     /**
@@ -303,19 +329,20 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     /**
      * Returns a routine used to call the specified method.
      *
-     * @param configuration the routine configuration.
-     * @param shareGroup    the group name.
-     * @param targetMethod  the target method.
+     * @param routineConfiguration the routine configuration.
+     * @param proxyConfiguration   the share configuration.
+     * @param targetMethod         the target method.
      * @return the routine.
-     * @throws java.lang.NullPointerException if the specified configuration or method are null.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
+            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ProxyConfiguration proxyConfiguration,
             @Nonnull final Method targetMethod) {
 
-        String methodShareGroup = shareGroup;
-        final Builder builder = RoutineConfiguration.builderFrom(configuration);
+        String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
+        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                routineConfiguration.builderFrom();
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {
@@ -323,11 +350,11 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             methodShareGroup = shareGroupAnnotation.value();
         }
 
-        warn(configuration);
-        builder.withInputOrder(OrderType.PASSING_ORDER)
-               .withInputSize(Integer.MAX_VALUE)
+        warn(routineConfiguration);
+        builder.withInputOrder(OrderType.PASS_ORDER)
+               .withInputMaxSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
-               .withOutputSize(Integer.MAX_VALUE)
+               .withOutputMaxSize(Integer.MAX_VALUE)
                .withOutputTimeout(TimeDuration.ZERO);
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
@@ -340,11 +367,10 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         if (actionAnnotation != null) {
 
-            builder.onReadTimeout(actionAnnotation.value());
+            builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
-        return getRoutine(builder.buildConfiguration(), methodShareGroup, targetMethod, false,
-                          false);
+        return getRoutine(builder.set(), methodShareGroup, targetMethod, false, false);
     }
 
     /**
@@ -355,21 +381,34 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     protected void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
-        final OrderType inputOrder = configuration.getInputOrderOr(null);
+        final Object[] args = configuration.getFactoryArgsOr(null);
 
-        if (inputOrder != null) {
+        if (args != null) {
 
-            logger = Logger.newLogger(configuration, this);
-            logger.wrn("the specified input order will be ignored: %s", inputOrder);
+            logger = configuration.newLogger(this);
+            logger.wrn("the specified factory arguments will be ignored: %s",
+                       Arrays.toString(args));
         }
 
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
+
+        if (inputOrderType != null) {
+
+            if (logger == null) {
+
+                logger = configuration.newLogger(this);
+            }
+
+            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
+        }
+
+        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
@@ -381,31 +420,31 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
-        final OrderType outputOrder = configuration.getOutputOrderOr(null);
+        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
 
-        if (outputOrder != null) {
+        if (outputOrderType != null) {
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
-            logger.wrn("the specified output order will be ignored: %s", outputOrder);
+            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
 
-        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
+        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
 
         if (outputSize != RoutineConfiguration.DEFAULT) {
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
@@ -417,7 +456,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
             if (logger == null) {
 
-                logger = Logger.newLogger(configuration, this);
+                logger = configuration.newLogger(this);
             }
 
             logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);

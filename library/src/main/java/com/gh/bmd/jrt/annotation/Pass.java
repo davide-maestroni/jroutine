@@ -20,8 +20,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
- * <p/>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
@@ -119,7 +118,7 @@ public @interface Pass {
     Class<?> value();
 
     /**
-     * Asynchronous passing mode.<br/>
+     * Asynchronous pass mode.<br/>
      * The type indicates in which way a parameter is passed to the wrapped method or the result
      * is passed outside.
      */
@@ -156,10 +155,10 @@ public @interface Pass {
         /**
          * Automatic mode.<br/>
          * The mode is automatically assigned based to the parameter or return type. Namely: if the
-         * parameters match the COLLECTION passing mode, they are assigned it; if they match the
-         * OBJECT mode, they are assigned the latter; finally the PARALLEL conditions are checked.
+         * parameters match the COLLECTION pass mode, they are assigned it; if they match the OBJECT
+         * mode, they are assigned the latter; finally the PARALLEL conditions are checked.
          * <p/>
-         * Dually, if the return type matches the PARALLEL passing mode, it is assigned it; if it
+         * Dually, if the return type matches the PARALLEL pass mode, it is assigned it; if it
          * matches the COLLECTION mode, it is assigned the latter; finally the OBJECT conditions are
          * checked.
          */

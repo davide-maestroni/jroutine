@@ -16,7 +16,6 @@ package com.gh.bmd.jrt.builder;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Interface defining a builder of routines wrapping an object instance.
@@ -54,7 +53,6 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
@@ -79,23 +77,19 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @throws java.lang.NullPointerException     if the specified class token is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
+     * {@inheritDoc}
      */
     @Nonnull
-    ObjectRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ObjectRoutineBuilder withShareGroup(@Nullable String group);
+    RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withRoutine();
 }

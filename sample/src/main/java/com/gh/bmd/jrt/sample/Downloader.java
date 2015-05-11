@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 
 /**
@@ -52,13 +51,12 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         // the read connection invocation is stateless so we can just use a single instance of it
-        mReadConnection = JRoutine.on(new ReadConnection()).withConfiguration(
-                // by setting the maximum number of parallel invocations
-                // we effectively limit the number of parallel downloads
-                builder().withMaxInvocations(maxParallelDownloads)
-                        // though we need to set a timeout in case the
-                        // downloads outnumber it
-                        .withAvailableTimeout(seconds(30)).buildConfiguration()).buildRoutine();
+        mReadConnection = JRoutine.on(new ReadConnection()).withRoutine()
+                // by setting the maximum number of parallel invocations we effectively limit the
+                // number of parallel downloads...
+                .withMaxInvocations(maxParallelDownloads)
+                        // ...though we need to set a timeout in case the downloads outnumber it
+                .withAvailInvocationTimeout(seconds(30)).set().buildRoutine();
     }
 
     /**
@@ -150,10 +148,12 @@ public class Downloader {
             // passed to the specific routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
-                    JRoutine.on(Invocations.withArgs(dstFile).factoryOf(WriteFile.class))
-                            .withConfiguration(builder().withInputSize(8)
-                                                        .withInputTimeout(seconds(30))
-                                                        .buildConfiguration())
+                    JRoutine.on(Invocations.factoryOf(WriteFile.class))
+                            .withRoutine()
+                            .withFactoryArgs(dstFile)
+                            .withInputMaxSize(8)
+                            .withInputTimeout(seconds(30))
+                            .set()
                             .buildRoutine();
             downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
         }

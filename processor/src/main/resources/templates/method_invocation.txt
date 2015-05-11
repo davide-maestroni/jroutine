@@ -14,14 +14,16 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private class Invocation${methodCount} extends com.gh.bmd.jrt.invocation.SingleCallInvocation<Object, ${resultClassName}> {
+    private static class Invocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.invocation.SingleCallInvocation<Object, ${resultClassName}> {
 
         private final Object mMutex;
 
-        private Invocation${methodCount}() {
+        private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
-            final Object mutex = getMutex(${shareGroup});
+        private Invocation${methodCount}(@javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped,
+                @javax.annotation.Nullable final Object mutex) {
 
+            mWrapped = wrapped;
             mMutex = (mutex != null) ? mutex : this;
         }
 

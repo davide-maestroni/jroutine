@@ -47,6 +47,8 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Created by Davide on 4/9/2015.
+ *
+ * @see com.gh.bmd.jrt.android.builder.InvocationConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

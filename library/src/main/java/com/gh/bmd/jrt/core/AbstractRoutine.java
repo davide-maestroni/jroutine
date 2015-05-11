@@ -21,8 +21,8 @@ import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Logger;
+import com.gh.bmd.jrt.routine.InvocationDeadlockException;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.routine.RoutineDeadlockException;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
@@ -100,8 +100,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      * Constructor.
      *
      * @param configuration the routine configuration.
-     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
-     * @throws java.lang.NullPointerException     if the specified configuration is null.
      */
     @SuppressWarnings("ConstantConditions")
     protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {
@@ -111,8 +109,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
         mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInvocationsOr(DEFAULT_CORE_INVOCATIONS);
-        mAvailTimeout = configuration.getAvailTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
-        mLogger = Logger.newLogger(configuration, this);
+        mAvailTimeout = configuration.getAvailInvocationTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
+        mLogger = configuration.newLogger(this);
         mLogger.dbg("building routine with configuration: %s", configuration);
     }
 
@@ -356,22 +354,21 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     mLogger.wrn("routine instance not available after timeout [#%d]: %s",
                                 mMaxInvocations, mAvailTimeout);
-                    throw new RoutineDeadlockException(
+                    throw new InvocationDeadlockException(
                             "deadlock while waiting for an available invocation instance");
                 }
 
-                ++mRunningCount;
                 final boolean async = mAsync;
                 final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
                         (async) ? mAsyncInvocations : mSyncInvocations;
+                final Invocation<INPUT, OUTPUT> invocation;
 
                 if (!invocations.isEmpty()) {
 
-                    final Invocation<INPUT, OUTPUT> invocation = invocations.removeFirst();
+                    invocation = invocations.removeFirst();
                     mLogger.dbg("reusing %ssync invocation instance [%d/%d]: %s",
                                 (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
                                 invocation);
-                    return invocation;
 
                 } else {
 
@@ -380,18 +377,28 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     if (!fallbackInvocations.isEmpty()) {
 
-                        final Invocation<INPUT, OUTPUT> invocation =
+                        final Invocation<INPUT, OUTPUT> convertInvocation =
                                 fallbackInvocations.removeFirst();
                         mLogger.dbg("converting %ssync invocation instance [%d/%d]: %s",
                                     (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
-                                    invocation);
-                        return convertInvocation(async, invocation);
+                                    convertInvocation);
+                        invocation = convertInvocation(async, convertInvocation);
+
+                    } else {
+
+                        mLogger.dbg("creating %ssync invocation instance [1/%d]",
+                                    (async) ? "a" : "", mCoreInvocations);
+                        invocation = newInvocation(async);
                     }
                 }
 
-                mLogger.dbg("creating %ssync invocation instance [1/%d]", (async) ? "a" : "",
-                            mCoreInvocations);
-                return newInvocation(async);
+                if (invocation == null) {
+
+                    throw new NullPointerException("null invocation returned");
+                }
+
+                ++mRunningCount;
+                return invocation;
             }
         }
 

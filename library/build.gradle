@@ -30,12 +30,6 @@ dependencies {
     testCompile 'org.assertj:assertj-core:1.7.1'
 }
 
-task('jacocoTest', dependsOn: 'test') {
-    description = 'Runs the tests and generates the JaCoCo report files.'
-} << {
-    tasks.jacocoTestReport.execute()
-}
-
 jacocoTestReport {
     reports {
         xml.enabled = true // Coveralls plugin depends on xml format report
@@ -43,39 +37,10 @@ jacocoTestReport {
     }
 }
 
-javadoc {
-    title = "${archivesBaseName} ${version}"
-    options.links('http://docs.oracle.com/javase/7/docs/api/')
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.windowTitle("Javadoc - ${archivesBaseName}")
-    options.setMemberLevel(JavadocMemberLevel.PUBLIC)
-}
-
 findbugs {
-    toolVersion = '3.0.0'
-    effort = 'max'
-    reportLevel = 'low'
+    toolVersion '3.0.0'
 }
 
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-tasks.findbugsTest.onlyIf { false }
-
-artifacts {
-    archives task('sourcesJar', type: Jar) {
-        description 'Generates sources Jar'
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    archives task('javadocJar', type: Jar, dependsOn: 'javadoc') {
-        description 'Generates Javadoc Jar'
-        classifier = 'javadoc'
-        from 'build/docs/javadoc'
-    }
+javadoc {
+    options.overview("${project.projectDir}/docs/overview.html")
 }

@@ -16,15 +16,16 @@
 
 package ${packageName};
 
-public final class JRoutine_${interfaceName}${genericTypes} implements ${interfaceFullName} {
+public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implements ${interfaceFullName} {
 
     private final String mShareGroup;
 
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
     @SuppressWarnings("ConstantConditions")
-    public JRoutine_${interfaceName}(@javax.annotation.Nonnull final ${classFullName} wrapped,
-            final String shareGroup, final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+    public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final ${classFullName} wrapped,
+            @javax.annotation.Nullable final String shareGroup,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
 
@@ -37,53 +38,59 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.processor.builder.WrapperBuilder<${interfaceFullName}> on(final ${classFullName} wrapped) {
+    public static ${genericTypes} com.gh.bmd.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
 
-        return new ${interfaceName}WrapperBuilder${genericTypes}(wrapped);
+        return new ${classNameSuffix}ProxyBuilder${genericTypes}(wrapped);
     }
 
-    private Object getMutex(final String shareGroup) {
+    @javax.annotation.Nullable
+    private Object getMutex(@javax.annotation.Nullable final String shareGroup) {
 
         if (com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
 
             return null;
         }
 
-        final String groupName = (shareGroup != null) ? shareGroup : mShareGroup;
-        return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(mWrapped, groupName);
+        return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(mWrapped, shareGroup);
     }
 
-    private static class ${interfaceName}WrapperBuilder${genericTypes} extends com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder<${interfaceFullName}> {
+    private static class ${classNameSuffix}ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
 
         private final ${classFullName} mTarget;
 
         private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
-        private ${interfaceName}WrapperBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
+        @SuppressWarnings("ConstantConditions")
+        private ${classNameSuffix}ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
+
+            if (target == null) {
+
+                throw new NullPointerException("the wrapped instance must not be null");
+            }
 
             mTarget = target;
         }
 
-        @javax.annotation.Nonnull
         @Override
+        @javax.annotation.Nonnull
         protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }
 
-        @javax.annotation.Nonnull
         @Override
+        @javax.annotation.Nonnull
         protected Object getTarget() {
 
             return mTarget;
         }
 
-        @javax.annotation.Nonnull
         @Override
-        protected ${interfaceFullName} newWrapper(
+        @javax.annotation.Nonnull
+        protected ${interfaceFullName} newProxy(
                 @javax.annotation.Nonnull final String shareGroup,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-            return new JRoutine_${interfaceName}${genericTypes}(mTarget, shareGroup, configuration);
+            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mTarget, shareGroup, configuration);
         }
     }

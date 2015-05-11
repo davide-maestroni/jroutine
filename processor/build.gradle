@@ -21,25 +21,10 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 javaCompatibility = JavaVersion.VERSION_1_6
 
-def mainProject = project.parent.subprojects.find { it.name.equals('library') };
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    if (!version.contains('PREVIEW') && mainProject.hasProperty('releaseVersion')) {
-        compile "com.github.davide-maestroni:jroutine:${toVersionRange(mainProject.getProperty('releaseVersion'))}"
-    } else {
-        compile project(':library')
-    }
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
 }
-
-task('jacocoTest', dependsOn: 'test') {
-    description = 'Runs the tests and generates the JaCoCo report files.'
-} << {
-    tasks.jacocoTestReport.execute()
-}
+addConditionalDependency('library', group)
 
 jacocoTestReport {
     reports {
@@ -48,38 +33,12 @@ jacocoTestReport {
     }
 }
 
-javadoc {
-    title = "${archivesBaseName} ${version}"
-    options.links('http://docs.oracle.com/javase/7/docs/api/')
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.windowTitle("Javadoc - ${archivesBaseName}")
-}
-
 findbugs {
-    toolVersion = '3.0.0'
-    effort = 'max'
-    reportLevel = 'low'
+    toolVersion '3.0.0'
 }
 
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-tasks.findbugsTest.onlyIf { false }
-
-artifacts {
-    archives task('sourcesJar', type: Jar) {
-        description 'Generates sources Jar'
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    archives task('javadocJar', type: Jar, dependsOn: 'javadoc') {
-        description 'Generates Javadoc Jar'
-        classifier = 'javadoc'
-        from 'build/docs/javadoc'
-    }
+javadoc {
+    options.overview("${project.projectDir}/docs/overview.html")
+    options.links('http://docs.oracle.com/javase/7/docs/api/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/library/')
 }

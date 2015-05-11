@@ -50,7 +50,6 @@ interface InvocationResult<OUTPUT> {
      * @param newChannels new channels freshly created.
      * @param oldChannels old channels already fed with previous results.
      * @return whether the invocation is complete.
-     * @throws java.lang.NullPointerException if any of the parameters is null.
      */
     boolean passTo(@Nonnull final Collection<StandaloneInput<OUTPUT>> newChannels,
             @Nonnull final Collection<StandaloneInput<OUTPUT>> oldChannels);

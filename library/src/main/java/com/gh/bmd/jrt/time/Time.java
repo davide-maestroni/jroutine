@@ -140,7 +140,6 @@ public class Time {
      * @param time the time value.
      * @param unit the time unit.
      * @return the time instance.
-     * @throws java.lang.NullPointerException if the specified time unit is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -364,7 +363,6 @@ public class Time {
      * Converts this time in the specified unit.
      *
      * @return the time value in the specified unit.
-     * @throws java.lang.NullPointerException if the specified time unit is null.
      */
     public long to(@Nonnull final TimeUnit timeUnit) {
 

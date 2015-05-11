@@ -3,9 +3,9 @@
     <title>jroutine-android</title>
 </head>
 <body>
-<a href="https://github.com/davide-maestroni/jroutine">Parallel programming on the go.</a>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <p>
-    Android platform customization of the <a href="http://davide-maestroni.github.io/jroutine/docs/jroutine">jroutine</a> library.
+    Android platform customization of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/library" target="_blank">jroutine</a> library.
 </p>
 <p>
     The code below shows how it is possible to load an image from the network in a background thread, by letting automatically handle any change in the configuration.
@@ -31,7 +31,9 @@
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
                     JRoutine.onActivity(this, ClassToken.tokenOf(LoadBitmap.class))
-                            .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
+                            .withInvocation()
+                            .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                            .set()
                             .callAsync(new URI(IMAGE_URI))
                             .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
@@ -107,7 +109,9 @@
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
                     JRoutine.onActivity(this, ClassToken.tokenOf(LoadBitmapFromService.class))
-                            .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
+                            .withInvocation()
+                            .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                            .set()
                             .callAsync(new URI(IMAGE_URI))
                             .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
@@ -168,7 +172,6 @@
                 public void onContext(&commat;Nonnull final Context context) {
 
                     super.onContext(context);
-
                     mRoutine = JRoutine.onService(getContext(), ClassToken.tokenOf(LoadBitmap.class))
                                        .buildRoutine();
                 }

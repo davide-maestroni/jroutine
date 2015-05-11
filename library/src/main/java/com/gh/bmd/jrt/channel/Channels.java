@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.channel;
 
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.core.JRoutine;
-import com.gh.bmd.jrt.invocation.StatelessInvocation;
+import com.gh.bmd.jrt.invocation.FilterInvocation;
 
 import java.util.List;
 
@@ -47,7 +47,6 @@ public class Channels {
      * @param <OUTPUT> the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @throws java.lang.NullPointerException     if the specified list is null.
      */
     @Nonnull
     public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> select(
@@ -87,7 +86,7 @@ public class Channels {
     public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> selectable(final int index,
             @Nullable final OutputChannel<? extends OUTPUT> channel) {
 
-        return JRoutine.on(new StatelessInvocation<OUTPUT, Selectable<OUTPUT>>() {
+        return JRoutine.on(new FilterInvocation<OUTPUT, Selectable<OUTPUT>>() {
 
             public void onInput(final OUTPUT output,
                     @Nonnull final ResultChannel<Selectable<OUTPUT>> result) {

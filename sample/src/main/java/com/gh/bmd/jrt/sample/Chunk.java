@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.annotation.Nonnull;
+
 /**
  * Chunk of bytes.<br/>
  * The objects are immutable since the internal data are read in the constructor and then written to
@@ -30,19 +32,37 @@ public class Chunk {
 
     private int mLength;
 
-    public Chunk(final int maxSize, final InputStream stream) throws IOException {
+    /**
+     * Constructor.
+     *
+     * @param maxSize the maximum number of bytes in the chunk.
+     * @param stream  the input stream from which to read the data.
+     * @throws IOException if an I/O error occurred.
+     */
+    public Chunk(final int maxSize, @Nonnull final InputStream stream) throws IOException {
 
         final byte[] data = new byte[maxSize];
         mLength = stream.read(data);
         mData = data;
     }
 
+    /**
+     * Gets the number of meaningful bytes in this chunk.
+     *
+     * @return the data length.
+     */
     public int getLength() {
 
         return mLength;
     }
 
-    public void writeTo(final OutputStream stream) throws IOException {
+    /**
+     * Writes the bytes of this chunk into the specified output stream.
+     *
+     * @param stream the output stream.
+     * @throws IOException if an I/O error occurred.
+     */
+    public void writeTo(@Nonnull final OutputStream stream) throws IOException {
 
         stream.write(mData, 0, mLength);
     }

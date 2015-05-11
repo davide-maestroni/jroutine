@@ -37,7 +37,12 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
 
     private BufferedOutputStream mOutputStream;
 
-    public WriteFile(final File file) {
+    /**
+     * Constructor.
+     *
+     * @param file the output file.
+     */
+    public WriteFile(@Nonnull final File file) {
 
         mFile = file;
     }

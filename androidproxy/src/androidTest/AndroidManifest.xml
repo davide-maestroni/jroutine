@@ -8,6 +8,10 @@
             android:name="com.gh.bmd.jrt.android.proxy.v4.core.TestActivity"
             android:label="test">
         </activity>
+        <activity
+            android:name="com.gh.bmd.jrt.android.proxy.v11.core.TestActivity"
+            android:label="test">
+        </activity>
     </application>
 
 </manifest>

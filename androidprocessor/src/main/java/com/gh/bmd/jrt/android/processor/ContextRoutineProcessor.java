@@ -80,6 +80,24 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @Nonnull
     @Override
+    protected String getGeneratedClassPrefix() {
+
+        final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
+
+        if (annotationClass == V4Proxy.class) {
+
+            return V4Proxy.CLASS_NAME_PREFIX;
+
+        } else if (annotationClass == V11Proxy.class) {
+
+            return V11Proxy.CLASS_NAME_PREFIX;
+        }
+
+        return super.getGeneratedClassPrefix();
+    }
+
+    @Nonnull
+    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getHeaderTemplate() throws IOException {
 
@@ -214,21 +232,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
         mCurrentAnnotationClass = annotationClass;
-
-        final String packageName = getPackage(element).getQualifiedName().toString();
-        final String interfaceName = element.getSimpleName().toString();
-        String prefix = "";
-
-        if (annotationClass == V4Proxy.class) {
-
-            prefix = ".JRoutineV4Proxy_";
-
-        } else if (annotationClass == V11Proxy.class) {
-
-            prefix = ".JRoutineV11Proxy_";
-        }
-
-        return packageName + prefix + interfaceName;
+        return super.getSourceName(annotationClass, element, targetElement);
     }
 
     @Nonnull

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v11.core;
+package com.gh.bmd.jrt.android.proxy.v11.core;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -19,15 +19,15 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
-import com.gh.bmd.jrt.android.R;
+import com.gh.bmd.jrt.android.proxy.R;
 
 /**
- * Test activity ensuring the creation of the loader manager during call to <code>onCreate()</code>.
+ * Test activity.
  * <p/>
- * Created by davide on 1/28/15.
+ * Created by davide on 12/16/14.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class RotationTestActivity extends Activity {
+public class TestActivity extends Activity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -36,7 +36,5 @@ public class RotationTestActivity extends Activity {
 
         setContentView(R.layout.test_v11_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        getLoaderManager();
     }
 }

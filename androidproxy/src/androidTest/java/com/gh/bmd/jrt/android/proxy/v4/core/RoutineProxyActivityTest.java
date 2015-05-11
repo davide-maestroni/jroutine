@@ -55,6 +55,8 @@ import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ * Proxy builder activity unit tests.
+ * <p/>
  * Created by davide on 07/05/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
@@ -108,7 +110,6 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("ConstantConditions")
     public void testNullPointerError() {
-
 
         try {
 
@@ -174,7 +175,8 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final ContextProxyBuilder<TestProxy> builder =
-                JRoutineV4Proxy_TestProxy.onActivity(getActivity(), TestClass.class);
+                JRoutineV4Proxy_RoutineProxyActivityTestTestProxy.onActivity(getActivity(),
+                                                                             TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);

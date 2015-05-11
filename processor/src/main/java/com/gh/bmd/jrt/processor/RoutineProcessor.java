@@ -566,6 +566,41 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
+     * Returns the prefix of the generated class name.
+     *
+     * @return the name prefix.
+     */
+    @Nonnull
+    protected String getGeneratedClassPrefix() {
+
+        return Proxy.CLASS_NAME_PREFIX;
+    }
+
+    /**
+     * Returns the suffix of the generated class name.
+     *
+     * @param element       the annotated element.
+     * @param targetElement the target element.
+     * @return the name suffix.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getGeneratedClassSuffix(@Nonnull final TypeElement element,
+            @Nonnull final TypeElement targetElement) {
+
+        String classNameSuffix = element.getSimpleName().toString();
+        Element enclosingElement = element.getEnclosingElement();
+
+        while ((enclosingElement != null) && !(enclosingElement instanceof PackageElement)) {
+
+            classNameSuffix = enclosingElement.getSimpleName().toString() + classNameSuffix;
+            enclosingElement = enclosingElement.getEnclosingElement();
+        }
+
+        return classNameSuffix;
+    }
+
+    /**
      * Returns the specified template as a string.
      *
      * @return the template.
@@ -1218,8 +1253,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
         final String packageName = getPackage(element).getQualifiedName().toString();
-        final String interfaceName = element.getSimpleName().toString();
-        return packageName + ".JRoutineProxy_" + interfaceName;
+        return packageName + "." + getGeneratedClassPrefix() +
+                getGeneratedClassSuffix(element, targetElement);
     }
 
     /**
@@ -1349,7 +1384,6 @@ public class RoutineProcessor extends AbstractProcessor {
         try {
 
             final String packageName = getPackage(element).getQualifiedName().toString();
-            final String interfaceName = element.getSimpleName().toString();
             final Filer filer = processingEnv.getFiler();
 
             if (!DEBUG) {
@@ -1365,9 +1399,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
             String header;
             header = getHeaderTemplate().replace("${packageName}", packageName);
+            header = header.replace("${classNamePrefix}", getGeneratedClassPrefix());
+            header = header.replace("${classNameSuffix}",
+                                    getGeneratedClassSuffix(element, targetElement));
             header = header.replace("${genericTypes}", buildGenericTypes(element));
             header = header.replace("${classFullName}", targetElement.asType().toString());
-            header = header.replace("${interfaceName}", interfaceName);
             header = header.replace("${interfaceFullName}", element.asType().toString());
             header = header.replace("${routineFieldsInit}",
                                     buildRoutineFieldsInit(methodElements.size()));

@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration.Builder;
+import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
@@ -255,8 +256,16 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
                 final Package classPackage = interfaceClass.getPackage();
                 final String packageName =
                         (classPackage != null) ? classPackage.getName() + "." : "";
-                final String className =
-                        packageName + "JRoutineV4Proxy_" + interfaceClass.getSimpleName();
+                String classNameSuffix = interfaceClass.getSimpleName();
+                Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+
+                while (enclosingClass != null) {
+
+                    classNameSuffix = enclosingClass.getSimpleName() + classNameSuffix;
+                    enclosingClass = enclosingClass.getEnclosingClass();
+                }
+
+                final String className = packageName + V4Proxy.CLASS_NAME_PREFIX + classNameSuffix;
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), context, targetClass, shareGroup,
                                         routineConfiguration, invocationConfiguration);

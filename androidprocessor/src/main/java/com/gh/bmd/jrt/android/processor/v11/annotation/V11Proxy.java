@@ -42,6 +42,11 @@ import java.lang.annotation.Target;
 public @interface V11Proxy {
 
     /**
+     * Constant indicating the generated class name prefix.
+     */
+    String CLASS_NAME_PREFIX = "JRoutineV11Proxy_";
+
+    /**
      * The wrapped class.
      *
      * @return the class.

@@ -16,14 +16,14 @@
 
 package ${packageName};
 
-public final class JRoutineProxy_${interfaceName}${genericTypes} implements ${interfaceFullName} {
+public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implements ${interfaceFullName} {
 
     private final String mShareGroup;
 
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
     @SuppressWarnings("ConstantConditions")
-    public JRoutineProxy_${interfaceName}(@javax.annotation.Nonnull final ${classFullName} wrapped,
+    public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final ${classFullName} wrapped,
             final String shareGroup, @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
@@ -39,7 +39,7 @@ public final class JRoutineProxy_${interfaceName}${genericTypes} implements ${in
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
 
-        return new ${interfaceName}ProxyBuilder${genericTypes}(wrapped);
+        return new ${classNameSuffix}ProxyBuilder${genericTypes}(wrapped);
     }
 
     @javax.annotation.Nullable
@@ -53,14 +53,14 @@ public final class JRoutineProxy_${interfaceName}${genericTypes} implements ${in
         return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(mWrapped, shareGroup);
     }
 
-    private static class ${interfaceName}ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
+    private static class ${classNameSuffix}ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
 
         private final ${classFullName} mTarget;
 
         private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
-        private ${interfaceName}ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
+        private ${classNameSuffix}ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
 
             if (target == null) {
 
@@ -90,6 +90,6 @@ public final class JRoutineProxy_${interfaceName}${genericTypes} implements ${in
                 @javax.annotation.Nonnull final String shareGroup,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-            return new JRoutineProxy_${interfaceName}${genericTypes}(mTarget, shareGroup, configuration);
+            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mTarget, shareGroup, configuration);
         }
     }

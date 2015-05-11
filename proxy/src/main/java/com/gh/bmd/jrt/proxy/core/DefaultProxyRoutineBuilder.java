@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.proxy.core;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.processor.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 
@@ -177,8 +178,16 @@ class DefaultProxyRoutineBuilder
                 final Package classPackage = interfaceClass.getPackage();
                 final String packageName =
                         (classPackage != null) ? classPackage.getName() + "." : "";
-                final String className =
-                        packageName + "JRoutineProxy_" + interfaceClass.getSimpleName();
+                String classNameSuffix = interfaceClass.getSimpleName();
+                Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+
+                while (enclosingClass != null) {
+
+                    classNameSuffix = enclosingClass.getSimpleName() + classNameSuffix;
+                    enclosingClass = enclosingClass.getEnclosingClass();
+                }
+
+                final String className = packageName + Proxy.CLASS_NAME_PREFIX + classNameSuffix;
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), target, shareGroup,
                                         configuration);

@@ -11,32 +11,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v11.core;
+package com.gh.bmd.jrt.android.proxy.v11.core;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.app.Fragment;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.view.WindowManager.LayoutParams;
-
-import com.gh.bmd.jrt.android.R;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 /**
- * Test activity ensuring the creation of the loader manager during call to <code>onCreate()</code>.
+ * Test fragment.
  * <p/>
- * Created by davide on 1/28/15.
+ * Created by davide on 12/16/14.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class RotationTestActivity extends Activity {
+public class TestFragment extends Fragment {
 
+    @Nullable
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.test_v11_layout);
-        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        getLoaderManager();
+        return new View(getActivity());
     }
 }

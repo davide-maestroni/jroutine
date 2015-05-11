@@ -37,6 +37,6 @@ public class RotationTestActivity extends FragmentActivity {
         setContentView(R.layout.test_v4_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        getSupportFragmentManager();
+        getSupportLoaderManager();
     }
 }

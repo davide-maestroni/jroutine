@@ -167,7 +167,6 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-
         outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
         iterableType = getTypeFromName(Iterable.class.getCanonicalName()).asType();
         listType = getTypeFromName(List.class.getCanonicalName()).asType();
@@ -183,6 +182,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             return false;
         }
+
+        checkDependencies();
 
         for (final Class<? extends Annotation> annotationClass : getSupportedAnnotationClasses()) {
 
@@ -283,8 +284,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             builder.append(".pass(");
 
-            if (typeUtils.isAssignable(outputChannelType,
-                                       typeUtils.erasure(variableElement.asType())) && (
+            if (typeUtils.isAssignable(outputChannelType, typeUtils.erasure(variableElement
+                                                                                    .asType())) && (
                     variableElement.getAnnotation(Pass.class) != null)) {
 
                 builder.append("(com.gh.bmd.jrt.channel.OutputChannel<? extends Object>)");
@@ -392,8 +393,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 builder.append(", ");
             }
 
-            builder.append("(")
-                   .append(getBoxedType(variableElement.asType()))
+            builder.append("(").append(getBoxedType(variableElement.asType()))
                    .append(") objects.get(")
                    .append(count++)
                    .append(")");
@@ -493,6 +493,19 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Checks if the correct dependencies needed by the generated classes are present.
+     */
+    protected void checkDependencies() {
+
+        if (getTypeFromName("com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder") == null) {
+
+            throw new IllegalStateException(
+                    "the 'com.github.davide-maestroni:jroutine-proxy' artifact is missing! Please"
+                            + " be sure to add it to your project dependencies.");
+        }
     }
 
     /**
@@ -1274,7 +1287,6 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param typeName the type name.
      * @return the type element.
      */
-    @Nonnull
     protected TypeElement getTypeFromName(@Nonnull final String typeName) {
 
         return processingEnv.getElementUtils().getTypeElement(normalizeTypeName(typeName));

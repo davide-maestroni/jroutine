@@ -42,13 +42,14 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
-Project.metaClass.addConditionalDependency = { String name, String group ->
+Project.metaClass.addConditionalDependency = { String name, Closure closure ->
 
     def dependsOnProject = parent.subprojects.find { it.name.equals(name) };
     def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
+    def projectVersion = hasProperty('releaseVersion') ? getProperty('releaseVersion') : 'PREVIEW'
     dependencies {
-        if (!dependsOnVersion.contains('PREVIEW')) {
-            compile group: group, name: dependsOnProject.getProperty('archivesBaseName'), version: toVersionRange(dependsOnVersion)
+        if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
+            compile group: group, name: closure(dependsOnProject), version: toVersionRange(dependsOnVersion)
         } else {
             compile project(":${name}")
         }
@@ -81,20 +82,20 @@ afterEvaluate { project ->
         }
 
         project.javadoc {
-            title = "${archivesBaseName} ${version}"
+            title = "${project.archivesBaseName} ${version}"
             options.links('http://docs.oracle.com/javase/7/docs/api/')
-            options.windowTitle("Javadoc - ${archivesBaseName}")
+            options.windowTitle("Javadoc - ${project.archivesBaseName}")
             options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         }
 
         project.artifacts {
-            archives task('sourcesJar', type: Jar) {
+            archives project.task('sourcesJar', type: Jar) {
                 description 'Generates sources Jar'
                 classifier = 'sources'
                 from sourceSets.main.allSource
             }
 
-            archives task('javadocJar', type: Jar, dependsOn: 'javadoc') {
+            archives project.task('javadocJar', type: Jar, dependsOn: 'javadoc') {
                 description 'Generates Javadoc Jar'
                 classifier = 'javadoc'
                 from 'build/docs/javadoc'
@@ -226,7 +227,7 @@ afterEvaluate { project ->
                     }
 
                     pom.project {
-                        name = archivesBaseName
+                        name = project.archivesBaseName
                         packaging = 'jar'
                         description = repoDescription
                         url = "http://${repoUser}.github.io/${repoName}/"

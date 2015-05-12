@@ -62,9 +62,11 @@ dependencies {
     apt project(':androidprocessor')
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }
-addConditionalDependency('proxy', { "${it.parent.name}-${it.name}" })
-addConditionalDependency('android', { "${it.parent.name}-${it.name}" })
-addConditionalDependency('androidprocessor', { "${it.parent.name}-${it.name}" })
+conditionalDependencies {
+    compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'android', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidprocessor', artifact: { "${it.parent.name}-${it.name}" }
+}
 
 findbugs {
     toolVersion '3.0.0'

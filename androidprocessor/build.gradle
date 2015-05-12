@@ -24,7 +24,9 @@ javaCompatibility = JavaVersion.VERSION_1_6
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
-addConditionalDependency('processor', { "${it.parent.name}-${it.name}" })
+conditionalDependencies {
+    compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }
+}
 
 jacocoTestReport {
     reports {

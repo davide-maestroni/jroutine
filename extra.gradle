@@ -55,6 +55,12 @@ Project.metaClass.addConditionalDependency = { String name, Closure closure ->
         }
     }
 }
+Project.metaClass.conditionalDependencies = { Closure closure ->
+
+    closure.delegate = new ConditionalDependencySpecs(delegate)
+    closure.resolveStrategy = Closure.DELEGATE_FIRST
+    closure()
+}
 
 afterEvaluate { project ->
 
@@ -286,5 +292,34 @@ def addJavadocTask(project, variant, taskName) {
         options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         exclude '**/BuildConfig.java'
         exclude '**/R.java'
+    }
+}
+
+class ConditionalDependencySpecs {
+
+    Project myProject
+
+    ConditionalDependencySpecs(Project context) {
+
+        myProject = context
+    }
+
+    def compile(Object config) {
+
+        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
+        def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
+        def projectVersion = myProject.hasProperty('releaseVersion') ? myProject.getProperty('releaseVersion') : 'PREVIEW'
+        myProject.dependencies {
+            if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
+                delegate.compile group: myProject.group, name: config.artifact(dependsOnProject), version: myProject.toVersionRange(dependsOnVersion)
+            } else {
+                delegate.compile myProject.project(":${config.name}")
+            }
+        }
+    }
+
+    def compile(String name) {
+
+        compile(name: name, artifact: { name })
     }
 }

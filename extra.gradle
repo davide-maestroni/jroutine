@@ -322,4 +322,23 @@ class ConditionalDependencySpecs {
 
         compile(name: name, artifact: { name })
     }
+
+    def androidCompile(Object config) {
+
+        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
+        def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
+        def projectVersion = myProject.hasProperty('releaseVersion') ? myProject.getProperty('releaseVersion') : 'PREVIEW'
+        myProject.dependencies {
+            if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
+                delegate.compile "${myProject.group}:${config.artifact(dependsOnProject)}:${myProject.toVersionRange(dependsOnVersion)}@aar"
+            } else {
+                delegate.compile myProject.project(":${config.name}")
+            }
+        }
+    }
+
+    def androidCompile(String name) {
+
+        androidCompile(name: name, artifact: { name })
+    }
 }

@@ -57,7 +57,7 @@ What the library has to offer is:
 
 And more:
 
-* ***< 210KB Jar***
+* ***< 200KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
 * ***Nullability annotations***
 
@@ -78,8 +78,9 @@ Please have a look at the [Wiki][wiki].
 Complete Javadoc with insights and examples is available for:
 
 * [JRoutine][javadoc]
-* [JRoutine-Processor][javadoc processor]
+* [JRoutine-Proxy][javadoc proxy]
 * [JRoutine-Android][javadoc android]
+* [JRoutine-AndroidProxy][javadoc androidproxy]
 
 The project contains an additional [sample][sample] module showing how to implement a file downloader with just 4 classes.
 
@@ -113,8 +114,9 @@ Please refer to the dedicated [Wiki page][wiki build].
 Module | Latest Version
 --- | ---
 JRoutine | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine)
-JRoutine-Processor | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor)
+JRoutine-Proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
 JRoutine-Android | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
+JRoutine-AndroidProxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
 
 ## License
 
@@ -142,8 +144,9 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
 [sample]:[sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
-[javadoc]:http://davide-maestroni.github.io/jroutine/docs/jroutine
-[javadoc processor]:http://davide-maestroni.github.io/jroutine/docs/processor
-[javadoc android]:http://davide-maestroni.github.io/jroutine/docs/android
-[javadoc routine]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/routine/Routine.html
-[javadoc runner]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html
+[javadoc]:http://davide-maestroni.github.io/jroutine/javadoc/jroutine
+[javadoc proxy]:http://davide-maestroni.github.io/jroutine/javadoc/proxy
+[javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/android
+[javadoc androidproxy]:http://davide-maestroni.github.io/jroutine/javadoc/androidproxy
+[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/jroutine/com/gh/bmd/jrt/routine/Routine.html
+[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/jroutine/com/gh/bmd/jrt/runner/Runner.html

@@ -15,11 +15,10 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ContextConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -32,9 +31,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 06/05/15.
  */
-public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextProxyRoutineBuilder>,
-        ProxyConfigurableBuilder<ContextProxyRoutineBuilder>,
-        ContextConfigurableBuilder<ContextProxyRoutineBuilder> {
+public interface ContextProxyRoutineBuilder
+        extends ProxyRoutineBuilder, ContextConfigurableBuilder<ContextProxyRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
@@ -51,17 +49,19 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      * {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} or
      * {@link com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy}. The generated class will
      * share the same package of the specified interface and will have a name of the type:
-     * "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v4.annotation
-     * .V4Proxy#CLASS_NAME_SUFFIX}" or "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
-     * .processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
+     * "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}" or
+     * "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
      * In case the specific interface is not a top class, the simple name of the outer classes will
      * be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
-     * .processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> or
-     * <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v11.annotation
-     * .V11Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> methods. Note, however, that, since the class is
-     * generated, a generic IDE may highlight an error even if the compilation is successful.<br/>
+     * explicitly calling the "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()" or
+     * "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}.onXXX()"
+     * methods. Note, however, that, since the class is generated, a generic IDE may highlight an
+     * error even if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * artifact to the specific project dependencies.
      *
@@ -89,17 +89,19 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      * {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} or
      * {@link com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy}. The generated class will
      * share the same package of the specified interface and will have a name of the type:
-     * "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v4.annotation
-     * .V4Proxy#CLASS_NAME_SUFFIX}" or "&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
-     * .processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
+     * "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}" or
+     * "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
      * In case the specific interface is not a top class, the simple name of the outer classes will
      * be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android
-     * .processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> or
-     * <code>&lt;itf_simple_name&gt;{@value com.gh.bmd.jrt.android.processor.v11.annotation
-     * .V11Proxy#CLASS_NAME_SUFFIX}.onXXX()</code> methods. Note, however, that, since the class is
-     * generated, a generic IDE may highlight an error even if the compilation is successful.<br/>
+     * explicitly calling the "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()" or
+     * "&lt;itf_simple_name&gt;
+     * {@value com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}.onXXX()"
+     * methods. Note, however, that, since the class is generated, a generic IDE may highlight an
+     * error even if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * artifact to the specific project dependencies.
      *
@@ -113,6 +115,14 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
+     * Note that all the options related to the output and input channels will be ignored.
+     *
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine();
+
+    /**
      * {@inheritDoc}
      */
     @Nonnull
@@ -123,12 +133,4 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      */
     @Nonnull
     ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxy();
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine();
 }

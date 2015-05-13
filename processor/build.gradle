@@ -24,7 +24,9 @@ javaCompatibility = JavaVersion.VERSION_1_6
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
-addConditionalDependency('library', group)
+conditionalDependencies {
+    compile name: 'library', artifact: { it.parent.name }
+}
 
 jacocoTestReport {
     reports {

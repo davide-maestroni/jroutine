@@ -18,12 +18,12 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 ## It's reactive!
 
-The library adheres to [The Reactive Manifesto][reactive manifesto]. It's responsive, resilient, elastic and "message driven".
+The library adheres to [The Reactive Manifesto][reactive manifesto]. It's *responsive*, *resilient*, *elastic* and *message driven*.
 
-It's responsive because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.
-It's resilient because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.
-It's elastic because the needed number of threads is allocated in response to higher loads.
-It's "message driven" because both ouputs and errors are dispatched along the chain of invocations.
+It's *responsive*, since commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.<br/>
+It's *resilient*, since errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.<br/>
+It's *elastic*, since the needed number of threads is allocated in response to higher loads.<br/>
+It's *message driven*, since both ouputs and errors are dispatched along the chain of invocations.
 
 ## Why not RxJava?
 
@@ -50,7 +50,7 @@ What the library has to offer is:
 * ***Memory optimization***: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption
 * ***Data streaming***: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution
 * ***Real processing abort***: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener
-* ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential sequence of operations
+* ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential array of operations
 * ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation
 * ***Nice handling of Android configuration changes***: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments
 * ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service

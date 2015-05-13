@@ -42,17 +42,24 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
-Project.metaClass.addConditionalDependency = { String name, String group ->
+Project.metaClass.addConditionalDependency = { String name, Closure closure ->
 
     def dependsOnProject = parent.subprojects.find { it.name.equals(name) };
     def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
+    def projectVersion = hasProperty('releaseVersion') ? getProperty('releaseVersion') : 'PREVIEW'
     dependencies {
-        if (!dependsOnVersion.contains('PREVIEW')) {
-            compile group: group, name: dependsOnProject.getProperty('archivesBaseName'), version: toVersionRange(dependsOnVersion)
+        if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
+            compile group: group, name: closure(dependsOnProject), version: toVersionRange(dependsOnVersion)
         } else {
             compile project(":${name}")
         }
     }
+}
+Project.metaClass.conditionalDependencies = { Closure closure ->
+
+    closure.delegate = new ConditionalDependencySpecs(delegate)
+    closure.resolveStrategy = Closure.DELEGATE_FIRST
+    closure()
 }
 
 afterEvaluate { project ->
@@ -81,20 +88,20 @@ afterEvaluate { project ->
         }
 
         project.javadoc {
-            title = "${archivesBaseName} ${version}"
+            title = "${project.archivesBaseName} ${version}"
             options.links('http://docs.oracle.com/javase/7/docs/api/')
-            options.windowTitle("Javadoc - ${archivesBaseName}")
+            options.windowTitle("Javadoc - ${project.archivesBaseName}")
             options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         }
 
         project.artifacts {
-            archives task('sourcesJar', type: Jar) {
+            archives project.task('sourcesJar', type: Jar) {
                 description 'Generates sources Jar'
                 classifier = 'sources'
                 from sourceSets.main.allSource
             }
 
-            archives task('javadocJar', type: Jar, dependsOn: 'javadoc') {
+            archives project.task('javadocJar', type: Jar, dependsOn: 'javadoc') {
                 description 'Generates Javadoc Jar'
                 classifier = 'javadoc'
                 from 'build/docs/javadoc'
@@ -226,7 +233,7 @@ afterEvaluate { project ->
                     }
 
                     pom.project {
-                        name = archivesBaseName
+                        name = project.archivesBaseName
                         packaging = 'jar'
                         description = repoDescription
                         url = "http://${repoUser}.github.io/${repoName}/"
@@ -285,5 +292,53 @@ def addJavadocTask(project, variant, taskName) {
         options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         exclude '**/BuildConfig.java'
         exclude '**/R.java'
+    }
+}
+
+class ConditionalDependencySpecs {
+
+    Project myProject
+
+    ConditionalDependencySpecs(Project context) {
+
+        myProject = context
+    }
+
+    def compile(Object config) {
+
+        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
+        def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
+        def projectVersion = myProject.hasProperty('releaseVersion') ? myProject.getProperty('releaseVersion') : 'PREVIEW'
+        myProject.dependencies {
+            if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
+                delegate.compile group: myProject.group, name: config.artifact(dependsOnProject), version: myProject.toVersionRange(dependsOnVersion)
+            } else {
+                delegate.compile myProject.project(":${config.name}")
+            }
+        }
+    }
+
+    def compile(String name) {
+
+        compile(name: name, artifact: { name })
+    }
+
+    def androidCompile(Object config) {
+
+        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
+        def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
+        def projectVersion = myProject.hasProperty('releaseVersion') ? myProject.getProperty('releaseVersion') : 'PREVIEW'
+        myProject.dependencies {
+            if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
+                delegate.compile "${myProject.group}:${config.artifact(dependsOnProject)}:${myProject.toVersionRange(dependsOnVersion)}@aar"
+            } else {
+                delegate.compile myProject.project(":${config.name}")
+            }
+        }
+    }
+
+    def androidCompile(String name) {
+
+        androidCompile(name: name, artifact: { name })
     }
 }

@@ -78,6 +78,18 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return builder.toString();
     }
 
+    @Override
+    protected void checkDependencies() {
+
+        if (getTypeFromName("com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder")
+                == null) {
+
+            throw new IllegalStateException(
+                    "the 'com.github.davide-maestroni:jroutine-androidproxy' artifact is missing!"
+                            + " Please be sure to add it to your project dependencies.");
+        }
+    }
+
     @Nonnull
     @Override
     protected String getGeneratedClassSuffix() {

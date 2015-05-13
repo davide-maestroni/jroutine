@@ -15,10 +15,9 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ContextConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.proxy.builder.ProxyBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -29,9 +28,8 @@ import javax.annotation.Nonnull;
  *
  * @param <TYPE> the interface type.
  */
-public interface ContextProxyBuilder<TYPE> extends ConfigurableBuilder<ContextProxyBuilder<TYPE>>,
-        ProxyConfigurableBuilder<ContextProxyBuilder<TYPE>>,
-        ContextConfigurableBuilder<ContextProxyBuilder<TYPE>> {
+public interface ContextProxyBuilder<TYPE>
+        extends ProxyBuilder<TYPE>, ContextConfigurableBuilder<ContextProxyBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
@@ -56,6 +54,14 @@ public interface ContextProxyBuilder<TYPE> extends ConfigurableBuilder<ContextPr
     TYPE buildProxy();
 
     /**
+     * Note that all the options related to the output and input channels will be ignored.
+     *
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    RoutineConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withRoutine();
+
+    /**
      * {@inheritDoc}
      */
     @Nonnull
@@ -66,12 +72,4 @@ public interface ContextProxyBuilder<TYPE> extends ConfigurableBuilder<ContextPr
      */
     @Nonnull
     ProxyConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withProxy();
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    RoutineConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withRoutine();
 }

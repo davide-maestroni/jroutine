@@ -15,11 +15,10 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ContextConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -32,9 +31,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 06/05/15.
  */
-public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextProxyRoutineBuilder>,
-        ProxyConfigurableBuilder<ContextProxyRoutineBuilder>,
-        ContextConfigurableBuilder<ContextProxyRoutineBuilder> {
+public interface ContextProxyRoutineBuilder
+        extends ProxyRoutineBuilder, ContextConfigurableBuilder<ContextProxyRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
@@ -117,6 +115,14 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
+     * Note that all the options related to the output and input channels will be ignored.
+     *
+     * @return the routine configuration builder.
+     */
+    @Nonnull
+    RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine();
+
+    /**
      * {@inheritDoc}
      */
     @Nonnull
@@ -127,12 +133,4 @@ public interface ContextProxyRoutineBuilder extends ConfigurableBuilder<ContextP
      */
     @Nonnull
     ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxy();
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine();
 }

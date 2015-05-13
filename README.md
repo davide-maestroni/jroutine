@@ -143,7 +143,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [akka]:http://akka.io/
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
-[sample]:[sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
+[sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
 [javadoc]:http://davide-maestroni.github.io/jroutine/javadoc/library
 [javadoc proxy]:http://davide-maestroni.github.io/jroutine/javadoc/proxy
 [javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/android

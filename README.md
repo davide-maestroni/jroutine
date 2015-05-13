@@ -144,9 +144,9 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
 [sample]:[sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
-[javadoc]:http://davide-maestroni.github.io/jroutine/javadoc/jroutine
+[javadoc]:http://davide-maestroni.github.io/jroutine/javadoc/library
 [javadoc proxy]:http://davide-maestroni.github.io/jroutine/javadoc/proxy
 [javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/android
 [javadoc androidproxy]:http://davide-maestroni.github.io/jroutine/javadoc/androidproxy
-[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/jroutine/com/gh/bmd/jrt/routine/Routine.html
-[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/jroutine/com/gh/bmd/jrt/runner/Runner.html
+[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/gh/bmd/jrt/routine/Routine.html
+[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/gh/bmd/jrt/runner/Runner.html

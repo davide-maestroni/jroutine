@@ -42,7 +42,8 @@ public interface ContextObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.Id} method annotations will be honored.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} method annotations will be honored.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name     the name specified in the annotation.
@@ -62,7 +63,8 @@ public interface ContextObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.Id} method annotations will be honored.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} method annotations will be honored.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param method   the method instance.
@@ -82,7 +84,8 @@ public interface ContextObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.Id} method annotations will be honored.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} method annotations will be honored.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name           the method name.
@@ -103,7 +106,7 @@ public interface ContextObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.Id} annotations.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -124,7 +127,7 @@ public interface ContextObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.Id} annotations.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.

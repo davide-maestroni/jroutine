@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.android.builder;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
 
@@ -354,9 +355,16 @@ public final class ServiceConfiguration {
          *
          * @param logClass the log class.
          * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified class has no default
+         *                                            constructor.
          */
         @Nonnull
         public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
+
+            if (logClass != null) {
+
+                Reflection.findConstructor(logClass);
+            }
 
             mLogClass = logClass;
             return this;
@@ -382,9 +390,16 @@ public final class ServiceConfiguration {
          *
          * @param runnerClass the runner class.
          * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified class has no default
+         *                                            constructor.
          */
         @Nonnull
         public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
+
+            if (runnerClass != null) {
+
+                Reflection.findConstructor(runnerClass);
+            }
 
             mRunnerClass = runnerClass;
             return this;

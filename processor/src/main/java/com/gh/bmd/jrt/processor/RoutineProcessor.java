@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.processor;
 
 import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -284,9 +284,9 @@ public class RoutineProcessor extends AbstractProcessor {
 
             builder.append(".pass(");
 
-            if (typeUtils.isAssignable(outputChannelType, typeUtils.erasure(variableElement
-                                                                                    .asType())) && (
-                    variableElement.getAnnotation(Pass.class) != null)) {
+            if (typeUtils.isAssignable(outputChannelType,
+                                       typeUtils.erasure(variableElement.asType())) && (
+                    variableElement.getAnnotation(Param.class) != null)) {
 
                 builder.append("(com.gh.bmd.jrt.channel.OutputChannel<?>)");
 
@@ -393,7 +393,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 builder.append(", ");
             }
 
-            builder.append("(").append(getBoxedType(variableElement.asType()))
+            builder.append("(")
+                   .append(getBoxedType(variableElement.asType()))
                    .append(") objects.get(")
                    .append(count++)
                    .append(")");
@@ -1013,7 +1014,7 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @Nonnull
     protected PassMode getParamMode(@Nonnull final ExecutableElement methodElement,
-            @Nonnull final Pass annotation, @Nonnull final VariableElement targetParameter,
+            @Nonnull final Param annotation, @Nonnull final VariableElement targetParameter,
             final int length) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
@@ -1022,7 +1023,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror listType = this.listType;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
-        final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Param.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
                 (TypeMirror) getElementValue(targetParameter, annotationType, "value");
@@ -1040,7 +1041,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 } else {
 
-                    passMode = PassMode.OBJECT;
+                    passMode = PassMode.VALUE;
                 }
 
             } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
@@ -1073,12 +1074,12 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + "pass mode for an output of type: " + targetParameter);
             }
 
-        } else if (passMode == PassMode.OBJECT) {
+        } else if (passMode == PassMode.VALUE) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with pass mode " + PassMode.OBJECT
+                        "[" + methodElement + "] an async input with pass mode " + PassMode.VALUE
                                 + " must implement an " + outputChannelType);
             }
 
@@ -1149,7 +1150,7 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @Nonnull
     protected PassMode getReturnMode(@Nonnull final ExecutableElement methodElement,
-            @Nonnull final Pass annotation) {
+            @Nonnull final Param annotation) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror outputChannelType = this.outputChannelType;
@@ -1157,7 +1158,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror listType = this.listType;
         final TypeMirror returnType = methodElement.getReturnType();
         final TypeMirror erasure = typeUtils.erasure(returnType);
-        final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Param.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
                 (TypeMirror) getElementValue(methodElement, annotationType, "value");
@@ -1189,7 +1190,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 } else {
 
-                    passMode = PassMode.OBJECT;
+                    passMode = PassMode.VALUE;
                 }
 
             } else {
@@ -1199,12 +1200,12 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + "pass mode for an input of type: " + returnType);
             }
 
-        } else if (passMode == PassMode.OBJECT) {
+        } else if (passMode == PassMode.VALUE) {
 
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
+                        "[" + methodElement + "] an async output with pass mode " + PassMode.VALUE
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1213,7 +1214,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
+                        "[" + methodElement + "] an async output with pass mode " + PassMode.VALUE
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1488,7 +1489,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final Types typeUtils = processingEnv.getTypeUtils();
             final TypeMirror asyncAnnotationType =
-                    getTypeFromName(Pass.class.getCanonicalName()).asType();
+                    getTypeFromName(Param.class.getCanonicalName()).asType();
             final List<? extends VariableElement> interfaceTypeParameters =
                     methodElement.getParameters();
             final int length = interfaceTypeParameters.size();
@@ -1513,7 +1514,7 @@ public class RoutineProcessor extends AbstractProcessor {
                         Object value = null;
                         final VariableElement variableElement = interfaceTypeParameters.get(i);
 
-                        if (variableElement.getAnnotation(Pass.class) != null) {
+                        if (variableElement.getAnnotation(Param.class) != null) {
 
                             value = getElementValue(variableElement, asyncAnnotationType, "value");
                         }
@@ -1594,7 +1595,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-        final Pass methodAnnotation = methodElement.getAnnotation(Pass.class);
+        final Param methodAnnotation = methodElement.getAnnotation(Param.class);
         PassMode asyncParamMode = null;
         PassMode asyncReturnMode = null;
 
@@ -1602,7 +1603,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         for (final VariableElement parameter : parameters) {
 
-            final Pass annotation = parameter.getAnnotation(Pass.class);
+            final Param annotation = parameter.getAnnotation(Param.class);
 
             if (annotation == null) {
 

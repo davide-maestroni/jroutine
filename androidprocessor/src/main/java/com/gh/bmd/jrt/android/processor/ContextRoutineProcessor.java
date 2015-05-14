@@ -296,7 +296,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         // We need to avoid explicit dependency on the android module...
         final StringBuilder builder = new StringBuilder();
         final TypeElement idAnnotationElement =
-                getTypeFromName("com.gh.bmd.jrt.android.annotation.Id");
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.InvocationId");
         final Integer id =
                 (Integer) getElementValue(methodElement, idAnnotationElement.asType(), "value");
 

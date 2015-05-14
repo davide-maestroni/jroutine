@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
  * Created by davide on 3/7/15.
  *
  * @see com.gh.bmd.jrt.annotation.Bind
- * @see com.gh.bmd.jrt.annotation.Pass
+ * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
@@ -46,7 +46,7 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.
+     * {@link com.gh.bmd.jrt.annotation.Param} annotations will be honored.
      *
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
@@ -70,7 +70,7 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.
+     * {@link com.gh.bmd.jrt.annotation.Param} annotations will be honored.
      *
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.

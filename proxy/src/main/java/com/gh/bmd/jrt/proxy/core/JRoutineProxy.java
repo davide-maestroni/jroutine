@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * Created by davide on 3/23/15.
  *
  * @see com.gh.bmd.jrt.annotation.Bind
- * @see com.gh.bmd.jrt.annotation.Pass
+ * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction

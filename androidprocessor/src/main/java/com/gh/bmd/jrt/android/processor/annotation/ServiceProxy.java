@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * interface one.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
- * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}, as
+ * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}, as
  * well as v4 builder annotations defined for each interface method.
  * <p/>
  * Created by davide on 13/05/15.

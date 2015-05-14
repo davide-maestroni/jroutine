@@ -19,7 +19,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.annotation.CacheStrategy;
 import com.gh.bmd.jrt.android.annotation.ClashResolution;
-import com.gh.bmd.jrt.android.annotation.Id;
+import com.gh.bmd.jrt.android.annotation.InvocationId;
 import com.gh.bmd.jrt.android.builder.ContextObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
@@ -28,8 +28,8 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
 import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -168,7 +168,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 configuration.builderFrom();
 
-        final Id idAnnotation = method.getAnnotation(Id.class);
+        final InvocationId idAnnotation = method.getAnnotation(InvocationId.class);
 
         if (idAnnotation != null) {
 
@@ -817,7 +817,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                 final Class<?>[] targetParameterTypes = mTargetParameterTypes;
                 final Method targetMethod = getTargetMethod(method, targetParameterTypes);
                 final Class<?> returnType = targetMethod.getReturnType();
-                final Pass annotation = method.getAnnotation(Pass.class);
+                final Param annotation = method.getAnnotation(Param.class);
                 final Class<?> expectedType;
 
                 if (annotation != null) {
@@ -1012,9 +1012,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
                     for (final Annotation annotation : parameterAnnotations[i]) {
 
-                        if (annotation.annotationType() == Pass.class) {
+                        if (annotation.annotationType() == Param.class) {
 
-                            targetParameterTypes[i] = ((Pass) annotation).value();
+                            targetParameterTypes[i] = ((Param) annotation).value();
                             break;
                         }
                     }
@@ -1027,7 +1027,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
             PassMode returnMode = null;
             final Class<?> returnType = method.getReturnType();
-            final Pass methodAnnotation = method.getAnnotation(Pass.class);
+            final Param methodAnnotation = method.getAnnotation(Param.class);
 
             if (methodAnnotation != null) {
 

@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -138,7 +138,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramMode == PassMode.OBJECT) {
+        } else if (paramMode == PassMode.VALUE) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -460,7 +460,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             PassMode asyncParamMode = null;
             PassMode asyncReturnMode = null;
             Class<?> returnClass = null;
-            final Pass methodAnnotation = method.getAnnotation(Pass.class);
+            final Param methodAnnotation = method.getAnnotation(Param.class);
 
             if (methodAnnotation != null) {
 
@@ -482,9 +482,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                     for (final Annotation paramAnnotation : annotations[i]) {
 
-                        if (paramAnnotation.annotationType() == Pass.class) {
+                        if (paramAnnotation.annotationType() == Param.class) {
 
-                            final Pass passAnnotation = (Pass) paramAnnotation;
+                            final Param passAnnotation = (Param) paramAnnotation;
                             targetParameterTypes[i] = passAnnotation.value();
                             break;
                         }

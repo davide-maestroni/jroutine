@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.gh.bmd.jrt.android.annotation.Id *;
+ *              &#64;com.gh.bmd.jrt.android.annotation.InvocationId *;
  *         }
  *     </code>
  * </pre>
@@ -53,7 +53,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Id {
+public @interface InvocationId {
 
     /**
      * The invocation ID.

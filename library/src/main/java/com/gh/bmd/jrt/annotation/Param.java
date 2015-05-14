@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         public int sum(&#64;Pass(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
+ *         public int sum(&#64;Param(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
  *     </code>
  * </pre>
  * <p/>
@@ -65,7 +65,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;Pass(int.class)
+ *         &#64;Param(int.class)
  *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
@@ -75,7 +75,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;Pass(int.class)
+ *         &#64;Param(int.class)
  *         public List&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
@@ -91,7 +91,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.gh.bmd.jrt.annotation.Pass *;
+ *              &#64;com.gh.bmd.jrt.annotation.Param *;
  *         }
  *     </code>
  * </pre>
@@ -101,7 +101,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Pass {
+public @interface Param {
 
     /**
      * The asynchronous passing mode.
@@ -111,7 +111,7 @@ public @interface Pass {
     PassMode mode() default PassMode.AUTO;
 
     /**
-     * The bound class.
+     * The parameter class.
      *
      * @return the class.
      */
@@ -125,13 +125,13 @@ public @interface Pass {
     enum PassMode {
 
         /**
-         * Object mode.<br/>
+         * Value mode.<br/>
          * The variable is just read from or passed to an output channel.
          * <p/>
          * The annotated parameter must extends an {@link com.gh.bmd.jrt.channel.OutputChannel},
          * while an annotated method must return a superclass of it.
          */
-        OBJECT,
+        VALUE,
         /**
          * Collection mode.<br/>
          * The inputs are collected from the channel and passed as an array or collection to the
@@ -155,11 +155,11 @@ public @interface Pass {
         /**
          * Automatic mode.<br/>
          * The mode is automatically assigned based to the parameter or return type. Namely: if the
-         * parameters match the COLLECTION pass mode, they are assigned it; if they match the OBJECT
+         * parameters match the COLLECTION pass mode, they are assigned it; if they match the VALUE
          * mode, they are assigned the latter; finally the PARALLEL conditions are checked.
          * <p/>
          * Dually, if the return type matches the PARALLEL pass mode, it is assigned it; if it
-         * matches the COLLECTION mode, it is assigned the latter; finally the OBJECT conditions are
+         * matches the COLLECTION mode, it is assigned the latter; finally the VALUE conditions are
          * checked.
          */
         AUTO

@@ -47,10 +47,8 @@ import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
-import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
 
@@ -105,30 +103,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         final Object[] invocationArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         findConstructor(invocationClass, invocationArgs);
-        final Class<? extends Runner> runnerClass = serviceConfiguration.getRunnerClassOr(null);
-
-        if (runnerClass != null) {
-
-            findConstructor(runnerClass);
-        }
-
-        Log log = Logger.getGlobalLog();
-        final Class<? extends Log> logClass = serviceConfiguration.getLogClassOr(null);
-
-        if (logClass != null) {
-
-            final Constructor<? extends Log> constructor = findConstructor(logClass);
-
-            try {
-
-                log = constructor.newInstance();
-
-            } catch (final Throwable t) {
-
-                throw new IllegalArgumentException(t);
-            }
-        }
-
         mContext = context.getApplicationContext();
         mInvocationClass = invocationClass;
         mRoutineConfiguration = routineConfiguration;
@@ -142,7 +116,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                            .withInputTimeout(TimeDuration.ZERO)
                            .withOutputMaxSize(Integer.MAX_VALUE)
                            .withOutputTimeout(TimeDuration.ZERO)
-                           .withLog(log)
                            .set()
                            .buildRoutine();
         final Logger logger = mLogger;
@@ -424,7 +397,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 if (!mIsBound) {
 
                     throw new RoutineException(
-                            "failed to bind to service: " + mServiceClass.getName());
+                            "failed to bind to service: " + mServiceClass.getName()
+                                    + ", remember to add it to the Android manifest file!");
                 }
             }
         }

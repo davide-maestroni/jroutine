@@ -34,7 +34,7 @@ public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYP
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>

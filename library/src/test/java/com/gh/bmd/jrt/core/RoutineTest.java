@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
+import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.InputDeadlockException;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
@@ -2884,9 +2884,9 @@ public class RoutineTest {
 
     private interface TestInterfaceAsync {
 
-        int getInt(@Pass(int.class) OutputChannel<Integer> i);
+        int getInt(@Param(int.class) OutputChannel<Integer> i);
 
-        @Pass(int.class)
+        @Param(int.class)
         OutputChannel<Integer> getOne();
 
         @Bind(value = "getInt")

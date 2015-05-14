@@ -39,8 +39,8 @@ public interface ServiceProxyRoutineBuilder
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass},
-     * as well as {@link com.gh.bmd.jrt.android.annotation.Id},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param},
+     * as well as {@link com.gh.bmd.jrt.android.annotation.InvocationId},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -74,8 +74,8 @@ public interface ServiceProxyRoutineBuilder
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass},
-     * as well as {@link com.gh.bmd.jrt.android.annotation.Id},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param},
+     * as well as {@link com.gh.bmd.jrt.android.annotation.InvocationId},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.

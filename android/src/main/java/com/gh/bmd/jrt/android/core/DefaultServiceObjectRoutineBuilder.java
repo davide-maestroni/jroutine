@@ -20,8 +20,8 @@ import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
 import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -775,7 +775,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 final Method method = mProxyClass.getMethod(mMethodName, parameterTypes);
                 final Method targetMethod = getTargetMethod(method, targetParameterTypes);
                 final Class<?> returnType = targetMethod.getReturnType();
-                final Pass annotation = method.getAnnotation(Pass.class);
+                final Param annotation = method.getAnnotation(Param.class);
                 final Class<?> expectedType;
 
                 if (annotation != null) {
@@ -954,9 +954,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                     for (final Annotation annotation : parameterAnnotations[i]) {
 
-                        if (annotation.annotationType() == Pass.class) {
+                        if (annotation.annotationType() == Param.class) {
 
-                            targetParameterTypes[i] = ((Pass) annotation).value();
+                            targetParameterTypes[i] = ((Param) annotation).value();
                             break;
                         }
                     }
@@ -969,7 +969,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             PassMode returnMode = null;
             final Class<?> returnType = method.getReturnType();
-            final Pass methodAnnotation = method.getAnnotation(Pass.class);
+            final Param methodAnnotation = method.getAnnotation(Param.class);
 
             if (methodAnnotation != null) {
 

@@ -100,8 +100,8 @@ import javax.annotation.Nonnull;
  *         public interface AsyncCallback {
  *
  *             public void onResults(
- *                  &#64;Pass(Result.class) OutputChannel&lt;Result&gt; result1,
- *                  &#64;Pass(Result.class) OutputChannel&lt;Result&gt; result2);
+ *                  &#64;Param(Result.class) OutputChannel&lt;Result&gt; result1,
+ *                  &#64;Param(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
  *         final AsyncCallback callback = JRoutine.on(myCallback)
@@ -140,7 +140,7 @@ import javax.annotation.Nonnull;
  * Created by davide on 9/7/14.
  *
  * @see com.gh.bmd.jrt.annotation.Bind
- * @see com.gh.bmd.jrt.annotation.Pass
+ * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction

@@ -26,7 +26,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
- * calls of their methods, bound to a context lifecycle.
+ * calls, bound to a context lifecycle, of their methods.
  * <p/>
  * The builders returned by this class are based on compile time code generation, enabled by
  * pre-processing of Java annotations.<br/>
@@ -50,7 +50,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending functionalities of another utility class")
-public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
+public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutineProxy {
 
     /**
      * Avoid direct instantiation.

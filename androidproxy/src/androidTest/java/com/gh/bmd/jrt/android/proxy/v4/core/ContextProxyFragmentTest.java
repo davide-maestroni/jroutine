@@ -11,14 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v11.core;
+package com.gh.bmd.jrt.android.proxy.v4.core;
 
 import android.annotation.TargetApi;
-import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
+import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.android.proxy.R;
 import com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
@@ -61,22 +60,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 11/05/15.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
-public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<TestActivity> {
+@TargetApi(VERSION_CODES.FROYO)
+public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public RoutineProxyFragmentTest() {
+    public ContextProxyFragmentTest() {
 
         super(TestActivity.class);
     }
 
     public void testGenericProxyCache() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ContextProxyRoutineBuilder builder =
@@ -107,12 +101,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testInterface() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
@@ -129,12 +118,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     @SuppressWarnings("ConstantConditions")
     public void testNullPointerError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -161,12 +145,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxy() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final NullLog log = new NullLog();
@@ -200,12 +179,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyBuilder() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final NullLog log = new NullLog();
@@ -217,7 +191,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final ContextProxyBuilder<TestProxy> builder =
-                RoutineProxyFragmentTestTestProxy_V11Proxy.onFragment(fragment, TestClass.class);
+                ContextProxyFragmentTestTestProxy_V4Proxy.onFragment(fragment, TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);
@@ -247,12 +221,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyCache() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final NullLog log = new NullLog();
@@ -279,12 +248,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyError() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
 
@@ -312,12 +276,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testShareGroup() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ContextProxyRoutineBuilder builder =
@@ -357,12 +316,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     @SuppressWarnings("unchecked")
     public void testTemplates() {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Itf itf = JRoutineProxy.onFragment(fragment, Impl.class)
@@ -582,12 +536,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         assertThat(JRoutineProxy.onFragment(fragment, TestTimeout.class)
@@ -613,7 +562,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    @V11Proxy(Impl.class)
+    @V4Proxy(Impl.class)
     public interface Itf {
 
         @Bind("a")
@@ -893,7 +842,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         void set2(@Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
     }
 
-    @V11Proxy(TestClass2.class)
+    @V4Proxy(TestClass2.class)
     public interface TestClassAsync {
 
         @Pass(int.class)
@@ -909,7 +858,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         int getOne();
     }
 
-    @V11Proxy(TestClassInterface.class)
+    @V4Proxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
         @Timeout(3000)
@@ -917,7 +866,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         OutputChannel<Integer> getOne();
     }
 
-    @V11Proxy(TestList.class)
+    @V4Proxy(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);
@@ -933,7 +882,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         List<TYPE> getList(int i);
     }
 
-    @V11Proxy(TestClass.class)
+    @V4Proxy(TestClass.class)
     public interface TestProxy {
 
         @Timeout(3000)
@@ -967,7 +916,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         String getString(@Pass(int.class) OutputChannel<Integer> i);
     }
 
-    @V11Proxy(TestTimeout.class)
+    @V4Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
         @Pass(int.class)

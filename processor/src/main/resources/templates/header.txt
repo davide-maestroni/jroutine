@@ -24,8 +24,8 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
 
     @SuppressWarnings("ConstantConditions")
     public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final ${classFullName} wrapped,
-            @javax.annotation.Nullable final String shareGroup,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
         if (wrapped == null) {
 
@@ -33,7 +33,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         }
 
         mWrapped = new java.lang.ref.WeakReference<${classFullName}>(wrapped);
-        mShareGroup = (shareGroup != null) ? shareGroup : com.gh.bmd.jrt.annotation.ShareGroup.ALL;
+        mShareGroup = proxyConfiguration.getShareGroupOr(com.gh.bmd.jrt.annotation.ShareGroup.ALL);
         ${routineFieldsInit}
     }
 
@@ -88,9 +88,9 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         @Override
         @javax.annotation.Nonnull
         protected ${interfaceFullName} newProxy(
-                @javax.annotation.Nonnull final String shareGroup,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mTarget, shareGroup, configuration);
+            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mTarget, routineConfiguration, proxyConfiguration);
         }
     }

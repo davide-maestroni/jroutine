@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.android.processor;
 
+import com.gh.bmd.jrt.android.processor.annotation.ServiceProxy;
 import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
 import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.processor.RoutineProcessor;
@@ -36,9 +37,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @SuppressWarnings("unchecked")
     private static final List<Class<? extends Annotation>> ANNOTATION_CLASSES =
-            Arrays.asList(V4Proxy.class, V11Proxy.class);
+            Arrays.asList(ServiceProxy.class, V4Proxy.class, V11Proxy.class);
 
     private Class<? extends Annotation> mCurrentAnnotationClass;
+
+    private String mHeaderService;
 
     private String mHeaderV11;
 
@@ -52,6 +55,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private String mMethodHeader;
 
+    private String mMethodHeaderV1;
+
     private String mMethodInvocation;
 
     private String mMethodInvocationCollection;
@@ -62,17 +67,24 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     @Override
     protected String buildRoutineFieldsInit(final int size) {
 
+        final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
+
         final StringBuilder builder = new StringBuilder();
 
         for (int i = 1; i <= size; i++) {
 
-            builder.append("mRoutine")
-                   .append(i)
-                   .append(" = ")
-                   .append("initRoutine")
-                   .append(i)
-                   .append("(routineConfiguration, invocationConfiguration);")
-                   .append(NEW_LINE);
+            builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
+
+            if (annotationClass == ServiceProxy.class) {
+
+                builder.append("(routineConfiguration, serviceConfiguration);");
+
+            } else {
+
+                builder.append("(routineConfiguration, invocationConfiguration);");
+            }
+
+            builder.append(NEW_LINE);
         }
 
         return builder.toString();
@@ -96,7 +108,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
 
-        if (annotationClass == V4Proxy.class) {
+        if (annotationClass == ServiceProxy.class) {
+
+            return ServiceProxy.CLASS_NAME_SUFFIX;
+
+        } else if (annotationClass == V4Proxy.class) {
 
             return V4Proxy.CLASS_NAME_SUFFIX;
 
@@ -115,7 +131,16 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
 
-        if (annotationClass == V4Proxy.class) {
+        if (annotationClass == ServiceProxy.class) {
+
+            if (mHeaderService == null) {
+
+                mHeaderService = parseTemplate("/android/templates/header.txt");
+            }
+
+            return mHeaderService;
+
+        } else if (annotationClass == V4Proxy.class) {
 
             if (mHeaderV4 == null) {
 
@@ -186,13 +211,23 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     protected String getMethodHeaderTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
 
+        if (mCurrentAnnotationClass != ServiceProxy.class) {
+
+            if (mMethodHeaderV1 == null) {
+
+                mMethodHeaderV1 = parseTemplate("/android/v1/templates/method_header.txt");
+            }
+
+            return mMethodHeaderV1.replace("${invocationBuilderOptions}",
+                                           buildInvocationOptions(methodElement));
+        }
+
         if (mMethodHeader == null) {
 
             mMethodHeader = parseTemplate("/android/templates/method_header.txt");
         }
 
-        return mMethodHeader.replace("${invocationBuilderOptions}",
-                                     buildInvocationOptions(methodElement));
+        return mMethodHeader;
     }
 
     @Nonnull

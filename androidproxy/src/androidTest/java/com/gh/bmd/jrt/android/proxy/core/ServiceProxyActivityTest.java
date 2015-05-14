@@ -11,17 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v4.core;
+package com.gh.bmd.jrt.android.proxy.core;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
-import com.gh.bmd.jrt.android.proxy.R;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
-import com.gh.bmd.jrt.android.v4.core.JRoutine;
+import com.gh.bmd.jrt.android.core.JRoutine;
+import com.gh.bmd.jrt.android.processor.annotation.ServiceProxy;
+import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassMode;
@@ -37,6 +36,7 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.RunnerDecorator;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -56,27 +56,27 @@ import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Proxy builder fragment unit tests.
+ * Proxy builder activity unit tests.
  * <p/>
- * Created by davide on 11/05/15.
+ * Created by davide on 07/05/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public RoutineProxyFragmentTest() {
+    public ServiceProxyActivityTest() {
 
         super(TestActivity.class);
     }
 
     public void testGenericProxyCache() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        final ContextProxyRoutineBuilder builder =
-                JRoutineProxy.onFragment(fragment, TestList.class)
+        final ServiceProxyRoutineBuilder builder =
+                JRoutineProxy.onService(getActivity(), TestList.class)
                              .withRoutine()
                              .withReadTimeout(seconds(10))
+                             .set()
+                             .withService()
+                             .withServiceClass(TestService.class)
                              .set();
 
         final TestListItf<String> testListItf1 =
@@ -101,14 +101,14 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testInterface() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
         final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
-        final TestInterfaceProxy testProxy = JRoutineProxy.onFragment(fragment, TestClass.class)
+        final TestInterfaceProxy testProxy = JRoutineProxy.onService(getActivity(), TestClass.class)
                                                           .withRoutine()
                                                           .withSyncRunner(
                                                                   Runners.sequentialRunner())
+                                                          .set()
+                                                          .withService()
+                                                          .withServiceClass(TestService.class)
                                                           .set()
                                                           .buildProxy(token);
 
@@ -118,13 +118,9 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     @SuppressWarnings("ConstantConditions")
     public void testNullPointerError() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class).buildProxy((Class<?>) null);
+            JRoutineProxy.onService(getActivity(), TestClass.class).buildProxy((Class<?>) null);
 
             fail();
 
@@ -134,7 +130,8 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class).buildProxy((ClassToken<?>) null);
+            JRoutineProxy.onService(getActivity(), TestClass.class)
+                         .buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -145,17 +142,16 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxy() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
         final NullLog log = new NullLog();
-        final Runner runner = Runners.poolRunner();
-        final TestProxy testProxy = JRoutineProxy.onFragment(fragment, TestClass.class)
+        final TestProxy testProxy = JRoutineProxy.onService(getActivity(), TestClass.class)
                                                  .withRoutine()
                                                  .withSyncRunner(Runners.sequentialRunner())
-                                                 .withAsyncRunner(runner)
+                                                 .withAsyncRunner(Runners.poolRunner())
                                                  .withLogLevel(LogLevel.DEBUG)
                                                  .withLog(log)
+                                                 .set()
+                                                 .withService()
+                                                 .withServiceClass(TestService.class)
                                                  .set()
                                                  .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
@@ -179,20 +175,23 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyBuilder() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
         final NullLog log = new NullLog();
-        final Runner runner = Runners.poolRunner();
         final RoutineConfiguration configuration =
                 builder().withSyncRunner(Runners.sequentialRunner())
-                         .withAsyncRunner(runner)
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final ContextProxyBuilder<TestProxy> builder =
-                RoutineProxyFragmentTestTestProxy_V4Proxy.onFragment(fragment, TestClass.class);
-        final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
+        final ServiceProxyBuilder<TestProxy> builder =
+                ServiceProxyActivityTestTestProxy_ServiceProxy.onService(getActivity(),
+                                                                         TestClass.class);
+        final TestProxy testProxy = builder.withRoutine()
+                                           .with(configuration)
+                                           .set()
+                                           .withService()
+                                           .withServiceClass(TestService.class)
+                                           .withRunnerClass(MyRunner.class)
+                                           .set()
+                                           .buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);
         assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
@@ -211,9 +210,13 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         standaloneChannel.input().pass(3).close();
         assertThat(testProxy.getString(standaloneChannel.output())).isEqualTo("3");
 
-        assertThat(JRoutineProxy.onFragment(fragment, TestClass.class)
+        assertThat(JRoutineProxy.onService(getActivity(), TestClass.class)
                                 .withRoutine()
                                 .with(configuration)
+                                .set()
+                                .withService()
+                                .withServiceClass(TestService.class)
+                                .withRunnerClass(MyRunner.class)
                                 .set()
                                 .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
                 testProxy);
@@ -221,9 +224,6 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyCache() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final RoutineConfiguration configuration =
@@ -232,15 +232,21 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final TestProxy testProxy = JRoutineProxy.onFragment(fragment, TestClass.class)
+        final TestProxy testProxy = JRoutineProxy.onService(getActivity(), TestClass.class)
                                                  .withRoutine()
                                                  .with(configuration)
                                                  .set()
+                                                 .withService()
+                                                 .withServiceClass(TestService.class)
+                                                 .set()
                                                  .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
-        assertThat(JRoutineProxy.onFragment(fragment, TestClass.class)
+        assertThat(JRoutineProxy.onService(getActivity(), TestClass.class)
                                 .withRoutine()
                                 .with(configuration)
+                                .set()
+                                .withService()
+                                .withServiceClass(TestService.class)
                                 .set()
                                 .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
                 testProxy);
@@ -248,13 +254,9 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyError() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class).buildProxy(TestClass.class);
+            JRoutineProxy.onService(getActivity(), TestClass.class).buildProxy(TestClass.class);
 
             fail();
 
@@ -264,7 +266,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class)
+            JRoutineProxy.onService(getActivity(), TestClass.class)
                          .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
@@ -276,13 +278,13 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testShareGroup() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        final ContextProxyRoutineBuilder builder =
-                JRoutineProxy.onFragment(fragment, TestClass2.class)
+        final ServiceProxyRoutineBuilder builder =
+                JRoutineProxy.onService(getActivity(), TestClass2.class)
                              .withRoutine()
                              .withReadTimeout(seconds(10))
+                             .set()
+                             .withService()
+                             .withServiceClass(TestService.class)
                              .set();
 
         long startTime = System.currentTimeMillis();
@@ -316,12 +318,12 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     @SuppressWarnings("unchecked")
     public void testTemplates() {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        final Itf itf = JRoutineProxy.onFragment(fragment, Impl.class)
+        final Itf itf = JRoutineProxy.onService(getActivity(), Impl.class)
                                      .withRoutine()
                                      .withReadTimeout(INFINITY)
+                                     .set()
+                                     .withService()
+                                     .withServiceClass(TestService.class)
                                      .set()
                                      .buildProxy(Itf.class);
 
@@ -536,21 +538,24 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        assertThat(JRoutineProxy.onFragment(fragment, TestTimeout.class)
+        assertThat(JRoutineProxy.onService(getActivity(), TestTimeout.class)
                                 .withRoutine()
                                 .withReadTimeout(seconds(10))
+                                .set()
+                                .withService()
+                                .withServiceClass(TestService.class)
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).containsExactly(31);
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestTimeout.class)
+            JRoutineProxy.onService(getActivity(), TestTimeout.class)
                          .withRoutine()
                          .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                         .set()
+                         .withService()
+                         .withServiceClass(TestService.class)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();
@@ -562,7 +567,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    @V4Proxy(Impl.class)
+    @ServiceProxy(Impl.class)
     public interface Itf {
 
         @Bind("a")
@@ -842,7 +847,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         void set2(@Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
     }
 
-    @V4Proxy(TestClass2.class)
+    @ServiceProxy(TestClass2.class)
     public interface TestClassAsync {
 
         @Pass(int.class)
@@ -858,7 +863,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         int getOne();
     }
 
-    @V4Proxy(TestClassInterface.class)
+    @ServiceProxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
         @Timeout(3000)
@@ -866,7 +871,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         OutputChannel<Integer> getOne();
     }
 
-    @V4Proxy(TestList.class)
+    @ServiceProxy(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);
@@ -882,7 +887,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         List<TYPE> getList(int i);
     }
 
-    @V4Proxy(TestClass.class)
+    @ServiceProxy(TestClass.class)
     public interface TestProxy {
 
         @Timeout(3000)
@@ -916,7 +921,7 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         String getString(@Pass(int.class) OutputChannel<Integer> i);
     }
 
-    @V4Proxy(TestTimeout.class)
+    @ServiceProxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
         @Pass(int.class)
@@ -1099,6 +1104,14 @@ public class RoutineProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         public int getWrnCount() {
 
             return mWrnCount;
+        }
+    }
+
+    private static class MyRunner extends RunnerDecorator {
+
+        public MyRunner() {
+
+            super(Runners.poolRunner());
         }
     }
 }

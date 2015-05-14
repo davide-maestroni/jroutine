@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Processor annotation definitions, specific to the Android platform.
+ * Processor annotation definitions bound to an Android context.
  * <p/>
  * Created by davide on 5/10/15.
  */

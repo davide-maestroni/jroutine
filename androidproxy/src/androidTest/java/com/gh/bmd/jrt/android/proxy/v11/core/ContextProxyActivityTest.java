@@ -61,9 +61,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide on 07/05/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public RoutineProxyActivityTest() {
+    public ContextProxyActivityTest() {
 
         super(TestActivity.class);
     }
@@ -201,7 +201,7 @@ public class RoutineProxyActivityTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final ContextProxyBuilder<TestProxy> builder =
-                RoutineProxyActivityTestTestProxy_V11Proxy.onActivity(getActivity(),
+                ContextProxyActivityTestTestProxy_V11Proxy.onActivity(getActivity(),
                                                                       TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 

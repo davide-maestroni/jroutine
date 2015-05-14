@@ -65,7 +65,7 @@ dependencies {
 conditionalDependencies {
     compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'androidprocessor', artifact: { "${it.parent.name}-${it.name}" }
-    androidCompile name: 'android', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'android', artifact: { "${it.parent.name}-${it.name}" }
 }
 
 findbugs {

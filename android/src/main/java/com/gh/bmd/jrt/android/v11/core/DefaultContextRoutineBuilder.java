@@ -197,7 +197,6 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
     withInvocation() {
 
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,
                                                                                          config);

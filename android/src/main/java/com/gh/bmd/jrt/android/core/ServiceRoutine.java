@@ -40,6 +40,7 @@ import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
+import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
@@ -80,19 +81,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
     private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
-    private final Class<? extends Log> mLogClass;
-
     private final Logger mLogger;
-
-    private final Looper mLooper;
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
     private final RoutineConfiguration mRoutineConfiguration;
 
-    private final Class<? extends Runner> mRunnerClass;
-
-    private final Class<? extends RoutineService> mServiceClass;
+    private final ServiceConfiguration mServiceConfiguration;
 
     /**
      * Constructor.
@@ -117,7 +112,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             findConstructor(runnerClass);
         }
 
-        Log log = null;
+        Log log = Logger.getGlobalLog();
         final Class<? extends Log> logClass = serviceConfiguration.getLogClassOr(null);
 
         if (logClass != null) {
@@ -134,23 +129,11 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             }
         }
 
-        if (log == null) {
-
-            log = routineConfiguration.getLogOr(Logger.getGlobalLog());
-        }
-
-        final Runner asyncRunner = routineConfiguration.getAsyncRunnerOr(null);
         mContext = context.getApplicationContext();
         mInvocationClass = invocationClass;
         mRoutineConfiguration = routineConfiguration;
-        mLooper = serviceConfiguration.getReceiverLooperOr(Looper.getMainLooper());
-        mServiceClass = serviceConfiguration.getServiceClassOr(RoutineService.class);
-        mRunnerClass = (runnerClass != null) ? runnerClass
-                : (asyncRunner != null) ? asyncRunner.getClass() : null;
-        mLogClass = (logClass != null) ? logClass : log.getClass();
-        mLogger = Logger.newLogger(log,
-                                   routineConfiguration.getLogLevelOr(Logger.getGlobalLogLevel()),
-                                   this);
+        mServiceConfiguration = serviceConfiguration;
+        mLogger = routineConfiguration.newLogger(this);
         mRoutine = JRoutine.on(new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {})
                            .withRoutine()
                            .with(routineConfiguration)
@@ -210,16 +193,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationClass,
-                                                 mRoutineConfiguration, mLooper, mServiceClass,
-                                                 mRunnerClass, mLogClass, mLogger);
+                                                 mRoutineConfiguration, mServiceConfiguration,
+                                                 mLogger);
     }
 
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
         return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationClass,
-                                                 mRoutineConfiguration, mLooper, mServiceClass,
-                                                 mRunnerClass, mLogClass, mLogger);
+                                                 mRoutineConfiguration, mServiceConfiguration,
+                                                 mLogger);
     }
 
     @Nonnull
@@ -250,17 +233,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private final boolean mIsParallel;
 
-        private final Class<? extends Log> mLogClass;
-
         private final Logger mLogger;
 
         private final Object mMutex = new Object();
 
         private final RoutineConfiguration mRoutineConfiguration;
 
-        private final Class<? extends Runner> mRunnerClass;
-
         private final Class<? extends RoutineService> mServiceClass;
+
+        private final ServiceConfiguration mServiceConfiguration;
 
         private final StandaloneInput<INPUT> mStandaloneParamInput;
 
@@ -283,36 +264,32 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         /**
          * Constructor.
          *
-         * @param isParallel      whether the invocation is parallel.
-         * @param context         the routine context.
-         * @param invocationClass the invocation class.
-         * @param configuration   the routine configuration.
-         * @param looper          the message looper.
-         * @param serviceClass    the service class.
-         * @param runnerClass     the asynchronous runner class.
-         * @param logClass        the log class.
-         * @param logger          the routine logger.
+         * @param isParallel           whether the invocation is parallel.
+         * @param context              the routine context.
+         * @param invocationClass      the invocation class.
+         * @param routineConfiguration the routine configuration.
+         * @param serviceConfiguration the service configuration.
+         * @param logger               the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final Context context,
                 @Nonnull Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
-                @Nonnull final RoutineConfiguration configuration, @Nonnull final Looper looper,
-                @Nonnull final Class<? extends RoutineService> serviceClass,
-                @Nullable final Class<? extends Runner> runnerClass,
-                @Nullable final Class<? extends Log> logClass, @Nonnull final Logger logger) {
+                @Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final ServiceConfiguration serviceConfiguration,
+                @Nonnull final Logger logger) {
 
             mUUID = randomUUID().toString();
             mIsParallel = isParallel;
             mContext = context;
-            mInMessenger = new Messenger(new IncomingHandler(looper));
+            mServiceClass = serviceConfiguration.getServiceClassOr(RoutineService.class);
+            mInMessenger = new Messenger(new IncomingHandler(
+                    serviceConfiguration.getReceiverLooperOr(Looper.getMainLooper())));
             mInvocationClass = invocationClass;
-            mRoutineConfiguration = configuration;
-            mServiceClass = serviceClass;
-            mRunnerClass = runnerClass;
-            mLogClass = logClass;
+            mRoutineConfiguration = routineConfiguration;
+            mServiceConfiguration = serviceConfiguration;
             mLogger = logger;
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
-            final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
+            final OrderType inputOrderType = routineConfiguration.getInputOrderTypeOr(null);
             final StandaloneChannel<INPUT> paramChannel = JRoutine.standalone()
                                                                   .withRoutine()
                                                                   .withOutputOrder(inputOrderType)
@@ -326,9 +303,10 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                   .buildChannel();
             mStandaloneParamInput = paramChannel.input();
             mStandaloneParamOutput = paramChannel.output();
-            final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-            final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
-            final TimeoutActionType timeoutActionType = configuration.getReadTimeoutActionOr(null);
+            final OrderType outputOrderType = routineConfiguration.getOutputOrderTypeOr(null);
+            final TimeDuration readTimeout = routineConfiguration.getReadTimeoutOr(null);
+            final TimeoutActionType timeoutActionType =
+                    routineConfiguration.getReadTimeoutActionOr(null);
             final StandaloneChannel<OUTPUT> resultChannel = JRoutine.standalone()
                                                                     .withRoutine()
                                                                     .withOutputOrder(
@@ -438,11 +416,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                     return;
                 }
 
-                mIsBound = true;
                 final Context context = mContext;
                 mConnection = new RoutineServiceConnection();
-                context.bindService(new Intent(context, mServiceClass), mConnection,
-                                    Context.BIND_AUTO_CREATE);
+                mIsBound = context.bindService(new Intent(context, mServiceClass), mConnection,
+                                               Context.BIND_AUTO_CREATE);
+
+                if (!mIsBound) {
+
+                    throw new RoutineException(
+                            "failed to bind to service: " + mServiceClass.getName());
+                }
             }
         }
 
@@ -607,13 +590,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     logger.dbg("sending parallel invocation message");
                     putParallelInvocation(message.getData(), mUUID, mInvocationClass,
-                                          mRoutineConfiguration, mRunnerClass, mLogClass);
+                                          mRoutineConfiguration, mServiceConfiguration);
 
                 } else {
 
                     logger.dbg("sending async invocation message");
                     putAsyncInvocation(message.getData(), mUUID, mInvocationClass,
-                                       mRoutineConfiguration, mRunnerClass, mLogClass);
+                                       mRoutineConfiguration, mServiceConfiguration);
                 }
 
                 message.replyTo = mInMessenger;

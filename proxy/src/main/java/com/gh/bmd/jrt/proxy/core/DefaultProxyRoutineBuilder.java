@@ -168,8 +168,8 @@ class DefaultProxyRoutineBuilder
 
         @Nonnull
         @Override
-        protected TYPE newProxy(@Nonnull final String shareGroup,
-                @Nonnull final RoutineConfiguration configuration) {
+        protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final ProxyConfiguration proxyConfiguration) {
 
             try {
 
@@ -189,10 +189,10 @@ class DefaultProxyRoutineBuilder
 
                 final String className = packageName + classNamePrefix + Proxy.CLASS_NAME_SUFFIX;
                 final Constructor<?> constructor =
-                        findConstructor(Class.forName(className), target, shareGroup,
-                                        configuration);
+                        findConstructor(Class.forName(className), target, routineConfiguration,
+                                        proxyConfiguration);
                 return interfaceClass.cast(
-                        constructor.newInstance(target, shareGroup, configuration));
+                        constructor.newInstance(target, routineConfiguration, proxyConfiguration));
 
             } catch (final Throwable t) {
 

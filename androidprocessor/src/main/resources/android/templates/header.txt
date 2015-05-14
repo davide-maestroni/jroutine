@@ -18,36 +18,18 @@ package ${packageName};
 
 public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implements ${interfaceFullName} {
 
-    private final java.lang.ref.WeakReference<Object> mContext;
+    private final java.lang.ref.WeakReference<android.content.Context> mContext;
 
     private final String mShareGroup;
 
     private final Class<?> mTargetClass;
 
-    public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final android.app.Activity activity,
-            @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
-
-        this((Object) activity, targetClass, routineConfiguration, proxyConfiguration, invocationConfiguration);
-    }
-
-    public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final android.app.Fragment fragment,
-            @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
-
-        this((Object) fragment, targetClass, routineConfiguration, proxyConfiguration, invocationConfiguration);
-    }
-
     @SuppressWarnings("ConstantConditions")
-    private ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final Object context,
+    public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final android.content.Context context,
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
         if (context == null) {
 
@@ -59,50 +41,33 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
             throw new NullPointerException("the target class must not be null");
         }
 
-        mContext = new java.lang.ref.WeakReference<Object>(context);
+        mContext = new java.lang.ref.WeakReference<android.content.Context>(context);
         mTargetClass = targetClass;
         mShareGroup = proxyConfiguration.getShareGroupOr(com.gh.bmd.jrt.annotation.ShareGroup.ALL);
         ${routineFieldsInit}
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onActivity(
-            @javax.annotation.Nonnull final android.app.Activity activity,
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> onService(
+            @javax.annotation.Nonnull final android.content.Context context,
             @javax.annotation.Nonnull final Class<?> targetClass) {
 
-        return new ${classNameSuffix}ContextProxyBuilder${genericTypes}(activity, targetClass);
+        return new ${classNameSuffix}ServiceProxyBuilder${genericTypes}(context, targetClass);
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onFragment(
-            @javax.annotation.Nonnull final android.app.Fragment fragment,
-            @javax.annotation.Nonnull final Class<?> targetClass) {
+    private static <OUTPUT> com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder<Object, OUTPUT> getBuilder(
+            @javax.annotation.Nonnull final java.lang.ref.WeakReference<android.content.Context> contextReference,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.common.ClassToken<? extends com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, OUTPUT>> classToken) {
 
-        return new ${classNameSuffix}ContextProxyBuilder${genericTypes}(fragment, targetClass);
-    }
-
-    @javax.annotation.Nonnull
-    private static <OUTPUT> com.gh.bmd.jrt.android.builder.ContextRoutineBuilder<Object, OUTPUT> getBuilder(
-            @javax.annotation.Nonnull final java.lang.ref.WeakReference<Object> contextReference,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, OUTPUT> factory) {
-
-        final Object context = contextReference.get();
+        final android.content.Context context = contextReference.get();
 
         if (context == null) {
 
             throw new IllegalStateException("the routine context has been destroyed");
         }
 
-        if (context instanceof android.app.Activity) {
-
-            return com.gh.bmd.jrt.android.v11.core.JRoutine.onActivity((android.app.Activity) context, factory);
-
-        } else if (context instanceof android.app.Fragment) {
-
-            return com.gh.bmd.jrt.android.v11.core.JRoutine.onFragment((android.app.Fragment) context, factory);
-        }
-
-        throw new IllegalArgumentException("invalid context type: " + context.getClass().getName());
+        return com.gh.bmd.jrt.android.core.JRoutine.onService(context, classToken);
     }
 
     @javax.annotation.Nonnull
@@ -146,15 +111,16 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(target, shareGroup);
     }
 
-    private static class ${classNameSuffix}ContextProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder<${interfaceFullName}> {
+    private static class ${classNameSuffix}ServiceProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {
 
-        private final Object mContext;
+        private final android.content.Context mContext;
 
         private final Class<?> mTargetClass;
 
         private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
-        private ${classNameSuffix}ContextProxyBuilder(@javax.annotation.Nonnull final Object context, @javax.annotation.Nonnull final Class<?> targetClass) {
+        private ${classNameSuffix}ServiceProxyBuilder(@javax.annotation.Nonnull final android.content.Context context,
+                @javax.annotation.Nonnull final Class<?> targetClass) {
 
             mContext = context;
             mTargetClass = targetClass;
@@ -179,8 +145,8 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         protected ${interfaceFullName} newProxy(
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mContext, mTargetClass, routineConfiguration, proxyConfiguration, invocationConfiguration);
+            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mContext, mTargetClass, routineConfiguration, proxyConfiguration, serviceConfiguration);
         }
     }

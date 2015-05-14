@@ -11,15 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v4.core;
+package com.gh.bmd.jrt.android.proxy.core;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.content.Context;
 
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
-import com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
+import com.gh.bmd.jrt.android.processor.annotation.ServiceProxy;
+import com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -32,49 +31,24 @@ import javax.annotation.Nonnull;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
- * Default implementation of a context proxy builder.
+ * Default implementation of a service proxy builder.
  * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide on 13/05/15.
  */
-class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
-        RoutineConfiguration.Configurable<ContextProxyRoutineBuilder>,
-        ProxyConfiguration.Configurable<ContextProxyRoutineBuilder>,
-        InvocationConfiguration.Configurable<ContextProxyRoutineBuilder> {
+class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
+        RoutineConfiguration.Configurable<ServiceProxyRoutineBuilder>,
+        ProxyConfiguration.Configurable<ServiceProxyRoutineBuilder>,
+        ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
 
-    private final WeakReference<?> mContextReference;
+    private final WeakReference<Context> mContextReference;
 
     private final Class<?> mTargetClass;
-
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
-    /**
-     * Constructor.
-     *
-     * @param activity    the invocation activity context.
-     * @param targetClass the target class.
-     */
-    DefaultContextProxyRoutineBuilder(@Nonnull final FragmentActivity activity,
-            @Nonnull final Class<?> targetClass) {
-
-        this((Object) activity, targetClass);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param fragment    the invocation fragment context.
-     * @param targetClass the target class.
-     */
-    DefaultContextProxyRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass) {
-
-        this((Object) fragment, targetClass);
-    }
+    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -83,7 +57,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
      * @param targetClass the target class.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultContextProxyRoutineBuilder(@Nonnull final Object context,
+    DefaultServiceProxyRoutineBuilder(@Nonnull final Context context,
             @Nonnull final Class<?> targetClass) {
 
         if (context == null) {
@@ -97,7 +71,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
         }
 
         mTargetClass = targetClass;
-        mContextReference = new WeakReference<Object>(context);
+        mContextReference = new WeakReference<Context>(context);
     }
 
     @Nonnull
@@ -130,36 +104,36 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
                       .withProxy()
                       .with(mProxyConfiguration)
                       .set()
-                      .withInvocation()
-                      .with(mInvocationConfiguration)
+                      .withService()
+                      .with(mServiceConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine() {
+    public RoutineConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
+        return new RoutineConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextProxyRoutineBuilder> withInvocation() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
-    }
-
-    @Nonnull
-    public ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
+        return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
+    }
+
+    @Nonnull
+    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService() {
+
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyRoutineBuilder setConfiguration(
+    public ServiceProxyRoutineBuilder setConfiguration(
             @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
@@ -173,7 +147,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyRoutineBuilder setConfiguration(
+    public ServiceProxyRoutineBuilder setConfiguration(
             @Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
@@ -187,15 +161,15 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public ServiceProxyRoutineBuilder setConfiguration(
+            @Nonnull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
-        mInvocationConfiguration = configuration;
+        mServiceConfiguration = configuration;
         return this;
     }
 
@@ -204,7 +178,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectContextProxyBuilder<TYPE> extends AbstractContextProxyBuilder<TYPE> {
+    private static class ObjectContextProxyBuilder<TYPE> extends AbstractServiceProxyBuilder<TYPE> {
 
         private final Object mContext;
 
@@ -246,7 +220,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
         @Override
         protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final InvocationConfiguration invocationConfiguration) {
+                @Nonnull final ServiceConfiguration serviceConfiguration) {
 
             try {
 
@@ -265,14 +239,15 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
                     enclosingClass = enclosingClass.getEnclosingClass();
                 }
 
-                final String className = packageName + classNamePrefix + V4Proxy.CLASS_NAME_SUFFIX;
+                final String className =
+                        packageName + classNamePrefix + ServiceProxy.CLASS_NAME_SUFFIX;
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), context, targetClass,
                                         routineConfiguration, proxyConfiguration,
-                                        invocationConfiguration);
+                                        serviceConfiguration);
                 return interfaceClass.cast(
                         constructor.newInstance(context, targetClass, routineConfiguration,
-                                                proxyConfiguration, invocationConfiguration));
+                                                proxyConfiguration, serviceConfiguration));
 
             } catch (final Throwable t) {
 

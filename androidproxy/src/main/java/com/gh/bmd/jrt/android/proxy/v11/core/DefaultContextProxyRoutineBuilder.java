@@ -17,7 +17,6 @@ import android.app.Activity;
 import android.app.Fragment;
 
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
@@ -33,7 +32,7 @@ import javax.annotation.Nonnull;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
- * Default implementation of a proxy builder.
+ * Default implementation of a context proxy builder.
  * <p/>
  * Created by davide on 06/05/15.
  */
@@ -46,7 +45,8 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
     private final Class<?> mTargetClass;
 
-    private InvocationConfiguration mInvocationConfiguration;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
@@ -137,10 +137,17 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
     }
 
     @Nonnull
-    public Builder<? extends ContextProxyRoutineBuilder> withInvocation() {
+    public RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine() {
+
+        final RoutineConfiguration config = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
+    }
+
+    @Nonnull
+    public InvocationConfiguration.Builder<? extends ContextProxyRoutineBuilder> withInvocation() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new Builder<ContextProxyRoutineBuilder>(this, config);
+        return new InvocationConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
@@ -148,13 +155,6 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
-    }
-
-    @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine() {
-
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
@@ -244,8 +244,8 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
         @Nonnull
         @Override
-        protected TYPE newProxy(@Nonnull final String shareGroup,
-                @Nonnull final RoutineConfiguration routineConfiguration,
+        protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final InvocationConfiguration invocationConfiguration) {
 
             try {
@@ -267,11 +267,12 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
                 final String className = packageName + classNamePrefix + V11Proxy.CLASS_NAME_SUFFIX;
                 final Constructor<?> constructor =
-                        findConstructor(Class.forName(className), context, targetClass, shareGroup,
-                                        routineConfiguration, invocationConfiguration);
-                return interfaceClass.cast(constructor.newInstance(context, targetClass, shareGroup,
-                                                                   routineConfiguration,
-                                                                   invocationConfiguration));
+                        findConstructor(Class.forName(className), context, targetClass,
+                                        routineConfiguration, proxyConfiguration,
+                                        invocationConfiguration);
+                return interfaceClass.cast(
+                        constructor.newInstance(context, targetClass, routineConfiguration,
+                                                proxyConfiguration, invocationConfiguration));
 
             } catch (final Throwable t) {
 

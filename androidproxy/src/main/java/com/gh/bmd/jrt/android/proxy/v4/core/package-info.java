@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 /**
- * Processor core interfaces and implementations.
+ * Processor core interfaces and implementations bound to an Android context, with support for
+ * Android compatibility library.
  * <p/>
  * Created by davide on 5/10/15.
  */

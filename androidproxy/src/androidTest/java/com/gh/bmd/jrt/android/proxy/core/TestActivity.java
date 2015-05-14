@@ -11,14 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.core;
+package com.gh.bmd.jrt.android.proxy.core;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
-import com.gh.bmd.jrt.android.R;
+import com.gh.bmd.jrt.android.proxy.R;
 
 /**
  * Test activity.

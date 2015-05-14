@@ -53,8 +53,8 @@ public interface ContextProxyRoutineBuilder
      * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}" or
      * "&lt;itf_simple_name&gt;
      * {@value com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
-     * In case the specific interface is not a top class, the simple name of the outer classes will
-     * be prepended to the interface one.<br/>
+     * In case the specific interface is not a top level class, the simple name of the outer classes
+     * will be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the "&lt;itf_simple_name&gt;
      * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()" or
@@ -93,8 +93,8 @@ public interface ContextProxyRoutineBuilder
      * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}" or
      * "&lt;itf_simple_name&gt;
      * {@value com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy#CLASS_NAME_SUFFIX}".<br/>
-     * In case the specific interface is not a top class, the simple name of the outer classes will
-     * be prepended to the interface one.<br/>
+     * In case the specific interface is not a top level class, the simple name of the outer classes
+     * will be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the "&lt;itf_simple_name&gt;
      * {@value com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy#CLASS_NAME_SUFFIX}.onXXX()" or

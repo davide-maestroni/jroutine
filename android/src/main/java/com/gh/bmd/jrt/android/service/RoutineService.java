@@ -24,6 +24,7 @@ import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.RemoteException;
 
+import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
@@ -174,22 +175,20 @@ public class RoutineService extends Service {
     /**
      * Puts the specified asynchronous invocation info into the passed bundle.
      *
-     * @param bundle          the bundle to fill.
-     * @param invocationId    the invocation ID.
-     * @param invocationClass the invocation class.
-     * @param configuration   the routine configuration.
-     * @param runnerClass     the runner class.
-     * @param logClass        the log class.
+     * @param bundle               the bundle to fill.
+     * @param invocationId         the invocation ID.
+     * @param invocationClass      the invocation class.
+     * @param routineConfiguration the routine configuration.
+     * @param serviceConfiguration the service configuration.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final RoutineConfiguration configuration,
-            @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Class<? extends Log> logClass) {
+            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ServiceConfiguration serviceConfiguration) {
 
-        putInvocation(bundle, false, invocationId, invocationClass, configuration, runnerClass,
-                      logClass);
+        putInvocation(bundle, false, invocationId, invocationClass, routineConfiguration,
+                      serviceConfiguration);
     }
 
     /**
@@ -221,22 +220,20 @@ public class RoutineService extends Service {
     /**
      * Puts the specified parallel invocation info into the passed bundle.
      *
-     * @param bundle          the bundle to fill.
-     * @param invocationId    the invocation ID.
-     * @param invocationClass the invocation class.
-     * @param configuration   the routine configuration.
-     * @param runnerClass     the runner class.
-     * @param logClass        the log class.
+     * @param bundle               the bundle to fill.
+     * @param invocationId         the invocation ID.
+     * @param invocationClass      the invocation class.
+     * @param routineConfiguration the routine configuration.
+     * @param serviceConfiguration the service configuration.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final RoutineConfiguration configuration,
-            @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Class<? extends Log> logClass) {
+            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ServiceConfiguration serviceConfiguration) {
 
-        putInvocation(bundle, true, invocationId, invocationClass, configuration, runnerClass,
-                      logClass);
+        putInvocation(bundle, true, invocationId, invocationClass, routineConfiguration,
+                      serviceConfiguration);
     }
 
     /**
@@ -261,14 +258,13 @@ public class RoutineService extends Service {
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final RoutineConfiguration configuration,
-            @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Class<? extends Log> logClass) {
+            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ServiceConfiguration serviceConfiguration) {
 
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
-        final Object[] invocationArgs = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
+        final Object[] invocationArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         final int length = invocationArgs.length;
         final ParcelableValue[] argValues = new ParcelableValue[length];
 
@@ -279,10 +275,10 @@ public class RoutineService extends Service {
 
         bundle.putParcelableArray(KEY_INVOCATION_ARGS, argValues);
         bundle.putInt(KEY_CORE_INVOCATIONS,
-                      configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
+                      routineConfiguration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
-                      configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT));
-        final TimeDuration availTimeout = configuration.getAvailInvocationTimeoutOr(null);
+                      routineConfiguration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT));
+        final TimeDuration availTimeout = routineConfiguration.getAvailInvocationTimeoutOr(null);
 
         if (availTimeout != null) {
 
@@ -290,11 +286,11 @@ public class RoutineService extends Service {
             bundle.putSerializable(KEY_AVAILABLE_UNIT, availTimeout.unit);
         }
 
-        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderTypeOr(null));
-        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderTypeOr(null));
-        bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
-        bundle.putSerializable(KEY_LOG_CLASS, logClass);
-        bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevelOr(null));
+        bundle.putSerializable(KEY_INPUT_ORDER, routineConfiguration.getInputOrderTypeOr(null));
+        bundle.putSerializable(KEY_OUTPUT_ORDER, routineConfiguration.getOutputOrderTypeOr(null));
+        bundle.putSerializable(KEY_LOG_LEVEL, routineConfiguration.getLogLevelOr(null));
+        bundle.putSerializable(KEY_RUNNER_CLASS, serviceConfiguration.getRunnerClassOr(null));
+        bundle.putSerializable(KEY_LOG_CLASS, serviceConfiguration.getLogClassOr(null));
     }
 
     private static void putValue(@Nonnull final Bundle bundle, @Nullable final Object value) {
@@ -444,11 +440,11 @@ public class RoutineService extends Service {
                     (timeUnit != null) ? TimeDuration.fromUnit(timeout, timeUnit) : null;
             final OrderType inputOrderType = (OrderType) data.getSerializable(KEY_INPUT_ORDER);
             final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
+            final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
             final Class<? extends Runner> runnerClass =
                     (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
             final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
-            final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
             final RoutineInfo routineInfo =
                     new RoutineInfo(invocationClass, invocationArgs, inputOrderType,
                                     outputOrderType, runnerClass, logClass, logLevel);

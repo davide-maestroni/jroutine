@@ -33,10 +33,8 @@ public class RotationTestActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.test_v11_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         getLoaderManager();
     }
 }

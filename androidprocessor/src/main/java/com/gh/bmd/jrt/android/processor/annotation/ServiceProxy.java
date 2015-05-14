@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.processor.v11.annotation;
+package com.gh.bmd.jrt.android.processor.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to indicate interfaces used as templates to generate proxy classes
- * enabling asynchronous calls to the target instance methods, bound to a context lifecycle.
+ * enabling asynchronous calls to the target instance methods in a dedicated service.
  * <p/>
  * The target class is specified in the annotation attribute. A proxy class implementing the
  * annotated interface will be generated within the interface package and its name will be obtained
@@ -30,23 +30,20 @@ import java.lang.annotation.Target;
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}, as
- * well as v11 builder annotations defined for each interface method.
+ * well as v4 builder annotations defined for each interface method.
  * <p/>
- * See {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} for support of API levels less
- * than 11.
- * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide on 13/05/15.
  *
  * @see com.gh.bmd.jrt.processor.annotation.Proxy
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface V11Proxy {
+public @interface ServiceProxy {
 
     /**
      * Constant indicating the generated class name suffix.
      */
-    String CLASS_NAME_SUFFIX = "_V11Proxy";
+    String CLASS_NAME_SUFFIX = "_ServiceProxy";
 
     /**
      * The wrapped class.

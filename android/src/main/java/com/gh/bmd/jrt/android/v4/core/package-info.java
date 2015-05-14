@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Routine interfaces and implementations with support for Android compatibility.
+ * Routine interfaces and implementations with support for Android compatibility library.
  * <p/>
  * Created by davide on 9/25/14.
  */

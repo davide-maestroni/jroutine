@@ -30,7 +30,6 @@ public class TestActivity extends FragmentActivity {
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.test_v4_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
     }

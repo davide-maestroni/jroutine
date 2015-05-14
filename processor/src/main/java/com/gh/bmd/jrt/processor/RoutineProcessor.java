@@ -288,7 +288,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                                                                     .asType())) && (
                     variableElement.getAnnotation(Pass.class) != null)) {
 
-                builder.append("(com.gh.bmd.jrt.channel.OutputChannel<? extends Object>)");
+                builder.append("(com.gh.bmd.jrt.channel.OutputChannel<?>)");
 
             } else {
 
@@ -444,7 +444,7 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(" = ")
                    .append("initRoutine")
                    .append(i)
-                   .append("(configuration);")
+                   .append("(routineConfiguration);")
                    .append(NEW_LINE);
         }
 

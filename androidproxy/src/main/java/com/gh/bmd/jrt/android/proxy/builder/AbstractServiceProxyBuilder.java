@@ -11,32 +11,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.proxy.builder;
+package com.gh.bmd.jrt.android.proxy.builder;
 
+import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
+import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
 
 /**
- * Abstract implementation of a builder of async proxy objects.
+ * Abstract implementation of a builder of async proxy objects, whose methods are executed in a
+ * dedicated service.
  * <p/>
- * Created by davide on 2/26/15.
+ * Created by davide on 13/05/15.
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractProxyBuilder<TYPE>
-        implements ProxyBuilder<TYPE>, RoutineConfiguration.Configurable<ProxyBuilder<TYPE>>,
-        ProxyConfiguration.Configurable<ProxyBuilder<TYPE>> {
+public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyBuilder<TYPE>,
+        RoutineConfiguration.Configurable<ServiceProxyBuilder<TYPE>>,
+        ProxyConfiguration.Configurable<ServiceProxyBuilder<TYPE>>,
+        ServiceConfiguration.Configurable<ServiceProxyBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
@@ -45,12 +48,14 @@ public abstract class AbstractProxyBuilder<TYPE>
 
     private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
+    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
+
     @Nonnull
     public TYPE buildProxy() {
 
         synchronized (sClassMap) {
 
-            final Object target = getTarget();
+            final Object target = getTargetClass();
             final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
             HashMap<ClassInfo, Object> classes = classMap.get(target);
 
@@ -62,9 +67,11 @@ public abstract class AbstractProxyBuilder<TYPE>
 
             final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
+            final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo =
-                    new ClassInfo(token, routineConfiguration, proxyConfiguration);
+                    new ClassInfo(token, routineConfiguration, proxyConfiguration,
+                                  serviceConfiguration);
             final Object instance = classes.get(classInfo);
 
             if (instance != null) {
@@ -76,7 +83,8 @@ public abstract class AbstractProxyBuilder<TYPE>
 
             try {
 
-                final TYPE newInstance = newProxy(routineConfiguration, proxyConfiguration);
+                final TYPE newInstance =
+                        newProxy(routineConfiguration, proxyConfiguration, serviceConfiguration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -88,14 +96,44 @@ public abstract class AbstractProxyBuilder<TYPE>
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ProxyBuilder<TYPE>> withRoutine() {
+    public RoutineConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withRoutine() {
 
-        return new RoutineConfiguration.Builder<ProxyBuilder<TYPE>>(this, mRoutineConfiguration);
+        final RoutineConfiguration config = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
+    }
+
+    @Nonnull
+    public ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withProxy() {
+
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
+    }
+
+    @Nonnull
+    public ServiceConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withService() {
+
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ProxyBuilder<TYPE> setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+    public ServiceProxyBuilder<TYPE> setConfiguration(
+            @Nonnull final ServiceConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the configuration must not be null");
+        }
+
+        mServiceConfiguration = configuration;
+        return this;
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ServiceProxyBuilder<TYPE> setConfiguration(
+            @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -108,7 +146,8 @@ public abstract class AbstractProxyBuilder<TYPE>
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ProxyBuilder<TYPE> setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+    public ServiceProxyBuilder<TYPE> setConfiguration(
+            @Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -117,12 +156,6 @@ public abstract class AbstractProxyBuilder<TYPE>
 
         mProxyConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> withProxy() {
-
-        return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, mProxyConfiguration);
     }
 
     /**
@@ -134,23 +167,25 @@ public abstract class AbstractProxyBuilder<TYPE>
     protected abstract ClassToken<TYPE> getInterfaceToken();
 
     /**
-     * Returns the builder target object.
+     * Returns the builder target class.
      *
-     * @return the target object.
+     * @return the target class.
      */
     @Nonnull
-    protected abstract Object getTarget();
+    protected abstract Class<?> getTargetClass();
 
     /**
      * Creates and return a new proxy instance.
      *
      * @param routineConfiguration the routine configuration.
      * @param proxyConfiguration   the proxy configuration.
+     * @param serviceConfiguration the service configuration.
      * @return the proxy instance.
      */
     @Nonnull
     protected abstract TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
-            @Nonnull final ProxyConfiguration proxyConfiguration);
+            @Nonnull final ProxyConfiguration proxyConfiguration,
+            @Nonnull final ServiceConfiguration serviceConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.
@@ -160,13 +195,12 @@ public abstract class AbstractProxyBuilder<TYPE>
     private void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
-        final Object[] args = configuration.getFactoryArgsOr(null);
+        final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
 
-        if (args != null) {
+        if (asyncRunner != null) {
 
             logger = configuration.newLogger(this);
-            logger.wrn("the specified factory arguments will be ignored: %s",
-                       Arrays.toString(args));
+            logger.wrn("the specified runner will be ignored: %s", asyncRunner);
         }
 
         final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
@@ -251,6 +285,8 @@ public abstract class AbstractProxyBuilder<TYPE>
 
         private final RoutineConfiguration mRoutineConfiguration;
 
+        private final ServiceConfiguration mServiceConfiguration;
+
         private final Type mType;
 
         /**
@@ -259,24 +295,17 @@ public abstract class AbstractProxyBuilder<TYPE>
          * @param token                the proxy interface token.
          * @param routineConfiguration the routine configuration.
          * @param proxyConfiguration   the proxy configuration.
+         * @param serviceConfiguration the service configuration.
          */
         private ClassInfo(@Nonnull final ClassToken<?> token,
                 @Nonnull final RoutineConfiguration routineConfiguration,
-                @Nonnull final ProxyConfiguration proxyConfiguration) {
+                @Nonnull final ProxyConfiguration proxyConfiguration,
+                @Nonnull final ServiceConfiguration serviceConfiguration) {
 
             mType = token.getRawClass();
             mRoutineConfiguration = routineConfiguration;
             mProxyConfiguration = proxyConfiguration;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // auto-generated code
-            int result = mProxyConfiguration.hashCode();
-            result = 31 * result + mRoutineConfiguration.hashCode();
-            result = 31 * result + mType.hashCode();
-            return result;
+            mServiceConfiguration = serviceConfiguration;
         }
 
         @Override
@@ -296,7 +325,19 @@ public abstract class AbstractProxyBuilder<TYPE>
             final ClassInfo classInfo = (ClassInfo) o;
             return mProxyConfiguration.equals(classInfo.mProxyConfiguration)
                     && mRoutineConfiguration.equals(classInfo.mRoutineConfiguration)
+                    && mServiceConfiguration.equals(classInfo.mServiceConfiguration)
                     && mType.equals(classInfo.mType);
+        }
+
+        @Override
+        public int hashCode() {
+
+            // auto-generated code
+            int result = mProxyConfiguration.hashCode();
+            result = 31 * result + mRoutineConfiguration.hashCode();
+            result = 31 * result + mServiceConfiguration.hashCode();
+            result = 31 * result + mType.hashCode();
+            return result;
         }
     }
 }

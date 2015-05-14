@@ -11,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v4.core;
+package com.gh.bmd.jrt.android.proxy.core;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.content.Context;
 
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -24,19 +23,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
- * calls, bound to a context lifecycle, of their methods.
+ * calls of their methods in a dedicated service.
  * <p/>
  * The builders returned by this class are based on compile time code generation, enabled by
  * pre-processing of Java annotations.<br/>
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide on 13/05/15.
  *
- * @see com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy
- * @see com.gh.bmd.jrt.android.annotation.Id
- * @see com.gh.bmd.jrt.android.annotation.ClashResolution
- * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
+ * @see com.gh.bmd.jrt.android.processor.annotation.ServiceProxy
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Pass
  * @see com.gh.bmd.jrt.annotation.ShareGroup
@@ -45,7 +41,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending functionalities of another utility class")
-public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutineProxy {
+public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
 
     /**
      * Avoid direct instantiation.
@@ -58,33 +54,21 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * Returns a builder of routines bound to the specified activity, wrapping the specified object
      * instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
+     * <p/>
+     * Note that the built routine results will be dispatched in the looper specified through the
+     * builder, thus, waiting for the outputs on the very same looper thread, immediately after its
+     * invocation, will result in a deadlock.<br/>
+     * By default output results are dispatched in the main looper.
      *
-     * @param activity the invocation activity context.
-     * @param target   the wrapped object class.
+     * @param context the invocation context.
+     * @param target  the wrapped object class.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
+    public static ServiceProxyRoutineBuilder onService(@Nonnull final Context context,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextProxyRoutineBuilder(activity, target);
-    }
-
-    /**
-     * Returns a builder of routines bound to the specified fragment, wrapping the specified object
-     * instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
-     *
-     * @param fragment the invocation fragment context.
-     * @param target   the wrapped object class.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static ContextProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> target) {
-
-        return new DefaultContextProxyRoutineBuilder(fragment, target);
+        return new DefaultServiceProxyRoutineBuilder(context, target);
     }
 }

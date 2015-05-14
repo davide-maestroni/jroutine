@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -66,14 +65,13 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
                 classMap.put(target, classes);
             }
 
-            final String shareGroup = mProxyConfiguration.getShareGroupOr(null);
-            final String classShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
             final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
+            final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo =
-                    new ClassInfo(token, routineConfiguration, invocationConfiguration,
-                                  classShareGroup);
+                    new ClassInfo(token, routineConfiguration, proxyConfiguration,
+                                  invocationConfiguration);
             final Object instance = classes.get(classInfo);
 
             if (instance != null) {
@@ -86,7 +84,7 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
             try {
 
                 final TYPE newInstance =
-                        newProxy(classShareGroup, routineConfiguration, invocationConfiguration);
+                        newProxy(routineConfiguration, proxyConfiguration, invocationConfiguration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -95,6 +93,13 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
                 throw new IllegalArgumentException(t);
             }
         }
+    }
+
+    @Nonnull
+    public RoutineConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withRoutine() {
+
+        final RoutineConfiguration config = mRoutineConfiguration;
+        return new RoutineConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
@@ -109,13 +114,6 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
-    }
-
-    @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withRoutine() {
-
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
@@ -179,14 +177,14 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
     /**
      * Creates and return a new proxy instance.
      *
-     * @param shareGroup              the share group name.
      * @param routineConfiguration    the routine configuration.
+     * @param proxyConfiguration      the proxy configuration.
      * @param invocationConfiguration the invocation configuration.
      * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newProxy(@Nonnull final String shareGroup,
-            @Nonnull final RoutineConfiguration routineConfiguration,
+    protected abstract TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ProxyConfiguration proxyConfiguration,
             @Nonnull final InvocationConfiguration invocationConfiguration);
 
     /**
@@ -285,9 +283,9 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
-        private final String mShareGroup;
+        private final RoutineConfiguration mRoutineConfiguration;
 
         private final Type mType;
 
@@ -296,18 +294,18 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
          *
          * @param token                   the proxy interface token.
          * @param routineConfiguration    the routine configuration.
+         * @param proxyConfiguration      the proxy configuration.
          * @param invocationConfiguration the invocation configuration.
-         * @param shareGroup              the share group name.
          */
         private ClassInfo(@Nonnull final ClassToken<?> token,
                 @Nonnull final RoutineConfiguration routineConfiguration,
-                @Nonnull final InvocationConfiguration invocationConfiguration,
-                @Nonnull final String shareGroup) {
+                @Nonnull final ProxyConfiguration proxyConfiguration,
+                @Nonnull final InvocationConfiguration invocationConfiguration) {
 
             mType = token.getRawClass();
             mRoutineConfiguration = routineConfiguration;
+            mProxyConfiguration = proxyConfiguration;
             mInvocationConfiguration = invocationConfiguration;
-            mShareGroup = shareGroup;
         }
 
         @Override
@@ -326,8 +324,9 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
 
             final ClassInfo classInfo = (ClassInfo) o;
             return mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
+                    && mProxyConfiguration.equals(classInfo.mProxyConfiguration)
                     && mRoutineConfiguration.equals(classInfo.mRoutineConfiguration)
-                    && mShareGroup.equals(classInfo.mShareGroup) && mType.equals(classInfo.mType);
+                    && mType.equals(classInfo.mType);
         }
 
         @Override
@@ -335,8 +334,8 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
 
             // auto-generated code
             int result = mInvocationConfiguration.hashCode();
+            result = 31 * result + mProxyConfiguration.hashCode();
             result = 31 * result + mRoutineConfiguration.hashCode();
-            result = 31 * result + mShareGroup.hashCode();
             result = 31 * result + mType.hashCode();
             return result;
         }

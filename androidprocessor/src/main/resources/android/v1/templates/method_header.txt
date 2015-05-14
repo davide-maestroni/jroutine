@@ -16,13 +16,28 @@
 
     private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
 
+    private static class ContextInvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
+
+        @javax.annotation.Nonnull
+        public String getInvocationType() {
+
+            return ContextInvocation${methodCount}.class.getName();
+        }
+
+        @javax.annotation.Nonnull
+        public com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation(@javax.annotation.Nonnull Object... args) {
+
+            return new ContextInvocation${methodCount}${genericTypes}((Class<?>) args[0], (String) args[1], (Object[]) args[2]);
+        }
+    }
+
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
 
         final Object[] args = routineConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.common.Reflection.NO_ARGS);
-        return getBuilder(mContext, new com.gh.bmd.jrt.common.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {})
+        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}())
                                            .withRoutine()
                                            .with(routineConfiguration)
                                            ${routineBuilderOptions}
@@ -32,8 +47,9 @@
                                            .withOutputMaxSize(Integer.MAX_VALUE)
                                            .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .set()
-                                           .withService()
-                                           .with(serviceConfiguration)
+                                           .withInvocation()
+                                           .with(invocationConfiguration)
+                                           ${invocationBuilderOptions}
                                            .set()
                                            .buildRoutine();
     }

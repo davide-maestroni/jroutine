@@ -132,7 +132,6 @@ public class RoutineTest {
         assertThat(channel.checkComplete()).isTrue();
         assertThat(channel.isOpen()).isFalse();
 
-
         final OutputChannel<String> channel1 = routine.callAsync("test2");
         assertThat(channel1.isOpen()).isTrue();
         assertThat(channel1.abort()).isTrue();
@@ -152,7 +151,6 @@ public class RoutineTest {
 
         assertThat(channel1.checkComplete()).isTrue();
         assertThat(channel1.isOpen()).isFalse();
-
 
         final FilterInvocation<String, String> abortInvocation =
                 new FilterInvocation<String, String>() {
@@ -3258,7 +3256,6 @@ public class RoutineTest {
 
             sActive = true;
         }
-
 
         @Override
         public void onReturn() {

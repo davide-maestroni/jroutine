@@ -108,6 +108,7 @@ public class LoggerTest {
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.DEBUG);
 
+        // - DBG
         logger.dbg(ARGS[0]);
         assertThat(log.getLevel()).isEqualTo(LogLevel.DEBUG);
         assertThat(log.getMessage()).contains(ARGS[0]);
@@ -164,7 +165,7 @@ public class LoggerTest {
         assertThat(log.getMessage()).contains(
                 String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-
+        // - WRN
         logger.wrn(ARGS[0]);
         assertThat(log.getLevel()).isEqualTo(LogLevel.WARNING);
         assertThat(log.getMessage()).contains(ARGS[0]);
@@ -221,7 +222,7 @@ public class LoggerTest {
         assertThat(log.getMessage()).contains(
                 String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-
+        // - ERR
         logger.err(ARGS[0]);
         assertThat(log.getLevel()).isEqualTo(LogLevel.ERROR);
         assertThat(log.getMessage()).contains(ARGS[0]);
@@ -289,6 +290,7 @@ public class LoggerTest {
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.ERROR);
 
+        // - DBG
         logger.dbg(ARGS[0]);
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
@@ -341,7 +343,7 @@ public class LoggerTest {
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
 
-
+        // - WRN
         logger.wrn(ARGS[0]);
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
@@ -394,7 +396,7 @@ public class LoggerTest {
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
 
-
+        // - ERR
         logger.err(ARGS[0]);
         assertThat(log.getLevel()).isEqualTo(LogLevel.ERROR);
         assertThat(log.getMessage()).contains(ARGS[0]);
@@ -462,6 +464,7 @@ public class LoggerTest {
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.SILENT);
 
+        // - DBG
         logger.dbg(ARGS[0]);
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
@@ -514,7 +517,7 @@ public class LoggerTest {
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
 
-
+        // - WRN
         logger.wrn(ARGS[0]);
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
@@ -567,7 +570,7 @@ public class LoggerTest {
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
 
-
+        // - ERR
         logger.err(ARGS[0]);
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
@@ -631,6 +634,7 @@ public class LoggerTest {
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.WARNING);
 
+        // - DBG
         logger.dbg(ARGS[0]);
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
@@ -683,7 +687,7 @@ public class LoggerTest {
         assertThat(log.getLevel()).isNull();
         assertThat(log.getMessage()).isNull();
 
-
+        // - WRN
         logger.wrn(ARGS[0]);
         assertThat(log.getLevel()).isEqualTo(LogLevel.WARNING);
         assertThat(log.getMessage()).contains(ARGS[0]);
@@ -740,7 +744,7 @@ public class LoggerTest {
         assertThat(log.getMessage()).contains(
                 String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-
+        // - ERR
         logger.err(ARGS[0]);
         assertThat(log.getLevel()).isEqualTo(LogLevel.ERROR);
         assertThat(log.getMessage()).contains(ARGS[0]);

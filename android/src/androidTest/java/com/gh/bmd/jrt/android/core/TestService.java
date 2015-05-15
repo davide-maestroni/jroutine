@@ -33,7 +33,6 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  */
 public class TestService extends RoutineService implements FactoryContext {
 
-
     private static final HashMap<InstanceInfo, Object> sInstanceMap =
             new HashMap<InstanceInfo, Object>();
 

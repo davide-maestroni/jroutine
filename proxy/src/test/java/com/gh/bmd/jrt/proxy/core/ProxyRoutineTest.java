@@ -59,7 +59,7 @@ import static org.junit.Assert.fail;
  * <p/>
  * Created by davide on 3/6/15.
  */
-public class RoutineProxyTest {
+public class ProxyRoutineTest {
 
     @Test
     public void testGenericProxyCache() {
@@ -177,7 +177,7 @@ public class RoutineProxyTest {
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final ProxyBuilder<TestProxy> builder = RoutineProxyTestTestProxy_Proxy.on(test);
+        final ProxyBuilder<TestProxy> builder = ProxyRoutineTestTestProxy_Proxy.on(test);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);

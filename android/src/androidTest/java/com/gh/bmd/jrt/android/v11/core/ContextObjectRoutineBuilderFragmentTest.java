@@ -1040,7 +1040,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                           R.id.test_fragment);
         final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
                                                      .withRoutine()
-                                                     .withReadTimeout(seconds(9))
+                                                     .withReadTimeout(seconds(10))
                                                      .set();
 
         long startTime = System.currentTimeMillis();

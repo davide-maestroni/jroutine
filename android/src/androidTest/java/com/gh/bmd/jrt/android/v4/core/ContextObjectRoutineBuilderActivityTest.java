@@ -869,7 +869,7 @@ public class ContextObjectRoutineBuilderActivityTest
 
         final ObjectRoutineBuilder builder = JRoutine.onActivity(getActivity(), TestClass2.class)
                                                      .withRoutine()
-                                                     .withReadTimeout(seconds(9))
+                                                     .withReadTimeout(seconds(10))
                                                      .set();
 
         long startTime = System.currentTimeMillis();

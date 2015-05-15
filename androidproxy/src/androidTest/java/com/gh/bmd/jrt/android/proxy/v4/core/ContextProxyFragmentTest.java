@@ -301,7 +301,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         assertThat(getOne.readNext()).isEqualTo(1);
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         startTime = System.currentTimeMillis();
 
@@ -310,7 +310,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
     }
 
     @SuppressWarnings("unchecked")
@@ -1021,14 +1021,14 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 2;
         }

@@ -867,7 +867,7 @@ public class ObjectServiceRoutineBuilderTest
 
         final ObjectRoutineBuilder builder = JRoutine.onService(getActivity(), TestClass2.class)
                                                      .withRoutine()
-                                                     .withReadTimeout(seconds(9))
+                                                     .withReadTimeout(seconds(10))
                                                      .set()
                                                      .withService()
                                                      .withServiceClass(TestService.class)

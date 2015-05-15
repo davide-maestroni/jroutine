@@ -81,7 +81,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             } else {
 
-                builder.append("(routineConfiguration, invocationConfiguration);");
+                builder.append("(routineConfiguration, loaderConfiguration);");
             }
 
             builder.append(NEW_LINE);
@@ -93,7 +93,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     @Override
     protected void checkDependencies() {
 
-        if (getTypeFromName("com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder")
+        if (processingEnv.getElementUtils().getPackageElement("com.gh.bmd.jrt.android.proxy")
                 == null) {
 
             throw new IllegalStateException(
@@ -312,9 +312,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         if (resolutionType != null) {
 
-            builder.append(
-                    ".withClashResolution(com.gh.bmd.jrt.android.builder.InvocationConfiguration"
-                            + ".ClashResolutionType.").append(resolutionType).append(")");
+            builder.append(".withClashResolution(com.gh.bmd.jrt.android.builder.LoaderConfiguration"
+                                   + ".ClashResolutionType.").append(resolutionType).append(")");
         }
 
         final TypeElement cacheAnnotationElement =
@@ -324,9 +323,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         if (strategyType != null) {
 
-            builder.append(
-                    ".withCacheStrategy(com.gh.bmd.jrt.android.builder.InvocationConfiguration"
-                            + ".CacheStrategyType.").append(strategyType).append(")");
+            builder.append(".withCacheStrategy(com.gh.bmd.jrt.android.builder.LoaderConfiguration"
+                                   + ".CacheStrategyType.").append(strategyType).append(")");
         }
 
         return builder.toString();

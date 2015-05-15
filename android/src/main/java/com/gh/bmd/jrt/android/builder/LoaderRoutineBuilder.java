@@ -13,18 +13,19 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.routine.ContextRoutine;
+import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of routines bound to a context lifecycle.
+ * Interface defining a builder of routines bound to a context lifecycle through loaders.
  * <p/>
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will always be dispatched in the main thread, no matter the calling one was,
+ * TODO: looper configuration?
  * so, waiting for the outputs right after the routine invocation, will result in a deadlock.<br/>
  * The local context of the invocations will always be the application one.
  * <p/>
@@ -33,15 +34,15 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface ContextRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT>,
-        ContextConfigurableBuilder<ContextRoutineBuilder<INPUT, OUTPUT>>,
-        ContextRoutine<INPUT, OUTPUT> {
+public interface LoaderRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT>,
+        LoaderConfigurableBuilder<LoaderRoutineBuilder<INPUT, OUTPUT>>,
+        LoaderRoutine<INPUT, OUTPUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ContextRoutine<INPUT, OUTPUT> buildRoutine();
+    LoaderRoutine<INPUT, OUTPUT> buildRoutine();
 
     /**
      * Note that all the options related to the output and input channels size and timeout will be
@@ -50,5 +51,5 @@ public interface ContextRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return the routine configuration builder.
      */
     @Nonnull
-    Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>> withRoutine();
+    Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> withRoutine();
 }

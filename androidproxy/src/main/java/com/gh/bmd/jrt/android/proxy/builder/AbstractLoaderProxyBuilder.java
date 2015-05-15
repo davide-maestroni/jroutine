@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.proxy.builder;
 
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -35,16 +35,15 @@ import javax.annotation.Nonnull;
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyBuilder<TYPE>,
-        RoutineConfiguration.Configurable<ContextProxyBuilder<TYPE>>,
-        ProxyConfiguration.Configurable<ContextProxyBuilder<TYPE>>,
-        InvocationConfiguration.Configurable<ContextProxyBuilder<TYPE>> {
+public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBuilder<TYPE>,
+        RoutineConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
+        ProxyConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
+        LoaderConfiguration.Configurable<LoaderProxyBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
@@ -67,11 +66,11 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
 
             final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
-            final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
+            final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo =
                     new ClassInfo(token, routineConfiguration, proxyConfiguration,
-                                  invocationConfiguration);
+                                  loaderConfiguration);
             final Object instance = classes.get(classInfo);
 
             if (instance != null) {
@@ -84,7 +83,7 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
             try {
 
                 final TYPE newInstance =
-                        newProxy(routineConfiguration, proxyConfiguration, invocationConfiguration);
+                        newProxy(routineConfiguration, proxyConfiguration, loaderConfiguration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -96,43 +95,43 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withRoutine() {
+    public RoutineConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
+        return new RoutineConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withInvocation() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withLoader() {
 
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ContextProxyBuilder<TYPE>> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ContextProxyBuilder<TYPE>>(this, config);
+        return new ProxyConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyBuilder<TYPE> setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public LoaderProxyBuilder<TYPE> setConfiguration(
+            @Nonnull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mInvocationConfiguration = configuration;
+        mLoaderConfiguration = configuration;
         return this;
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyBuilder<TYPE> setConfiguration(
+    public LoaderProxyBuilder<TYPE> setConfiguration(
             @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
@@ -146,7 +145,7 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyBuilder<TYPE> setConfiguration(
+    public LoaderProxyBuilder<TYPE> setConfiguration(
             @Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
@@ -177,15 +176,15 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
     /**
      * Creates and return a new proxy instance.
      *
-     * @param routineConfiguration    the routine configuration.
-     * @param proxyConfiguration      the proxy configuration.
-     * @param invocationConfiguration the invocation configuration.
+     * @param routineConfiguration the routine configuration.
+     * @param proxyConfiguration   the proxy configuration.
+     * @param loaderConfiguration  the loader configuration.
      * @return the proxy instance.
      */
     @Nonnull
     protected abstract TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
             @Nonnull final ProxyConfiguration proxyConfiguration,
-            @Nonnull final InvocationConfiguration invocationConfiguration);
+            @Nonnull final LoaderConfiguration loaderConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.
@@ -281,7 +280,7 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
      */
     private static class ClassInfo {
 
-        private final InvocationConfiguration mInvocationConfiguration;
+        private final LoaderConfiguration mLoaderConfiguration;
 
         private final ProxyConfiguration mProxyConfiguration;
 
@@ -292,20 +291,20 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
         /**
          * Constructor.
          *
-         * @param token                   the proxy interface token.
-         * @param routineConfiguration    the routine configuration.
-         * @param proxyConfiguration      the proxy configuration.
-         * @param invocationConfiguration the invocation configuration.
+         * @param token                the proxy interface token.
+         * @param routineConfiguration the routine configuration.
+         * @param proxyConfiguration   the proxy configuration.
+         * @param loaderConfiguration  the loader configuration.
          */
         private ClassInfo(@Nonnull final ClassToken<?> token,
                 @Nonnull final RoutineConfiguration routineConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final InvocationConfiguration invocationConfiguration) {
+                @Nonnull final LoaderConfiguration loaderConfiguration) {
 
             mType = token.getRawClass();
             mRoutineConfiguration = routineConfiguration;
             mProxyConfiguration = proxyConfiguration;
-            mInvocationConfiguration = invocationConfiguration;
+            mLoaderConfiguration = loaderConfiguration;
         }
 
         @Override
@@ -323,7 +322,7 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
             }
 
             final ClassInfo classInfo = (ClassInfo) o;
-            return mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
+            return mLoaderConfiguration.equals(classInfo.mLoaderConfiguration)
                     && mProxyConfiguration.equals(classInfo.mProxyConfiguration)
                     && mRoutineConfiguration.equals(classInfo.mRoutineConfiguration)
                     && mType.equals(classInfo.mType);
@@ -333,7 +332,7 @@ public abstract class AbstractContextProxyBuilder<TYPE> implements ContextProxyB
         public int hashCode() {
 
             // auto-generated code
-            int result = mInvocationConfiguration.hashCode();
+            int result = mLoaderConfiguration.hashCode();
             result = 31 * result + mProxyConfiguration.hashCode();
             result = 31 * result + mRoutineConfiguration.hashCode();
             result = 31 * result + mType.hashCode();

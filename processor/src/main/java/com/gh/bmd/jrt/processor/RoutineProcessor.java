@@ -501,7 +501,7 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     protected void checkDependencies() {
 
-        if (getTypeFromName("com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder") == null) {
+        if (processingEnv.getElementUtils().getPackageElement("com.gh.bmd.jrt.proxy") == null) {
 
             throw new IllegalStateException(
                     "the 'com.github.davide-maestroni:jroutine-proxy' artifact is missing! Please"

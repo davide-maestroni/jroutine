@@ -28,18 +28,18 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        this((Object) activity, targetClass, routineConfiguration, proxyConfiguration, invocationConfiguration);
+        this((Object) activity, targetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
     }
 
     public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final android.app.Fragment fragment,
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        this((Object) fragment, targetClass, routineConfiguration, proxyConfiguration, invocationConfiguration);
+        this((Object) fragment, targetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -47,7 +47,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
         if (context == null) {
 
@@ -66,23 +66,23 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onActivity(
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> onActivity(
             @javax.annotation.Nonnull final android.app.Activity activity,
             @javax.annotation.Nonnull final Class<?> targetClass) {
 
-        return new ${classNameSuffix}ContextProxyBuilder${genericTypes}(activity, targetClass);
+        return new LoaderProxyBuilder${genericTypes}(activity, targetClass);
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder<${interfaceFullName}> onFragment(
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> onFragment(
             @javax.annotation.Nonnull final android.app.Fragment fragment,
             @javax.annotation.Nonnull final Class<?> targetClass) {
 
-        return new ${classNameSuffix}ContextProxyBuilder${genericTypes}(fragment, targetClass);
+        return new LoaderProxyBuilder${genericTypes}(fragment, targetClass);
     }
 
     @javax.annotation.Nonnull
-    private static <OUTPUT> com.gh.bmd.jrt.android.builder.ContextRoutineBuilder<Object, OUTPUT> getBuilder(
+    private static <OUTPUT> com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder<Object, OUTPUT> getBuilder(
             @javax.annotation.Nonnull final java.lang.ref.WeakReference<Object> contextReference,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, OUTPUT> factory) {
 
@@ -146,7 +146,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(target, shareGroup);
     }
 
-    private static class ${classNameSuffix}ContextProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder<${interfaceFullName}> {
+    private static class LoaderProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {
 
         private final Object mContext;
 
@@ -154,7 +154,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
 
         private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
-        private ${classNameSuffix}ContextProxyBuilder(@javax.annotation.Nonnull final Object context, @javax.annotation.Nonnull final Class<?> targetClass) {
+        private LoaderProxyBuilder(@javax.annotation.Nonnull final Object context, @javax.annotation.Nonnull final Class<?> targetClass) {
 
             mContext = context;
             mTargetClass = targetClass;
@@ -179,8 +179,8 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         protected ${interfaceFullName} newProxy(
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mContext, mTargetClass, routineConfiguration, proxyConfiguration, invocationConfiguration);
+            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mContext, mTargetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
         }
     }

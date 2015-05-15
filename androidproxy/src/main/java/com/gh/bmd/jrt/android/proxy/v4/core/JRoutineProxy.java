@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.proxy.v4.core;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -65,10 +65,10 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
+    public static LoaderProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextProxyRoutineBuilder(activity, target);
+        return new DefaultLoaderProxyRoutineBuilder(activity, target);
     }
 
     /**
@@ -82,9 +82,9 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
+    public static LoaderProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextProxyRoutineBuilder(fragment, target);
+        return new DefaultLoaderProxyRoutineBuilder(fragment, target);
     }
 }

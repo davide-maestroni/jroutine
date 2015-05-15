@@ -31,7 +31,7 @@ import static com.gh.bmd.jrt.android.builder.ServiceConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Context invocation configuration unit tests.
+ * Service invocation configuration unit tests.
  * <p/>
  * Created by davide on 23/04/15.
  */

@@ -26,9 +26,9 @@ import android.util.SparseArray;
 
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -94,14 +94,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * @param context       the context reference.
      * @param factory       the invocation factory.
      * @param args          the invocation factory arguments.
-     * @param configuration the invocation configuration.
+     * @param configuration the loader configuration.
      * @param order         the input data order.
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
-            @Nonnull final Object[] args, @Nonnull final InvocationConfiguration configuration,
+            @Nonnull final Object[] args, @Nonnull final LoaderConfiguration configuration,
             @Nullable final OrderType order, @Nonnull final Logger logger) {
 
         if (context == null) {
@@ -121,7 +121,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         mContext = context;
         mFactory = factory;
-        mLoaderId = configuration.getInvocationIdOr(InvocationConfiguration.AUTO);
+        mLoaderId = configuration.getInvocationIdOr(LoaderConfiguration.AUTO);
         mClashResolutionType =
                 configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
         mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
@@ -255,7 +255,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if (((loaderId == InvocationConfiguration.AUTO) || (loaderId == id))
+                if (((loaderId == LoaderConfiguration.AUTO) || (loaderId == id))
                         && loader.areSameInputs(inputs)) {
 
                     loaderManager.destroyLoader(id);
@@ -399,7 +399,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if ((loaderId == InvocationConfiguration.AUTO) || (loaderId == id)) {
+                if ((loaderId == LoaderConfiguration.AUTO) || (loaderId == id)) {
 
                     loaderManager.destroyLoader(id);
                     callbackArray.removeAt(i);
@@ -480,7 +480,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         int loaderId = mLoaderId;
 
-        if (loaderId == InvocationConfiguration.AUTO) {
+        if (loaderId == LoaderConfiguration.AUTO) {
 
             loaderId = mFactory.getInvocationType().hashCode();
 

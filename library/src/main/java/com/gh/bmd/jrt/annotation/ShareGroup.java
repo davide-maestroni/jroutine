@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.annotation;
 
-import com.gh.bmd.jrt.builder.ProxyConfiguration;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -56,7 +54,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide on 1/26/15.
  *
- * @see ProxyConfiguration
+ * @see com.gh.bmd.jrt.builder.ProxyConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

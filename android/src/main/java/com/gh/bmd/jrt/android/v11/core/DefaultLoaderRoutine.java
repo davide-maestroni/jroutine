@@ -11,16 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v4.core;
+package com.gh.bmd.jrt.android.v11.core;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
-import com.gh.bmd.jrt.android.routine.ContextRoutine;
+import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -51,12 +53,13 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
-        implements ContextRoutine<INPUT, OUTPUT> {
+@TargetApi(VERSION_CODES.HONEYCOMB)
+class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
+        implements LoaderRoutine<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 
-    private final InvocationConfiguration mConfiguration;
+    private final LoaderConfiguration mConfiguration;
 
     private final WeakReference<Object> mContext;
 
@@ -69,17 +72,17 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
     /**
      * Constructor.
      *
-     * @param context                 the context reference.
-     * @param factory                 the invocation factory.
-     * @param routineConfiguration    the routine configuration.
-     * @param invocationConfiguration the invocation configuration.
+     * @param context              the context reference.
+     * @param factory              the invocation factory.
+     * @param routineConfiguration the routine configuration.
+     * @param loaderConfiguration  the loader configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultContextRoutine(@Nonnull final WeakReference<Object> context,
+    DefaultLoaderRoutine(@Nonnull final WeakReference<Object> context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
             @Nonnull final RoutineConfiguration routineConfiguration,
-            @Nonnull final InvocationConfiguration invocationConfiguration) {
+            @Nonnull final LoaderConfiguration loaderConfiguration) {
 
         super(routineConfiguration);
 
@@ -93,19 +96,19 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
             throw new NullPointerException("the context invocation factory must not be null");
         }
 
-        if (invocationConfiguration == null) {
+        if (loaderConfiguration == null) {
 
-            throw new NullPointerException("the invocation configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mContext = context;
         mFactory = factory;
-        mConfiguration = invocationConfiguration;
-        mInvocationId = invocationConfiguration.getInvocationIdOr(InvocationConfiguration.AUTO);
+        mConfiguration = loaderConfiguration;
+        mInvocationId = loaderConfiguration.getInvocationIdOr(LoaderConfiguration.AUTO);
         mArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         mOrderType = routineConfiguration.getOutputOrderTypeOr(null);
         getLogger().dbg("building context routine with invocation type %s and configuration: %s",
-                        factory.getInvocationType(), invocationConfiguration);
+                        factory.getInvocationType(), loaderConfiguration);
     }
 
     @Override
@@ -164,9 +167,9 @@ class DefaultContextRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         final Context appContext;
 
-        if (context instanceof FragmentActivity) {
+        if (context instanceof Activity) {
 
-            final FragmentActivity activity = (FragmentActivity) context;
+            final Activity activity = (Activity) context;
             appContext = activity.getApplicationContext();
 
         } else if (context instanceof Fragment) {

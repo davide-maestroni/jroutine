@@ -18,7 +18,7 @@ import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -70,7 +70,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextProxyRoutineBuilder onActivity(@Nonnull final Activity activity,
+    public static LoaderProxyRoutineBuilder onActivity(@Nonnull final Activity activity,
             @Nonnull final Class<?> target) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -82,7 +82,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
                             + "instead");
         }
 
-        return new DefaultContextProxyRoutineBuilder(activity, target);
+        return new DefaultLoaderProxyRoutineBuilder(activity, target);
     }
 
     /**
@@ -96,9 +96,9 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
+    public static LoaderProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextProxyRoutineBuilder(fragment, target);
+        return new DefaultLoaderProxyRoutineBuilder(fragment, target);
     }
 }

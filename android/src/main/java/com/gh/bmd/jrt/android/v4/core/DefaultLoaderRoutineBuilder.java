@@ -11,17 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v11.core;
+package com.gh.bmd.jrt.android.v4.core;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Fragment;
-import android.os.Build.VERSION_CODES;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
-import com.gh.bmd.jrt.android.routine.ContextRoutine;
+import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
@@ -36,36 +34,34 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of an Android routine builder.
+ * Default implementation of an loader routine builder.
  * <p/>
  * Created by davide on 12/9/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
-class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
-        implements ContextRoutineBuilder<INPUT, OUTPUT>,
-        InvocationConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>> {
+class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
+        implements LoaderRoutineBuilder<INPUT, OUTPUT>,
+        LoaderConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>> {
 
     private final WeakReference<Object> mContext;
 
     private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
-    private final RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>
+    private final RoutineConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>>
             mRoutineConfigurable =
-            new RoutineConfiguration.Configurable<ContextRoutineBuilder<INPUT, OUTPUT>>() {
+            new RoutineConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>>() {
 
                 @Nonnull
-                public ContextRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+                public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
                         @Nonnull final RoutineConfiguration configuration) {
 
-                    return DefaultContextRoutineBuilder.this.setConfiguration(configuration);
+                    return DefaultLoaderRoutineBuilder.this.setConfiguration(configuration);
                 }
             };
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -75,7 +71,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
      *                                            static.
      */
-    DefaultContextRoutineBuilder(@Nonnull final Activity activity,
+    DefaultLoaderRoutineBuilder(@Nonnull final FragmentActivity activity,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         this((Object) activity, factory);
@@ -89,7 +85,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
      *                                            static.
      */
-    DefaultContextRoutineBuilder(@Nonnull final Fragment fragment,
+    DefaultLoaderRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         this((Object) fragment, factory);
@@ -104,7 +100,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultContextRoutineBuilder(@Nonnull final Object context,
+    private DefaultLoaderRoutineBuilder(@Nonnull final Object context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         if (context == null) {
@@ -126,7 +122,7 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ContextRoutine<INPUT, OUTPUT> buildRoutine() {
+    public LoaderRoutine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = getConfiguration();
         warn(configuration);
@@ -137,8 +133,8 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
                              .withInputTimeout(TimeDuration.INFINITY)
                              .withOutputMaxSize(Integer.MAX_VALUE)
                              .withOutputTimeout(TimeDuration.INFINITY);
-        return new DefaultContextRoutine<INPUT, OUTPUT>(mContext, mFactory, builder.set(),
-                                                        mInvocationConfiguration);
+        return new DefaultLoaderRoutine<INPUT, OUTPUT>(mContext, mFactory, builder.set(),
+                                                       mLoaderConfiguration);
     }
 
     @Override
@@ -164,20 +160,20 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextRoutineBuilder<INPUT, OUTPUT> setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mInvocationConfiguration = configuration;
+        mLoaderConfiguration = configuration;
         return this;
     }
 
     @Nonnull
-    public ContextRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+    public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
             @Nonnull final RoutineConfiguration configuration) {
 
         super.setConfiguration(configuration);
@@ -187,19 +183,17 @@ class DefaultContextRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     @Nonnull
     @Override
     public RoutineConfiguration.Builder<? extends
-            ContextRoutineBuilder<INPUT, OUTPUT>> withRoutine() {
+            LoaderRoutineBuilder<INPUT, OUTPUT>> withRoutine() {
 
-        return new RoutineConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(
+        return new RoutineConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(
                 mRoutineConfigurable, getConfiguration());
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextRoutineBuilder<INPUT, OUTPUT>>
-    withInvocation() {
+    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> withLoader() {
 
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextRoutineBuilder<INPUT, OUTPUT>>(this,
-                                                                                         config);
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(this, config);
     }
 
     /**

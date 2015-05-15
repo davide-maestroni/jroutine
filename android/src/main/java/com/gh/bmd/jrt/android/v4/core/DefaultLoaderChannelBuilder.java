@@ -16,10 +16,10 @@ package com.gh.bmd.jrt.android.v4.core;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.ContextChannelBuilder;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -37,20 +37,19 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of an Android channel builder.
+ * Default implementation of an loader channel builder.
  * <p/>
  * Created by davide on 1/14/15.
  */
-class DefaultContextChannelBuilder implements ContextChannelBuilder,
-        InvocationConfiguration.Configurable<ContextChannelBuilder>,
-        RoutineConfiguration.Configurable<ContextChannelBuilder> {
+class DefaultLoaderChannelBuilder
+        implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
+        RoutineConfiguration.Configurable<LoaderChannelBuilder> {
 
     private final WeakReference<Object> mContext;
 
     private final int mInvocationId;
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
@@ -60,7 +59,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
      * @param activity     the context activity.
      * @param invocationId the invocation ID.
      */
-    DefaultContextChannelBuilder(@Nonnull final FragmentActivity activity, final int invocationId) {
+    DefaultLoaderChannelBuilder(@Nonnull final FragmentActivity activity, final int invocationId) {
 
         this((Object) activity, invocationId);
     }
@@ -71,7 +70,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
      * @param fragment     the context fragment.
      * @param invocationId the invocation ID.
      */
-    DefaultContextChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
+    DefaultLoaderChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
 
         this((Object) fragment, invocationId);
     }
@@ -83,7 +82,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
      * @param invocationId the invocation ID.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultContextChannelBuilder(@Nonnull final Object context, final int invocationId) {
+    private DefaultLoaderChannelBuilder(@Nonnull final Object context, final int invocationId) {
 
         if (context == null) {
 
@@ -104,7 +103,7 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
             return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf()).callSync();
         }
 
-        final ContextRoutineBuilder<OUTPUT, OUTPUT> builder;
+        final LoaderRoutineBuilder<OUTPUT, OUTPUT> builder;
 
         if (context instanceof FragmentActivity) {
 
@@ -125,9 +124,9 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
         }
 
         final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
-        final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
+        final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
         final ClashResolutionType resolutionType =
-                invocationConfiguration.getClashResolutionTypeOr(null);
+                loaderConfiguration.getClashResolutionTypeOr(null);
 
         if (resolutionType != null) {
 
@@ -138,9 +137,9 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
         return builder.withRoutine()
                       .with(routineConfiguration)
                       .set()
-                      .withInvocation()
+                      .withLoader()
                       .withId(mInvocationId)
-                      .with(invocationConfiguration)
+                      .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.KEEP_THAT)
                       .set()
                       .callAsync();
@@ -213,36 +212,35 @@ class DefaultContextChannelBuilder implements ContextChannelBuilder,
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation() {
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader() {
 
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextChannelBuilder>(this, config);
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutine() {
+    public RoutineConfiguration.Builder<? extends LoaderChannelBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextChannelBuilder>(this, config);
+        return new RoutineConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextChannelBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public LoaderChannelBuilder setConfiguration(@Nonnull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mInvocationConfiguration = configuration;
+        mLoaderConfiguration = configuration;
         return this;
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextChannelBuilder setConfiguration(
+    public LoaderChannelBuilder setConfiguration(
             @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {

@@ -52,7 +52,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
             @javax.annotation.Nonnull final android.content.Context context,
             @javax.annotation.Nonnull final Class<?> targetClass) {
 
-        return new ${classNameSuffix}ServiceProxyBuilder${genericTypes}(context, targetClass);
+        return new ServiceProxyBuilder${genericTypes}(context, targetClass);
     }
 
     @javax.annotation.Nonnull
@@ -111,7 +111,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(target, shareGroup);
     }
 
-    private static class ${classNameSuffix}ServiceProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {
+    private static class ServiceProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {
 
         private final android.content.Context mContext;
 
@@ -119,7 +119,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
 
         private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
-        private ${classNameSuffix}ServiceProxyBuilder(@javax.annotation.Nonnull final android.content.Context context,
+        private ServiceProxyBuilder(@javax.annotation.Nonnull final android.content.Context context,
                 @javax.annotation.Nonnull final Class<?> targetClass) {
 
             mContext = context;

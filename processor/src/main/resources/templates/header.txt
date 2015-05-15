@@ -40,7 +40,7 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
 
-        return new ${classNameSuffix}ProxyBuilder${genericTypes}(wrapped);
+        return new ProxyBuilder${genericTypes}(wrapped);
     }
 
     @javax.annotation.Nullable
@@ -54,14 +54,14 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
         return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(mWrapped, shareGroup);
     }
 
-    private static class ${classNameSuffix}ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
+    private static class ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
 
         private final ${classFullName} mTarget;
 
         private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
-        private ${classNameSuffix}ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
+        private ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
 
             if (target == null) {
 

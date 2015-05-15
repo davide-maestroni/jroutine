@@ -18,7 +18,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.R;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
@@ -169,7 +169,7 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         try {
 
-            new DefaultContextObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
                     (RoutineConfiguration) null);
 
             fail();
@@ -180,7 +180,7 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         try {
 
-            new DefaultContextObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -191,8 +191,8 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         try {
 
-            new DefaultContextObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
-                    (InvocationConfiguration) null);
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
+                    (LoaderConfiguration) null);
 
             fail();
 
@@ -967,7 +967,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocation()
+                           .withLoader()
                            .withId(0)
                            .set()
                            .boundMethod("test")
@@ -980,7 +980,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocation()
+                    .withLoader()
                     .withId(1)
                     .set()
                     .boundMethod("test")
@@ -997,7 +997,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocation()
+                           .withLoader()
                            .withId(2)
                            .set()
                            .method("getInt")
@@ -1010,7 +1010,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocation()
+                    .withLoader()
                     .withId(3)
                     .set()
                     .method("getInt")
@@ -1027,7 +1027,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocation()
+                           .withLoader()
                            .withId(4)
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
@@ -1040,7 +1040,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocation()
+                    .withLoader()
                     .withId(5)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
@@ -1057,7 +1057,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withInvocation()
+                           .withLoader()
                            .withId(6)
                            .set()
                            .buildProxy(TestTimeoutItf.class)
@@ -1069,7 +1069,7 @@ public class ContextObjectRoutineBuilderFragmentTest
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withInvocation()
+                    .withLoader()
                     .withId(7)
                     .set()
                     .buildProxy(TestTimeoutItf.class)

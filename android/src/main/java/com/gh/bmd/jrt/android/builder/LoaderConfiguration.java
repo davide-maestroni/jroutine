@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Class storing the context invocation configuration.
+ * Class storing the invocation loader configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
@@ -28,7 +28,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 19/04/15.
  */
-public final class InvocationConfiguration {
+public final class LoaderConfiguration {
+
+    // TODO: looper configuration?
 
     /**
      * Constant identifying an invocation ID computed from the executor class and the input
@@ -36,12 +38,12 @@ public final class InvocationConfiguration {
      */
     public static final int AUTO = Integer.MIN_VALUE;
 
-    private static final Configurable<InvocationConfiguration> sDefaultConfigurable =
-            new Configurable<InvocationConfiguration>() {
+    private static final Configurable<LoaderConfiguration> sDefaultConfigurable =
+            new Configurable<LoaderConfiguration>() {
 
                 @Nonnull
-                public InvocationConfiguration setConfiguration(
-                        @Nonnull final InvocationConfiguration configuration) {
+                public LoaderConfiguration setConfiguration(
+                        @Nonnull final LoaderConfiguration configuration) {
 
                     return configuration;
                 }
@@ -50,8 +52,7 @@ public final class InvocationConfiguration {
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
-    public static final InvocationConfiguration DEFAULT_CONFIGURATION =
-            builder().buildConfiguration();
+    public static final LoaderConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
     private final int mInvocationId;
 
@@ -66,7 +67,7 @@ public final class InvocationConfiguration {
      * @param resolutionType the type of resolution.
      * @param strategyType   the cache strategy type.
      */
-    private InvocationConfiguration(final int invocationId,
+    private LoaderConfiguration(final int invocationId,
             @Nullable final ClashResolutionType resolutionType,
             @Nullable final CacheStrategyType strategyType) {
 
@@ -76,37 +77,37 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns a invocation configuration builder.
+     * Returns a loader configuration builder.
      *
      * @return the builder.
      */
     @Nonnull
-    public static Builder<InvocationConfiguration> builder() {
+    public static Builder<LoaderConfiguration> builder() {
 
-        return new Builder<InvocationConfiguration>(sDefaultConfigurable);
+        return new Builder<LoaderConfiguration>(sDefaultConfigurable);
     }
 
     /**
-     * Returns a invocation configuration builder initialized with the specified configuration.
+     * Returns a loader configuration builder initialized with the specified configuration.
      *
-     * @param initialConfiguration the initial invocation configuration.
+     * @param initialConfiguration the initial loader configuration.
      * @return the builder.
      */
     @Nonnull
-    public static Builder<InvocationConfiguration> builderFrom(
-            @Nullable final InvocationConfiguration initialConfiguration) {
+    public static Builder<LoaderConfiguration> builderFrom(
+            @Nullable final LoaderConfiguration initialConfiguration) {
 
         return (initialConfiguration == null) ? builder()
-                : new Builder<InvocationConfiguration>(sDefaultConfigurable, initialConfiguration);
+                : new Builder<LoaderConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
     /**
-     * Returns a invocation configuration builder initialized with this configuration.
+     * Returns a loader configuration builder initialized with this configuration.
      *
      * @return the builder.
      */
     @Nonnull
-    public Builder<InvocationConfiguration> builderFrom() {
+    public Builder<LoaderConfiguration> builderFrom() {
 
         return builderFrom(this);
     }
@@ -120,12 +121,12 @@ public final class InvocationConfiguration {
             return true;
         }
 
-        if (!(o instanceof InvocationConfiguration)) {
+        if (!(o instanceof LoaderConfiguration)) {
 
             return false;
         }
 
-        final InvocationConfiguration that = (InvocationConfiguration) o;
+        final LoaderConfiguration that = (LoaderConfiguration) o;
         return mInvocationId == that.mInvocationId && mResolutionType == that.mResolutionType
                 && mStrategyType == that.mStrategyType;
     }
@@ -143,7 +144,7 @@ public final class InvocationConfiguration {
     @Override
     public String toString() {
 
-        return "InvocationConfiguration{" +
+        return "LoaderConfiguration{" +
                 "mInvocationId=" + mInvocationId +
                 ", mResolutionType=" + mResolutionType +
                 ", mStrategyType=" + mStrategyType +
@@ -268,11 +269,11 @@ public final class InvocationConfiguration {
          * @return the configurable instance.
          */
         @Nonnull
-        TYPE setConfiguration(@Nonnull InvocationConfiguration configuration);
+        TYPE setConfiguration(@Nonnull LoaderConfiguration configuration);
     }
 
     /**
-     * Builder of invocation configurations.
+     * Builder of loader configurations.
      */
     public static final class Builder<TYPE> {
 
@@ -304,11 +305,11 @@ public final class InvocationConfiguration {
         /**
          * Constructor.
          *
-         * @param initialConfiguration the initial invocation configuration.
+         * @param initialConfiguration the initial loader configuration.
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final InvocationConfiguration initialConfiguration) {
+                @Nonnull final LoaderConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -335,11 +336,11 @@ public final class InvocationConfiguration {
          * configuration options need to be set to their default value, otherwise only the set
          * options will be applied.
          *
-         * @param configuration the invocation configuration.
+         * @param configuration the loader configuration.
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
+        public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
 
             if (configuration == null) {
 
@@ -415,12 +416,12 @@ public final class InvocationConfiguration {
         }
 
         @Nonnull
-        private InvocationConfiguration buildConfiguration() {
+        private LoaderConfiguration buildConfiguration() {
 
-            return new InvocationConfiguration(mInvocationId, mResolutionType, mStrategyType);
+            return new LoaderConfiguration(mInvocationId, mResolutionType, mStrategyType);
         }
 
-        private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {
+        private void setConfiguration(@Nonnull final LoaderConfiguration configuration) {
 
             mInvocationId = configuration.mInvocationId;
             mResolutionType = configuration.mResolutionType;

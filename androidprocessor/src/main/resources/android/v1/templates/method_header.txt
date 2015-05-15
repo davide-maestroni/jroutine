@@ -34,7 +34,7 @@
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.InvocationConfiguration invocationConfiguration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
         final Object[] args = routineConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.common.Reflection.NO_ARGS);
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}())
@@ -47,8 +47,8 @@
                                            .withOutputMaxSize(Integer.MAX_VALUE)
                                            .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .set()
-                                           .withInvocation()
-                                           .with(invocationConfiguration)
+                                           .withLoader()
+                                           .with(loaderConfiguration)
                                            ${invocationBuilderOptions}
                                            .set()
                                            .buildRoutine();

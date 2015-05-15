@@ -27,10 +27,10 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 1/14/15.
  *
- * @see ContextRoutineBuilder
+ * @see com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder
  */
-public interface ContextChannelBuilder extends ConfigurableBuilder<ContextChannelBuilder>,
-        ContextConfigurableBuilder<ContextChannelBuilder> {
+public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelBuilder>,
+        LoaderConfigurableBuilder<LoaderChannelBuilder> {
 
     /**
      * Builds and returns an output channel bound to the routine invocation.
@@ -69,10 +69,10 @@ public interface ContextChannelBuilder extends ConfigurableBuilder<ContextChanne
     /**
      * Note that the clash resolution type will be ignored.
      *
-     * @return the invocation configuration builder.
+     * @return the loader configuration builder.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ContextChannelBuilder> withInvocation();
+    LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader();
 
     /**
      * Note that only the options related to logs will be employed.
@@ -80,5 +80,5 @@ public interface ContextChannelBuilder extends ConfigurableBuilder<ContextChanne
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextChannelBuilder> withRoutine();
+    RoutineConfiguration.Builder<? extends LoaderChannelBuilder> withRoutine();
 }

@@ -13,27 +13,27 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.Builder;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a configurable builder of context routines.
+ * Interface defining a configurable builder of routines backed by loaders.
  * <p/>
  * Created by davide on 01/05/15.
  *
  * @param <TYPE> the builder type.
  */
-public interface ContextConfigurableBuilder<TYPE> {
+public interface LoaderConfigurableBuilder<TYPE> {
 
     /**
-     * Gets the invocation configuration builder related to this builder instance.
+     * Gets the loader configuration builder related to this builder instance.
      * The configuration options not supported by the builder implementation might be ignored.
      * <p/>
      * Note that the builder will be initialized with the current configuration.
      *
-     * @return the invocation configuration builder.
+     * @return the loader configuration builder.
      */
     @Nonnull
-    Builder<? extends TYPE> withInvocation();
+    Builder<? extends TYPE> withLoader();
 }

@@ -16,10 +16,10 @@ package com.gh.bmd.jrt.android.v4.core;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.ContextChannelBuilder;
-import com.gh.bmd.jrt.android.builder.ContextObjectRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
@@ -148,10 +148,10 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextObjectRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
+    public static LoaderObjectRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextObjectRoutineBuilder(activity, target);
+        return new DefaultLoaderObjectRoutineBuilder(activity, target);
     }
 
     /**
@@ -170,11 +170,11 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      *                                            static.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onActivity(
+    public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> onActivity(
             @Nonnull final FragmentActivity activity,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
-        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(activity, factory);
+        return new DefaultLoaderRoutineBuilder<INPUT, OUTPUT>(activity, factory);
     }
 
     /**
@@ -190,7 +190,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onActivity(
+    public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> onActivity(
             @Nonnull final FragmentActivity activity,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> token) {
 
@@ -210,15 +210,15 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      */
     @Nonnull
-    public static ContextChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
+    public static LoaderChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
             final int id) {
 
-        if (id == InvocationConfiguration.AUTO) {
+        if (id == LoaderConfiguration.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultContextChannelBuilder(activity, id);
+        return new DefaultLoaderChannelBuilder(activity, id);
     }
 
     /**
@@ -232,10 +232,10 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextObjectRoutineBuilder onFragment(@Nonnull final Fragment fragment,
+    public static LoaderObjectRoutineBuilder onFragment(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextObjectRoutineBuilder(fragment, target);
+        return new DefaultLoaderObjectRoutineBuilder(fragment, target);
     }
 
     /**
@@ -254,11 +254,11 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      *                                            static.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onFragment(
+    public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> onFragment(
             @Nonnull final Fragment fragment,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
-        return new DefaultContextRoutineBuilder<INPUT, OUTPUT>(fragment, factory);
+        return new DefaultLoaderRoutineBuilder<INPUT, OUTPUT>(fragment, factory);
     }
 
     /**
@@ -274,7 +274,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> onFragment(
+    public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> onFragment(
             @Nonnull final Fragment fragment,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> token) {
 
@@ -294,13 +294,13 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      */
     @Nonnull
-    public static ContextChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
+    public static LoaderChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
 
-        if (id == InvocationConfiguration.AUTO) {
+        if (id == LoaderConfiguration.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultContextChannelBuilder(fragment, id);
+        return new DefaultLoaderChannelBuilder(fragment, id);
     }
 }

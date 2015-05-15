@@ -19,8 +19,8 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.android.proxy.R;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.android.v4.core.JRoutine;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Param;
@@ -73,11 +73,10 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final ContextProxyRoutineBuilder builder =
-                JRoutineProxy.onFragment(fragment, TestList.class)
-                             .withRoutine()
-                             .withReadTimeout(seconds(10))
-                             .set();
+        final LoaderProxyRoutineBuilder builder = JRoutineProxy.onFragment(fragment, TestList.class)
+                                                               .withRoutine()
+                                                               .withReadTimeout(seconds(10))
+                                                               .set();
 
         final TestListItf<String> testListItf1 =
                 builder.buildProxy(new ClassToken<TestListItf<String>>() {});
@@ -190,7 +189,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final ContextProxyBuilder<TestProxy> builder =
+        final LoaderProxyBuilder<TestProxy> builder =
                 ContextProxyFragmentTestTestProxy_V4Proxy.onFragment(fragment, TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
@@ -279,7 +278,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final ContextProxyRoutineBuilder builder =
+        final LoaderProxyRoutineBuilder builder =
                 JRoutineProxy.onFragment(fragment, TestClass2.class)
                              .withRoutine()
                              .withReadTimeout(seconds(10))

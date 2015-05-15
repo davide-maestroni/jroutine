@@ -11,15 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v11.core;
+package com.gh.bmd.jrt.android.proxy.v4.core;
 
-import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
-import com.gh.bmd.jrt.android.proxy.builder.AbstractContextProxyBuilder;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
+import com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -36,17 +36,16 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * <p/>
  * Created by davide on 06/05/15.
  */
-class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
-        RoutineConfiguration.Configurable<ContextProxyRoutineBuilder>,
-        ProxyConfiguration.Configurable<ContextProxyRoutineBuilder>,
-        InvocationConfiguration.Configurable<ContextProxyRoutineBuilder> {
+class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
+        RoutineConfiguration.Configurable<LoaderProxyRoutineBuilder>,
+        ProxyConfiguration.Configurable<LoaderProxyRoutineBuilder>,
+        LoaderConfiguration.Configurable<LoaderProxyRoutineBuilder> {
 
     private final WeakReference<?> mContextReference;
 
     private final Class<?> mTargetClass;
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
@@ -58,7 +57,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
      * @param activity    the invocation activity context.
      * @param targetClass the target class.
      */
-    DefaultContextProxyRoutineBuilder(@Nonnull final Activity activity,
+    DefaultLoaderProxyRoutineBuilder(@Nonnull final FragmentActivity activity,
             @Nonnull final Class<?> targetClass) {
 
         this((Object) activity, targetClass);
@@ -70,7 +69,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
      * @param fragment    the invocation fragment context.
      * @param targetClass the target class.
      */
-    DefaultContextProxyRoutineBuilder(@Nonnull final Fragment fragment,
+    DefaultLoaderProxyRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> targetClass) {
 
         this((Object) fragment, targetClass);
@@ -83,7 +82,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
      * @param targetClass the target class.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultContextProxyRoutineBuilder(@Nonnull final Object context,
+    private DefaultLoaderProxyRoutineBuilder(@Nonnull final Object context,
             @Nonnull final Class<?> targetClass) {
 
         if (context == null) {
@@ -122,44 +121,44 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
             throw new IllegalStateException("the context object has been destroyed");
         }
 
-        final ObjectContextProxyBuilder<TYPE> builder =
-                new ObjectContextProxyBuilder<TYPE>(context, mTargetClass, itf);
+        final ObjectLoaderProxyBuilder<TYPE> builder =
+                new ObjectLoaderProxyBuilder<TYPE>(context, mTargetClass, itf);
         return builder.withRoutine()
                       .with(mRoutineConfiguration)
                       .set()
                       .withProxy()
                       .with(mProxyConfiguration)
                       .set()
-                      .withInvocation()
-                      .with(mInvocationConfiguration)
+                      .withLoader()
+                      .with(mLoaderConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine() {
+    public RoutineConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
+        return new RoutineConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextProxyRoutineBuilder> withInvocation() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withLoader() {
 
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ContextProxyRoutineBuilder>(this, config);
+        return new ProxyConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyRoutineBuilder setConfiguration(
+    public LoaderProxyRoutineBuilder setConfiguration(
             @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
@@ -173,7 +172,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyRoutineBuilder setConfiguration(
+    public LoaderProxyRoutineBuilder setConfiguration(
             @Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
@@ -187,15 +186,15 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextProxyRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public LoaderProxyRoutineBuilder setConfiguration(
+            @Nonnull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
-        mInvocationConfiguration = configuration;
+        mLoaderConfiguration = configuration;
         return this;
     }
 
@@ -204,7 +203,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectContextProxyBuilder<TYPE> extends AbstractContextProxyBuilder<TYPE> {
+    private static class ObjectLoaderProxyBuilder<TYPE> extends AbstractLoaderProxyBuilder<TYPE> {
 
         private final Object mContext;
 
@@ -219,7 +218,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
          * @param targetClass    the proxy target class.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectContextProxyBuilder(@Nonnull final Object context,
+        private ObjectLoaderProxyBuilder(@Nonnull final Object context,
                 @Nonnull final Class<?> targetClass,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
@@ -246,7 +245,7 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
         @Override
         protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final InvocationConfiguration invocationConfiguration) {
+                @Nonnull final LoaderConfiguration loaderConfiguration) {
 
             try {
 
@@ -265,14 +264,14 @@ class DefaultContextProxyRoutineBuilder implements ContextProxyRoutineBuilder,
                     enclosingClass = enclosingClass.getEnclosingClass();
                 }
 
-                final String className = packageName + classNamePrefix + V11Proxy.CLASS_NAME_SUFFIX;
+                final String className = packageName + classNamePrefix + V4Proxy.CLASS_NAME_SUFFIX;
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), context, targetClass,
                                         routineConfiguration, proxyConfiguration,
-                                        invocationConfiguration);
+                                        loaderConfiguration);
                 return interfaceClass.cast(
                         constructor.newInstance(context, targetClass, routineConfiguration,
-                                                proxyConfiguration, invocationConfiguration));
+                                                proxyConfiguration, loaderConfiguration));
 
             } catch (final Throwable t) {
 

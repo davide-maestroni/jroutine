@@ -19,8 +19,8 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyBuilder;
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.android.v4.core.JRoutine;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Param;
@@ -75,7 +75,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
             return;
         }
 
-        final ContextProxyRoutineBuilder builder =
+        final LoaderProxyRoutineBuilder builder =
                 JRoutineProxy.onActivity(getActivity(), TestList.class)
                              .withRoutine()
                              .withReadTimeout(seconds(10))
@@ -200,7 +200,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final ContextProxyBuilder<TestProxy> builder =
+        final LoaderProxyBuilder<TestProxy> builder =
                 ContextProxyActivityTestTestProxy_V11Proxy.onActivity(getActivity(),
                                                                       TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
@@ -295,7 +295,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
             return;
         }
 
-        final ContextProxyRoutineBuilder builder =
+        final LoaderProxyRoutineBuilder builder =
                 JRoutineProxy.onActivity(getActivity(), TestClass2.class)
                              .withRoutine()
                              .withReadTimeout(seconds(10))

@@ -38,10 +38,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide on 1/28/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class ContextRoutineBuilderRotationTest
+public class LoaderRoutineBuilderRotationTest
         extends ActivityInstrumentationTestCase2<RotationTestActivity> {
 
-    public ContextRoutineBuilderRotationTest() {
+    public LoaderRoutineBuilderRotationTest() {
 
         super(RotationTestActivity.class);
     }
@@ -58,7 +58,7 @@ public class ContextRoutineBuilderRotationTest
                 .withRoutine()
                 .withOutputOrder(OrderType.PASS_ORDER)
                 .set()
-                .withInvocation()
+                .withLoader()
                 .withId(0)
                 .set()
                 .callAsync("test1", "test2");

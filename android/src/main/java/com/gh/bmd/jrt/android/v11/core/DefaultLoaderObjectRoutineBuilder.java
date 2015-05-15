@@ -11,19 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v4.core;
+package com.gh.bmd.jrt.android.v11.core;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.annotation.CacheStrategy;
 import com.gh.bmd.jrt.android.annotation.ClashResolution;
 import com.gh.bmd.jrt.android.annotation.InvocationId;
-import com.gh.bmd.jrt.android.builder.ContextObjectRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.ContextRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
@@ -71,10 +71,10 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * <p/>
  * Created by Davide on 4/6/2015.
  */
-class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
-        InvocationConfiguration.Configurable<ContextObjectRoutineBuilder>,
-        ProxyConfiguration.Configurable<ContextObjectRoutineBuilder>,
-        RoutineConfiguration.Configurable<ContextObjectRoutineBuilder> {
+class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
+        LoaderConfiguration.Configurable<LoaderObjectRoutineBuilder>,
+        ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
+        RoutineConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
     private static final BoundMethodInvocationFactory<Object, Object> sBoundMethodFactory =
             new BoundMethodInvocationFactory<Object, Object>();
@@ -91,8 +91,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
     private final Class<?> mTargetClass;
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
@@ -104,7 +103,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      * @param activity    the context activity.
      * @param targetClass the invocation class token.
      */
-    DefaultContextObjectRoutineBuilder(@Nonnull final FragmentActivity activity,
+    DefaultLoaderObjectRoutineBuilder(@Nonnull final Activity activity,
             @Nonnull final Class<?> targetClass) {
 
         this((Object) activity, targetClass);
@@ -116,7 +115,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      * @param fragment    the context fragment.
      * @param targetClass the invocation class token.
      */
-    DefaultContextObjectRoutineBuilder(@Nonnull final Fragment fragment,
+    DefaultLoaderObjectRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> targetClass) {
 
         this((Object) fragment, targetClass);
@@ -129,7 +128,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
      * @param targetClass the target object class.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultContextObjectRoutineBuilder(@Nonnull final Object context,
+    private DefaultLoaderObjectRoutineBuilder(@Nonnull final Object context,
             @Nonnull final Class<?> targetClass) {
 
         if (context == null) {
@@ -162,10 +161,10 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static InvocationConfiguration configurationWithAnnotations(
-            @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
+    private static LoaderConfiguration configurationWithAnnotations(
+            @Nonnull final LoaderConfiguration configuration, @Nonnull final Method method) {
 
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+        final LoaderConfiguration.Builder<LoaderConfiguration> builder =
                 configuration.builderFrom();
 
         final InvocationId idAnnotation = method.getAnnotation(InvocationId.class);
@@ -250,7 +249,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static <INPUT, OUTPUT> ContextRoutineBuilder<INPUT, OUTPUT> getBuilder(
+    private static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> getBuilder(
             @Nonnull WeakReference<Object> contextReference,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
@@ -261,9 +260,9 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             throw new IllegalStateException("the routine context has been destroyed");
         }
 
-        if (context instanceof FragmentActivity) {
+        if (context instanceof Activity) {
 
-            return JRoutine.onActivity((FragmentActivity) context, factory);
+            return JRoutine.onActivity((Activity) context, factory);
 
         } else if (context instanceof Fragment) {
 
@@ -338,15 +337,15 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                 (BoundMethodInvocationFactory<INPUT, OUTPUT>) sBoundMethodFactory;
         final RoutineConfiguration routineConfiguration =
                 configurationWithTimeout(configuration, targetMethod);
-        final InvocationConfiguration invocationConfiguration =
-                configurationWithAnnotations(mInvocationConfiguration, targetMethod);
+        final LoaderConfiguration loaderConfiguration =
+                configurationWithAnnotations(mLoaderConfiguration, targetMethod);
         return getBuilder(mContext, factory).withRoutine()
                                             .with(routineConfiguration)
                                             .withFactoryArgs(invocationArgs)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
-                                            .withInvocation()
-                                            .with(invocationConfiguration)
+                                            .withLoader()
+                                            .with(loaderConfiguration)
                                             .set()
                                             .buildRoutine();
     }
@@ -364,15 +363,15 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
                 (MethodInvocationFactory<INPUT, OUTPUT>) sMethodFactory;
         final RoutineConfiguration routineConfiguration =
                 configurationWithTimeout(configuration, method);
-        final InvocationConfiguration invocationConfiguration =
-                configurationWithAnnotations(mInvocationConfiguration, method);
+        final LoaderConfiguration loaderConfiguration =
+                configurationWithAnnotations(mLoaderConfiguration, method);
         return getBuilder(mContext, factory).withRoutine()
                                             .with(routineConfiguration)
                                             .withFactoryArgs(invocationArgs)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
-                                            .withInvocation()
-                                            .with(invocationConfiguration)
+                                            .withLoader()
+                                            .with(loaderConfiguration)
                                             .set()
                                             .buildRoutine();
     }
@@ -426,22 +425,22 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ContextObjectRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
+        return new ProxyConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ContextObjectRoutineBuilder> withRoutine() {
+    public RoutineConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withRoutine() {
 
         final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
+        return new RoutineConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextObjectRoutineBuilder setConfiguration(
+    public LoaderObjectRoutineBuilder setConfiguration(
             @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {
@@ -455,21 +454,21 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextObjectRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public LoaderObjectRoutineBuilder setConfiguration(
+            @Nonnull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mInvocationConfiguration = configuration;
+        mLoaderConfiguration = configuration;
         return this;
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ContextObjectRoutineBuilder setConfiguration(
+    public LoaderObjectRoutineBuilder setConfiguration(
             @Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
@@ -482,10 +481,10 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ContextObjectRoutineBuilder> withInvocation() {
+    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withLoader() {
 
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ContextObjectRoutineBuilder>(this, config);
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     /**
@@ -966,7 +965,7 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
 
         private final WeakReference<Object> mContext;
 
-        private final InvocationConfiguration mInvocationConfiguration;
+        private final LoaderConfiguration mLoaderConfiguration;
 
         private final ProxyConfiguration mProxyConfiguration;
 
@@ -979,13 +978,13 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
          *
          * @param builder the builder instance.
          */
-        private ProxyInvocationHandler(@Nonnull final DefaultContextObjectRoutineBuilder builder) {
+        private ProxyInvocationHandler(@Nonnull final DefaultLoaderObjectRoutineBuilder builder) {
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
             mRoutineConfiguration = builder.mRoutineConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
-            mInvocationConfiguration = builder.mInvocationConfiguration;
+            mLoaderConfiguration = builder.mLoaderConfiguration;
             mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         }
 
@@ -1042,20 +1041,20 @@ class DefaultContextObjectRoutineBuilder implements ContextObjectRoutineBuilder,
             final OrderType inputOrderType = (isParallel) ? OrderType.NONE : OrderType.PASS_ORDER;
             final OrderType outputOrderType =
                     (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER : OrderType.NONE;
-            final ContextRoutineBuilder<Object, Object> routineBuilder =
+            final LoaderRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, sProxyFactory);
             final RoutineConfiguration routineConfiguration =
                     configurationWithTimeout(mRoutineConfiguration, method);
-            final InvocationConfiguration invocationConfiguration =
-                    configurationWithAnnotations(mInvocationConfiguration, method);
+            final LoaderConfiguration loaderConfiguration =
+                    configurationWithAnnotations(mLoaderConfiguration, method);
             final Routine<Object, Object> routine = routineBuilder.withRoutine()
                                                                   .with(routineConfiguration)
                                                                   .withFactoryArgs(invocationArgs)
                                                                   .withInputOrder(inputOrderType)
                                                                   .withOutputOrder(outputOrderType)
                                                                   .set()
-                                                                  .withInvocation()
-                                                                  .with(invocationConfiguration)
+                                                                  .withLoader()
+                                                                  .with(loaderConfiguration)
                                                                   .set()
                                                                   .buildRoutine();
             final ParameterChannel<Object, Object> parameterChannel =

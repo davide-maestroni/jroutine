@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.android.proxy.builder;
 
-import com.gh.bmd.jrt.android.builder.ContextConfigurableBuilder;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfigurableBuilder;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -31,8 +31,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 06/05/15.
  */
-public interface ContextProxyRoutineBuilder
-        extends ProxyRoutineBuilder, ContextConfigurableBuilder<ContextProxyRoutineBuilder> {
+public interface LoaderProxyRoutineBuilder
+        extends ProxyRoutineBuilder, LoaderConfigurableBuilder<LoaderProxyRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
@@ -120,17 +120,17 @@ public interface ContextProxyRoutineBuilder
      * @return the routine configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ContextProxyRoutineBuilder> withRoutine();
+    RoutineConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withRoutine();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ContextProxyRoutineBuilder> withInvocation();
+    LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withLoader();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ContextProxyRoutineBuilder> withProxy();
+    ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withProxy();
 }

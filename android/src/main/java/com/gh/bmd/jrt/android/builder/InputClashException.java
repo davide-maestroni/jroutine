@@ -23,7 +23,7 @@ public class InputClashException extends InvocationClashException {
     /**
      * Constructor.
      *
-     * @param id the invocation ID.
+     * @param id the loader ID.
      */
     public InputClashException(final int id) {
 

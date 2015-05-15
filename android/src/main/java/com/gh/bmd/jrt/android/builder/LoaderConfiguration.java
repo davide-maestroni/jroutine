@@ -33,8 +33,7 @@ public final class LoaderConfiguration {
     // TODO: looper configuration?
 
     /**
-     * Constant identifying an invocation ID computed from the executor class and the input
-     * parameters.
+     * Constant identifying an loader ID computed from the executor class and the input parameters.
      */
     public static final int AUTO = Integer.MIN_VALUE;
 
@@ -54,7 +53,7 @@ public final class LoaderConfiguration {
      */
     public static final LoaderConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
-    private final int mInvocationId;
+    private final int mLoaderId;
 
     private final ClashResolutionType mResolutionType;
 
@@ -63,15 +62,15 @@ public final class LoaderConfiguration {
     /**
      * Constructor.
      *
-     * @param invocationId   the the invocation ID.
+     * @param loaderId       the the loader ID.
      * @param resolutionType the type of resolution.
      * @param strategyType   the cache strategy type.
      */
-    private LoaderConfiguration(final int invocationId,
+    private LoaderConfiguration(final int loaderId,
             @Nullable final ClashResolutionType resolutionType,
             @Nullable final CacheStrategyType strategyType) {
 
-        mInvocationId = invocationId;
+        mLoaderId = loaderId;
         mResolutionType = resolutionType;
         mStrategyType = strategyType;
     }
@@ -127,7 +126,7 @@ public final class LoaderConfiguration {
         }
 
         final LoaderConfiguration that = (LoaderConfiguration) o;
-        return mInvocationId == that.mInvocationId && mResolutionType == that.mResolutionType
+        return mLoaderId == that.mLoaderId && mResolutionType == that.mResolutionType
                 && mStrategyType == that.mStrategyType;
     }
 
@@ -135,7 +134,7 @@ public final class LoaderConfiguration {
     public int hashCode() {
 
         // auto-generated code
-        int result = mInvocationId;
+        int result = mLoaderId;
         result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
         result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
         return result;
@@ -145,7 +144,7 @@ public final class LoaderConfiguration {
     public String toString() {
 
         return "LoaderConfiguration{" +
-                "mInvocationId=" + mInvocationId +
+                "mLoaderId=" + mLoaderId +
                 ", mResolutionType=" + mResolutionType +
                 ", mStrategyType=" + mStrategyType +
                 '}';
@@ -178,15 +177,15 @@ public final class LoaderConfiguration {
     }
 
     /**
-     * Returns the invocation ID (AUTO by default).
+     * Returns the loader ID (AUTO by default).
      *
      * @param valueIfNotSet the default value if none was set.
-     * @return the invocation ID.
+     * @return the loader ID.
      */
-    public int getInvocationIdOr(final int valueIfNotSet) {
+    public int getLoaderIdOr(final int valueIfNotSet) {
 
-        final int invocationId = mInvocationId;
-        return (invocationId != AUTO) ? invocationId : valueIfNotSet;
+        final int loaderId = mLoaderId;
+        return (loaderId != AUTO) ? loaderId : valueIfNotSet;
     }
 
     /**
@@ -279,7 +278,7 @@ public final class LoaderConfiguration {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private int mInvocationId;
+        private int mLoaderId;
 
         private ClashResolutionType mResolutionType;
 
@@ -299,7 +298,7 @@ public final class LoaderConfiguration {
             }
 
             mConfigurable = configurable;
-            mInvocationId = AUTO;
+            mLoaderId = AUTO;
         }
 
         /**
@@ -348,11 +347,11 @@ public final class LoaderConfiguration {
                 return this;
             }
 
-            final int invocationId = configuration.mInvocationId;
+            final int loaderId = configuration.mLoaderId;
 
-            if (invocationId != AUTO) {
+            if (loaderId != AUTO) {
 
-                withId(invocationId);
+                withId(loaderId);
             }
 
             final ClashResolutionType resolutionType = configuration.mResolutionType;
@@ -403,27 +402,27 @@ public final class LoaderConfiguration {
         }
 
         /**
-         * Tells the builder to identify the invocation with the specified ID.
+         * Tells the builder to identify the loader with the specified ID.
          *
-         * @param invocationId the invocation ID.
+         * @param loaderId the loader ID.
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withId(final int invocationId) {
+        public Builder<TYPE> withId(final int loaderId) {
 
-            mInvocationId = invocationId;
+            mLoaderId = loaderId;
             return this;
         }
 
         @Nonnull
         private LoaderConfiguration buildConfiguration() {
 
-            return new LoaderConfiguration(mInvocationId, mResolutionType, mStrategyType);
+            return new LoaderConfiguration(mLoaderId, mResolutionType, mStrategyType);
         }
 
         private void setConfiguration(@Nonnull final LoaderConfiguration configuration) {
 
-            mInvocationId = configuration.mInvocationId;
+            mLoaderId = configuration.mLoaderId;
             mResolutionType = configuration.mResolutionType;
             mStrategyType = configuration.mStrategyType;
         }

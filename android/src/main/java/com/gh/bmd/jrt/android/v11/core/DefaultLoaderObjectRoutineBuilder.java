@@ -19,7 +19,7 @@ import android.content.Context;
 
 import com.gh.bmd.jrt.android.annotation.CacheStrategy;
 import com.gh.bmd.jrt.android.annotation.ClashResolution;
-import com.gh.bmd.jrt.android.annotation.InvocationId;
+import com.gh.bmd.jrt.android.annotation.LoaderId;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
@@ -167,7 +167,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final LoaderConfiguration.Builder<LoaderConfiguration> builder =
                 configuration.builderFrom();
 
-        final InvocationId idAnnotation = method.getAnnotation(InvocationId.class);
+        final LoaderId idAnnotation = method.getAnnotation(LoaderId.class);
 
         if (idAnnotation != null) {
 

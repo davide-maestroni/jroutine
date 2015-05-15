@@ -42,7 +42,7 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} method annotations will be honored.
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -63,7 +63,7 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} method annotations will be honored.
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -84,7 +84,7 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} method annotations will be honored.
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -106,7 +106,7 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} annotations.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -127,7 +127,7 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.InvocationId} annotations.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.

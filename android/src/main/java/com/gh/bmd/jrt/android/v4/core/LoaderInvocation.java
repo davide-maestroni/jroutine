@@ -118,7 +118,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         mContext = context;
         mFactory = factory;
-        mLoaderId = configuration.getInvocationIdOr(LoaderConfiguration.AUTO);
+        mLoaderId = configuration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mClashResolutionType =
                 configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
         mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
@@ -487,7 +487,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             }
 
             loaderId = 31 * loaderId + inputs.hashCode();
-            logger.dbg("generating invocation ID: %d", loaderId);
+            logger.dbg("generating loader ID: %d", loaderId);
         }
 
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
@@ -602,7 +602,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         if (loader.getClass() != RoutineLoader.class) {
 
-            logger.err("clashing invocation ID [%d]: %s", loaderId, loader.getClass().getName());
+            logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
             throw new InvocationClashException(loaderId);
         }
 
@@ -613,8 +613,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                 !routineLoader.getInvocationType().equals(invocationType) || !Arrays.equals(
                         routineLoader.getInvocationArgs(), mArgs))) {
 
-            logger.wrn("clashing invocation ID [%d]: %s", loaderId,
-                       routineLoader.getInvocationType());
+            logger.wrn("clashing loader ID [%d]: %s", loaderId, routineLoader.getInvocationType());
             throw new InvocationClashException(loaderId);
         }
 

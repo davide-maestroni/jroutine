@@ -27,7 +27,7 @@ public class InvocationClashException extends RoutineException {
     /**
      * Constructor.
      *
-     * @param id the invocation ID.
+     * @param id the loader ID.
      */
     public InvocationClashException(final int id) {
 
@@ -35,9 +35,9 @@ public class InvocationClashException extends RoutineException {
     }
 
     /**
-     * Returns the invocation ID.
+     * Returns the loader ID.
      *
-     * @return the invocation ID.
+     * @return the loader ID.
      */
     public int getId() {
 

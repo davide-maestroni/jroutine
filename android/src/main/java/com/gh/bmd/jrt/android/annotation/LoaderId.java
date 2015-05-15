@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
- * Through this annotation, it is possible to set a specific invocation ID for a single method.
+ * Through this annotation, it is possible to set a specific loader ID for a single method.
  * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.gh.bmd.jrt.android.annotation.InvocationId *;
+ *              &#64;com.gh.bmd.jrt.android.annotation.LoaderId *;
  *         }
  *     </code>
  * </pre>
@@ -53,10 +53,10 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface InvocationId {
+public @interface LoaderId {
 
     /**
-     * The invocation ID.
+     * The loader ID.
      *
      * @return the ID.
      */

@@ -47,7 +47,7 @@ class DefaultLoaderChannelBuilder
 
     private final WeakReference<Object> mContext;
 
-    private final int mInvocationId;
+    private final int mLoaderId;
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
@@ -56,33 +56,33 @@ class DefaultLoaderChannelBuilder
     /**
      * Constructor.
      *
-     * @param activity     the context activity.
-     * @param invocationId the invocation ID.
+     * @param activity the context activity.
+     * @param loaderId the loader ID.
      */
-    DefaultLoaderChannelBuilder(@Nonnull final FragmentActivity activity, final int invocationId) {
+    DefaultLoaderChannelBuilder(@Nonnull final FragmentActivity activity, final int loaderId) {
 
-        this((Object) activity, invocationId);
+        this((Object) activity, loaderId);
     }
 
     /**
      * Constructor.
      *
-     * @param fragment     the context fragment.
-     * @param invocationId the invocation ID.
+     * @param fragment the context fragment.
+     * @param loaderId the loader ID.
      */
-    DefaultLoaderChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
+    DefaultLoaderChannelBuilder(@Nonnull final Fragment fragment, final int loaderId) {
 
-        this((Object) fragment, invocationId);
+        this((Object) fragment, loaderId);
     }
 
     /**
      * Constructor.
      *
-     * @param context      the context instance.
-     * @param invocationId the invocation ID.
+     * @param context  the context instance.
+     * @param loaderId the loader ID.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultLoaderChannelBuilder(@Nonnull final Object context, final int invocationId) {
+    private DefaultLoaderChannelBuilder(@Nonnull final Object context, final int loaderId) {
 
         if (context == null) {
 
@@ -90,7 +90,7 @@ class DefaultLoaderChannelBuilder
         }
 
         mContext = new WeakReference<Object>(context);
-        mInvocationId = invocationId;
+        mLoaderId = loaderId;
     }
 
     @Nonnull
@@ -138,7 +138,7 @@ class DefaultLoaderChannelBuilder
                       .with(routineConfiguration)
                       .set()
                       .withLoader()
-                      .withId(mInvocationId)
+                      .withId(mLoaderId)
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.KEEP_THAT)
                       .set()
@@ -153,7 +153,7 @@ class DefaultLoaderChannelBuilder
 
             final List<Object> inputList = Collections.singletonList(input);
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+                   .run(new PurgeInputsExecution(context, mLoaderId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -167,7 +167,7 @@ class DefaultLoaderChannelBuilder
             final List<Object> inputList =
                     (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+                   .run(new PurgeInputsExecution(context, mLoaderId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -195,7 +195,7 @@ class DefaultLoaderChannelBuilder
             }
 
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+                   .run(new PurgeInputsExecution(context, mLoaderId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -207,7 +207,7 @@ class DefaultLoaderChannelBuilder
         if (context.get() != null) {
 
             Runners.mainRunner()
-                   .run(new PurgeExecution(context, mInvocationId), 0, TimeUnit.MILLISECONDS);
+                   .run(new PurgeExecution(context, mLoaderId), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -259,19 +259,18 @@ class DefaultLoaderChannelBuilder
 
         private final WeakReference<Object> mContext;
 
-        private final int mInvocationId;
+        private final int mLoaderId;
 
         /**
          * Constructor.
          *
-         * @param context      the context reference.
-         * @param invocationId the invocation ID.
+         * @param context  the context reference.
+         * @param loaderId the loader ID.
          */
-        private PurgeExecution(@Nonnull final WeakReference<Object> context,
-                final int invocationId) {
+        private PurgeExecution(@Nonnull final WeakReference<Object> context, final int loaderId) {
 
             mContext = context;
-            mInvocationId = invocationId;
+            mLoaderId = loaderId;
         }
 
         public void run() {
@@ -280,7 +279,7 @@ class DefaultLoaderChannelBuilder
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mInvocationId);
+                LoaderInvocation.purgeLoader(context, mLoaderId);
             }
         }
     }
@@ -294,20 +293,20 @@ class DefaultLoaderChannelBuilder
 
         private final List<Object> mInputs;
 
-        private final int mInvocationId;
+        private final int mLoaderId;
 
         /**
          * Constructor.
          *
-         * @param context      the context reference.
-         * @param invocationId the invocation ID.
-         * @param inputs       the list of inputs.
+         * @param context  the context reference.
+         * @param loaderId the loader ID.
+         * @param inputs   the list of inputs.
          */
         private PurgeInputsExecution(@Nonnull final WeakReference<Object> context,
-                final int invocationId, @Nonnull final List<Object> inputs) {
+                final int loaderId, @Nonnull final List<Object> inputs) {
 
             mContext = context;
-            mInvocationId = invocationId;
+            mLoaderId = loaderId;
             mInputs = inputs;
         }
 
@@ -317,7 +316,7 @@ class DefaultLoaderChannelBuilder
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mInvocationId, mInputs);
+                LoaderInvocation.purgeLoader(context, mLoaderId, mInputs);
             }
         }
     }

@@ -62,7 +62,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
     private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
-    private final int mInvocationId;
+    private final int mLoaderId;
 
     private final OrderType mOrderType;
 
@@ -101,7 +101,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
         mContext = context;
         mFactory = factory;
         mConfiguration = loaderConfiguration;
-        mInvocationId = loaderConfiguration.getInvocationIdOr(LoaderConfiguration.AUTO);
+        mLoaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         mOrderType = routineConfiguration.getOutputOrderTypeOr(null);
         getLogger().dbg("building context routine with invocation type %s and configuration: %s",
@@ -117,8 +117,8 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
         if (context.get() != null) {
 
             Runners.mainRunner()
-                   .run(new PurgeExecution(context, mFactory.getInvocationType(), mArgs,
-                                           mInvocationId), 0, TimeUnit.MILLISECONDS);
+                   .run(new PurgeExecution(context, mFactory.getInvocationType(), mArgs, mLoaderId),
+                        0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -210,7 +210,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             final List<INPUT> inputList = Collections.singletonList(input);
             final PurgeInputsExecution<INPUT> execution =
                     new PurgeInputsExecution<INPUT>(context, mFactory.getInvocationType(), mArgs,
-                                                    mInvocationId, inputList);
+                                                    mLoaderId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -225,7 +225,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
                     (inputs == null) ? Collections.<INPUT>emptyList() : Arrays.asList(inputs);
             final PurgeInputsExecution<INPUT> execution =
                     new PurgeInputsExecution<INPUT>(context, mFactory.getInvocationType(), mArgs,
-                                                    mInvocationId, inputList);
+                                                    mLoaderId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -254,7 +254,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
             final PurgeInputsExecution<INPUT> execution =
                     new PurgeInputsExecution<INPUT>(context, mFactory.getInvocationType(), mArgs,
-                                                    mInvocationId, inputList);
+                                                    mLoaderId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -268,9 +268,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
         private final Object[] mInvocationArgs;
 
-        private final int mInvocationId;
-
         private final String mInvocationType;
+
+        private final int mLoaderId;
 
         /**
          * Constructor.
@@ -278,16 +278,16 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
          * @param context        the context reference.
          * @param invocationType the invocation type.
          * @param invocationArgs the invocation factory arguments.
-         * @param invocationId   the invocation ID.
+         * @param loaderId       the loader ID.
          */
         private PurgeExecution(@Nonnull final WeakReference<Object> context,
                 @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs,
-                final int invocationId) {
+                final int loaderId) {
 
             mContext = context;
             mInvocationType = invocationType;
             mInvocationArgs = invocationArgs;
-            mInvocationId = invocationId;
+            mLoaderId = loaderId;
         }
 
         public void run() {
@@ -296,8 +296,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoaders(context, mInvocationId, mInvocationType,
-                                              mInvocationArgs);
+                LoaderInvocation.purgeLoaders(context, mLoaderId, mInvocationType, mInvocationArgs);
             }
         }
     }
@@ -315,9 +314,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
         private final Object[] mInvocationArgs;
 
-        private final int mInvocationId;
-
         private final String mInvocationType;
+
+        private final int mLoaderId;
 
         /**
          * Constructor.
@@ -325,17 +324,17 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
          * @param context        the context reference.
          * @param invocationType the invocation type.
          * @param invocationArgs the invocation factory arguments.
-         * @param invocationId   the invocation ID.
+         * @param loaderId       the loader ID.
          * @param inputs         the list of inputs.
          */
         private PurgeInputsExecution(@Nonnull final WeakReference<Object> context,
                 @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs,
-                final int invocationId, @Nonnull final List<INPUT> inputs) {
+                final int loaderId, @Nonnull final List<INPUT> inputs) {
 
             mContext = context;
             mInvocationType = invocationType;
             mInvocationArgs = invocationArgs;
-            mInvocationId = invocationId;
+            mLoaderId = loaderId;
             mInputs = inputs;
         }
 
@@ -345,8 +344,8 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mInvocationId, mInvocationType,
-                                             mInvocationArgs, mInputs);
+                LoaderInvocation.purgeLoader(context, mLoaderId, mInvocationType, mInvocationArgs,
+                                             mInputs);
             }
         }
     }

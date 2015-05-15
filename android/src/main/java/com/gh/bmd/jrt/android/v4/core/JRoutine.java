@@ -39,7 +39,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects and the invocation factory arguments, might be employed to check for clashing of
- * invocation instances or compute the invocation ID.<br/>
+ * invocation instances or compute the loader ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or an input independent clash resolution should be used to
  * avoid unexpected results.
@@ -198,16 +198,16 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
     }
 
     /**
-     * Returns a builder of an output channel bound to the invocation identified by the specified
-     * ID.<br/>
+     * Returns a builder of an output channel bound to the loader identified by the specified ID.
+     * <br/>
      * Note that, if no invocation with the specified ID is running at the time of the channel
      * creation, the output will be aborted with a
      * {@link com.gh.bmd.jrt.android.builder.InvocationMissingException}.
      *
      * @param activity the invocation activity context.
-     * @param id       the invocation ID.
+     * @param id       the loader ID.
      * @return the channel builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
+     * @throws java.lang.IllegalArgumentException if the specified loader ID is equal to AUTO.
      */
     @Nonnull
     public static LoaderChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
@@ -215,7 +215,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
 
         if (id == LoaderConfiguration.AUTO) {
 
-            throw new IllegalArgumentException("the invocation ID must not be generated");
+            throw new IllegalArgumentException("the loader ID must not be generated");
         }
 
         return new DefaultLoaderChannelBuilder(activity, id);
@@ -282,23 +282,23 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
     }
 
     /**
-     * Returns a builder of an output channel bound to the invocation identified by the specified
-     * ID.<br/>
+     * Returns a builder of an output channel bound to the loader identified by the specified ID.
+     * <br/>
      * Note that, if no invocation with the specified ID is running at the time of the channel
      * creation, the output will be aborted with a
      * {@link com.gh.bmd.jrt.android.builder.InvocationMissingException}.
      *
      * @param fragment the invocation fragment context.
-     * @param id       the invocation ID.
+     * @param id       the loader ID.
      * @return the channel builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
+     * @throws java.lang.IllegalArgumentException if the specified loader ID is equal to AUTO.
      */
     @Nonnull
     public static LoaderChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
 
         if (id == LoaderConfiguration.AUTO) {
 
-            throw new IllegalArgumentException("the invocation ID must not be generated");
+            throw new IllegalArgumentException("the loader ID must not be generated");
         }
 
         return new DefaultLoaderChannelBuilder(fragment, id);

@@ -39,9 +39,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide on 06/05/15.
  *
  * @see com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy
- * @see com.gh.bmd.jrt.android.annotation.InvocationId
- * @see com.gh.bmd.jrt.android.annotation.ClashResolution
  * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
+ * @see com.gh.bmd.jrt.android.annotation.ClashResolution
+ * @see com.gh.bmd.jrt.android.annotation.LoaderId
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup

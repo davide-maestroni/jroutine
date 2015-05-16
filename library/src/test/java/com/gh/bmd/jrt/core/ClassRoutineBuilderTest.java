@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
@@ -49,7 +49,7 @@ import static org.junit.Assert.fail;
 public class ClassRoutineBuilderTest {
 
     @Test
-    public void testBoundMethod() throws NoSuchMethodException {
+    public void testAliasMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine = JRoutine.on(TestStatic.class)
@@ -59,17 +59,17 @@ public class ClassRoutineBuilderTest {
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
-                                                        .boundMethod(TestStatic.GET);
+                                                        .aliasMethod(TestStatic.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
 
     @Test
-    public void testBoundMethodError() {
+    public void testAliasMethodError() {
 
         try {
 
-            new DefaultClassRoutineBuilder(TestStatic.class).boundMethod("test");
+            new DefaultClassRoutineBuilder(TestStatic.class).aliasMethod("test");
 
             fail();
 
@@ -121,7 +121,7 @@ public class ClassRoutineBuilderTest {
                 .withLogLevel(LogLevel.DEBUG)
                 .withLog(countLog)
                 .set()
-                .boundMethod(TestStatic.GET);
+                .aliasMethod(TestStatic.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
@@ -145,7 +145,7 @@ public class ClassRoutineBuilderTest {
         final TimeDuration timeout = seconds(1);
 
         final Routine<Object, Object> routine3 =
-                JRoutine.on(TestStatic.class).boundMethod(TestStatic.THROW);
+                JRoutine.on(TestStatic.class).aliasMethod(TestStatic.THROW);
 
         try {
 
@@ -264,7 +264,7 @@ public class ClassRoutineBuilderTest {
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
-                                                         .boundMethod(TestStatic.GET);
+                                                         .aliasMethod(TestStatic.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
@@ -275,7 +275,7 @@ public class ClassRoutineBuilderTest {
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
-                                                         .boundMethod(TestStatic.GET);
+                                                         .aliasMethod(TestStatic.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -287,7 +287,7 @@ public class ClassRoutineBuilderTest {
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
-                                                         .boundMethod(TestStatic.GET);
+                                                         .aliasMethod(TestStatic.GET);
 
         assertThat(routine3.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -300,7 +300,7 @@ public class ClassRoutineBuilderTest {
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(nullLog)
                                                          .set()
-                                                         .boundMethod(TestStatic.GET);
+                                                         .aliasMethod(TestStatic.GET);
 
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -312,7 +312,7 @@ public class ClassRoutineBuilderTest {
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(new NullLog())
                                                          .set()
-                                                         .boundMethod(TestStatic.GET);
+                                                         .aliasMethod(TestStatic.GET);
 
         assertThat(routine5.callSync().readAll()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -399,13 +399,13 @@ public class ClassRoutineBuilderTest {
 
         public static final String GET = "get";
 
-        @Bind(GET)
+        @Alias(GET)
         public static int getOne() {
 
             return 1;
         }
 
-        @Bind(GET)
+        @Alias(GET)
         public static int getTwo() {
 
             return 2;
@@ -419,13 +419,13 @@ public class ClassRoutineBuilderTest {
 
         public static final String THROW = "throw";
 
-        @Bind(GET)
+        @Alias(GET)
         public static long getLong() {
 
             return -77;
         }
 
-        @Bind(THROW)
+        @Alias(THROW)
         public static void throwException(final RuntimeException ex) {
 
             throw ex;

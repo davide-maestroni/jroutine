@@ -195,9 +195,9 @@
                                                                   .withRoutine()
                                                                   .withReadTimeout(TimeDuration.INFINITY)
                                                                   .set();
-                final Routine&lt;String, Integer&gt; parseRoutine = builder.boundMethod(PARSE);
-                final Routine&lt;Integer, Integer&gt; squareRoutine = builder.boundMethod(SQUARE);
-                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.boundMethod(MEAN);
+                final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
+                final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
+                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
 
                 final Double rms = meanRoutine.callAsync(
                         squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll()).readNext();
@@ -207,19 +207,19 @@
                 System.exit(0);
             }
 
-            &commat;Bind(PARSE)
+            &commat;Alias(PARSE)
             private static int parseArg(final String arg) {
 
                 return Integer.parseInt(arg);
             }
 
-            &commat;Bind(SQUARE)
+            &commat;Alias(SQUARE)
             private static int square(final int value) {
 
                 return value * value;
             }
 
-            &commat;Bind(MEAN)
+            &commat;Alias(MEAN)
             private static double squareRootMean(final List&lt;Integer&gt; values) {
 
                 if (values.isEmpty()) {

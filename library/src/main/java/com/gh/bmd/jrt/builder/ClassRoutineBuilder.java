@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 3/7/15.
  *
- * @see com.gh.bmd.jrt.annotation.Bind
+ * @see com.gh.bmd.jrt.annotation.Alias
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
@@ -38,7 +38,7 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
-     * {@link com.gh.bmd.jrt.annotation.Bind} annotation.<br/>
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation.<br/>
      * Optional {@link com.gh.bmd.jrt.annotation.ShareGroup},
      * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
      * method annotations will be honored.<br/>
@@ -51,13 +51,13 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
 
     /**
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is invoked ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Bind} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout} and
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} method annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -74,7 +74,7 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is searched via reflection ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Bind} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout} and
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} method annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.

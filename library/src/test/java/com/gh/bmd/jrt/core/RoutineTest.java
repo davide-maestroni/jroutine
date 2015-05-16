@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.InputDeadlockException;
@@ -1472,15 +1472,15 @@ public class RoutineTest {
                            .afterMax(timeout)
                            .readAll()).containsExactly(1);
         assertThat(
-                JRoutine.on(test).boundMethod(TestClass.GET).callSync().afterMax(timeout).readAll())
+                JRoutine.on(test).aliasMethod(TestClass.GET).callSync().afterMax(timeout).readAll())
                 .containsExactly(1);
         assertThat(JRoutine.on(TestClass.class)
-                           .boundMethod(TestClass.GET)
+                           .aliasMethod(TestClass.GET)
                            .callSync(3)
                            .afterMax(timeout)
                            .readAll()).containsExactly(3);
         assertThat(JRoutine.on(TestClass.class)
-                           .boundMethod("get")
+                           .aliasMethod("get")
                            .callAsync(-3)
                            .afterMax(timeout)
                            .readAll()).containsExactly(-3);
@@ -1494,7 +1494,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(TestClass.class).boundMethod("get").callAsync().afterMax(timeout).readAll();
+            JRoutine.on(TestClass.class).aliasMethod("get").callAsync().afterMax(timeout).readAll();
 
             fail();
 
@@ -1504,7 +1504,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(TestClass.class).boundMethod("take");
+            JRoutine.on(TestClass.class).aliasMethod("take");
 
             fail();
 
@@ -2887,7 +2887,7 @@ public class RoutineTest {
         @Param(int.class)
         OutputChannel<Integer> getOne();
 
-        @Bind(value = "getInt")
+        @Alias(value = "getInt")
         int take(int i);
     }
 
@@ -3076,7 +3076,7 @@ public class RoutineTest {
 
         public static final String GET = "get";
 
-        @Bind(GET)
+        @Alias(GET)
         public static int get(final int i) {
 
             return i;
@@ -3087,7 +3087,7 @@ public class RoutineTest {
             return i;
         }
 
-        @Bind(GET)
+        @Alias(GET)
         public int getOne() {
 
             return 1;

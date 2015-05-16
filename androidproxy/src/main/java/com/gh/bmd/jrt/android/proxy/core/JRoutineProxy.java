@@ -33,7 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide-maestroni on 13/05/15.
  *
  * @see com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy
- * @see com.gh.bmd.jrt.annotation.Bind
+ * @see com.gh.bmd.jrt.annotation.Alias
  * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
@@ -51,8 +51,8 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
     }
 
     /**
-     * Returns a builder of routines bound to the specified activity, wrapping the specified object
-     * instances.<br/>
+     * Returns a builder of routines running in a service based on the specified context, wrapping
+     * the specified object instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
      * <p/>

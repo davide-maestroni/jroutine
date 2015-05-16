@@ -27,7 +27,7 @@ import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
-import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
@@ -76,8 +76,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         RoutineConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
-    private static final BoundMethodInvocationFactory<Object, Object> sBoundMethodFactory =
-            new BoundMethodInvocationFactory<Object, Object>();
+    private static final AliasMethodInvocationFactory<Object, Object> sAliasMethodFactory =
+            new AliasMethodInvocationFactory<Object, Object>();
 
     private static final MethodInvocationFactory<Object, Object> sMethodFactory =
             new MethodInvocationFactory<Object, Object>();
@@ -142,7 +142,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         for (final Method method : targetClass.getMethods()) {
 
-            final Bind annotation = method.getAnnotation(Bind.class);
+            final Alias annotation = method.getAnnotation(Alias.class);
 
             if (annotation != null) {
 
@@ -222,7 +222,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         for (final Method method : targetClass.getMethods()) {
 
-            final Bind annotation = method.getAnnotation(Bind.class);
+            final Alias annotation = method.getAnnotation(Alias.class);
 
             if ((annotation != null) && name.equals(annotation.value())) {
 
@@ -235,7 +235,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             for (final Method method : targetClass.getDeclaredMethods()) {
 
-                final Bind annotation = method.getAnnotation(Bind.class);
+                final Alias annotation = method.getAnnotation(Alias.class);
 
                 if ((annotation != null) && name.equals(annotation.value())) {
 
@@ -317,7 +317,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
         final Class<?> targetClass = mTargetClass;
         final Method targetMethod = getAnnotatedMethod(targetClass, name);
@@ -333,8 +333,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass, args, shareGroup, name};
-        final BoundMethodInvocationFactory<INPUT, OUTPUT> factory =
-                (BoundMethodInvocationFactory<INPUT, OUTPUT>) sBoundMethodFactory;
+        final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
+                (AliasMethodInvocationFactory<INPUT, OUTPUT>) sAliasMethodFactory;
         final RoutineConfiguration routineConfiguration =
                 configurationWithTimeout(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
@@ -517,12 +517,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     /**
-     * Bound method invocation.
+     * Alias method invocation.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class BoundMethodInvocation<INPUT, OUTPUT>
+    private static class AliasMethodInvocation<INPUT, OUTPUT>
             extends SingleCallContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
@@ -546,7 +546,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param name        the binding name.
          */
         @SuppressWarnings("unchecked")
-        public BoundMethodInvocation(@Nonnull final Class<?> targetClass,
+        public AliasMethodInvocation(@Nonnull final Class<?> targetClass,
                 @Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final String name) {
 
@@ -580,7 +580,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                    .withProxy()
                                    .withShareGroup(mShareGroup)
                                    .set()
-                                   .boundMethod(mBindingName);
+                                   .aliasMethod(mBindingName);
                 mTarget = target;
 
             } catch (final RoutineException e) {
@@ -595,24 +595,24 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     /**
-     * Factory of {@link BoundMethodInvocation}s.
+     * Factory of {@link AliasMethodInvocation}s.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class BoundMethodInvocationFactory<INPUT, OUTPUT>
+    private static class AliasMethodInvocationFactory<INPUT, OUTPUT>
             implements ContextInvocationFactory<INPUT, OUTPUT> {
 
         @Nonnull
         public String getInvocationType() {
 
-            return BoundMethodInvocation.class.getName();
+            return AliasMethodInvocation.class.getName();
         }
 
         @Nonnull
         public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-            return new BoundMethodInvocation<INPUT, OUTPUT>((Class<?>) args[0], (Object[]) args[1],
+            return new AliasMethodInvocation<INPUT, OUTPUT>((Class<?>) args[0], (Object[]) args[1],
                                                             (String) args[2], (String) args[3]);
         }
     }
@@ -773,7 +773,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             String name = null;
             Method targetMethod = null;
             final Class<?> targetClass = mTarget.getClass();
-            final Bind annotation = method.getAnnotation(Bind.class);
+            final Alias annotation = method.getAnnotation(Alias.class);
 
             if (annotation != null) {
 

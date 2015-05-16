@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
@@ -278,7 +278,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         String name = null;
         Method targetMethod = null;
         final Class<?> targetClass = getTargetClass();
-        final Bind annotation = method.getAnnotation(Bind.class);
+        final Alias annotation = method.getAnnotation(Alias.class);
 
         if (annotation != null) {
 

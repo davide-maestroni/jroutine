@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
  *
  *             public static final String METHOD_NAME = "get";
  *
- *             &#64;Bind(METHOD_NAME)
+ *             &#64;Alias(METHOD_NAME)
  *             public int getOne() {
  *
  *                 return 1;
@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         JRoutine.on(new MyClass()).boundMethod(MyClass.METHOD_NAME).callAsync();
+ *         JRoutine.on(new MyClass()).aliasMethod(MyClass.METHOD_NAME).callAsync();
  *     </code>
  * </pre>
  * <p/>
@@ -67,7 +67,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.gh.bmd.jrt.annotation.Bind *;
+ *              &#64;com.gh.bmd.jrt.annotation.Alias *;
  *         }
  *     </code>
  * </pre>
@@ -77,9 +77,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Bind {
-
-    //TODO: rename in Alias
+public @interface Alias {
 
     /**
      * The name used to identify the method independently from its original signature.

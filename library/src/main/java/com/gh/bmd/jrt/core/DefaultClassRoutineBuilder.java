@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -108,7 +108,7 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
         final Method method = mMethodMap.get(name);
 
@@ -200,7 +200,7 @@ class DefaultClassRoutineBuilder
      *
      * @param name the name specified in the annotation.
      * @return the method or null.
-     * @see com.gh.bmd.jrt.annotation.Bind
+     * @see com.gh.bmd.jrt.annotation.Alias
      */
     @Nullable
     protected Method getAnnotatedMethod(final String name) {
@@ -482,7 +482,7 @@ class DefaultClassRoutineBuilder
                 continue;
             }
 
-            final Bind annotation = method.getAnnotation(Bind.class);
+            final Alias annotation = method.getAnnotation(Alias.class);
 
             if (annotation != null) {
 

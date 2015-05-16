@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 3/23/15.
  *
- * @see com.gh.bmd.jrt.annotation.Bind
+ * @see com.gh.bmd.jrt.annotation.Alias
  * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout

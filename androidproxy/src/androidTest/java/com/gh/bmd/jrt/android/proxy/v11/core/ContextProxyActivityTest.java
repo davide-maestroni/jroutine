@@ -22,7 +22,7 @@ import com.gh.bmd.jrt.android.proxy.annotation.V11Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.android.v4.core.JRoutine;
-import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.Timeout;
@@ -585,281 +585,281 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
     @V11Proxy(Impl.class)
     public interface Itf {
 
-        @Bind("a")
+        @Alias("a")
         int add0(char c);
 
-        @Bind("a")
+        @Alias("a")
         int add1(@Param(value = char.class, mode = PassMode.VALUE) OutputChannel<Character> c);
 
-        @Bind("a")
+        @Alias("a")
         int add2(@Param(value = char.class, mode = PassMode.PARALLEL) OutputChannel<Character> c);
 
-        @Bind("a")
+        @Alias("a")
         @Param(value = int.class, mode = PassMode.VALUE)
         OutputChannel<Integer> add3(char c);
 
-        @Bind("a")
+        @Alias("a")
         @Param(value = int.class, mode = PassMode.VALUE)
         OutputChannel<Integer> add4(
                 @Param(value = char.class, mode = PassMode.VALUE) OutputChannel<Character> c);
 
-        @Bind("a")
+        @Alias("a")
         @Param(value = int.class, mode = PassMode.VALUE)
         OutputChannel<Integer> add5(
                 @Param(value = char.class, mode = PassMode.PARALLEL) OutputChannel<Character> c);
 
-        @Bind("aa")
+        @Alias("aa")
         int[] addA00(char[] c);
 
-        @Bind("aa")
+        @Alias("aa")
         int[] addA01(@Param(value = char[].class,
                 mode = PassMode.VALUE) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         int[] addA02(@Param(value = char[].class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("aa")
+        @Alias("aa")
         int[] addA03(@Param(value = char[].class,
                 mode = PassMode.PARALLEL) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
         OutputChannel<int[]> addA04(char[] c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
         OutputChannel<int[]> addA05(
                 @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
         OutputChannel<int[]> addA06(@Param(value = char[].class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
         OutputChannel<int[]> addA07(@Param(value = char[].class,
                 mode = PassMode.PARALLEL) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addA08(char[] c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addA09(
                 @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addA10(@Param(value = char[].class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addA11(@Param(value = char[].class,
                 mode = PassMode.PARALLEL) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         List<int[]> addA12(char[] c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         List<int[]> addA13(
                 @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         List<int[]> addA14(@Param(value = char[].class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         List<int[]> addA15(@Param(value = char[].class,
                 mode = PassMode.PARALLEL) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         int[][] addA16(char[] c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         int[][] addA17(@Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         int[][] addA18(@Param(value = char[].class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("aa")
+        @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         int[][] addA19(@Param(value = char[].class,
                 mode = PassMode.PARALLEL) OutputChannel<char[]> c);
 
-        @Bind("al")
+        @Alias("al")
         List<Integer> addL00(List<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         List<Integer> addL01(@Param(value = List.class,
                 mode = PassMode.VALUE) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         List<Integer> addL02(@Param(value = List.class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         List<Integer> addL03(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
         OutputChannel<List<Integer>> addL04(List<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
         OutputChannel<List<Integer>> addL05(@Param(value = List.class,
                 mode = PassMode.VALUE) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
         OutputChannel<List<Integer>> addL06(@Param(value = List.class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
         OutputChannel<List<Integer>> addL07(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addL08(List<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addL09(@Param(value = List.class,
                 mode = PassMode.VALUE) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addL10(@Param(value = List.class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addL11(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List<List<Integer>> addL12(List<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List<List<Integer>> addL13(@Param(value = List.class,
                 mode = PassMode.VALUE) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List<List<Integer>> addL14(@Param(value = List.class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List<List<Integer>> addL15(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List[] addL16(List<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List[] addL17(@Param(value = List.class,
                 mode = PassMode.VALUE) OutputChannel<List<Character>> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List[] addL18(@Param(value = List.class,
                 mode = PassMode.COLLECTION) OutputChannel<Character> c);
 
-        @Bind("al")
+        @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List[] addL19(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
 
-        @Bind("g")
+        @Alias("g")
         int get0();
 
-        @Bind("s")
+        @Alias("s")
         void set0(int i);
 
-        @Bind("g")
+        @Alias("g")
         @Param(value = int.class, mode = PassMode.VALUE)
         OutputChannel<Integer> get1();
 
-        @Bind("s")
+        @Alias("s")
         void set1(@Param(value = int.class, mode = PassMode.VALUE) OutputChannel<Integer> i);
 
-        @Bind("ga")
+        @Alias("ga")
         int[] getA0();
 
-        @Bind("sa")
+        @Alias("sa")
         void setA0(int[] i);
 
-        @Bind("ga")
+        @Alias("ga")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> getA1();
 
-        @Bind("sa")
+        @Alias("sa")
         void setA1(@Param(value = int[].class, mode = PassMode.VALUE) OutputChannel<int[]> i);
 
-        @Bind("ga")
+        @Alias("ga")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         List<int[]> getA2();
 
-        @Bind("sa")
+        @Alias("sa")
         void setA2(
                 @Param(value = int[].class, mode = PassMode.COLLECTION) OutputChannel<Integer> i);
 
-        @Bind("ga")
+        @Alias("ga")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         int[][] getA3();
 
-        @Bind("sa")
+        @Alias("sa")
         void setA3(@Param(value = int[].class, mode = PassMode.PARALLEL) OutputChannel<int[]> i);
 
-        @Bind("gl")
+        @Alias("gl")
         List<Integer> getL0();
 
-        @Bind("sl")
+        @Alias("sl")
         void setL0(List<Integer> i);
 
-        @Bind("gl")
+        @Alias("gl")
         @Param(value = List.class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> getL1();
 
-        @Bind("sl")
+        @Alias("sl")
         void setL1(@Param(value = List.class,
                 mode = PassMode.VALUE) OutputChannel<List<Integer>> i);
 
-        @Bind("gl")
+        @Alias("gl")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List<List<Integer>> getL2();
 
-        @Bind("sl")
+        @Alias("sl")
         void setL2(@Param(value = List.class, mode = PassMode.COLLECTION) OutputChannel<Integer> i);
 
-        @Bind("gl")
+        @Alias("gl")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List[] getL3();
 
-        @Bind("sl")
+        @Alias("sl")
         void setL3(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Integer>> i);
 
-        @Bind("s")
+        @Alias("s")
         void set2(@Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
     }
 
@@ -894,11 +894,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         TYPE get(int i);
 
-        @Bind("get")
+        @Alias("get")
         @Param(Object.class)
         OutputChannel<TYPE> getAsync(int i);
 
-        @Bind("get")
+        @Alias("get")
         @Param(Object.class)
         List<TYPE> getList(int i);
     }
@@ -949,13 +949,13 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
     @SuppressWarnings("unused")
     public static class Impl {
 
-        @Bind("a")
+        @Alias("a")
         public int add(char c) {
 
             return c;
         }
 
-        @Bind("aa")
+        @Alias("aa")
         public int[] addArray(char[] c) {
 
             final int[] array = new int[c.length];
@@ -968,7 +968,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
             return array;
         }
 
-        @Bind("al")
+        @Alias("al")
         public List<Integer> addList(List<Character> c) {
 
             final ArrayList<Integer> list = new ArrayList<Integer>(c.size());
@@ -981,37 +981,37 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
             return list;
         }
 
-        @Bind("g")
+        @Alias("g")
         public int get() {
 
             return 31;
         }
 
-        @Bind("ga")
+        @Alias("ga")
         public int[] getArray() {
 
             return new int[]{1, 2, 3};
         }
 
-        @Bind("sa")
+        @Alias("sa")
         public void setArray(int[] i) {
 
             assertThat(i).containsExactly(1, 2, 3);
         }
 
-        @Bind("gl")
+        @Alias("gl")
         public List<Integer> getList() {
 
             return Arrays.asList(1, 2, 3);
         }
 
-        @Bind("sl")
+        @Alias("sl")
         public void setList(List<Integer> l) {
 
             assertThat(l).containsExactly(1, 2, 3);
         }
 
-        @Bind("s")
+        @Alias("s")
         public void set(int i) {
 
             assertThat(i).isEqualTo(-17);

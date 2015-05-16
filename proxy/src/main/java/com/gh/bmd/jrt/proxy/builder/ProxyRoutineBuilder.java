@@ -35,7 +35,7 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -61,7 +61,7 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.

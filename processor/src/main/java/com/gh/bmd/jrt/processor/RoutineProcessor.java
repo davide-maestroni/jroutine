@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.processor;
 
-import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
@@ -1571,7 +1571,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
-        final Bind asyncAnnotation = methodElement.getAnnotation(Bind.class);
+        final Alias asyncAnnotation = methodElement.getAnnotation(Alias.class);
 
         if (asyncAnnotation != null) {
 
@@ -1580,7 +1580,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                     targetElement.getEnclosedElements())) {
 
-                final Bind targetAsyncAnnotation = targetMethodElement.getAnnotation(Bind.class);
+                final Alias targetAsyncAnnotation = targetMethodElement.getAnnotation(Alias.class);
 
                 if ((targetAsyncAnnotation != null) && methodName.equals(
                         targetAsyncAnnotation.value())) {

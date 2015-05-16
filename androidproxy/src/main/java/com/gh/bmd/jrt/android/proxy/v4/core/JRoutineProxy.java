@@ -37,7 +37,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
  * @see com.gh.bmd.jrt.android.annotation.ClashResolution
  * @see com.gh.bmd.jrt.android.annotation.LoaderId
- * @see com.gh.bmd.jrt.annotation.Bind
+ * @see com.gh.bmd.jrt.annotation.Alias
  * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout

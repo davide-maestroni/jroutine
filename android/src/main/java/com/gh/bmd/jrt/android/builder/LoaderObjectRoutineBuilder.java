@@ -36,7 +36,7 @@ public interface LoaderObjectRoutineBuilder
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
-     * {@link com.gh.bmd.jrt.annotation.Bind} annotation.<br/>
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation.<br/>
      * Optional {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction},
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
@@ -53,13 +53,13 @@ public interface LoaderObjectRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
 
     /**
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is invoked ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Bind} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
@@ -79,7 +79,7 @@ public interface LoaderObjectRoutineBuilder
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is searched via reflection ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Bind} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
      * {@link com.gh.bmd.jrt.annotation.Timeout}, {@link com.gh.bmd.jrt.annotation.TimeoutAction},
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
@@ -101,7 +101,7 @@ public interface LoaderObjectRoutineBuilder
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction},
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
@@ -122,7 +122,7 @@ public interface LoaderObjectRoutineBuilder
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction},
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},

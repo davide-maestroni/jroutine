@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.processor.annotation;
+package com.gh.bmd.jrt.proxy.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * <p/>
  * The target class is specified in the annotation attribute. A proxy class implementing the
  * annotated interface will be generated within the interface package and its name will be obtained
- * by appending "{@value #CLASS_NAME_SUFFIX}" to the interface simple name. In case the specific
+ * by appending "{@value #DEFAULT_CLASS_SUFFIX}" to the interface simple name. In case the specific
  * interface is not a top level class, the simple name of the outer classes will be prepended to the
  * interface one.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
@@ -96,13 +96,51 @@ import java.lang.annotation.Target;
  * Created by davide on 11/3/14.
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Proxy {
+
+    /**
+     * TODO
+     */
+    String DEFAULT = "*";
+
+    /**
+     * Constant indicating the generated class name prefix.
+     */
+    String DEFAULT_CLASS_PREFIX = "";
 
     /**
      * Constant indicating the generated class name suffix.
      */
-    String CLASS_NAME_SUFFIX = "_Proxy";
+    String DEFAULT_CLASS_SUFFIX = "_Proxy";
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassName() default DEFAULT;
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassPackage() default DEFAULT;
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassPrefix() default DEFAULT_CLASS_PREFIX;
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassSuffix() default DEFAULT_CLASS_SUFFIX;
 
     /**
      * The wrapped class.

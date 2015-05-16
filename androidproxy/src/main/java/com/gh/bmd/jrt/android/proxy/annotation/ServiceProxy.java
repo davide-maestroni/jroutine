@@ -11,7 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.processor.v11.annotation;
+package com.gh.bmd.jrt.android.proxy.annotation;
+
+import com.gh.bmd.jrt.proxy.annotation.Proxy;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,33 +22,63 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to indicate interfaces used as templates to generate proxy classes
- * enabling asynchronous calls to the target instance methods, bound to a context lifecycle.
+ * enabling asynchronous calls to the target instance methods in a dedicated service.
  * <p/>
  * The target class is specified in the annotation attribute. A proxy class implementing the
  * annotated interface will be generated within the interface package and its name will be obtained
- * by appending "{@value #CLASS_NAME_SUFFIX}" to the interface simple name. In case the specific
+ * by appending "{@value #DEFAULT_CLASS_SUFFIX}" to the interface simple name. In case the specific
  * interface is not a top level class, the simple name of the outer classes will be prepended to the
  * interface one.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}, as
- * well as v11 builder annotations defined for each interface method.
+ * well as v4 builder annotations defined for each interface method.
  * <p/>
- * See {@link com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy} for support of API levels less
- * than 11.
- * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide on 13/05/15.
  *
- * @see com.gh.bmd.jrt.processor.annotation.Proxy
+ * @see com.gh.bmd.jrt.proxy.annotation.Proxy
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
-public @interface V11Proxy {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ServiceProxy {
+
+    /**
+     * Constant indicating the generated class name prefix.
+     */
+    String DEFAULT_CLASS_PREFIX = "";
 
     /**
      * Constant indicating the generated class name suffix.
      */
-    String CLASS_NAME_SUFFIX = "_V11Proxy";
+    String DEFAULT_CLASS_SUFFIX = "_ServiceProxy";
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassName() default Proxy.DEFAULT;
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassPackage() default Proxy.DEFAULT;
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassPrefix() default DEFAULT_CLASS_PREFIX;
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    String generatedClassSuffix() default DEFAULT_CLASS_SUFFIX;
 
     /**
      * The wrapped class.

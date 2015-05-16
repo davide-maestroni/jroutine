@@ -39,7 +39,7 @@ public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYP
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}.<br/>
+     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

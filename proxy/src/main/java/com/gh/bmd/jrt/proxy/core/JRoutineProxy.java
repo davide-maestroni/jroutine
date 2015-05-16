@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.proxy.core;
 
+import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
@@ -33,7 +34,7 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
- * @see com.gh.bmd.jrt.processor.annotation.Proxy
+ * @see Proxy
  */
 public class JRoutineProxy {
 

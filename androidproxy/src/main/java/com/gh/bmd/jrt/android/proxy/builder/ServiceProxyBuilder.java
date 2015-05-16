@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
+import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.proxy.builder.ProxyBuilder;
@@ -44,7 +45,7 @@ public interface ServiceProxyBuilder<TYPE>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.android.processor.annotation.ServiceProxy}.<br/>
+     * {@link ServiceProxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

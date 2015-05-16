@@ -13,13 +13,9 @@
  */
 package com.gh.bmd.jrt.android.processor;
 
-import com.gh.bmd.jrt.android.processor.annotation.ServiceProxy;
-import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
-import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
 import com.gh.bmd.jrt.processor.RoutineProcessor;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,11 +31,7 @@ import javax.lang.model.element.TypeElement;
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
 
-    @SuppressWarnings("unchecked")
-    private static final List<Class<? extends Annotation>> ANNOTATION_CLASSES =
-            Arrays.asList(ServiceProxy.class, V4Proxy.class, V11Proxy.class);
-
-    private Class<? extends Annotation> mCurrentAnnotationClass;
+    private TypeElement mCurrentAnnotationElement;
 
     private String mHeaderService;
 
@@ -63,11 +55,18 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private String mMethodInvocationVoid;
 
+    private TypeElement mServiceProxyElement;
+
+    private TypeElement mV11ProxyElement;
+
+    private TypeElement mV4ProxyElement;
+
     @Nonnull
     @Override
     protected String buildRoutineFieldsInit(final int size) {
 
-        final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
+        final TypeElement serviceProxyElement = mServiceProxyElement;
+        final TypeElement annotationElement = mCurrentAnnotationElement;
 
         final StringBuilder builder = new StringBuilder();
 
@@ -75,7 +74,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
 
-            if (annotationClass == ServiceProxy.class) {
+            if (annotationElement == serviceProxyElement) {
 
                 builder.append("(routineConfiguration, serviceConfiguration);");
 
@@ -90,48 +89,17 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return builder.toString();
     }
 
-    @Override
-    protected void checkDependencies() {
-
-        if (processingEnv.getElementUtils().getPackageElement("com.gh.bmd.jrt.android.proxy")
-                == null) {
-
-            throw new IllegalStateException(
-                    "the 'com.github.davide-maestroni:jroutine-androidproxy' artifact is missing!"
-                            + " Please be sure to add it to your project dependencies.");
-        }
-    }
-
-    @Nonnull
-    @Override
-    protected String getGeneratedClassSuffix() {
-
-        final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
-
-        if (annotationClass == ServiceProxy.class) {
-
-            return ServiceProxy.CLASS_NAME_SUFFIX;
-
-        } else if (annotationClass == V4Proxy.class) {
-
-            return V4Proxy.CLASS_NAME_SUFFIX;
-
-        } else if (annotationClass == V11Proxy.class) {
-
-            return V11Proxy.CLASS_NAME_SUFFIX;
-        }
-
-        return super.getGeneratedClassSuffix();
-    }
-
     @Nonnull
     @Override
     @SuppressWarnings("UnusedParameters")
     protected String getHeaderTemplate() throws IOException {
 
-        final Class<? extends Annotation> annotationClass = mCurrentAnnotationClass;
+        final TypeElement serviceProxyElement = mServiceProxyElement;
+        final TypeElement v4ProxyElement = mV4ProxyElement;
+        final TypeElement v11ProxyElement = mV11ProxyElement;
+        final TypeElement annotationElement = mCurrentAnnotationElement;
 
-        if (annotationClass == ServiceProxy.class) {
+        if (annotationElement == serviceProxyElement) {
 
             if (mHeaderService == null) {
 
@@ -140,7 +108,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             return mHeaderService;
 
-        } else if (annotationClass == V4Proxy.class) {
+        } else if (annotationElement == v4ProxyElement) {
 
             if (mHeaderV4 == null) {
 
@@ -149,7 +117,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             return mHeaderV4;
 
-        } else if (annotationClass == V11Proxy.class) {
+        } else if (annotationElement == v11ProxyElement) {
 
             if (mHeaderV11 == null) {
 
@@ -211,7 +179,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     protected String getMethodHeaderTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
 
-        if (mCurrentAnnotationClass != ServiceProxy.class) {
+        if (mCurrentAnnotationElement != mServiceProxyElement) {
 
             if (mMethodHeaderV1 == null) {
 
@@ -275,18 +243,27 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @Nonnull
     @Override
-    protected String getSourceName(@Nonnull final Class<? extends Annotation> annotationClass,
+    protected String getSourceName(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        mCurrentAnnotationClass = annotationClass;
-        return super.getSourceName(annotationClass, element, targetElement);
+        mCurrentAnnotationElement = annotationElement;
+        return super.getSourceName(annotationElement, element, targetElement);
     }
 
     @Nonnull
     @Override
-    protected List<Class<? extends Annotation>> getSupportedAnnotationClasses() {
+    protected List<TypeElement> getSupportedAnnotationElements() {
 
-        return ANNOTATION_CLASSES;
+        if ((mServiceProxyElement == null) || (mV4ProxyElement == null) || (mV11ProxyElement
+                == null)) {
+
+            mServiceProxyElement =
+                    getTypeFromName("com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy");
+            mV4ProxyElement = getTypeFromName("com.gh.bmd.jrt.android.proxy.annotation.V4Proxy");
+            mV11ProxyElement = getTypeFromName("com.gh.bmd.jrt.android.proxy.annotation.V11Proxy");
+        }
+
+        return Arrays.asList(mServiceProxyElement, mV4ProxyElement, mV11ProxyElement);
     }
 
     @SuppressWarnings("unchecked")
@@ -298,7 +275,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final TypeElement idAnnotationElement =
                 getTypeFromName("com.gh.bmd.jrt.android.annotation.LoaderId");
         final Integer id =
-                (Integer) getElementValue(methodElement, idAnnotationElement.asType(), "value");
+                (Integer) getAnnotationValue(methodElement, idAnnotationElement.asType(), "value");
 
         if (id != null) {
 
@@ -308,7 +285,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final TypeElement clashAnnotationElement =
                 getTypeFromName("com.gh.bmd.jrt.android.annotation.ClashResolution");
         final Object resolutionType =
-                getElementValue(methodElement, clashAnnotationElement.asType(), "value");
+                getAnnotationValue(methodElement, clashAnnotationElement.asType(), "value");
 
         if (resolutionType != null) {
 
@@ -319,7 +296,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final TypeElement cacheAnnotationElement =
                 getTypeFromName("com.gh.bmd.jrt.android.annotation.CacheStrategy");
         final Object strategyType =
-                getElementValue(methodElement, cacheAnnotationElement.asType(), "value");
+                getAnnotationValue(methodElement, cacheAnnotationElement.asType(), "value");
 
         if (strategyType != null) {
 

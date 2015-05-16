@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 /**
- * Processor annotation definitions.
+ * Proxy annotation definitions.
  * <p/>
  * Created by davide on 3/23/15.
  */
-package com.gh.bmd.jrt.processor.annotation;
+package com.gh.bmd.jrt.proxy.annotation;

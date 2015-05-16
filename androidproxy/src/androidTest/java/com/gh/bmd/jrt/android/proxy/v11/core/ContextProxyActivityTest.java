@@ -18,7 +18,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.processor.v11.annotation.V11Proxy;
+import com.gh.bmd.jrt.android.proxy.annotation.V11Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.android.v4.core.JRoutine;

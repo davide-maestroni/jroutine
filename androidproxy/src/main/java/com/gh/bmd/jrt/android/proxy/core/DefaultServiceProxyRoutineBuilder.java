@@ -16,12 +16,13 @@ package com.gh.bmd.jrt.android.proxy.core;
 import android.content.Context;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
-import com.gh.bmd.jrt.android.processor.annotation.ServiceProxy;
+import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.proxy.annotation.Proxy;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -83,10 +84,19 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
+        final Class<TYPE> itfClass = itf.getRawClass();
+
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getRawClass().getName());
+                    "the specified class is not an interface: " + itfClass.getName());
+        }
+
+        if (itfClass.getAnnotation(ServiceProxy.class) == null) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not annotated with " + ServiceProxy.class.getName()
+                            + ": " + itfClass.getName());
         }
 
         final Object context = mContextReference.get();
@@ -227,22 +237,34 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                 final Object context = mContext;
                 final Class<?> targetClass = mTargetClass;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
-                final Package classPackage = interfaceClass.getPackage();
-                final String packageName =
-                        (classPackage != null) ? classPackage.getName() + "." : "";
-                String classNamePrefix = interfaceClass.getSimpleName();
-                Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+                final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
+                String packageName = annotation.generatedClassPackage();
 
-                while (enclosingClass != null) {
+                if (packageName.equals(Proxy.DEFAULT)) {
 
-                    classNamePrefix = enclosingClass.getSimpleName() + classNamePrefix;
-                    enclosingClass = enclosingClass.getEnclosingClass();
+                    final Package classPackage = interfaceClass.getPackage();
+                    packageName = (classPackage != null) ? classPackage.getName() + "." : "";
                 }
 
-                final String className =
-                        packageName + classNamePrefix + ServiceProxy.CLASS_NAME_SUFFIX;
+                String className = annotation.generatedClassName();
+
+                if (className.equals(Proxy.DEFAULT)) {
+
+                    className = interfaceClass.getSimpleName();
+                    Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+
+                    while (enclosingClass != null) {
+
+                        className = enclosingClass.getSimpleName() + className;
+                        enclosingClass = enclosingClass.getEnclosingClass();
+                    }
+                }
+
+                final String fullClassName =
+                        packageName + annotation.generatedClassPrefix() + className
+                                + annotation.generatedClassSuffix();
                 final Constructor<?> constructor =
-                        findConstructor(Class.forName(className), context, targetClass,
+                        findConstructor(Class.forName(fullClassName), context, targetClass,
                                         routineConfiguration, proxyConfiguration,
                                         serviceConfiguration);
                 return interfaceClass.cast(

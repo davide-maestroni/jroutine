@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
+import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -46,15 +47,15 @@ public interface ServiceProxyRoutineBuilder
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.android.processor.annotation.ServiceProxy}. The generated class will
+     * {@link ServiceProxy}. The generated class will
      * share the same package of the specified interface and will have a name of the type:
      * "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.android.processor.annotation.ServiceProxy#CLASS_NAME_SUFFIX}".<br/>
+     * {@value ServiceProxy#DEFAULT_CLASS_SUFFIX}".<br/>
      * In case the specific interface is not a top level class, the simple name of the outer classes
      * will be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.android.processor.annotation.ServiceProxy#CLASS_NAME_SUFFIX}.onXXX()"
+     * {@value ServiceProxy#DEFAULT_CLASS_SUFFIX}.onXXX()"
      * methods. Note, however, that, since the class is generated, a generic IDE may highlight an
      * error even if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
@@ -81,15 +82,15 @@ public interface ServiceProxyRoutineBuilder
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.android.processor.annotation.ServiceProxy}. The generated class will
+     * {@link ServiceProxy}. The generated class will
      * share the same package of the specified interface and will have a name of the type:
      * "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.android.processor.annotation.ServiceProxy#CLASS_NAME_SUFFIX}".<br/>
+     * {@value ServiceProxy#DEFAULT_CLASS_SUFFIX}".<br/>
      * In case the specific interface is not a top level class, the simple name of the outer classes
      * will be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.android.processor.annotation.ServiceProxy#CLASS_NAME_SUFFIX}.onXXX()"
+     * {@value ServiceProxy#DEFAULT_CLASS_SUFFIX}.onXXX()"
      * methods. Note, however, that, since the class is generated, a generic IDE may highlight an
      * error even if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor

@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.proxy.core;
 
 import android.content.Context;
 
+import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
@@ -32,7 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide on 13/05/15.
  *
- * @see com.gh.bmd.jrt.android.processor.annotation.ServiceProxy
+ * @see ServiceProxy
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup

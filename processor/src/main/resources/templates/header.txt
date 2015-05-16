@@ -16,14 +16,14 @@
 
 package ${packageName};
 
-public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implements ${interfaceFullName} {
+public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
     private final String mShareGroup;
 
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
     @SuppressWarnings("ConstantConditions")
-    public ${classNamePrefix}${classNameSuffix}(@javax.annotation.Nonnull final ${classFullName} wrapped,
+    public ${generatedClassName}(@javax.annotation.Nonnull final ${classFullName} wrapped,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
@@ -91,6 +91,6 @@ public final class ${classNamePrefix}${classNameSuffix}${genericTypes} implement
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-            return new ${classNamePrefix}${classNameSuffix}${genericTypes}(mTarget, routineConfiguration, proxyConfiguration);
+            return new ${generatedClassName}${genericTypes}(mTarget, routineConfiguration, proxyConfiguration);
         }
     }

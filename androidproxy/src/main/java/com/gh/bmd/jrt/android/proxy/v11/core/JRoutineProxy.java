@@ -18,6 +18,7 @@ import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
+import com.gh.bmd.jrt.android.proxy.annotation.V4Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
@@ -38,7 +39,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide on 06/05/15.
  *
- * @see com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy
+ * @see V4Proxy
  * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
  * @see com.gh.bmd.jrt.android.annotation.ClashResolution
  * @see com.gh.bmd.jrt.android.annotation.LoaderId

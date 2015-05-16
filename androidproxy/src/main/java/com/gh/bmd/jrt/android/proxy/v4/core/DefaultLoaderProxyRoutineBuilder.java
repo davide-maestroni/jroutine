@@ -17,12 +17,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
-import com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy;
+import com.gh.bmd.jrt.android.proxy.annotation.V4Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.proxy.annotation.Proxy;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -108,10 +109,19 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
+        final Class<TYPE> itfClass = itf.getRawClass();
+
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getRawClass().getName());
+                    "the specified class is not an interface: " + itfClass.getName());
+        }
+
+        if (itfClass.getAnnotation(V4Proxy.class) == null) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not annotated with " + V4Proxy.class.getName() + ": "
+                            + itfClass.getName());
         }
 
         final Object context = mContextReference.get();
@@ -252,21 +262,34 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 final Object context = mContext;
                 final Class<?> targetClass = mTargetClass;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
-                final Package classPackage = interfaceClass.getPackage();
-                final String packageName =
-                        (classPackage != null) ? classPackage.getName() + "." : "";
-                String classNamePrefix = interfaceClass.getSimpleName();
-                Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+                final V4Proxy annotation = interfaceClass.getAnnotation(V4Proxy.class);
+                String packageName = annotation.generatedClassPackage();
 
-                while (enclosingClass != null) {
+                if (packageName.equals(Proxy.DEFAULT)) {
 
-                    classNamePrefix = enclosingClass.getSimpleName() + classNamePrefix;
-                    enclosingClass = enclosingClass.getEnclosingClass();
+                    final Package classPackage = interfaceClass.getPackage();
+                    packageName = (classPackage != null) ? classPackage.getName() + "." : "";
                 }
 
-                final String className = packageName + classNamePrefix + V4Proxy.CLASS_NAME_SUFFIX;
+                String className = annotation.generatedClassName();
+
+                if (className.equals(Proxy.DEFAULT)) {
+
+                    className = interfaceClass.getSimpleName();
+                    Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+
+                    while (enclosingClass != null) {
+
+                        className = enclosingClass.getSimpleName() + className;
+                        enclosingClass = enclosingClass.getEnclosingClass();
+                    }
+                }
+
+                final String fullClassName =
+                        packageName + annotation.generatedClassPrefix() + className
+                                + annotation.generatedClassSuffix();
                 final Constructor<?> constructor =
-                        findConstructor(Class.forName(className), context, targetClass,
+                        findConstructor(Class.forName(fullClassName), context, targetClass,
                                         routineConfiguration, proxyConfiguration,
                                         loaderConfiguration);
                 return interfaceClass.cast(

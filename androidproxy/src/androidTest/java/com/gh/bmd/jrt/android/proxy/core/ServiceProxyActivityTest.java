@@ -18,7 +18,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.core.JRoutine;
-import com.gh.bmd.jrt.android.processor.annotation.ServiceProxy;
+import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.gh.bmd.jrt.annotation.Bind;

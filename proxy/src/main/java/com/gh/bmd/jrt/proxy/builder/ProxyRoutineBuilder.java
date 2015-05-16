@@ -41,14 +41,14 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
+     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy}. The generated class will share the same
      * package of the specified interface and will have a name of the type: "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.processor.annotation.Proxy#CLASS_NAME_SUFFIX}".<br/>
+     * {@value com.gh.bmd.jrt.proxy.annotation.Proxy#DEFAULT_CLASS_SUFFIX}".<br/>
      * In case the specific interface is not a top level class, the simple name of the outer classes
      * will be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.processor.annotation.Proxy#CLASS_NAME_SUFFIX}.on()" method.
+     * {@value com.gh.bmd.jrt.proxy.annotation.Proxy#DEFAULT_CLASS_SUFFIX}.on()" method.
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
@@ -73,14 +73,14 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}. The generated class will share the same
+     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy}. The generated class will share the same
      * package of the specified interface and will have a name of the type: "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.processor.annotation.Proxy#CLASS_NAME_SUFFIX}".<br/>
+     * {@value com.gh.bmd.jrt.proxy.annotation.Proxy#DEFAULT_CLASS_SUFFIX}".<br/>
      * In case the specific interface is not a top level class, the simple name of the outer classes
      * will be prepended to the interface one.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the "&lt;itf_simple_name&gt;
-     * {@value com.gh.bmd.jrt.processor.annotation.Proxy#CLASS_NAME_SUFFIX}.on()" method.
+     * {@value com.gh.bmd.jrt.proxy.annotation.Proxy#DEFAULT_CLASS_SUFFIX}.on()" method.
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.<br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor

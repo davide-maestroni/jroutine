@@ -12,9 +12,8 @@
  * limitations under the License.
  */
 /**
- * Processor annotation definitions bound to an Android context, with support for Android
- * compatibility library.
+ * Processor annotation definitions, specific to the Android platform.
  * <p/>
- * Created by davide on 5/10/15.
+ * Created by davide on 5/14/15.
  */
-package com.gh.bmd.jrt.android.processor.v4.annotation;
+package com.gh.bmd.jrt.android.proxy.annotation;

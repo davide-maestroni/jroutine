@@ -29,7 +29,7 @@ import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
-import com.gh.bmd.jrt.processor.annotation.Proxy;
+import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.ProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.gh.bmd.jrt.runner.Runner;
@@ -177,7 +177,7 @@ public class ProxyRoutineTest {
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final ProxyBuilder<TestProxy> builder = ProxyRoutineTestTestProxy_Proxy.on(test);
+        final ProxyBuilder<TestProxy> builder = Test_Proxy.on(test);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);
@@ -881,7 +881,7 @@ public class ProxyRoutineTest {
         List<TYPE> getList(int i);
     }
 
-    @Proxy(TestClass.class)
+    @Proxy(value = TestClass.class, generatedClassName = "Test")
     public interface TestProxy {
 
         @Timeout(300)

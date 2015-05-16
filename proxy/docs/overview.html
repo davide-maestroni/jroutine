@@ -83,7 +83,7 @@
 <b>Example 2:</b> via code generation (again).
 <p>
     It is possible to completely avoid the use of reflection by slightly modifying the example above.<br/>
-    Note that, since the <i>XXX_Proxy</i> class is generated, a generic IDE may highlight an error even if the compilation is successful.
+    Note that, since the <i>Proxy_XXX</i> class is generated, a generic IDE may highlight an error even if the compilation is successful.
 </p>
 <pre>
     <code>
@@ -92,7 +92,7 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = MainAsyncMain_Proxy.on(instance)
+                final AsyncMain proxy = Proxy_MainAsyncMain.on(instance)
                                                            .withProxy()
                                                            .withShareGroup(ShareGroup.NONE)
                                                            .set()

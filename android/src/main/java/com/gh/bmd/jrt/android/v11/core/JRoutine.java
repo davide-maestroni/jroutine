@@ -137,7 +137,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * See {@link com.gh.bmd.jrt.android.v4.core.JRoutine} for support of API levels less than
  * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
- * Created by davide on 12/8/14.
+ * Created by davide-maestroni on 12/8/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending functionalities of another utility class")

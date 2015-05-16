@@ -30,7 +30,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Default implementation of a proxy builder.
  * <p/>
- * Created by davide on 3/23/15.
+ * Created by davide-maestroni on 3/23/15.
  */
 class DefaultProxyRoutineBuilder
         implements ProxyRoutineBuilder, RoutineConfiguration.Configurable<ProxyRoutineBuilder>,
@@ -191,6 +191,10 @@ class DefaultProxyRoutineBuilder
 
                     final Package classPackage = interfaceClass.getPackage();
                     packageName = (classPackage != null) ? classPackage.getName() + "." : "";
+
+                } else {
+
+                    packageName += ".";
                 }
 
                 String className = annotation.generatedClassName();

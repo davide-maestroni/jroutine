@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * This interface is used to abstract the handling of placeholders for asynchronously available
  * data, in order to support forced input and output ordering.
  * <p/>
- * Created by davide on 9/30/14.
+ * Created by davide-maestroni on 9/30/14.
  *
  * @param <E> the element type.
  */

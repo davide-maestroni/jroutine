@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
  * and still running (or cached) at the time of the channel creation.
  * <p/>
- * Created by davide on 1/14/15.
+ * Created by davide-maestroni on 1/14/15.
  *
  * @see com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder
  */

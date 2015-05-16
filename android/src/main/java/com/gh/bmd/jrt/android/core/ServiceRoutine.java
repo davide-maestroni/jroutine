@@ -68,7 +68,7 @@ import static java.util.UUID.randomUUID;
 /**
  * Routine implementation employing an Android service to run its invocations.
  * <p/>
- * Created by davide on 1/8/15.
+ * Created by davide-maestroni on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

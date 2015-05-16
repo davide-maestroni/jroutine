@@ -32,7 +32,7 @@ import javax.annotation.Nonnull;
  * Abstract implementation of a builder of async proxy objects, whose methods are executed in a
  * dedicated service.
  * <p/>
- * Created by davide on 13/05/15.
+ * Created by davide-maestroni on 13/05/15.
  *
  * @param <TYPE> the interface type.
  */

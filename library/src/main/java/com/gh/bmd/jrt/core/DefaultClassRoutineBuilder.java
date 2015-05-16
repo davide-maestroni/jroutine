@@ -53,7 +53,7 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 /**
  * Class implementing a builder of routines wrapping a class method.
  * <p/>
- * Created by davide on 9/21/14.
+ * Created by davide-maestroni on 9/21/14.
  */
 class DefaultClassRoutineBuilder
         implements ClassRoutineBuilder, RoutineConfiguration.Configurable<ClassRoutineBuilder>,

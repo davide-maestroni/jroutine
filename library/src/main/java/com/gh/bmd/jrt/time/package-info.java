@@ -14,6 +14,6 @@
 /**
  * Time related helper classes.
  * <p/>
- * Created by davide on 9/25/14.
+ * Created by davide-maestroni on 9/25/14.
  */
 package com.gh.bmd.jrt.time;

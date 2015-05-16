@@ -43,7 +43,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
  * This class provides a default implementation of all the routine functionalities. The inheriting
  * class just need to create invocation objects when required.
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

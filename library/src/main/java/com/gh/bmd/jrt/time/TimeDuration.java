@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Utility class for handling a time duration in different time units.
  * <p/>
- * Created by davide on 9/9/14.
+ * Created by davide-maestroni on 9/9/14.
  */
 public class TimeDuration extends Time {
 
@@ -274,7 +274,7 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs a {@link Thread#join()} using this duration as timeout.
+     * Performs a {@link java.lang.Thread#join()} using this duration as timeout.
      *
      * @param target the target thread.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
@@ -285,7 +285,7 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs a {@link Thread#sleep(long, int)} using this duration as timeout.
+     * Performs a {@link java.lang.Thread#sleep(long, int)} using this duration as timeout.
      *
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
@@ -295,8 +295,8 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs a {@link Thread#sleep(long, int)} using this duration as timeout, ensuring that
-     * the sleep time is respected even if spurious wake ups happen in the while.
+     * Performs a {@link java.lang.Thread#sleep(long, int)} using this duration as timeout, ensuring
+     * that the sleep time is respected even if spurious wake ups happen in the while.
      *
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
@@ -332,8 +332,8 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs a {@link Thread#sleep(long, int)} as if started from the specified system time in
-     * milliseconds, by using this duration as timeout.
+     * Performs a {@link java.lang.Thread#sleep(long, int)} as if started from the specified system
+     * time in milliseconds, by using this duration as timeout.
      *
      * @param milliTime the starting system time in milliseconds.
      * @return whether the sleep happened at all.
@@ -366,8 +366,8 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs a {@link Thread#sleep(long, int)} as if started from the specified high precision
-     * system time in nanoseconds, by using this duration as timeout.
+     * Performs a {@link java.lang.Thread#sleep(long, int)} as if started from the specified high
+     * precision system time in nanoseconds, by using this duration as timeout.
      *
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the sleep happened at all.
@@ -400,7 +400,7 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs an {@link Object#wait()} using this duration as timeout.
+     * Performs an {@link java.lang.Object#wait()} using this duration as timeout.
      *
      * @param target the target object.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
@@ -424,7 +424,7 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs an {@link Object#wait()} as if started from the specified system time in
+     * Performs an {@link java.lang.Object#wait()} as if started from the specified system time in
      * milliseconds, by using this duration as timeout.
      *
      * @param target    the target object.
@@ -461,8 +461,8 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Performs an {@link Object#wait()} as if started from the specified high precision system
-     * time in nanoseconds, by using this duration as timeout.
+     * Performs an {@link java.lang.Object#wait()} as if started from the specified high precision
+     * system time in nanoseconds, by using this duration as timeout.
      *
      * @param target   the target object.
      * @param nanoTime the starting system time in nanoseconds.
@@ -498,8 +498,8 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Waits for the specified check to be true by performing an {@link Object#wait()} and using
-     * this duration as timeout.
+     * Waits for the specified check to be true by performing an {@link java.lang.Object#wait()} and
+     * using this duration as timeout.
      *
      * @param target the target object.
      * @param check  the check to verify.

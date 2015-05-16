@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * Implementation of a runner employing {@link android.os.AsyncTask} instances to execute the
  * routine invocations.
  * <p/>
- * Created by davide on 9/28/14.
+ * Created by davide-maestroni on 9/28/14.
  */
 class AsyncTaskRunner extends MainRunner {
 

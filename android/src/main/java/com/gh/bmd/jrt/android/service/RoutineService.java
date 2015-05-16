@@ -57,7 +57,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Basic implementation of a service running routine invocations.
  * <p/>
- * Created by davide on 1/9/15.
+ * Created by davide-maestroni on 1/9/15.
  */
 public class RoutineService extends Service {
 

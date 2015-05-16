@@ -35,7 +35,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Default implementation of a context proxy builder.
  * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide-maestroni on 06/05/15.
  */
 class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         RoutineConfiguration.Configurable<LoaderProxyRoutineBuilder>,
@@ -269,6 +269,10 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
                     final Package classPackage = interfaceClass.getPackage();
                     packageName = (classPackage != null) ? classPackage.getName() + "." : "";
+
+                } else {
+
+                    packageName += ".";
                 }
 
                 String className = annotation.generatedClassName();

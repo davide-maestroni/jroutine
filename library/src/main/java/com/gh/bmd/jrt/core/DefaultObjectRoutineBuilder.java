@@ -52,7 +52,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 /**
  * Class implementing a builder of routines wrapping an object instance.
  * <p/>
- * Created by davide on 9/21/14.
+ * Created by davide-maestroni on 9/21/14.
  */
 class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         implements ObjectRoutineBuilder {

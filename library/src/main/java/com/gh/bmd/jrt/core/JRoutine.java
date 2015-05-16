@@ -137,7 +137,7 @@ import javax.annotation.Nonnull;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  *
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Param

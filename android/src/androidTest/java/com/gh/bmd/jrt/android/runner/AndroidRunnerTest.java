@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Android runners unit tests.
  * <p/>
- * Created by davide on 10/10/14.
+ * Created by davide-maestroni on 10/10/14.
  */
 public class AndroidRunnerTest extends AndroidTestCase {
 

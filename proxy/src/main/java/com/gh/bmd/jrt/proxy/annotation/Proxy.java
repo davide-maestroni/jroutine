@@ -19,14 +19,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate interfaces used as templates to generate proxy classes
- * enabling asynchronous calls to the target instance methods.
+ * This annotation is used to indicate interfaces used as templates to generate proxy classes,
+ * enabling asynchronous calls to the target instance methods.<br/>
+ * The target class is specified in the annotation value. A proxy class implementing the annotated
+ * interface will be generated according to the specific annotation attributes.
  * <p/>
- * The target class is specified in the annotation attribute. A proxy class implementing the
- * annotated interface will be generated within the interface package and its name will be obtained
- * by appending "{@value #DEFAULT_CLASS_SUFFIX}" to the interface simple name. In case the specific
- * interface is not a top level class, the simple name of the outer classes will be prepended to the
- * interface one.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
@@ -93,52 +90,53 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 11/3/14.
+ * Created by davide-maestroni on 11/3/14.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Proxy {
 
     /**
-     * TODO
+     * Constant indicating a default class name or package.
      */
     String DEFAULT = "*";
 
     /**
-     * Constant indicating the generated class name prefix.
+     * Constant indicating the default generated class name prefix.
      */
-    String DEFAULT_CLASS_PREFIX = "";
+    String DEFAULT_CLASS_PREFIX = "Proxy_";
 
     /**
-     * Constant indicating the generated class name suffix.
+     * Constant indicating the default generated class name suffix.
      */
-    String DEFAULT_CLASS_SUFFIX = "_Proxy";
+    String DEFAULT_CLASS_SUFFIX = "";
 
     /**
-     * TODO
+     * The generated class name. By default the name is obtained by the interface simple name,
+     * prepending all the outer class names in case it is not a top level class.
      *
-     * @return
+     * @return the class name.
      */
     String generatedClassName() default DEFAULT;
 
     /**
-     * TODO
+     * The generated class package. By default it is the same as the interface.
      *
-     * @return
+     * @return the package.
      */
     String generatedClassPackage() default DEFAULT;
 
     /**
-     * TODO
+     * The generated class name prefix.
      *
-     * @return
+     * @return the name prefix.
      */
     String generatedClassPrefix() default DEFAULT_CLASS_PREFIX;
 
     /**
-     * TODO
+     * The generated class name suffix.
      *
-     * @return
+     * @return the name suffix.
      */
     String generatedClassSuffix() default DEFAULT_CLASS_SUFFIX;
 

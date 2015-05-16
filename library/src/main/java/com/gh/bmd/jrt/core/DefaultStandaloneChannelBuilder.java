@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a builder of standalone channel objects.
  * <p/>
- * Created by davide on 10/25/14.
+ * Created by davide-maestroni on 10/25/14.
  */
 class DefaultStandaloneChannelBuilder
         implements StandaloneChannelBuilder, Configurable<StandaloneChannelBuilder> {

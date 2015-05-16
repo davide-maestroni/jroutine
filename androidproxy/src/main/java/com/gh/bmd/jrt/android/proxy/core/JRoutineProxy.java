@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.android.proxy.core;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
@@ -31,9 +30,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide on 13/05/15.
+ * Created by davide-maestroni on 13/05/15.
  *
- * @see ServiceProxy
+ * @see com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup

@@ -67,7 +67,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Invocation context routine unit tests.
  * <p/>
- * Created by davide on 12/10/14.
+ * Created by davide-maestroni on 12/10/14.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<TestActivity> {

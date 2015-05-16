@@ -14,6 +14,6 @@
 /**
  * Processor core interfaces and implementations.
  * <p/>
- * Created by davide on 5/14/15.
+ * Created by davide-maestroni on 5/14/15.
  */
 package com.gh.bmd.jrt.android.proxy.core;

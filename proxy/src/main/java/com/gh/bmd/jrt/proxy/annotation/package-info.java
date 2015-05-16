@@ -14,6 +14,6 @@
 /**
  * Proxy annotation definitions.
  * <p/>
- * Created by davide on 3/23/15.
+ * Created by davide-maestroni on 3/23/15.
  */
 package com.gh.bmd.jrt.proxy.annotation;

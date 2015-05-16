@@ -14,6 +14,6 @@
 /**
  * Annotation pre-processor implementation.
  * <p/>
- * Created by davide on 10/14/14.
+ * Created by davide-maestroni on 10/14/14.
  */
 package com.gh.bmd.jrt.processor;

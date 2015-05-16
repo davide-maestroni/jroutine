@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 /**
  * Invocation factory interface.
  * <p/>
- * Created by davide on 2/12/15.
+ * Created by davide-maestroni on 2/12/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

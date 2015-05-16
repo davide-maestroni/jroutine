@@ -62,7 +62,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Class implementing a builder of routine objects based on methods of a concrete object instance.
  * <p/>
- * Created by davide on 3/29/15.
+ * Created by davide-maestroni on 3/29/15.
  */
 class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         RoutineConfiguration.Configurable<ServiceObjectRoutineBuilder>,

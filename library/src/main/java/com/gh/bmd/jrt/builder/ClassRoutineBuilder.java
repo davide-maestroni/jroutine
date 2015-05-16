@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
  * Note that only static methods can be asynchronously invoked through the routines created by this
  * builder.
  * <p/>
- * Created by davide on 3/7/15.
+ * Created by davide-maestroni on 3/7/15.
  *
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.ShareGroup

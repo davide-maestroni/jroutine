@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Proxy builder activity unit tests.
  * <p/>
- * Created by davide on 07/05/15.
+ * Created by davide-maestroni on 07/05/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
@@ -182,7 +182,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final ServiceProxyBuilder<TestProxy> builder =
-                ServiceProxyActivityTestTestProxy_ServiceProxy.onService(getActivity(),
+                com.gh.bmd.jrt.android.proxy.ServiceProxy_Test.onService(getActivity(),
                                                                          TestClass.class);
         final TestProxy testProxy = builder.withRoutine()
                                            .with(configuration)
@@ -888,7 +888,8 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         List<TYPE> getList(int i);
     }
 
-    @ServiceProxy(TestClass.class)
+    @ServiceProxy(value = TestClass.class, generatedClassName = "Test",
+            generatedClassPackage = "com.gh.bmd.jrt.android.proxy")
     public interface TestProxy {
 
         @Timeout(3000)

@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 /**
  * Interface defining a builder of standalone channel objects.
  * <p/>
- * Created by davide on 3/7/15.
+ * Created by davide-maestroni on 3/7/15.
  */
 public interface StandaloneChannelBuilder extends ConfigurableBuilder<StandaloneChannelBuilder> {
 

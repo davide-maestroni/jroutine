@@ -24,7 +24,7 @@ import com.gh.bmd.jrt.android.proxy.R;
 /**
  * Test activity.
  * <p/>
- * Created by davide on 12/16/14.
+ * Created by davide-maestroni on 12/16/14.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestActivity extends Activity {

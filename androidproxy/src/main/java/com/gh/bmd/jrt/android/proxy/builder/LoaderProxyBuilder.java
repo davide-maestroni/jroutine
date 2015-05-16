@@ -15,8 +15,6 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
-import com.gh.bmd.jrt.android.proxy.annotation.V11Proxy;
-import com.gh.bmd.jrt.android.proxy.annotation.V4Proxy;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.proxy.builder.ProxyBuilder;
@@ -26,7 +24,7 @@ import javax.annotation.Nonnull;
 /**
  * Interface defining a builder of async proxy objects, bound to a context lifecycle.
  * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide-maestroni on 06/05/15.
  *
  * @param <TYPE> the interface type.
  */
@@ -45,8 +43,8 @@ public interface LoaderProxyBuilder<TYPE>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link V4Proxy} or
-     * {@link V11Proxy}.<br/>
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.V4Proxy} or
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.V11Proxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * so, waiting for the outputs right after the routine invocation, will result in a deadlock.<br/>
  * The local context of the invocations will always be the application one.
  * <p/>
- * Created by davide on 12/9/14.
+ * Created by davide-maestroni on 12/9/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

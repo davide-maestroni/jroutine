@@ -23,7 +23,7 @@ import com.gh.bmd.jrt.android.R;
 /**
  * Test activity.
  * <p/>
- * Created by davide on 11/1/15.
+ * Created by davide-maestroni on 11/1/15.
  */
 public class TestActivity extends Activity {
 

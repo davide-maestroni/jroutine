@@ -14,6 +14,6 @@
 /**
  * Android platform specific annotation definitions.
  * <p/>
- * Created by davide on 4/9/15.
+ * Created by davide-maestroni on 4/9/15.
  */
 package com.gh.bmd.jrt.android.annotation;

@@ -20,7 +20,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Utility class for creating and sharing log instances, employing specific Android classes.
  * <p/>
- * Created by davide on 12/22/14.
+ * Created by davide-maestroni on 12/22/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending functionalities of another utility class")

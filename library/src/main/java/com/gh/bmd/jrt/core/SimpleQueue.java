@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * Minimal implementation of a light-weight queue storing elements into dynamically increasing
  * circular buffer.
  * <p/>
- * Created by davide on 9/27/14.
+ * Created by davide-maestroni on 9/27/14.
  *
  * @param <E> the element type.
  */

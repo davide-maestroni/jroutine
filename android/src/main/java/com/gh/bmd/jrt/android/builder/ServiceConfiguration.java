@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
  * <p/>
- * Created by davide on 20/04/15.
+ * Created by davide-maestroni on 20/04/15.
  */
 public final class ServiceConfiguration {
 

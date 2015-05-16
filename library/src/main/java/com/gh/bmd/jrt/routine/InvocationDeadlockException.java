@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * Exception indicating that no invocation instance became available before the specific timeout
  * elapsed.
  * <p/>
- * Created by davide on 9/20/14.
+ * Created by davide-maestroni on 9/20/14.
  */
 public class InvocationDeadlockException extends DeadlockException {
 

@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * Interface defining a routine that can purge specific invocation instances, identifying them by
  * their inputs.
  * <p/>
- * Created by davide on 3/9/15.
+ * Created by davide-maestroni on 3/9/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

@@ -45,7 +45,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 /**
  * Default implementation of a parameter input channel.
  * <p/>
- * Created by davide on 9/24/14.
+ * Created by davide-maestroni on 9/24/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

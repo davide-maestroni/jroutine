@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  * Implementation of a nested queue ensuring that data are returned in the same order as they are
  * added, even if added later through a nested queue.
  * <p/>
- * Created by davide on 9/30/14.
+ * Created by davide-maestroni on 9/30/14.
  *
  * @param <E> the element type.
  */

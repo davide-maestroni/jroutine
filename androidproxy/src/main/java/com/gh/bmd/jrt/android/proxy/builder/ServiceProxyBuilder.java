@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
-import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.proxy.builder.ProxyBuilder;
@@ -26,7 +25,7 @@ import javax.annotation.Nonnull;
  * Interface defining a builder of async proxy objects, whose methods are executed in a dedicated
  * service.
  * <p/>
- * Created by davide on 13/05/15.
+ * Created by davide-maestroni on 13/05/15.
  *
  * @param <TYPE> the interface type.
  */
@@ -45,7 +44,7 @@ public interface ServiceProxyBuilder<TYPE>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link ServiceProxy}.<br/>
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

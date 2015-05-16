@@ -26,7 +26,7 @@ import static org.junit.Assert.fail;
 /**
  * Time unit tests.
  * <p/>
- * Created by davide on 10/2/14.
+ * Created by davide-maestroni on 10/2/14.
  */
 public class TimeTest {
 

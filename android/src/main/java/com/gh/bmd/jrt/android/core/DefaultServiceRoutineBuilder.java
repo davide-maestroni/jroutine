@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a builder of routine objects based on an invocation class token.
  * <p/>
- * Created by davide on 1/8/15.
+ * Created by davide-maestroni on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

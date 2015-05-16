@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 /**
  * Invocation used to know whether a loader with a specific ID is present or not.
  * <p/>
- * Created by davide on 1/14/15.
+ * Created by davide-maestroni on 1/14/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

@@ -57,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Proxy builder activity unit tests.
  * <p/>
- * Created by davide on 07/05/15.
+ * Created by davide-maestroni on 07/05/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
@@ -175,8 +175,8 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final LoaderProxyBuilder<TestProxy> builder =
-                ContextProxyActivityTestTestProxy_V4Proxy.onActivity(getActivity(),
-                                                                     TestClass.class);
+                com.gh.bmd.jrt.android.proxy.V4Proxy_TestActivity.onActivity(getActivity(),
+                                                                             TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);
@@ -852,7 +852,8 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
         List<TYPE> getList(int i);
     }
 
-    @V4Proxy(TestClass.class)
+    @V4Proxy(value = TestClass.class, generatedClassName = "TestActivity",
+            generatedClassPackage = "com.gh.bmd.jrt.android.proxy")
     public interface TestProxy {
 
         @Timeout(3000)

@@ -19,7 +19,7 @@ package com.gh.bmd.jrt.runner;
  * This interface is meant to be used by a runner to ensure that the routine execution will take
  * place in the specific handled thread or threads.
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  */
 public interface Execution extends Runnable {
 

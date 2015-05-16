@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.
  * <p/>
- * Created by Davide on 4/6/2015.
+ * Created by davide-maestroni on 4/6/2015.
  */
 public interface LoaderObjectRoutineBuilder
         extends ObjectRoutineBuilder, LoaderConfigurableBuilder<LoaderObjectRoutineBuilder> {

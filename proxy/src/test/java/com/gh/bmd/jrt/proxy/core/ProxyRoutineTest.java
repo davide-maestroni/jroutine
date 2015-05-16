@@ -57,7 +57,7 @@ import static org.junit.Assert.fail;
 /**
  * Proxy builder unit tests.
  * <p/>
- * Created by davide on 3/6/15.
+ * Created by davide-maestroni on 3/6/15.
  */
 public class ProxyRoutineTest {
 
@@ -177,7 +177,7 @@ public class ProxyRoutineTest {
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final ProxyBuilder<TestProxy> builder = Test_Proxy.on(test);
+        final ProxyBuilder<TestProxy> builder = com.gh.bmd.jrt.proxy.Proxy_Test.on(test);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);
@@ -881,7 +881,8 @@ public class ProxyRoutineTest {
         List<TYPE> getList(int i);
     }
 
-    @Proxy(value = TestClass.class, generatedClassName = "Test")
+    @Proxy(value = TestClass.class, generatedClassName = "Test",
+            generatedClassPackage = "com.gh.bmd.jrt.proxy")
     public interface TestProxy {
 
         @Timeout(300)

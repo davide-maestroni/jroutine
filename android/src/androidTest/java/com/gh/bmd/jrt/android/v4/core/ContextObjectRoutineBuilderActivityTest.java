@@ -59,7 +59,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Object context routine activity unit tests.
  * <p/>
- * Created by davide on 4/7/15.
+ * Created by davide-maestroni on 4/7/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class ContextObjectRoutineBuilderActivityTest

@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
 /**
  * Default implementation of an loader channel builder.
  * <p/>
- * Created by davide on 1/14/15.
+ * Created by davide-maestroni on 1/14/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class DefaultLoaderChannelBuilder

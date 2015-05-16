@@ -42,7 +42,7 @@ import javax.annotation.Nullable;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 10/3/14.
+ * Created by davide-maestroni on 10/3/14.
  *
  * @see com.gh.bmd.jrt.log.Logger
  */

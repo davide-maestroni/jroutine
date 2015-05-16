@@ -96,7 +96,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 1/31/15.
+ * Created by davide-maestroni on 1/31/15.
  */
 @Inherited
 @Target({ElementType.PARAMETER, ElementType.METHOD})

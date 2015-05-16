@@ -14,6 +14,6 @@
 /**
  * Core classes and interfaces specific to the Android platform.
  * <p/>
- * Created by davide on 4/6/15.
+ * Created by davide-maestroni on 4/6/15.
  */
 package com.gh.bmd.jrt.android.core;

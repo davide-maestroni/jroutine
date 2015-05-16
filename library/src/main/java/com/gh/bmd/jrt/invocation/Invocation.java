@@ -72,7 +72,7 @@ import javax.annotation.Nullable;
  * The <b><code>onDestroy()</code></b> method is meant to indicate that the invocation object is no
  * longer needed, so any associated resource can be safely released.
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

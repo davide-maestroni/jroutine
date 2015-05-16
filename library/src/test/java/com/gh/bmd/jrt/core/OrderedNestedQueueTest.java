@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * Ordered nested queue unit tests.
  * <p/>
- * Created by davide on 10/2/14.
+ * Created by davide-maestroni on 10/2/14.
  */
 public class OrderedNestedQueueTest {
 

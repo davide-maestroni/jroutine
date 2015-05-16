@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
  * is, they share the same ID, and to set a specific type of caching of the invocation results.
  * <p/>
- * Created by davide on 19/04/15.
+ * Created by davide-maestroni on 19/04/15.
  */
 public final class LoaderConfiguration {
 
@@ -239,7 +239,8 @@ public final class LoaderConfiguration {
          */
         KEEP_THAT,
         /**
-         * The clash is resolved by aborting the invocation with an {@link InputClashException}.
+         * The clash is resolved by aborting the invocation with an
+         * {@link com.gh.bmd.jrt.android.builder.InputClashException}.
          */
         ABORT_THIS,
         /**
@@ -248,8 +249,9 @@ public final class LoaderConfiguration {
          */
         ABORT_THAT_INPUT,
         /**
-         * The clash is resolved by aborting the invocation with an {@link InputClashException},
-         * only in case its input data are different from the current ones.
+         * The clash is resolved by aborting the invocation with an
+         * {@link com.gh.bmd.jrt.android.builder.InputClashException},  only in case its input data
+         * are different from the current ones.
          */
         ABORT_THIS_INPUT,
     }

@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * Exception wrapping any throwable escaping a routine execution.
  * <p/>
- * Created by davide on 9/8/14.
+ * Created by davide-maestroni on 9/8/14.
  */
 public class InvocationException extends RoutineException {
 

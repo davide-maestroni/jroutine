@@ -16,7 +16,6 @@ package com.gh.bmd.jrt.android.proxy.v4.core;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.proxy.annotation.V4Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
@@ -32,9 +31,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide-maestroni on 06/05/15.
  *
- * @see V4Proxy
+ * @see com.gh.bmd.jrt.android.proxy.annotation.V4Proxy
  * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
  * @see com.gh.bmd.jrt.android.annotation.ClashResolution
  * @see com.gh.bmd.jrt.android.annotation.LoaderId

@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * Exception indicating that an invocation has been explicitly aborted.
  * <p/>
- * Created by davide on 1/27/15.
+ * Created by davide-maestroni on 1/27/15.
  */
 public class AbortException extends InvocationException {
 

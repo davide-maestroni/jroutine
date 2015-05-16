@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 /**
  * Utility class for creating and sharing log instances.
  * <p/>
- * Created by davide on 12/22/14.
+ * Created by davide-maestroni on 12/22/14.
  */
 public class Logs {
 

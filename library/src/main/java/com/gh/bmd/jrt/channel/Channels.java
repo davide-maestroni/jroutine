@@ -27,7 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Utility class for handling channels.
  * <p/>
- * Created by davide on 3/15/15.
+ * Created by davide-maestroni on 3/15/15.
  */
 public class Channels {
 

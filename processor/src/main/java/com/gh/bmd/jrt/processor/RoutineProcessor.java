@@ -66,7 +66,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations.
  * <p/>
- * Created by davide on 11/3/14.
+ * Created by davide-maestroni on 11/3/14.
  */
 public class RoutineProcessor extends AbstractProcessor {
 
@@ -603,7 +603,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * Returns the specified template as a string.
      *
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     protected String getFooterTemplate() throws IOException {
@@ -713,7 +713,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * Returns the specified template as a string.
      *
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     protected String getHeaderTemplate() throws IOException {
@@ -732,7 +732,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -754,7 +754,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -775,7 +775,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -797,7 +797,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -818,7 +818,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -839,7 +839,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -860,7 +860,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -882,7 +882,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -903,7 +903,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -924,7 +924,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -945,7 +945,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -966,7 +966,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -987,7 +987,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -1008,7 +1008,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -1029,7 +1029,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -1050,7 +1050,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -1071,7 +1071,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -1454,7 +1454,7 @@ public class RoutineProcessor extends AbstractProcessor {
      *
      * @param path the resource path.
      * @return the template as a string.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressFBWarnings(value = "UI_INHERITANCE_UNSAFE_GETRESOURCE",
@@ -1498,7 +1498,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
         try {
 
-            final String packageName = getPackage(element).getQualifiedName().toString();
             final Filer filer = processingEnv.getFiler();
 
             if (!DEBUG) {
@@ -1513,7 +1512,9 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             String header;
-            header = getHeaderTemplate().replace("${packageName}", packageName);
+            header = getHeaderTemplate().replace("${packageName}",
+                                                 getGeneratedClassPackage(annotationElement,
+                                                                          element, targetElement));
             header = header.replace("${generatedClassName}",
                                     getGeneratedClassPrefix(annotationElement, element,
                                                             targetElement) +

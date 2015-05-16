@@ -69,7 +69,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Class implementing a builder of routine objects based on methods of a concrete object instance.
  * <p/>
- * Created by Davide on 4/6/2015.
+ * Created by davide-maestroni on 4/6/2015.
  */
 class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         LoaderConfiguration.Configurable<LoaderObjectRoutineBuilder>,

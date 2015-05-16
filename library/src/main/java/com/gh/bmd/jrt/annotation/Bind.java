@@ -72,12 +72,14 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 1/22/15.
+ * Created by davide-maestroni on 1/22/15.
  */
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Bind {
+
+    //TODO: rename in Alias
 
     /**
      * The name used to identify the method independently from its original signature.

@@ -14,6 +14,6 @@
 /**
  * Processor core interfaces and implementations bound to an Android context.
  * <p/>
- * Created by davide on 5/10/15.
+ * Created by davide-maestroni on 5/10/15.
  */
 package com.gh.bmd.jrt.android.proxy.v11.core;

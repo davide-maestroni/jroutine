@@ -28,7 +28,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Utility class for creating invocation factory objects.
  * <p/>
- * Created by davide on 2/12/15.
+ * Created by davide-maestroni on 2/12/15.
  */
 public class Invocations {
 

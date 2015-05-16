@@ -29,7 +29,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Test service.
  * <p/>
- * Created by davide on 1/16/15.
+ * Created by davide-maestroni on 1/16/15.
  */
 public class TestService extends RoutineService implements FactoryContext {
 

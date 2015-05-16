@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * This class is useful to avoid the need of implementing some of the methods defined in the
  * interface.
  * <p/>
- * Created by davide on 10/17/14.
+ * Created by davide-maestroni on 10/17/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

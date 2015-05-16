@@ -30,7 +30,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Test application.
  * <p/>
- * Created by Davide on 4/6/2015.
+ * Created by davide-maestroni on 4/6/2015.
  */
 @SuppressWarnings("unused")
 public class TestApp extends Application implements FactoryContext {

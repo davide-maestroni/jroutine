@@ -32,7 +32,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 /**
  * The downloader implementation.
  * <p/>
- * Created by davide on 10/17/14.
+ * Created by davide-maestroni on 10/17/14.
  */
 public class Downloader {
 
@@ -85,8 +85,8 @@ public class Downloader {
      * download.
      *
      * @param args the arguments.
-     * @throws IOException        if an I/O error occurred.
-     * @throws URISyntaxException if one of the specified URIs is not correctly formatted.
+     * @throws java.io.IOException         if an I/O error occurred.
+     * @throws java.net.URISyntaxException if one of the specified URIs is not correctly formatted.
      */
     public static void main(final String args[]) throws IOException, URISyntaxException {
 

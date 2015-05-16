@@ -56,7 +56,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Invocation implementation employing loaders to perform background operations.
  * <p/>
- * Created by davide on 12/11/14.
+ * Created by davide-maestroni on 12/11/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

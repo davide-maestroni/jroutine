@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
  * objects on the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable}
  * objects instead.
  * <p/>
- * Created by davide on 3/7/15.
+ * Created by davide-maestroni on 3/7/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

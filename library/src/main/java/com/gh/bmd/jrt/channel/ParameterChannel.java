@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * Interface defining a parameter input channel, that is the channel used to pass input data to the
  * routine invocation.
  * <p/>
- * Created by davide on 9/15/14.
+ * Created by davide-maestroni on 9/15/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

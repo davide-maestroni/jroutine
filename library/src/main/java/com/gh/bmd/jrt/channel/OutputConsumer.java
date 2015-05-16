@@ -40,7 +40,7 @@ import javax.annotation.Nullable;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  *
  * @param <OUTPUT> the output data type.
  */

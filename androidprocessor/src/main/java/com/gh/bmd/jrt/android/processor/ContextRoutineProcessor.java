@@ -27,7 +27,7 @@ import javax.lang.model.element.TypeElement;
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations,
  * bound to a context lifecycle.
  * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide-maestroni on 06/05/15.
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
 

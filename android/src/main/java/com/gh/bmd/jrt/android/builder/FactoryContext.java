@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * Interface defining a factory providing wrapped object instances, whose methods are to be called
  * inside asynchronous invocations.
  * <p/>
- * Created by Davide on 4/6/2015.
+ * Created by davide-maestroni on 4/6/2015.
  */
 public interface FactoryContext {
 

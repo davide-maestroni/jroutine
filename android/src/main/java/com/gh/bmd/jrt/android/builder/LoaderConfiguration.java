@@ -370,6 +370,13 @@ public final class LoaderConfiguration {
                 return this;
             }
 
+            final Looper looper = configuration.mLooper;
+
+            if (looper != null) {
+
+                withResultLooper(looper);
+            }
+
             final int loaderId = configuration.mLoaderId;
 
             if (loaderId != AUTO) {

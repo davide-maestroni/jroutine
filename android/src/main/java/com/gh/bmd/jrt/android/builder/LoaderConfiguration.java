@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import android.os.Looper;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -29,8 +31,6 @@ import javax.annotation.Nullable;
  * Created by davide-maestroni on 19/04/15.
  */
 public final class LoaderConfiguration {
-
-    // TODO: looper configuration?
 
     /**
      * Constant identifying an loader ID computed from the executor class and the input parameters.
@@ -59,17 +59,21 @@ public final class LoaderConfiguration {
 
     private final CacheStrategyType mStrategyType;
 
+    private Looper mLooper;
+
     /**
      * Constructor.
      *
+     * @param looper         the looper instance.
      * @param loaderId       the the loader ID.
      * @param resolutionType the type of resolution.
      * @param strategyType   the cache strategy type.
      */
-    private LoaderConfiguration(final int loaderId,
+    private LoaderConfiguration(@Nullable final Looper looper, final int loaderId,
             @Nullable final ClashResolutionType resolutionType,
             @Nullable final CacheStrategyType strategyType) {
 
+        mLooper = looper;
         mLoaderId = loaderId;
         mResolutionType = resolutionType;
         mStrategyType = strategyType;
@@ -127,7 +131,8 @@ public final class LoaderConfiguration {
 
         final LoaderConfiguration that = (LoaderConfiguration) o;
         return mLoaderId == that.mLoaderId && mResolutionType == that.mResolutionType
-                && mStrategyType == that.mStrategyType;
+                && mStrategyType == that.mStrategyType && !(mLooper != null ? !mLooper.equals(
+                that.mLooper) : that.mLooper != null);
     }
 
     @Override
@@ -137,6 +142,7 @@ public final class LoaderConfiguration {
         int result = mLoaderId;
         result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
         result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
+        result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
         return result;
     }
 
@@ -147,6 +153,7 @@ public final class LoaderConfiguration {
                 "mLoaderId=" + mLoaderId +
                 ", mResolutionType=" + mResolutionType +
                 ", mStrategyType=" + mStrategyType +
+                ", mLooper=" + mLooper +
                 '}';
     }
 
@@ -186,6 +193,18 @@ public final class LoaderConfiguration {
 
         final int loaderId = mLoaderId;
         return (loaderId != AUTO) ? loaderId : valueIfNotSet;
+    }
+
+    /**
+     * Returns the looper used for dispatching results from the loader (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the looper instance.
+     */
+    public Looper getResultLooperOr(@Nullable final Looper valueIfNotSet) {
+
+        final Looper looper = mLooper;
+        return (looper != null) ? looper : valueIfNotSet;
     }
 
     /**
@@ -281,6 +300,8 @@ public final class LoaderConfiguration {
         private final Configurable<? extends TYPE> mConfigurable;
 
         private int mLoaderId;
+
+        private Looper mLooper;
 
         private ClashResolutionType mResolutionType;
 
@@ -416,14 +437,29 @@ public final class LoaderConfiguration {
             return this;
         }
 
+        /**
+         * Sets the looper on which the results from the service are dispatched. A null value means
+         * that results will be dispatched on the main thread (as by default).
+         *
+         * @param looper the looper instance.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withResultLooper(@Nullable final Looper looper) {
+
+            mLooper = looper;
+            return this;
+        }
+
         @Nonnull
         private LoaderConfiguration buildConfiguration() {
 
-            return new LoaderConfiguration(mLoaderId, mResolutionType, mStrategyType);
+            return new LoaderConfiguration(mLooper, mLoaderId, mResolutionType, mStrategyType);
         }
 
         private void setConfiguration(@Nonnull final LoaderConfiguration configuration) {
 
+            mLooper = configuration.mLooper;
             mLoaderId = configuration.mLoaderId;
             mResolutionType = configuration.mResolutionType;
             mStrategyType = configuration.mStrategyType;

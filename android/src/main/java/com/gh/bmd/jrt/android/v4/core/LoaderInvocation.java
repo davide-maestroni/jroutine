@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.v4.core;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -29,6 +30,7 @@ import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -38,6 +40,7 @@ import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -83,6 +86,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
     private final Logger mLogger;
 
+    private final Looper mLooper;
+
     private final OrderType mOrderType;
 
     /**
@@ -118,6 +123,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         mContext = context;
         mFactory = factory;
+        mLooper = configuration.getResultLooperOr(null);
         mLoaderId = configuration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mClashResolutionType =
                 configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
@@ -537,7 +543,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheStrategyType);
         callbacks.setCacheStrategy(mCacheStrategyType);
 
-        final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
+        final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel(mLooper);
 
         if (isClash) {
 
@@ -694,10 +700,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
          * Creates and returns a new output channel.<br/>
          * The channel will be used to deliver the loader results.
          *
+         * @param looper the looper instance.
          * @return the new output channel.
          */
         @Nonnull
-        public OutputChannel<OUTPUT> newChannel() {
+        public OutputChannel<OUTPUT> newChannel(@Nullable final Looper looper) {
 
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
@@ -714,6 +721,24 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
+
+            if ((looper != null) && (looper != Looper.getMainLooper())) {
+
+                return JRoutine.on(PassingInvocation.<OUTPUT>factoryOf())
+                               .withRoutine()
+                               .withAsyncRunner(Runners.looperRunner(looper))
+                               .withInputMaxSize(Integer.MAX_VALUE)
+                               .withInputTimeout(TimeDuration.ZERO)
+                               .withOutputMaxSize(Integer.MAX_VALUE)
+                               .withOutputTimeout(TimeDuration.ZERO)
+                               .withLog(logger.getLog())
+                               .withLogLevel(logger.getLogLevel())
+                               .set()
+                               .invokeAsync()
+                               .pass(channel.output())
+                               .result();
+            }
+
             return channel.output();
         }
 

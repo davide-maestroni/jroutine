@@ -34,8 +34,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * specific to the Android platform.<br/>
  * Routine invocations created through the returned builders can be safely restored after a change
  * in the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
- * invocation results will always be dispatched in the main thread, no matter the calling one was,
- * so that waiting for the outputs right after the routine invocation will result in a deadlock.
+ * invocation results will be dispatched on the configured looper thread, no matter the calling one
+ * was, so that, waiting for the outputs right after the routine invocation, may result in a
+ * deadlock.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects and the invocation factory arguments, might be employed to check for clashing of

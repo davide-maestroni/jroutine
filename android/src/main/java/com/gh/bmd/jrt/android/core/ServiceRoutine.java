@@ -255,7 +255,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mContext = context;
             mServiceClass = serviceConfiguration.getServiceClassOr(RoutineService.class);
             mInMessenger = new Messenger(new IncomingHandler(
-                    serviceConfiguration.getReceiverLooperOr(Looper.getMainLooper())));
+                    serviceConfiguration.getResultLooperOr(Looper.getMainLooper())));
             mInvocationClass = invocationClass;
             mRoutineConfiguration = routineConfiguration;
             mServiceConfiguration = serviceConfiguration;

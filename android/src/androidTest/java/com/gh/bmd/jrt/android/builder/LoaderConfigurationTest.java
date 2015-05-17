@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.test.AndroidTestCase;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.Builder;
@@ -37,6 +39,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         final LoaderConfiguration configuration = builder().withId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
+                                                           .withResultLooper(Looper.getMainLooper())
                                                            .set();
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set()).isEqualTo(LoaderConfiguration.DEFAULT_CONFIGURATION);
@@ -73,6 +76,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         final LoaderConfiguration configuration = builder().withId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
+                                                           .withResultLooper(Looper.getMainLooper())
                                                            .set();
         assertThat(builder().with(configuration).set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
@@ -87,6 +91,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         final LoaderConfiguration configuration = builder().withId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
+                                                           .withResultLooper(Looper.getMainLooper())
                                                            .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withCacheStrategy(CacheStrategyType.CLEAR).set());
@@ -103,6 +108,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         final LoaderConfiguration configuration = builder().withId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
+                                                           .withResultLooper(Looper.getMainLooper())
                                                            .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withClashResolution(ClashResolutionType.ABORT_THIS).set());
@@ -119,9 +125,26 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         final LoaderConfiguration configuration = builder().withId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
+                                                           .withResultLooper(Looper.getMainLooper())
                                                            .set();
         assertThat(configuration).isNotEqualTo(builder().withId(3).set());
         assertThat(configuration.builderFrom().withId(27).set()).isNotEqualTo(
                 builder().withId(27).set());
+    }
+
+    public void testLooperEquals() {
+
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
+        final LoaderConfiguration configuration = builder().withId(-1)
+                                                           .withClashResolution(resolutionType)
+                                                           .withCacheStrategy(strategyType)
+                                                           .withResultLooper(Looper.getMainLooper())
+                                                           .set();
+        assertThat(configuration).isNotEqualTo(
+                builder().withResultLooper(new Handler().getLooper()).set());
+        final Looper looper = new Handler().getLooper();
+        assertThat(configuration.builderFrom().withResultLooper(looper).set()).isNotEqualTo(
+                builder().withResultLooper(looper).set());
     }
 }

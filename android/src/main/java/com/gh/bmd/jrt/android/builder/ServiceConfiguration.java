@@ -70,8 +70,8 @@ public final class ServiceConfiguration {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        mServiceClass = serviceClass;
         mLooper = looper;
+        mServiceClass = serviceClass;
         mRunnerClass = runnerClass;
         mLogClass = logClass;
     }
@@ -113,7 +113,6 @@ public final class ServiceConfiguration {
     }
 
     @Override
-    @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(final Object o) {
 
         // auto-generated code
@@ -128,25 +127,12 @@ public final class ServiceConfiguration {
         }
 
         final ServiceConfiguration that = (ServiceConfiguration) o;
+        return !(mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null)
+                && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) && !(
+                mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
+                        : that.mRunnerClass != null) && !(mServiceClass != null
+                ? !mServiceClass.equals(that.mServiceClass) : that.mServiceClass != null);
 
-        if (mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null) {
-
-            return false;
-        }
-
-        if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
-
-            return false;
-        }
-
-        if (mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
-                : that.mRunnerClass != null) {
-
-            return false;
-        }
-
-        return !(mServiceClass != null ? !mServiceClass.equals(that.mServiceClass)
-                : that.mServiceClass != null);
     }
 
     @Override
@@ -189,7 +175,7 @@ public final class ServiceConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
      */
-    public Looper getReceiverLooperOr(@Nullable final Looper valueIfNotSet) {
+    public Looper getResultLooperOr(@Nullable final Looper valueIfNotSet) {
 
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
@@ -322,7 +308,7 @@ public final class ServiceConfiguration {
 
             if (looper != null) {
 
-                withReceiverLooper(looper);
+                withResultLooper(looper);
             }
 
             final Class<? extends RoutineService> serviceClass = configuration.mServiceClass;
@@ -378,7 +364,7 @@ public final class ServiceConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withReceiverLooper(@Nullable final Looper looper) {
+        public Builder<TYPE> withResultLooper(@Nullable final Looper looper) {
 
             mLooper = looper;
             return this;

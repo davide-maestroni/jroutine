@@ -24,9 +24,9 @@ import javax.annotation.Nonnull;
  * <p/>
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
- * invocation results will always be dispatched in the main thread, no matter the calling one was,
- * TODO: looper configuration?
- * so, waiting for the outputs right after the routine invocation, will result in a deadlock.<br/>
+ * invocation results will be dispatched on the configured looper thread, no matter the calling one
+ * was, so that, waiting for the outputs right after the routine invocation, may result in a
+ * deadlock.<br/>
  * The local context of the invocations will always be the application one.
  * <p/>
  * Created by davide-maestroni on 12/9/14.

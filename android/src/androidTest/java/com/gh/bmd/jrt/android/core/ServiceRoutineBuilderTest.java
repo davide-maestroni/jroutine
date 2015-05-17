@@ -303,7 +303,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                            .withReadTimeoutAction(TimeoutActionType.EXIT)
                            .set()
                            .withService()
-                           .withReceiverLooper(Looper.myLooper())
+                           .withResultLooper(Looper.myLooper())
                            .set()
                            .callAsync("test1")
                            .readAll()).isEmpty();
@@ -322,7 +322,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                     .withReadTimeoutAction(TimeoutActionType.ABORT)
                     .set()
                     .withService()
-                    .withReceiverLooper(Looper.myLooper())
+                    .withResultLooper(Looper.myLooper())
                     .set()
                     .callAsync("test2")
                     .readAll();
@@ -347,7 +347,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .withService()
-                    .withReceiverLooper(Looper.myLooper())
+                    .withResultLooper(Looper.myLooper())
                     .set()
                     .callAsync("test3")
                     .readAll();

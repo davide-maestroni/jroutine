@@ -737,9 +737,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                                .withLog(logger.getLog())
                                .withLogLevel(logger.getLogLevel())
                                .set()
-                               .invokeAsync()
-                               .pass(channel.output())
-                               .result();
+                               .callAsync(channel.output());
             }
 
             return channel.output();

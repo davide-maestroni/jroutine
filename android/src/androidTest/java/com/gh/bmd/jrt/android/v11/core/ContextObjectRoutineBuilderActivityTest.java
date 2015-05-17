@@ -71,6 +71,32 @@ public class ContextObjectRoutineBuilderActivityTest
         super(TestActivity.class);
     }
 
+    public void testAliasMethod() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TimeDuration timeout = seconds(10);
+        final TimeUnit timeUnit = TimeUnit.SECONDS;
+        final Routine<Object, Object> routine = JRoutine.onActivity(getActivity(), TestClass.class)
+                                                        .withRoutine()
+                                                        .withSyncRunner(Runners.sequentialRunner())
+                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withMaxInvocations(1)
+                                                        .withCoreInvocations(1)
+                                                        .withAvailInvocationTimeout(1, timeUnit)
+                                                        .withReadTimeoutAction(
+                                                                TimeoutActionType.EXIT)
+                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .set()
+                                                        .aliasMethod(TestClass.GET);
+
+        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+    }
+
     public void testArgs() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -140,32 +166,6 @@ public class ContextObjectRoutineBuilderActivityTest
         assertThat(countAsync.count2(2).readAll()).containsExactly(0, 1);
         assertThat(countAsync.countList(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.countList1(3).readAll()).containsExactly(0, 1, 2);
-    }
-
-    public void testAliasMethod() throws NoSuchMethodException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TimeDuration timeout = seconds(10);
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
-        final Routine<Object, Object> routine = JRoutine.onActivity(getActivity(), TestClass.class)
-                                                        .withRoutine()
-                                                        .withSyncRunner(Runners.sequentialRunner())
-                                                        .withAsyncRunner(Runners.poolRunner())
-                                                        .withMaxInvocations(1)
-                                                        .withCoreInvocations(1)
-                                                        .withAvailInvocationTimeout(1, timeUnit)
-                                                        .withReadTimeoutAction(
-                                                                TimeoutActionType.EXIT)
-                                                        .withLogLevel(LogLevel.DEBUG)
-                                                        .withLog(new NullLog())
-                                                        .set()
-                                                        .aliasMethod(TestClass.GET);
-
-        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
 
     @SuppressWarnings("ConstantConditions")

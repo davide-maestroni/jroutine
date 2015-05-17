@@ -132,8 +132,7 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .set();
-        assertThat(configuration).isNotEqualTo(
-                builder().withResultLooper(Looper.myLooper()).set());
+        assertThat(configuration).isNotEqualTo(builder().withResultLooper(Looper.myLooper()).set());
         assertThat(builder().withResultLooper(Looper.myLooper()).set()).isNotEqualTo(
                 builder().withResultLooper(Looper.getMainLooper()).set());
     }

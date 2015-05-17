@@ -71,6 +71,30 @@ public class ContextObjectRoutineBuilderFragmentTest
         super(TestActivity.class);
     }
 
+    public void testAliasMethod() throws NoSuchMethodException {
+
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final TimeUnit timeUnit = TimeUnit.SECONDS;
+        final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
+                                                        .withRoutine()
+                                                        .withSyncRunner(Runners.sequentialRunner())
+                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withMaxInvocations(1)
+                                                        .withCoreInvocations(1)
+                                                        .withAvailInvocationTimeout(1, timeUnit)
+                                                        .withReadTimeoutAction(
+                                                                TimeoutActionType.EXIT)
+                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .set()
+                                                        .aliasMethod(TestClass.GET);
+
+        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+    }
+
     public void testArgs() {
 
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
@@ -134,30 +158,6 @@ public class ContextObjectRoutineBuilderFragmentTest
         assertThat(countAsync.count2(2).readAll()).containsExactly(0, 1);
         assertThat(countAsync.countList(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.countList1(3).readAll()).containsExactly(0, 1, 2);
-    }
-
-    public void testAliasMethod() throws NoSuchMethodException {
-
-        final TimeDuration timeout = seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
-        final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
-                                                        .withRoutine()
-                                                        .withSyncRunner(Runners.sequentialRunner())
-                                                        .withAsyncRunner(Runners.poolRunner())
-                                                        .withMaxInvocations(1)
-                                                        .withCoreInvocations(1)
-                                                        .withAvailInvocationTimeout(1, timeUnit)
-                                                        .withReadTimeoutAction(
-                                                                TimeoutActionType.EXIT)
-                                                        .withLogLevel(LogLevel.DEBUG)
-                                                        .withLog(new NullLog())
-                                                        .set()
-                                                        .aliasMethod(TestClass.GET);
-
-        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
 
     @SuppressWarnings("ConstantConditions")

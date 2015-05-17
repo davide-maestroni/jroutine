@@ -62,6 +62,29 @@ import static org.junit.Assert.fail;
 public class ObjectRoutineBuilderTest {
 
     @Test
+    public void testAliasMethod() throws NoSuchMethodException {
+
+        final TimeDuration timeout = seconds(1);
+        final TestClass test = new TestClass();
+        final TimeUnit timeUnit = TimeUnit.SECONDS;
+        final Routine<Object, Object> routine = JRoutine.on(test)
+                                                        .withRoutine()
+                                                        .withSyncRunner(Runners.sequentialRunner())
+                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withMaxInvocations(1)
+                                                        .withCoreInvocations(1)
+                                                        .withAvailInvocationTimeout(1, timeUnit)
+                                                        .withReadTimeoutAction(
+                                                                TimeoutActionType.EXIT)
+                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .set()
+                                                        .aliasMethod(TestClass.GET);
+
+        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+    }
+
+    @Test
     public void testAsyncInputProxyRoutine() {
 
         final TimeDuration timeout = seconds(1);
@@ -107,29 +130,6 @@ public class ObjectRoutineBuilderTest {
         assertThat(countAsync.count2(2).readAll()).containsExactly(0, 1);
         assertThat(countAsync.countList(3).readAll()).containsExactly(0, 1, 2);
         assertThat(countAsync.countList1(3).readAll()).containsExactly(0, 1, 2);
-    }
-
-    @Test
-    public void testAliasMethod() throws NoSuchMethodException {
-
-        final TimeDuration timeout = seconds(1);
-        final TestClass test = new TestClass();
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
-        final Routine<Object, Object> routine = JRoutine.on(test)
-                                                        .withRoutine()
-                                                        .withSyncRunner(Runners.sequentialRunner())
-                                                        .withAsyncRunner(Runners.poolRunner())
-                                                        .withMaxInvocations(1)
-                                                        .withCoreInvocations(1)
-                                                        .withAvailInvocationTimeout(1, timeUnit)
-                                                        .withReadTimeoutAction(
-                                                                TimeoutActionType.EXIT)
-                                                        .withLogLevel(LogLevel.DEBUG)
-                                                        .withLog(new NullLog())
-                                                        .set()
-                                                        .aliasMethod(TestClass.GET);
-
-        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
 
     @Test

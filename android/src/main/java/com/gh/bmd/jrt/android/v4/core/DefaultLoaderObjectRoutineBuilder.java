@@ -26,7 +26,7 @@ import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
-import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
@@ -523,7 +523,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class AliasMethodInvocation<INPUT, OUTPUT>
-            extends SingleCallContextInvocation<INPUT, OUTPUT> {
+            extends ProcedureContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -624,7 +624,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class MethodInvocation<INPUT, OUTPUT>
-            extends SingleCallContextInvocation<INPUT, OUTPUT> {
+            extends ProcedureContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -720,7 +720,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends SingleCallContextInvocation<Object, Object> {
+    private static class ProxyInvocation extends ProcedureContextInvocation<Object, Object> {
 
         private final Object[] mArgs;
 

@@ -24,7 +24,7 @@ import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.SingleCallInvocation;
+import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
@@ -94,7 +94,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
             @Nonnull
             public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
 
-                return new SingleCallInvocation<Object, Object>() {
+                return new ProcedureInvocation<Object, Object>() {
 
                     @Override
                     public void onCall(@Nonnull final List<?> objects,

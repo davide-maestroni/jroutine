@@ -186,7 +186,7 @@ public class ContextInvocations {
         @Nonnull
         public ContextInvocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-            return new SingleCallContextInvocation<Object, OUTPUT>() {
+            return new ProcedureContextInvocation<Object, OUTPUT>() {
 
                 @Override
                 public void onCall(@Nonnull final List<?> objects,

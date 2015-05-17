@@ -28,7 +28,7 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.DelegatingContextInvocation;
 import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
-import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
 import com.gh.bmd.jrt.android.routine.LoaderRoutine;
@@ -1159,8 +1159,8 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
 
-        final ClassToken<StringSingleCallInvocation> token2 =
-                ClassToken.tokenOf(StringSingleCallInvocation.class);
+        final ClassToken<StringProcedureInvocation> token2 =
+                ClassToken.tokenOf(StringProcedureInvocation.class);
         final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(), token2)
                                                          .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
@@ -1439,8 +1439,8 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static class StringSingleCallInvocation
-            extends SingleCallContextInvocation<String, String> {
+    private static class StringProcedureInvocation
+            extends ProcedureContextInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,

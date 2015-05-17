@@ -40,7 +40,7 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
-import com.gh.bmd.jrt.invocation.SingleCallInvocation;
+import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -453,8 +453,8 @@ public class RoutineTest {
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final SingleCallInvocation<Integer, Integer> execSum =
-                new SingleCallInvocation<Integer, Integer>() {
+        final ProcedureInvocation<Integer, Integer> execSum =
+                new ProcedureInvocation<Integer, Integer>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends Integer> integers,
@@ -516,8 +516,8 @@ public class RoutineTest {
     public void testComposedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final SingleCallInvocation<Integer, Integer> execSum =
-                new SingleCallInvocation<Integer, Integer>() {
+        final ProcedureInvocation<Integer, Integer> execSum =
+                new ProcedureInvocation<Integer, Integer>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends Integer> integers,
@@ -1536,7 +1536,7 @@ public class RoutineTest {
     public void testOutputTimeout() {
 
         final Routine<String, String> routine =
-                JRoutine.on(ClassToken.tokenOf(new SingleCallInvocation<String, String>() {
+                JRoutine.on(ClassToken.tokenOf(new ProcedureInvocation<String, String>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends String> strings,
@@ -1946,8 +1946,8 @@ public class RoutineTest {
     public void testRoutineFunction() {
 
         final TimeDuration timeout = seconds(1);
-        final SingleCallInvocation<Integer, Integer> execSum =
-                new SingleCallInvocation<Integer, Integer>() {
+        final ProcedureInvocation<Integer, Integer> execSum =
+                new ProcedureInvocation<Integer, Integer>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends Integer> integers,

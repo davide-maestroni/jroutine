@@ -27,7 +27,7 @@ import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
-import com.gh.bmd.jrt.invocation.SingleCallInvocation;
+import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -282,7 +282,7 @@ class DefaultClassRoutineBuilder
                 final RoutineConfiguration.Builder<RoutineConfiguration> builder =
                         configuration.builderFrom();
                 final InvocationFactory<Object, Object> factory =
-                        Invocations.factoryOf(MethodSingleCallInvocation.class);
+                        Invocations.factoryOf(MethodProcedureInvocation.class);
                 routine = new DefaultRoutine<Object, Object>(
                         builder.withFactoryArgs(target, method, mutex, isInputCollection,
                                                 isOutputCollection).set(), factory);
@@ -522,7 +522,7 @@ class DefaultClassRoutineBuilder
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodSingleCallInvocation extends SingleCallInvocation<Object, Object> {
+    private static class MethodProcedureInvocation extends ProcedureInvocation<Object, Object> {
 
         private final boolean mHasResult;
 
@@ -547,7 +547,7 @@ class DefaultClassRoutineBuilder
          * @param isInputCollection  whether we need to collect the input parameters.
          * @param isOutputCollection whether the output is a collection.
          */
-        public MethodSingleCallInvocation(@Nullable final Object target,
+        public MethodProcedureInvocation(@Nullable final Object target,
                 @Nonnull final Method method, @Nullable final Object mutex,
                 final boolean isInputCollection, final boolean isOutputCollection) {
 

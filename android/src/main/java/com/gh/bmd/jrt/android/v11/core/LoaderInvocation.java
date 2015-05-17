@@ -43,7 +43,7 @@ import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
-import com.gh.bmd.jrt.invocation.SingleCallInvocation;
+import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -67,7 +67,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @param <OUTPUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT> {
+class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT> {
 
     private static final WeakIdentityHashMap<Object,
             SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>

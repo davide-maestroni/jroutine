@@ -205,7 +205,7 @@ public class Invocations {
         @Nonnull
         public Invocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-            return new SingleCallInvocation<Object, OUTPUT>() {
+            return new ProcedureInvocation<Object, OUTPUT>() {
 
                 @Override
                 public void onCall(@Nonnull final List<?> objects,

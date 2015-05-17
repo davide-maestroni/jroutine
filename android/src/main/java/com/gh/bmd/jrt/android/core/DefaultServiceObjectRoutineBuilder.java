@@ -19,9 +19,9 @@ import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.SingleCallContextInvocation;
-import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.Alias;
+import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -62,7 +62,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Class implementing a builder of routine objects based on methods of a concrete object instance.
  * <p/>
- * Created by davide on 3/29/15.
+ * Created by davide-maestroni on 3/29/15.
  */
 class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         RoutineConfiguration.Configurable<ServiceObjectRoutineBuilder>,
@@ -103,7 +103,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         for (final Method method : targetClass.getMethods()) {
 
-            final Bind annotation = method.getAnnotation(Bind.class);
+            final Alias annotation = method.getAnnotation(Alias.class);
 
             if (annotation != null) {
 
@@ -178,7 +178,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         for (final Method method : targetClass.getMethods()) {
 
-            final Bind annotation = method.getAnnotation(Bind.class);
+            final Alias annotation = method.getAnnotation(Alias.class);
 
             if ((annotation != null) && name.equals(annotation.value())) {
 
@@ -191,7 +191,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             for (final Method method : targetClass.getDeclaredMethods()) {
 
-                final Bind annotation = method.getAnnotation(Bind.class);
+                final Alias annotation = method.getAnnotation(Alias.class);
 
                 if ((annotation != null) && name.equals(annotation.value())) {
 
@@ -317,7 +317,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
         final Class<?> targetClass = mTargetClass;
         final Method targetMethod = getAnnotatedMethod(targetClass, name);
@@ -332,7 +332,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
         final Object[] args = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         warn(serviceConfiguration.getLogClassOr(null), routineConfiguration);
-        final BoundMethodToken<INPUT, OUTPUT> classToken = new BoundMethodToken<INPUT, OUTPUT>();
+        final AliasMethodToken<INPUT, OUTPUT> classToken = new AliasMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
                        .withRoutine()
@@ -480,12 +480,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     /**
-     * Bound method invocation.
+     * Alias method invocation.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class BoundMethodInvocation<INPUT, OUTPUT>
+    private static class AliasMethodInvocation<INPUT, OUTPUT>
             extends SingleCallContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
@@ -509,7 +509,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param name            the binding name.
          */
         @SuppressWarnings("unchecked")
-        public BoundMethodInvocation(@Nonnull final String targetClassName,
+        public AliasMethodInvocation(@Nonnull final String targetClassName,
                 @Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final String name) throws ClassNotFoundException {
 
@@ -543,7 +543,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                    .withProxy()
                                    .withShareGroup(mShareGroup)
                                    .set()
-                                   .boundMethod(mBindingName);
+                                   .aliasMethod(mBindingName);
                 mTarget = target;
 
             } catch (final RoutineException e) {
@@ -558,13 +558,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     /**
-     * Class token of a {@link BoundMethodInvocation}.
+     * Class token of a {@link AliasMethodInvocation}.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class BoundMethodToken<INPUT, OUTPUT>
-            extends ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> {
+    private static class AliasMethodToken<INPUT, OUTPUT>
+            extends ClassToken<AliasMethodInvocation<INPUT, OUTPUT>> {
 
     }
 
@@ -731,7 +731,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             String name = null;
             Method targetMethod = null;
             final Class<?> targetClass = mTarget.getClass();
-            final Bind annotation = method.getAnnotation(Bind.class);
+            final Alias annotation = method.getAnnotation(Alias.class);
 
             if (annotation != null) {
 
@@ -775,7 +775,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 final Method method = mProxyClass.getMethod(mMethodName, parameterTypes);
                 final Method targetMethod = getTargetMethod(method, targetParameterTypes);
                 final Class<?> returnType = targetMethod.getReturnType();
-                final Pass annotation = method.getAnnotation(Pass.class);
+                final Param annotation = method.getAnnotation(Param.class);
                 final Class<?> expectedType;
 
                 if (annotation != null) {
@@ -954,9 +954,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                     for (final Annotation annotation : parameterAnnotations[i]) {
 
-                        if (annotation.annotationType() == Pass.class) {
+                        if (annotation.annotationType() == Param.class) {
 
-                            targetParameterTypes[i] = ((Pass) annotation).value();
+                            targetParameterTypes[i] = ((Param) annotation).value();
                             break;
                         }
                     }
@@ -969,7 +969,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             PassMode returnMode = null;
             final Class<?> returnType = method.getReturnType();
-            final Pass methodAnnotation = method.getAnnotation(Pass.class);
+            final Param methodAnnotation = method.getAnnotation(Param.class);
 
             if (methodAnnotation != null) {
 

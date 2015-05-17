@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.proxy.builder;
 
-import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -31,7 +30,7 @@ import javax.annotation.Nonnull;
 /**
  * Abstract implementation of a builder of async proxy objects.
  * <p/>
- * Created by davide on 2/26/15.
+ * Created by davide-maestroni on 2/26/15.
  *
  * @param <TYPE> the interface type.
  */
@@ -61,11 +60,11 @@ public abstract class AbstractProxyBuilder<TYPE>
                 classMap.put(target, classes);
             }
 
-            final String shareGroup = mProxyConfiguration.getShareGroupOr(null);
-            final String classShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
-            final RoutineConfiguration configuration = mRoutineConfiguration;
+            final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
+            final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
-            final ClassInfo classInfo = new ClassInfo(token, configuration, classShareGroup);
+            final ClassInfo classInfo =
+                    new ClassInfo(token, routineConfiguration, proxyConfiguration);
             final Object instance = classes.get(classInfo);
 
             if (instance != null) {
@@ -73,11 +72,11 @@ public abstract class AbstractProxyBuilder<TYPE>
                 return token.cast(instance);
             }
 
-            warn(configuration);
+            warn(routineConfiguration);
 
             try {
 
-                final TYPE newInstance = newProxy(classShareGroup, configuration);
+                final TYPE newInstance = newProxy(routineConfiguration, proxyConfiguration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -145,13 +144,13 @@ public abstract class AbstractProxyBuilder<TYPE>
     /**
      * Creates and return a new proxy instance.
      *
-     * @param shareGroup    the share group name.
-     * @param configuration the routine configuration.
+     * @param routineConfiguration the routine configuration.
+     * @param proxyConfiguration   the proxy configuration.
      * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newProxy(@Nonnull final String shareGroup,
-            @Nonnull final RoutineConfiguration configuration);
+    protected abstract TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final ProxyConfiguration proxyConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.
@@ -248,35 +247,35 @@ public abstract class AbstractProxyBuilder<TYPE>
      */
     private static class ClassInfo {
 
-        private final RoutineConfiguration mConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
-        private final String mShareGroup;
+        private final RoutineConfiguration mRoutineConfiguration;
 
         private final Type mType;
 
         /**
          * Constructor.
          *
-         * @param token         the proxy interface token.
-         * @param configuration the routine configuration.
-         * @param shareGroup    the share group name.
+         * @param token                the proxy interface token.
+         * @param routineConfiguration the routine configuration.
+         * @param proxyConfiguration   the proxy configuration.
          */
         private ClassInfo(@Nonnull final ClassToken<?> token,
-                @Nonnull final RoutineConfiguration configuration,
-                @Nonnull final String shareGroup) {
+                @Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final ProxyConfiguration proxyConfiguration) {
 
             mType = token.getRawClass();
-            mConfiguration = configuration;
-            mShareGroup = shareGroup;
+            mRoutineConfiguration = routineConfiguration;
+            mProxyConfiguration = proxyConfiguration;
         }
 
         @Override
         public int hashCode() {
 
             // auto-generated code
-            int result = mConfiguration.hashCode();
+            int result = mProxyConfiguration.hashCode();
+            result = 31 * result + mRoutineConfiguration.hashCode();
             result = 31 * result + mType.hashCode();
-            result = 31 * result + mShareGroup.hashCode();
             return result;
         }
 
@@ -294,9 +293,10 @@ public abstract class AbstractProxyBuilder<TYPE>
                 return false;
             }
 
-            final ClassInfo that = (ClassInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mType.equals(that.mType)
-                    && mShareGroup.equals(that.mShareGroup);
+            final ClassInfo classInfo = (ClassInfo) o;
+            return mProxyConfiguration.equals(classInfo.mProxyConfiguration)
+                    && mRoutineConfiguration.equals(classInfo.mRoutineConfiguration)
+                    && mType.equals(classInfo.mType);
         }
     }
 }

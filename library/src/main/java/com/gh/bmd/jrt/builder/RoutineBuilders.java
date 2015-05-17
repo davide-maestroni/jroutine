@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
@@ -33,7 +33,7 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 /**
  * Utility class used to manage cached objects shared by routine builders.
  * <p/>
- * Created by davide on 3/23/15.
+ * Created by davide-maestroni on 3/23/15.
  */
 public class RoutineBuilders {
 
@@ -57,25 +57,25 @@ public class RoutineBuilders {
     @Nullable
     public static PassMode getParamMode(@Nonnull final Method method, final int index) {
 
-        Pass passAnnotation = null;
+        Param paramAnnotation = null;
         final Annotation[][] annotations = method.getParameterAnnotations();
 
         for (final Annotation annotation : annotations[index]) {
 
-            if (annotation.annotationType() == Pass.class) {
+            if (annotation.annotationType() == Param.class) {
 
-                passAnnotation = (Pass) annotation;
+                paramAnnotation = (Param) annotation;
                 break;
             }
         }
 
-        if (passAnnotation == null) {
+        if (paramAnnotation == null) {
 
             return null;
         }
 
-        PassMode passMode = passAnnotation.mode();
-        final Class<?> paramClass = passAnnotation.value();
+        PassMode passMode = paramAnnotation.mode();
+        final Class<?> paramClass = paramAnnotation.value();
         final Class<?>[] parameterTypes = method.getParameterTypes();
         final Class<?> parameterType = parameterTypes[index];
         final int length = parameterTypes.length;
@@ -92,7 +92,7 @@ public class RoutineBuilders {
 
                 } else {
 
-                    passMode = PassMode.OBJECT;
+                    passMode = PassMode.VALUE;
                 }
 
             } else if (isArray || Iterable.class.isAssignableFrom(parameterType)) {
@@ -124,12 +124,12 @@ public class RoutineBuilders {
                                                            + parameterType.getCanonicalName());
             }
 
-        } else if (passMode == PassMode.OBJECT) {
+        } else if (passMode == PassMode.VALUE) {
 
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with pass mode " + PassMode.OBJECT
+                        "[" + method + "] an async input with pass mode " + PassMode.VALUE
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
@@ -198,7 +198,7 @@ public class RoutineBuilders {
     @Nullable
     public static PassMode getReturnMode(@Nonnull final Method method) {
 
-        final Pass annotation = method.getAnnotation(Pass.class);
+        final Param annotation = method.getAnnotation(Param.class);
 
         if (annotation == null) {
 
@@ -235,7 +235,7 @@ public class RoutineBuilders {
 
                 } else {
 
-                    passMode = PassMode.OBJECT;
+                    passMode = PassMode.VALUE;
                 }
 
             } else {
@@ -245,13 +245,13 @@ public class RoutineBuilders {
                                                            + returnType.getCanonicalName());
             }
 
-        } else if (passMode == PassMode.OBJECT) {
+        } else if (passMode == PassMode.VALUE) {
 
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with pass mode " + PassMode.OBJECT
+                        "[" + method + "] an async output with pass mode " + PassMode.VALUE
                                 + " must be a superclass of " + channelClassName);
             }
 
@@ -261,7 +261,7 @@ public class RoutineBuilders {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with pass mode " + PassMode.OBJECT
+                        "[" + method + "] an async output with pass mode " + PassMode.VALUE
                                 + " must be a superclass of " + channelClassName);
             }
 

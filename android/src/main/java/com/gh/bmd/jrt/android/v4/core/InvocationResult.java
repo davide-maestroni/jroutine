@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 /**
  * Interface defining an Android invocation result.
  * <p/>
- * Created by davide on 1/4/15.
+ * Created by davide-maestroni on 1/4/15.
  *
  * @param <OUTPUT> the output data type.
  */

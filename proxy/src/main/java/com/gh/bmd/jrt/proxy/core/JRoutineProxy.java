@@ -26,14 +26,14 @@ import javax.annotation.Nonnull;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide on 3/23/15.
+ * Created by davide-maestroni on 3/23/15.
  *
- * @see com.gh.bmd.jrt.annotation.Bind
- * @see com.gh.bmd.jrt.annotation.Pass
+ * @see com.gh.bmd.jrt.annotation.Alias
+ * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
- * @see com.gh.bmd.jrt.processor.annotation.Proxy
+ * @see com.gh.bmd.jrt.proxy.annotation.Proxy
  */
 public class JRoutineProxy {
 

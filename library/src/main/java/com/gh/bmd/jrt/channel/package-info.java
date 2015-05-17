@@ -14,6 +14,6 @@
 /**
  * Classes and interfaces related to routine channels.
  * <p/>
- * Created by davide on 9/19/14.
+ * Created by davide-maestroni on 9/19/14.
  */
 package com.gh.bmd.jrt.channel;

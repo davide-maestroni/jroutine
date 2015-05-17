@@ -13,16 +13,15 @@
  */
 package com.gh.bmd.jrt.processor;
 
-import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassMode;
+import com.gh.bmd.jrt.annotation.Alias;
+import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.processor.annotation.Proxy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,7 +29,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -68,14 +66,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations.
  * <p/>
- * Created by davide on 11/3/14.
+ * Created by davide-maestroni on 11/3/14.
  */
 public class RoutineProcessor extends AbstractProcessor {
 
     protected static final String NEW_LINE = System.getProperty("line.separator");
-
-    private static final List<Class<? extends Annotation>> ANNOTATION_CLASSES =
-            Collections.<Class<? extends Annotation>>singletonList(Proxy.class);
 
     private static final boolean DEBUG = false;
 
@@ -127,6 +122,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodVoid;
 
+    private TypeElement mProxyElement;
+
     /**
      * Prints the stacktrace of the specified throwable into a string.
      *
@@ -144,12 +141,15 @@ public class RoutineProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
 
-        final List<Class<? extends Annotation>> annotationClasses = getSupportedAnnotationClasses();
-        final HashSet<String> annotationTypes = new HashSet<String>(annotationClasses.size());
+        final List<TypeElement> annotationElements = getSupportedAnnotationElements();
+        final HashSet<String> annotationTypes = new HashSet<String>(annotationElements.size());
 
-        for (final Class<? extends Annotation> annotationClass : annotationClasses) {
+        for (final TypeElement annotationElement : annotationElements) {
 
-            annotationTypes.add(annotationClass.getName());
+            if (annotationElement != null) {
+
+                annotationTypes.add(annotationElement.getQualifiedName().toString());
+            }
         }
 
         return annotationTypes;
@@ -183,16 +183,12 @@ public class RoutineProcessor extends AbstractProcessor {
             return false;
         }
 
-        checkDependencies();
+        for (final TypeElement annotationElement : getSupportedAnnotationElements()) {
 
-        for (final Class<? extends Annotation> annotationClass : getSupportedAnnotationClasses()) {
-
-            final TypeElement annotationElement =
-                    getTypeFromName(annotationClass.getCanonicalName());
             final TypeMirror annotationType = annotationElement.asType();
 
             for (final Element element : ElementFilter.typesIn(
-                    roundEnvironment.getElementsAnnotatedWith(annotationClass))) {
+                    roundEnvironment.getElementsAnnotatedWith(annotationElement))) {
 
                 final TypeElement classElement = (TypeElement) element;
                 final List<ExecutableElement> methodElements =
@@ -209,11 +205,11 @@ public class RoutineProcessor extends AbstractProcessor {
                     }
                 }
 
-                final Object targetElement = getElementValue(element, annotationType, "value");
+                final Object targetElement = getAnnotationValue(element, annotationType, "value");
 
                 if (targetElement != null) {
 
-                    createProxy(annotationClass, classElement,
+                    createProxy(annotationElement, classElement,
                                 getTypeFromName(targetElement.toString()), methodElements);
                 }
             }
@@ -284,11 +280,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
             builder.append(".pass(");
 
-            if (typeUtils.isAssignable(outputChannelType, typeUtils.erasure(variableElement
-                                                                                    .asType())) && (
-                    variableElement.getAnnotation(Pass.class) != null)) {
+            if (typeUtils.isAssignable(outputChannelType,
+                                       typeUtils.erasure(variableElement.asType())) && (
+                    variableElement.getAnnotation(Param.class) != null)) {
 
-                builder.append("(com.gh.bmd.jrt.channel.OutputChannel<? extends Object>)");
+                builder.append("(com.gh.bmd.jrt.channel.OutputChannel<?>)");
 
             } else {
 
@@ -393,7 +389,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 builder.append(", ");
             }
 
-            builder.append("(").append(getBoxedType(variableElement.asType()))
+            builder.append("(")
+                   .append(getBoxedType(variableElement.asType()))
                    .append(") objects.get(")
                    .append(count++)
                    .append(")");
@@ -444,7 +441,7 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(" = ")
                    .append("initRoutine")
                    .append(i)
-                   .append("(configuration);")
+                   .append("(routineConfiguration);")
                    .append(NEW_LINE);
         }
 
@@ -496,35 +493,6 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
-     * Checks if the correct dependencies needed by the generated classes are present.
-     */
-    protected void checkDependencies() {
-
-        if (getTypeFromName("com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder") == null) {
-
-            throw new IllegalStateException(
-                    "the 'com.github.davide-maestroni:jroutine-proxy' artifact is missing! Please"
-                            + " be sure to add it to your project dependencies.");
-        }
-    }
-
-    /**
-     * Returned the boxed type.
-     *
-     * @param type the type to be boxed.
-     * @return the boxed type.
-     */
-    protected TypeMirror getBoxedType(@Nullable final TypeMirror type) {
-
-        if ((type != null) && (type.getKind().isPrimitive() || (type.getKind() == TypeKind.VOID))) {
-
-            return processingEnv.getTypeUtils().boxedClass((PrimitiveType) type).asType();
-        }
-
-        return type;
-    }
-
-    /**
      * Returns the element value of the specified annotation attribute.
      *
      * @param element        the annotated element.
@@ -533,7 +501,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @return the value.
      */
     @Nullable
-    protected Object getElementValue(@Nonnull final Element element,
+    protected Object getAnnotationValue(@Nonnull final Element element,
             @Nonnull final TypeMirror annotationType, @Nonnull final String attributeName) {
 
         AnnotationValue value = null;
@@ -562,10 +530,80 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
+     * Returned the boxed type.
+     *
+     * @param type the type to be boxed.
+     * @return the boxed type.
+     */
+    protected TypeMirror getBoxedType(@Nullable final TypeMirror type) {
+
+        if ((type != null) && (type.getKind().isPrimitive() || (type.getKind() == TypeKind.VOID))) {
+
+            return processingEnv.getTypeUtils().boxedClass((PrimitiveType) type).asType();
+        }
+
+        return type;
+    }
+
+    /**
+     * Gets the default class name prefix.
+     *
+     * @param annotationElement the annotation element.
+     * @param element           the annotated element.
+     * @param targetElement     the target element.
+     * @return the name prefix.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getDefaultClassPrefix(@Nonnull final TypeElement annotationElement,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
+
+        String defaultPrefix = null;
+
+        for (final Element valueElement : annotationElement.getEnclosedElements()) {
+
+            if (valueElement.getSimpleName().toString().equals("DEFAULT_CLASS_PREFIX")) {
+
+                defaultPrefix = (String) ((VariableElement) valueElement).getConstantValue();
+                break;
+            }
+        }
+
+        return (defaultPrefix == null) ? "" : defaultPrefix;
+    }
+
+    /**
+     * Gets the default class name suffix.
+     *
+     * @param annotationElement the annotation element.
+     * @param element           the annotated element.
+     * @param targetElement     the target element.
+     * @return the name suffix.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getDefaultClassSuffix(@Nonnull final TypeElement annotationElement,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
+
+        String defaultSuffix = null;
+
+        for (final Element valueElement : annotationElement.getEnclosedElements()) {
+
+            if (valueElement.getSimpleName().toString().equals("DEFAULT_CLASS_SUFFIX")) {
+
+                defaultSuffix = (String) ((VariableElement) valueElement).getConstantValue();
+                break;
+            }
+        }
+
+        return (defaultSuffix == null) ? "" : defaultSuffix;
+    }
+
+    /**
      * Returns the specified template as a string.
      *
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     protected String getFooterTemplate() throws IOException {
@@ -579,45 +617,103 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
+     * Returns the name of the generated class.
+     *
+     * @param annotationElement the annotation element.
+     * @param element           the annotated element.
+     * @param targetElement     the target element.
+     * @return the class name.
+     */
+    @Nonnull
+    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    protected String getGeneratedClassName(@Nonnull final TypeElement annotationElement,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
+
+        String className = (String) getAnnotationValue(element, annotationElement.asType(),
+                                                       "generatedClassName");
+
+        if ((className == null) || className.equals("*")) {
+
+            className = element.getSimpleName().toString();
+            Element enclosingElement = element.getEnclosingElement();
+
+            while ((enclosingElement != null) && !(enclosingElement instanceof PackageElement)) {
+
+                className = enclosingElement.getSimpleName().toString() + className;
+                enclosingElement = enclosingElement.getEnclosingElement();
+            }
+        }
+
+        return className;
+    }
+
+    /**
+     * Returns the package of the generated class.
+     *
+     * @param annotationElement the annotation element.
+     * @param element           the annotated element.
+     * @param targetElement     the target element.
+     * @return the class package.
+     */
+    @Nonnull
+    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    protected String getGeneratedClassPackage(@Nonnull final TypeElement annotationElement,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
+
+        String classPackage = (String) getAnnotationValue(element, annotationElement.asType(),
+                                                          "generatedClassPackage");
+
+        if ((classPackage == null) || classPackage.equals("*")) {
+
+            classPackage = getPackage(element).getQualifiedName().toString();
+        }
+
+        return classPackage;
+    }
+
+    /**
      * Returns the prefix of the generated class name.
      *
-     * @param element       the annotated element.
-     * @param targetElement the target element.
+     * @param annotationElement the annotation element.
+     * @param element           the annotated element.
+     * @param targetElement     the target element.
      * @return the name prefix.
      */
     @Nonnull
-    @SuppressWarnings("UnusedParameters")
-    protected String getGeneratedClassPrefix(@Nonnull final TypeElement element,
-            @Nonnull final TypeElement targetElement) {
+    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    protected String getGeneratedClassPrefix(@Nonnull final TypeElement annotationElement,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        String classNameSuffix = element.getSimpleName().toString();
-        Element enclosingElement = element.getEnclosingElement();
-
-        while ((enclosingElement != null) && !(enclosingElement instanceof PackageElement)) {
-
-            classNameSuffix = enclosingElement.getSimpleName().toString() + classNameSuffix;
-            enclosingElement = enclosingElement.getEnclosingElement();
-        }
-
-        return classNameSuffix;
+        final String classPrefix = (String) getAnnotationValue(element, annotationElement.asType(),
+                                                               "generatedClassPrefix");
+        return (classPrefix == null) ? getDefaultClassPrefix(annotationElement, element,
+                                                             targetElement) : classPrefix;
     }
 
     /**
      * Returns the suffix of the generated class name.
      *
+     * @param annotationElement the annotation element.
+     * @param element           the annotated element.
+     * @param targetElement     the target element.
      * @return the name suffix.
      */
     @Nonnull
-    protected String getGeneratedClassSuffix() {
+    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    protected String getGeneratedClassSuffix(@Nonnull final TypeElement annotationElement,
+            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        return Proxy.CLASS_NAME_SUFFIX;
+        final String classSuffix = (String) getAnnotationValue(element, annotationElement.asType(),
+                                                               "generatedClassSuffix");
+        return (classSuffix == null) ? getDefaultClassSuffix(annotationElement, element,
+                                                             targetElement) : classSuffix;
     }
 
     /**
      * Returns the specified template as a string.
      *
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     protected String getHeaderTemplate() throws IOException {
@@ -636,7 +732,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -658,7 +754,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -679,7 +775,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -701,7 +797,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -722,7 +818,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -743,7 +839,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -764,7 +860,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -786,7 +882,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -807,7 +903,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -828,7 +924,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -849,7 +945,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -870,7 +966,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -891,7 +987,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -912,7 +1008,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -933,7 +1029,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -954,7 +1050,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -975,7 +1071,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @param methodElement the method element.
      * @param count         the method count.
      * @return the template.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
@@ -1013,7 +1109,7 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @Nonnull
     protected PassMode getParamMode(@Nonnull final ExecutableElement methodElement,
-            @Nonnull final Pass annotation, @Nonnull final VariableElement targetParameter,
+            @Nonnull final Param annotation, @Nonnull final VariableElement targetParameter,
             final int length) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
@@ -1022,10 +1118,10 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror listType = this.listType;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
-        final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Param.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
-                (TypeMirror) getElementValue(targetParameter, annotationType, "value");
+                (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
         PassMode passMode = annotation.mode();
 
         if (passMode == PassMode.AUTO) {
@@ -1040,7 +1136,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 } else {
 
-                    passMode = PassMode.OBJECT;
+                    passMode = PassMode.VALUE;
                 }
 
             } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
@@ -1073,12 +1169,12 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + "pass mode for an output of type: " + targetParameter);
             }
 
-        } else if (passMode == PassMode.OBJECT) {
+        } else if (passMode == PassMode.VALUE) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with pass mode " + PassMode.OBJECT
+                        "[" + methodElement + "] an async input with pass mode " + PassMode.VALUE
                                 + " must implement an " + outputChannelType);
             }
 
@@ -1149,7 +1245,7 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @Nonnull
     protected PassMode getReturnMode(@Nonnull final ExecutableElement methodElement,
-            @Nonnull final Pass annotation) {
+            @Nonnull final Param annotation) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror outputChannelType = this.outputChannelType;
@@ -1157,10 +1253,10 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror listType = this.listType;
         final TypeMirror returnType = methodElement.getReturnType();
         final TypeMirror erasure = typeUtils.erasure(returnType);
-        final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Param.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
-                (TypeMirror) getElementValue(methodElement, annotationType, "value");
+                (TypeMirror) getAnnotationValue(methodElement, annotationType, "value");
         PassMode passMode = annotation.mode();
 
         if (passMode == PassMode.AUTO) {
@@ -1189,7 +1285,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 } else {
 
-                    passMode = PassMode.OBJECT;
+                    passMode = PassMode.VALUE;
                 }
 
             } else {
@@ -1199,12 +1295,12 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + "pass mode for an input of type: " + returnType);
             }
 
-        } else if (passMode == PassMode.OBJECT) {
+        } else if (passMode == PassMode.VALUE) {
 
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
+                        "[" + methodElement + "] an async output with pass mode " + PassMode.VALUE
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1213,7 +1309,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with pass mode " + PassMode.OBJECT
+                        "[" + methodElement + "] an async output with pass mode " + PassMode.VALUE
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1255,30 +1351,37 @@ public class RoutineProcessor extends AbstractProcessor {
     /**
      * Gets the generated source name.
      *
-     * @param annotationClass the annotation class.
-     * @param element         the annotated element.
-     * @param targetElement   the target element.
+     * @param annotationElement the annotation element.
+     * @param element           the annotated element.
+     * @param targetElement     the target element.
      * @return the source name.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
-    protected String getSourceName(@Nonnull final Class<? extends Annotation> annotationClass,
+    protected String getSourceName(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        final String packageName = getPackage(element).getQualifiedName().toString();
-        return packageName + "." + getGeneratedClassPrefix(element, targetElement)
-                + getGeneratedClassSuffix();
+        return getGeneratedClassPackage(annotationElement, element, targetElement) + "."
+                + getGeneratedClassPrefix(annotationElement, element, targetElement)
+                + getGeneratedClassName(annotationElement, element, targetElement)
+                + getGeneratedClassSuffix(annotationElement, element, targetElement);
     }
 
     /**
-     * Returns the list of supported annotation classes.
+     * Returns the list of supported annotation elements.
      *
-     * @return the classes of the supported annotations.
+     * @return the elements of the supported annotations.
      */
     @Nonnull
-    protected List<Class<? extends Annotation>> getSupportedAnnotationClasses() {
+    @SuppressWarnings("unchecked")
+    protected List<TypeElement> getSupportedAnnotationElements() {
 
-        return ANNOTATION_CLASSES;
+        if (mProxyElement == null) {
+
+            mProxyElement = getTypeFromName("com.gh.bmd.jrt.proxy.annotation.Proxy");
+        }
+
+        return Collections.singletonList(mProxyElement);
     }
 
     /**
@@ -1351,7 +1454,7 @@ public class RoutineProcessor extends AbstractProcessor {
      *
      * @param path the resource path.
      * @return the template as a string.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     @Nonnull
     @SuppressFBWarnings(value = "UI_INHERITANCE_UNSAFE_GETRESOURCE",
@@ -1387,7 +1490,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @SuppressWarnings("PointlessBooleanExpression")
-    private void createProxy(@Nonnull final Class<? extends Annotation> annotationClass,
+    private void createProxy(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement,
             @Nonnull final List<ExecutableElement> methodElements) {
 
@@ -1395,13 +1498,12 @@ public class RoutineProcessor extends AbstractProcessor {
 
         try {
 
-            final String packageName = getPackage(element).getQualifiedName().toString();
             final Filer filer = processingEnv.getFiler();
 
             if (!DEBUG) {
 
                 final JavaFileObject sourceFile = filer.createSourceFile(
-                        getSourceName(annotationClass, element, targetElement));
+                        getSourceName(annotationElement, element, targetElement));
                 writer = sourceFile.openWriter();
 
             } else {
@@ -1410,10 +1512,16 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             String header;
-            header = getHeaderTemplate().replace("${packageName}", packageName);
-            header = header.replace("${classNamePrefix}",
-                                    getGeneratedClassPrefix(element, targetElement));
-            header = header.replace("${classNameSuffix}", getGeneratedClassSuffix());
+            header = getHeaderTemplate().replace("${packageName}",
+                                                 getGeneratedClassPackage(annotationElement,
+                                                                          element, targetElement));
+            header = header.replace("${generatedClassName}",
+                                    getGeneratedClassPrefix(annotationElement, element,
+                                                            targetElement) +
+                                            getGeneratedClassName(annotationElement, element,
+                                                                  targetElement) +
+                                            getGeneratedClassSuffix(annotationElement, element,
+                                                                    targetElement));
             header = header.replace("${genericTypes}", buildGenericTypes(element));
             header = header.replace("${classFullName}", targetElement.asType().toString());
             header = header.replace("${interfaceFullName}", element.asType().toString());
@@ -1463,7 +1571,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
-        final Bind asyncAnnotation = methodElement.getAnnotation(Bind.class);
+        final Alias asyncAnnotation = methodElement.getAnnotation(Alias.class);
 
         if (asyncAnnotation != null) {
 
@@ -1472,7 +1580,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                     targetElement.getEnclosedElements())) {
 
-                final Bind targetAsyncAnnotation = targetMethodElement.getAnnotation(Bind.class);
+                final Alias targetAsyncAnnotation = targetMethodElement.getAnnotation(Alias.class);
 
                 if ((targetAsyncAnnotation != null) && methodName.equals(
                         targetAsyncAnnotation.value())) {
@@ -1488,7 +1596,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final Types typeUtils = processingEnv.getTypeUtils();
             final TypeMirror asyncAnnotationType =
-                    getTypeFromName(Pass.class.getCanonicalName()).asType();
+                    getTypeFromName(Param.class.getCanonicalName()).asType();
             final List<? extends VariableElement> interfaceTypeParameters =
                     methodElement.getParameters();
             final int length = interfaceTypeParameters.size();
@@ -1513,9 +1621,10 @@ public class RoutineProcessor extends AbstractProcessor {
                         Object value = null;
                         final VariableElement variableElement = interfaceTypeParameters.get(i);
 
-                        if (variableElement.getAnnotation(Pass.class) != null) {
+                        if (variableElement.getAnnotation(Param.class) != null) {
 
-                            value = getElementValue(variableElement, asyncAnnotationType, "value");
+                            value = getAnnotationValue(variableElement, asyncAnnotationType,
+                                                       "value");
                         }
 
                         if (value != null) {
@@ -1594,7 +1703,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-        final Pass methodAnnotation = methodElement.getAnnotation(Pass.class);
+        final Param methodAnnotation = methodElement.getAnnotation(Param.class);
         PassMode asyncParamMode = null;
         PassMode asyncReturnMode = null;
 
@@ -1602,7 +1711,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         for (final VariableElement parameter : parameters) {
 
-            final Pass annotation = parameter.getAnnotation(Pass.class);
+            final Param annotation = parameter.getAnnotation(Param.class);
 
             if (annotation == null) {
 

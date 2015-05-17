@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a runner employing an executor service.
  * <p/>
- * Created by davide on 10/14/14.
+ * Created by davide-maestroni on 10/14/14.
  */
 class ScheduledRunner implements Runner {
 

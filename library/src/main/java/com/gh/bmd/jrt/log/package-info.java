@@ -14,6 +14,6 @@
 /**
  * Log related classes and definitions.
  * <p/>
- * Created by davide on 10/4/14.
+ * Created by davide-maestroni on 10/4/14.
  */
 package com.gh.bmd.jrt.log;

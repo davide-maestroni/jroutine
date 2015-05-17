@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 /**
  * Single call invocation implementing an Android invocation.
  * <p/>
- * Created by davide on 1/8/15.
+ * Created by davide-maestroni on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

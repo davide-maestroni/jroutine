@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 9/21/14.
+ * Created by davide-maestroni on 9/21/14.
  *
  * @see com.gh.bmd.jrt.builder.RoutineConfiguration
  */

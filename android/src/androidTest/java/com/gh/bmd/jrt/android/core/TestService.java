@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
@@ -28,26 +29,28 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Test service.
  * <p/>
- * Created by davide on 1/16/15.
+ * Created by davide-maestroni on 1/16/15.
  */
 public class TestService extends RoutineService implements FactoryContext {
 
-    private static final HashMap<Class<?>, Object> sInstanceMap = new HashMap<Class<?>, Object>();
+    private static final HashMap<InstanceInfo, Object> sInstanceMap =
+            new HashMap<InstanceInfo, Object>();
 
     @Nullable
     @SuppressWarnings("unchecked")
     public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
-            @Nonnull final Object... args) {
+            @Nonnull final Object[] args) {
 
-        final HashMap<Class<?>, Object> instanceMap = sInstanceMap;
-        Object instance = instanceMap.get(type);
+        final HashMap<InstanceInfo, Object> instanceMap = sInstanceMap;
+        final InstanceInfo instanceInfo = new InstanceInfo(type, args);
+        Object instance = instanceMap.get(instanceInfo);
 
         if (instance == null) {
 
             try {
 
                 instance = findConstructor(type, args).newInstance(args);
-                instanceMap.put(type, instance);
+                instanceMap.put(instanceInfo, instance);
 
             } catch (final RoutineException e) {
 
@@ -60,5 +63,43 @@ public class TestService extends RoutineService implements FactoryContext {
         }
 
         return (TYPE) instance;
+    }
+
+    private static class InstanceInfo {
+
+        private final Object[] mArgs;
+
+        private final Class<?> mType;
+
+        private InstanceInfo(@Nonnull final Class<?> type, @Nonnull final Object[] args) {
+
+            mType = type;
+            mArgs = args;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof InstanceInfo)) {
+
+                return false;
+            }
+
+            final InstanceInfo that = (InstanceInfo) o;
+            return Arrays.equals(mArgs, that.mArgs) && mType.equals(that.mType);
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = Arrays.hashCode(mArgs);
+            result = 31 * result + mType.hashCode();
+            return result;
+        }
     }
 }

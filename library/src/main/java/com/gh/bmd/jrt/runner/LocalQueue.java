@@ -29,7 +29,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.nanos;
  * The implementation ensures that recursive executions are broken into commands handled inside a
  * consuming loop, running in the same thread.
  * <p/>
- * Created by davide on 9/18/14.
+ * Created by davide-maestroni on 9/18/14.
  */
 class LocalQueue {
 

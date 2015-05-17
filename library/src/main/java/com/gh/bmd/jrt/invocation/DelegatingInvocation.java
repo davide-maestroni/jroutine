@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 /**
  * Invocation implementation delegating the execution to another routine.
  * <p/>
- * Created by davide on 18/04/15.
+ * Created by davide-maestroni on 18/04/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Downloader unit tests.
  * <p/>
- * Created by davide on 10/17/14.
+ * Created by davide-maestroni on 10/17/14.
  */
 public class DownloaderTest {
 

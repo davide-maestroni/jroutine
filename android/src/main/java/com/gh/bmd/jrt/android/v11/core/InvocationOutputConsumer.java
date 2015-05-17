@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 /**
  * Class storing the invocation loader results.
  * <p/>
- * Created by davide on 12/12/14.
+ * Created by davide-maestroni on 12/12/14.
  *
  * @param <OUTPUT> the output data type.
  */

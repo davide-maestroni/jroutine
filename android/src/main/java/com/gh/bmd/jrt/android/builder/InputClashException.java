@@ -16,14 +16,14 @@ package com.gh.bmd.jrt.android.builder;
 /**
  * Exception indicating a clash of routine invocations with the same ID but different input data.
  * <p/>
- * Created by davide on 12/14/14.
+ * Created by davide-maestroni on 12/14/14.
  */
 public class InputClashException extends InvocationClashException {
 
     /**
      * Constructor.
      *
-     * @param id the invocation ID.
+     * @param id the loader ID.
      */
     public InputClashException(final int id) {
 

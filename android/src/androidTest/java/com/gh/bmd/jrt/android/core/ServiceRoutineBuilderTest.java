@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Invocation service routine unit tests.
  * <p/>
- * Created by davide on 12/1/15.
+ * Created by davide-maestroni on 12/1/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<TestActivity> {
@@ -303,7 +303,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                            .withReadTimeoutAction(TimeoutActionType.EXIT)
                            .set()
                            .withService()
-                           .withReceiverLooper(Looper.myLooper())
+                           .withResultLooper(Looper.myLooper())
                            .set()
                            .callAsync("test1")
                            .readAll()).isEmpty();
@@ -322,7 +322,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                     .withReadTimeoutAction(TimeoutActionType.ABORT)
                     .set()
                     .withService()
-                    .withReceiverLooper(Looper.myLooper())
+                    .withResultLooper(Looper.myLooper())
                     .set()
                     .callAsync("test2")
                     .readAll();
@@ -347,7 +347,7 @@ public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .withService()
-                    .withReceiverLooper(Looper.myLooper())
+                    .withResultLooper(Looper.myLooper())
                     .set()
                     .callAsync("test3")
                     .readAll();

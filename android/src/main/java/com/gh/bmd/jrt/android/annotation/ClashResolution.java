@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.annotation;
 
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -49,9 +49,9 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by Davide on 4/9/2015.
+ * Created by davide-maestroni on 4/9/2015.
  *
- * @see com.gh.bmd.jrt.android.builder.InvocationConfiguration
+ * @see com.gh.bmd.jrt.android.builder.LoaderConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

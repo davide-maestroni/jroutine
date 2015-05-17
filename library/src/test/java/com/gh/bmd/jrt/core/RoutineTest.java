@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Bind;
-import com.gh.bmd.jrt.annotation.Pass;
+import com.gh.bmd.jrt.annotation.Alias;
+import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.InputDeadlockException;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
@@ -78,7 +78,7 @@ import static org.junit.Assert.fail;
 /**
  * Routine unit tests.
  * <p/>
- * Created by davide on 9/9/14.
+ * Created by davide-maestroni on 9/9/14.
  */
 public class RoutineTest {
 
@@ -132,7 +132,6 @@ public class RoutineTest {
         assertThat(channel.checkComplete()).isTrue();
         assertThat(channel.isOpen()).isFalse();
 
-
         final OutputChannel<String> channel1 = routine.callAsync("test2");
         assertThat(channel1.isOpen()).isTrue();
         assertThat(channel1.abort()).isTrue();
@@ -152,7 +151,6 @@ public class RoutineTest {
 
         assertThat(channel1.checkComplete()).isTrue();
         assertThat(channel1.isOpen()).isFalse();
-
 
         final FilterInvocation<String, String> abortInvocation =
                 new FilterInvocation<String, String>() {
@@ -1474,15 +1472,15 @@ public class RoutineTest {
                            .afterMax(timeout)
                            .readAll()).containsExactly(1);
         assertThat(
-                JRoutine.on(test).boundMethod(TestClass.GET).callSync().afterMax(timeout).readAll())
+                JRoutine.on(test).aliasMethod(TestClass.GET).callSync().afterMax(timeout).readAll())
                 .containsExactly(1);
         assertThat(JRoutine.on(TestClass.class)
-                           .boundMethod(TestClass.GET)
+                           .aliasMethod(TestClass.GET)
                            .callSync(3)
                            .afterMax(timeout)
                            .readAll()).containsExactly(3);
         assertThat(JRoutine.on(TestClass.class)
-                           .boundMethod("get")
+                           .aliasMethod("get")
                            .callAsync(-3)
                            .afterMax(timeout)
                            .readAll()).containsExactly(-3);
@@ -1496,7 +1494,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(TestClass.class).boundMethod("get").callAsync().afterMax(timeout).readAll();
+            JRoutine.on(TestClass.class).aliasMethod("get").callAsync().afterMax(timeout).readAll();
 
             fail();
 
@@ -1506,7 +1504,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(TestClass.class).boundMethod("take");
+            JRoutine.on(TestClass.class).aliasMethod("take");
 
             fail();
 
@@ -2884,12 +2882,12 @@ public class RoutineTest {
 
     private interface TestInterfaceAsync {
 
-        int getInt(@Pass(int.class) OutputChannel<Integer> i);
+        int getInt(@Param(int.class) OutputChannel<Integer> i);
 
-        @Pass(int.class)
+        @Param(int.class)
         OutputChannel<Integer> getOne();
 
-        @Bind(value = "getInt")
+        @Alias(value = "getInt")
         int take(int i);
     }
 
@@ -3078,7 +3076,7 @@ public class RoutineTest {
 
         public static final String GET = "get";
 
-        @Bind(GET)
+        @Alias(GET)
         public static int get(final int i) {
 
             return i;
@@ -3089,7 +3087,7 @@ public class RoutineTest {
             return i;
         }
 
-        @Bind(GET)
+        @Alias(GET)
         public int getOne() {
 
             return 1;
@@ -3258,7 +3256,6 @@ public class RoutineTest {
 
             sActive = true;
         }
-
 
         @Override
         public void onReturn() {

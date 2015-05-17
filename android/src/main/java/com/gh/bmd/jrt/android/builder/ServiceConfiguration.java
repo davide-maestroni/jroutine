@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.android.builder;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
 
@@ -28,7 +29,7 @@ import javax.annotation.Nullable;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
  * <p/>
- * Created by davide on 20/04/15.
+ * Created by davide-maestroni on 20/04/15.
  */
 public final class ServiceConfiguration {
 
@@ -69,8 +70,8 @@ public final class ServiceConfiguration {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        mServiceClass = serviceClass;
         mLooper = looper;
+        mServiceClass = serviceClass;
         mRunnerClass = runnerClass;
         mLogClass = logClass;
     }
@@ -112,7 +113,6 @@ public final class ServiceConfiguration {
     }
 
     @Override
-    @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(final Object o) {
 
         // auto-generated code
@@ -127,25 +127,12 @@ public final class ServiceConfiguration {
         }
 
         final ServiceConfiguration that = (ServiceConfiguration) o;
+        return !(mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null)
+                && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) && !(
+                mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
+                        : that.mRunnerClass != null) && !(mServiceClass != null
+                ? !mServiceClass.equals(that.mServiceClass) : that.mServiceClass != null);
 
-        if (mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null) {
-
-            return false;
-        }
-
-        if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
-
-            return false;
-        }
-
-        if (mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
-                : that.mRunnerClass != null) {
-
-            return false;
-        }
-
-        return !(mServiceClass != null ? !mServiceClass.equals(that.mServiceClass)
-                : that.mServiceClass != null);
     }
 
     @Override
@@ -188,7 +175,7 @@ public final class ServiceConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
      */
-    public Looper getReceiverLooperOr(@Nullable final Looper valueIfNotSet) {
+    public Looper getResultLooperOr(@Nullable final Looper valueIfNotSet) {
 
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
@@ -321,7 +308,7 @@ public final class ServiceConfiguration {
 
             if (looper != null) {
 
-                withReceiverLooper(looper);
+                withResultLooper(looper);
             }
 
             final Class<? extends RoutineService> serviceClass = configuration.mServiceClass;
@@ -354,9 +341,16 @@ public final class ServiceConfiguration {
          *
          * @param logClass the log class.
          * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified class has no default
+         *                                            constructor.
          */
         @Nonnull
         public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
+
+            if (logClass != null) {
+
+                Reflection.findConstructor(logClass);
+            }
 
             mLogClass = logClass;
             return this;
@@ -370,7 +364,7 @@ public final class ServiceConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withReceiverLooper(@Nullable final Looper looper) {
+        public Builder<TYPE> withResultLooper(@Nullable final Looper looper) {
 
             mLooper = looper;
             return this;
@@ -382,9 +376,16 @@ public final class ServiceConfiguration {
          *
          * @param runnerClass the runner class.
          * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified class has no default
+         *                                            constructor.
          */
         @Nonnull
         public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
+
+            if (runnerClass != null) {
+
+                Reflection.findConstructor(runnerClass);
+            }
 
             mRunnerClass = runnerClass;
             return this;

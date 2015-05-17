@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 /**
  * Android specific log implementation.
  * <p/>
- * Created by davide on 10/7/14.
+ * Created by davide-maestroni on 10/7/14.
  */
 public class AndroidLog implements com.gh.bmd.jrt.log.Log {
 

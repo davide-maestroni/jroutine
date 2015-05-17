@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * Interface defining a result channel, that is the channel used by the routine invocation to
  * publish the results into the output channel.
  * <p/>
- * Created by davide on 9/15/14.
+ * Created by davide-maestroni on 9/15/14.
  *
  * @param <OUTPUT> the output data type.
  */

@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 /**
  * Utility class for creating and sharing runner instances.
  * <p/>
- * Created by davide on 9/9/14.
+ * Created by davide-maestroni on 9/9/14.
  */
 public class Runners {
 

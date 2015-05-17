@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * Channel instances are used to transfer data to and from the code executed inside the routine
  * invocation.
  * <p/>
- * Created by davide on 9/9/14.
+ * Created by davide-maestroni on 9/9/14.
  */
 public interface Channel {
 

@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 /**
  * Loader implementation performing the routine invocation.
  * <p/>
- * Created by davide on 12/8/14.
+ * Created by davide-maestroni on 12/8/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

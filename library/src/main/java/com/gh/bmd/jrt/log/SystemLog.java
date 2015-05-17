@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 /**
  * Simple log implementation writing messages to the system output.
  * <p/>
- * Created by davide on 10/3/14.
+ * Created by davide-maestroni on 10/3/14.
  */
 public class SystemLog extends TemplateLog {
 

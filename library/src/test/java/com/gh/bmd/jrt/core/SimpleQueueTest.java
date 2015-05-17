@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
 /**
  * Simple queue unit tests.
  * <p/>
- * Created by davide on 10/1/14.
+ * Created by davide-maestroni on 10/1/14.
  */
 public class SimpleQueueTest {
 

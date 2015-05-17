@@ -18,7 +18,7 @@ import com.gh.bmd.jrt.common.RoutineException;
 /**
  * Exception indicating that a routine invocation with a specified ID is not running.
  * <p/>
- * Created by davide on 1/14/15.
+ * Created by davide-maestroni on 1/14/15.
  */
 public class InvocationMissingException extends RoutineException {
 

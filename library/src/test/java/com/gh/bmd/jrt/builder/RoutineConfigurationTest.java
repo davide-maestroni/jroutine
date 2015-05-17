@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 /**
  * Routine configuration unit tests.
  * <p/>
- * Created by davide on 11/22/14.
+ * Created by davide-maestroni on 11/22/14.
  */
 public class RoutineConfigurationTest {
 

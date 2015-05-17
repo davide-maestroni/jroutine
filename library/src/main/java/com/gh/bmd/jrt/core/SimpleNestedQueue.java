@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
  * <p/>
  * No data ordering is guaranteed.
  * <p/>
- * Created by davide on 9/30/14.
+ * Created by davide-maestroni on 9/30/14.
  *
  * @param <E> the element type.
  */

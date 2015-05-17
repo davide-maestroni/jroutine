@@ -21,7 +21,7 @@ import com.gh.bmd.jrt.log.Logger;
 /**
  * Android log unit tests.
  * <p/>
- * Created by davide on 10/27/14.
+ * Created by davide-maestroni on 10/27/14.
  */
 public class AndroidLogTest extends AndroidTestCase {
 

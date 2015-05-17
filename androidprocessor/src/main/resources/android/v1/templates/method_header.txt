@@ -1,0 +1,55 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// GENERATED CODE - PLEASE DO NOT EDIT
+
+    private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
+
+    private static class ContextInvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
+
+        @javax.annotation.Nonnull
+        public String getInvocationType() {
+
+            return ContextInvocation${methodCount}.class.getName();
+        }
+
+        @javax.annotation.Nonnull
+        public com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation(@javax.annotation.Nonnull Object... args) {
+
+            return new ContextInvocation${methodCount}${genericTypes}((Class<?>) args[0], (String) args[1], (Object[]) args[2]);
+        }
+    }
+
+    @javax.annotation.Nonnull
+    private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
+
+        final Object[] args = routineConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.common.Reflection.NO_ARGS);
+        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}())
+                                           .withRoutine()
+                                           .with(routineConfiguration)
+                                           ${routineBuilderOptions}
+                                           .withFactoryArgs(mTargetClass, ${shareGroup}, args)
+                                           .withInputMaxSize(Integer.MAX_VALUE)
+                                           .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withOutputMaxSize(Integer.MAX_VALUE)
+                                           .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                                           .set()
+                                           .withLoader()
+                                           .with(loaderConfiguration)
+                                           ${invocationBuilderOptions}
+                                           .set()
+                                           .buildRoutine();
+    }

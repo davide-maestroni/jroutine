@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Channels unit tests.
  * <p/>
- * Created by davide on 3/18/15.
+ * Created by davide-maestroni on 3/18/15.
  */
 public class ChannelsTest {
 

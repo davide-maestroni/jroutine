@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
  * The implementing class may additionally override the invocation methods to specifically handle
  * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

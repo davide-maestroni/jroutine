@@ -29,7 +29,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * increase the depth of the call stack, and blocks execution of the calling thread during delayed
  * executions.
  * <p/>
- * Created by davide on 9/9/14.
+ * Created by davide-maestroni on 9/9/14.
  *
  * @see com.gh.bmd.jrt.runner.QueuedRunner
  */

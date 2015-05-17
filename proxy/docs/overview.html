@@ -68,14 +68,14 @@
             &commat;Proxy(Main.class)
             public interface AsyncMain {
 
-                &commat;Pass(int.class)
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
+                &commat;Param(int.class)
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Param(String.class) String[] args);
 
-                &commat;Pass(int.class)
+                &commat;Param(int.class)
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
-                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(&commat;Param(List.class) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>
@@ -83,7 +83,7 @@
 <b>Example 2:</b> via code generation (again).
 <p>
     It is possible to completely avoid the use of reflection by slightly modifying the example above.<br/>
-    Note that, since the <i>XXX_Proxy</i> class is generated, a generic IDE may highlight an error even if the compilation is successful.
+    Note that, since the <i>Proxy_XXX</i> class is generated, a generic IDE may highlight an error even if the compilation is successful.
 </p>
 <pre>
     <code>
@@ -92,7 +92,7 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = MainAsyncMain_Proxy.on(instance)
+                final AsyncMain proxy = Proxy_MainAsyncMain.on(instance)
                                                            .withProxy()
                                                            .withShareGroup(ShareGroup.NONE)
                                                            .set()
@@ -137,14 +137,14 @@
             &commat;Proxy(Main.class)
             public interface AsyncMain {
 
-                &commat;Pass(int.class)
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
+                &commat;Param(int.class)
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Param(String.class) String[] args);
 
-                &commat;Pass(int.class)
+                &commat;Param(int.class)
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
-                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(&commat;Param(List.class) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>

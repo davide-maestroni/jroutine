@@ -55,7 +55,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * result channel puts data into the output queue and, on the other end, the output channel reads
  * them from the same queue.
  * <p/>
- * Created by davide on 9/24/14.
+ * Created by davide-maestroni on 9/24/14.
  *
  * @param <OUTPUT> the output data type.
  */

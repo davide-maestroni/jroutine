@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Note that the delivery order of the output data might not be guaranteed.
  * <p/>
- * Created by davide on 9/4/14.
+ * Created by davide-maestroni on 9/4/14.
  *
  * @param <OUTPUT> the output data type.
  */
@@ -69,7 +69,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     /**
      * Binds the specified consumer to this channel. After the call, all the output will be passed
      * only to the consumer. Attempting to read through the dedicated methods will cause an
-     * {@link IllegalStateException} to be thrown.
+     * {@link java.lang.IllegalStateException} to be thrown.
      *
      * @param consumer the consumer instance.
      * @return this channel.
@@ -105,7 +105,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to abort the invocation execution in case no result is available before
      * the timeout has elapsed.
      * <p/>
-     * By default a {@link ReadDeadlockException} exception will be thrown.
+     * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} exception will be thrown.
      *
      * @return this channel.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
@@ -118,8 +118,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     OutputChannel<OUTPUT> eventuallyAbort();
 
     /**
-     * Tells the channel to throw a {@link ReadDeadlockException} in case no result is available
-     * before the timeout has elapsed.
+     * Tells the channel to throw a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} in case no
+     * result is available before the timeout has elapsed.
      * <p/>
      * This is the default behavior.
      *
@@ -137,7 +137,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to break execution in case no result is available before the timeout has
      * elapsed.
      * <p/>
-     * By default a {@link ReadDeadlockException} exception will be thrown.
+     * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} exception will be thrown.
      *
      * @return this channel.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)

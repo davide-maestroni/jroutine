@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.proxy.v4.core;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh.bmd.jrt.android.proxy.builder.ContextProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -24,28 +24,28 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
- * calls of their methods, bound to a context lifecycle.
+ * calls, bound to a context lifecycle, of their methods.
  * <p/>
  * The builders returned by this class are based on compile time code generation, enabled by
  * pre-processing of Java annotations.<br/>
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide on 06/05/15.
+ * Created by davide-maestroni on 06/05/15.
  *
- * @see com.gh.bmd.jrt.android.processor.v4.annotation.V4Proxy
- * @see com.gh.bmd.jrt.android.annotation.Id
- * @see com.gh.bmd.jrt.android.annotation.ClashResolution
+ * @see com.gh.bmd.jrt.android.proxy.annotation.V4Proxy
  * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
- * @see com.gh.bmd.jrt.annotation.Bind
- * @see com.gh.bmd.jrt.annotation.Pass
+ * @see com.gh.bmd.jrt.android.annotation.ClashResolution
+ * @see com.gh.bmd.jrt.android.annotation.LoaderId
+ * @see com.gh.bmd.jrt.annotation.Alias
+ * @see com.gh.bmd.jrt.annotation.Param
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending functionalities of another utility class")
-public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
+public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutineProxy {
 
     /**
      * Avoid direct instantiation.
@@ -65,10 +65,10 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
+    public static LoaderProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextProxyRoutineBuilder(activity, target);
+        return new DefaultLoaderProxyRoutineBuilder(activity, target);
     }
 
     /**
@@ -82,9 +82,9 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ContextProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
+    public static LoaderProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
             @Nonnull final Class<?> target) {
 
-        return new DefaultContextProxyRoutineBuilder(fragment, target);
+        return new DefaultLoaderProxyRoutineBuilder(fragment, target);
     }
 }

@@ -16,7 +16,6 @@ package com.gh.bmd.jrt.builder;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.routine.InvocationDeadlockException;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -52,8 +51,8 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * limit is reached and an additional instance is requires, the call is blocked until one becomes
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
- * In case the timeout elapses before an invocation instance becomes available, a
- * {@link InvocationDeadlockException} will be thrown.
+ * In case the timeout elapses before an invocation instance becomes available, an
+ * {@link com.gh.bmd.jrt.routine.InvocationDeadlockException} will be thrown.
  * <p/>
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
@@ -65,7 +64,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increased memory usage and computation.
  * <p/>
- * Created by davide on 11/15/14.
+ * Created by davide-maestroni on 11/15/14.
  */
 public final class RoutineConfiguration {
 

@@ -24,7 +24,7 @@ import com.gh.bmd.jrt.android.R;
 /**
  * Test activity.
  * <p/>
- * Created by davide on 12/16/14.
+ * Created by davide-maestroni on 12/16/14.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestActivity extends Activity {
@@ -33,7 +33,6 @@ public class TestActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.test_v11_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
     }

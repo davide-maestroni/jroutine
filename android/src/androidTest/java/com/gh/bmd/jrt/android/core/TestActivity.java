@@ -23,7 +23,7 @@ import com.gh.bmd.jrt.android.R;
 /**
  * Test activity.
  * <p/>
- * Created by davide on 11/1/15.
+ * Created by davide-maestroni on 11/1/15.
  */
 public class TestActivity extends Activity {
 
@@ -31,10 +31,8 @@ public class TestActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.test_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         startService(new Intent(this, TestService.class));
     }
 
@@ -42,7 +40,6 @@ public class TestActivity extends Activity {
     protected void onDestroy() {
 
         stopService(new Intent(this, TestService.class));
-
         super.onDestroy();
     }
 }

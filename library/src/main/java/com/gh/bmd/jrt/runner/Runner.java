@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * Note also that the runner methods can be called from different threads, so, it is up to the
  * implementing class to ensure synchronization when needed.
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  */
 public interface Runner {
 

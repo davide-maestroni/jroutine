@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Note that the delivery order of the input data might not be guaranteed.
  * <p/>
- * Created by davide on 9/4/14.
+ * Created by davide-maestroni on 9/4/14.
  *
  * @param <INPUT> the input data type.
  */

@@ -22,15 +22,17 @@ import android.content.Context;
 import android.content.Loader;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.SparseArray;
 
 import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.CacheStrategyType;
-import com.gh.bmd.jrt.android.builder.InvocationConfiguration.ClashResolutionType;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -40,6 +42,7 @@ import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -58,7 +61,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Invocation implementation employing loaders to perform background operations.
  * <p/>
- * Created by davide on 12/11/14.
+ * Created by davide-maestroni on 12/11/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
@@ -86,6 +89,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
     private final Logger mLogger;
 
+    private final Looper mLooper;
+
     private final OrderType mOrderType;
 
     /**
@@ -94,14 +99,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * @param context       the context reference.
      * @param factory       the invocation factory.
      * @param args          the invocation factory arguments.
-     * @param configuration the invocation configuration.
+     * @param configuration the loader configuration.
      * @param order         the input data order.
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
-            @Nonnull final Object[] args, @Nonnull final InvocationConfiguration configuration,
+            @Nonnull final Object[] args, @Nonnull final LoaderConfiguration configuration,
             @Nullable final OrderType order, @Nonnull final Logger logger) {
 
         if (context == null) {
@@ -121,7 +126,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         mContext = context;
         mFactory = factory;
-        mLoaderId = configuration.getInvocationIdOr(InvocationConfiguration.AUTO);
+        mLooper = configuration.getResultLooperOr(null);
+        mLoaderId = configuration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mClashResolutionType =
                 configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
         mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
@@ -255,7 +261,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if (((loaderId == InvocationConfiguration.AUTO) || (loaderId == id))
+                if (((loaderId == LoaderConfiguration.AUTO) || (loaderId == id))
                         && loader.areSameInputs(inputs)) {
 
                     loaderManager.destroyLoader(id);
@@ -399,7 +405,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
                 final int id = callbackArray.keyAt(i);
 
-                if ((loaderId == InvocationConfiguration.AUTO) || (loaderId == id)) {
+                if ((loaderId == LoaderConfiguration.AUTO) || (loaderId == id)) {
 
                     loaderManager.destroyLoader(id);
                     callbackArray.removeAt(i);
@@ -480,7 +486,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         int loaderId = mLoaderId;
 
-        if (loaderId == InvocationConfiguration.AUTO) {
+        if (loaderId == LoaderConfiguration.AUTO) {
 
             loaderId = mFactory.getInvocationType().hashCode();
 
@@ -490,7 +496,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             }
 
             loaderId = 31 * loaderId + inputs.hashCode();
-            logger.dbg("generating invocation ID: %d", loaderId);
+            logger.dbg("generating loader ID: %d", loaderId);
         }
 
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
@@ -540,7 +546,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheStrategyType);
         callbacks.setCacheStrategy(mCacheStrategyType);
 
-        final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
+        final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel(mLooper);
 
         if (isClash) {
 
@@ -605,7 +611,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         if (loader.getClass() != RoutineLoader.class) {
 
-            logger.err("clashing invocation ID [%d]: %s", loaderId, loader.getClass().getName());
+            logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
             throw new InvocationClashException(loaderId);
         }
 
@@ -616,8 +622,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
                 !routineLoader.getInvocationType().equals(invocationType) || !Arrays.equals(
                         routineLoader.getInvocationArgs(), mArgs))) {
 
-            logger.wrn("clashing invocation ID [%d]: %s", loaderId,
-                       routineLoader.getInvocationType());
+            logger.wrn("clashing loader ID [%d]: %s", loaderId, routineLoader.getInvocationType());
             throw new InvocationClashException(loaderId);
         }
 
@@ -698,10 +703,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
          * Creates and returns a new output channel.<br/>
          * The channel will be used to deliver the loader results.
          *
+         * @param looper the looper instance.
          * @return the new output channel.
          */
         @Nonnull
-        public OutputChannel<OUTPUT> newChannel() {
+        public OutputChannel<OUTPUT> newChannel(@Nullable final Looper looper) {
 
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
@@ -718,6 +724,22 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
+
+            if ((looper != null) && (looper != Looper.getMainLooper())) {
+
+                return JRoutine.on(PassingInvocation.<OUTPUT>factoryOf())
+                               .withRoutine()
+                               .withAsyncRunner(Runners.looperRunner(looper))
+                               .withInputMaxSize(Integer.MAX_VALUE)
+                               .withInputTimeout(TimeDuration.ZERO)
+                               .withOutputMaxSize(Integer.MAX_VALUE)
+                               .withOutputTimeout(TimeDuration.ZERO)
+                               .withLog(logger.getLog())
+                               .withLogLevel(logger.getLogLevel())
+                               .set()
+                               .callAsync(channel.output());
+            }
+
             return channel.output();
         }
 

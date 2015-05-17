@@ -14,6 +14,6 @@
 /**
  * Routine interfaces specific to the Android platform.
  * <p/>
- * Created by davide on 1/10/15.
+ * Created by davide-maestroni on 1/10/15.
  */
 package com.gh.bmd.jrt.android.routine;

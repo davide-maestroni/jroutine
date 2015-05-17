@@ -58,7 +58,7 @@
         }
 
         @Override
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "SynchronizeOnNonFinalField"})
         public void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
 

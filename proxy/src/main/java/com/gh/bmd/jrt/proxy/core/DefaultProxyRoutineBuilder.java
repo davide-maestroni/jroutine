@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.proxy.core;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.processor.annotation.Proxy;
+import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 
@@ -30,7 +30,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 /**
  * Default implementation of a proxy builder.
  * <p/>
- * Created by davide on 3/23/15.
+ * Created by davide-maestroni on 3/23/15.
  */
 class DefaultProxyRoutineBuilder
         implements ProxyRoutineBuilder, RoutineConfiguration.Configurable<ProxyRoutineBuilder>,
@@ -67,10 +67,19 @@ class DefaultProxyRoutineBuilder
     @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
+        final Class<TYPE> itfClass = itf.getRawClass();
+
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getRawClass().getName());
+                    "the specified class is not an interface: " + itfClass.getName());
+        }
+
+        if (itfClass.getAnnotation(Proxy.class) == null) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not annotated with " + Proxy.class.getName() + ": "
+                            + itfClass.getName());
         }
 
         final Object target = mTargetReference.get();
@@ -168,31 +177,48 @@ class DefaultProxyRoutineBuilder
 
         @Nonnull
         @Override
-        protected TYPE newProxy(@Nonnull final String shareGroup,
-                @Nonnull final RoutineConfiguration configuration) {
+        protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final ProxyConfiguration proxyConfiguration) {
 
             try {
 
                 final Object target = mTarget;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
-                final Package classPackage = interfaceClass.getPackage();
-                final String packageName =
-                        (classPackage != null) ? classPackage.getName() + "." : "";
-                String classNamePrefix = interfaceClass.getSimpleName();
-                Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+                final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
+                String packageName = annotation.generatedClassPackage();
 
-                while (enclosingClass != null) {
+                if (packageName.equals(Proxy.DEFAULT)) {
 
-                    classNamePrefix = enclosingClass.getSimpleName() + classNamePrefix;
-                    enclosingClass = enclosingClass.getEnclosingClass();
+                    final Package classPackage = interfaceClass.getPackage();
+                    packageName = (classPackage != null) ? classPackage.getName() + "." : "";
+
+                } else {
+
+                    packageName += ".";
                 }
 
-                final String className = packageName + classNamePrefix + Proxy.CLASS_NAME_SUFFIX;
+                String className = annotation.generatedClassName();
+
+                if (className.equals(Proxy.DEFAULT)) {
+
+                    className = interfaceClass.getSimpleName();
+                    Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+
+                    while (enclosingClass != null) {
+
+                        className = enclosingClass.getSimpleName() + className;
+                        enclosingClass = enclosingClass.getEnclosingClass();
+                    }
+                }
+
+                final String fullClassName =
+                        packageName + annotation.generatedClassPrefix() + className
+                                + annotation.generatedClassSuffix();
                 final Constructor<?> constructor =
-                        findConstructor(Class.forName(className), target, shareGroup,
-                                        configuration);
+                        findConstructor(Class.forName(fullClassName), target, routineConfiguration,
+                                        proxyConfiguration);
                 return interfaceClass.cast(
-                        constructor.newInstance(target, shareGroup, configuration));
+                        constructor.newInstance(target, routineConfiguration, proxyConfiguration));
 
             } catch (final Throwable t) {
 

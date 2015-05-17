@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 /**
  * Interface defining a builder of async proxy objects.
  * <p/>
- * Created by davide on 3/7/15.
+ * Created by davide-maestroni on 3/7/15.
  *
  * @param <TYPE> the interface type.
  */
@@ -33,13 +33,13 @@ public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYP
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Pass}
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.processor.annotation.Proxy}.<br/>
+     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

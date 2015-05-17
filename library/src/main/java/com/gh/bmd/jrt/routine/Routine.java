@@ -75,7 +75,7 @@ import javax.annotation.Nullable;
  * as far as the implementation honors the specific contracts, it is possible to seamlessly combine
  * different routine implementations. Even the ones coming from third party libraries.
  * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide-maestroni on 9/7/14.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

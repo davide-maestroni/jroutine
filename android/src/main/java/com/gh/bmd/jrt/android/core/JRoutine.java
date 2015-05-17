@@ -35,8 +35,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Note that it is up to the caller to properly declare the service in the manifest file. Note also
  * that it is possible to manage the service lifecycle starting it through the
- * {@link Context#startService(android.content.Intent)} method. Normally the service will stay
- * active only during a routine invocation.<br/>
+ * {@link android.content.Context#startService(android.content.Intent)} method. Normally the service
+ * will stay active only during a routine invocation.<br/>
  * The service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels must comply with the
  * {@link android.os.Parcel#writeValue(Object)} method. Be aware though, that issues may arise when
@@ -75,7 +75,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 1/8/15.
+ * Created by davide-maestroni on 1/8/15.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending functionalities of another utility class")

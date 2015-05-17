@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a builder of routine objects based on an invocation class token.
  * <p/>
- * Created by davide on 1/8/15.
+ * Created by davide-maestroni on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
@@ -109,7 +109,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     public RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
     withRoutine() {
 
-
         final RoutineConfiguration config = getConfiguration();
         return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(mConfigurable,
                                                                                       config);
@@ -118,7 +117,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     @Nonnull
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
     withService() {
-
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this, config);

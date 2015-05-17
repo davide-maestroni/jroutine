@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * <b><code>close()</code></b> method must be called to correctly terminate the invocation
  * lifecycle.
  * <p/>
- * Created by davide on 10/25/14.
+ * Created by davide-maestroni on 10/25/14.
  *
  * @param <DATA> the data type.
  */

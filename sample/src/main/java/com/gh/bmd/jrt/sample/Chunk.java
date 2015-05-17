@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
  * The objects are immutable since the internal data are read in the constructor and then written to
  * an output stream.
  * <p/>
- * Created by davide on 10/17/14.
+ * Created by davide-maestroni on 10/17/14.
  */
 public class Chunk {
 
@@ -37,7 +37,7 @@ public class Chunk {
      *
      * @param maxSize the maximum number of bytes in the chunk.
      * @param stream  the input stream from which to read the data.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     public Chunk(final int maxSize, @Nonnull final InputStream stream) throws IOException {
 
@@ -60,7 +60,7 @@ public class Chunk {
      * Writes the bytes of this chunk into the specified output stream.
      *
      * @param stream the output stream.
-     * @throws IOException if an I/O error occurred.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     public void writeTo(@Nonnull final OutputStream stream) throws IOException {
 

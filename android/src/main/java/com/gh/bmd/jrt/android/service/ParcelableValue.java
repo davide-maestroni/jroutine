@@ -21,9 +21,9 @@ import javax.annotation.Nonnull;
 /**
  * Parcelable implementation wrapping a generic value.<br/>
  * Note that specified object must be among the ones supported by the
- * {@link Parcel#writeValue(Object)} method.
+ * {@link android.os.Parcel#writeValue(Object)} method.
  * <p/>
- * Created by davide on 1/10/15.
+ * Created by davide-maestroni on 1/10/15.
  */
 class ParcelableValue implements Parcelable {
 

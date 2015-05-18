@@ -28,7 +28,7 @@ before_script:
 script: ./gradlew -i build connectedCheck
 
 # Print reports
-after_failure: find . -name TEST-\*.xml -print -execdir cat {} \;
+after_failure: find . -name TEST-\*.xml -print -exec cat {} \;
 
 # Code coverage
 after_success: ./gradlew jacocoTestReport coveralls

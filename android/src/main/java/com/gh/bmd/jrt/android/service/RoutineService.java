@@ -29,7 +29,6 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
@@ -453,7 +452,8 @@ public class RoutineService extends Service {
 
             if (routineState == null) {
 
-                final Builder<RoutineConfiguration> builder = RoutineConfiguration.builder();
+                final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                        RoutineConfiguration.builder();
 
                 if (runnerClass != null) {
 
@@ -487,7 +487,6 @@ public class RoutineService extends Service {
                        .withInputOrder(inputOrderType)
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
-
                 final ContextInvocationFactory<Object, Object> factory =
                         getInvocationFactory(invocationClass);
                 final AndroidRoutine androidRoutine =

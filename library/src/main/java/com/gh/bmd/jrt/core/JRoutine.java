@@ -61,7 +61,6 @@ import javax.annotation.Nonnull;
  *     <code>
  *
  *         final TransportChannel&lt;Result&gt; channel = JRoutine.transport().buildChannel();
- *
  *         channel.input()
  *                .pass(doSomething1.callAsync())
  *                .pass(doSomething2.callAsync())
@@ -77,7 +76,6 @@ import javax.annotation.Nonnull;
  *
  *         final OutputChannel&lt;Result&gt; output1 = doSomething1.callAsync();
  *         final OutputChannel&lt;Result&gt; output2 = doSomething2.callAsync();
- *
  *         output1.eventually().readAllInto(results);
  *         output2.eventually().readAllInto(results);
  *     </code>
@@ -106,7 +104,6 @@ import javax.annotation.Nonnull;
  *
  *         final AsyncCallback callback = JRoutine.on(myCallback)
  *                                                .buildProxy(AsyncCallback.class);
- *
  *         callback.onResults(doSomething1.callAsync(), doSomething2.callAsync());
  *     </code>
  * </pre>
@@ -132,7 +129,6 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                          .buildRoutine();
- *
  *         routine.callAsync(channel.output()).eventually().readAllInto(results);
  *     </code>
  * </pre>

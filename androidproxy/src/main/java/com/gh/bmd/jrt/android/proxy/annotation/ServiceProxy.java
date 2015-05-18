@@ -30,6 +30,29 @@ import java.lang.annotation.Target;
  * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}.
  * <p/>
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy *;
+ *         }
+ *     </code>
+ * </pre>
+ * Be sure also to include a proper rule in your Proguard file, so to keep the name of all the
+ * classes implementing the specific mirror interface, like, for example:
+ * <pre>
+ *     <code>
+ *
+ *         -keep public class * extends my.mirror.Interface {
+ *              public &lt;init&gt;;
+ *         }
+ *     </code>
+ * </pre>
+ * <p/>
  * Created by davide-maestroni on 13/05/15.
  *
  * @see com.gh.bmd.jrt.proxy.annotation.Proxy

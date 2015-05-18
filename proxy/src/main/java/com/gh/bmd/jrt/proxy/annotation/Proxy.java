@@ -77,10 +77,20 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Note that, you'll need to enable annotation pre-processing by adding the "jroutine-processor"
- * artifact or module to the specific project dependencies. Be sure also to include a proper rule in
- * your Proguard file, so to keep the name of all the classes implementing the specific mirror
- * interface, like, for example:
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.gh.bmd.jrt.proxy.annotation.Proxy *;
+ *         }
+ *     </code>
+ * </pre>
+ * Be sure also to include a proper rule in your Proguard file, so to keep the name of all the
+ * classes implementing the specific mirror interface, like, for example:
  * <pre>
  *     <code>
  *

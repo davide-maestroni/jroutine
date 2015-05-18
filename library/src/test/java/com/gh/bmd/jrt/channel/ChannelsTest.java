@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.channel;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
+import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.channel.Channels.Selectable;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.core.JRoutine;
@@ -41,12 +41,12 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testSelect() {
 
-        final StandaloneChannelBuilder builder =
-                JRoutine.standalone().withRoutine().withOutputOrder(OrderType.PASS_ORDER).set();
-        final StandaloneChannel<String> channel1 = builder.buildChannel();
-        final StandaloneChannel<String> channel2 = builder.buildChannel();
-        final StandaloneChannel<String> channel3 = builder.buildChannel();
-        final StandaloneChannel<String> channel4 = builder.buildChannel();
+        final TransportChannelBuilder builder =
+                JRoutine.transport().withRoutine().withOutputOrder(OrderType.PASS_ORDER).set();
+        final TransportChannel<String> channel1 = builder.buildChannel();
+        final TransportChannel<String> channel2 = builder.buildChannel();
+        final TransportChannel<String> channel3 = builder.buildChannel();
+        final TransportChannel<String> channel4 = builder.buildChannel();
 
         final Routine<Selectable<String>, String> routine =
                 JRoutine.on(new ClassToken<Amb<String>>() {}).buildRoutine();

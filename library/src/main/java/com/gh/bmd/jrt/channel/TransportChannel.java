@@ -22,9 +22,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a standalone channel.
+ * Interface defining a transport channel.
  * <p/>
- * A standalone channel is useful to make other asynchronous tasks communicate with a routine.<br/>
+ * A transport channel is useful to make other asynchronous tasks communicate with a routine.<br/>
  * The channel output can be passed to a routine input channel in order to feed it with data coming
  * asynchronously from other sources. Note however, that in both cases the
  * <b><code>close()</code></b> method must be called to correctly terminate the invocation
@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
  *
  * @param <DATA> the data type.
  */
-public interface StandaloneChannel<DATA> {
+public interface TransportChannel<DATA> {
 
     /**
      * Returns the input end of this channel.
@@ -42,7 +42,7 @@ public interface StandaloneChannel<DATA> {
      * @return the input channel.
      */
     @Nonnull
-    StandaloneInput<DATA> input();
+    TransportInput<DATA> input();
 
     /**
      * Returns the output end of this channel.
@@ -50,56 +50,56 @@ public interface StandaloneChannel<DATA> {
      * @return the output channel.
      */
     @Nonnull
-    StandaloneOutput<DATA> output();
+    TransportOutput<DATA> output();
 
     /**
-     * Interface defining a standalone channel input.
+     * Interface defining a transport channel input.
      *
      * @param <INPUT> the input data type.
      */
-    interface StandaloneInput<INPUT> extends InputChannel<INPUT> {
+    interface TransportInput<INPUT> extends InputChannel<INPUT> {
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneInput<INPUT> after(@Nonnull TimeDuration delay);
+        TransportInput<INPUT> after(@Nonnull TimeDuration delay);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+        TransportInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneInput<INPUT> now();
+        TransportInput<INPUT> now();
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
+        TransportInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+        TransportInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneInput<INPUT> pass(@Nullable INPUT input);
+        TransportInput<INPUT> pass(@Nullable INPUT input);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneInput<INPUT> pass(@Nullable INPUT... inputs);
+        TransportInput<INPUT> pass(@Nullable INPUT... inputs);
 
         /**
          * Closes the channel input.<br/>
@@ -111,70 +111,70 @@ public interface StandaloneChannel<DATA> {
     }
 
     /**
-     * Interface defining a standalone channel output.
+     * Interface defining a transport channel output.
      *
      * @param <OUTPUT> the output data type.
      */
-    interface StandaloneOutput<OUTPUT> extends OutputChannel<OUTPUT> {
+    interface TransportOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+        TransportOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+        TransportOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
+        TransportOutput<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> eventually();
+        TransportOutput<OUTPUT> eventually();
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> eventuallyAbort();
+        TransportOutput<OUTPUT> eventuallyAbort();
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> eventuallyDeadlock();
+        TransportOutput<OUTPUT> eventuallyDeadlock();
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> eventuallyExit();
+        TransportOutput<OUTPUT> eventuallyExit();
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> immediately();
+        TransportOutput<OUTPUT> immediately();
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+        TransportOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        StandaloneOutput<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
+        TransportOutput<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
     }
 }

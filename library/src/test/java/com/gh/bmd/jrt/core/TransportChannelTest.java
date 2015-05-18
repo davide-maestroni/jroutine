@@ -17,9 +17,9 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
+import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
@@ -46,22 +46,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Standalone channel unit tests.
+ * Transport channel unit tests.
  * <p/>
  * Created by davide-maestroni on 10/26/14.
  */
-public class StandaloneChannelTest {
+public class TransportChannelTest {
 
     @Test
     public void testAbort() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(standaloneChannel.output());
+                        .callAsync(transportChannel.output());
 
-        standaloneChannel.input().abort(new IllegalStateException());
+        transportChannel.input().abort(new IllegalStateException());
 
         try {
 
@@ -78,10 +78,10 @@ public class StandaloneChannelTest {
     @Test
     public void testAbortDelay() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.days(1)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.days(1)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         final ArrayList<String> results = new ArrayList<String>();
@@ -106,10 +106,10 @@ public class StandaloneChannelTest {
     @Test
     public void testAllIntoTimeout() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock();
@@ -130,10 +130,10 @@ public class StandaloneChannelTest {
     @Test
     public void testAllIntoTimeout2() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
@@ -154,10 +154,10 @@ public class StandaloneChannelTest {
     @Test
     public void testAllTimeout() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock();
@@ -178,10 +178,10 @@ public class StandaloneChannelTest {
     @Test
     public void testAllTimeout2() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
@@ -203,7 +203,7 @@ public class StandaloneChannelTest {
     public void testAsynchronousInput() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
 
         new Thread() {
 
@@ -218,14 +218,14 @@ public class StandaloneChannelTest {
 
                 } finally {
 
-                    standaloneChannel.input().pass("test").close();
+                    transportChannel.input().pass("test").close();
                 }
             }
         }.start();
 
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(standaloneChannel.output());
+                        .callAsync(transportChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
     }
@@ -234,30 +234,30 @@ public class StandaloneChannelTest {
     public void testAsynchronousInput2() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<String> standaloneChannel1 = JRoutine.standalone()
-                                                                     .withRoutine()
-                                                                     .withOutputOrder(
-                                                                             OrderType.PASS_ORDER)
-                                                                     .set()
-                                                                     .buildChannel();
+        final TransportChannel<String> transportChannel1 = JRoutine.transport()
+                                                                   .withRoutine()
+                                                                   .withOutputOrder(
+                                                                           OrderType.PASS_ORDER)
+                                                                   .set()
+                                                                   .buildChannel();
 
         new Thread() {
 
             @Override
             public void run() {
 
-                standaloneChannel1.input()
-                                  .after(1, TimeUnit.MILLISECONDS)
-                                  .after(TimeDuration.millis(200))
-                                  .pass("test1", "test2")
-                                  .pass(Collections.singleton("test3"))
-                                  .close();
+                transportChannel1.input()
+                                 .after(1, TimeUnit.MILLISECONDS)
+                                 .after(TimeDuration.millis(200))
+                                 .pass("test1", "test2")
+                                 .pass(Collections.singleton("test3"))
+                                 .close();
             }
         }.start();
 
         final OutputChannel<String> outputChannel1 =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(standaloneChannel1.output());
+                        .callAsync(transportChannel1.output());
         assertThat(outputChannel1.afterMax(timeout).readAll()).containsExactly("test1", "test2",
                                                                                "test3");
     }
@@ -268,7 +268,7 @@ public class StandaloneChannelTest {
 
         try {
 
-            new DefaultStandaloneChannelBuilder().setConfiguration(null);
+            new DefaultTransportChannelBuilder().setConfiguration(null);
 
             fail();
 
@@ -281,7 +281,7 @@ public class StandaloneChannelTest {
     public void testConfigurationWarnings() {
 
         final CountLog countLog = new CountLog();
-        JRoutine.standalone()
+        JRoutine.transport()
                 .withRoutine()
                 .withFactoryArgs()
                 .withSyncRunner(Runners.sequentialRunner())
@@ -301,10 +301,10 @@ public class StandaloneChannelTest {
     @Test
     public void testHasNextIteratorTimeout() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock();
@@ -325,10 +325,10 @@ public class StandaloneChannelTest {
     @Test
     public void testHasNextIteratorTimeout2() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
@@ -349,10 +349,10 @@ public class StandaloneChannelTest {
     @Test
     public void testNextIteratorTimeout() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock();
@@ -373,10 +373,10 @@ public class StandaloneChannelTest {
     @Test
     public void testNextIteratorTimeout2() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
@@ -397,10 +397,10 @@ public class StandaloneChannelTest {
     @Test
     public void testNextTimeout() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock();
@@ -421,10 +421,10 @@ public class StandaloneChannelTest {
     @Test
     public void testNextTimeout2() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final StandaloneOutput<String> output = standaloneChannel.output();
+        final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
@@ -446,51 +446,51 @@ public class StandaloneChannelTest {
     public void testOrderType() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<Object> channel = JRoutine.standalone()
-                                                          .withRoutine()
-                                                          .withOutputOrder(OrderType.PASS_ORDER)
-                                                          .withAsyncRunner(Runners.sharedRunner())
-                                                          .withOutputMaxSize(1)
-                                                          .withOutputTimeout(1,
-                                                                             TimeUnit.MILLISECONDS)
-                                                          .withOutputTimeout(seconds(1))
-                                                          .withLogLevel(LogLevel.DEBUG)
-                                                          .withLog(new NullLog())
-                                                          .set()
-                                                          .buildChannel();
+        final TransportChannel<Object> channel = JRoutine.transport()
+                                                         .withRoutine()
+                                                         .withOutputOrder(OrderType.PASS_ORDER)
+                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withOutputMaxSize(1)
+                                                         .withOutputTimeout(1,
+                                                                            TimeUnit.MILLISECONDS)
+                                                         .withOutputTimeout(seconds(1))
+                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLog(new NullLog())
+                                                         .set()
+                                                         .buildChannel();
         channel.input().pass(-77L);
         assertThat(channel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
 
-        final StandaloneChannel<Object> standaloneChannel1 = JRoutine.standalone().buildChannel();
-        final StandaloneInput<Object> input1 = standaloneChannel1.input();
+        final TransportChannel<Object> transportChannel1 = JRoutine.transport().buildChannel();
+        final TransportInput<Object> input1 = transportChannel1.input();
 
         input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(standaloneChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
+        assertThat(transportChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
-        final StandaloneChannel<Object> standaloneChannel2 = JRoutine.standalone()
-                                                                     .withRoutine()
-                                                                     .withOutputOrder(
-                                                                             OrderType.PASS_ORDER)
-                                                                     .set()
-                                                                     .buildChannel();
-        final StandaloneInput<Object> input2 = standaloneChannel2.input();
+        final TransportChannel<Object> transportChannel2 = JRoutine.transport()
+                                                                   .withRoutine()
+                                                                   .withOutputOrder(
+                                                                           OrderType.PASS_ORDER)
+                                                                   .set()
+                                                                   .buildChannel();
+        final TransportInput<Object> input2 = transportChannel2.input();
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(standaloneChannel2.output().afterMax(timeout).readAll()).containsExactly(23,
-                                                                                            -77L);
+        assertThat(transportChannel2.output().afterMax(timeout).readAll()).containsExactly(23,
+                                                                                           -77L);
     }
 
     @Test
     public void testPartialOut() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
 
         new Thread() {
 
             @Override
             public void run() {
 
-                standaloneChannel.input().pass("test");
+                transportChannel.input().pass("test");
             }
         }.start();
 
@@ -498,7 +498,7 @@ public class StandaloneChannelTest {
 
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(standaloneChannel.output())
+                        .callAsync(transportChannel.output())
                         .eventuallyExit();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).readAll()).containsExactly(
                 "test");
@@ -506,7 +506,7 @@ public class StandaloneChannelTest {
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         assertThat(outputChannel.immediately().checkComplete()).isFalse();
-        standaloneChannel.input().close();
+        transportChannel.input().close();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).checkComplete()).isTrue();
     }
 
@@ -514,26 +514,26 @@ public class StandaloneChannelTest {
     public void testReadFirst() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
 
-        new WeakThread(standaloneChannel).start();
+        new WeakThread(transportChannel).start();
 
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(standaloneChannel.output());
+                        .callAsync(transportChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
     }
 
     @Test
     public void testReadTimeout() {
 
-        final StandaloneChannel<Object> channel1 = JRoutine.standalone()
-                                                           .withRoutine()
-                                                           .withReadTimeout(millis(10))
-                                                           .withReadTimeoutAction(
-                                                                   TimeoutActionType.EXIT)
-                                                           .set()
-                                                           .buildChannel();
+        final TransportChannel<Object> channel1 = JRoutine.transport()
+                                                          .withRoutine()
+                                                          .withReadTimeout(millis(10))
+                                                          .withReadTimeoutAction(
+                                                                  TimeoutActionType.EXIT)
+                                                          .set()
+                                                          .buildChannel();
 
         assertThat(channel1.output().readAll()).isEmpty();
     }
@@ -541,13 +541,13 @@ public class StandaloneChannelTest {
     @Test
     public void testReadTimeout2() {
 
-        final StandaloneChannel<Object> channel2 = JRoutine.standalone()
-                                                           .withRoutine()
-                                                           .withReadTimeout(millis(10))
-                                                           .withReadTimeoutAction(
-                                                                   TimeoutActionType.ABORT)
-                                                           .set()
-                                                           .buildChannel();
+        final TransportChannel<Object> channel2 = JRoutine.transport()
+                                                          .withRoutine()
+                                                          .withReadTimeout(millis(10))
+                                                          .withReadTimeoutAction(
+                                                                  TimeoutActionType.ABORT)
+                                                          .set()
+                                                          .buildChannel();
 
         try {
 
@@ -563,13 +563,13 @@ public class StandaloneChannelTest {
     @Test
     public void testReadTimeout3() {
 
-        final StandaloneChannel<Object> channel3 = JRoutine.standalone()
-                                                           .withRoutine()
-                                                           .withReadTimeout(millis(10))
-                                                           .withReadTimeoutAction(
-                                                                   TimeoutActionType.DEADLOCK)
-                                                           .set()
-                                                           .buildChannel();
+        final TransportChannel<Object> channel3 = JRoutine.transport()
+                                                          .withRoutine()
+                                                          .withReadTimeout(millis(10))
+                                                          .withReadTimeoutAction(
+                                                                  TimeoutActionType.DEADLOCK)
+                                                          .set()
+                                                          .buildChannel();
 
         try {
 
@@ -627,11 +627,11 @@ public class StandaloneChannelTest {
 
     private static class WeakThread extends Thread {
 
-        private final WeakReference<StandaloneChannel<String>> mChannelRef;
+        private final WeakReference<TransportChannel<String>> mChannelRef;
 
-        public WeakThread(final StandaloneChannel<String> standaloneChannel) {
+        public WeakThread(final TransportChannel<String> transportChannel) {
 
-            mChannelRef = new WeakReference<StandaloneChannel<String>>(standaloneChannel);
+            mChannelRef = new WeakReference<TransportChannel<String>>(transportChannel);
         }
 
         @Override
@@ -645,11 +645,11 @@ public class StandaloneChannelTest {
 
             } finally {
 
-                final StandaloneChannel<String> standaloneChannel = mChannelRef.get();
+                final TransportChannel<String> transportChannel = mChannelRef.get();
 
-                if (standaloneChannel != null) {
+                if (transportChannel != null) {
 
-                    standaloneChannel.input().pass("test");
+                    transportChannel.input().pass("test");
                 }
             }
         }

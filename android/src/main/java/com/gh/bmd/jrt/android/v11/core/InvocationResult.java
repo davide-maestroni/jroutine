@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 
 import java.util.Collection;
 
@@ -51,6 +51,6 @@ interface InvocationResult<OUTPUT> {
      * @param oldChannels old channels already fed with previous results.
      * @return whether the invocation is complete.
      */
-    boolean passTo(@Nonnull final Collection<StandaloneInput<OUTPUT>> newChannels,
-            @Nonnull final Collection<StandaloneInput<OUTPUT>> oldChannels);
+    boolean passTo(@Nonnull final Collection<TransportInput<OUTPUT>> newChannels,
+            @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels);
 }

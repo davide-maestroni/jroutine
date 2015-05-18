@@ -16,43 +16,43 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
-import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
+import com.gh.bmd.jrt.builder.TransportChannelBuilder;
+import com.gh.bmd.jrt.channel.TransportChannel;
 
 import javax.annotation.Nonnull;
 
 /**
- * Class implementing a builder of standalone channel objects.
+ * Class implementing a builder of transport channel objects.
  * <p/>
  * Created by davide-maestroni on 10/25/14.
  */
-class DefaultStandaloneChannelBuilder
-        implements StandaloneChannelBuilder, Configurable<StandaloneChannelBuilder> {
+class DefaultTransportChannelBuilder
+        implements TransportChannelBuilder, Configurable<TransportChannelBuilder> {
 
     private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Avoid direct instantiation.
      */
-    DefaultStandaloneChannelBuilder() {
+    DefaultTransportChannelBuilder() {
 
     }
 
     @Nonnull
-    public <T> StandaloneChannel<T> buildChannel() {
+    public <T> TransportChannel<T> buildChannel() {
 
-        return new DefaultStandaloneChannel<T>(mConfiguration);
+        return new DefaultTransportChannel<T>(mConfiguration);
     }
 
     @Nonnull
-    public Builder<StandaloneChannelBuilder> withRoutine() {
+    public Builder<TransportChannelBuilder> withRoutine() {
 
-        return new Builder<StandaloneChannelBuilder>(this, mConfiguration);
+        return new Builder<TransportChannelBuilder>(this, mConfiguration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public StandaloneChannelBuilder setConfiguration(
+    public TransportChannelBuilder setConfiguration(
             @Nonnull final RoutineConfiguration configuration) {
 
         if (configuration == null) {

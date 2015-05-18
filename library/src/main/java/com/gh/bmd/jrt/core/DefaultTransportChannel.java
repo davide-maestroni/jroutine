@@ -17,7 +17,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
+import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
@@ -34,24 +34,24 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of a standalone channel.
+ * Default implementation of a transport channel.
  * <p/>
  * Created by davide-maestroni on 10/24/14.
  *
  * @param <DATA> the data type.
  */
-class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
+class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
 
-    private final DefaultStandaloneInput<DATA> mInputChannel;
+    private final DefaultTransportInput<DATA> mInputChannel;
 
-    private final DefaultStandaloneOutput<DATA> mOutputChannel;
+    private final DefaultTransportOutput<DATA> mOutputChannel;
 
     /**
      * Constructor.
      *
      * @param configuration the routine configuration.
      */
-    DefaultStandaloneChannel(@Nonnull final RoutineConfiguration configuration) {
+    DefaultTransportChannel(@Nonnull final RoutineConfiguration configuration) {
 
         final Logger logger = configuration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
@@ -60,9 +60,9 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
                                                configuration.getAsyncRunnerOr(
                                                        Runners.sharedRunner()), logger);
         abortHandler.setChannel(inputChannel);
-        mInputChannel = new DefaultStandaloneInput<DATA>(inputChannel);
-        mOutputChannel = new DefaultStandaloneOutput<DATA>(inputChannel.getOutput());
-        logger.dbg("building standalone channel with configuration: %s", configuration);
+        mInputChannel = new DefaultTransportInput<DATA>(inputChannel);
+        mOutputChannel = new DefaultTransportOutput<DATA>(inputChannel.getOutput());
+        logger.dbg("building transport channel with configuration: %s", configuration);
         warn(logger, configuration);
     }
 
@@ -137,13 +137,13 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
     }
 
     @Nonnull
-    public StandaloneInput<DATA> input() {
+    public TransportInput<DATA> input() {
 
         return mInputChannel;
     }
 
     @Nonnull
-    public StandaloneOutput<DATA> output() {
+    public TransportOutput<DATA> output() {
 
         return mOutputChannel;
     }
@@ -168,11 +168,11 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
     }
 
     /**
-     * Default implementation of a standalone channel input.
+     * Default implementation of a transport channel input.
      *
      * @param <INPUT> the input data type.
      */
-    private static class DefaultStandaloneInput<INPUT> implements StandaloneInput<INPUT> {
+    private static class DefaultTransportInput<INPUT> implements TransportInput<INPUT> {
 
         private final DefaultResultChannel<INPUT> mChannel;
 
@@ -181,7 +181,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
          *
          * @param wrapped the wrapped result channel.
          */
-        private DefaultStandaloneInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
+        private DefaultTransportInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
 
             mChannel = wrapped;
         }
@@ -192,49 +192,49 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        public StandaloneInput<INPUT> after(@Nonnull final TimeDuration delay) {
+        public TransportInput<INPUT> after(@Nonnull final TimeDuration delay) {
 
             mChannel.after(delay);
             return this;
         }
 
         @Nonnull
-        public StandaloneInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+        public TransportInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mChannel.after(delay, timeUnit);
             return this;
         }
 
         @Nonnull
-        public StandaloneInput<INPUT> now() {
+        public TransportInput<INPUT> now() {
 
             mChannel.now();
             return this;
         }
 
         @Nonnull
-        public StandaloneInput<INPUT> pass(@Nullable final OutputChannel<? extends INPUT> channel) {
+        public TransportInput<INPUT> pass(@Nullable final OutputChannel<? extends INPUT> channel) {
 
             mChannel.pass(channel);
             return this;
         }
 
         @Nonnull
-        public StandaloneInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
+        public TransportInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
             mChannel.pass(inputs);
             return this;
         }
 
         @Nonnull
-        public StandaloneInput<INPUT> pass(@Nullable final INPUT input) {
+        public TransportInput<INPUT> pass(@Nullable final INPUT input) {
 
             mChannel.pass(input);
             return this;
         }
 
         @Nonnull
-        public StandaloneInput<INPUT> pass(@Nullable final INPUT... inputs) {
+        public TransportInput<INPUT> pass(@Nullable final INPUT... inputs) {
 
             mChannel.pass(inputs);
             return this;
@@ -257,11 +257,11 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
     }
 
     /**
-     * Default implementation of a standalone channel output.
+     * Default implementation of a transport channel output.
      *
      * @param <OUTPUT> the output data type.
      */
-    private static class DefaultStandaloneOutput<OUTPUT> implements StandaloneOutput<OUTPUT> {
+    private static class DefaultTransportOutput<OUTPUT> implements TransportOutput<OUTPUT> {
 
         private final OutputChannel<OUTPUT> mChannel;
 
@@ -270,20 +270,20 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
          *
          * @param wrapped the wrapped output channel.
          */
-        private DefaultStandaloneOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
+        private DefaultTransportOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
 
             mChannel = wrapped;
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
+        public TransportOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
             mChannel.afterMax(timeout);
             return this;
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> afterMax(final long timeout,
+        public TransportOutput<OUTPUT> afterMax(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
             mChannel.afterMax(timeout, timeUnit);
@@ -291,7 +291,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> bind(
+        public TransportOutput<OUTPUT> bind(
                 @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
             mChannel.bind(consumer);
@@ -299,42 +299,42 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> eventually() {
+        public TransportOutput<OUTPUT> eventually() {
 
             mChannel.eventually();
             return this;
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> eventuallyAbort() {
+        public TransportOutput<OUTPUT> eventuallyAbort() {
 
             mChannel.eventuallyAbort();
             return this;
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> eventuallyDeadlock() {
+        public TransportOutput<OUTPUT> eventuallyDeadlock() {
 
             mChannel.eventuallyDeadlock();
             return this;
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> eventuallyExit() {
+        public TransportOutput<OUTPUT> eventuallyExit() {
 
             mChannel.eventuallyExit();
             return this;
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> immediately() {
+        public TransportOutput<OUTPUT> immediately() {
 
             mChannel.immediately();
             return this;
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> readAllInto(
+        public TransportOutput<OUTPUT> readAllInto(
                 @Nonnull final Collection<? super OUTPUT> result) {
 
             mChannel.readAllInto(result);
@@ -342,7 +342,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        public StandaloneOutput<OUTPUT> unbind(
+        public TransportOutput<OUTPUT> unbind(
                 @Nullable final OutputConsumer<? super OUTPUT> consumer) {
 
             mChannel.unbind(consumer);

@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
-import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
+import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
@@ -51,7 +51,7 @@ import javax.annotation.Nonnull;
  * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
  * or module in the project dependencies.
  * <p/>
- * This class provides also a way to build standalone channel instances, which can be used to pass
+ * This class provides also a way to build transport channel instances, which can be used to pass
  * data without the need to start a routine invocation.
  * <p/>
  * <b>Some usage examples</b>
@@ -60,7 +60,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final StandaloneChannel&lt;Result&gt; channel = JRoutine.standalone().buildChannel();
+ *         final TransportChannel&lt;Result&gt; channel = JRoutine.transport().buildChannel();
  *
  *         channel.input()
  *                .pass(doSomething1.callAsync())
@@ -117,7 +117,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final StandaloneChannel&lt;Result&gt; channel = JRoutine.standalone().buildChannel();
+ *         final TransportChannel&lt;Result&gt; channel = JRoutine.transport().buildChannel();
  *
  *         new Thread() {
  *
@@ -221,13 +221,13 @@ public class JRoutine {
     }
 
     /**
-     * Returns a standalone channel builder.
+     * Returns a transport channel builder.
      *
-     * @return the standalone channel builder instance.
+     * @return the transport channel builder instance.
      */
     @Nonnull
-    public static StandaloneChannelBuilder standalone() {
+    public static TransportChannelBuilder transport() {
 
-        return new DefaultStandaloneChannelBuilder();
+        return new DefaultTransportChannelBuilder();
     }
 }

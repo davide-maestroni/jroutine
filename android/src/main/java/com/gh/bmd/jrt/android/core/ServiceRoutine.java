@@ -34,9 +34,9 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
+import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
@@ -216,13 +216,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private final ServiceConfiguration mServiceConfiguration;
 
-        private final StandaloneInput<INPUT> mStandaloneParamInput;
+        private final TransportInput<INPUT> mTransportParamInput;
 
-        private final StandaloneOutput<INPUT> mStandaloneParamOutput;
+        private final TransportOutput<INPUT> mTransportParamOutput;
 
-        private final StandaloneInput<OUTPUT> mStandaloneResultInput;
+        private final TransportInput<OUTPUT> mTransportResultInput;
 
-        private final StandaloneOutput<OUTPUT> mStandaloneResultOutput;
+        private final TransportOutput<OUTPUT> mTransportResultOutput;
 
         private final String mUUID;
 
@@ -263,63 +263,62 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
             final OrderType inputOrderType = routineConfiguration.getInputOrderTypeOr(null);
-            final StandaloneChannel<INPUT> paramChannel = JRoutine.standalone()
-                                                                  .withRoutine()
-                                                                  .withOutputOrder(inputOrderType)
-                                                                  .withOutputMaxSize(
-                                                                          Integer.MAX_VALUE)
-                                                                  .withOutputTimeout(
-                                                                          TimeDuration.ZERO)
-                                                                  .withLog(log)
-                                                                  .withLogLevel(logLevel)
-                                                                  .set()
-                                                                  .buildChannel();
-            mStandaloneParamInput = paramChannel.input();
-            mStandaloneParamOutput = paramChannel.output();
+            final TransportChannel<INPUT> paramChannel = JRoutine.transport()
+                                                                 .withRoutine()
+                                                                 .withOutputOrder(inputOrderType)
+                                                                 .withOutputMaxSize(
+                                                                         Integer.MAX_VALUE)
+                                                                 .withOutputTimeout(
+                                                                         TimeDuration.ZERO)
+                                                                 .withLog(log)
+                                                                 .withLogLevel(logLevel)
+                                                                 .set()
+                                                                 .buildChannel();
+            mTransportParamInput = paramChannel.input();
+            mTransportParamOutput = paramChannel.output();
             final OrderType outputOrderType = routineConfiguration.getOutputOrderTypeOr(null);
             final TimeDuration readTimeout = routineConfiguration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
                     routineConfiguration.getReadTimeoutActionOr(null);
-            final StandaloneChannel<OUTPUT> resultChannel = JRoutine.standalone()
-                                                                    .withRoutine()
-                                                                    .withOutputOrder(
-                                                                            outputOrderType)
-                                                                    .withOutputMaxSize(
-                                                                            Integer.MAX_VALUE)
-                                                                    .withOutputTimeout(
-                                                                            TimeDuration.ZERO)
-                                                                    .withReadTimeout(readTimeout)
-                                                                    .withReadTimeoutAction(
-                                                                            timeoutActionType)
-                                                                    .withLog(log)
-                                                                    .withLogLevel(logLevel)
-                                                                    .set()
-                                                                    .buildChannel();
-            mStandaloneResultInput = resultChannel.input();
-            mStandaloneResultOutput = resultChannel.output();
+            final TransportChannel<OUTPUT> resultChannel = JRoutine.transport()
+                                                                   .withRoutine()
+                                                                   .withOutputOrder(outputOrderType)
+                                                                   .withOutputMaxSize(
+                                                                           Integer.MAX_VALUE)
+                                                                   .withOutputTimeout(
+                                                                           TimeDuration.ZERO)
+                                                                   .withReadTimeout(readTimeout)
+                                                                   .withReadTimeoutAction(
+                                                                           timeoutActionType)
+                                                                   .withLog(log)
+                                                                   .withLogLevel(logLevel)
+                                                                   .set()
+                                                                   .buildChannel();
+            mTransportResultInput = resultChannel.input();
+            mTransportResultOutput = resultChannel.output();
         }
 
         public boolean abort() {
 
             bindService();
-            return mStandaloneParamInput.abort();
+            return mTransportParamInput.abort();
         }
 
         public boolean abort(@Nullable final Throwable reason) {
 
             bindService();
-            return mStandaloneParamInput.abort(reason);
+            return mTransportParamInput.abort(reason);
         }
 
         public boolean isOpen() {
 
-            return mStandaloneParamInput.isOpen();
+            return mTransportParamInput.isOpen();
         }
 
         @Nonnull
         public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
-            mStandaloneParamInput.after(delay);
+            mTransportParamInput.after(delay);
             return this;
         }
 
@@ -327,14 +326,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
-            mStandaloneParamInput.after(delay, timeUnit);
+            mTransportParamInput.after(delay, timeUnit);
             return this;
         }
 
         @Nonnull
         public ParameterChannel<INPUT, OUTPUT> now() {
 
-            mStandaloneParamInput.now();
+            mTransportParamInput.now();
             return this;
         }
 
@@ -343,7 +342,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 @Nullable final OutputChannel<? extends INPUT> channel) {
 
             bindService();
-            mStandaloneParamInput.pass(channel);
+            mTransportParamInput.pass(channel);
             return this;
         }
 
@@ -352,7 +351,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
             bindService();
-            mStandaloneParamInput.pass(inputs);
+            mTransportParamInput.pass(inputs);
             return this;
         }
 
@@ -360,7 +359,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
-            mStandaloneParamInput.pass(input);
+            mTransportParamInput.pass(input);
             return this;
         }
 
@@ -368,7 +367,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
-            mStandaloneParamInput.pass(inputs);
+            mTransportParamInput.pass(inputs);
             return this;
         }
 
@@ -376,8 +375,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public OutputChannel<OUTPUT> result() {
 
             bindService();
-            mStandaloneParamInput.close();
-            return mStandaloneResultOutput;
+            mTransportParamInput.close();
+            return mTransportResultOutput;
         }
 
         private void bindService() {
@@ -508,16 +507,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                     switch (msg.what) {
 
                         case RoutineService.MSG_DATA:
-                            mStandaloneResultInput.pass((OUTPUT) getValue(msg));
+                            mTransportResultInput.pass((OUTPUT) getValue(msg));
                             break;
 
                         case RoutineService.MSG_COMPLETE:
-                            mStandaloneResultInput.close();
+                            mTransportResultInput.close();
                             unbindService();
                             break;
 
                         case RoutineService.MSG_ABORT:
-                            mStandaloneResultInput.abort(getAbortError(msg));
+                            mTransportResultInput.abort(getAbortError(msg));
                             unbindService();
                             break;
 
@@ -540,7 +539,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                         logger.err(ignored, "error while sending service abort message");
                     }
 
-                    mStandaloneResultInput.abort(t);
+                    mTransportResultInput.abort(t);
                     unbindService();
                 }
             }
@@ -579,12 +578,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
-                    mStandaloneParamOutput.bind(mConsumer);
+                    mTransportParamOutput.bind(mConsumer);
 
                 } catch (final RemoteException e) {
 
                     logger.err(e, "error while sending service invocation message");
-                    mStandaloneResultInput.abort(e);
+                    mTransportResultInput.abort(e);
                     unbindService();
                 }
             }
@@ -592,7 +591,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);
-                mStandaloneParamOutput.unbind(mConsumer);
+                mTransportParamOutput.unbind(mConsumer);
             }
         }
     }

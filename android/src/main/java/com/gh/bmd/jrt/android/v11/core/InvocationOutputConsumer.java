@@ -17,8 +17,8 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.RoutineException;
@@ -193,8 +193,8 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             }
         }
 
-        public boolean passTo(@Nonnull final Collection<StandaloneInput<OUTPUT>> newChannels,
-                @Nonnull final Collection<StandaloneInput<OUTPUT>> oldChannels) {
+        public boolean passTo(@Nonnull final Collection<TransportInput<OUTPUT>> newChannels,
+                @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels) {
 
             synchronized (mMutex) {
 
@@ -216,12 +216,12 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
                         logger.dbg("passing result: %s + %s", cachedResults, lastResults);
 
-                        for (final StandaloneInput<OUTPUT> newChannel : newChannels) {
+                        for (final TransportInput<OUTPUT> newChannel : newChannels) {
 
                             newChannel.pass(cachedResults).pass(lastResults);
                         }
 
-                        for (final StandaloneInput<OUTPUT> channel : oldChannels) {
+                        for (final TransportInput<OUTPUT> channel : oldChannels) {
 
                             channel.pass(lastResults);
                         }

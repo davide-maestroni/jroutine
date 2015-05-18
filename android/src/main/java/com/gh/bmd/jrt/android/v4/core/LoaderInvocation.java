@@ -35,8 +35,8 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
+import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
@@ -665,8 +665,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
-        private final ArrayList<StandaloneInput<OUTPUT>> mChannels =
-                new ArrayList<StandaloneInput<OUTPUT>>();
+        private final ArrayList<TransportInput<OUTPUT>> mChannels =
+                new ArrayList<TransportInput<OUTPUT>>();
 
         private final RoutineLoader<?, OUTPUT> mLoader;
 
@@ -674,8 +674,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
 
         private final Logger mLogger;
 
-        private final ArrayList<StandaloneInput<OUTPUT>> mNewChannels =
-                new ArrayList<StandaloneInput<OUTPUT>>();
+        private final ArrayList<TransportInput<OUTPUT>> mNewChannels =
+                new ArrayList<TransportInput<OUTPUT>>();
 
         private CacheStrategyType mCacheStrategyType;
 
@@ -709,15 +709,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final ArrayList<StandaloneInput<OUTPUT>> channels = mNewChannels;
-            final StandaloneChannel<OUTPUT> channel = JRoutine.standalone()
-                                                              .withRoutine()
-                                                              .withOutputMaxSize(Integer.MAX_VALUE)
-                                                              .withOutputTimeout(TimeDuration.ZERO)
-                                                              .withLog(logger.getLog())
-                                                              .withLogLevel(logger.getLogLevel())
-                                                              .set()
-                                                              .buildChannel();
+            final ArrayList<TransportInput<OUTPUT>> channels = mNewChannels;
+            final TransportChannel<OUTPUT> channel = JRoutine.transport()
+                                                             .withRoutine()
+                                                             .withOutputMaxSize(Integer.MAX_VALUE)
+                                                             .withOutputTimeout(TimeDuration.ZERO)
+                                                             .withLog(logger.getLog())
+                                                             .withLogLevel(logger.getLogLevel())
+                                                             .set()
+                                                             .buildChannel();
             channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
@@ -750,14 +750,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
                 final InvocationResult<OUTPUT> data) {
 
             final Logger logger = mLogger;
-            final ArrayList<StandaloneInput<OUTPUT>> channels = mChannels;
-            final ArrayList<StandaloneInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<TransportInput<OUTPUT>> channels = mChannels;
+            final ArrayList<TransportInput<OUTPUT>> newChannels = mNewChannels;
             logger.dbg("dispatching invocation result: %s", data);
 
             if (data.passTo(newChannels, channels)) {
 
-                final ArrayList<StandaloneInput<OUTPUT>> channelsToClose =
-                        new ArrayList<StandaloneInput<OUTPUT>>(channels);
+                final ArrayList<TransportInput<OUTPUT>> channelsToClose =
+                        new ArrayList<TransportInput<OUTPUT>>(channels);
                 channelsToClose.addAll(newChannels);
                 mResultCount += channels.size() + newChannels.size();
                 channels.clear();
@@ -784,14 +784,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
 
                     final Throwable exception = data.getAbortException();
 
-                    for (final StandaloneInput<OUTPUT> channel : channelsToClose) {
+                    for (final TransportInput<OUTPUT> channel : channelsToClose) {
 
                         channel.abort(exception);
                     }
 
                 } else {
 
-                    for (final StandaloneInput<OUTPUT> channel : channelsToClose) {
+                    for (final TransportInput<OUTPUT> channel : channelsToClose) {
 
                         channel.close();
                     }
@@ -813,8 +813,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         private void reset() {
 
             mLogger.dbg("aborting result channels");
-            final ArrayList<StandaloneInput<OUTPUT>> channels = mChannels;
-            final ArrayList<StandaloneInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<TransportInput<OUTPUT>> channels = mChannels;
+            final ArrayList<TransportInput<OUTPUT>> newChannels = mNewChannels;
             final InvocationClashException reason = new InvocationClashException(mLoader.getId());
 
             for (final InputChannel<OUTPUT> channel : channels) {

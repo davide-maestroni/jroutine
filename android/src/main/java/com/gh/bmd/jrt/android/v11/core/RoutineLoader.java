@@ -22,8 +22,8 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
+import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
@@ -277,9 +277,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      */
     private static class LoaderResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
-        private final StandaloneChannel<OUTPUT> mStandaloneChannel;
+        private final TransportChannel<OUTPUT> mTransportChannel;
 
-        private final StandaloneInput<OUTPUT> mStandaloneInput;
+        private final TransportInput<OUTPUT> mTransportInput;
 
         /**
          * Constructor.
@@ -289,91 +289,91 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
          */
         private LoaderResultChannel(@Nullable final OrderType order, @Nonnull final Logger logger) {
 
-            mStandaloneChannel = JRoutine.standalone()
-                                         .withRoutine()
-                                         .withOutputOrder(order)
-                                         .withOutputMaxSize(Integer.MAX_VALUE)
-                                         .withOutputTimeout(TimeDuration.ZERO)
-                                         .withLog(logger.getLog())
-                                         .withLogLevel(logger.getLogLevel())
-                                         .set()
-                                         .buildChannel();
-            mStandaloneInput = mStandaloneChannel.input();
+            mTransportChannel = JRoutine.transport()
+                                        .withRoutine()
+                                        .withOutputOrder(order)
+                                        .withOutputMaxSize(Integer.MAX_VALUE)
+                                        .withOutputTimeout(TimeDuration.ZERO)
+                                        .withLog(logger.getLog())
+                                        .withLogLevel(logger.getLogLevel())
+                                        .set()
+                                        .buildChannel();
+            mTransportInput = mTransportChannel.input();
         }
 
         public boolean abort() {
 
-            return mStandaloneInput.abort();
+            return mTransportInput.abort();
         }
 
         public boolean abort(@Nullable final Throwable reason) {
 
-            return mStandaloneInput.abort(reason);
+            return mTransportInput.abort(reason);
         }
 
         public boolean isOpen() {
 
-            return mStandaloneInput.isOpen();
+            return mTransportInput.isOpen();
         }
 
         @Nonnull
         public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
-            mStandaloneInput.after(delay);
+            mTransportInput.after(delay);
             return this;
         }
 
         @Nonnull
         public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
-            mStandaloneInput.after(delay, timeUnit);
+            mTransportInput.after(delay, timeUnit);
             return this;
         }
 
         @Nonnull
         public ResultChannel<OUTPUT> now() {
 
-            mStandaloneInput.now();
+            mTransportInput.now();
             return this;
         }
 
         @Nonnull
         public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
 
-            mStandaloneInput.pass(channel);
+            mTransportInput.pass(channel);
             return this;
         }
 
         @Nonnull
         public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
-            mStandaloneInput.pass(outputs);
+            mTransportInput.pass(outputs);
             return this;
         }
 
         @Nonnull
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
-            mStandaloneInput.pass(output);
+            mTransportInput.pass(output);
             return this;
         }
 
         @Nonnull
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
-            mStandaloneInput.pass(outputs);
+            mTransportInput.pass(outputs);
             return this;
         }
 
         private void close() {
 
-            mStandaloneInput.close();
+            mTransportInput.close();
         }
 
         @Nonnull
         private OutputChannel<OUTPUT> output() {
 
-            return mStandaloneChannel.output();
+            return mTransportChannel.output();
         }
     }
 }

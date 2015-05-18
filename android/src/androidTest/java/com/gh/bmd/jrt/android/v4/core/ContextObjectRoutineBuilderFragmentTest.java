@@ -31,7 +31,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
+import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
@@ -121,23 +121,23 @@ public class ContextObjectRoutineBuilderFragmentTest
                                         .withReadTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
-        final StandaloneChannel<Integer> channel3 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel3 = JRoutine.transport().buildChannel();
         channel3.input().pass(7).close();
         assertThat(sumAsync.compute(3, channel3.output())).isEqualTo(10);
 
-        final StandaloneChannel<Integer> channel4 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel4 = JRoutine.transport().buildChannel();
         channel4.input().pass(1, 2, 3, 4).close();
         assertThat(sumAsync.compute(channel4.output())).isEqualTo(10);
 
-        final StandaloneChannel<int[]> channel5 = JRoutine.standalone().buildChannel();
+        final TransportChannel<int[]> channel5 = JRoutine.transport().buildChannel();
         channel5.input().pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5.output())).isEqualTo(10);
 
-        final StandaloneChannel<Integer> channel6 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel6 = JRoutine.transport().buildChannel();
         channel6.input().pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList(channel6.output())).isEqualTo(10);
 
-        final StandaloneChannel<Integer> channel7 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel7 = JRoutine.transport().buildChannel();
         channel7.input().pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList1(channel7.output())).isEqualTo(10);
     }
@@ -358,7 +358,7 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         }
 
-        final StandaloneChannel<Integer> channel = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel = JRoutine.transport().buildChannel();
 
         try {
 
@@ -673,42 +673,42 @@ public class ContextObjectRoutineBuilderFragmentTest
                                 .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
-        final StandaloneChannel<Character> channel1 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel1 = JRoutine.transport().buildChannel();
         channel1.input().pass('a').close();
         assertThat(itf.add1(channel1.output())).isEqualTo((int) 'a');
-        final StandaloneChannel<Character> channel2 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel2 = JRoutine.transport().buildChannel();
         channel2.input().pass('d', 'e', 'f').close();
         assertThat(itf.add2(channel2.output())).isIn((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add3('c').readAll()).containsExactly((int) 'c');
-        final StandaloneChannel<Character> channel3 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel3 = JRoutine.transport().buildChannel();
         channel3.input().pass('a').close();
         assertThat(itf.add4(channel3.output()).readAll()).containsExactly((int) 'a');
-        final StandaloneChannel<Character> channel4 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel4 = JRoutine.transport().buildChannel();
         channel4.input().pass('d', 'e', 'f').close();
         assertThat(itf.add5(channel4.output()).readAll()).containsOnly((int) 'd', (int) 'e',
                                                                        (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-        final StandaloneChannel<char[]> channel5 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
         channel5.input().pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA01(channel5.output())).isEqualTo(new int[]{'a', 'z'});
-        final StandaloneChannel<Character> channel6 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel6 = JRoutine.transport().buildChannel();
         channel6.input().pass('d', 'e', 'f').close();
         assertThat(itf.addA02(channel6.output())).isEqualTo(new int[]{'d', 'e', 'f'});
-        final StandaloneChannel<char[]> channel7 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel7 = JRoutine.transport().buildChannel();
         channel7.input()
                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                 .close();
         assertThat(itf.addA03(channel7.output())).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                                        new int[]{'f', 'z'});
         assertThat(itf.addA04(new char[]{'c', 'z'}).readAll()).containsExactly(new int[]{'c', 'z'});
-        final StandaloneChannel<char[]> channel8 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel8 = JRoutine.transport().buildChannel();
         channel8.input().pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA05(channel8.output()).readAll()).containsExactly(new int[]{'a', 'z'});
-        final StandaloneChannel<Character> channel9 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel9 = JRoutine.transport().buildChannel();
         channel9.input().pass('d', 'e', 'f').close();
         assertThat(itf.addA06(channel9.output()).readAll()).containsExactly(
                 new int[]{'d', 'e', 'f'});
-        final StandaloneChannel<char[]> channel10 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel10 = JRoutine.transport().buildChannel();
         channel10.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
@@ -717,27 +717,27 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                           new int[]{'f', 'z'});
         assertThat(itf.addA08(new char[]{'c', 'z'}).readAll()).containsExactly((int) 'c',
                                                                                (int) 'z');
-        final StandaloneChannel<char[]> channel11 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel11 = JRoutine.transport().buildChannel();
         channel11.input().pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA09(channel11.output()).readAll()).containsExactly((int) 'a', (int) 'z');
-        final StandaloneChannel<Character> channel12 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel12 = JRoutine.transport().buildChannel();
         channel12.input().pass('d', 'e', 'f').close();
         assertThat(itf.addA10(channel12.output()).readAll()).containsExactly((int) 'd', (int) 'e',
                                                                              (int) 'f');
-        final StandaloneChannel<char[]> channel13 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel13 = JRoutine.transport().buildChannel();
         channel13.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
         assertThat(itf.addA11(channel13.output()).readAll()).containsOnly((int) 'd', (int) 'e',
                                                                           (int) 'f', (int) 'z');
         assertThat(itf.addA12(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
-        final StandaloneChannel<char[]> channel14 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel14 = JRoutine.transport().buildChannel();
         channel14.input().pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA13(channel14.output())).containsExactly(new int[]{'a', 'z'});
-        final StandaloneChannel<Character> channel15 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel15 = JRoutine.transport().buildChannel();
         channel15.input().pass('d', 'e', 'f').close();
         assertThat(itf.addA14(channel15.output())).containsExactly(new int[]{'d', 'e', 'f'});
-        final StandaloneChannel<char[]> channel16 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel16 = JRoutine.transport().buildChannel();
         channel16.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
@@ -745,13 +745,13 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                 new int[]{'e', 'z'},
                                                                 new int[]{'f', 'z'});
         assertThat(itf.addA16(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
-        final StandaloneChannel<char[]> channel17 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel17 = JRoutine.transport().buildChannel();
         channel17.input().pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA17(channel17.output())).containsExactly(new int[]{'a', 'z'});
-        final StandaloneChannel<Character> channel18 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel18 = JRoutine.transport().buildChannel();
         channel18.input().pass('d', 'e', 'f').close();
         assertThat(itf.addA18(channel18.output())).containsExactly(new int[]{'d', 'e', 'f'});
-        final StandaloneChannel<char[]> channel19 = JRoutine.standalone().buildChannel();
+        final TransportChannel<char[]> channel19 = JRoutine.transport().buildChannel();
         channel19.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
@@ -760,14 +760,14 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                 new int[]{'f', 'z'});
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final StandaloneChannel<List<Character>> channel20 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel20 = JRoutine.transport().buildChannel();
         channel20.input().pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL01(channel20.output())).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-        final StandaloneChannel<Character> channel21 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel21 = JRoutine.transport().buildChannel();
         channel21.input().pass('d', 'e', 'f').close();
         assertThat(itf.addL02(channel21.output())).isEqualTo(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final StandaloneChannel<List<Character>> channel22 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel22 = JRoutine.transport().buildChannel();
         channel22.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
@@ -776,15 +776,15 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                         Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL04(Arrays.asList('c', 'z')).readAll()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final StandaloneChannel<List<Character>> channel23 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel23 = JRoutine.transport().buildChannel();
         channel23.input().pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL05(channel23.output()).readAll()).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
-        final StandaloneChannel<Character> channel24 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel24 = JRoutine.transport().buildChannel();
         channel24.input().pass('d', 'e', 'f').close();
         assertThat(itf.addL06(channel24.output()).readAll()).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final StandaloneChannel<List<Character>> channel25 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel25 = JRoutine.transport().buildChannel();
         channel25.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
@@ -793,14 +793,14 @@ public class ContextObjectRoutineBuilderFragmentTest
                 Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL08(Arrays.asList('c', 'z')).readAll()).containsExactly((int) 'c',
                                                                                   (int) 'z');
-        final StandaloneChannel<List<Character>> channel26 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel26 = JRoutine.transport().buildChannel();
         channel26.input().pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL09(channel26.output()).readAll()).containsExactly((int) 'a', (int) 'z');
-        final StandaloneChannel<Character> channel27 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel27 = JRoutine.transport().buildChannel();
         channel27.input().pass('d', 'e', 'f').close();
         assertThat(itf.addL10(channel27.output()).readAll()).containsExactly((int) 'd', (int) 'e',
                                                                              (int) 'f');
-        final StandaloneChannel<List<Character>> channel28 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel28 = JRoutine.transport().buildChannel();
         channel28.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
@@ -808,15 +808,15 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                           (int) 'f', (int) 'z');
         assertThat(itf.addL12(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final StandaloneChannel<List<Character>> channel29 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel29 = JRoutine.transport().buildChannel();
         channel29.input().pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL13(channel29.output())).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
-        final StandaloneChannel<Character> channel30 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel30 = JRoutine.transport().buildChannel();
         channel30.input().pass('d', 'e', 'f').close();
         assertThat(itf.addL14(channel30.output())).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final StandaloneChannel<List<Character>> channel31 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel31 = JRoutine.transport().buildChannel();
         channel31.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
@@ -826,15 +826,15 @@ public class ContextObjectRoutineBuilderFragmentTest
                                                                               (int) 'z'));
         assertThat(itf.addL16(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final StandaloneChannel<List<Character>> channel32 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel32 = JRoutine.transport().buildChannel();
         channel32.input().pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL17(channel32.output())).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
-        final StandaloneChannel<Character> channel33 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Character> channel33 = JRoutine.transport().buildChannel();
         channel33.input().pass('d', 'e', 'f').close();
         assertThat(itf.addL18(channel33.output())).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final StandaloneChannel<List<Character>> channel34 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Character>> channel34 = JRoutine.transport().buildChannel();
         channel34.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
@@ -853,30 +853,30 @@ public class ContextObjectRoutineBuilderFragmentTest
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
-        final StandaloneChannel<Integer> channel35 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
         channel35.input().pass(-17).close();
         itf.set1(channel35.output());
-        final StandaloneChannel<Integer> channel36 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel36 = JRoutine.transport().buildChannel();
         channel36.input().pass(-17).close();
         itf.set2(channel36.output());
         itf.setA0(new int[]{1, 2, 3});
-        final StandaloneChannel<int[]> channel37 = JRoutine.standalone().buildChannel();
+        final TransportChannel<int[]> channel37 = JRoutine.transport().buildChannel();
         channel37.input().pass(new int[]{1, 2, 3}).close();
         itf.setA1(channel37.output());
-        final StandaloneChannel<Integer> channel38 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel38 = JRoutine.transport().buildChannel();
         channel38.input().pass(1, 2, 3).close();
         itf.setA2(channel38.output());
-        final StandaloneChannel<int[]> channel39 = JRoutine.standalone().buildChannel();
+        final TransportChannel<int[]> channel39 = JRoutine.transport().buildChannel();
         channel39.input().pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39.output());
         itf.setL0(Arrays.asList(1, 2, 3));
-        final StandaloneChannel<List<Integer>> channel40 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Integer>> channel40 = JRoutine.transport().buildChannel();
         channel40.input().pass(Arrays.asList(1, 2, 3)).close();
         itf.setL1(channel40.output());
-        final StandaloneChannel<Integer> channel41 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel41 = JRoutine.transport().buildChannel();
         channel41.input().pass(1, 2, 3).close();
         itf.setL2(channel41.output());
-        final StandaloneChannel<List<Integer>> channel42 = JRoutine.standalone().buildChannel();
+        final TransportChannel<List<Integer>> channel42 = JRoutine.transport().buildChannel();
         channel42.input().pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42.output());
     }
@@ -911,11 +911,11 @@ public class ContextObjectRoutineBuilderFragmentTest
                               .readAll()).isEmpty();
         assertThat(squareAsync.computeParallel3(null).afterMax(timeout).readAll()).isEmpty();
 
-        final StandaloneChannel<Integer> channel1 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel1 = JRoutine.transport().buildChannel();
         channel1.input().pass(4).close();
         assertThat(squareAsync.computeAsync(channel1.output())).isEqualTo(16);
 
-        final StandaloneChannel<Integer> channel2 = JRoutine.standalone().buildChannel();
+        final TransportChannel<Integer> channel2 = JRoutine.transport().buildChannel();
         channel2.input().pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel4(channel2.output())
                               .afterMax(timeout)

@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 
@@ -57,9 +57,8 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels cannot be empty");
         }
 
-        final StandaloneChannel<Selectable<OUTPUT>> standalone =
-                JRoutine.standalone().buildChannel();
-        final StandaloneInput<Selectable<OUTPUT>> input = standalone.input();
+        final TransportChannel<Selectable<OUTPUT>> transport = JRoutine.transport().buildChannel();
+        final TransportInput<Selectable<OUTPUT>> input = transport.input();
         int i = 0;
 
         for (final OutputChannel<? extends OUTPUT> channel : channels) {
@@ -68,7 +67,7 @@ public class Channels {
         }
 
         input.close();
-        return standalone.output();
+        return transport.output();
     }
 
     /**

@@ -141,11 +141,11 @@ public class Downloader {
 
             // remove it from the downloaded set
             mDownloadedSet.remove(uri);
-            // in order to be able to abort the download at any time we need to split the processing
-            // between the routine responsible for reading the data from the socket and the one
-            // writing the next chunk of bytes to the local file
-            // in such way we can abort the download by aborting the writing between two chunks are
-            // passed to the specific routine
+            // in order to be able to abort the download at any time, we need to split the
+            // processing between the routine responsible for reading the data from the socket, and
+            // the one writing the next chunk of bytes to the local file
+            // in such way we can abort the download between two chunks are passed to the specific
+            // routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
                     JRoutine.on(Invocations.factoryOf(WriteFile.class))
@@ -211,6 +211,8 @@ public class Downloader {
                         mDownloadedSet.add(uri);
                         return true;
                     }
+
+                    return false;
                 }
 
             } catch (final InvocationException ignored) {

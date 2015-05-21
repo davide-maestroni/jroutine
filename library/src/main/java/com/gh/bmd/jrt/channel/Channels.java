@@ -39,6 +39,31 @@ public class Channels {
     }
 
     /**
+     * Returns a new channel making the specified one selectable.<br/>
+     * Each output will be passed along unchanged.
+     * <p/>
+     * Note that the channel will be bound as a result of the call.
+     *
+     * @param index    the channel index.
+     * @param channel  the channel to make selectable.
+     * @param <OUTPUT> the output data type.
+     * @return the selectable output channel.
+     */
+    @Nonnull
+    public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> asSelectable(final int index,
+            @Nullable final OutputChannel<? extends OUTPUT> channel) {
+
+        return JRoutine.on(new FilterInvocation<OUTPUT, Selectable<OUTPUT>>() {
+
+            public void onInput(final OUTPUT output,
+                    @Nonnull final ResultChannel<Selectable<OUTPUT>> result) {
+
+                result.pass(new Selectable<OUTPUT>(output, channel, index));
+            }
+        }).callSync(channel);
+    }
+
+    /**
      * Merges the specified channels into a selectable one.
      * <p/>
      * Note that the channels will be bound as a result of the call.
@@ -49,7 +74,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> select(
+    public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> selectFrom(
             @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
 
         if (channels.isEmpty()) {
@@ -63,36 +88,11 @@ public class Channels {
 
         for (final OutputChannel<? extends OUTPUT> channel : channels) {
 
-            input.pass(selectable(i++, channel));
+            input.pass(asSelectable(i++, channel));
         }
 
         input.close();
         return transport.output();
-    }
-
-    /**
-     * Returns a new channel making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
-     *
-     * @param index    the channel index.
-     * @param channel  the channel to make selectable.
-     * @param <OUTPUT> the output data type.
-     * @return the selectable output channel.
-     */
-    @Nonnull
-    public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> selectable(final int index,
-            @Nullable final OutputChannel<? extends OUTPUT> channel) {
-
-        return JRoutine.on(new FilterInvocation<OUTPUT, Selectable<OUTPUT>>() {
-
-            public void onInput(final OUTPUT output,
-                    @Nonnull final ResultChannel<Selectable<OUTPUT>> result) {
-
-                result.pass(new Selectable<OUTPUT>(output, channel, index));
-            }
-        }).callSync(channel);
     }
 
     /**

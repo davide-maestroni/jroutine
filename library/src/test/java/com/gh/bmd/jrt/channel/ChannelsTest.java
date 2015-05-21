@@ -50,7 +50,7 @@ public class ChannelsTest {
 
         final Routine<Selectable<String>, String> routine =
                 JRoutine.on(new ClassToken<Amb<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(Channels.select(
+        final OutputChannel<String> outputChannel = routine.callAsync(Channels.selectFrom(
                 Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
                               channel4.output())));
 

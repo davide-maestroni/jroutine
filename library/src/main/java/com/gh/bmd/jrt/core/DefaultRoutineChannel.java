@@ -18,7 +18,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
@@ -50,7 +50,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, OUTPUT> {
+class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
@@ -95,7 +95,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      * @param logger        the logger instance.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
-    DefaultParameterChannel(@Nonnull final RoutineConfiguration configuration,
+    DefaultRoutineChannel(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final InvocationManager<INPUT, OUTPUT> manager, @Nonnull final Runner runner,
             @Nonnull final Logger logger) {
 
@@ -219,7 +219,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
+    public RoutineChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
         synchronized (mMutex) {
 
@@ -238,20 +238,19 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> after(final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public RoutineChannel<INPUT, OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> now() {
+    public RoutineChannel<INPUT, OUTPUT> now() {
 
         return after(ZERO);
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> pass(
+    public RoutineChannel<INPUT, OUTPUT> pass(
             @Nullable final OutputChannel<? extends INPUT> channel) {
 
         final TimeDuration delay;
@@ -274,12 +273,12 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             consumer = new DefaultOutputConsumer(delay);
         }
 
-        channel.bind(consumer);
+        channel.passTo(consumer);
         return this;
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
+    public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
         NestedQueue<INPUT> inputQueue;
         ArrayList<INPUT> list = null;
@@ -356,7 +355,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
+    public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
         NestedQueue<INPUT> inputQueue;
         boolean needsExecution = false;
@@ -412,7 +411,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
+    public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
         synchronized (mMutex) {
 

@@ -21,19 +21,20 @@ import com.gh.bmd.jrt.builder.OutputDeadlockException;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
-import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
+import com.gh.bmd.jrt.core.DefaultRoutineChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -93,7 +94,7 @@ public class RoutineTest {
                         .set()
                         .buildRoutine();
 
-        final ParameterChannel<String, String> inputChannel = routine.invokeAsync().pass("test1");
+        final RoutineChannel<String, String> inputChannel = routine.invokeAsync().pass("test1");
         final OutputChannel<String> outputChannel = inputChannel.result();
 
         assertThat(inputChannel.isOpen()).isFalse();
@@ -101,7 +102,7 @@ public class RoutineTest {
         assertThat(inputChannel.isOpen()).isFalse();
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test1");
 
-        final ParameterChannel<String, String> inputChannel1 = routine.invokeAsync().pass("test1");
+        final RoutineChannel<String, String> inputChannel1 = routine.invokeAsync().pass("test1");
         final OutputChannel<String> outputChannel1 = inputChannel1.result();
 
         assertThat(inputChannel1.isOpen()).isFalse();
@@ -297,7 +298,7 @@ public class RoutineTest {
                                                         .set()
                                                         .buildRoutine();
 
-        final ParameterChannel<String, String> channel = routine.invokeAsync();
+        final RoutineChannel<String, String> channel = routine.invokeAsync();
         final IllegalArgumentException exception = new IllegalArgumentException();
         channel.after(millis(100)).abort(exception);
 
@@ -305,7 +306,7 @@ public class RoutineTest {
 
         assertThat(abortReason.get()).isEqualTo(exception);
 
-        final ParameterChannel<String, String> channel1 = routine.invokeAsync();
+        final RoutineChannel<String, String> channel1 = routine.invokeAsync();
         final IllegalAccessError exception1 = new IllegalAccessError();
         channel1.now().abort(exception1);
 
@@ -324,27 +325,15 @@ public class RoutineTest {
                                                        .pass("test1")
                                                        .result();
 
-        channel1.bind(consumer);
+        channel1.passTo(consumer);
         assertThat(channel1.isBound()).isTrue();
-        assertThat(consumer.isOutput()).isFalse();
-
-        channel1.unbind(null);
-        assertThat(channel1.isBound()).isTrue();
-        assertThat(consumer.isOutput()).isFalse();
-
-        channel1.unbind(new TestOutputConsumer());
-        assertThat(channel1.isBound()).isTrue();
-        assertThat(consumer.isOutput()).isFalse();
-
-        channel1.unbind(consumer);
-        assertThat(channel1.isBound()).isFalse();
         assertThat(consumer.isOutput()).isFalse();
 
         final OutputChannel<Object> channel2 =
                 JRoutine.on(PassingInvocation.factoryOf()).invokeSync().pass("test2").result();
 
-        channel2.bind(consumer);
-        assertThat(channel1.isBound()).isFalse();
+        channel2.passTo(consumer);
+        assertThat(channel1.isBound()).isTrue();
         assertThat(channel2.isBound()).isTrue();
         assertThat(consumer.isOutput()).isTrue();
         assertThat(consumer.getOutput()).isEqualTo("test2");
@@ -556,7 +545,7 @@ public class RoutineTest {
         final TemplateInvocation<Integer, Integer> invokeSquareSum =
                 new TemplateInvocation<Integer, Integer>() {
 
-                    private ParameterChannel<Integer, Integer> mChannel;
+                    private RoutineChannel<Integer, Integer> mChannel;
 
                     @Override
                     public void onAbort(final Throwable reason) {
@@ -574,7 +563,7 @@ public class RoutineTest {
                     public void onInput(final Integer integer,
                             @Nonnull final ResultChannel<Integer> result) {
 
-                        mChannel.pass(squareRoutine.callAsync(integer));
+                        squareRoutine.callAsync(integer).passTo(mChannel);
                     }
 
                     @Override
@@ -620,7 +609,7 @@ public class RoutineTest {
 
         long startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel =
+        final RoutineChannel<String, String> channel =
                 JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
                         .withRoutine()
                         .withFactoryArgs(millis(10))
@@ -639,7 +628,7 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel1 =
+        final RoutineChannel<String, String> channel1 =
                 JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
                         .withRoutine()
                         .withFactoryArgs(millis(10))
@@ -660,7 +649,7 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel2 =
+        final RoutineChannel<String, String> channel2 =
                 JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
                         .withRoutine()
                         .withFactoryArgs(millis(10), 2)
@@ -683,7 +672,7 @@ public class RoutineTest {
                                                             .withInputOrder(OrderType.PASS_ORDER)
                                                             .withOutputOrder(OrderType.PASS_ORDER)
                                                             .set();
-        final ParameterChannel<String, String> channel3 =
+        final RoutineChannel<String, String> channel3 =
                 JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
                         .withRoutine()
                         .with(configuration)
@@ -700,7 +689,7 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel4 =
+        final RoutineChannel<String, String> channel4 =
                 JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
                         .withRoutine()
                         .withFactoryArgs(TimeDuration.ZERO, 2)
@@ -721,7 +710,7 @@ public class RoutineTest {
 
         final RoutineConfiguration configuration1 =
                 configuration.builderFrom().withFactoryArgs(TimeDuration.ZERO, 2).set();
-        final ParameterChannel<String, String> channel5 =
+        final RoutineChannel<String, String> channel5 =
                 JRoutine.on(ClassToken.tokenOf(DelayedListInvocation.class))
                         .withRoutine()
                         .with(configuration1)
@@ -738,7 +727,7 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel6 =
+        final RoutineChannel<String, String> channel6 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
                         .withRoutine()
                         .withFactoryArgs(millis(10))
@@ -757,7 +746,7 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel7 =
+        final RoutineChannel<String, String> channel7 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
                         .withRoutine()
                         .with(configuration.builderFrom().withFactoryArgs(millis(10)).set())
@@ -774,7 +763,7 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel8 =
+        final RoutineChannel<String, String> channel8 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
                         .withRoutine()
                         .withFactoryArgs(TimeDuration.ZERO)
@@ -793,7 +782,7 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final ParameterChannel<String, String> channel9 =
+        final RoutineChannel<String, String> channel9 =
                 JRoutine.on(ClassToken.tokenOf(DelayedChannelInvocation.class))
                         .withRoutine()
                         .with(configuration.builderFrom().withFactoryArgs(TimeDuration.ZERO).set())
@@ -816,12 +805,12 @@ public class RoutineTest {
         final Routine<String, String> passingRoutine =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
 
-        final ParameterChannel<String, String> channel1 = passingRoutine.invokeAsync();
+        final RoutineChannel<String, String> channel1 = passingRoutine.invokeAsync();
         channel1.after(seconds(2)).abort();
         assertThat(channel1.now().pass("test").result().afterMax(timeout).readNext()).isEqualTo(
                 "test");
 
-        final ParameterChannel<String, String> channel2 = passingRoutine.invokeAsync();
+        final RoutineChannel<String, String> channel2 = passingRoutine.invokeAsync();
         channel2.after(millis(100)).abort();
 
         try {
@@ -890,7 +879,7 @@ public class RoutineTest {
         assertThat(routine2.callAsync("test1").afterMax(timeout).readAll()).containsExactly(
                 "test1");
 
-        final ParameterChannel<Object, Object> channel =
+        final RoutineChannel<Object, Object> channel =
                 routine2.invokeAsync().after(timeout).pass("test2");
         channel.now().abort(new IllegalArgumentException());
 
@@ -1571,8 +1560,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
-                                                        null, Runners.sharedRunner(), logger);
+            new DefaultRoutineChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
+                                                      null, Runners.sharedRunner(), logger);
 
             fail();
 
@@ -1582,8 +1571,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
-                                                        new TestInvocationManager(), null, logger);
+            new DefaultRoutineChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
+                                                      new TestInvocationManager(), null, logger);
 
             fail();
 
@@ -1593,9 +1582,9 @@ public class RoutineTest {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
-                                                        new TestInvocationManager(),
-                                                        Runners.sharedRunner(), null);
+            new DefaultRoutineChannel<Object, Object>(RoutineConfiguration.DEFAULT_CONFIGURATION,
+                                                      new TestInvocationManager(),
+                                                      Runners.sharedRunner(), null);
 
             fail();
 
@@ -1605,8 +1594,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(null, new TestInvocationManager(),
-                                                        Runners.sharedRunner(), logger);
+            new DefaultRoutineChannel<Object, Object>(null, new TestInvocationManager(),
+                                                      Runners.sharedRunner(), logger);
 
             fail();
 
@@ -1616,8 +1605,8 @@ public class RoutineTest {
 
         try {
 
-            final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(
+            final DefaultRoutineChannel<Object, Object> channel =
+                    new DefaultRoutineChannel<Object, Object>(
                             RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
@@ -1632,8 +1621,8 @@ public class RoutineTest {
 
         try {
 
-            final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(
+            final DefaultRoutineChannel<Object, Object> channel =
+                    new DefaultRoutineChannel<Object, Object>(
                             RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
@@ -1647,8 +1636,8 @@ public class RoutineTest {
 
         try {
 
-            final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(
+            final DefaultRoutineChannel<Object, Object> channel =
+                    new DefaultRoutineChannel<Object, Object>(
                             RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
@@ -1662,8 +1651,8 @@ public class RoutineTest {
 
         try {
 
-            final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(
+            final DefaultRoutineChannel<Object, Object> channel =
+                    new DefaultRoutineChannel<Object, Object>(
                             RoutineConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
                             Runners.sharedRunner(), logger);
 
@@ -1817,7 +1806,17 @@ public class RoutineTest {
 
         try {
 
-            channel.bind(null);
+            channel.passTo((InputChannel) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            channel.passTo((OutputConsumer<String>) null);
 
             fail();
 
@@ -1839,7 +1838,7 @@ public class RoutineTest {
 
         try {
 
-            channel.bind(consumer).bind(consumer);
+            channel.passTo(consumer).passTo(consumer);
 
             fail();
 
@@ -2690,30 +2689,34 @@ public class RoutineTest {
                         .set()
                         .buildRoutine();
 
-        assertThat(
-                routine.callSync(input).bind(consumer).afterMax(timeout).checkComplete()).isTrue();
-        assertThat(
-                routine.callAsync(input).bind(consumer).afterMax(timeout).checkComplete()).isTrue();
+        assertThat(routine.callSync(input)
+                          .passTo(consumer)
+                          .afterMax(timeout)
+                          .checkComplete()).isTrue();
+        assertThat(routine.callAsync(input)
+                          .passTo(consumer)
+                          .afterMax(timeout)
+                          .checkComplete()).isTrue();
         assertThat(routine.callParallel(input)
-                          .bind(consumer)
+                          .passTo(consumer)
                           .afterMax(timeout)
                           .checkComplete()).isTrue();
         assertThat(routine.invokeSync()
                           .pass(input)
                           .result()
-                          .bind(consumer)
+                          .passTo(consumer)
                           .afterMax(timeout)
                           .checkComplete()).isTrue();
         assertThat(routine.invokeAsync()
                           .pass(input)
                           .result()
-                          .bind(consumer)
+                          .passTo(consumer)
                           .afterMax(timeout)
                           .checkComplete()).isTrue();
         assertThat(routine.invokeParallel()
                           .pass(input)
                           .result()
-                          .bind(consumer)
+                          .passTo(consumer)
                           .afterMax(timeout)
                           .checkComplete()).isTrue();
     }

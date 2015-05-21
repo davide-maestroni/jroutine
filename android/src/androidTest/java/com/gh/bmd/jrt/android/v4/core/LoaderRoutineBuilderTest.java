@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.android.v4.core;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -26,6 +27,7 @@ import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.android.invocation.DelegatingContextInvocation;
 import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
@@ -36,13 +38,14 @@ import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
+import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -198,14 +201,17 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withLoader()
-                        .withId(0)
-                        .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                        .set()
-                        .callAsync(data1)
-                        .afterMax(timeout);
+        final OutputChannel<Data> result1 = JRoutine.onActivity(getActivity(),
+                                                                ContextInvocations.contextFactoryOf(
+                                                                        ClassToken.tokenOf(
+                                                                                Abort.class)))
+                                                    .withLoader()
+                                                    .withId(0)
+                                                    .withCacheStrategy(
+                                                            CacheStrategyType.CACHE_IF_SUCCESS)
+                                                    .set()
+                                                    .callAsync(data1)
+                                                    .afterMax(timeout);
 
         try {
 
@@ -261,7 +267,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
         InvocationException error = null;
         final OutputChannel<Data> result2 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
@@ -282,13 +288,15 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
         result2.checkComplete();
 
-        final OutputChannel<Data> result3 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .withLoader()
-                        .withId(0)
-                        .set()
-                        .callAsync(data1)
-                        .afterMax(timeout);
+        final OutputChannel<Data> result3 = JRoutine.onActivity(getActivity(),
+                                                                ContextInvocations.contextFactoryOf(
+                                                                        ClassToken.tokenOf(
+                                                                                Abort.class)))
+                                                    .withLoader()
+                                                    .withId(0)
+                                                    .set()
+                                                    .callAsync(data1)
+                                                    .afterMax(timeout);
 
         try {
 
@@ -318,7 +326,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         assertThat(routine2.callAsync("test1").afterMax(timeout).readAll()).containsExactly(
                 "test1");
 
-        final ParameterChannel<Object, Object> channel =
+        final RoutineChannel<Object, Object> channel =
                 routine2.invokeAsync().after(timeout).pass("test2");
         channel.now().abort(new IllegalArgumentException());
 
@@ -531,7 +539,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
         InvocationException error = null;
         final OutputChannel<Data> result3 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE)
@@ -553,7 +561,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         result3.checkComplete();
 
         final OutputChannel<Data> result4 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
                         .withLoader()
                         .withId(0)
                         .set()
@@ -640,6 +648,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         assertThat(result2.readNext()).isSameAs(data1);
     }
 
+    public void testActivitySyncInvocation() {
+
+        assertThat(JRoutine.on(ContextInvocations.invocationFactoryOf(
+                new ClassToken<GetContextInvocation<String>>() {}, getActivity()))
+                           .callSync()).isSameAs(getActivity().getApplicationContext());
+    }
+
     public void testChannelBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
@@ -682,7 +697,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
                         .withLoader()
                         .withId(0)
                         .set()
@@ -858,7 +873,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         assertThat(routine2.callAsync("test1").afterMax(timeout).readAll()).containsExactly(
                 "test1");
 
-        final ParameterChannel<Object, Object> channel =
+        final RoutineChannel<Object, Object> channel =
                 routine2.invokeAsync().after(timeout).pass("test2");
         channel.now().abort(new IllegalArgumentException());
 
@@ -1333,7 +1348,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static class Abort extends TemplateContextInvocation<Data, Data> {
+    private static class Abort extends TemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -1412,6 +1427,16 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
         private ErrorInvocation(final int ignored) {
 
+        }
+    }
+
+    private static class GetContextInvocation<DATA>
+            extends TemplateContextInvocation<DATA, Context> {
+
+        @Override
+        public void onResult(@Nonnull final ResultChannel<Context> result) {
+
+            result.pass(getContext());
         }
     }
 

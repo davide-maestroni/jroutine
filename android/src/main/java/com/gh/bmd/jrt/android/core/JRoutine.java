@@ -57,7 +57,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *                     JRoutine.onService(this, ClassToken.tokenOf(LoadResourceUri.class))
  *                             .buildRoutine();
  *             routine.callAsync(RESOURCE_URI)
- *                    .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
+ *                    .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
  *
  *                        &#64;Override
  *                        public void onError(&#64;Nullable final Throwable error) {

@@ -17,6 +17,7 @@ import com.gh.bmd.jrt.builder.OutputDeadlockException;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
@@ -228,7 +229,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             consumer = new DefaultOutputConsumer(delay);
         }
 
-        channel.bind(consumer);
+        channel.passTo(consumer);
         return this;
     }
 
@@ -1007,8 +1008,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
+        public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
+                @Nonnull final INPUT channel) {
+
+            channel.pass(this);
+            return channel;
+        }
+
+        @Nonnull
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<? super OUTPUT> consumer) {
+        public OutputChannel<OUTPUT> passTo(
+                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
             final boolean forceClose;
             final ChannelState state;
@@ -1254,22 +1264,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 throw e;
             }
-        }
-
-        @Nonnull
-        public OutputChannel<OUTPUT> unbind(
-                @Nullable final OutputConsumer<? super OUTPUT> consumer) {
-
-            synchronized (mMutex) {
-
-                if (mOutputConsumer == consumer) {
-
-                    mOutputConsumer = null;
-                    mConsumerMutex = null;
-                }
-            }
-
-            return this;
         }
 
         @Nonnull

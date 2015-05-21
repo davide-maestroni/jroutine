@@ -26,22 +26,20 @@ import android.os.RemoteException;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.ParameterChannel;
-import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.common.RoutineException;
-import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -49,7 +47,6 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.time.TimeDuration;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -108,10 +105,10 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mRoutineConfiguration = routineConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = routineConfiguration.newLogger(this);
-        mRoutine = JRoutine.on(new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {})
+        mRoutine = JRoutine.on(ContextInvocations.invocationFactoryOf(invocationClass, mContext))
                            .withRoutine()
                            .with(routineConfiguration)
-                           .withFactoryArgs(mContext, invocationClass, invocationArgs)
+                           .withFactoryArgs(invocationArgs)
                            .withInputMaxSize(Integer.MAX_VALUE)
                            .withInputTimeout(TimeDuration.ZERO)
                            .withOutputMaxSize(Integer.MAX_VALUE)
@@ -163,7 +160,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+    public RoutineChannel<INPUT, OUTPUT> invokeAsync() {
 
         return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationClass,
                                                  mRoutineConfiguration, mServiceConfiguration,
@@ -171,7 +168,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+    public RoutineChannel<INPUT, OUTPUT> invokeParallel() {
 
         return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationClass,
                                                  mRoutineConfiguration, mServiceConfiguration,
@@ -179,7 +176,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+    public RoutineChannel<INPUT, OUTPUT> invokeSync() {
 
         return mRoutine.invokeSync();
     }
@@ -196,7 +193,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class ServiceChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, OUTPUT> {
+    private static class ServiceChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
 
         private final Context mContext;
 
@@ -316,14 +313,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
+        public RoutineChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mTransportParamInput.after(delay);
             return this;
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> after(final long delay,
+        public RoutineChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
             mTransportParamInput.after(delay, timeUnit);
@@ -331,14 +328,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> now() {
+        public RoutineChannel<INPUT, OUTPUT> now() {
 
             mTransportParamInput.now();
             return this;
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(
+        public RoutineChannel<INPUT, OUTPUT> pass(
                 @Nullable final OutputChannel<? extends INPUT> channel) {
 
             bindService();
@@ -347,7 +344,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(
+        public RoutineChannel<INPUT, OUTPUT> pass(
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
             bindService();
@@ -356,7 +353,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
+        public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
             mTransportParamInput.pass(input);
@@ -364,7 +361,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
+        public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
             mTransportParamInput.pass(inputs);
@@ -578,7 +575,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
-                    mTransportParamOutput.bind(mConsumer);
+                    mTransportParamOutput.passTo(mConsumer);
 
                 } catch (final RemoteException e) {
 
@@ -591,73 +588,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);
-                mTransportParamOutput.unbind(mConsumer);
+                mTransportParamOutput.abort(); // TODO: what??
             }
-        }
-    }
-
-    /**
-     * Invocation used to synchronously call the specified one.
-     *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     */
-    private static class SyncInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
-
-        private final ContextInvocation<INPUT, OUTPUT> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param context         the the routine context.
-         * @param invocationClass the invocation class.
-         * @param args            the invocation constructor arguments.
-         * @throws java.lang.IllegalAccessException            if an error occurred during the
-         *                                                     invocation instantiation.
-         * @throws java.lang.reflect.InvocationTargetException if an error occurred during the
-         *                                                     invocation instantiation.
-         * @throws java.lang.InstantiationException            if an error occurred during the
-         *                                                     invocation instantiation.
-         */
-        public SyncInvocation(@Nonnull final Context context,
-                @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
-                @Nonnull final Object[] args) throws IllegalAccessException,
-                InvocationTargetException, InstantiationException {
-
-            final ContextInvocation<INPUT, OUTPUT> invocation =
-                    findConstructor(invocationClass, args).newInstance(args);
-            invocation.onContext(context);
-            mInvocation = invocation;
-        }
-
-        public void onAbort(@Nullable final Throwable reason) {
-
-            mInvocation.onAbort(reason);
-        }
-
-        public void onDestroy() {
-
-            mInvocation.onDestroy();
-        }
-
-        public void onInit() {
-
-            mInvocation.onInit();
-        }
-
-        public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
-
-            mInvocation.onInput(input, result);
-        }
-
-        public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
-
-            mInvocation.onResult(result);
-        }
-
-        public void onReturn() {
-
-            mInvocation.onReturn();
         }
     }
 }

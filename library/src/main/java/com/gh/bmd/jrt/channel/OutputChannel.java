@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Interface defining an output channel, that is the channel used to read the routine invocation
@@ -65,18 +64,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      */
     @Nonnull
     OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
-
-    /**
-     * Binds the specified consumer to this channel. After the call, all the output will be passed
-     * only to the consumer. Attempting to read through the dedicated methods will cause an
-     * {@link java.lang.IllegalStateException} to be thrown.
-     *
-     * @param consumer the consumer instance.
-     * @return this channel.
-     * @throws java.lang.IllegalStateException if this channel is already bound to a consumer.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
     /**
      * Checks if the routine is complete waiting at the maximum for the set timeout.
@@ -163,11 +150,38 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     OutputChannel<OUTPUT> immediately();
 
     /**
-     * Checks if this channel is bound to a consumer.
+     * Checks if this channel is bound to a consumer or another channel.
      *
      * @return whether the channel is bound.
+     * @see #passTo(InputChannel)
+     * @see #passTo(OutputConsumer)
      */
     boolean isBound();
+
+    /**
+     * Binds this channel to the specified one. After the call, all the output will be passed
+     * only to the specified input channel. Attempting to read through the dedicated methods will
+     * cause an {@link java.lang.IllegalStateException} to be thrown.
+     *
+     * @param channel the input channel
+     * @param <INPUT> the input data type.
+     * @return this channel.
+     * @throws java.lang.IllegalStateException if this channel is already bound.
+     */
+    @Nonnull
+    <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(@Nonnull INPUT channel);
+
+    /**
+     * Binds this channel to the specified consumer. After the call, all the output will be passed
+     * only to the consumer. Attempting to read through the dedicated methods will cause an
+     * {@link java.lang.IllegalStateException} to be thrown.
+     *
+     * @param consumer the consumer instance.
+     * @return this channel.
+     * @throws java.lang.IllegalStateException if this channel is already bound.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> passTo(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
     /**
      * Reads all the results by waiting for the routine to complete at the maximum for the set
@@ -234,14 +248,4 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #eventuallyExit()
      */
     OUTPUT readNext();
-
-    /**
-     * Unbinds the specified consumer from this channel. After the call the outputs will be returned
-     * to readers.
-     *
-     * @param consumer the consumer instance.
-     * @return this channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
 }

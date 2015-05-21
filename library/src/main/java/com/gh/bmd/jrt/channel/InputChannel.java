@@ -72,14 +72,14 @@ public interface InputChannel<INPUT> extends Channel {
     /**
      * Passes the specified channel to this one.
      * <p/>
-     * Note that this channel will be bound as a result of the call, thus preventing any other
-     * reader getting data from the specified output channel.
+     * Note that the output channel will be bound as a result of the call, thus effectively
+     * preventing any other reader from getting data from it.
      *
      * @param channel the output channel.
      * @return this channel.
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException        if this channel is already closed.
-     * @see com.gh.bmd.jrt.channel.OutputChannel#bind(OutputConsumer)
+     * @see com.gh.bmd.jrt.channel.OutputChannel#passTo(InputChannel)
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);

@@ -25,7 +25,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.routine.Routine;
@@ -105,17 +105,17 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         if (paramMode == PassMode.PARALLEL) {
 
-            final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
+            final RoutineChannel<Object, Object> routineChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
             final Object arg = args[0];
 
             if (arg == null) {
 
-                parameterChannel.pass((Iterable<Object>) null);
+                routineChannel.pass((Iterable<Object>) null);
 
             } else if (OutputChannel.class.isAssignableFrom(parameterType)) {
 
-                parameterChannel.pass((OutputChannel<Object>) arg);
+                routineChannel.pass((OutputChannel<Object>) arg);
 
             } else if (parameterType.isArray()) {
 
@@ -123,7 +123,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                 for (int i = 0; i < length; i++) {
 
-                    parameterChannel.pass(Array.get(arg, i));
+                    routineChannel.pass(Array.get(arg, i));
                 }
 
             } else {
@@ -132,15 +132,15 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                 for (final Object input : iterable) {
 
-                    parameterChannel.pass(input);
+                    routineChannel.pass(input);
                 }
             }
 
-            outputChannel = parameterChannel.result();
+            outputChannel = routineChannel.result();
 
         } else if (paramMode == PassMode.VALUE) {
 
-            final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
+            final RoutineChannel<Object, Object> routineChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
 
@@ -150,20 +150,20 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                 if (OutputChannel.class.isAssignableFrom(parameterTypes[i])) {
 
-                    parameterChannel.pass((OutputChannel<Object>) arg);
+                    routineChannel.pass((OutputChannel<Object>) arg);
 
                 } else {
 
-                    parameterChannel.pass(arg);
+                    routineChannel.pass(arg);
                 }
             }
 
-            outputChannel = parameterChannel.result();
+            outputChannel = routineChannel.result();
 
         } else if (paramMode == PassMode.COLLECTION) {
 
-            final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
-            outputChannel = parameterChannel.pass((OutputChannel<Object>) args[0]).result();
+            final RoutineChannel<Object, Object> routineChannel = routine.invokeAsync();
+            outputChannel = routineChannel.pass((OutputChannel<Object>) args[0]).result();
 
         } else {
 

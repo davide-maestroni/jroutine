@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
@@ -291,10 +292,10 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         @Nonnull
-        public TransportOutput<OUTPUT> bind(
+        public TransportOutput<OUTPUT> passTo(
                 @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
-            mChannel.bind(consumer);
+            mChannel.passTo(consumer);
             return this;
         }
 
@@ -341,12 +342,17 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
             return this;
         }
 
-        @Nonnull
-        public TransportOutput<OUTPUT> unbind(
-                @Nullable final OutputConsumer<? super OUTPUT> consumer) {
+        public Iterator<OUTPUT> iterator() {
 
-            mChannel.unbind(consumer);
-            return this;
+            return mChannel.iterator();
+        }
+
+        @Nonnull
+        public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
+                @Nonnull final INPUT channel) {
+
+            channel.pass(this);
+            return channel;
         }
 
         public boolean checkComplete() {
@@ -368,11 +374,6 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         public OUTPUT readNext() {
 
             return mChannel.readNext();
-        }
-
-        public Iterator<OUTPUT> iterator() {
-
-            return mChannel.iterator();
         }
 
         public boolean abort() {

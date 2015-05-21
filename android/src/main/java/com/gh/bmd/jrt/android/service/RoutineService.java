@@ -31,7 +31,7 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.common.RoutineException;
@@ -496,7 +496,7 @@ public class RoutineService extends Service {
             }
 
             final boolean isParallel = data.getBoolean(KEY_PARALLEL_INVOCATION);
-            final ParameterChannel<Object, Object> channel =
+            final RoutineChannel<Object, Object> channel =
                     (isParallel) ? routineState.invokeParallel() : routineState.invokeAsync();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
@@ -781,7 +781,7 @@ public class RoutineService extends Service {
          * @return the invocation parameter channel.
          */
         @Nonnull
-        public ParameterChannel<Object, Object> invokeAsync() {
+        public RoutineChannel<Object, Object> invokeAsync() {
 
             ++mInvocationCount;
             return mRoutine.invokeAsync();
@@ -793,7 +793,7 @@ public class RoutineService extends Service {
          * @return the invocation parameter channel.
          */
         @Nonnull
-        public ParameterChannel<Object, Object> invokeParallel() {
+        public RoutineChannel<Object, Object> invokeParallel() {
 
             ++mInvocationCount;
             return mRoutine.invokeParallel();
@@ -897,7 +897,7 @@ public class RoutineService extends Service {
      */
     private class RoutineInvocation {
 
-        private final ParameterChannel<Object, Object> mChannel;
+        private final RoutineChannel<Object, Object> mChannel;
 
         private final String mId;
 
@@ -914,7 +914,7 @@ public class RoutineService extends Service {
          * @param state   the routine state.
          */
         private RoutineInvocation(@Nonnull final String id,
-                @Nonnull final ParameterChannel<Object, Object> channel,
+                @Nonnull final RoutineChannel<Object, Object> channel,
                 @Nonnull final RoutineInfo info, @Nonnull final RoutineState state) {
 
             mId = id;
@@ -970,7 +970,7 @@ public class RoutineService extends Service {
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 
-            mChannel.result().bind(consumer);
+            mChannel.result().passTo(consumer);
         }
     }
 }

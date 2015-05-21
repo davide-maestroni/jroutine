@@ -173,7 +173,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
                 new LoaderResultChannel<OUTPUT>(mOrderType, logger);
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
-        channel.output().bind(consumer);
+        channel.output().passTo(consumer);
         Throwable abortException = null;
         logger.dbg("running invocation");
 

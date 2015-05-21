@@ -25,8 +25,8 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
@@ -61,6 +61,17 @@ class DefaultClassRoutineBuilder
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
+
+    private static InvocationFactory<Object, Object> sMethodInvocationFactory =
+            new InvocationFactory<Object, Object>() {
+
+                @Nonnull
+                public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+
+                    return new MethodProcedureInvocation(args[0], (Method) args[1], args[2],
+                                                         (Boolean) args[3], (Boolean) args[4]);
+                }
+            };
 
     private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
 
@@ -281,8 +292,7 @@ class DefaultClassRoutineBuilder
 
                 final RoutineConfiguration.Builder<RoutineConfiguration> builder =
                         configuration.builderFrom();
-                final InvocationFactory<Object, Object> factory =
-                        Invocations.factoryOf(MethodProcedureInvocation.class);
+                final InvocationFactory<Object, Object> factory = sMethodInvocationFactory;
                 routine = new DefaultRoutine<Object, Object>(
                         builder.withFactoryArgs(target, method, mutex, isInputCollection,
                                                 isOutputCollection).set(), factory);

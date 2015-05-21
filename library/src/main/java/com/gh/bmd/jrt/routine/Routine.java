@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -237,7 +237,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation parameter channel.
      */
     @Nonnull
-    ParameterChannel<INPUT, OUTPUT> invokeAsync();
+    RoutineChannel<INPUT, OUTPUT> invokeAsync();
 
     /**
      * Invokes the execution of this routine in parallel mode.
@@ -245,7 +245,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation parameter channel.
      */
     @Nonnull
-    ParameterChannel<INPUT, OUTPUT> invokeParallel();
+    RoutineChannel<INPUT, OUTPUT> invokeParallel();
 
     /**
      * Invokes the execution of this routine in synchronous mode.
@@ -253,7 +253,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation parameter channel.
      */
     @Nonnull
-    ParameterChannel<INPUT, OUTPUT> invokeSync();
+    RoutineChannel<INPUT, OUTPUT> invokeSync();
 
     /**
      * Makes the routine destroy all the cached invocation instances.

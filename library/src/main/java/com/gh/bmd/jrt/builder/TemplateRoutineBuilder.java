@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.builder;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 
 import javax.annotation.Nonnull;
@@ -36,19 +36,19 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+    public RoutineChannel<INPUT, OUTPUT> invokeAsync() {
 
         return buildRoutine().invokeAsync();
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+    public RoutineChannel<INPUT, OUTPUT> invokeParallel() {
 
         return buildRoutine().invokeParallel();
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+    public RoutineChannel<INPUT, OUTPUT> invokeSync() {
 
         return buildRoutine().invokeSync();
     }

@@ -17,7 +17,7 @@
     @SuppressWarnings({"unchecked", "RedundantCast"})
     public void ${methodName}(${paramTypes}) {
 
-        final com.gh.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> $$channel = this.mRoutine${methodCount}.invokeParallel();
+        final com.gh.bmd.jrt.channel.RoutineChannel<Object, ${resultClassName}> $$channel = this.mRoutine${methodCount}.invokeParallel();
 
         for (final Object $$object: ${params}) {
 

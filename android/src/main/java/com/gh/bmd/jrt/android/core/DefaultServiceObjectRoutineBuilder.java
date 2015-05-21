@@ -29,8 +29,8 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
@@ -995,7 +995,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                             .with(mServiceConfiguration)
                             .set()
                             .buildRoutine();
-            final ParameterChannel<Object, Object> parameterChannel =
+            final RoutineChannel<Object, Object> routineChannel =
                     (isParallel) ? routine.invokeParallel() : routine.invokeAsync();
 
             for (int i = 0; i < length; i++) {
@@ -1006,11 +1006,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                     if (OutputChannel.class.isAssignableFrom(parameterType)) {
 
-                        parameterChannel.pass((OutputChannel<?>) args[i]);
+                        routineChannel.pass((OutputChannel<?>) args[i]);
 
                     } else if (args[i] == null) {
 
-                        parameterChannel.pass((Object[]) null);
+                        routineChannel.pass((Object[]) null);
 
                     } else if (parameterType.isArray()) {
 
@@ -1019,24 +1019,24 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                         for (int j = 0; j < size; j++) {
 
-                            parameterChannel.pass(Array.get(array, j));
+                            routineChannel.pass(Array.get(array, j));
                         }
 
                     } else if (Iterable.class.isAssignableFrom(parameterType)) {
 
                         for (final Object object : ((Iterable<?>) args[i])) {
 
-                            parameterChannel.pass(object);
+                            routineChannel.pass(object);
                         }
                     }
 
                 } else {
 
-                    parameterChannel.pass(args[i]);
+                    routineChannel.pass(args[i]);
                 }
             }
 
-            final OutputChannel<Object> outputChannel = parameterChannel.result();
+            final OutputChannel<Object> outputChannel = routineChannel.result();
 
             if (!Void.class.equals(boxingClass(returnType))) {
 

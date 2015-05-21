@@ -132,12 +132,6 @@ public interface TransportChannel<DATA> {
          * {@inheritDoc}
          */
         @Nonnull
-        TransportOutput<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
         TransportOutput<OUTPUT> eventually();
 
         /**
@@ -168,12 +162,12 @@ public interface TransportChannel<DATA> {
          * {@inheritDoc}
          */
         @Nonnull
-        TransportOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+        TransportOutput<OUTPUT> passTo(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
         /**
          * {@inheritDoc}
          */
         @Nonnull
-        TransportOutput<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
+        TransportOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
     }
 }

@@ -14,10 +14,10 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
-import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultRoutineChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Logger;
@@ -136,13 +136,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+    public RoutineChannel<INPUT, OUTPUT> invokeAsync() {
 
         return invoke(true);
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+    public RoutineChannel<INPUT, OUTPUT> invokeParallel() {
 
         synchronized (mParallelMutex) {
 
@@ -167,7 +167,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+    public RoutineChannel<INPUT, OUTPUT> invokeSync() {
 
         return invoke(false);
     }
@@ -277,14 +277,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
+    private RoutineChannel<INPUT, OUTPUT> invoke(final boolean async) {
 
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
-        return new DefaultParameterChannel<INPUT, OUTPUT>(mConfiguration,
-                                                          getInvocationManager(async),
-                                                          (async) ? mAsyncRunner : mSyncRunner,
-                                                          logger);
+        return new DefaultRoutineChannel<INPUT, OUTPUT>(mConfiguration, getInvocationManager(async),
+                                                        (async) ? mAsyncRunner : mSyncRunner,
+                                                        logger);
     }
 
     /**

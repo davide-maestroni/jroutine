@@ -35,7 +35,7 @@
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
                             .callAsync(new URI(IMAGE_URI))
-                            .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                            .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                 &commat;Override
                                 public void onError(&commat;Nullable final Throwable error) {
@@ -56,7 +56,7 @@
                 }
             }
 
-            private static class LoadBitmap extends AndroidTemplateInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
                 public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
@@ -113,7 +113,7 @@
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
                             .callAsync(new URI(IMAGE_URI))
-                            .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                            .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                 &commat;Override
                                 public void onError(&commat;Nullable final Throwable error) {
@@ -134,7 +134,7 @@
                 }
             }
 
-            private static class LoadBitmap extends AndroidTemplateInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
                 public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
@@ -164,7 +164,7 @@
                 }
             }
 
-            private static class LoadBitmapFromService extends AndroidTemplateInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmapFromService extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 private Routine&lt;URI, Bitmap&gt; mRoutine;
 

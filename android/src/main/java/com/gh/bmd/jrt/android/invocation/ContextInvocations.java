@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.android.invocation;
 
+import android.content.Context;
+
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -37,6 +39,50 @@ public class ContextInvocations {
      */
     protected ContextInvocations() {
 
+    }
+
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified class
+     * token.
+     * <p/>
+     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
+     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * and all the variables captured in the closure.
+     *
+     * @param invocationToken the invocation class token.
+     * @param <INPUT>         the input data type.
+     * @param <OUTPUT>        the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> contextFactoryOf(
+            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken) {
+
+        return contextFactoryOf(invocationToken.getRawClass());
+    }
+
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified
+     * class.
+     * <p/>
+     * Note that inner and anonymous classes can be passed as well. Remember however that Java
+     * creates synthetic constructor for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+     * first constructor parameter, and anonymous classes has both the outer instance and all the
+     * variables captured in the closure.
+     *
+     * @param invocationClass the invocation class.
+     * @param <INPUT>         the input data type.
+     * @param <OUTPUT>        the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> contextFactoryOf(
+            @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass) {
+
+        return new DecoratingContextInvocationFactory<INPUT, OUTPUT>(invocationClass);
     }
 
     /**
@@ -103,6 +149,142 @@ public class ContextInvocations {
             @Nonnull final Function<OUTPUT> function) {
 
         return new FunctionContextInvocationFactory<OUTPUT>(function);
+    }
+
+    /**
+     * Builds and returns a new invocation factory creating instances of the specified class.
+     * <p/>
+     * Note that inner and anonymous classes can be passed as well. Remember however that Java
+     * creates synthetic constructor for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+     * first constructor parameter, and anonymous classes has both the outer instance and all the
+     * variables captured in the closure.
+     *
+     * @param invocationClass the invocation class.
+     * @param context         the routine context.
+     * @param <INPUT>         the input data type.
+     * @param <OUTPUT>        the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> invocationFactoryOf(
+            @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
+            @Nonnull final Context context) {
+
+        return new AdaptingContextInvocationFactory<INPUT, OUTPUT>(invocationClass, context);
+    }
+
+    /**
+     * Builds and returns a new invocation factory creating instances of the specified class token.
+     * <p/>
+     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
+     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * and all the variables captured in the closure.
+     *
+     * @param invocationToken the invocation class token.
+     * @param context         the routine context.
+     * @param <INPUT>         the input data type.
+     * @param <OUTPUT>        the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> invocationFactoryOf(
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> invocationToken,
+            @Nonnull final Context context) {
+
+        return invocationFactoryOf(invocationToken.getRawClass(), context);
+    }
+
+    /**
+     * Implementation of an invocation factory.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class AdaptingContextInvocationFactory<INPUT, OUTPUT>
+            implements InvocationFactory<INPUT, OUTPUT> {
+
+        private final Context mContext;
+
+        private final InvocationFactory<INPUT, OUTPUT> mFactory;
+
+        private final String mInvocationType;
+
+        /**
+         * Constructor.
+         *
+         * @param invocationClass the invocation class.
+         * @param context         the routine context.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private AdaptingContextInvocationFactory(
+                @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
+                @Nonnull final Context context) {
+
+            if (context == null) {
+
+                throw new NullPointerException("the routine context must not be null");
+            }
+
+            mContext = context;
+            mFactory = Invocations.factoryOf(invocationClass);
+            mInvocationType = invocationClass.getName();
+        }
+
+        @Nonnull
+        public String getInvocationType() {
+
+            return mInvocationType;
+        }
+
+        @Nonnull
+        public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+            final ContextInvocation<INPUT, OUTPUT> invocation =
+                    (ContextInvocation<INPUT, OUTPUT>) mFactory.newInvocation(args);
+            invocation.onContext(mContext);
+            return invocation;
+        }
+    }
+
+    /**
+     * Implementation of an invocation factory decorating base invocations.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class DecoratingContextInvocationFactory<INPUT, OUTPUT>
+            implements ContextInvocationFactory<INPUT, OUTPUT> {
+
+        private final InvocationFactory<INPUT, OUTPUT> mFactory;
+
+        private final String mInvocationType;
+
+        /**
+         * Constructor.
+         *
+         * @param invocationClass the invocation class.
+         */
+        private DecoratingContextInvocationFactory(
+                @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass) {
+
+            mFactory = Invocations.factoryOf(invocationClass);
+            mInvocationType = invocationClass.getName();
+        }
+
+        @Nonnull
+        public String getInvocationType() {
+
+            return mInvocationType;
+        }
+
+        @Nonnull
+        public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+            return new ContextInvocationDecorator<INPUT, OUTPUT>(mFactory.newInvocation(args));
+        }
     }
 
     /**

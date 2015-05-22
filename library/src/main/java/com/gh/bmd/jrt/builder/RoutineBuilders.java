@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.builder;
 
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Params;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
@@ -45,6 +46,83 @@ public class RoutineBuilders {
      */
     protected RoutineBuilders() {
 
+    }
+
+    /**
+     * TODO
+     *
+     * @param method
+     * @return
+     */
+    @Nullable
+    public static PassMode getParamMode(@Nonnull final Method method) {
+
+        final Params methodAnnotation = method.getAnnotation(Params.class);
+
+        if (methodAnnotation == null) {
+
+            return null;
+        }
+
+        PassMode passMode = methodAnnotation.mode();
+
+        if (passMode == PassMode.AUTO) {
+
+            final Class<?>[] parameterTypes = methodAnnotation.value();
+
+            if (parameterTypes.length == 1) {
+
+                final Class<?> parameterType = parameterTypes[0];
+
+                if (parameterType.isArray() || parameterType.isAssignableFrom(List.class)) {
+
+                    passMode = PassMode.COLLECTION;
+
+                } else {
+
+                    passMode = PassMode.PARALLEL;
+                }
+
+            } else {
+
+                passMode = PassMode.VALUE;
+            }
+
+        } else if (passMode == PassMode.COLLECTION) {
+
+            final Class<?>[] parameterTypes = methodAnnotation.value();
+            final Class<?> parameterType = parameterTypes[0];
+
+            if (!parameterType.isArray() && !parameterType.isAssignableFrom(List.class)) {
+
+                throw new IllegalArgumentException(
+                        "[" + method + "] an async input with pass mode " + PassMode.COLLECTION
+                                + " must be bound to an array or a superclass of "
+                                + List.class.getCanonicalName());
+            }
+
+            if (parameterTypes.length > 1) {
+
+                throw new IllegalArgumentException(
+                        "[" + method + "] an async input with pass mode " + PassMode.COLLECTION +
+                                " cannot be applied to a method taking " + parameterTypes.length
+                                + " input parameters");
+            }
+
+        } else if (passMode == PassMode.PARALLEL) {
+
+            final Class<?>[] parameterTypes = methodAnnotation.value();
+
+            if (parameterTypes.length > 1) {
+
+                throw new IllegalArgumentException(
+                        "[" + method + "] an async input with pass mode " + PassMode.PARALLEL +
+                                " cannot be applied to a method taking " + parameterTypes.length
+                                + " input parameters");
+            }
+        }
+
+        return passMode;
     }
 
     /**

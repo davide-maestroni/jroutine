@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Params;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -24,7 +25,9 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -105,6 +108,8 @@ public class ObjectRoutineBuilderTest {
         final TransportChannel<int[]> channel5 = JRoutine.transport().buildChannel();
         channel5.input().pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5.output())).isEqualTo(10);
+
+        assertThat(sumAsync.compute2().pass(1, 2, 3, 4).result().readNext()).isEqualTo(10);
 
         final TransportChannel<Integer> channel6 = JRoutine.transport().buildChannel();
         channel6.input().pass(1, 2, 3, 4).close();
@@ -218,6 +223,72 @@ public class ObjectRoutineBuilderTest {
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
             assertThat(e.getCause().getMessage()).isEqualTo("test");
+        }
+    }
+
+    @Test
+    public void testInvalidParamsOutputAnnotationError() {
+
+        final Sum sum = new Sum();
+
+        try {
+
+            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute1();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute2();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute3();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute4();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute5();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute6();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
         }
     }
 
@@ -594,6 +665,10 @@ public class ObjectRoutineBuilderTest {
         channel4.input().pass('d', 'e', 'f').close();
         assertThat(itf.add5(channel4.output()).readAll()).containsOnly((int) 'd', (int) 'e',
                                                                        (int) 'f');
+        assertThat(itf.add6().pass('d').result().readAll()).containsOnly((int) 'd');
+        assertThat(itf.add7().pass('d', 'e', 'f').result().readAll()).containsOnly((int) 'd',
+                                                                                   (int) 'e',
+                                                                                   (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
         channel5.input().pass(new char[]{'a', 'z'}).close();
@@ -665,6 +740,15 @@ public class ObjectRoutineBuilderTest {
         assertThat(itf.addA19(channel19.output())).containsOnly(new int[]{'d', 'z'},
                                                                 new int[]{'e', 'z'},
                                                                 new int[]{'f', 'z'});
+        assertThat(itf.addA20().pass(new char[]{'c', 'z'}).result().readAll()).containsOnly(
+                new int[]{'c', 'z'});
+        assertThat(itf.addA21()
+                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .result()
+                      .readAll()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                               new int[]{'f', 'z'});
+        assertThat(itf.addA22().pass('d', 'e', 'f').result().readAll()).containsOnly(
+                new int[]{'d', 'e', 'f'});
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel20 = JRoutine.transport().buildChannel();
@@ -749,16 +833,30 @@ public class ObjectRoutineBuilderTest {
                                                                 Arrays.asList((int) 'e', (int) 'z'),
                                                                 Arrays.asList((int) 'f',
                                                                               (int) 'z'));
+        assertThat(itf.addL20().pass(Arrays.asList('c', 'z')).result().readAll()).containsOnly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        assertThat(itf.addL21()
+                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                            Arrays.asList('f', 'z'))
+                      .result()
+                      .readAll()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                               Arrays.asList((int) 'e', (int) 'z'),
+                                               Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL22().pass('d', 'e', 'f').result().readAll()).containsOnly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().readAll()).containsExactly(31);
+        assertThat(itf.get2().result().readAll()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().readAll()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA4().result().readAll()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().readAll()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL4().result().readAll()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
         channel35.input().pass(-17).close();
@@ -766,6 +864,7 @@ public class ObjectRoutineBuilderTest {
         final TransportChannel<Integer> channel36 = JRoutine.transport().buildChannel();
         channel36.input().pass(-17).close();
         itf.set2(channel36.output());
+        itf.set3().pass(-17).result().checkComplete();
         itf.setA0(new int[]{1, 2, 3});
         final TransportChannel<int[]> channel37 = JRoutine.transport().buildChannel();
         channel37.input().pass(new int[]{1, 2, 3}).close();
@@ -776,6 +875,8 @@ public class ObjectRoutineBuilderTest {
         final TransportChannel<int[]> channel39 = JRoutine.transport().buildChannel();
         channel39.input().pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39.output());
+        itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
+        itf.setA5().pass(1, 2, 3).result().checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final TransportChannel<List<Integer>> channel40 = JRoutine.transport().buildChannel();
         channel40.input().pass(Arrays.asList(1, 2, 3)).close();
@@ -786,6 +887,8 @@ public class ObjectRoutineBuilderTest {
         final TransportChannel<List<Integer>> channel42 = JRoutine.transport().buildChannel();
         channel42.input().pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42.output());
+        itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
+        itf.setL5().pass(1, 2, 3).result().checkComplete();
     }
 
     @Test
@@ -1050,6 +1153,14 @@ public class ObjectRoutineBuilderTest {
         OutputChannel<Integer> add5(
                 @Param(value = char.class, mode = PassMode.PARALLEL) OutputChannel<Character> c);
 
+        @Alias("a")
+        @Params(value = char.class, mode = PassMode.VALUE)
+        RoutineChannel<Character, Integer> add6();
+
+        @Alias("a")
+        @Params(value = char.class, mode = PassMode.PARALLEL)
+        RoutineChannel<Character, Integer> add7();
+
         @Alias("aa")
         int[] addA00(char[] c);
 
@@ -1139,6 +1250,18 @@ public class ObjectRoutineBuilderTest {
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         int[][] addA19(@Param(value = char[].class,
                 mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+
+        @Alias("aa")
+        @Params(value = char[].class, mode = PassMode.VALUE)
+        RoutineChannel<char[], int[]> addA20();
+
+        @Alias("aa")
+        @Params(value = char[].class, mode = PassMode.PARALLEL)
+        RoutineChannel<char[], int[]> addA21();
+
+        @Alias("aa")
+        @Params(value = char[].class, mode = PassMode.COLLECTION)
+        RoutineChannel<Character, int[]> addA22();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
@@ -1231,6 +1354,18 @@ public class ObjectRoutineBuilderTest {
         List[] addL19(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
 
+        @Alias("al")
+        @Params(value = List.class, mode = PassMode.VALUE)
+        RoutineChannel<List<Character>, List<Integer>> addL20();
+
+        @Alias("al")
+        @Params(value = List.class, mode = PassMode.PARALLEL)
+        RoutineChannel<List<Character>, List<Integer>> addL21();
+
+        @Alias("al")
+        @Params(value = List.class, mode = PassMode.COLLECTION)
+        RoutineChannel<Character, List<Integer>> addL22();
+
         @Alias("g")
         int get0();
 
@@ -1243,6 +1378,13 @@ public class ObjectRoutineBuilderTest {
 
         @Alias("s")
         void set1(@Param(value = int.class, mode = PassMode.VALUE) OutputChannel<Integer> i);
+
+        @Alias("g")
+        @Params({})
+        RoutineChannel<Void, Integer> get2();
+
+        @Alias("s")
+        void set2(@Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
 
         @Alias("ga")
         int[] getA0();
@@ -1271,6 +1413,10 @@ public class ObjectRoutineBuilderTest {
 
         @Alias("sa")
         void setA3(@Param(value = int[].class, mode = PassMode.PARALLEL) OutputChannel<int[]> i);
+
+        @Alias("ga")
+        @Params({})
+        RoutineChannel<Void, int[]> getA4();
 
         @Alias("gl")
         List<Integer> getL0();
@@ -1301,8 +1447,57 @@ public class ObjectRoutineBuilderTest {
         void setL3(@Param(value = List.class,
                 mode = PassMode.PARALLEL) OutputChannel<List<Integer>> i);
 
+        @Alias("gl")
+        @Params({})
+        RoutineChannel<Void, List> getL4();
+
         @Alias("s")
-        void set2(@Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
+        @Params(value = int.class, mode = PassMode.VALUE)
+        RoutineChannel<Integer, Void> set3();
+
+        @Alias("sa")
+        @Params(value = int[].class, mode = PassMode.VALUE)
+        RoutineChannel<int[], Void> setA4();
+
+        @Alias("sa")
+        @Params(value = int[].class, mode = PassMode.COLLECTION)
+        RoutineChannel<Integer, Void> setA5();
+
+        @Alias("sl")
+        @Params(value = List.class, mode = PassMode.VALUE)
+        RoutineChannel<List<Integer>, Void> setL4();
+
+        @Alias("sl")
+        @Params(value = List.class, mode = PassMode.COLLECTION)
+        RoutineChannel<Integer, Void> setL5();
+    }
+
+    public interface SumError2 {
+
+        @Alias("compute")
+        @Params({int.class, int.class})
+        int compute1();
+
+        @Alias("compute")
+        @Param(int.class)
+        @Params({int.class, int.class})
+        InputChannel<Integer> compute2();
+
+        @Alias("compute")
+        @Params(value = {int.class, int.class}, mode = PassMode.PARALLEL)
+        InputChannel<Integer> compute3();
+
+        @Alias("compute")
+        @Params(value = {int.class, int.class}, mode = PassMode.COLLECTION)
+        InputChannel<Integer> compute4();
+
+        @Alias("compute")
+        @Params(value = int.class, mode = PassMode.COLLECTION)
+        InputChannel<Integer> compute5();
+
+        @Alias("compute")
+        @Params(value = {int[].class, int.class}, mode = PassMode.COLLECTION)
+        InputChannel<Integer> compute6();
     }
 
     private interface CountError {
@@ -1434,6 +1629,10 @@ public class ObjectRoutineBuilderTest {
 
         @Alias("compute")
         int compute1(@Param(value = int[].class, mode = PassMode.VALUE) OutputChannel<int[]> ints);
+
+        @Alias("compute")
+        @Params(int[].class)
+        RoutineChannel<Integer, Integer> compute2();
 
         @Alias("compute")
         int computeList(@Param(List.class) OutputChannel<Integer> ints);
@@ -1643,6 +1842,11 @@ public class ObjectRoutineBuilderTest {
 
     @SuppressWarnings("unused")
     private static class Sum {
+
+        public int compute(final int a) {
+
+            return a;
+        }
 
         public int compute(final int a, final int b) {
 

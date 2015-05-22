@@ -312,6 +312,17 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
         result3.checkComplete();
     }
 
+    public void testActivityContext() {
+
+        assertThat(JRoutine.on(ContextInvocations.invocationFactoryOf(
+                new ClassToken<GetContextInvocation<String>>() {}, getActivity()))
+                           .callSync()
+                           .readNext()).isSameAs(getActivity());
+        assertThat(JRoutine.onActivity(getActivity(), ContextInvocations.factoryOf(
+                new ClassToken<GetContextInvocation<String>>() {})).callSync().readNext()).isSameAs(
+                getActivity().getApplicationContext());
+    }
+
     public void testActivityDelegation() {
 
         final TimeDuration timeout = seconds(1);
@@ -646,13 +657,6 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(result1.readNext()).isSameAs(data1);
         assertThat(result2.readNext()).isSameAs(data1);
-    }
-
-    public void testActivitySyncInvocation() {
-
-        assertThat(JRoutine.on(ContextInvocations.invocationFactoryOf(
-                new ClassToken<GetContextInvocation<String>>() {}, getActivity()))
-                           .callSync()).isSameAs(getActivity().getApplicationContext());
     }
 
     public void testChannelBuilderWarnings() {

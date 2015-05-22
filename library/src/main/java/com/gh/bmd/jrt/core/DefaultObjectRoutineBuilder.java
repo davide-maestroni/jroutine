@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Params;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -162,8 +163,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         } else if (paramMode == PassMode.COLLECTION) {
 
-            final RoutineChannel<Object, Object> routineChannel = routine.invokeAsync();
-            outputChannel = routineChannel.pass((OutputChannel<Object>) args[0]).result();
+            outputChannel = routine.invokeAsync().pass((OutputChannel<Object>) args[0]).result();
 
         } else {
 
@@ -199,7 +199,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 }
             }
 
-            return outputChannel.readNext();
+            return outputChannel.readAll().iterator().next();
         }
 
         return null;
@@ -460,33 +460,58 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             PassMode asyncParamMode = null;
             PassMode asyncReturnMode = null;
             Class<?> returnClass = null;
+            final Class<?>[] targetParameterTypes;
+            final Params paramsAnnotation = method.getAnnotation(Params.class);
             final Param methodAnnotation = method.getAnnotation(Param.class);
 
-            if (methodAnnotation != null) {
+            if (paramsAnnotation != null) {
 
-                returnClass = methodAnnotation.value();
-                asyncReturnMode = getReturnMode(method);
-            }
+                if (methodAnnotation != null) {
 
-            final Class<?>[] targetParameterTypes = method.getParameterTypes();
-            final Annotation[][] annotations = method.getParameterAnnotations();
-            final int length = annotations.length;
+                    throw new IllegalArgumentException(
+                            "cannot have both " + Param.class.getSimpleName() + " and "
+                                    + Params.class.getSimpleName()
+                                    + " annotations on the same method: " + method);
+                }
 
-            for (int i = 0; i < length; ++i) {
+                targetParameterTypes = paramsAnnotation.value();
+                asyncParamMode = getParamMode(method);
+                asyncReturnMode = PassMode.VALUE;
 
-                final PassMode paramMode = getParamMode(method, i);
+                if (!method.getReturnType().isAssignableFrom(RoutineChannel.class)) {
 
-                if (paramMode != null) {
+                    throw new IllegalArgumentException(
+                            "the proxy method has incompatible return type: " + method);
+                }
 
-                    asyncParamMode = paramMode;
+            } else {
 
-                    for (final Annotation paramAnnotation : annotations[i]) {
+                if (methodAnnotation != null) {
 
-                        if (paramAnnotation.annotationType() == Param.class) {
+                    returnClass = methodAnnotation.value();
+                    asyncReturnMode = getReturnMode(method);
+                }
 
-                            final Param passAnnotation = (Param) paramAnnotation;
-                            targetParameterTypes[i] = passAnnotation.value();
-                            break;
+                targetParameterTypes = method.getParameterTypes();
+                final Annotation[][] annotations = method.getParameterAnnotations();
+                final int length = annotations.length;
+
+                for (int i = 0; i < length; ++i) {
+
+                    final PassMode paramMode = getParamMode(method, i);
+
+                    if (paramMode != null) {
+
+                        asyncParamMode = paramMode;
+
+                        for (final Annotation paramAnnotation : annotations[i]) {
+
+                            if (paramAnnotation.annotationType() == Param.class) {
+
+                                final Param passAnnotation = (Param) paramAnnotation;
+                                targetParameterTypes[i] = passAnnotation.value();
+                                break;
+                            }
                         }
                     }
                 }
@@ -526,7 +551,10 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                     if (methodAnnotation == null) {
 
-                        isError = !returnType.isAssignableFrom(targetReturnType);
+                        if (paramsAnnotation == null) {
+
+                            isError = !returnType.isAssignableFrom(targetReturnType);
+                        }
 
                     } else {
 
@@ -549,6 +577,13 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             final Routine<Object, Object> routine =
                     buildRoutine(method, targetMethod, asyncParamMode, asyncReturnMode);
+
+            if (paramsAnnotation != null) {
+
+                return (asyncParamMode == PassMode.PARALLEL) ? routine.invokeParallel()
+                        : routine.invokeAsync();
+            }
+
             return callRoutine(routine, method, (args != null) ? args : NO_ARGS, asyncParamMode,
                                asyncReturnMode);
         }

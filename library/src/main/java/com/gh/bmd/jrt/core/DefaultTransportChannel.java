@@ -292,14 +292,6 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         @Nonnull
-        public TransportOutput<OUTPUT> passTo(
-                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
-
-            mChannel.passTo(consumer);
-            return this;
-        }
-
-        @Nonnull
         public TransportOutput<OUTPUT> eventually() {
 
             mChannel.eventually();
@@ -335,24 +327,19 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         @Nonnull
+        public TransportOutput<OUTPUT> passTo(
+                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
+
+            mChannel.passTo(consumer);
+            return this;
+        }
+
+        @Nonnull
         public TransportOutput<OUTPUT> readAllInto(
                 @Nonnull final Collection<? super OUTPUT> result) {
 
             mChannel.readAllInto(result);
             return this;
-        }
-
-        public Iterator<OUTPUT> iterator() {
-
-            return mChannel.iterator();
-        }
-
-        @Nonnull
-        public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
-                @Nonnull final INPUT channel) {
-
-            channel.pass(this);
-            return channel;
         }
 
         public boolean checkComplete() {
@@ -366,6 +353,14 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         @Nonnull
+        public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
+                @Nonnull final INPUT channel) {
+
+            channel.pass(this);
+            return channel;
+        }
+
+        @Nonnull
         public List<OUTPUT> readAll() {
 
             return mChannel.readAll();
@@ -374,6 +369,11 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         public OUTPUT readNext() {
 
             return mChannel.readNext();
+        }
+
+        public Iterator<OUTPUT> iterator() {
+
+            return mChannel.iterator();
         }
 
         public boolean abort() {

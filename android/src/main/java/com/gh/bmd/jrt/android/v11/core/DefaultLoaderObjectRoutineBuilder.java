@@ -78,12 +78,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         RoutineConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
-    private static final AliasMethodInvocationFactory<Object, Object> sAliasMethodFactory =
-            new AliasMethodInvocationFactory<Object, Object>();
-
-    private static final MethodInvocationFactory<Object, Object> sMethodFactory =
-            new MethodInvocationFactory<Object, Object>();
-
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
@@ -336,7 +330,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass, args, shareGroup, name};
         final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
-                (AliasMethodInvocationFactory<INPUT, OUTPUT>) sAliasMethodFactory;
+                new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod);
         final RoutineConfiguration routineConfiguration =
                 configurationWithTimeout(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
@@ -362,7 +356,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
         final Object[] invocationArgs = new Object[]{mTargetClass, args, shareGroup, method};
         final MethodInvocationFactory<INPUT, OUTPUT> factory =
-                (MethodInvocationFactory<INPUT, OUTPUT>) sMethodFactory;
+                new MethodInvocationFactory<INPUT, OUTPUT>(method);
         final RoutineConfiguration routineConfiguration =
                 configurationWithTimeout(configuration, method);
         final LoaderConfiguration loaderConfiguration =
@@ -605,10 +599,22 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static class AliasMethodInvocationFactory<INPUT, OUTPUT>
             implements ContextInvocationFactory<INPUT, OUTPUT> {
 
+        private final String mType;
+
+        /**
+         * Constructor.
+         *
+         * @param targetMethod the target method.
+         */
+        private AliasMethodInvocationFactory(@Nonnull final Method targetMethod) {
+
+            mType = targetMethod.toString();
+        }
+
         @Nonnull
         public String getInvocationType() {
 
-            return AliasMethodInvocation.class.getName();
+            return mType;
         }
 
         @Nonnull
@@ -705,10 +711,22 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static class MethodInvocationFactory<INPUT, OUTPUT>
             implements ContextInvocationFactory<INPUT, OUTPUT> {
 
+        private final String mType;
+
+        /**
+         * Constructor.
+         *
+         * @param targetMethod the target method.
+         */
+        private MethodInvocationFactory(@Nonnull final Method targetMethod) {
+
+            mType = targetMethod.toString();
+        }
+
         @Nonnull
         public String getInvocationType() {
 
-            return MethodInvocation.class.getName();
+            return mType;
         }
 
         @Nonnull

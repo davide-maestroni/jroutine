@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Alias;
-import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
@@ -348,7 +348,7 @@ public class ClassRoutineBuilderTest {
     @SuppressWarnings("unused")
     private interface TestItf {
 
-        void throwException(@Param(int.class) RuntimeException ex);
+        void throwException(@Input(int.class) RuntimeException ex);
     }
 
     @SuppressWarnings("unused")

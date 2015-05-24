@@ -20,6 +20,8 @@ import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.annotation.Alias;
+import com.gh.bmd.jrt.annotation.Input;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
@@ -53,7 +55,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getInputMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
@@ -944,19 +946,19 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             for (int i = 0; i < length; i++) {
 
-                final PassMode paramMode = getParamMode(method, i);
+                final InputMode inputMode = getInputMode(method, i);
 
-                if (paramMode != null) {
+                if (inputMode != null) {
 
                     isAsync[i] = true;
-                    isParallel = (paramMode == PassMode.PARALLEL);
-                    isInputCollection = (paramMode == PassMode.COLLECTION);
+                    isParallel = (inputMode == InputMode.ELEMENT);
+                    isInputCollection = (inputMode == InputMode.COLLECTION);
 
                     for (final Annotation annotation : parameterAnnotations[i]) {
 
-                        if (annotation.annotationType() == Param.class) {
+                        if (annotation.annotationType() == Input.class) {
 
-                            targetParameterTypes[i] = ((Param) annotation).value();
+                            targetParameterTypes[i] = ((Input) annotation).value();
                             break;
                         }
                     }

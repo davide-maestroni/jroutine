@@ -14,9 +14,11 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Alias;
+import com.gh.bmd.jrt.annotation.Input;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Inputs;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
-import com.gh.bmd.jrt.annotation.Params;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -44,7 +46,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getInputMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
 import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
@@ -99,12 +101,12 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @SuppressWarnings("unchecked")
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nullable final PassMode paramMode, @Nullable final PassMode returnMode) {
+            @Nullable final InputMode inputMode, @Nullable final PassMode returnMode) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
-        if (paramMode == PassMode.PARALLEL) {
+        if (inputMode == InputMode.ELEMENT) {
 
             final RoutineChannel<Object, Object> routineChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
@@ -139,7 +141,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = routineChannel.result();
 
-        } else if (paramMode == PassMode.VALUE) {
+        } else if (inputMode == InputMode.VALUE) {
 
             final RoutineChannel<Object, Object> routineChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -161,7 +163,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = routineChannel.result();
 
-        } else if (paramMode == PassMode.COLLECTION) {
+        } else if (inputMode == InputMode.COLLECTION) {
 
             outputChannel = routine.invokeAsync().pass((OutputChannel<Object>) args[0]).result();
 
@@ -398,7 +400,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         @Nonnull
         private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
-                @Nonnull final Method targetMethod, @Nullable final PassMode paramMode,
+                @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
                 @Nullable final PassMode returnMode) {
 
             String shareGroup = mProxyConfiguration.getShareGroupOr(null);
@@ -414,7 +416,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             warn(configuration);
             builder.withInputOrder(
-                    (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASS_ORDER)
+                    (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER)
                    .withInputMaxSize(Integer.MAX_VALUE)
                    .withInputTimeout(TimeDuration.ZERO)
                    .withOutputOrder((returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER
@@ -436,7 +438,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             }
 
             return getRoutine(builder.set(), shareGroup, targetMethod,
-                              (paramMode == PassMode.COLLECTION),
+                              (inputMode == InputMode.COLLECTION),
                               (returnMode == PassMode.COLLECTION));
         }
 
@@ -457,25 +459,25 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            PassMode asyncParamMode = null;
+            InputMode inputMode = null;
             PassMode asyncReturnMode = null;
             Class<?> returnClass = null;
             final Class<?>[] targetParameterTypes;
-            final Params paramsAnnotation = method.getAnnotation(Params.class);
+            final Inputs inputsAnnotation = method.getAnnotation(Inputs.class);
             final Param methodAnnotation = method.getAnnotation(Param.class);
 
-            if (paramsAnnotation != null) {
+            if (inputsAnnotation != null) {
 
                 if (methodAnnotation != null) {
 
                     throw new IllegalArgumentException(
                             "cannot have both " + Param.class.getSimpleName() + " and "
-                                    + Params.class.getSimpleName()
+                                    + Inputs.class.getSimpleName()
                                     + " annotations on the same method: " + method);
                 }
 
-                targetParameterTypes = paramsAnnotation.value();
-                asyncParamMode = getParamMode(method);
+                targetParameterTypes = inputsAnnotation.value();
+                inputMode = getInputMode(method);
                 asyncReturnMode = PassMode.VALUE;
 
                 if (!method.getReturnType().isAssignableFrom(RoutineChannel.class)) {
@@ -498,18 +500,17 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                 for (int i = 0; i < length; ++i) {
 
-                    final PassMode paramMode = getParamMode(method, i);
+                    final InputMode paramMode = getInputMode(method, i);
 
                     if (paramMode != null) {
 
-                        asyncParamMode = paramMode;
+                        inputMode = paramMode;
 
                         for (final Annotation paramAnnotation : annotations[i]) {
 
-                            if (paramAnnotation.annotationType() == Param.class) {
+                            if (paramAnnotation.annotationType() == Input.class) {
 
-                                final Param passAnnotation = (Param) paramAnnotation;
-                                targetParameterTypes[i] = passAnnotation.value();
+                                targetParameterTypes[i] = ((Input) paramAnnotation).value();
                                 break;
                             }
                         }
@@ -551,7 +552,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                     if (methodAnnotation == null) {
 
-                        if (paramsAnnotation == null) {
+                        if (inputsAnnotation == null) {
 
                             isError = !returnType.isAssignableFrom(targetReturnType);
                         }
@@ -576,15 +577,15 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             }
 
             final Routine<Object, Object> routine =
-                    buildRoutine(method, targetMethod, asyncParamMode, asyncReturnMode);
+                    buildRoutine(method, targetMethod, inputMode, asyncReturnMode);
 
-            if (paramsAnnotation != null) {
+            if (inputsAnnotation != null) {
 
-                return (asyncParamMode == PassMode.PARALLEL) ? routine.invokeParallel()
+                return (inputMode == InputMode.ELEMENT) ? routine.invokeParallel()
                         : routine.invokeAsync();
             }
 
-            return callRoutine(routine, method, (args != null) ? args : NO_ARGS, asyncParamMode,
+            return callRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
                                asyncReturnMode);
         }
     }

@@ -32,6 +32,8 @@ import javax.annotation.Nonnull;
  */
 public interface Runner {
 
+    //TODO: isRunnerThread()??
+
     /**
      * Runs the specified execution (that is, it calls the execution <b><code>run()</code></b>
      * method inside the runner thread).

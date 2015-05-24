@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.annotation;
 
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -29,14 +29,14 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Params {
+public @interface Inputs {
 
     /**
-     * The asynchronous passing mode.
+     * The asynchronous input mode.
      *
      * @return the mode.
      */
-    PassMode mode() default PassMode.AUTO;
+    InputMode mode() default InputMode.AUTO;
 
     /**
      * The array of parameter classes.

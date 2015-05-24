@@ -20,6 +20,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.gh.bmd.jrt.android.R;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.annotation.Alias;
+import com.gh.bmd.jrt.annotation.Input;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Param;
 import com.gh.bmd.jrt.annotation.Param.PassMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
@@ -1088,10 +1090,10 @@ public class ContextObjectRoutineBuilderFragmentTest
         int add0(char c);
 
         @Alias("a")
-        int add1(@Param(value = char.class, mode = PassMode.VALUE) OutputChannel<Character> c);
+        int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        int add2(@Param(value = char.class, mode = PassMode.PARALLEL) OutputChannel<Character> c);
+        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("a")
         @Param(value = int.class, mode = PassMode.VALUE)
@@ -1100,27 +1102,27 @@ public class ContextObjectRoutineBuilderFragmentTest
         @Alias("a")
         @Param(value = int.class, mode = PassMode.VALUE)
         OutputChannel<Integer> add4(
-                @Param(value = char.class, mode = PassMode.VALUE) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
         @Param(value = int.class, mode = PassMode.VALUE)
         OutputChannel<Integer> add5(
-                @Param(value = char.class, mode = PassMode.PARALLEL) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("aa")
         int[] addA00(char[] c);
 
         @Alias("aa")
-        int[] addA01(@Param(value = char[].class,
-                mode = PassMode.VALUE) OutputChannel<char[]> c);
+        int[] addA01(@Input(value = char[].class,
+                mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        int[] addA02(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        int[] addA02(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        int[] addA03(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        int[] addA03(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
@@ -1129,17 +1131,17 @@ public class ContextObjectRoutineBuilderFragmentTest
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
         OutputChannel<int[]> addA05(
-                @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
-        OutputChannel<int[]> addA06(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        OutputChannel<int[]> addA06(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.VALUE)
-        OutputChannel<int[]> addA07(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        OutputChannel<int[]> addA07(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
@@ -1148,17 +1150,17 @@ public class ContextObjectRoutineBuilderFragmentTest
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
         OutputChannel<Integer> addA09(
-                @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addA10(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        OutputChannel<Integer> addA10(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addA11(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        OutputChannel<Integer> addA11(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
@@ -1167,17 +1169,17 @@ public class ContextObjectRoutineBuilderFragmentTest
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         List<int[]> addA13(
-                @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
-        List<int[]> addA14(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        List<int[]> addA14(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
-        List<int[]> addA15(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        List<int[]> addA15(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
@@ -1185,32 +1187,33 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
-        int[][] addA17(@Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+        int[][] addA17(
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
-        int[][] addA18(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        int[][] addA18(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
-        int[][] addA19(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        int[][] addA19(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
 
         @Alias("al")
-        List<Integer> addL01(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        List<Integer> addL01(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        List<Integer> addL02(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        List<Integer> addL02(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        List<Integer> addL03(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        List<Integer> addL03(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
@@ -1218,18 +1221,18 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
-        OutputChannel<List<Integer>> addL05(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        OutputChannel<List<Integer>> addL05(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
-        OutputChannel<List<Integer>> addL06(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        OutputChannel<List<Integer>> addL06(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.VALUE)
-        OutputChannel<List<Integer>> addL07(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        OutputChannel<List<Integer>> addL07(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
@@ -1237,18 +1240,18 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addL09(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        OutputChannel<Integer> addL09(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addL10(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        OutputChannel<Integer> addL10(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addL11(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        OutputChannel<Integer> addL11(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
@@ -1256,18 +1259,18 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
-        List<List<Integer>> addL13(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        List<List<Integer>> addL13(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
-        List<List<Integer>> addL14(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        List<List<Integer>> addL14(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
-        List<List<Integer>> addL15(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        List<List<Integer>> addL15(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
@@ -1275,18 +1278,18 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
-        List[] addL17(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        List[] addL17(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
-        List[] addL18(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        List[] addL18(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Param(value = List.class, mode = PassMode.PARALLEL)
-        List[] addL19(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        List[] addL19(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("g")
         int get0();
@@ -1299,7 +1302,7 @@ public class ContextObjectRoutineBuilderFragmentTest
         OutputChannel<Integer> get1();
 
         @Alias("s")
-        void set1(@Param(value = int.class, mode = PassMode.VALUE) OutputChannel<Integer> i);
+        void set1(@Input(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
 
         @Alias("ga")
         int[] getA0();
@@ -1312,7 +1315,7 @@ public class ContextObjectRoutineBuilderFragmentTest
         OutputChannel<Integer> getA1();
 
         @Alias("sa")
-        void setA1(@Param(value = int[].class, mode = PassMode.VALUE) OutputChannel<int[]> i);
+        void setA1(@Input(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
@@ -1320,14 +1323,14 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Alias("sa")
         void setA2(
-                @Param(value = int[].class, mode = PassMode.COLLECTION) OutputChannel<Integer> i);
+                @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("ga")
         @Param(value = int[].class, mode = PassMode.PARALLEL)
         int[][] getA3();
 
         @Alias("sa")
-        void setA3(@Param(value = int[].class, mode = PassMode.PARALLEL) OutputChannel<int[]> i);
+        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
 
         @Alias("gl")
         List<Integer> getL0();
@@ -1340,26 +1343,27 @@ public class ContextObjectRoutineBuilderFragmentTest
         OutputChannel<Integer> getL1();
 
         @Alias("sl")
-        void setL1(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Integer>> i);
+        void setL1(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List<List<Integer>> getL2();
 
         @Alias("sl")
-        void setL2(@Param(value = List.class, mode = PassMode.COLLECTION) OutputChannel<Integer> i);
+        void setL2(
+                @Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("gl")
         @Param(value = List.class, mode = PassMode.PARALLEL)
         List[] getL3();
 
         @Alias("sl")
-        void setL3(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Integer>> i);
+        void setL3(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
 
         @Alias("s")
-        void set2(@Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
+        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
     }
 
     private interface CountError {
@@ -1412,12 +1416,12 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Timeout(10000)
         @Param(int.class)
-        int[] inc(@Param(int.class) int... i);
+        int[] inc(@Input(int.class) int... i);
 
         @Timeout(10000)
         @Alias("inc")
         @Param(int.class)
-        Iterable<Integer> incIterable(@Param(int.class) int... i);
+        Iterable<Integer> incIterable(@Input(int.class) int... i);
     }
 
     private interface SquareItf {
@@ -1437,73 +1441,73 @@ public class ContextObjectRoutineBuilderFragmentTest
 
         @Alias("compute")
         @Timeout(10000)
-        int computeAsync(@Param(int.class) OutputChannel<Integer> i);
+        int computeAsync(@Input(int.class) OutputChannel<Integer> i);
 
         @ShareGroup(ShareGroup.NONE)
         @Alias("compute")
         @Param(int.class)
-        OutputChannel<Integer> computeParallel1(@Param(int.class) int... i);
+        OutputChannel<Integer> computeParallel1(@Input(int.class) int... i);
 
         @Alias("compute")
         @Param(int.class)
-        OutputChannel<Integer> computeParallel2(@Param(int.class) Integer... i);
+        OutputChannel<Integer> computeParallel2(@Input(int.class) Integer... i);
 
         @ShareGroup(ShareGroup.NONE)
         @Alias("compute")
         @Param(int.class)
-        OutputChannel<Integer> computeParallel3(@Param(int.class) List<Integer> i);
+        OutputChannel<Integer> computeParallel3(@Input(int.class) List<Integer> i);
 
         @ShareGroup(ShareGroup.NONE)
         @Alias("compute")
         @Param(int.class)
         OutputChannel<Integer> computeParallel4(
-                @Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
+                @Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
     }
 
     private interface SumError {
 
-        int compute(int a, @Param(int.class) int[] b);
+        int compute(int a, @Input(int.class) int[] b);
 
-        int compute(@Param(int.class) String[] ints);
+        int compute(@Input(int.class) String[] ints);
 
-        int compute(@Param(value = int.class, mode = PassMode.VALUE) int[] ints);
+        int compute(@Input(value = int.class, mode = InputMode.VALUE) int[] ints);
 
-        int compute(@Param(value = int.class, mode = PassMode.COLLECTION) Iterable<Integer> ints);
+        int compute(@Input(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
 
-        int compute(@Param(value = int.class,
-                mode = PassMode.COLLECTION) OutputChannel<Integer> ints);
+        int compute(@Input(value = int.class,
+                mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
 
         int compute(int a,
-                @Param(value = int[].class, mode = PassMode.COLLECTION) OutputChannel<Integer> b);
+                @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> b);
 
-        int compute(@Param(value = int.class, mode = PassMode.PARALLEL) Object ints);
+        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object ints);
 
-        int compute(@Param(value = int.class, mode = PassMode.PARALLEL) Object[] ints);
+        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object[] ints);
 
-        int compute(String text, @Param(value = int.class, mode = PassMode.PARALLEL) int[] ints);
+        int compute(String text, @Input(value = int.class, mode = InputMode.ELEMENT) int[] ints);
     }
 
     private interface SumItf {
 
-        int compute(int a, @Param(int.class) OutputChannel<Integer> b);
+        int compute(int a, @Input(int.class) OutputChannel<Integer> b);
 
-        int compute(@Param(int[].class) OutputChannel<Integer> ints);
-
-        @Alias("compute")
-        int compute1(@Param(value = int[].class, mode = PassMode.VALUE) OutputChannel<int[]> ints);
+        int compute(@Input(int[].class) OutputChannel<Integer> ints);
 
         @Alias("compute")
-        int computeList(@Param(List.class) OutputChannel<Integer> ints);
+        int compute1(@Input(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> ints);
 
         @Alias("compute")
-        int computeList1(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Integer> ints);
+        int computeList(@Input(List.class) OutputChannel<Integer> ints);
+
+        @Alias("compute")
+        int computeList1(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
     }
 
     @SuppressWarnings("unused")
     private interface TestItf {
 
-        void throwException(@Param(int.class) RuntimeException ex);
+        void throwException(@Input(int.class) RuntimeException ex);
 
         @Alias(TestClass.THROW)
         @Param(int.class)

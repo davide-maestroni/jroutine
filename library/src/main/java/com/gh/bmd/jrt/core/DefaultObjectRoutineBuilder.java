@@ -17,8 +17,8 @@ import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Inputs;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Output;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -47,7 +47,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getInputMode;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getOutputMode;
 import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
@@ -101,7 +101,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @SuppressWarnings("unchecked")
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nullable final InputMode inputMode, @Nullable final PassMode returnMode) {
+            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
@@ -174,7 +174,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         if (!Void.class.equals(boxingClass(returnType))) {
 
-            if (returnMode != null) {
+            if (outputMode != null) {
 
                 if (OutputChannel.class.isAssignableFrom(returnType)) {
 
@@ -401,7 +401,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         @Nonnull
         private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
                 @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
-                @Nullable final PassMode returnMode) {
+                @Nullable final OutputMode outputMode) {
 
             String shareGroup = mProxyConfiguration.getShareGroupOr(null);
             final RoutineConfiguration configuration = mRoutineConfiguration;
@@ -419,7 +419,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER)
                    .withInputMaxSize(Integer.MAX_VALUE)
                    .withInputTimeout(TimeDuration.ZERO)
-                   .withOutputOrder((returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER
+                   .withOutputOrder((outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER
                                             : OrderType.NONE)
                    .withOutputMaxSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
@@ -439,7 +439,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             return getRoutine(builder.set(), shareGroup, targetMethod,
                               (inputMode == InputMode.COLLECTION),
-                              (returnMode == PassMode.COLLECTION));
+                              (outputMode == OutputMode.ELEMENT));
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -460,25 +460,24 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             }
 
             InputMode inputMode = null;
-            PassMode asyncReturnMode = null;
-            Class<?> returnClass = null;
+            OutputMode outputMode = null;
             final Class<?>[] targetParameterTypes;
             final Inputs inputsAnnotation = method.getAnnotation(Inputs.class);
-            final Param methodAnnotation = method.getAnnotation(Param.class);
+            final Output outputAnnotation = method.getAnnotation(Output.class);
 
             if (inputsAnnotation != null) {
 
-                if (methodAnnotation != null) {
+                if (outputAnnotation != null) {
 
                     throw new IllegalArgumentException(
-                            "cannot have both " + Param.class.getSimpleName() + " and "
+                            "cannot have both " + Output.class.getSimpleName() + " and "
                                     + Inputs.class.getSimpleName()
                                     + " annotations on the same method: " + method);
                 }
 
                 targetParameterTypes = inputsAnnotation.value();
                 inputMode = getInputMode(method);
-                asyncReturnMode = PassMode.VALUE;
+                outputMode = OutputMode.VALUE;
 
                 if (!method.getReturnType().isAssignableFrom(RoutineChannel.class)) {
 
@@ -487,12 +486,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 }
 
             } else {
-
-                if (methodAnnotation != null) {
-
-                    returnClass = methodAnnotation.value();
-                    asyncReturnMode = getReturnMode(method);
-                }
 
                 targetParameterTypes = method.getParameterTypes();
                 final Annotation[][] annotations = method.getParameterAnnotations();
@@ -550,22 +543,19 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     final Class<?> targetReturnType = targetMethod.getReturnType();
                     boolean isError = false;
 
-                    if (methodAnnotation == null) {
+                    if (outputAnnotation != null) {
 
-                        if (inputsAnnotation == null) {
+                        outputMode = getOutputMode(method, targetReturnType);
 
-                            isError = !returnType.isAssignableFrom(targetReturnType);
-                        }
-
-                    } else {
-
-                        if ((asyncReturnMode == PassMode.PARALLEL) && returnType.isArray()) {
+                        if ((outputMode == OutputMode.COLLECTION) && returnType.isArray()) {
 
                             isError = !boxingClass(returnType.getComponentType()).isAssignableFrom(
                                     boxingClass(targetReturnType));
                         }
 
-                        isError |= !returnClass.isAssignableFrom(targetReturnType);
+                    } else if (inputsAnnotation == null) {
+
+                        isError = !returnType.isAssignableFrom(targetReturnType);
                     }
 
                     if (isError) {
@@ -573,11 +563,15 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                         throw new IllegalArgumentException(
                                 "the proxy method has incompatible return type: " + method);
                     }
+
+                } else if (outputAnnotation != null) {
+
+                    outputMode = getOutputMode(method, targetMethod.getReturnType());
                 }
             }
 
             final Routine<Object, Object> routine =
-                    buildRoutine(method, targetMethod, inputMode, asyncReturnMode);
+                    buildRoutine(method, targetMethod, inputMode, outputMode);
 
             if (inputsAnnotation != null) {
 
@@ -586,7 +580,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             }
 
             return callRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
-                               asyncReturnMode);
+                               outputMode);
         }
     }
 }

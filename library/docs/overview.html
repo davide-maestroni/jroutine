@@ -294,14 +294,14 @@
 
             private interface AsyncMain {
 
-                &commat;Param(int.class)
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Param(String.class) String[] args);
+                &commat;Output
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Input(String.class) String[] args);
 
-                &commat;Param(int.class)
+                &commat;Output
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Input(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
-                double squareRootMean(&commat;Param(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(&commat;Input(List.class) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>

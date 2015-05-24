@@ -34,7 +34,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @see com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy
  * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Param
+ * @see com.gh.bmd.jrt.annotation.Input
+ * @see com.gh.bmd.jrt.annotation.Inputs
+ * @see com.gh.bmd.jrt.annotation.Output
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction

@@ -36,11 +36,13 @@ public interface ServiceProxyBuilder<TYPE>
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param},
-     * as well as {@link com.gh.bmd.jrt.android.annotation.LoaderId},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+     * {@link com.gh.bmd.jrt.annotation.Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} and
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with

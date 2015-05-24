@@ -16,8 +16,8 @@ package com.gh.bmd.jrt.builder;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Inputs;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Output;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
@@ -128,11 +128,11 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the async input mode associated to the specified method parameter.
+     * Gets the input transfer mode associated to the specified method parameter.
      *
-     * @param method the target method.
+     * @param method the proxy method.
      * @param index  the index of the parameter.
-     * @return the async input mode.
+     * @return the input mode.
      */
     @Nullable
     public static InputMode getInputMode(@Nonnull final Method method, final int index) {
@@ -271,114 +271,112 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the async pass mode of the return type of the specified method.
+     * Gets the output transfer mode of the return type of the specified method.
      *
-     * @param method the target method.
-     * @return the async pass mode.
+     * @param method           the proxy method.
+     * @param targetReturnType the target return type.
+     * @return the output mode.
      */
     @Nullable
-    public static PassMode getReturnMode(@Nonnull final Method method) {
+    public static OutputMode getOutputMode(@Nonnull final Method method,
+            @Nonnull final Class<?> targetReturnType) {
 
-        final Param annotation = method.getAnnotation(Param.class);
+        final Output outputAnnotation = method.getAnnotation(Output.class);
 
-        if (annotation == null) {
+        if (outputAnnotation == null) {
 
             return null;
         }
 
         final Class<?> returnType = method.getReturnType();
-        PassMode passMode = annotation.mode();
+        OutputMode outputMode = outputAnnotation.value();
 
-        if (passMode == PassMode.AUTO) {
+        if (outputMode == OutputMode.AUTO) {
 
             if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
 
-                final Class<?> returnClass = annotation.value();
-
                 if (returnType.isArray() && !boxingClass(
-                        returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
+                        returnType.getComponentType()).isAssignableFrom(
+                        boxingClass(targetReturnType))) {
 
                     throw new IllegalArgumentException(
-                            "[" + method + "] the async output array with pass mode "
-                                    + PassMode.PARALLEL + " does not match the bound type: "
-                                    + returnClass.getCanonicalName());
+                            "[" + method + "] the async output array with mode "
+                                    + OutputMode.COLLECTION + " does not match the bound type: "
+                                    + targetReturnType.getCanonicalName());
                 }
 
-                passMode = PassMode.PARALLEL;
+                outputMode = OutputMode.COLLECTION;
 
             } else if (returnType.isAssignableFrom(OutputChannel.class)) {
 
-                final Class<?> returnClass = annotation.value();
+                if (targetReturnType.isArray() || Iterable.class.isAssignableFrom(
+                        targetReturnType)) {
 
-                if (returnClass.isArray() || Iterable.class.isAssignableFrom(returnClass)) {
-
-                    passMode = PassMode.COLLECTION;
+                    outputMode = OutputMode.ELEMENT;
 
                 } else {
 
-                    passMode = PassMode.VALUE;
+                    outputMode = OutputMode.VALUE;
                 }
 
             } else {
 
-                throw new IllegalArgumentException("[" + method + "] cannot automatically choose a "
-                                                           + "pass mode for an input of type: "
-                                                           + returnType.getCanonicalName());
+                throw new IllegalArgumentException(
+                        "[" + method + "] cannot automatically choose an "
+                                + "output mode for an output of type: "
+                                + returnType.getCanonicalName());
             }
 
-        } else if (passMode == PassMode.VALUE) {
+        } else if (outputMode == OutputMode.VALUE) {
 
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with pass mode " + PassMode.VALUE
+                        "[" + method + "] an async output with mode " + OutputMode.VALUE
                                 + " must be a superclass of " + channelClassName);
             }
 
-        } else if (passMode == PassMode.COLLECTION) {
+        } else if (outputMode == OutputMode.ELEMENT) {
 
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with pass mode " + PassMode.VALUE
+                        "[" + method + "] an async output with mode " + OutputMode.VALUE
                                 + " must be a superclass of " + channelClassName);
             }
 
-            final Class<?> returnClass = annotation.value();
-
-            if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(returnClass)) {
+            if (!targetReturnType.isArray() && !Iterable.class.isAssignableFrom(targetReturnType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with pass mode " + PassMode.COLLECTION
+                        "[" + method + "] an async output with mode " + OutputMode.ELEMENT
                                 + " must be bound to an array or a type implementing an "
                                 + Iterable.class.getCanonicalName());
             }
 
-        } else { // PassMode.PARALLEL
+        } else { // OutputMode.COLLECTION
 
             if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async output with pass mode " + PassMode.PARALLEL
+                        "[" + method + "] an async output with mode " + OutputMode.COLLECTION
                                 + " must be an array or a superclass of "
                                 + List.class.getCanonicalName());
             }
 
-            final Class<?> returnClass = annotation.value();
-
             if (returnType.isArray() && !boxingClass(
-                    returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
+                    returnType.getComponentType()).isAssignableFrom(
+                    boxingClass(targetReturnType))) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] the async output array with pass mode "
-                                + PassMode.PARALLEL + " does not match the bound type: "
-                                + returnClass.getCanonicalName());
+                        "[" + method + "] the async output array with mode " + OutputMode.COLLECTION
+                                + " does not match the bound type: "
+                                + targetReturnType.getCanonicalName());
             }
         }
 
-        return passMode;
+        return outputMode;
     }
 
     /**

@@ -28,11 +28,11 @@ import java.lang.annotation.Target;
  * the framework as well.
  * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a mirror
- * of another class methods. The interface can take some input parameters asynchronous way. In such
- * case, the value specified in the annotation will indicate the type of the parameter expected by
- * the target method.
+ * of another class methods. The interface can return the output in an asynchronous way. In such
+ * case, the value specified in the annotation will indicate the mode in which the output is
+ * transferred outside the routine.
  * <p/>
- * For example, a method taking two integers:
+ * For example, a method returning an integer:
  * <p/>
  * <pre>
  *     <code>
@@ -45,12 +45,23 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         public int sum(&#64;Input(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
+ *         &#64;Output
+ *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * <p/>
+ * The interface can also return an array or list of outputs:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Output
+ *         public List&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
  * <p/>
  * Note that the transfer mode is automatically inferred by the mirror and the target type, unless
- * specifically chosen through the annotation <code>mode</code> attribute.
+ * specifically chosen through the annotation value.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -60,68 +71,59 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.gh.bmd.jrt.annotation.Input *;
+ *              &#64;com.gh.bmd.jrt.annotation.Output *;
  *         }
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 23/05/15.
+ * Created by davide-maestroni on 24/05/15.
  */
 @Inherited
-@Target(ElementType.PARAMETER)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Input {
+public @interface Output {
 
     /**
-     * The input transfer mode.
+     * The output transfer mode.
      *
      * @return the mode.
      */
-    InputMode mode() default InputMode.AUTO;
+    OutputMode value() default OutputMode.AUTO;
 
     /**
-     * The parameter class.
-     *
-     * @return the class.
+     * Output transfer mode type.<br/>
+     * The mode indicates in which way the result is passed outside.
      */
-    Class<?> value();
-
-    /**
-     * Input transfer mode type.<br/>
-     * The mode indicates in which way a parameter is passed to the wrapped method.
-     */
-    enum InputMode {
+    enum OutputMode {
 
         /**
          * Value mode.<br/>
-         * The variable is just read from an output channel.
+         * The variable is just read passed to an output channel.
          * <p/>
-         * The annotated parameter must extends an {@link com.gh.bmd.jrt.channel.OutputChannel}.
+         * The annotated method must return a superclass of
+         * {@link com.gh.bmd.jrt.channel.OutputChannel}.
          */
         VALUE,
         /**
-         * Collection mode.<br/>
-         * The inputs are collected from the channel and passed as an array or collection to the
-         * wrapped method.
-         * <p/>
-         * The annotated parameter must extends an {@link com.gh.bmd.jrt.channel.OutputChannel} and
-         * must be the only parameter accepted by the method.
-         */
-        COLLECTION,
-        /**
          * Element mode.<br/>
-         * Each input is passed to a different parallel invocation of the wrapped method.
+         * The elements of the result array or iterable are passed one by one to the output channel.
          * <p/>
-         * The annotated parameter must be an array or implement an {@link java.lang.Iterable} and
-         * must be the only parameter accepted by the method.
+         * The annotated method must return a superclass of
+         * {@link com.gh.bmd.jrt.channel.OutputChannel}.
          */
         ELEMENT,
         /**
+         * Collection mode.<br/>
+         * The results are collected before being returned by the annotated method.
+         * <p/>
+         * The annotated method must return an array or a superclass of a {@link java.util.List}.
+         */
+        COLLECTION,
+        /**
          * Automatic mode.<br/>
-         * The mode is automatically assigned based to the parameter or return type. Namely: if the
-         * parameters match the COLLECTION input mode, they are assigned it; if they match the VALUE
-         * input mode, they are assigned the latter; finally the ELEMENT input mode conditions are
-         * checked.
+         * The mode is automatically assigned based to the return type. Namely: if the return type
+         * matches the COLLECTION output mode, it is assigned it; if it  matches the ELEMENT output
+         * mode, it is assigned the latter; finally the VALUE output mode conditions are checked.
          */
         AUTO
     }

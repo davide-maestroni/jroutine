@@ -30,8 +30,8 @@ import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Output;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -63,7 +63,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getInputMode;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getOutputMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
@@ -728,15 +728,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final boolean mIsInputCollection;
 
-        private final boolean mIsOutputCollection;
-
-        private final Method mMethod;
+        private final boolean mIsOutputElement;
 
         private final String mShareGroup;
 
         private final Class<?> mTargetClass;
 
-        private final Class<?>[] mTargetParameterTypes;
+        private final Method mTargetMethod;
 
         private Object mMutex;
 
@@ -745,66 +743,24 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetClass          the target object class.
-         * @param args                 the factory constructor arguments.
-         * @param shareGroup           the share group name.
-         * @param method               the method.
-         * @param targetParameterTypes the target method parameter types.
-         * @param isInputCollection    whether the input is a collection.
-         * @param isOutputCollection   whether the output is a collection.
+         * @param args              the factory constructor arguments.
+         * @param shareGroup        the share group name.
+         * @param targetClass       the target object class.
+         * @param targetMethod      the target method.
+         * @param isInputCollection whether the input is a collection.
+         * @param isOutputElement   whether the output is a collection.
          */
-        public ProxyInvocation(@Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
-                @Nullable final String shareGroup, @Nonnull final Method method,
-                @Nonnull final Class<?>[] targetParameterTypes, final boolean isInputCollection,
-                final boolean isOutputCollection) {
+        public ProxyInvocation(@Nonnull final Object[] args, @Nullable final String shareGroup,
+                @Nonnull final Class<?> targetClass, @Nonnull final Method targetMethod,
+                final boolean isInputCollection, final boolean isOutputElement) {
 
-            mTargetClass = targetClass;
             mArgs = args;
             mShareGroup = shareGroup;
-            mMethod = method;
-            mTargetParameterTypes = targetParameterTypes;
+            mTargetClass = targetClass;
+            mTargetMethod = targetMethod;
             mIsInputCollection = isInputCollection;
-            mIsOutputCollection = isOutputCollection;
+            mIsOutputElement = isOutputElement;
             mMutex = this;
-        }
-
-        @Nonnull
-        private Method getTargetMethod(@Nonnull final Method method,
-                @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
-
-            String name = null;
-            Method targetMethod = null;
-            final Class<?> targetClass = mTarget.getClass();
-            final Alias annotation = method.getAnnotation(Alias.class);
-
-            if (annotation != null) {
-
-                name = annotation.value();
-                targetMethod = getAnnotatedMethod(targetClass, name);
-            }
-
-            if (targetMethod == null) {
-
-                if (name == null) {
-
-                    name = method.getName();
-                }
-
-                try {
-
-                    targetMethod = targetClass.getMethod(name, targetParameterTypes);
-
-                } catch (final NoSuchMethodException ignored) {
-
-                }
-
-                if (targetMethod == null) {
-
-                    targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
-                }
-            }
-
-            return targetMethod;
         }
 
         @Override
@@ -814,28 +770,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final Method method = mMethod;
-                final Class<?>[] targetParameterTypes = mTargetParameterTypes;
-                final Method targetMethod = getTargetMethod(method, targetParameterTypes);
+                final Method targetMethod = mTargetMethod;
+                final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
                 final Class<?> returnType = targetMethod.getReturnType();
-                final Param annotation = method.getAnnotation(Param.class);
-                final Class<?> expectedType;
-
-                if (annotation != null) {
-
-                    expectedType = annotation.value();
-
-                } else {
-
-                    expectedType = method.getReturnType();
-                }
-
-                if (!returnType.isAssignableFrom(expectedType)) {
-
-                    throw new IllegalArgumentException(
-                            "the proxy method has incompatible return type: " + method);
-                }
-
                 final Object methodResult;
 
                 synchronized (mMutex) {
@@ -870,7 +807,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
                 if (!Void.class.equals(boxingClass(returnType))) {
 
-                    if (mIsOutputCollection) {
+                    if (mIsOutputElement) {
 
                         if (returnType.isArray()) {
 
@@ -952,9 +889,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Nonnull
         public ContextInvocation<Object, Object> newInvocation(@Nonnull final Object... args) {
 
-            return new ProxyInvocation((Class<?>) args[0], (Object[]) args[1], (String) args[2],
-                                       (Method) args[3], (Class<?>[]) args[4], (Boolean) args[5],
-                                       (Boolean) args[6]);
+            return new ProxyInvocation((Object[]) args[0], (String) args[1], (Class<?>) args[2],
+                                       (Method) args[3], (Boolean) args[4], (Boolean) args[5]);
         }
     }
 
@@ -1026,23 +962,28 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 }
             }
 
-            PassMode returnMode = null;
             final Class<?> returnType = method.getReturnType();
-            final Param methodAnnotation = method.getAnnotation(Param.class);
+            final Method targetMethod = getTargetMethod(method, targetParameterTypes);
+            final Class<?> targetReturnType = targetMethod.getReturnType();
+            final OutputMode outputMode = getOutputMode(method, targetReturnType);
 
-            if (methodAnnotation != null) {
+            if (outputMode == null) {
 
-                returnMode = getReturnMode(method);
+                if (!returnType.isAssignableFrom(targetReturnType)) {
+
+                    throw new IllegalArgumentException(
+                            "the proxy method has incompatible return type: " + method);
+                }
             }
 
             final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
-            final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
+            final boolean isOutputElement = (outputMode == OutputMode.ELEMENT);
             final Object[] invocationArgs =
-                    new Object[]{mTargetClass, mArgs, shareGroup, method, targetParameterTypes,
-                                 isInputCollection, isOutputCollection};
+                    new Object[]{mArgs, shareGroup, mTargetClass, targetMethod, isInputCollection,
+                                 isOutputElement};
             final OrderType inputOrderType = (isParallel) ? OrderType.NONE : OrderType.PASS_ORDER;
             final OrderType outputOrderType =
-                    (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER : OrderType.NONE;
+                    (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
             final LoaderRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, sProxyFactory);
             final RoutineConfiguration routineConfiguration =
@@ -1100,11 +1041,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 }
             }
 
+            final Output outputAnnotation = method.getAnnotation(Output.class);
             final OutputChannel<Object> outputChannel = routineChannel.result();
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                if (methodAnnotation != null) {
+                if (outputAnnotation != null) {
 
                     if (OutputChannel.class.isAssignableFrom(returnType)) {
 
@@ -1135,6 +1077,45 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             }
 
             return null;
+        }
+
+        @Nonnull
+        private Method getTargetMethod(@Nonnull final Method method,
+                @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
+
+            String name = null;
+            Method targetMethod = null;
+            final Class<?> targetClass = mTargetClass;
+            final Alias annotation = method.getAnnotation(Alias.class);
+
+            if (annotation != null) {
+
+                name = annotation.value();
+                targetMethod = getAnnotatedMethod(targetClass, name);
+            }
+
+            if (targetMethod == null) {
+
+                if (name == null) {
+
+                    name = method.getName();
+                }
+
+                try {
+
+                    targetMethod = targetClass.getMethod(name, targetParameterTypes);
+
+                } catch (final NoSuchMethodException ignored) {
+
+                }
+
+                if (targetMethod == null) {
+
+                    targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
+                }
+            }
+
+            return targetMethod;
         }
     }
 

@@ -26,8 +26,8 @@ import com.gh.bmd.jrt.android.v4.core.JRoutine;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Output;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
@@ -628,16 +628,16 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("a")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add3(char c);
 
         @Alias("a")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add4(
                 @Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add5(
                 @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
@@ -657,78 +657,78 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA04(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA05(
                 @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA06(@Input(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA08(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA09(
                 @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA10(@Input(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@Input(value = char[].class,
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> addA12(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> addA13(
                 @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> addA14(@Input(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> addA15(@Input(value = char[].class,
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         int[][] addA16(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         int[][] addA17(
                 @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         int[][] addA18(@Input(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
@@ -748,78 +748,78 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL04(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL05(@Input(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL06(@Input(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL08(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL09(@Input(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL10(@Input(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@Input(value = List.class,
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL12(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL13(@Input(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL14(@Input(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL15(@Input(value = List.class,
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List[] addL16(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List[] addL17(@Input(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List[] addL18(@Input(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List[] addL19(@Input(value = List.class,
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
@@ -830,7 +830,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         void set0(int i);
 
         @Alias("g")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> get1();
 
         @Alias("s")
@@ -843,14 +843,14 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         void setA0(int[] i);
 
         @Alias("ga")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> getA1();
 
         @Alias("sa")
         void setA1(@Input(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> i);
 
         @Alias("ga")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> getA2();
 
         @Alias("sa")
@@ -858,7 +858,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                 @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("ga")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         int[][] getA3();
 
         @Alias("sa")
@@ -871,7 +871,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         void setL0(List<Integer> i);
 
         @Alias("gl")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> getL1();
 
         @Alias("sl")
@@ -879,7 +879,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                 mode = InputMode.VALUE) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<List<Integer>> getL2();
 
         @Alias("sl")
@@ -887,7 +887,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
                 @Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("gl")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List[] getL3();
 
         @Alias("sl")
@@ -901,10 +901,10 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     @V11Proxy(TestClass2.class)
     public interface TestClassAsync {
 
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getOne();
 
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getTwo();
     }
 
@@ -918,7 +918,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     public interface TestInterfaceProxy {
 
         @Timeout(3000)
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getOne();
     }
 
@@ -930,11 +930,11 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
         TYPE get(int i);
 
         @Alias("get")
-        @Param(Object.class)
+        @Output
         OutputChannel<TYPE> getAsync(int i);
 
         @Alias("get")
-        @Param(Object.class)
+        @Output
         List<TYPE> getList(int i);
     }
 
@@ -943,30 +943,30 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     public interface TestProxy {
 
         @Timeout(3000)
-        @Param(List.class)
+        @Output
         Iterable<Iterable> getList(@Input(List.class) List<? extends List<String>> i);
 
         @Timeout(3000)
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getOne();
 
         @Timeout(3000)
         String getString(@Input(int.class) int... i);
 
         @Timeout(3000)
-        @Param(String.class)
+        @Output
         OutputChannel<String> getString(@Input(int.class) HashSet<Integer> i);
 
         @Timeout(3000)
-        @Param(String.class)
+        @Output
         List<String> getString(@Input(int.class) List<Integer> i);
 
         @Timeout(3000)
-        @Param(String.class)
+        @Output
         Iterable<String> getString(@Input(int.class) Iterable<Integer> i);
 
         @Timeout(3000)
-        @Param(String.class)
+        @Output
         String[] getString(@Input(int.class) Collection<Integer> i);
 
         @Timeout(3000)
@@ -976,7 +976,7 @@ public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<T
     @V11Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
-        @Param(int.class)
+        @Output
         @TimeoutAction(TimeoutActionType.ABORT)
         List<Integer> getInt();
     }

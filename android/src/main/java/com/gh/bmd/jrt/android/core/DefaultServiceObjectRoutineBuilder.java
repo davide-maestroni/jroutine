@@ -22,8 +22,8 @@ import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Output;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -56,7 +56,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getInputMode;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getOutputMode;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
@@ -408,7 +408,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         warn(mServiceConfiguration.getLogClassOr(null), mRoutineConfiguration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                                                    new ProxyInvocationHandler(this, itf));
+                                                    new ProxyInvocationHandler(this));
         return itf.cast(proxy);
     }
 
@@ -674,17 +674,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final boolean mIsInputCollection;
 
-        private final boolean mIsOutputCollection;
-
-        private final String mMethodName;
-
-        private final Class<?>[] mParameterTypes;
-
-        private final Class<?> mProxyClass;
+        private final boolean mIsOutputElement;
 
         private final String mShareGroup;
 
         private final Class<?> mTargetClass;
+
+        private final String mTargetMethodName;
 
         private final Class<?>[] mTargetParameterTypes;
 
@@ -695,74 +691,29 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param proxyClassName       the proxy class name.
-         * @param targetClassName      the target object class name.
          * @param args                 the factory constructor arguments.
          * @param shareGroup           the share group name.
-         * @param name                 the method name.
-         * @param parameterTypes       the method parameter type names.
+         * @param targetClassName      the target object class name.
+         * @param targetMethodName     the target method name.
          * @param targetParameterTypes the target method parameter type names.
          * @param isInputCollection    whether the input is a collection.
-         * @param isOutputCollection   whether the output is a collection.
+         * @param isOutputElement      whether the output is a collection.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
         @SuppressWarnings("unchecked")
-        public ProxyInvocation(@Nonnull final String proxyClassName,
-                @Nonnull final String targetClassName, @Nonnull final Object[] args,
-                @Nullable final String shareGroup, @Nonnull final String name,
-                @Nonnull final String[] parameterTypes,
+        public ProxyInvocation(@Nonnull final Object[] args, @Nullable final String shareGroup,
+                @Nonnull final String targetClassName, @Nonnull final String targetMethodName,
                 @Nonnull final String[] targetParameterTypes, final boolean isInputCollection,
-                final boolean isOutputCollection) throws ClassNotFoundException {
+                final boolean isOutputElement) throws ClassNotFoundException {
 
-            mProxyClass = Class.forName(proxyClassName);
-            mTargetClass = Class.forName(targetClassName);
             mArgs = args;
             mShareGroup = shareGroup;
-            mMethodName = name;
-            mParameterTypes = forNames(parameterTypes);
+            mTargetClass = Class.forName(targetClassName);
+            mTargetMethodName = targetMethodName;
             mTargetParameterTypes = forNames(targetParameterTypes);
             mIsInputCollection = isInputCollection;
-            mIsOutputCollection = isOutputCollection;
+            mIsOutputElement = isOutputElement;
             mMutex = this;
-        }
-
-        @Nonnull
-        private Method getTargetMethod(@Nonnull final Method method,
-                @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
-
-            String name = null;
-            Method targetMethod = null;
-            final Class<?> targetClass = mTarget.getClass();
-            final Alias annotation = method.getAnnotation(Alias.class);
-
-            if (annotation != null) {
-
-                name = annotation.value();
-                targetMethod = getAnnotatedMethod(targetClass, name);
-            }
-
-            if (targetMethod == null) {
-
-                if (name == null) {
-
-                    name = method.getName();
-                }
-
-                try {
-
-                    targetMethod = targetClass.getMethod(name, targetParameterTypes);
-
-                } catch (final NoSuchMethodException ignored) {
-
-                }
-
-                if (targetMethod == null) {
-
-                    targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
-                }
-            }
-
-            return targetMethod;
         }
 
         @Override
@@ -772,28 +723,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                final Class<?>[] parameterTypes = mParameterTypes;
                 final Class<?>[] targetParameterTypes = mTargetParameterTypes;
-                final Method method = mProxyClass.getMethod(mMethodName, parameterTypes);
-                final Method targetMethod = getTargetMethod(method, targetParameterTypes);
+                final Method targetMethod =
+                        mTargetClass.getMethod(mTargetMethodName, targetParameterTypes);
                 final Class<?> returnType = targetMethod.getReturnType();
-                final Param annotation = method.getAnnotation(Param.class);
-                final Class<?> expectedType;
-
-                if (annotation != null) {
-
-                    expectedType = annotation.value();
-
-                } else {
-
-                    expectedType = method.getReturnType();
-                }
-
-                if (!returnType.isAssignableFrom(expectedType)) {
-
-                    throw new IllegalArgumentException(
-                            "the proxy method has incompatible return type: " + method);
-                }
 
                 final Object methodResult;
 
@@ -829,7 +762,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 if (!Void.class.equals(boxingClass(returnType))) {
 
-                    if (mIsOutputCollection) {
+                    if (mIsOutputElement) {
 
                         if (returnType.isArray()) {
 
@@ -905,8 +838,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Context mContext;
 
-        private final Class<?> mProxyClass;
-
         private final ProxyConfiguration mProxyConfiguration;
 
         private final RoutineConfiguration mRoutineConfiguration;
@@ -918,18 +849,15 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param builder    the builder instance.
-         * @param proxyClass the proxy class.
+         * @param builder the builder instance.
          */
-        private ProxyInvocationHandler(@Nonnull final DefaultServiceObjectRoutineBuilder builder,
-                @Nonnull final Class<?> proxyClass) {
+        private ProxyInvocationHandler(@Nonnull final DefaultServiceObjectRoutineBuilder builder) {
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
             mRoutineConfiguration = builder.mRoutineConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mServiceConfiguration = builder.mServiceConfiguration;
-            mProxyClass = proxyClass;
             mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         }
 
@@ -969,28 +897,33 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 }
             }
 
-            PassMode returnMode = null;
             final Class<?> returnType = method.getReturnType();
-            final Param methodAnnotation = method.getAnnotation(Param.class);
+            final Method targetMethod = getTargetMethod(method, targetParameterTypes);
+            final Class<?> targetReturnType = targetMethod.getReturnType();
+            final OutputMode outputMode = getOutputMode(method, targetReturnType);
 
-            if (methodAnnotation != null) {
+            if (outputMode == null) {
 
-                returnMode = getReturnMode(method);
+                if (!returnType.isAssignableFrom(targetReturnType)) {
+
+                    throw new IllegalArgumentException(
+                            "the proxy method has incompatible return type: " + method);
+                }
             }
 
-            final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
+            final boolean isOutputElement = (outputMode == OutputMode.ELEMENT);
             final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
                             .withRoutine()
                             .with(configurationWithTimeout(mRoutineConfiguration, method))
-                            .withFactoryArgs(mProxyClass.getName(), mTargetClass.getName(), mArgs,
+                            .withFactoryArgs(mArgs,
                                              groupWithShareAnnotation(mProxyConfiguration, method),
-                                             method.getName(), toNames(parameterTypes),
+                                             mTargetClass.getName(), targetMethod.getName(),
                                              toNames(targetParameterTypes), isInputCollection,
-                                             isOutputCollection)
+                                             isOutputElement)
                             .withInputOrder((isParallel) ? OrderType.NONE : OrderType.PASS_ORDER)
                             .withOutputOrder(
-                                    (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER
+                                    (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER
                                             : OrderType.NONE)
                             .set()
                             .withService()
@@ -1038,11 +971,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 }
             }
 
+            final Output outputAnnotation = method.getAnnotation(Output.class);
             final OutputChannel<Object> outputChannel = routineChannel.result();
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                if (methodAnnotation != null) {
+                if (outputAnnotation != null) {
 
                     if (OutputChannel.class.isAssignableFrom(returnType)) {
 
@@ -1073,6 +1007,45 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             }
 
             return null;
+        }
+
+        @Nonnull
+        private Method getTargetMethod(@Nonnull final Method method,
+                @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
+
+            String name = null;
+            Method targetMethod = null;
+            final Class<?> targetClass = mTargetClass;
+            final Alias annotation = method.getAnnotation(Alias.class);
+
+            if (annotation != null) {
+
+                name = annotation.value();
+                targetMethod = getAnnotatedMethod(targetClass, name);
+            }
+
+            if (targetMethod == null) {
+
+                if (name == null) {
+
+                    name = method.getName();
+                }
+
+                try {
+
+                    targetMethod = targetClass.getMethod(name, targetParameterTypes);
+
+                } catch (final NoSuchMethodException ignored) {
+
+                }
+
+                if (targetMethod == null) {
+
+                    targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
+                }
+            }
+
+            return targetMethod;
         }
     }
 

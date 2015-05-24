@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 /**
  * TODO
  * <p/>
- * Created by davide on 22/05/15.
+ * Created by davide-maestroni on 22/05/15.
  */
 @Inherited
 @Target(ElementType.METHOD)
@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
 public @interface Inputs {
 
     /**
-     * The asynchronous input mode.
+     * The input transfer mode.
      *
      * @return the mode.
      */

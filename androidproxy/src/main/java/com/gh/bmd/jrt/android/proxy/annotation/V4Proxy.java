@@ -27,8 +27,9 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
- * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}, as
+ * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+ * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+ * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as
  * well as v4 builder annotations defined for each interface method.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to

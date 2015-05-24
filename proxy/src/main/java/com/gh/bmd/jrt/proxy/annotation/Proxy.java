@@ -25,8 +25,9 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
- * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
+ * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+ * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+ * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
  * annotations defined for each interface method.
  * <p/>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
@@ -67,11 +68,11 @@ import java.lang.annotation.Target;
  *                 TYPE get(int i);
  *
  *                 &#64;Alias("get")
- *                 &#64;Param(Object.class)
+ *                 &#64;Output
  *                 OutputChannel&lt;TYPE&gt; getAsync(int i);
  *
  *                 &#64;Alias("get")
- *                 &#64;Param(Object.class)
+ *                 &#64;Output
  *                 List&lt;TYPE&gt; getList(int i);
  *             }
  *     </code>

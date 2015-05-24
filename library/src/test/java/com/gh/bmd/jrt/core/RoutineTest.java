@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
-import com.gh.bmd.jrt.annotation.Param;
+import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.InputDeadlockException;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
@@ -2888,7 +2888,7 @@ public class RoutineTest {
 
         int getInt(@Input(int.class) OutputChannel<Integer> i);
 
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getOne();
 
         @Alias(value = "getInt")

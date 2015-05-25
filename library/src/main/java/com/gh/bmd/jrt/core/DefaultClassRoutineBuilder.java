@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -22,8 +21,6 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
@@ -33,22 +30,18 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.RoutineBuilders.callInvocation;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedStaticMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.common.Reflection.boxingClass;
+import static com.gh.bmd.jrt.common.Reflection.findMethod;
 
 /**
  * Class implementing a builder of routines wrapping a class method.
@@ -72,8 +65,6 @@ class DefaultClassRoutineBuilder
                                                          (Boolean) args[3], (Boolean) args[4]);
                 }
             };
-
-    private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
 
     private final Class<?> mTargetClass;
 
@@ -101,7 +92,6 @@ class DefaultClassRoutineBuilder
 
         mTargetClass = targetClass;
         mTargetReference = null;
-        fillMethodMap(true);
     }
 
     /**
@@ -115,13 +105,12 @@ class DefaultClassRoutineBuilder
 
         mTargetClass = target.getClass();
         mTargetReference = new WeakReference<Object>(target);
-        fillMethodMap(false);
     }
 
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        final Method method = mMethodMap.get(name);
+        final Method method = getAnnotatedStaticMethod(mTargetClass, name);
 
         if (method == null) {
 
@@ -142,30 +131,7 @@ class DefaultClassRoutineBuilder
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
-        final Class<?> targetClass = mTargetClass;
-        Method targetMethod = null;
-
-        try {
-
-            targetMethod = targetClass.getMethod(name, parameterTypes);
-
-        } catch (final NoSuchMethodException ignored) {
-
-        }
-
-        if (targetMethod == null) {
-
-            try {
-
-                targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
-
-            } catch (final NoSuchMethodException e) {
-
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        return method(targetMethod);
+        return method(findMethod(mTargetClass, name, parameterTypes));
     }
 
     @Nonnull
@@ -207,19 +173,6 @@ class DefaultClassRoutineBuilder
     }
 
     /**
-     * Gets the annotated method associated to the specified name.
-     *
-     * @param name the name specified in the annotation.
-     * @return the method or null.
-     * @see com.gh.bmd.jrt.annotation.Alias
-     */
-    @Nullable
-    protected Method getAnnotatedMethod(final String name) {
-
-        return mMethodMap.get(name);
-    }
-
-    /**
      * Returns the internal share configuration.
      *
      * @return the configuration.
@@ -246,11 +199,6 @@ class DefaultClassRoutineBuilder
             @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
             @Nonnull final Method method, final boolean isInputCollection,
             final boolean isOutputElement) {
-
-        if (!method.isAccessible()) {
-
-            AccessController.doPrivileged(new SetAccessibleAction(method));
-        }
 
         final Object target = (mTargetReference != null) ? mTargetReference.get() : mTargetClass;
 
@@ -473,70 +421,10 @@ class DefaultClassRoutineBuilder
         }
     }
 
-    private void fillMap(@Nonnull final HashMap<String, Method> map,
-            @Nonnull final Method[] methods, final boolean isClass) {
-
-        for (final Method method : methods) {
-
-            final boolean isStatic = Modifier.isStatic(method.getModifiers());
-
-            if (isClass) {
-
-                if (!isStatic) {
-
-                    continue;
-                }
-
-            } else if (isStatic) {
-
-                continue;
-            }
-
-            final Alias annotation = method.getAnnotation(Alias.class);
-
-            if (annotation != null) {
-
-                final String name = annotation.value();
-
-                if (map.containsKey(name)) {
-
-                    throw new IllegalArgumentException(
-                            "the name '" + name + "' has already been used to identify a different"
-                                    + " method");
-                }
-
-                map.put(name, method);
-            }
-        }
-    }
-
-    private void fillMethodMap(final boolean isClass) {
-
-        final Class<?> targetClass = mTargetClass;
-        final HashMap<String, Method> methodMap = mMethodMap;
-        fillMap(methodMap, targetClass.getMethods(), isClass);
-        final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
-        fillMap(declaredMethodMap, targetClass.getDeclaredMethods(), isClass);
-
-        for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
-
-            final String name = methodEntry.getKey();
-
-            if (!methodMap.containsKey(name)) {
-
-                methodMap.put(name, methodEntry.getValue());
-            }
-        }
-    }
-
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
     private static class MethodProcedureInvocation extends ProcedureInvocation<Object, Object> {
-
-        private final boolean mHasResult;
-
-        private final boolean mIsArrayResult;
 
         private final boolean mIsInputCollection;
 
@@ -566,99 +454,21 @@ class DefaultClassRoutineBuilder
             mMutex = (mutex != null) ? mutex : this;
             mIsInputCollection = isInputCollection;
             mIsOutputElement = isOutputElement;
-            final Class<?> returnClass = method.getReturnType();
-            mHasResult = !Void.class.equals(boxingClass(returnClass));
-            mIsArrayResult = returnClass.isArray();
         }
 
         @Override
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            synchronized (mMutex) {
+            final Object target = mTargetReference.get();
 
-                final Object target = mTargetReference.get();
+            if (target == null) {
 
-                if (target == null) {
-
-                    throw new IllegalStateException("the target object has been destroyed");
-                }
-
-                final Method method = mMethod;
-
-                try {
-
-                    final Object[] args;
-
-                    if (mIsInputCollection) {
-
-                        final Class<?> paramClass = method.getParameterTypes()[0];
-
-                        if (paramClass.isArray()) {
-
-                            final int size = objects.size();
-                            final Object array =
-                                    Array.newInstance(paramClass.getComponentType(), size);
-
-                            for (int i = 0; i < size; ++i) {
-
-                                Array.set(array, i, objects.get(i));
-                            }
-
-                            args = new Object[]{array};
-
-                        } else {
-
-                            args = new Object[]{objects};
-                        }
-
-                    } else {
-
-                        args = objects.toArray(new Object[objects.size()]);
-                    }
-
-                    final Object methodResult = method.invoke(target, args);
-
-                    if (mHasResult) {
-
-                        if (mIsOutputElement) {
-
-                            if (mIsArrayResult) {
-
-                                if (methodResult != null) {
-
-                                    final int length = Array.getLength(methodResult);
-
-                                    for (int i = 0; i < length; ++i) {
-
-                                        result.pass(Array.get(methodResult, i));
-                                    }
-                                }
-
-                            } else {
-
-                                result.pass((Iterable<?>) methodResult);
-                            }
-
-                        } else {
-
-                            result.pass(methodResult);
-                        }
-                    }
-
-                } catch (final RoutineException e) {
-
-                    throw e;
-
-                } catch (final InvocationTargetException e) {
-
-                    throw new InvocationException(e.getCause());
-
-                } catch (final Throwable t) {
-
-                    throw new InvocationException(t);
-                }
+                throw new IllegalStateException("the target object has been destroyed");
             }
+
+            callInvocation(target, mMethod, mMutex, mIsInputCollection, mIsOutputElement, objects,
+                           result);
         }
     }
 
@@ -728,30 +538,6 @@ class DefaultClassRoutineBuilder
                     && mIsOutputElement == that.mIsOutputElement && mConfiguration.equals(
                     that.mConfiguration) && mMethod.equals(that.mMethod) && mShareGroup.equals(
                     that.mShareGroup);
-        }
-    }
-
-    /**
-     * Privileged action used to grant accessibility to a method.
-     */
-    private static class SetAccessibleAction implements PrivilegedAction<Void> {
-
-        private final Method mMethod;
-
-        /**
-         * Constructor.
-         *
-         * @param method the method instance.
-         */
-        private SetAccessibleAction(@Nonnull final Method method) {
-
-            mMethod = method;
-        }
-
-        public Void run() {
-
-            mMethod.setAccessible(true);
-            return null;
         }
     }
 }

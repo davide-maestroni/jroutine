@@ -11,13 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.proxy.v4.core;
+package com.gh.bmd.jrt.android.proxy.v11.core;
 
 import android.annotation.TargetApi;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.proxy.annotation.V4Proxy;
+import com.gh.bmd.jrt.android.proxy.annotation.V11Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.android.v4.core.JRoutine;
@@ -61,15 +62,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide-maestroni on 07/05/15.
  */
-@TargetApi(VERSION_CODES.FROYO)
-public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
+@TargetApi(VERSION_CODES.HONEYCOMB)
+public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ContextProxyActivityTest() {
+    public LoaderProxyActivityTest() {
 
         super(TestActivity.class);
     }
 
     public void testGenericProxyCache() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final LoaderProxyRoutineBuilder builder =
                 JRoutineProxy.onActivity(getActivity(), TestList.class)
@@ -99,6 +105,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     public void testInterface() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
         final TestInterfaceProxy testProxy =
                 JRoutineProxy.onActivity(getActivity(), TestClass.class)
@@ -112,6 +123,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("ConstantConditions")
     public void testNullPointerError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -136,6 +152,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testProxy() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
@@ -168,6 +189,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyBuilder() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final RoutineConfiguration configuration =
@@ -177,8 +203,8 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
                          .withLog(log)
                          .set();
         final LoaderProxyBuilder<TestProxy> builder =
-                com.gh.bmd.jrt.android.proxy.V4Proxy_TestActivity.onActivity(getActivity(),
-                                                                             TestClass.class);
+                com.gh.bmd.jrt.android.proxy.V11Proxy_TestActivity.onActivity(getActivity(),
+                                                                              TestClass.class);
         final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().readNext()).isEqualTo(1);
@@ -208,6 +234,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyCache() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final RoutineConfiguration configuration =
@@ -232,6 +263,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     public void testProxyError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
             JRoutineProxy.onActivity(getActivity(), TestClass.class).buildProxy(TestClass.class);
@@ -255,6 +291,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testShareGroup() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final LoaderProxyRoutineBuilder builder =
                 JRoutineProxy.onActivity(getActivity(), TestClass2.class)
@@ -292,6 +333,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("unchecked")
     public void testTemplates() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final Itf itf = JRoutineProxy.onActivity(getActivity(), Impl.class)
                                      .withRoutine()
@@ -510,6 +556,11 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         assertThat(JRoutineProxy.onActivity(getActivity(), TestTimeout.class)
                                 .withRoutine()
                                 .withReadTimeout(seconds(10))
@@ -533,7 +584,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    @V4Proxy(Impl.class)
+    @V11Proxy(Impl.class)
     public interface Itf {
 
         @Alias("a")
@@ -816,7 +867,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
         void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
     }
 
-    @V4Proxy(TestClass2.class)
+    @V11Proxy(TestClass2.class)
     public interface TestClassAsync {
 
         @Output
@@ -832,7 +883,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
         int getOne();
     }
 
-    @V4Proxy(TestClassInterface.class)
+    @V11Proxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
         @Timeout(3000)
@@ -840,7 +891,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
         OutputChannel<Integer> getOne();
     }
 
-    @V4Proxy(TestList.class)
+    @V11Proxy(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);
@@ -856,7 +907,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
         List<TYPE> getList(int i);
     }
 
-    @V4Proxy(value = TestClass.class, generatedClassName = "TestActivity",
+    @V11Proxy(value = TestClass.class, generatedClassName = "TestActivity",
             generatedClassPackage = "com.gh.bmd.jrt.android.proxy")
     public interface TestProxy {
 
@@ -891,7 +942,7 @@ public class ContextProxyActivityTest extends ActivityInstrumentationTestCase2<T
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
-    @V4Proxy(TestTimeout.class)
+    @V11Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
         @Output

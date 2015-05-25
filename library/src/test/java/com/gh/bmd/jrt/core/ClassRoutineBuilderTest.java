@@ -130,7 +130,8 @@ public class ClassRoutineBuilderTest {
 
         try {
 
-            new DefaultClassRoutineBuilder(DuplicateAnnotationStatic.class);
+            new DefaultClassRoutineBuilder(DuplicateAnnotationStatic.class).aliasMethod(
+                    DuplicateAnnotationStatic.GET);
 
             fail();
 

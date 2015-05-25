@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.common;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -93,12 +94,73 @@ public class Reflection {
             }
         }
 
-        if (!constructor.isAccessible()) {
+        return (Constructor<TYPE>) makeAccessible(constructor);
+    }
 
-            AccessController.doPrivileged(new SetAccessibleAction(constructor));
+    /**
+     * TODO
+     *
+     * @param type
+     * @param name
+     * @param parameterTypes
+     * @return
+     * @throws java.lang.IllegalArgumentException TODO
+     */
+    @Nonnull
+    public static Method findMethod(@Nonnull final Class<?> type, @Nonnull final String name,
+            @Nonnull final Class<?>... parameterTypes) {
+
+        Method method;
+
+        try {
+
+            method = type.getMethod(name, parameterTypes);
+
+        } catch (final NoSuchMethodException ignored) {
+
+            try {
+
+                method = type.getDeclaredMethod(name, parameterTypes);
+
+            } catch (final NoSuchMethodException e) {
+
+                throw new IllegalArgumentException(e);
+            }
         }
 
-        return (Constructor<TYPE>) constructor;
+        return method;
+    }
+
+    /**
+     * TODO
+     *
+     * @param constructor
+     * @return
+     */
+    public static Constructor<?> makeAccessible(@Nonnull final Constructor<?> constructor) {
+
+        if (!constructor.isAccessible()) {
+
+            AccessController.doPrivileged(new SetAccessibleConstructorAction(constructor));
+        }
+
+        return constructor;
+    }
+
+    /**
+     * TODO
+     *
+     * @param method
+     * @return
+     */
+    public static Method makeAccessible(@Nonnull final Method method) {
+
+        if (!method.isAccessible()) {
+
+            AccessController.doPrivileged(new SetAccessibleMethodAction(method));
+        }
+
+        return method;
     }
 
     @Nullable
@@ -173,7 +235,7 @@ public class Reflection {
     /**
      * Privileged action used to grant accessibility to a constructor.
      */
-    private static class SetAccessibleAction implements PrivilegedAction<Void> {
+    private static class SetAccessibleConstructorAction implements PrivilegedAction<Void> {
 
         private final Constructor<?> mmConstructor;
 
@@ -182,7 +244,7 @@ public class Reflection {
          *
          * @param constructor the constructor instance.
          */
-        private SetAccessibleAction(@Nonnull final Constructor<?> constructor) {
+        private SetAccessibleConstructorAction(@Nonnull final Constructor<?> constructor) {
 
             mmConstructor = constructor;
         }
@@ -190,6 +252,31 @@ public class Reflection {
         public Void run() {
 
             mmConstructor.setAccessible(true);
+            return null;
+        }
+    }
+
+
+    /**
+     * Privileged action used to grant accessibility to a method.
+     */
+    private static class SetAccessibleMethodAction implements PrivilegedAction<Void> {
+
+        private final Method mMethod;
+
+        /**
+         * Constructor.
+         *
+         * @param method the method instance.
+         */
+        private SetAccessibleMethodAction(@Nonnull final Method method) {
+
+            mMethod = method;
+        }
+
+        public Void run() {
+
+            mMethod.setAccessible(true);
             return null;
         }
     }

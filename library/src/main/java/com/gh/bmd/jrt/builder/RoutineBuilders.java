@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Inputs;
@@ -20,18 +21,29 @@ import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
+import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
+import static com.gh.bmd.jrt.common.Reflection.findMethod;
+import static com.gh.bmd.jrt.common.Reflection.makeAccessible;
 
 /**
  * Utility class used to manage cached objects shared by routine builders.
@@ -40,14 +52,278 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
  */
 public class RoutineBuilders {
 
+    private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasCache =
+            new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
+
+    private static final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> sMethodCache =
+            new WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>>();
+
     private static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexCache =
             new WeakIdentityHashMap<Object, Map<String, Object>>();
+
+    private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sStaticAliasCache =
+            new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
 
     /**
      * Avoid direct instantiation.
      */
     protected RoutineBuilders() {
 
+    }
+
+    /**
+     * TODO
+     *
+     * @param target
+     * @param targetMethod
+     * @param mutex
+     * @param isInputCollection
+     * @param isOutputElement
+     * @param objects
+     * @param result
+     */
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    public static void callInvocation(@Nonnull final Object target,
+            @Nonnull final Method targetMethod, @Nonnull final Object mutex,
+            final boolean isInputCollection, final boolean isOutputElement,
+            @Nonnull final List<?> objects, @Nonnull final ResultChannel<Object> result) {
+
+        makeAccessible(targetMethod);
+
+        try {
+
+            final Object methodResult;
+
+            synchronized (mutex) {
+
+                final Object[] args;
+
+                if (isInputCollection) {
+
+                    final Class<?> paramClass = targetMethod.getParameterTypes()[0];
+
+                    if (paramClass.isArray()) {
+
+                        final int size = objects.size();
+                        final Object array = Array.newInstance(paramClass.getComponentType(), size);
+
+                        for (int i = 0; i < size; ++i) {
+
+                            Array.set(array, i, objects.get(i));
+                        }
+
+                        args = new Object[]{array};
+
+                    } else {
+
+                        args = new Object[]{objects};
+                    }
+
+                } else {
+
+                    args = objects.toArray(new Object[objects.size()]);
+                }
+
+                methodResult = targetMethod.invoke(target, args);
+            }
+
+            final Class<?> returnType = targetMethod.getReturnType();
+
+            if (!Void.class.equals(boxingClass(returnType))) {
+
+                if (isOutputElement) {
+
+                    if (returnType.isArray()) {
+
+                        if (methodResult != null) {
+
+                            final int length = Array.getLength(methodResult);
+
+                            for (int i = 0; i < length; ++i) {
+
+                                result.pass(Array.get(methodResult, i));
+                            }
+                        }
+
+                    } else {
+
+                        result.pass((Iterable<?>) methodResult);
+                    }
+
+                } else {
+
+                    result.pass(methodResult);
+                }
+            }
+
+        } catch (final RoutineException e) {
+
+            throw e;
+
+        } catch (final InvocationTargetException e) {
+
+            throw new InvocationException(e.getCause());
+
+        } catch (final Throwable t) {
+
+            throw new InvocationException(t);
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param routine
+     * @param method
+     * @param args
+     * @param inputMode
+     * @param outputMode
+     * @return
+     */
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
+            @Nonnull final Method method, @Nonnull final Object[] args,
+            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+
+        if (method.getAnnotation(Inputs.class) != null) {
+
+            return (inputMode == InputMode.ELEMENT) ? routine.invokeParallel()
+                    : routine.invokeAsync();
+        }
+
+        final Class<?> returnType = method.getReturnType();
+        final OutputChannel<Object> outputChannel;
+
+        if (inputMode == InputMode.ELEMENT) {
+
+            final RoutineChannel<Object, Object> routineChannel = routine.invokeParallel();
+            final Class<?> parameterType = method.getParameterTypes()[0];
+            final Object arg = args[0];
+
+            if (arg == null) {
+
+                routineChannel.pass((Iterable<Object>) null);
+
+            } else if (OutputChannel.class.isAssignableFrom(parameterType)) {
+
+                routineChannel.pass((OutputChannel<Object>) arg);
+
+            } else if (parameterType.isArray()) {
+
+                final int length = Array.getLength(arg);
+
+                for (int i = 0; i < length; i++) {
+
+                    routineChannel.pass(Array.get(arg, i));
+                }
+
+            } else {
+
+                final Iterable<?> iterable = (Iterable<?>) arg;
+
+                for (final Object input : iterable) {
+
+                    routineChannel.pass(input);
+                }
+            }
+
+            outputChannel = routineChannel.result();
+
+        } else if (inputMode == InputMode.VALUE) {
+
+            final RoutineChannel<Object, Object> routineChannel = routine.invokeAsync();
+            final Class<?>[] parameterTypes = method.getParameterTypes();
+            final int length = args.length;
+
+            for (int i = 0; i < length; ++i) {
+
+                final Object arg = args[i];
+
+                if (OutputChannel.class.isAssignableFrom(parameterTypes[i])) {
+
+                    routineChannel.pass((OutputChannel<Object>) arg);
+
+                } else {
+
+                    routineChannel.pass(arg);
+                }
+            }
+
+            outputChannel = routineChannel.result();
+
+        } else if (inputMode == InputMode.COLLECTION) {
+
+            outputChannel = routine.invokeAsync().pass((OutputChannel<Object>) args[0]).result();
+
+        } else {
+
+            outputChannel = routine.callAsync(args);
+        }
+
+        if (!Void.class.equals(boxingClass(returnType))) {
+
+            if (outputMode != null) {
+
+                if (OutputChannel.class.isAssignableFrom(returnType)) {
+
+                    return outputChannel;
+                }
+
+                if (returnType.isAssignableFrom(List.class)) {
+
+                    return outputChannel.readAll();
+                }
+
+                if (returnType.isArray()) {
+
+                    final List<Object> results = outputChannel.readAll();
+                    final int size = results.size();
+                    final Object array = Array.newInstance(returnType.getComponentType(), size);
+
+                    for (int i = 0; i < size; ++i) {
+
+                        Array.set(array, i, results.get(i));
+                    }
+
+                    return array;
+                }
+            }
+
+            return outputChannel.readAll().iterator().next();
+        }
+
+        return null;
+    }
+
+    /**
+     * TODO
+     *
+     * @param targetClass
+     * @param name
+     * @return
+     * @throws java.lang.IllegalArgumentException
+     */
+    @Nullable
+    public static Method getAnnotatedMethod(@Nonnull final Class<?> targetClass,
+            @Nonnull final String name) {
+
+        return getAnnotatedMethod(targetClass, name, false);
+    }
+
+    /**
+     * TODO
+     *
+     * @param targetClass
+     * @param name
+     * @return
+     * @throws java.lang.IllegalArgumentException
+     */
+    @Nullable
+    public static Method getAnnotatedStaticMethod(@Nonnull final Class<?> targetClass,
+            @Nonnull final String name) {
+
+        return getAnnotatedMethod(targetClass, name, true);
     }
 
     /**
@@ -412,6 +688,289 @@ public class RoutineBuilders {
             }
 
             return mutex;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param targetClass
+     * @param proxyMethod
+     * @return
+     * @throws java.lang.IllegalArgumentException
+     */
+    @Nonnull
+    public static MethodInfo getTargetMethodInfo(@Nonnull final Class<?> targetClass,
+            @Nonnull final Method proxyMethod) {
+
+        MethodInfo methodInfo;
+
+        synchronized (sMethodCache) {
+
+            final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> methodCache = sMethodCache;
+            Map<Method, MethodInfo> methodMap = methodCache.get(targetClass);
+
+            if (methodMap == null) {
+
+                methodMap = new HashMap<Method, MethodInfo>();
+                methodCache.put(targetClass, methodMap);
+            }
+
+            methodInfo = methodMap.get(proxyMethod);
+
+            if (methodInfo == null) {
+
+                InputMode inputMode = null;
+                OutputMode outputMode = null;
+                final Class<?>[] targetParameterTypes;
+                final Inputs inputsAnnotation = proxyMethod.getAnnotation(Inputs.class);
+                final Output outputAnnotation = proxyMethod.getAnnotation(Output.class);
+
+                if (inputsAnnotation != null) {
+
+                    if (outputAnnotation != null) {
+
+                        throw new IllegalArgumentException(
+                                "cannot have both " + Output.class.getSimpleName() + " and "
+                                        + Inputs.class.getSimpleName()
+                                        + " annotations on the same method: " + proxyMethod);
+                    }
+
+                    targetParameterTypes = inputsAnnotation.value();
+                    inputMode = getInputMode(proxyMethod);
+                    outputMode = OutputMode.VALUE;
+
+                    if (!proxyMethod.getReturnType().isAssignableFrom(RoutineChannel.class)) {
+
+                        throw new IllegalArgumentException(
+                                "the proxy method has incompatible return type: " + proxyMethod);
+                    }
+
+                } else {
+
+                    targetParameterTypes = proxyMethod.getParameterTypes();
+                    final Annotation[][] annotations = proxyMethod.getParameterAnnotations();
+                    final int length = annotations.length;
+
+                    for (int i = 0; i < length; ++i) {
+
+                        final InputMode paramMode = getInputMode(proxyMethod, i);
+
+                        if (paramMode != null) {
+
+                            inputMode = paramMode;
+
+                            for (final Annotation paramAnnotation : annotations[i]) {
+
+                                if (paramAnnotation.annotationType() == Input.class) {
+
+                                    targetParameterTypes[i] = ((Input) paramAnnotation).value();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                final Method targetMethod;
+
+                try {
+
+                    targetMethod = getTargetMethod(targetClass, proxyMethod, targetParameterTypes);
+
+                } catch (final NoSuchMethodException e) {
+
+                    throw new IllegalArgumentException(e);
+                }
+
+                final Class<?> returnType = proxyMethod.getReturnType();
+                final Class<?> targetReturnType = targetMethod.getReturnType();
+                boolean isError = false;
+
+                if (outputAnnotation != null) {
+
+                    outputMode = getOutputMode(proxyMethod, targetReturnType);
+
+                    if ((outputMode == OutputMode.COLLECTION) && returnType.isArray()) {
+
+                        isError = !boxingClass(returnType.getComponentType()).isAssignableFrom(
+                                boxingClass(targetReturnType));
+                    }
+
+                } else if (inputsAnnotation == null) {
+
+                    isError = !returnType.isAssignableFrom(targetReturnType);
+                }
+
+                if (isError) {
+
+                    throw new IllegalArgumentException(
+                            "the proxy method has incompatible return type: " + proxyMethod);
+                }
+
+                methodInfo = new MethodInfo(targetMethod, inputMode, outputMode);
+                methodMap.put(proxyMethod, methodInfo);
+            }
+        }
+
+        return methodInfo;
+    }
+
+    private static void fillMap(@Nonnull final Map<String, Method> map,
+            @Nonnull final Method[] methods, boolean isStatic) {
+
+        for (final Method method : methods) {
+
+            final boolean isStaticMethod = Modifier.isStatic(method.getModifiers());
+
+            if (isStatic) {
+
+                if (!isStaticMethod) {
+
+                    continue;
+                }
+
+            } else if (isStaticMethod) {
+
+                continue;
+            }
+
+            final Alias annotation = method.getAnnotation(Alias.class);
+
+            if (annotation != null) {
+
+                final String name = annotation.value();
+
+                if (map.containsKey(name)) {
+
+                    throw new IllegalArgumentException(
+                            "the name '" + name + "' has already been used to identify a different"
+                                    + " method");
+                }
+
+                map.put(name, method);
+            }
+        }
+    }
+
+    @Nullable
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    private static Method getAnnotatedMethod(@Nonnull final Class<?> targetClass,
+            @Nonnull final String name, final boolean isStatic) {
+
+        final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasCache =
+                (isStatic) ? sStaticAliasCache : sAliasCache;
+
+        synchronized (aliasCache) {
+
+            Map<String, Method> methodMap = aliasCache.get(targetClass);
+
+            if (methodMap == null) {
+
+                methodMap = new HashMap<String, Method>();
+                fillMap(methodMap, targetClass.getMethods(), isStatic);
+                final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
+                fillMap(declaredMethodMap, targetClass.getDeclaredMethods(), isStatic);
+
+                for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
+
+                    final String methodName = methodEntry.getKey();
+
+                    if (!methodMap.containsKey(methodName)) {
+
+                        methodMap.put(methodName, methodEntry.getValue());
+                    }
+                }
+
+                aliasCache.put(targetClass, methodMap);
+            }
+
+            return methodMap.get(name);
+        }
+    }
+
+    @Nonnull
+    private static Method getTargetMethod(@Nonnull final Class<?> targetClass,
+            @Nonnull final Method method, @Nonnull final Class<?>[] targetParameterTypes) throws
+            NoSuchMethodException {
+
+        String name = null;
+        Method targetMethod = null;
+        final Alias annotation = method.getAnnotation(Alias.class);
+
+        if (annotation != null) {
+
+            name = annotation.value();
+            targetMethod = getAnnotatedMethod(targetClass, name, false);
+        }
+
+        if (targetMethod == null) {
+
+            if (name == null) {
+
+                name = method.getName();
+            }
+
+            targetMethod = findMethod(targetClass, name, targetParameterTypes);
+        }
+
+        return targetMethod;
+    }
+
+    /**
+     * TODO
+     */
+    public static class MethodInfo {
+
+        private final InputMode mInputMode;
+
+        private final Method mMethod;
+
+        private final OutputMode mOutputMode;
+
+        /**
+         * Constructor.
+         *
+         * @param targetMethod the target method.
+         * @param inputMode    the input mode.
+         * @param outputMode   the output mode.
+         */
+        private MethodInfo(@Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) {
+
+            mMethod = targetMethod;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
+        }
+
+        /**
+         * TODO
+         *
+         * @return
+         */
+        public InputMode getInputMode() {
+
+            return mInputMode;
+        }
+
+        /**
+         * TODO
+         *
+         * @return
+         */
+        public Method getMethod() {
+
+            return mMethod;
+        }
+
+        /**
+         * TODO
+         *
+         * @return
+         */
+        public OutputMode getOutputMode() {
+
+            return mOutputMode;
         }
     }
 }

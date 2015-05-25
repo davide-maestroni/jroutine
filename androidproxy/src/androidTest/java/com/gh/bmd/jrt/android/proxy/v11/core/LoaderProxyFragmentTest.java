@@ -64,9 +64,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 11/05/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class ContextProxyFragmentTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ContextProxyFragmentTest() {
+    public LoaderProxyFragmentTest() {
 
         super(TestActivity.class);
     }

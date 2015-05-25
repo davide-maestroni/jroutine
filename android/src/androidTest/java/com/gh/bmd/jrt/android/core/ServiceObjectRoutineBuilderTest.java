@@ -21,6 +21,7 @@ import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Inputs;
 import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
@@ -32,6 +33,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -64,10 +66,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 3/30/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class ObjectServiceRoutineBuilderTest
+public class ServiceObjectRoutineBuilderTest
         extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ObjectServiceRoutineBuilderTest() {
+    public ServiceObjectRoutineBuilderTest() {
 
         super(TestActivity.class);
     }
@@ -224,7 +226,8 @@ public class ObjectServiceRoutineBuilderTest
 
         try {
 
-            JRoutine.onService(getActivity(), DuplicateAnnotation.class);
+            JRoutine.onService(getActivity(), DuplicateAnnotation.class)
+                    .aliasMethod(DuplicateAnnotation.GET);
 
             fail();
 
@@ -627,6 +630,10 @@ public class ObjectServiceRoutineBuilderTest
         channel4.input().pass('d', 'e', 'f').close();
         assertThat(itf.add5(channel4.output()).readAll()).containsOnly((int) 'd', (int) 'e',
                                                                        (int) 'f');
+        assertThat(itf.add6().pass('d').result().readAll()).containsOnly((int) 'd');
+        assertThat(itf.add7().pass('d', 'e', 'f').result().readAll()).containsOnly((int) 'd',
+                                                                                   (int) 'e',
+                                                                                   (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
         channel5.input().pass(new char[]{'a', 'z'}).close();
@@ -698,6 +705,15 @@ public class ObjectServiceRoutineBuilderTest
         assertThat(itf.addA19(channel19.output())).containsOnly(new int[]{'d', 'z'},
                                                                 new int[]{'e', 'z'},
                                                                 new int[]{'f', 'z'});
+        assertThat(itf.addA20().pass(new char[]{'c', 'z'}).result().readAll()).containsOnly(
+                new int[]{'c', 'z'});
+        assertThat(itf.addA21()
+                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .result()
+                      .readAll()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                               new int[]{'f', 'z'});
+        assertThat(itf.addA22().pass('d', 'e', 'f').result().readAll()).containsOnly(
+                new int[]{'d', 'e', 'f'});
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel20 = JRoutine.transport().buildChannel();
@@ -782,16 +798,30 @@ public class ObjectServiceRoutineBuilderTest
                                                                 Arrays.asList((int) 'e', (int) 'z'),
                                                                 Arrays.asList((int) 'f',
                                                                               (int) 'z'));
+        assertThat(itf.addL20().pass(Arrays.asList('c', 'z')).result().readAll()).containsOnly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        assertThat(itf.addL21()
+                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                            Arrays.asList('f', 'z'))
+                      .result()
+                      .readAll()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                               Arrays.asList((int) 'e', (int) 'z'),
+                                               Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL22().pass('d', 'e', 'f').result().readAll()).containsOnly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().readAll()).containsExactly(31);
+        assertThat(itf.get2().result().readAll()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().readAll()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA4().result().readAll()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().readAll()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL4().result().readAll()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
         channel35.input().pass(-17).close();
@@ -799,6 +829,7 @@ public class ObjectServiceRoutineBuilderTest
         final TransportChannel<Integer> channel36 = JRoutine.transport().buildChannel();
         channel36.input().pass(-17).close();
         itf.set2(channel36.output());
+        itf.set3().pass(-17).result().checkComplete();
         itf.setA0(new int[]{1, 2, 3});
         final TransportChannel<int[]> channel37 = JRoutine.transport().buildChannel();
         channel37.input().pass(new int[]{1, 2, 3}).close();
@@ -809,6 +840,8 @@ public class ObjectServiceRoutineBuilderTest
         final TransportChannel<int[]> channel39 = JRoutine.transport().buildChannel();
         channel39.input().pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39.output());
+        itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
+        itf.setA5().pass(1, 2, 3).result().checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final TransportChannel<List<Integer>> channel40 = JRoutine.transport().buildChannel();
         channel40.input().pass(Arrays.asList(1, 2, 3)).close();
@@ -819,6 +852,8 @@ public class ObjectServiceRoutineBuilderTest
         final TransportChannel<List<Integer>> channel42 = JRoutine.transport().buildChannel();
         channel42.input().pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42.output());
+        itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
+        itf.setL5().pass(1, 2, 3).result().checkComplete();
     }
 
     @SuppressWarnings("NullArgumentToVariableArgMethod")
@@ -1017,6 +1052,14 @@ public class ObjectServiceRoutineBuilderTest
         OutputChannel<Integer> add5(
                 @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
+        @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.VALUE)
+        RoutineChannel<Character, Integer> add6();
+
+        @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        RoutineChannel<Character, Integer> add7();
+
         @Alias("aa")
         int[] addA00(char[] c);
 
@@ -1058,7 +1101,7 @@ public class ObjectServiceRoutineBuilderTest
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA09(
-                @Input(value = char[].class, mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -1107,6 +1150,18 @@ public class ObjectServiceRoutineBuilderTest
         @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.VALUE)
+        RoutineChannel<char[], int[]> addA20();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
+        RoutineChannel<char[], int[]> addA21();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.COLLECTION)
+        RoutineChannel<Character, int[]> addA22();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
@@ -1199,6 +1254,18 @@ public class ObjectServiceRoutineBuilderTest
         List[] addL19(@Input(value = List.class,
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        RoutineChannel<List<Character>, List<Integer>> addL20();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.ELEMENT)
+        RoutineChannel<List<Character>, List<Integer>> addL21();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        RoutineChannel<Character, List<Integer>> addL22();
+
         @Alias("g")
         int get0();
 
@@ -1211,6 +1278,13 @@ public class ObjectServiceRoutineBuilderTest
 
         @Alias("s")
         void set1(@Input(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
+
+        @Alias("g")
+        @Inputs({})
+        RoutineChannel<Void, Integer> get2();
+
+        @Alias("s")
+        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
 
         @Alias("ga")
         int[] getA0();
@@ -1239,6 +1313,10 @@ public class ObjectServiceRoutineBuilderTest
 
         @Alias("sa")
         void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
+
+        @Alias("ga")
+        @Inputs({})
+        RoutineChannel<Void, int[]> getA4();
 
         @Alias("gl")
         List<Integer> getL0();
@@ -1270,8 +1348,29 @@ public class ObjectServiceRoutineBuilderTest
         void setL3(@Input(value = List.class,
                 mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
 
+        @Alias("gl")
+        @Inputs({})
+        RoutineChannel<Void, List> getL4();
+
         @Alias("s")
-        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+        @Inputs(value = int.class, mode = InputMode.VALUE)
+        RoutineChannel<Integer, Void> set3();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.VALUE)
+        RoutineChannel<int[], Void> setA4();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.COLLECTION)
+        RoutineChannel<Integer, Void> setA5();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        RoutineChannel<List<Integer>, Void> setL4();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        RoutineChannel<Integer, Void> setL5();
     }
 
     private interface CountError {

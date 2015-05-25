@@ -199,7 +199,8 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(new DuplicateAnnotation());
+            new DefaultObjectRoutineBuilder(new DuplicateAnnotation()).aliasMethod(
+                    DuplicateAnnotation.GET);
 
             fail();
 

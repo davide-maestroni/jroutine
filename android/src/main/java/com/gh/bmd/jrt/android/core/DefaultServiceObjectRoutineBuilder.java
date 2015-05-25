@@ -48,11 +48,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.callInvocation;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.callRoutine;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.callFromInvocation;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getTargetMethodInfo;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 import static com.gh.bmd.jrt.common.Reflection.findMethod;
 
@@ -65,6 +65,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         RoutineConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ProxyConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceObjectRoutineBuilder> {
+
+    private static final ClassToken<ProxyInvocation> PROXY_TOKEN =
+            ClassToken.tokenOf(ProxyInvocation.class);
 
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
@@ -601,9 +604,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Object[] mArgs;
 
-        private final boolean mIsInputCollection;
+        private final InputMode mInputMode;
 
-        private final boolean mIsOutputElement;
+        private final OutputMode mOutputMode;
 
         private final String mShareGroup;
 
@@ -623,16 +626,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param targetClassName      the target object class name.
          * @param targetMethodName     the target method name.
          * @param targetParameterTypes the target method parameter type names.
-         * @param isInputCollection    whether the input is a collection.
-         * @param isOutputElement      whether the output is a collection.
+         * @param inputMode            the input transfer mode.
+         * @param outputMode           the output transfer mode.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
-         * @throws java.lang.NoSuchMethodException  TODO
+         * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
         @SuppressWarnings("unchecked")
         public ProxyInvocation(@Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final String targetClassName, @Nonnull final String targetMethodName,
-                @Nonnull final String[] targetParameterTypes, final boolean isInputCollection,
-                final boolean isOutputElement) throws ClassNotFoundException,
+                @Nonnull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) throws ClassNotFoundException,
                 NoSuchMethodException {
 
             final Class<?> targetClass = Class.forName(targetClassName);
@@ -640,8 +643,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mShareGroup = shareGroup;
             mTargetClass = targetClass;
             mTargetMethod = targetClass.getMethod(targetMethodName, forNames(targetParameterTypes));
-            mIsInputCollection = isInputCollection;
-            mIsOutputElement = isOutputElement;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
             mMutex = this;
         }
 
@@ -650,8 +653,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            callInvocation(mTarget, mTargetMethod, mMutex, mIsInputCollection, mIsOutputElement,
-                           objects, result);
+            callFromInvocation(mTarget, mMutex, objects, result, mTargetMethod, mInputMode,
+                               mOutputMode);
         }
 
         @Override
@@ -719,34 +722,32 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             final Class<?> targetClass = mTargetClass;
             final MethodInfo methodInfo = getTargetMethodInfo(targetClass, method);
-            final Method targetMethod = methodInfo.getMethod();
+            final Method targetMethod = methodInfo.method;
+            final InputMode inputMode = methodInfo.inputMode;
+            final OutputMode outputMode = methodInfo.outputMode;
             final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
-            final InputMode inputMode = methodInfo.getInputMode();
-            final OutputMode outputMode = methodInfo.getOutputMode();
-            final boolean isInputCollection = (inputMode == InputMode.COLLECTION);
-            final boolean isOutputElement = (outputMode == OutputMode.ELEMENT);
             final Object[] factoryArgs =
                     new Object[]{mArgs, groupWithShareAnnotation(mProxyConfiguration, method),
                                  targetClass.getName(), targetMethod.getName(),
-                                 toNames(targetParameterTypes), isInputCollection, isOutputElement};
+                                 toNames(targetParameterTypes), inputMode, outputMode};
             final OrderType inputOrder =
                     (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER;
             final OrderType outputOrder =
                     (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
-            final Routine<Object, Object> routine =
-                    JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
-                            .withRoutine()
-                            .with(configurationWithTimeout(mRoutineConfiguration, method))
-                            .withFactoryArgs(factoryArgs)
-                            .withInputOrder(inputOrder)
-                            .withOutputOrder(outputOrder)
-                            .set()
-                            .withService()
-                            .with(mServiceConfiguration)
-                            .set()
-                            .buildRoutine();
-            return callRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
-                               inputMode, outputMode);
+            final Routine<Object, Object> routine = JRoutine.onService(mContext, PROXY_TOKEN)
+                                                            .withRoutine()
+                                                            .with(configurationWithTimeout(
+                                                                    mRoutineConfiguration, method))
+                                                            .withFactoryArgs(factoryArgs)
+                                                            .withInputOrder(inputOrder)
+                                                            .withOutputOrder(outputOrder)
+                                                            .set()
+                                                            .withService()
+                                                            .with(mServiceConfiguration)
+                                                            .set()
+                                                            .buildRoutine();
+            return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
+                                 inputMode, outputMode);
         }
     }
 

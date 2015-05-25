@@ -14,7 +14,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
+    private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     private static class ContextInvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
 
@@ -32,7 +32,7 @@
     }
 
     @javax.annotation.Nonnull
-    private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
+    private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 

@@ -17,7 +17,8 @@
     @SuppressWarnings({"unchecked", "RedundantCast"})
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        final java.util.List<${resultClassName}> $$list = this.mRoutine${methodCount}.${invokeMethod}()${inputParams}.result()${outputOptions}.readAll();
+        final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
+        final java.util.List<${resultClassName}> $$list = $$routine.${invokeMethod}()${inputParams}.result()${outputOptions}.readAll();
         final int $$size = $$list.size();
         final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
 

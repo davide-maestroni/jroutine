@@ -37,9 +37,9 @@ import java.lang.reflect.Proxy;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.callRoutine;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getTargetMethodInfo;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
@@ -291,9 +291,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 builder.withReadTimeoutAction(actionAnnotation.value());
             }
 
-            return getRoutine(builder.set(), shareGroup, targetMethod,
-                              (inputMode == InputMode.COLLECTION),
-                              (outputMode == OutputMode.ELEMENT));
+            return getRoutine(builder.set(), shareGroup, targetMethod, inputMode, outputMode);
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -314,12 +312,12 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             }
 
             final MethodInfo methodInfo = getTargetMethodInfo(getTargetClass(), method);
-            final InputMode inputMode = methodInfo.getInputMode();
-            final OutputMode outputMode = methodInfo.getOutputMode();
+            final InputMode inputMode = methodInfo.inputMode;
+            final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =
-                    buildRoutine(method, methodInfo.getMethod(), inputMode, outputMode);
-            return callRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
-                               outputMode);
+                    buildRoutine(method, methodInfo.method, inputMode, outputMode);
+            return invokeRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
+                                 outputMode);
         }
     }
 }

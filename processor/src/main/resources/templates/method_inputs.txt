@@ -15,15 +15,7 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
     @SuppressWarnings({"unchecked", "RedundantCast"})
-    public ${resultType} ${methodName}(${paramTypes}) {
+    public ${resultType} ${methodName}() {
 
-        final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        final com.gh.bmd.jrt.channel.RoutineChannel<Object, ${resultClassName}> $$channel = $$routine.invokeParallel();
-
-        for (final Object $$object: ${params}) {
-
-            $$channel.pass($$object);
-        }
-
-        return $$channel.result()${outputOptions}.readAll();
+        return (${resultType}) this.mRoutine${methodCount}.${invokeMethod}();
     }

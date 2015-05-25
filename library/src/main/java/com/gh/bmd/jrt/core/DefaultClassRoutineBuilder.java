@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.core;
 
+import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -38,7 +40,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.callInvocation;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.callFromInvocation;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedStaticMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.common.Reflection.findMethod;
@@ -62,7 +64,7 @@ class DefaultClassRoutineBuilder
                 public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
 
                     return new MethodProcedureInvocation(args[0], (Method) args[1], args[2],
-                                                         (Boolean) args[3], (Boolean) args[4]);
+                                                         (InputMode) args[3], (OutputMode) args[4]);
                 }
             };
 
@@ -186,19 +188,19 @@ class DefaultClassRoutineBuilder
     /**
      * Gets or creates the routine.
      *
-     * @param configuration     the routine configuration.
-     * @param shareGroup        the share group name.
-     * @param method            the method to wrap.
-     * @param isInputCollection whether we need to collect the input parameters.
-     * @param isOutputElement   whether the output is a collection.
+     * @param configuration the routine configuration.
+     * @param shareGroup    the share group name.
+     * @param method        the method to wrap.
+     * @param inputMode     the input transfer mode.
+     * @param outputMode    the output transfer mode.
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
             @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
-            @Nonnull final Method method, final boolean isInputCollection,
-            final boolean isOutputElement) {
+            @Nonnull final Method method, @Nullable final InputMode inputMode,
+            @Nullable final OutputMode outputMode) {
 
         final Object target = (mTargetReference != null) ? mTargetReference.get() : mTargetClass;
 
@@ -221,8 +223,7 @@ class DefaultClassRoutineBuilder
 
             final String methodShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(configuration, method, methodShareGroup, isInputCollection,
-                                    isOutputElement);
+                    new RoutineInfo(configuration, method, methodShareGroup, inputMode, outputMode);
             Routine<?, ?> routine = routineMap.get(routineInfo);
 
             if (routine == null) {
@@ -242,8 +243,8 @@ class DefaultClassRoutineBuilder
                         configuration.builderFrom();
                 final InvocationFactory<Object, Object> factory = sMethodInvocationFactory;
                 routine = new DefaultRoutine<Object, Object>(
-                        builder.withFactoryArgs(target, method, mutex, isInputCollection,
-                                                isOutputElement).set(), factory);
+                        builder.withFactoryArgs(target, method, mutex, inputMode, outputMode).set(),
+                        factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -328,7 +329,7 @@ class DefaultClassRoutineBuilder
             builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
-        return getRoutine(builder.set(), methodShareGroup, targetMethod, false, false);
+        return getRoutine(builder.set(), methodShareGroup, targetMethod, null, null);
     }
 
     /**
@@ -426,34 +427,34 @@ class DefaultClassRoutineBuilder
      */
     private static class MethodProcedureInvocation extends ProcedureInvocation<Object, Object> {
 
-        private final boolean mIsInputCollection;
-
-        private final boolean mIsOutputElement;
+        private final InputMode mInputMode;
 
         private final Method mMethod;
 
         private final Object mMutex;
+
+        private final OutputMode mOutputMode;
 
         private final WeakReference<?> mTargetReference;
 
         /**
          * Constructor.
          *
-         * @param target            the target object.
-         * @param method            the method to wrap.
-         * @param mutex             the mutex used for synchronization.
-         * @param isInputCollection whether we need to collect the input parameters.
-         * @param isOutputElement   whether the output is a collection.
+         * @param target     the target object.
+         * @param method     the method to wrap.
+         * @param mutex      the mutex used for synchronization.
+         * @param inputMode  the input transfer mode.
+         * @param outputMode the output transfer mode.
          */
         public MethodProcedureInvocation(@Nullable final Object target,
                 @Nonnull final Method method, @Nullable final Object mutex,
-                final boolean isInputCollection, final boolean isOutputElement) {
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mTargetReference = new WeakReference<Object>(target);
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
-            mIsInputCollection = isInputCollection;
-            mIsOutputElement = isOutputElement;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
         }
 
         @Override
@@ -467,8 +468,7 @@ class DefaultClassRoutineBuilder
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            callInvocation(target, mMethod, mMutex, mIsInputCollection, mIsOutputElement, objects,
-                           result);
+            callFromInvocation(target, mMutex, objects, result, mMethod, mInputMode, mOutputMode);
         }
     }
 
@@ -479,32 +479,32 @@ class DefaultClassRoutineBuilder
 
         private final RoutineConfiguration mConfiguration;
 
-        private final boolean mIsInputCollection;
-
-        private final boolean mIsOutputElement;
+        private final InputMode mInputMode;
 
         private final Method mMethod;
+
+        private final OutputMode mOutputMode;
 
         private final String mShareGroup;
 
         /**
          * Constructor.
          *
-         * @param configuration     the routine configuration.
-         * @param method            the method to wrap.
-         * @param shareGroup        the group name.
-         * @param isInputCollection whether we need to collect the input parameters.
-         * @param isOutputElement   whether the output is a collection.
+         * @param configuration the routine configuration.
+         * @param method        the method to wrap.
+         * @param shareGroup    the group name.
+         * @param inputMode     the input transfer mode.
+         * @param outputMode    the output transfer mode.
          */
         public RoutineInfo(@Nonnull final RoutineConfiguration configuration,
                 @Nonnull final Method method, @Nonnull final String shareGroup,
-                final boolean isInputCollection, final boolean isOutputElement) {
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mMethod = method;
             mShareGroup = shareGroup;
             mConfiguration = configuration;
-            mIsInputCollection = isInputCollection;
-            mIsOutputElement = isOutputElement;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
         }
 
         @Override
@@ -512,9 +512,9 @@ class DefaultClassRoutineBuilder
 
             // auto-generated code
             int result = mConfiguration.hashCode();
-            result = 31 * result + (mIsInputCollection ? 1 : 0);
-            result = 31 * result + (mIsOutputElement ? 1 : 0);
+            result = 31 * result + (mInputMode != null ? mInputMode.hashCode() : 0);
             result = 31 * result + mMethod.hashCode();
+            result = 31 * result + (mOutputMode != null ? mOutputMode.hashCode() : 0);
             result = 31 * result + mShareGroup.hashCode();
             return result;
         }
@@ -534,10 +534,9 @@ class DefaultClassRoutineBuilder
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-            return mIsInputCollection == that.mIsInputCollection
-                    && mIsOutputElement == that.mIsOutputElement && mConfiguration.equals(
-                    that.mConfiguration) && mMethod.equals(that.mMethod) && mShareGroup.equals(
-                    that.mShareGroup);
+            return mConfiguration.equals(that.mConfiguration) && mInputMode == that.mInputMode
+                    && mMethod.equals(that.mMethod) && mOutputMode == that.mOutputMode
+                    && mShareGroup.equals(that.mShareGroup);
         }
     }
 }

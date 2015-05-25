@@ -55,11 +55,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.callInvocation;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.callRoutine;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.callFromInvocation;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getTargetMethodInfo;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 import static com.gh.bmd.jrt.common.Reflection.findMethod;
 
@@ -456,7 +456,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final Class<?> mTargetClass;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private Routine<INPUT, OUTPUT> mRoutine = null;
 
         private Object mTarget;
 
@@ -569,7 +569,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final Class<?> mTargetClass;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private Routine<INPUT, OUTPUT> mRoutine = null;
 
         private Object mTarget;
 
@@ -671,9 +671,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final Object[] mArgs;
 
-        private final boolean mIsInputCollection;
+        private final InputMode mInputMode;
 
-        private final boolean mIsOutputElement;
+        private final OutputMode mOutputMode;
 
         private final String mShareGroup;
 
@@ -688,23 +688,23 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param args              the factory constructor arguments.
-         * @param shareGroup        the share group name.
-         * @param targetClass       the target object class.
-         * @param targetMethod      the target method.
-         * @param isInputCollection whether the input is a collection.
-         * @param isOutputElement   whether the output is a collection.
+         * @param args         the factory constructor arguments.
+         * @param shareGroup   the share group name.
+         * @param targetClass  the target object class.
+         * @param targetMethod the target method.
+         * @param inputMode    the input transfer mode.
+         * @param outputMode   the output transfer mode.
          */
         public ProxyInvocation(@Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final Class<?> targetClass, @Nonnull final Method targetMethod,
-                final boolean isInputCollection, final boolean isOutputElement) {
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mArgs = args;
             mShareGroup = shareGroup;
             mTargetClass = targetClass;
             mTargetMethod = targetMethod;
-            mIsInputCollection = isInputCollection;
-            mIsOutputElement = isOutputElement;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
             mMutex = this;
         }
 
@@ -713,8 +713,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            callInvocation(mTarget, mTargetMethod, mMutex, mIsInputCollection, mIsOutputElement,
-                           objects, result);
+            callFromInvocation(mTarget, mMutex, objects, result, mTargetMethod, mInputMode,
+                               mOutputMode);
         }
 
         @Override
@@ -761,7 +761,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public ContextInvocation<Object, Object> newInvocation(@Nonnull final Object... args) {
 
             return new ProxyInvocation((Object[]) args[0], (String) args[1], (Class<?>) args[2],
-                                       (Method) args[3], (Boolean) args[4], (Boolean) args[5]);
+                                       (Method) args[3], (InputMode) args[4], (OutputMode) args[5]);
         }
     }
 
@@ -801,15 +801,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Throwable {
 
             final MethodInfo methodInfo = getTargetMethodInfo(mTargetClass, method);
-            final Method targetMethod = methodInfo.getMethod();
-            final InputMode inputMode = methodInfo.getInputMode();
-            final OutputMode outputMode = methodInfo.getOutputMode();
-            final boolean isInputCollection = (inputMode == InputMode.COLLECTION);
-            final boolean isOutputElement = (outputMode == OutputMode.ELEMENT);
+            final Method targetMethod = methodInfo.method;
+            final InputMode inputMode = methodInfo.inputMode;
+            final OutputMode outputMode = methodInfo.outputMode;
             final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
             final Object[] invocationArgs =
-                    new Object[]{mArgs, shareGroup, mTargetClass, targetMethod, isInputCollection,
-                                 isOutputElement};
+                    new Object[]{mArgs, shareGroup, mTargetClass, targetMethod, inputMode,
+                                 outputMode};
             final OrderType inputOrderType =
                     (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER;
             final OrderType outputOrderType =
@@ -830,8 +828,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                                                   .with(loaderConfiguration)
                                                                   .set()
                                                                   .buildRoutine();
-            return callRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
-                               inputMode, outputMode);
+            return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
+                                 inputMode, outputMode);
         }
     }
 

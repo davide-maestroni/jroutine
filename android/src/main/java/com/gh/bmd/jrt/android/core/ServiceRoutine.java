@@ -25,6 +25,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
+import com.gh.bmd.jrt.android.builder.ServiceDisconnectedException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.android.service.RoutineService;
@@ -588,7 +589,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);
-                mTransportParamOutput.abort(); // TODO: what??
+                mTransportParamOutput.abort(new ServiceDisconnectedException(name));
             }
         }
     }

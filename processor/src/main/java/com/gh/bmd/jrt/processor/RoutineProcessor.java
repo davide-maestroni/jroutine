@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.processor;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Inputs;
 import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
@@ -24,6 +25,7 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.RoutineChannel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -86,6 +88,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     protected TypeMirror outputChannelType;
 
+    protected TypeMirror routineChannelType;
+
     private String mFooter;
 
     private String mHeader;
@@ -101,6 +105,8 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodAsync;
 
     private String mMethodHeader;
+
+    private String mMethodInputs;
 
     private String mMethodInvocation;
 
@@ -169,6 +175,7 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
+        routineChannelType = getTypeFromName(RoutineChannel.class.getCanonicalName()).asType();
         outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
         iterableType = getTypeFromName(Iterable.class.getCanonicalName()).asType();
         listType = getTypeFromName(List.class.getCanonicalName()).asType();
@@ -286,7 +293,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                        typeUtils.erasure(variableElement.asType())) && (
                     variableElement.getAnnotation(Input.class) != null)) {
 
-                builder.append("(com.gh.bmd.jrt.channel.OutputChannel<?>)");
+                builder.append("(").append(typeUtils.erasure(outputChannelType)).append("<?>)");
 
             } else {
 
@@ -642,7 +649,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             while ((enclosingElement != null) && !(enclosingElement instanceof PackageElement)) {
 
-                className = enclosingElement.getSimpleName().toString() + className;
+                className = enclosingElement.getSimpleName().toString() + "_" + className;
                 enclosingElement = enclosingElement.getEnclosingElement();
             }
         }
@@ -867,6 +874,104 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
+     * Gets the input transfer mode.
+     *
+     * @param methodElement the method element.
+     * @param annotation    the method annotation.
+     * @return the input mode.
+     */
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    protected InputMode getInputsMode(@Nonnull final ExecutableElement methodElement,
+            @Nonnull final Inputs annotation) {
+
+        if (!methodElement.getParameters().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "methods annotated with " + Inputs.class.getSimpleName()
+                            + " must have no input parameters: " + methodElement);
+        }
+
+        final Types typeUtils = processingEnv.getTypeUtils();
+
+        if (!typeUtils.isAssignable(this.routineChannelType,
+                                    typeUtils.erasure(methodElement.getReturnType()))) {
+
+            throw new IllegalArgumentException(
+                    "the proxy method has incompatible return type: " + methodElement);
+        }
+
+        final TypeMirror listType = this.listType;
+        final TypeElement annotationElement = getTypeFromName(Inputs.class.getCanonicalName());
+        final TypeMirror annotationType = annotationElement.asType();
+        final List<AnnotationValue> targetMirrors =
+                (List<AnnotationValue>) getAnnotationValue(methodElement, annotationType, "value");
+
+        if (targetMirrors == null) {
+
+            // should never happen
+            throw new NullPointerException(
+                    Inputs.class.getSimpleName() + " annotation value must not be null");
+        }
+
+        InputMode inputMode = annotation.mode();
+
+        if (inputMode == InputMode.AUTO) {
+
+            if (targetMirrors.size() == 1) {
+
+                final TypeMirror targetType = (TypeMirror) targetMirrors.get(0).getValue();
+
+                if ((targetType != null) && ((targetType.getKind() == TypeKind.ARRAY)
+                        || typeUtils.isAssignable(listType, typeUtils.erasure(targetType)))) {
+
+                    inputMode = InputMode.COLLECTION;
+
+                } else {
+
+                    inputMode = InputMode.ELEMENT;
+                }
+
+            } else {
+
+                inputMode = InputMode.VALUE;
+            }
+
+        } else if (inputMode == InputMode.COLLECTION) {
+
+            final TypeMirror targetType = (TypeMirror) targetMirrors.get(0).getValue();
+
+            if ((targetType != null) && ((targetType.getKind() != TypeKind.ARRAY)
+                    && !typeUtils.isAssignable(listType, typeUtils.erasure(targetType)))) {
+
+                throw new IllegalArgumentException(
+                        "[" + methodElement + "] an async input with mode " + InputMode.COLLECTION
+                                + " must be bound to an array or a superclass of " + listType);
+            }
+
+            if (targetMirrors.size() > 1) {
+
+                throw new IllegalArgumentException(
+                        "[" + methodElement + "] an async input with mode " + InputMode.COLLECTION +
+                                " cannot be applied to a method taking " + targetMirrors.size()
+                                + " input parameters");
+            }
+
+        } else if (inputMode == InputMode.ELEMENT) {
+
+            if (targetMirrors.size() > 1) {
+
+                throw new IllegalArgumentException(
+                        "[" + methodElement + "] an async input with mode " + InputMode.ELEMENT +
+                                " cannot be applied to a method taking " + targetMirrors.size()
+                                + " input parameters");
+            }
+        }
+
+        return inputMode;
+    }
+
+    /**
      * Returns the specified template as a string.
      *
      * @param methodElement the method element.
@@ -992,6 +1097,27 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return mMethodHeader;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodInputsTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodInputs == null) {
+
+            mMethodInputs = parseTemplate("/templates/method_inputs.txt");
+        }
+
+        return mMethodInputs;
     }
 
     /**
@@ -1700,6 +1826,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
+        final Inputs inputsAnnotation = methodElement.getAnnotation(Inputs.class);
         final Output outputAnnotation = methodElement.getAnnotation(Output.class);
         InputMode inputMode = null;
         OutputMode outputMode = null;
@@ -1720,7 +1847,13 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String method;
 
-        if (outputAnnotation != null) {
+        if (inputsAnnotation != null) {
+
+            inputMode = getInputsMode(methodElement, inputsAnnotation);
+            outputMode = OutputMode.VALUE;
+            method = getMethodInputsTemplate(methodElement, count);
+
+        } else if (outputAnnotation != null) {
 
             outputMode = getOutputMode(methodElement, targetMethod);
 

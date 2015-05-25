@@ -98,13 +98,16 @@ public class Reflection {
     }
 
     /**
-     * TODO
+     * Finds the method matching the specified parameters.
+     * <p/>
+     * Note that the returned method may not be accessible.
      *
-     * @param type
-     * @param name
-     * @param parameterTypes
-     * @return
-     * @throws java.lang.IllegalArgumentException TODO
+     * @param type           the target class.
+     * @param name           the method name.
+     * @param parameterTypes the method parameter types.
+     * @return the matching method.
+     * @throws java.lang.IllegalArgumentException if no method matching the specified parameters was
+     *                                            found.
      */
     @Nonnull
     public static Method findMethod(@Nonnull final Class<?> type, @Nonnull final String name,
@@ -132,11 +135,12 @@ public class Reflection {
     }
 
     /**
-     * TODO
+     * Makes the specified constructor accessible.
      *
-     * @param constructor
-     * @return
+     * @param constructor the constructor instance.
+     * @return the constructor.
      */
+    @Nonnull
     public static Constructor<?> makeAccessible(@Nonnull final Constructor<?> constructor) {
 
         if (!constructor.isAccessible()) {
@@ -148,11 +152,12 @@ public class Reflection {
     }
 
     /**
-     * TODO
+     * Makes the specified method accessible.
      *
-     * @param method
-     * @return
+     * @param method the method instance.
+     * @return the method.
      */
+    @Nonnull
     public static Method makeAccessible(@Nonnull final Method method) {
 
         if (!method.isAccessible()) {

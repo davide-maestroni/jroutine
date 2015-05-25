@@ -284,7 +284,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
                     while (enclosingClass != null) {
 
-                        className = enclosingClass.getSimpleName() + className;
+                        className = enclosingClass.getSimpleName() + "_" + className;
                         enclosingClass = enclosingClass.getEnclosingClass();
                     }
                 }

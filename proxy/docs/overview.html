@@ -93,14 +93,14 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = Proxy_MainAsyncMain.on(instance)
-                                                           .withProxy()
-                                                           .withShareGroup(ShareGroup.NONE)
-                                                           .set()
-                                                           .withRoutine()
-                                                           .withReadTimeout(TimeDuration.INFINITY)
-                                                           .set()
-                                                           .buildProxy();
+                final AsyncMain proxy = Proxy_Main_AsyncMain.on(instance)
+                                                            .withProxy()
+                                                            .withShareGroup(ShareGroup.NONE)
+                                                            .set()
+                                                            .withRoutine()
+                                                            .withReadTimeout(TimeDuration.INFINITY)
+                                                            .set()
+                                                            .buildProxy();
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);

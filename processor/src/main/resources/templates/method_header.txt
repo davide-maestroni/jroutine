@@ -14,7 +14,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
+    private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     private static class InvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
 
@@ -26,7 +26,7 @@
     }
 
     @javax.annotation.Nonnull
-    private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
+    private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}())

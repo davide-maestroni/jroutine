@@ -11,8 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.core;
+package com.gh.bmd.jrt.android.v4.core;
 
+import android.annotation.TargetApi;
+import android.os.Build.VERSION_CODES;
+import android.test.ActivityInstrumentationTestCase2;
+
+import com.gh.bmd.jrt.android.R;
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
@@ -27,7 +33,6 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
-import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
@@ -40,8 +45,6 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
-
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,22 +60,29 @@ import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 /**
- * Object routine builder unit tests.
+ * Loader object routine fragment unit tests.
  * <p/>
- * Created by davide-maestroni on 3/27/15.
+ * Created by davide-maestroni on 4/7/15.
  */
-public class ObjectRoutineBuilderTest {
+@TargetApi(VERSION_CODES.FROYO)
+public class LoaderObjectRoutineFragmentTest
+        extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    @Test
+    public LoaderObjectRoutineFragmentTest() {
+
+        super(TestActivity.class);
+    }
+
     public void testAliasMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(1);
-        final TestClass test = new TestClass();
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
         final TimeUnit timeUnit = TimeUnit.SECONDS;
-        final Routine<Object, Object> routine = JRoutine.on(test)
+        final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
                                                         .withRoutine()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
@@ -89,12 +99,28 @@ public class ObjectRoutineBuilderTest {
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
 
-    @Test
+    public void testArgs() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        assertThat(JRoutine.onFragment(fragment, TestArgs.class)
+                           .withRoutine()
+                           .withFactoryArgs(17)
+                           .set()
+                           .method("getId")
+                           .callAsync()
+                           .eventually()
+                           .readNext()).isEqualTo(17);
+    }
+
     public void testAsyncInputProxyRoutine() {
 
-        final TimeDuration timeout = seconds(1);
-        final Sum sum = new Sum();
-        final SumItf sumAsync = JRoutine.on(sum)
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final SumItf sumAsync = JRoutine.onFragment(fragment, Sum.class)
                                         .withRoutine()
                                         .withReadTimeout(timeout)
                                         .set()
@@ -111,8 +137,6 @@ public class ObjectRoutineBuilderTest {
         channel5.input().pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5.output())).isEqualTo(10);
 
-        assertThat(sumAsync.compute2().pass(1, 2, 3, 4).result().readNext()).isEqualTo(10);
-
         final TransportChannel<Integer> channel6 = JRoutine.transport().buildChannel();
         channel6.input().pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList(channel6.output())).isEqualTo(10);
@@ -122,12 +146,13 @@ public class ObjectRoutineBuilderTest {
         assertThat(sumAsync.computeList1(channel7.output())).isEqualTo(10);
     }
 
-    @Test
     public void testAsyncOutputProxyRoutine() {
 
-        final TimeDuration timeout = seconds(1);
-        final Count count = new Count();
-        final CountItf countAsync = JRoutine.on(count)
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final CountItf countAsync = JRoutine.onFragment(fragment, Count.class)
                                             .withRoutine()
                                             .withReadTimeout(timeout)
                                             .set()
@@ -139,13 +164,16 @@ public class ObjectRoutineBuilderTest {
         assertThat(countAsync.countList1(3).readAll()).containsExactly(0, 1, 2);
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testConfigurationErrors() {
 
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            new DefaultObjectRoutineBuilder(TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
                     (RoutineConfiguration) null);
 
             fail();
@@ -156,8 +184,19 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
                     (ProxyConfiguration) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
+                    (LoaderConfiguration) null);
 
             fail();
 
@@ -166,41 +205,54 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     public void testConfigurationWarnings() {
 
-        final TestClass test = new TestClass();
         final CountLog countLog = new CountLog();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
         final RoutineConfiguration configuration = builder().withFactoryArgs()
                                                             .withInputOrder(OrderType.NONE)
                                                             .withInputMaxSize(3)
-                                                            .withInputTimeout(seconds(1))
+                                                            .withInputTimeout(seconds(10))
                                                             .withOutputOrder(OrderType.NONE)
                                                             .withOutputMaxSize(3)
-                                                            .withOutputTimeout(seconds(1))
+                                                            .withOutputTimeout(seconds(10))
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .set();
-        JRoutine.on(test).withRoutine().with(configuration).set().aliasMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
-
-        final Square square = new Square();
-        JRoutine.on(square)
+        JRoutine.onFragment(fragment, TestClass.class)
                 .withRoutine()
                 .with(configuration)
                 .set()
+                .withProxy()
+                .withShareGroup("test")
+                .set()
+                .aliasMethod(TestClass.GET);
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
+
+        JRoutine.onFragment(fragment, Square.class)
+                .withRoutine()
+                .with(configuration)
+                .set()
+                .withProxy()
+                .withShareGroup("test")
+                .set()
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(14);
+        assertThat(countLog.getWrnCount()).isEqualTo(12);
     }
 
-    @Test
     public void testDuplicateAnnotationError() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            new DefaultObjectRoutineBuilder(new DuplicateAnnotation()).aliasMethod(
-                    DuplicateAnnotation.GET);
+            JRoutine.onFragment(fragment, DuplicateAnnotation.class)
+                    .aliasMethod(DuplicateAnnotation.GET);
 
             fail();
 
@@ -209,12 +261,14 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     public void testException() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(1);
-        final TestClass test = new TestClass();
-        final Routine<Object, Object> routine3 = JRoutine.on(test).aliasMethod(TestClass.THROW);
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<Object, Object> routine3 =
+                JRoutine.onFragment(fragment, TestClass.class).aliasMethod(TestClass.THROW);
 
         try {
 
@@ -229,80 +283,15 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
-    public void testInvalidParamsOutputAnnotationError() {
-
-        final Sum sum = new Sum();
-
-        try {
-
-            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute1();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute2();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute3();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute4();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute5();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(sum).buildProxy(SumError2.class).compute6();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
     public void testInvalidProxyError() {
 
-        final TestClass test = new TestClass();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildProxy(TestClass.class);
+            JRoutine.onFragment(fragment, TestClass.class).buildProxy(TestClass.class);
 
             fail();
 
@@ -312,7 +301,8 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildProxy(ClassToken.tokenOf(TestClass.class));
+            JRoutine.onFragment(fragment, TestClass.class)
+                    .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -321,14 +311,17 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     public void testInvalidProxyInputAnnotationError() {
 
-        final Sum sum = new Sum();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(1, new int[0]);
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(1, new int[0]);
 
             fail();
 
@@ -338,7 +331,9 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(new String[0]);
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(new String[0]);
 
             fail();
 
@@ -348,7 +343,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(new int[0]);
+            JRoutine.onFragment(fragment, Sum.class).buildProxy(SumError.class).compute(new int[0]);
 
             fail();
 
@@ -358,7 +353,9 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(Collections.<Integer>emptyList());
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(Collections.<Integer>emptyList());
 
             fail();
 
@@ -370,7 +367,9 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(channel.output());
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(channel.output());
 
             fail();
 
@@ -380,7 +379,9 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(1, channel.output());
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(1, channel.output());
 
             fail();
 
@@ -390,7 +391,9 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(new Object());
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(new Object());
 
             fail();
 
@@ -400,7 +403,9 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute(new Object[0]);
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(new Object[0]);
 
             fail();
 
@@ -410,7 +415,9 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(sum).buildProxy(SumError.class).compute("test", new int[0]);
+            JRoutine.onFragment(fragment, Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute("test", new int[0]);
 
             fail();
 
@@ -419,14 +426,15 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     public void testInvalidProxyMethodError() {
 
-        final TestClass test = new TestClass();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            JRoutine.on(test)
+            JRoutine.onFragment(fragment, TestClass.class)
                     .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -441,7 +449,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(test)
+            JRoutine.onFragment(fragment, TestClass.class)
                     .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -456,7 +464,12 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(test).buildProxy(TestItf.class).throwException2(null);
+            JRoutine.onFragment(fragment, TestClass.class)
+                    .withRoutine()
+                    .withReadTimeout(INFINITY)
+                    .set()
+                    .buildProxy(TestItf.class)
+                    .throwException2(null);
 
             fail();
 
@@ -465,14 +478,15 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     public void testInvalidProxyOutputAnnotationError() {
 
-        final Count count = new Count();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            JRoutine.on(count).buildProxy(CountError.class).count(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count(3);
 
             fail();
 
@@ -482,7 +496,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(count).buildProxy(CountError.class).count1(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count1(3);
 
             fail();
 
@@ -492,7 +506,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(count).buildProxy(CountError.class).count2(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count2(3);
 
             fail();
 
@@ -502,7 +516,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(count).buildProxy(CountError.class).countList(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList(3);
 
             fail();
 
@@ -512,7 +526,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(count).buildProxy(CountError.class).countList1(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList1(3);
 
             fail();
 
@@ -522,7 +536,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(count).buildProxy(CountError.class).countList2(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList2(3);
 
             fail();
 
@@ -531,12 +545,13 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     public void testMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(1);
-        final TestClass test = new TestClass();
-        final Routine<Object, Object> routine2 = JRoutine.on(test)
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<Object, Object> routine2 = JRoutine.onFragment(fragment, TestClass.class)
                                                          .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
@@ -553,12 +568,13 @@ public class ObjectRoutineBuilderTest {
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
 
-    @Test
     public void testMethodBySignature() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(1);
-        final TestClass test = new TestClass();
-        final Routine<Object, Object> routine1 = JRoutine.on(test)
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<Object, Object> routine1 = JRoutine.onFragment(fragment, TestClass.class)
                                                          .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
@@ -568,14 +584,15 @@ public class ObjectRoutineBuilderTest {
         assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
     }
 
-    @Test
     public void testMissingAliasMethodError() {
 
-        final TestClass test = new TestClass();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).aliasMethod("test");
+            JRoutine.onFragment(fragment, TestClass.class).aliasMethod("test");
 
             fail();
 
@@ -584,14 +601,15 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     public void testMissingMethodError() {
 
-        final TestClass test = new TestClass();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).method("test");
+            JRoutine.onFragment(fragment, TestClass.class).method("test");
 
             fail();
 
@@ -600,13 +618,16 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testNullPointerError() {
 
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            new DefaultObjectRoutineBuilder(null);
+            JRoutine.onFragment(fragment, (Class<?>) null);
 
             fail();
 
@@ -615,15 +636,16 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testNullProxyError() {
 
-        final TestClass test = new TestClass();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildProxy((Class<?>) null);
+            JRoutine.onFragment(fragment, TestClass.class).buildProxy((Class<?>) null);
 
             fail();
 
@@ -633,7 +655,7 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildProxy((ClassToken<?>) null);
+            JRoutine.onFragment(fragment, TestClass.class).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -642,12 +664,13 @@ public class ObjectRoutineBuilderTest {
         }
     }
 
-    @Test
     @SuppressWarnings("unchecked")
     public void testProxyAnnotations() {
 
-        final Impl impl = new Impl();
-        final Itf itf = JRoutine.on(impl)
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Itf itf = JRoutine.onFragment(fragment, Impl.class)
                                 .withRoutine()
                                 .withReadTimeout(INFINITY)
                                 .set()
@@ -894,13 +917,15 @@ public class ObjectRoutineBuilderTest {
         itf.setL5().pass(1, 2, 3).result().checkComplete();
     }
 
-    @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testProxyRoutine() {
 
-        final TimeDuration timeout = seconds(1);
-        final Square square = new Square();
-        final SquareItf squareAsync = JRoutine.on(square).buildProxy(SquareItf.class);
+        final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final SquareItf squareAsync =
+                JRoutine.onFragment(fragment, Square.class).buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.compute1(3)).containsExactly(9);
@@ -932,84 +957,21 @@ public class ObjectRoutineBuilderTest {
                               .afterMax(timeout)
                               .readAll()).contains(1, 4, 9);
 
-        final Inc inc = new Inc();
-        final IncItf incItf = JRoutine.on(inc).buildProxy(ClassToken.tokenOf(IncItf.class));
+        final IncItf incItf = JRoutine.onFragment(fragment, Inc.class)
+                                      .buildProxy(ClassToken.tokenOf(IncItf.class));
         assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
         assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
     }
 
-    @Test
-    public void testRoutineCache() {
-
-        final TestClass test = new TestClass();
-        final NullLog nullLog = new NullLog();
-        final Routine<Object, Object> routine1 = JRoutine.on(test)
-                                                         .withRoutine()
-                                                         .withSyncRunner(Runners.sequentialRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
-                                                         .withLogLevel(LogLevel.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .set()
-                                                         .aliasMethod(TestClass.GET);
-
-        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
-
-        final Routine<Object, Object> routine2 = JRoutine.on(test)
-                                                         .withRoutine()
-                                                         .withSyncRunner(Runners.sequentialRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
-                                                         .withLogLevel(LogLevel.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .set()
-                                                         .aliasMethod(TestClass.GET);
-
-        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
-        assertThat(routine1).isEqualTo(routine2);
-
-        final Routine<Object, Object> routine3 = JRoutine.on(test)
-                                                         .withRoutine()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
-                                                         .withLogLevel(LogLevel.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .set()
-                                                         .aliasMethod(TestClass.GET);
-
-        assertThat(routine3.callSync().readAll()).containsExactly(-77L);
-        assertThat(routine1).isNotEqualTo(routine3);
-        assertThat(routine2).isNotEqualTo(routine3);
-
-        final Routine<Object, Object> routine4 = JRoutine.on(test)
-                                                         .withRoutine()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
-                                                         .withLogLevel(LogLevel.WARNING)
-                                                         .withLog(nullLog)
-                                                         .set()
-                                                         .aliasMethod(TestClass.GET);
-
-        assertThat(routine4.callSync().readAll()).containsExactly(-77L);
-        assertThat(routine3).isNotEqualTo(routine4);
-
-        final Routine<Object, Object> routine5 = JRoutine.on(test)
-                                                         .withRoutine()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
-                                                         .withLogLevel(LogLevel.WARNING)
-                                                         .withLog(new NullLog())
-                                                         .set()
-                                                         .aliasMethod(TestClass.GET);
-
-        assertThat(routine5.callSync().readAll()).containsExactly(-77L);
-        assertThat(routine4).isNotEqualTo(routine5);
-    }
-
-    @Test
     public void testShareGroup() throws NoSuchMethodException {
 
-        final TestClass2 test2 = new TestClass2();
-        final ObjectRoutineBuilder builder =
-                JRoutine.on(test2).withRoutine().withReadTimeout(seconds(2)).set();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
+                                                     .withRoutine()
+                                                     .withReadTimeout(seconds(10))
+                                                     .set();
 
         long startTime = System.currentTimeMillis();
 
@@ -1020,7 +982,7 @@ public class ObjectRoutineBuilderTest {
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         startTime = System.currentTimeMillis();
 
@@ -1029,16 +991,20 @@ public class ObjectRoutineBuilderTest {
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
     }
 
-    @Test
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
-        final TestTimeout testTimeout = new TestTimeout();
-        assertThat(JRoutine.on(testTimeout)
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
-                           .withReadTimeout(seconds(1))
+                           .withReadTimeout(seconds(10))
+                           .set()
+                           .withLoader()
+                           .withId(0)
                            .set()
                            .aliasMethod("test")
                            .callAsync()
@@ -1046,9 +1012,12 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(testTimeout)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .set()
+                    .withLoader()
+                    .withId(1)
                     .set()
                     .aliasMethod("test")
                     .callAsync()
@@ -1060,9 +1029,12 @@ public class ObjectRoutineBuilderTest {
 
         }
 
-        assertThat(JRoutine.on(testTimeout)
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
-                           .withReadTimeout(seconds(1))
+                           .withReadTimeout(seconds(10))
+                           .set()
+                           .withLoader()
+                           .withId(2)
                            .set()
                            .method("getInt")
                            .callAsync()
@@ -1070,9 +1042,12 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(testTimeout)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .set()
+                    .withLoader()
+                    .withId(3)
                     .set()
                     .method("getInt")
                     .callAsync()
@@ -1084,9 +1059,12 @@ public class ObjectRoutineBuilderTest {
 
         }
 
-        assertThat(JRoutine.on(testTimeout)
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
-                           .withReadTimeout(seconds(1))
+                           .withReadTimeout(seconds(10))
+                           .set()
+                           .withLoader()
+                           .withId(4)
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
@@ -1094,9 +1072,12 @@ public class ObjectRoutineBuilderTest {
 
         try {
 
-            JRoutine.on(testTimeout)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .set()
+                    .withLoader()
+                    .withId(5)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
@@ -1108,18 +1089,24 @@ public class ObjectRoutineBuilderTest {
 
         }
 
-        assertThat(JRoutine.on(testTimeout)
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
-                           .withReadTimeout(seconds(1))
+                           .withReadTimeout(seconds(10))
+                           .set()
+                           .withLoader()
+                           .withId(6)
                            .set()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
 
         try {
 
-            JRoutine.on(testTimeout)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .set()
+                    .withLoader()
+                    .withId(7)
                     .set()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
@@ -1477,34 +1464,6 @@ public class ObjectRoutineBuilderTest {
         RoutineChannel<Integer, Void> setL5();
     }
 
-    public interface SumError2 {
-
-        @Alias("compute")
-        @Inputs({int.class, int.class})
-        int compute1();
-
-        @Alias("compute")
-        @Output
-        @Inputs({int.class, int.class})
-        InputChannel<Integer> compute2();
-
-        @Alias("compute")
-        @Inputs(value = {int.class, int.class}, mode = InputMode.ELEMENT)
-        InputChannel<Integer> compute3();
-
-        @Alias("compute")
-        @Inputs(value = {int.class, int.class}, mode = InputMode.COLLECTION)
-        InputChannel<Integer> compute4();
-
-        @Alias("compute")
-        @Inputs(value = int.class, mode = InputMode.COLLECTION)
-        InputChannel<Integer> compute5();
-
-        @Alias("compute")
-        @Inputs(value = {int[].class, int.class}, mode = InputMode.COLLECTION)
-        InputChannel<Integer> compute6();
-    }
-
     private interface CountError {
 
         @Output
@@ -1553,11 +1512,11 @@ public class ObjectRoutineBuilderTest {
 
     private interface IncItf {
 
-        @Timeout(1000)
+        @Timeout(10000)
         @Output
         int[] inc(@Input(int.class) int... i);
 
-        @Timeout(1000)
+        @Timeout(10000)
         @Alias("inc")
         @Output
         Iterable<Integer> incIterable(@Input(int.class) int... i);
@@ -1565,21 +1524,21 @@ public class ObjectRoutineBuilderTest {
 
     private interface SquareItf {
 
-        @Timeout(value = 1, unit = TimeUnit.SECONDS)
+        @Timeout(value = 10, unit = TimeUnit.SECONDS)
         int compute(int i);
 
         @Alias("compute")
         @Output(OutputMode.COLLECTION)
-        @Timeout(1000)
+        @Timeout(10000)
         int[] compute1(int length);
 
         @Alias("compute")
         @Output(OutputMode.COLLECTION)
-        @Timeout(1000)
+        @Timeout(10000)
         List<Integer> compute2(int length);
 
         @Alias("compute")
-        @Timeout(1000)
+        @Timeout(10000)
         int computeAsync(@Input(int.class) OutputChannel<Integer> i);
 
         @ShareGroup(ShareGroup.NONE)
@@ -1636,10 +1595,6 @@ public class ObjectRoutineBuilderTest {
         int compute1(@Input(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> ints);
 
         @Alias("compute")
-        @Inputs(int[].class)
-        RoutineChannel<Integer, Integer> compute2();
-
-        @Alias("compute")
         int computeList(@Input(List.class) OutputChannel<Integer> ints);
 
         @Alias("compute")
@@ -1647,6 +1602,7 @@ public class ObjectRoutineBuilderTest {
                 mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
     }
 
+    @SuppressWarnings("unused")
     private interface TestItf {
 
         void throwException(@Input(int.class) RuntimeException ex);
@@ -1848,11 +1804,6 @@ public class ObjectRoutineBuilderTest {
     @SuppressWarnings("unused")
     private static class Sum {
 
-        public int compute(final int a) {
-
-            return a;
-        }
-
         public int compute(final int a, final int b) {
 
             return a + b;
@@ -1884,6 +1835,22 @@ public class ObjectRoutineBuilderTest {
     }
 
     @SuppressWarnings("unused")
+    private static class TestArgs {
+
+        private final int mId;
+
+        public TestArgs(final int id) {
+
+            mId = id;
+        }
+
+        public int getId() {
+
+            return mId;
+        }
+    }
+
+    @SuppressWarnings("unused")
     private static class TestClass {
 
         public static final String GET = "get";
@@ -1909,14 +1876,14 @@ public class ObjectRoutineBuilderTest {
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            TimeDuration.millis(1000).sleepAtLeast();
 
             return 2;
         }

@@ -11,10 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v4.core;
+package com.gh.bmd.jrt.android.v11.core;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -68,14 +69,14 @@ import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Invocation context routine unit tests.
+ * Loader routine unit tests.
  * <p/>
  * Created by davide-maestroni on 12/10/14.
  */
-@TargetApi(VERSION_CODES.FROYO)
-public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<TestActivity> {
+@TargetApi(VERSION_CODES.HONEYCOMB)
+public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public LoaderRoutineBuilderTest() {
+    public LoaderRoutineTest() {
 
         super(TestActivity.class);
     }
@@ -92,6 +93,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
@@ -119,6 +125,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityAbortInput() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -145,6 +156,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityBuilderPurge() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutine()
@@ -165,6 +181,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityBuilderPurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
@@ -198,6 +219,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityClearError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -250,6 +276,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityClearResult() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -314,6 +345,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityContext() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         assertThat(JRoutine.on(ContextInvocations.invocationFactoryOf(
                 new ClassToken<GetContextInvocation<String>>() {}, getActivity()))
                            .callSync()
@@ -324,6 +360,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityDelegation() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine1 =
@@ -353,6 +394,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityFunction() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<Object, String> routine =
                 JRoutine.onActivity(getActivity(), factoryOn(getFunction())).buildRoutine();
@@ -360,6 +406,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityInputs() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
@@ -374,6 +425,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityInvalidIdError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
             JRoutine.onActivity(getActivity(), LoaderConfiguration.AUTO);
@@ -386,6 +442,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityInvalidTokenError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -402,6 +463,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityKeep() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
@@ -420,6 +486,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityMissingRoutine() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
 
@@ -436,6 +507,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("ConstantConditions")
     public void testActivityNullPointerErrors() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -471,6 +547,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityRestart() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -497,6 +578,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityRestartOnInput() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
@@ -522,6 +608,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityRetain() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -595,6 +686,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivityRoutinePurge() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
                         .withRoutine()
@@ -615,6 +711,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testActivityRoutinePurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
@@ -648,6 +749,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testActivitySame() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine =
@@ -660,6 +766,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testChannelBuilderWarnings() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
@@ -677,7 +788,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
                 .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         JRoutine.onFragment(fragment, 0).withRoutine().with(configuration).set().buildChannel();
@@ -685,6 +796,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testClash() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
@@ -724,6 +840,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     @SuppressWarnings("ConstantConditions")
     public void testConfigurationErrors() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final ContextInvocationFactory<Object, Object> factory =
                 PassingContextInvocation.factoryOf();
 
@@ -754,8 +875,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentAbort() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -783,7 +909,12 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentBuilderPurge() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
@@ -806,7 +937,12 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentBuilderPurgeInputs() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
@@ -841,8 +977,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentChannel() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -863,8 +1004,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentDelegation() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(1);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 =
@@ -893,8 +1039,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentFunction() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, String> routine =
@@ -904,8 +1055,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentInputs() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -919,9 +1075,14 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentInvalidIdError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
-            final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
             JRoutine.onFragment(fragment, LoaderConfiguration.AUTO);
@@ -934,6 +1095,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testFragmentInvalidTokenError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -951,8 +1117,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentKeep() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -971,8 +1142,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentMissingRoutine() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final OutputChannel<String> channel = JRoutine.onFragment(fragment, 0).buildChannel();
@@ -990,6 +1166,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("ConstantConditions")
     public void testFragmentNullPointerErrors() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -1013,7 +1194,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
             JRoutine.onFragment(fragment, (ClassToken<ContextInvocation<Object, Object>>) null);
@@ -1027,8 +1208,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentReset() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -1056,8 +1242,13 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentRestart() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
@@ -1085,7 +1276,12 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentRoutinePurge() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
@@ -1108,7 +1304,12 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentRoutinePurgeInputs() throws InterruptedException {
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
@@ -1143,9 +1344,14 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testFragmentSame() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Data, Data> routine =
@@ -1158,6 +1364,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testInvocations() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
@@ -1200,6 +1411,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("ConstantConditions")
     public void testLoaderError() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final Logger logger = Logger.newLogger(null, null, this);
         final LoaderConfiguration configuration = LoaderConfiguration.DEFAULT_CONFIGURATION;
@@ -1263,6 +1479,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     public void testRoutineBuilderWarnings() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
                                                             .withInputMaxSize(3)
@@ -1283,7 +1504,7 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
@@ -1300,6 +1521,11 @@ public class LoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("ConstantConditions")
     public void testRoutineError() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final LoaderConfiguration configuration = LoaderConfiguration.DEFAULT_CONFIGURATION;
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());

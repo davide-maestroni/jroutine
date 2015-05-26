@@ -22,7 +22,51 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * TODO
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * the framework as well.
+ * <p/>
+ * The only use case in which this annotation is useful, is when an interface is used as a mirror
+ * of another class methods. The interface can take its input parameters in an asynchronous way. In
+ * such case, the values specified in the annotation will indicate the type of the parameters
+ * expected by the target method.
+ * <p/>
+ * For example, a method taking two integers:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         public int sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * can be mirrored by a method defined as:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Inputs({int.class, int.class})
+ *         public RoutineChannel&lt;Integer, Integer&gt; sum();
+ *     </code>
+ * </pre>
+ * <p/>
+ * Note that the transfer mode is automatically inferred by the target types, unless specifically
+ * chosen through the annotation <code>mode</code> attribute.
+ * <p/>
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.gh.bmd.jrt.annotation.Inputs *;
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide-maestroni on 22/05/15.
  */

@@ -42,11 +42,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Class routine builder unit tests.
+ * Class routine unit tests.
  * <p/>
  * Created by davide-maestroni on 3/26/15.
  */
-public class ClassRoutineBuilderTest {
+public class ClassRoutineTest {
 
     @Test
     public void testAliasMethod() throws NoSuchMethodException {

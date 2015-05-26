@@ -11,12 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.v4.core;
+package com.gh.bmd.jrt.android.v11.core;
 
 import android.annotation.TargetApi;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.gh.bmd.jrt.android.R;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
@@ -61,24 +63,32 @@ import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Object context routine activity unit tests.
+ * Loader object routine fragment unit tests.
  * <p/>
  * Created by davide-maestroni on 4/7/15.
  */
-@TargetApi(VERSION_CODES.FROYO)
-public class LoaderObjectRoutineBuilderActivityTest
+@TargetApi(VERSION_CODES.HONEYCOMB)
+public class LoaderObjectRoutineFragmentTest
         extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public LoaderObjectRoutineBuilderActivityTest() {
+    public LoaderObjectRoutineFragmentTest() {
 
         super(TestActivity.class);
     }
 
     public void testAliasMethod() throws NoSuchMethodException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
         final TimeUnit timeUnit = TimeUnit.SECONDS;
-        final Routine<Object, Object> routine = JRoutine.onActivity(getActivity(), TestClass.class)
+        final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
                                                         .withRoutine()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
@@ -97,7 +107,15 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testArgs() {
 
-        assertThat(JRoutine.onActivity(getActivity(), TestArgs.class)
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        assertThat(JRoutine.onFragment(fragment, TestArgs.class)
                            .withRoutine()
                            .withFactoryArgs(17)
                            .set()
@@ -109,8 +127,16 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testAsyncInputProxyRoutine() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(10);
-        final SumItf sumAsync = JRoutine.onActivity(getActivity(), Sum.class)
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final SumItf sumAsync = JRoutine.onFragment(fragment, Sum.class)
                                         .withRoutine()
                                         .withReadTimeout(timeout)
                                         .set()
@@ -138,8 +164,16 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testAsyncOutputProxyRoutine() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(10);
-        final CountItf countAsync = JRoutine.onActivity(getActivity(), Count.class)
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final CountItf countAsync = JRoutine.onFragment(fragment, Count.class)
                                             .withRoutine()
                                             .withReadTimeout(timeout)
                                             .set()
@@ -154,9 +188,18 @@ public class LoaderObjectRoutineBuilderActivityTest
     @SuppressWarnings("ConstantConditions")
     public void testConfigurationErrors() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
                     (RoutineConfiguration) null);
 
             fail();
@@ -167,7 +210,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -178,7 +221,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
                     (LoaderConfiguration) null);
 
             fail();
@@ -190,7 +233,15 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testConfigurationWarnings() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final CountLog countLog = new CountLog();
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
         final RoutineConfiguration configuration = builder().withFactoryArgs()
                                                             .withInputOrder(OrderType.NONE)
                                                             .withInputMaxSize(3)
@@ -201,7 +252,7 @@ public class LoaderObjectRoutineBuilderActivityTest
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .set();
-        JRoutine.onActivity(getActivity(), TestClass.class)
+        JRoutine.onFragment(fragment, TestClass.class)
                 .withRoutine()
                 .with(configuration)
                 .set()
@@ -211,7 +262,7 @@ public class LoaderObjectRoutineBuilderActivityTest
                 .aliasMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
-        JRoutine.onActivity(getActivity(), Square.class)
+        JRoutine.onFragment(fragment, Square.class)
                 .withRoutine()
                 .with(configuration)
                 .set()
@@ -225,9 +276,18 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testDuplicateAnnotationError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), DuplicateAnnotation.class)
+            JRoutine.onFragment(fragment, DuplicateAnnotation.class)
                     .aliasMethod(DuplicateAnnotation.GET);
 
             fail();
@@ -239,9 +299,17 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testException() throws NoSuchMethodException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
         final Routine<Object, Object> routine3 =
-                JRoutine.onActivity(getActivity(), TestClass.class).aliasMethod(TestClass.THROW);
+                JRoutine.onFragment(fragment, TestClass.class).aliasMethod(TestClass.THROW);
 
         try {
 
@@ -258,9 +326,18 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testInvalidProxyError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).buildProxy(TestClass.class);
+            JRoutine.onFragment(fragment, TestClass.class).buildProxy(TestClass.class);
 
             fail();
 
@@ -270,7 +347,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class)
+            JRoutine.onFragment(fragment, TestClass.class)
                     .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
@@ -282,9 +359,18 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testInvalidProxyInputAnnotationError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute(1, new int[0]);
 
@@ -296,7 +382,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new String[0]);
 
@@ -308,9 +394,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
-                    .buildProxy(SumError.class)
-                    .compute(new int[0]);
+            JRoutine.onFragment(fragment, Sum.class).buildProxy(SumError.class).compute(new int[0]);
 
             fail();
 
@@ -320,7 +404,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute(Collections.<Integer>emptyList());
 
@@ -334,7 +418,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute(channel.output());
 
@@ -346,7 +430,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute(1, channel.output());
 
@@ -358,7 +442,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new Object());
 
@@ -370,7 +454,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new Object[0]);
 
@@ -382,7 +466,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Sum.class)
+            JRoutine.onFragment(fragment, Sum.class)
                     .buildProxy(SumError.class)
                     .compute("test", new int[0]);
 
@@ -395,9 +479,18 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testInvalidProxyMethodError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class)
+            JRoutine.onFragment(fragment, TestClass.class)
                     .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -412,7 +505,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class)
+            JRoutine.onFragment(fragment, TestClass.class)
                     .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -427,7 +520,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class)
+            JRoutine.onFragment(fragment, TestClass.class)
                     .withRoutine()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -443,9 +536,18 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testInvalidProxyOutputAnnotationError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), Count.class).buildProxy(CountError.class).count(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count(3);
 
             fail();
 
@@ -455,7 +557,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Count.class).buildProxy(CountError.class).count1(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count1(3);
 
             fail();
 
@@ -465,7 +567,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Count.class).buildProxy(CountError.class).count2(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count2(3);
 
             fail();
 
@@ -475,9 +577,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Count.class)
-                    .buildProxy(CountError.class)
-                    .countList(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList(3);
 
             fail();
 
@@ -487,9 +587,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Count.class)
-                    .buildProxy(CountError.class)
-                    .countList1(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList1(3);
 
             fail();
 
@@ -499,9 +597,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), Count.class)
-                    .buildProxy(CountError.class)
-                    .countList2(3);
+            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList2(3);
 
             fail();
 
@@ -512,8 +608,16 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testMethod() throws NoSuchMethodException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(10);
-        final Routine<Object, Object> routine2 = JRoutine.onActivity(getActivity(), TestClass.class)
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<Object, Object> routine2 = JRoutine.onFragment(fragment, TestClass.class)
                                                          .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
@@ -528,13 +632,20 @@ public class LoaderObjectRoutineBuilderActivityTest
                                                                  "getLong"));
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
-
     }
 
     public void testMethodBySignature() throws NoSuchMethodException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(10);
-        final Routine<Object, Object> routine1 = JRoutine.onActivity(getActivity(), TestClass.class)
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<Object, Object> routine1 = JRoutine.onFragment(fragment, TestClass.class)
                                                          .withRoutine()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
@@ -546,9 +657,18 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testMissingAliasMethodError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).aliasMethod("test");
+            JRoutine.onFragment(fragment, TestClass.class).aliasMethod("test");
 
             fail();
 
@@ -559,9 +679,18 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testMissingMethodError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).method("test");
+            JRoutine.onFragment(fragment, TestClass.class).method("test");
 
             fail();
 
@@ -573,9 +702,18 @@ public class LoaderObjectRoutineBuilderActivityTest
     @SuppressWarnings("ConstantConditions")
     public void testNullPointerError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), (Class<?>) null);
+            JRoutine.onFragment(fragment, (Class<?>) null);
 
             fail();
 
@@ -587,9 +725,18 @@ public class LoaderObjectRoutineBuilderActivityTest
     @SuppressWarnings("ConstantConditions")
     public void testNullProxyError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).buildProxy((Class<?>) null);
+            JRoutine.onFragment(fragment, TestClass.class).buildProxy((Class<?>) null);
 
             fail();
 
@@ -599,7 +746,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestClass.class).buildProxy((ClassToken<?>) null);
+            JRoutine.onFragment(fragment, TestClass.class).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -611,7 +758,15 @@ public class LoaderObjectRoutineBuilderActivityTest
     @SuppressWarnings("unchecked")
     public void testProxyAnnotations() {
 
-        final Itf itf = JRoutine.onActivity(getActivity(), Impl.class)
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Itf itf = JRoutine.onFragment(fragment, Impl.class)
                                 .withRoutine()
                                 .withReadTimeout(INFINITY)
                                 .set()
@@ -861,9 +1016,17 @@ public class LoaderObjectRoutineBuilderActivityTest
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testProxyRoutine() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TimeDuration timeout = seconds(10);
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
         final SquareItf squareAsync =
-                JRoutine.onActivity(getActivity(), Square.class).buildProxy(SquareItf.class);
+                JRoutine.onFragment(fragment, Square.class).buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.compute1(3)).containsExactly(9);
@@ -895,7 +1058,7 @@ public class LoaderObjectRoutineBuilderActivityTest
                               .afterMax(timeout)
                               .readAll()).contains(1, 4, 9);
 
-        final IncItf incItf = JRoutine.onActivity(getActivity(), Inc.class)
+        final IncItf incItf = JRoutine.onFragment(fragment, Inc.class)
                                       .buildProxy(ClassToken.tokenOf(IncItf.class));
         assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
         assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
@@ -903,7 +1066,15 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testShareGroup() throws NoSuchMethodException {
 
-        final ObjectRoutineBuilder builder = JRoutine.onActivity(getActivity(), TestClass2.class)
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
                                                      .withRoutine()
                                                      .withReadTimeout(seconds(10))
                                                      .set();
@@ -931,7 +1102,15 @@ public class LoaderObjectRoutineBuilderActivityTest
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
-        assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -944,7 +1123,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestTimeout.class)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -961,7 +1140,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         }
 
-        assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -974,7 +1153,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestTimeout.class)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -991,7 +1170,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         }
 
-        assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -1004,7 +1183,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestTimeout.class)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -1021,7 +1200,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         }
 
-        assertThat(JRoutine.onActivity(getActivity(), TestTimeout.class)
+        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
                            .withRoutine()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -1033,7 +1212,7 @@ public class LoaderObjectRoutineBuilderActivityTest
 
         try {
 
-            JRoutine.onActivity(getActivity(), TestTimeout.class)
+            JRoutine.onFragment(fragment, TestTimeout.class)
                     .withRoutine()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()

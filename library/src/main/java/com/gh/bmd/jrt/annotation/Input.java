@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
  * the framework as well.
  * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a mirror
- * of another class methods. The interface can take some input parameters asynchronous way. In such
- * case, the value specified in the annotation will indicate the type of the parameter expected by
- * the target method.
+ * of another class methods. The interface can take some input parameters in an asynchronous way. In
+ * such case, the value specified in the annotation will indicate the type of the parameter expected
+ * by the target method.
  * <p/>
  * For example, a method taking two integers:
  * <p/>

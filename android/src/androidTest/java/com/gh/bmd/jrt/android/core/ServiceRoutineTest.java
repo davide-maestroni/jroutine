@@ -56,14 +56,14 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Invocation service routine unit tests.
+ * Service routine unit tests.
  * <p/>
  * Created by davide-maestroni on 12/1/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class ServiceRoutineBuilderTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ServiceRoutineBuilderTest() {
+    public ServiceRoutineTest() {
 
         super(TestActivity.class);
     }

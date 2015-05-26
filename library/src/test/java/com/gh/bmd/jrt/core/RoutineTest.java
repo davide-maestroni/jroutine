@@ -682,7 +682,8 @@ public class RoutineTest {
                                 .set()
                                 .callAsync("test")
                                 .eventually()
-                                .iterator().next();
+                                .iterator()
+                                .next();
                     }
                 }).buildRoutine();
 
@@ -708,7 +709,8 @@ public class RoutineTest {
 
                         JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
                                 .withRoutine()
-                                .withFactoryArgs(millis(100)).set()
+                                .withFactoryArgs(millis(100))
+                                .set()
                                 .callAsync("test")
                                 .eventually()
                                 .readAll();
@@ -2061,6 +2063,57 @@ public class RoutineTest {
                 1, 4, 9, 16);
         assertThat(squareRoutine.callParallel(1, 2, 3, 4).afterMax(timeout).readAll()).containsOnly(
                 1, 4, 9, 16);
+    }
+
+    @Test
+    public void testRoutineBuilder() {
+
+        assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
+                           .withRoutine()
+                           .withSyncRunner(Runners.sequentialRunner())
+                           .withAsyncRunner(Runners.poolRunner())
+                           .withCoreInvocations(0)
+                           .withMaxInvocations(1)
+                           .withAvailInvocationTimeout(1, TimeUnit.SECONDS)
+                           .withInputMaxSize(2)
+                           .withInputTimeout(1, TimeUnit.SECONDS)
+                           .withOutputMaxSize(2)
+                           .withOutputTimeout(1, TimeUnit.SECONDS)
+                           .withOutputOrder(OrderType.PASS_ORDER)
+                           .set()
+                           .callSync("test1", "test2")
+                           .readAll()).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
+                           .withRoutine()
+                           .withSyncRunner(Runners.queuedRunner())
+                           .withAsyncRunner(Runners.poolRunner())
+                           .withCoreInvocations(0)
+                           .withMaxInvocations(1)
+                           .withAvailInvocationTimeout(TimeDuration.ZERO)
+                           .withInputMaxSize(2)
+                           .withInputTimeout(TimeDuration.ZERO)
+                           .withOutputMaxSize(2)
+                           .withOutputTimeout(TimeDuration.ZERO)
+                           .withOutputOrder(OrderType.PASS_ORDER)
+                           .set()
+                           .callSync("test1", "test2")
+                           .readAll()).containsExactly("test1", "test2");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testRoutineBuilderError() {
+
+        try {
+
+            new DefaultRoutineBuilder<String, String>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test

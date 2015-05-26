@@ -31,6 +31,7 @@ import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.common.DeadlockException;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
@@ -601,6 +602,126 @@ public class RoutineTest {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testDeadlockOnCheckComplete() {
+
+        final Routine<Object, Object> routine1 =
+                JRoutine.on(new FilterInvocation<Object, Object>() {
+
+                    public void onInput(final Object o,
+                            @Nonnull final ResultChannel<Object> result) {
+
+                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                                .withRoutine()
+                                .withFactoryArgs(millis(100))
+                                .set()
+                                .callAsync("test")
+                                .eventually()
+                                .checkComplete();
+                    }
+                }).buildRoutine();
+
+        try {
+
+            routine1.callAsync("test").eventually().readAll();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testDeadlockOnHasNext() {
+
+        final Routine<Object, Object> routine3 =
+                JRoutine.on(new FilterInvocation<Object, Object>() {
+
+                    public void onInput(final Object o,
+                            @Nonnull final ResultChannel<Object> result) {
+
+                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                                .withRoutine()
+                                .withFactoryArgs(millis(100))
+                                .set()
+                                .callAsync("test")
+                                .eventually()
+                                .iterator()
+                                .hasNext();
+                    }
+                }).buildRoutine();
+
+        try {
+
+            routine3.callAsync("test").eventually().readAll();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testDeadlockOnNext() {
+
+        final Routine<Object, Object> routine4 =
+                JRoutine.on(new FilterInvocation<Object, Object>() {
+
+                    public void onInput(final Object o,
+                            @Nonnull final ResultChannel<Object> result) {
+
+                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                                .withRoutine()
+                                .withFactoryArgs(millis(100))
+                                .set()
+                                .callAsync("test")
+                                .eventually()
+                                .iterator().next();
+                    }
+                }).buildRoutine();
+
+        try {
+
+            routine4.callAsync("test").eventually().readAll();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testDeadlockOnReadAll() {
+
+        final Routine<Object, Object> routine2 =
+                JRoutine.on(new FilterInvocation<Object, Object>() {
+
+                    public void onInput(final Object o,
+                            @Nonnull final ResultChannel<Object> result) {
+
+                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                                .withRoutine()
+                                .withFactoryArgs(millis(100)).set()
+                                .callAsync("test")
+                                .eventually()
+                                .readAll();
+                    }
+                }).buildRoutine();
+
+        try {
+
+            routine2.callAsync("test").eventually().readAll();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
 
         }
     }

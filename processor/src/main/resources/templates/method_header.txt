@@ -19,7 +19,8 @@
     private static class InvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
 
         @javax.annotation.Nonnull
-        public com.gh.bmd.jrt.invocation.Invocation newInvocation(@javax.annotation.Nonnull Object... args) {
+        @SuppressWarnings("unchecked")
+        public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation(@javax.annotation.Nonnull Object... args) {
 
             return new Invocation${methodCount}${genericTypes}((java.lang.ref.WeakReference<${classFullName}>) args[0], args[1]);
         }

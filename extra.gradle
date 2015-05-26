@@ -42,6 +42,12 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
+Project.metaClass.setJavaCompileArgs = { args ->
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs = args
+    }
+}
 Project.metaClass.addConditionalDependency = { String name, Closure closure ->
 
     def dependsOnProject = parent.subprojects.find { it.name.equals(name) };

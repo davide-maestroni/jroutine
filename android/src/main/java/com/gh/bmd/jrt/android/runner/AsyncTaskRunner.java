@@ -18,8 +18,11 @@ import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
+import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.runner.Execution;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +39,9 @@ class AsyncTaskRunner extends MainRunner {
 
     private final Executor mExecutor;
 
+    private final Map<Thread, Void> mThreads =
+            Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
+
     /**
      * Constructor.
      * <p/>
@@ -49,10 +55,16 @@ class AsyncTaskRunner extends MainRunner {
     }
 
     @Override
+    public boolean isRunnerThread() {
+
+        return mThreads.containsKey(Thread.currentThread());
+    }
+
+    @Override
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        final ExecutionTask task = new ExecutionTask(mExecutor, execution);
+        final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
         // the super method is called to ensure that a task is always started in the main thread
         super.run(task, delay, timeUnit);
     }
@@ -66,21 +78,29 @@ class AsyncTaskRunner extends MainRunner {
 
         private final Executor mExecutor;
 
+        private final Map<Thread, Void> mThreads;
+
+        private Thread mCurrentThread;
+
         /**
          * Constructor.
          *
-         * @param executor  the executor.
          * @param execution the execution instance.
+         * @param executor  the executor.
+         * @param threads   the map of runner threads.
          */
-        private ExecutionTask(@Nullable final Executor executor,
-                @Nonnull final Execution execution) {
+        private ExecutionTask(@Nonnull final Execution execution, @Nullable final Executor executor,
+                @Nonnull final Map<Thread, Void> threads) {
 
-            mExecutor = executor;
             mExecution = execution;
+            mExecutor = executor;
+            mThreads = threads;
         }
 
         @TargetApi(VERSION_CODES.HONEYCOMB)
         public void run() {
+
+            mCurrentThread = Thread.currentThread();
 
             if ((mExecutor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
 
@@ -94,6 +114,13 @@ class AsyncTaskRunner extends MainRunner {
 
         @Override
         protected Void doInBackground(@Nonnull final Void... voids) {
+
+            final Thread currentThread = Thread.currentThread();
+
+            if (currentThread != mCurrentThread) {
+
+                mThreads.put(currentThread, null);
+            }
 
             mExecution.run();
             return null;

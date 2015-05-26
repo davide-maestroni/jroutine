@@ -23,6 +23,7 @@ import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.AbortException;
+import com.gh.bmd.jrt.common.DeadlockException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
@@ -725,6 +726,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return nextOutput(timeout);
         }
 
+        if (mRunner.isRunnerThread()) {
+
+            throw new DeadlockException("cannot wait on the same runner thread");
+        }
+
         if (mOutputNotEmpty == null) {
 
             mOutputNotEmpty = new Check() {
@@ -872,6 +878,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else {
 
+                    if (mRunner.isRunnerThread()) {
+
+                        throw new DeadlockException("cannot wait on the same runner thread");
+                    }
+
                     if (mOutputHasNext == null) {
 
                         mOutputHasNext = new Check() {
@@ -1014,6 +1025,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             synchronized (mMutex) {
 
                 final TimeDuration timeout = mReadTimeout;
+
+                if (!timeout.isZero() && mRunner.isRunnerThread()) {
+
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
 
                 try {
 
@@ -1186,6 +1202,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 } else {
 
                     final long startTime = System.currentTimeMillis();
+                    final boolean isRunnerThread = mRunner.isRunnerThread();
                     final boolean isTimeout;
 
                     try {
@@ -1202,6 +1219,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                             if (mState == ChannelState.DONE) {
 
                                 break;
+                            }
+
+                            if (isRunnerThread) {
+
+                                throw new DeadlockException(
+                                        "cannot wait on the same runner thread");
                             }
 
                         } while (timeout.waitSinceMillis(mMutex, startTime));

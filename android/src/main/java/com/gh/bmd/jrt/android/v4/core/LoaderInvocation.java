@@ -594,6 +594,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
     }
 
+    @SuppressWarnings("unchecked")
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
     private boolean isClash(@Nullable final Loader<InvocationResult<OUTPUT>> loader,

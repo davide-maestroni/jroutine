@@ -35,6 +35,11 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  */
 class SequentialRunner implements Runner {
 
+    public boolean isRunnerThread() {
+
+        return false;
+    }
+
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 

@@ -258,6 +258,11 @@ public class PriorityRunner {
             mPriority = priority;
         }
 
+        public boolean isRunnerThread() {
+
+            return mRunner.isRunnerThread();
+        }
+
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 

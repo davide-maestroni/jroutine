@@ -13,6 +13,10 @@
  */
 package com.gh.bmd.jrt.runner;
 
+import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +30,9 @@ import javax.annotation.Nonnull;
 class ScheduledRunner implements Runner {
 
     private final ScheduledExecutorService mService;
+
+    private final Map<Thread, Void> mThreads =
+            Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
 
     /**
      * Constructor.
@@ -43,16 +50,59 @@ class ScheduledRunner implements Runner {
         mService = service;
     }
 
+    public boolean isRunnerThread() {
+
+        return mThreads.containsKey(Thread.currentThread());
+    }
+
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
         if (delay > 0) {
 
-            mService.schedule(execution, delay, timeUnit);
+            mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
 
         } else {
 
-            mService.execute(execution);
+            mService.execute(new ExecutionWrapper(execution, mThreads));
+        }
+    }
+
+    /**
+     * Class used to keep trace of the threads employed by this runner.
+     */
+    private static class ExecutionWrapper implements Execution {
+
+        private final Thread mCurrentThread;
+
+        private final Execution mExecution;
+
+        private final Map<Thread, Void> mThreads;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped execution.
+         * @param threads the map of runner threads.
+         */
+        private ExecutionWrapper(@Nonnull final Execution wrapped,
+                @Nonnull final Map<Thread, Void> threads) {
+
+            mExecution = wrapped;
+            mThreads = threads;
+            mCurrentThread = Thread.currentThread();
+        }
+
+        public void run() {
+
+            final Thread currentThread = Thread.currentThread();
+
+            if (currentThread != mCurrentThread) {
+
+                mThreads.put(currentThread, null);
+            }
+
+            mExecution.run();
         }
     }
 }

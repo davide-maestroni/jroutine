@@ -32,7 +32,13 @@ import javax.annotation.Nonnull;
  */
 public interface Runner {
 
-    //TODO: isRunnerThread()??
+    /**
+     * Checks if the calling thread belongs to the runner ones.<br/>
+     * A synchronous runner will always return <code>false</code>.
+     *
+     * @return whether the calling thread is managed by the runner.
+     */
+    boolean isRunnerThread();
 
     /**
      * Runs the specified execution (that is, it calls the execution <b><code>run()</code></b>

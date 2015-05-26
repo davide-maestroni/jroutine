@@ -51,6 +51,11 @@ class LooperRunner implements Runner {
         mHandler = new Handler(looper);
         mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new Runner() {
 
+            public boolean isRunnerThread() {
+
+                return false;
+            }
+
             public void run(@Nonnull final Execution execution, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
 
@@ -70,6 +75,11 @@ class LooperRunner implements Runner {
 
             mHandler.post(execution);
         }
+    }
+
+    public boolean isRunnerThread() {
+
+        return (Thread.currentThread() == mThread) || mSameThreadRunner.isRunnerThread();
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

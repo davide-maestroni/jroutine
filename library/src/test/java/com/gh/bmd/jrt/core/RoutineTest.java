@@ -1807,7 +1807,7 @@ public class RoutineTest {
 
         try {
 
-            channel.passTo((InputChannel) null);
+            channel.passTo((InputChannel<String>) null);
 
             fail();
 

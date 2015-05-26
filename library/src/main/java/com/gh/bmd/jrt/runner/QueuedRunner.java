@@ -33,6 +33,11 @@ import javax.annotation.Nonnull;
  */
 class QueuedRunner implements Runner {
 
+    public boolean isRunnerThread() {
+
+        return false;
+    }
+
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 

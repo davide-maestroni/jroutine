@@ -949,14 +949,14 @@ public class RoutineBuilders {
         /**
          * Constructor.
          *
-         * @param targetMethod the target method.
-         * @param inputMode    the input mode.
-         * @param outputMode   the output mode.
+         * @param method     the target method.
+         * @param inputMode  the input mode.
+         * @param outputMode the output mode.
          */
-        private MethodInfo(@Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
+        private MethodInfo(@Nonnull final Method method, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
 
-            method = targetMethod;
+            this.method = method;
             this.inputMode = inputMode;
             this.outputMode = outputMode;
         }

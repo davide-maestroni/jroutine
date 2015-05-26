@@ -38,6 +38,11 @@ public class MainRunner extends LooperRunner {
 
         private final Runner mQueued = Runners.queuedRunner();
 
+        public boolean isRunnerThread() {
+
+            return mMain.isRunnerThread();
+        }
+
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 

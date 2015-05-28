@@ -53,6 +53,8 @@ public final class LoaderConfiguration {
      */
     public static final LoaderConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
+    private final ClashResolutionType mInputResolutionType;
+
     private final int mLoaderId;
 
     private final ClashResolutionType mResolutionType;
@@ -64,18 +66,21 @@ public final class LoaderConfiguration {
     /**
      * Constructor.
      *
-     * @param looper         the looper instance.
-     * @param loaderId       the the loader ID.
-     * @param resolutionType the type of resolution.
-     * @param strategyType   the cache strategy type.
+     * @param looper              the looper instance.
+     * @param loaderId            the the loader ID.
+     * @param resolutionType      the type of resolution.
+     * @param inputResolutionType the type of input resolution.
+     * @param strategyType        the cache strategy type.
      */
     private LoaderConfiguration(@Nullable final Looper looper, final int loaderId,
             @Nullable final ClashResolutionType resolutionType,
+            @Nullable final ClashResolutionType inputResolutionType,
             @Nullable final CacheStrategyType strategyType) {
 
         mLooper = looper;
         mLoaderId = loaderId;
         mResolutionType = resolutionType;
+        mInputResolutionType = inputResolutionType;
         mStrategyType = strategyType;
     }
 
@@ -130,16 +135,17 @@ public final class LoaderConfiguration {
         }
 
         final LoaderConfiguration that = (LoaderConfiguration) o;
-        return mLoaderId == that.mLoaderId && mResolutionType == that.mResolutionType
-                && mStrategyType == that.mStrategyType && !(mLooper != null ? !mLooper.equals(
-                that.mLooper) : that.mLooper != null);
+        return mLoaderId == that.mLoaderId && mInputResolutionType == that.mInputResolutionType
+                && mResolutionType == that.mResolutionType && mStrategyType == that.mStrategyType
+                && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null);
     }
 
     @Override
     public int hashCode() {
 
         // auto-generated code
-        int result = mLoaderId;
+        int result = mInputResolutionType != null ? mInputResolutionType.hashCode() : 0;
+        result = 31 * result + mLoaderId;
         result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
         result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
         result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
@@ -150,7 +156,8 @@ public final class LoaderConfiguration {
     public String toString() {
 
         return "LoaderConfiguration{" +
-                "mLoaderId=" + mLoaderId +
+                "mInputResolutionType=" + mInputResolutionType +
+                ", mLoaderId=" + mLoaderId +
                 ", mResolutionType=" + mResolutionType +
                 ", mStrategyType=" + mStrategyType +
                 ", mLooper=" + mLooper +
@@ -180,6 +187,19 @@ public final class LoaderConfiguration {
             @Nullable final ClashResolutionType valueIfNotSet) {
 
         final ClashResolutionType resolutionType = mResolutionType;
+        return (resolutionType != null) ? resolutionType : valueIfNotSet;
+    }
+
+    /**
+     * Returns the type of input clash resolution (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the clash resolution type.
+     */
+    public ClashResolutionType getInputClashResolutionTypeOr(
+            @Nullable final ClashResolutionType valueIfNotSet) {
+
+        final ClashResolutionType resolutionType = mInputResolutionType;
         return (resolutionType != null) ? resolutionType : valueIfNotSet;
     }
 
@@ -230,49 +250,40 @@ public final class LoaderConfiguration {
         /**
          * On completion the invocation results are retained.
          */
-        CACHE,
+        CACHE
     }
 
     /**
      * Invocation clash resolution enumeration.<br/>
-     * The clash of two invocation happens when the same ID is already in use at the time of the
-     * routine execution. The possible outcomes are:
+     * The clash of two invocation happens when the same loader ID is already in use at the time of
+     * the routine execution. The possible outcomes are:
      * <ul>
+     * <li>the running invocation is retained and merged with the current one</li>
      * <li>the running invocation is aborted</li>
-     * <li>the running invocation is retained, ignoring the input data</li>
      * <li>the current invocation is aborted</li>
-     * <li>the running invocation is aborted only if the input data are different from the current
-     * ones, and retained otherwise</li>
-     * <li>the current invocation is aborted only if the input data are different from the current
-     * ones, and retained otherwise</li>
+     * <li>both running and current invocations are aborted</li>
      * </ul>
+     * Two different types of resolution can be set based on whether the input data are different.
      */
     public enum ClashResolutionType {
 
         /**
+         * The clash is resolved by merging the two invocations.
+         */
+        MERGE,
+        /**
          * The clash is resolved by aborting the running invocation.
          */
         ABORT_THAT,
-        /**
-         * The clash is resolved by keeping the running invocation.
-         */
-        KEEP_THAT,
         /**
          * The clash is resolved by aborting the invocation with an
          * {@link com.gh.bmd.jrt.android.builder.InputClashException}.
          */
         ABORT_THIS,
         /**
-         * The clash is resolved by aborting the running invocation, only in case its input data are
-         * different from the current ones.
+         * The clash is resolved by aborting both the invocations.
          */
-        ABORT_THAT_INPUT,
-        /**
-         * The clash is resolved by aborting the invocation with an
-         * {@link com.gh.bmd.jrt.android.builder.InputClashException},  only in case its input data
-         * are different from the current ones.
-         */
-        ABORT_THIS_INPUT,
+        ABORT
     }
 
     /**
@@ -298,6 +309,8 @@ public final class LoaderConfiguration {
     public static final class Builder<TYPE> {
 
         private final Configurable<? extends TYPE> mConfigurable;
+
+        private ClashResolutionType mInputResolutionType;
 
         private int mLoaderId;
 
@@ -391,6 +404,13 @@ public final class LoaderConfiguration {
                 withClashResolution(resolutionType);
             }
 
+            final ClashResolutionType inputResolutionType = configuration.mInputResolutionType;
+
+            if (inputResolutionType != null) {
+
+                withInputClashResolution(inputResolutionType);
+            }
+
             final CacheStrategyType strategyType = configuration.mStrategyType;
 
             if (strategyType != null) {
@@ -416,9 +436,9 @@ public final class LoaderConfiguration {
         }
 
         /**
-         * Tells the builder how to resolve clashes of invocations. A clash happens when an
-         * invocation of the same type and with the same ID is still running. A null value means
-         * that it is up to the framework to choose a default resolution type.
+         * Tells the builder how to resolve clashes of invocations with different inputs. A clash
+         * happens when a loader with the same ID is still running. A null value means that it is up
+         * to the framework to choose a default resolution type.
          *
          * @param resolutionType the type of resolution.
          * @return this builder.
@@ -445,6 +465,22 @@ public final class LoaderConfiguration {
         }
 
         /**
+         * Tells the builder how to resolve clashes of invocations with same inputs. A clash happens
+         * when a loader with the same ID is still running. A null value means that it is up to the
+         * framework to choose a default resolution type.
+         *
+         * @param resolutionType the type of resolution.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withInputClashResolution(
+                @Nullable final ClashResolutionType resolutionType) {
+
+            mInputResolutionType = resolutionType;
+            return this;
+        }
+
+        /**
          * Sets the looper on which the results from the service are dispatched. A null value means
          * that results will be dispatched on the main thread (as by default).
          *
@@ -461,7 +497,8 @@ public final class LoaderConfiguration {
         @Nonnull
         private LoaderConfiguration buildConfiguration() {
 
-            return new LoaderConfiguration(mLooper, mLoaderId, mResolutionType, mStrategyType);
+            return new LoaderConfiguration(mLooper, mLoaderId, mResolutionType,
+                                           mInputResolutionType, mStrategyType);
         }
 
         private void setConfiguration(@Nonnull final LoaderConfiguration configuration) {
@@ -469,6 +506,7 @@ public final class LoaderConfiguration {
             mLooper = configuration.mLooper;
             mLoaderId = configuration.mLoaderId;
             mResolutionType = configuration.mResolutionType;
+            mInputResolutionType = configuration.mInputResolutionType;
             mStrategyType = configuration.mStrategyType;
         }
     }

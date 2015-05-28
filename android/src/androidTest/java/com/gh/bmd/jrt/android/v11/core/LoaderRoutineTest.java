@@ -104,7 +104,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.ABORT_THIS)
+                        .withInputClashResolution(ClashResolutionType.ABORT_THIS)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -135,7 +135,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.ABORT_THIS_INPUT)
+                        .withClashResolution(ClashResolutionType.ABORT_THIS)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -474,7 +474,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.KEEP_THAT)
+                        .withClashResolution(ClashResolutionType.MERGE)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -557,7 +557,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.ABORT_THAT)
+                        .withInputClashResolution(ClashResolutionType.ABORT_THAT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -588,7 +588,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.ABORT_THAT_INPUT)
+                        .withClashResolution(ClashResolutionType.ABORT_THAT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -888,7 +888,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.ABORT_THIS_INPUT)
+                        .withClashResolution(ClashResolutionType.ABORT_THIS)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -1130,7 +1130,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.KEEP_THAT)
+                        .withClashResolution(ClashResolutionType.MERGE)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -1221,7 +1221,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.ABORT_THAT)
+                        .withInputClashResolution(ClashResolutionType.ABORT_THAT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -1255,7 +1255,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.ABORT_THAT_INPUT)
+                        .withClashResolution(ClashResolutionType.ABORT_THAT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
@@ -1499,7 +1499,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .set()
                 .withLoader()
                 .withId(0)
-                .withClashResolution(ClashResolutionType.KEEP_THAT)
+                .withInputClashResolution(ClashResolutionType.MERGE)
                 .set()
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(5);
@@ -1513,7 +1513,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .set()
                 .withLoader()
                 .withId(0)
-                .withClashResolution(ClashResolutionType.KEEP_THAT)
+                .withInputClashResolution(ClashResolutionType.MERGE)
                 .set()
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(10);

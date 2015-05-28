@@ -85,6 +85,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
 
     private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
+    private final ClashResolutionType mInputClashResolutionType;
+
     private final int mLoaderId;
 
     private final Logger mLogger;
@@ -129,7 +131,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         mLooper = configuration.getResultLooperOr(null);
         mLoaderId = configuration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mClashResolutionType =
-                configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT_INPUT);
+                configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT);
+        mInputClashResolutionType =
+                configuration.getInputClashResolutionTypeOr(ClashResolutionType.MERGE);
         mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
         mArgs = args;
         mOrderType = order;
@@ -500,7 +504,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         }
 
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
-        final boolean isClash = isClash(loader, loaderId, inputs);
+        final ClashType clashType = getClashType(loader, loaderId, inputs);
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
         SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -517,11 +521,23 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         RoutineLoaderCallbacks<OUTPUT> callbacks = (callbackReference != null)
                 ? (RoutineLoaderCallbacks<OUTPUT>) callbackReference.get() : null;
 
-        if ((callbacks == null) || (loader == null) || isClash) {
+        if (clashType == ClashType.ABORT_BOTH) {
+
+            if (callbacks != null) {
+
+                logger.dbg("resetting existing callbacks [%d]", loaderId);
+                callbacks.reset();
+            }
+
+            throw new InvocationClashException(loaderId);
+        }
+
+        if ((callbacks == null) || (loader == null) || (clashType != ClashType.NONE)) {
 
             final RoutineLoader<INPUT, OUTPUT> routineLoader;
 
-            if (!isClash && (loader != null) && (loader.getClass() == RoutineLoader.class)) {
+            if ((clashType == ClashType.NONE) && (loader != null) && (loader.getClass()
+                    == RoutineLoader.class)) {
 
                 routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
 
@@ -548,7 +564,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel(mLooper);
 
-        if (isClash) {
+        if (clashType == ClashType.ABORT_THAT) {
 
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
@@ -600,12 +616,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
     @SuppressWarnings("unchecked")
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    private boolean isClash(@Nullable final Loader<InvocationResult<OUTPUT>> loader,
+    private ClashType getClashType(@Nullable final Loader<InvocationResult<OUTPUT>> loader,
             final int loaderId, @Nonnull final List<? extends INPUT> inputs) {
 
         if (loader == null) {
 
-            return false;
+            return ClashType.NONE;
         }
 
         final Logger logger = mLogger;
@@ -627,36 +643,42 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             throw new InvocationClashException(loaderId);
         }
 
-        final ClashResolutionType resolution = mClashResolutionType;
+        final ClashResolutionType resolution =
+                routineLoader.areSameInputs(inputs) ? mInputClashResolutionType
+                        : mClashResolutionType;
 
-        if (resolution == ClashResolutionType.ABORT_THAT) {
+        if (resolution == ClashResolutionType.MERGE) {
+
+            logger.dbg("keeping existing invocation [%d]", loaderId);
+            return ClashType.NONE;
+
+        } else if (resolution == ClashResolutionType.ABORT) {
 
             logger.dbg("restarting existing invocation [%d]", loaderId);
-            return true;
+            return ClashType.ABORT_BOTH;
+
+        } else if (resolution == ClashResolutionType.ABORT_THAT) {
+
+            logger.dbg("restarting existing invocation [%d]", loaderId);
+            return ClashType.ABORT_THAT;
 
         } else if (resolution == ClashResolutionType.ABORT_THIS) {
 
             logger.dbg("aborting invocation [%d]", loaderId);
             throw new InputClashException(loaderId);
-
-        } else if ((resolution == ClashResolutionType.KEEP_THAT) || routineLoader.areSameInputs(
-                inputs)) {
-
-            logger.dbg("keeping existing invocation [%d]", loaderId);
-            return false;
-
-        } else if (resolution == ClashResolutionType.ABORT_THAT_INPUT) {
-
-            logger.dbg("restarting existing invocation [%d]", loaderId);
-            return true;
-
-        } else if (resolution == ClashResolutionType.ABORT_THIS_INPUT) {
-
-            logger.dbg("aborting invocation [%d]", loaderId);
-            throw new InputClashException(loaderId);
         }
 
-        return true;
+        return ClashType.ABORT_BOTH;
+    }
+
+    /**
+     * Clash type enumeration.
+     */
+    private enum ClashType {
+
+        NONE,       // no clash detected
+        ABORT_THAT, // need to abort the running loader
+        ABORT_BOTH  // need to abort both the invocation and the running loader
     }
 
     /**

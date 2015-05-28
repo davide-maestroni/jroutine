@@ -582,7 +582,7 @@ public final class RoutineConfiguration {
          * No order.<br/>
          * There is no guarantee about the data order.
          */
-        NONE,
+        NONE
     }
 
     /**

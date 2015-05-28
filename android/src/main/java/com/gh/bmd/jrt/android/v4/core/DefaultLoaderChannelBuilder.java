@@ -140,7 +140,8 @@ class DefaultLoaderChannelBuilder
                       .withLoader()
                       .withId(mLoaderId)
                       .with(loaderConfiguration)
-                      .withClashResolution(ClashResolutionType.KEEP_THAT)
+                      .withClashResolution(ClashResolutionType.MERGE)
+                      .withInputClashResolution(ClashResolutionType.MERGE)
                       .set()
                       .callAsync();
     }

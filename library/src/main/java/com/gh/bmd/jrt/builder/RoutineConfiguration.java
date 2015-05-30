@@ -73,16 +73,7 @@ public final class RoutineConfiguration {
      */
     public static final int DEFAULT = Integer.MIN_VALUE;
 
-    private static final Configurable<RoutineConfiguration> sDefaultConfigurable =
-            new Configurable<RoutineConfiguration>() {
-
-                @Nonnull
-                public RoutineConfiguration setConfiguration(
-                        @Nonnull final RoutineConfiguration configuration) {
-
-                    return configuration;
-                }
-            };
+    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
@@ -1212,6 +1203,19 @@ public final class RoutineConfiguration {
             mOutputTimeout = configuration.mOutputTimeout;
             mLog = configuration.mLog;
             mLogLevel = configuration.mLogLevel;
+        }
+    }
+
+    /**
+     * Default configurable implementation.
+     */
+    private static class DefaultConfigurable implements Configurable<RoutineConfiguration> {
+
+        @Nonnull
+        public RoutineConfiguration setConfiguration(
+                @Nonnull final RoutineConfiguration configuration) {
+
+            return configuration;
         }
     }
 }

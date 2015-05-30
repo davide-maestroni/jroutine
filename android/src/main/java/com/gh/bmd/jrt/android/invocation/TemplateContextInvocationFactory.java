@@ -11,46 +11,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.invocation;
-
-import com.gh.bmd.jrt.channel.ResultChannel;
+package com.gh.bmd.jrt.android.invocation;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
- * Empty abstract implementation of a routine invocation.
+ * Empty abstract implementation of a context invocation factory.
  * <p/>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
- * Created by davide-maestroni on 9/11/14.
+ * Created by davide on 28/05/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
+public abstract class TemplateContextInvocationFactory<INPUT, OUTPUT>
+        implements ContextInvocationFactory<INPUT, OUTPUT> {
 
-    public void onAbort(@Nullable final Throwable reason) {
+    private final String mInvocationType = getClass().getName();
 
-    }
+    @Nonnull
+    public String getInvocationType() {
 
-    public void onDestroy() {
-
-    }
-
-    public void onInitialize() {
-
-    }
-
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
-
-    }
-
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
-
-    }
-
-    public void onTerminate() {
-
+        return mInvocationType;
     }
 }

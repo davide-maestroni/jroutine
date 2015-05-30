@@ -75,7 +75,7 @@ public abstract class ProcedureInvocation<INPUT, OUTPUT> extends TemplateInvocat
     }
 
     @Override
-    public void onReturn() {
+    public void onTerminate() {
 
         final ArrayList<INPUT> inputs = mInputs;
 

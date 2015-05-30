@@ -38,20 +38,8 @@ import javax.annotation.Nonnull;
  */
 public class PriorityRunner {
 
-    private static final Comparator<PriorityExecution> PRIORITY_EXECUTION_COMPARATOR =
-            new Comparator<PriorityExecution>() {
-
-                public int compare(final PriorityExecution o1, final PriorityExecution o2) {
-
-                    final int thisPriority = o1.mPriority;
-                    final long thisAge = o1.mAge;
-                    final int thatPriority = o2.mPriority;
-                    final long thatAge = o2.mAge;
-
-                    final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
-                    return (compare == 0) ? compareLong(thatAge, thisAge) : compare;
-                }
-            };
+    private static final PriorityExecutionComparator PRIORITY_EXECUTION_COMPARATOR =
+            new PriorityExecutionComparator();
 
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
 
@@ -238,6 +226,23 @@ public class PriorityRunner {
         public void run() {
 
             mExecution.run();
+        }
+    }
+
+    /**
+     * Comparator of priority execution instances.
+     */
+    private static class PriorityExecutionComparator implements Comparator<PriorityExecution> {
+
+        public int compare(final PriorityExecution o1, final PriorityExecution o2) {
+
+            final int thisPriority = o1.mPriority;
+            final long thisAge = o1.mAge;
+            final int thatPriority = o2.mPriority;
+            final long thatAge = o2.mAge;
+
+            final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
+            return (compare == 0) ? compareLong(thatAge, thisAge) : compare;
         }
     }
 

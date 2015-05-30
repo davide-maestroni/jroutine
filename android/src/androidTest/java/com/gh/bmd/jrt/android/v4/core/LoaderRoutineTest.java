@@ -62,7 +62,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOn;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,17 +77,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public LoaderRoutineTest() {
 
         super(TestActivity.class);
-    }
-
-    private static Function<String> getFunction() {
-
-        return new Function<String>() {
-
-            public String call(@Nonnull final Object... params) {
-
-                return params[0].toString().toUpperCase();
-            }
-        };
     }
 
     public void testActivityAbort() {
@@ -355,7 +343,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<Object, String> routine =
-                JRoutine.onActivity(getActivity(), factoryOn(getFunction())).buildRoutine();
+                JRoutine.onActivity(getActivity(), factoryOf(new TestFunction())).buildRoutine();
         assertThat(routine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("TEST");
     }
 
@@ -898,7 +886,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, String> routine =
-                JRoutine.onFragment(fragment, factoryOn(getFunction())).buildRoutine();
+                JRoutine.onFragment(fragment, factoryOf(new TestFunction())).buildRoutine();
         assertThat(routine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("TEST");
     }
 
@@ -1476,6 +1464,14 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 @Nonnull final ResultChannel<String> result) {
 
             result.pass(strings);
+        }
+    }
+
+    private static class TestFunction implements Function<String> {
+
+        public String call(@Nonnull final Object... params) {
+
+            return params[0].toString().toUpperCase();
         }
     }
 

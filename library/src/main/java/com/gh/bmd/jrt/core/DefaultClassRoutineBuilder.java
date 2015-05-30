@@ -57,16 +57,7 @@ class DefaultClassRoutineBuilder
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
 
-    private static InvocationFactory<Object, Object> sMethodInvocationFactory =
-            new InvocationFactory<Object, Object>() {
-
-                @Nonnull
-                public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
-
-                    return new MethodProcedureInvocation(args[0], (Method) args[1], args[2],
-                                                         (InputMode) args[3], (OutputMode) args[4]);
-                }
-            };
+    private static MethodInvocationFactory sMethodInvocationFactory = new MethodInvocationFactory();
 
     private final Class<?> mTargetClass;
 
@@ -419,6 +410,19 @@ class DefaultClassRoutineBuilder
             }
 
             logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
+        }
+    }
+
+    /**
+     * Factory creating method invocations.
+     */
+    private static class MethodInvocationFactory implements InvocationFactory<Object, Object> {
+
+        @Nonnull
+        public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+
+            return new MethodProcedureInvocation(args[0], (Method) args[1], args[2],
+                                                 (InputMode) args[3], (OutputMode) args[4]);
         }
     }
 

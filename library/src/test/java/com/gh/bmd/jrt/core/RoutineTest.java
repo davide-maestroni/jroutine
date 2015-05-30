@@ -71,7 +71,6 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
-import static com.gh.bmd.jrt.invocation.Invocations.factoryOn;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
@@ -556,7 +555,7 @@ public class RoutineTest {
                     }
 
                     @Override
-                    public void onInit() {
+                    public void onInitialize() {
 
                         mChannel = sumRoutine.invokeAsync();
                     }
@@ -1386,7 +1385,7 @@ public class RoutineTest {
                 new TemplateInvocation<String, String>() {
 
                     @Override
-                    public void onInit() {
+                    public void onInitialize() {
 
                         throw new NullPointerException("test1");
                     }
@@ -1538,7 +1537,7 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() throws InterruptedException {
 
-        final Routine<Object, String> routine = JRoutine.on(factoryOn(new Function<String>() {
+        final Routine<Object, String> routine = JRoutine.on(factoryOf(new Function<String>() {
 
             public String call(@Nonnull final Object... params) {
 
@@ -3313,9 +3312,9 @@ public class RoutineTest {
         }
 
         @Override
-        public void onReturn() {
+        public void onTerminate() {
 
-            super.onReturn();
+            super.onTerminate();
             throw new IllegalArgumentException("test");
         }
     }
@@ -3323,9 +3322,9 @@ public class RoutineTest {
     private static class TestDestroyDiscardException extends TestDestroyException {
 
         @Override
-        public void onReturn() {
+        public void onTerminate() {
 
-            super.onReturn();
+            super.onTerminate();
             throw new IllegalArgumentException("test");
         }
     }
@@ -3343,9 +3342,9 @@ public class RoutineTest {
     private static class TestDiscardException extends TestDestroy {
 
         @Override
-        public void onReturn() {
+        public void onTerminate() {
 
-            super.onReturn();
+            super.onTerminate();
             throw new IllegalArgumentException("test");
         }
     }
@@ -3430,13 +3429,13 @@ public class RoutineTest {
         }
 
         @Override
-        public void onInit() {
+        public void onInitialize() {
 
             sActive = true;
         }
 
         @Override
-        public void onReturn() {
+        public void onTerminate() {
 
             sActive = false;
         }

@@ -20,15 +20,17 @@ import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import javax.annotation.Nonnull;
 
 /**
- * Template invocation implementing an Android invocation.
+ * Empty abstract implementation of a context invocation.
+ * <p/>
+ * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
  * Created by davide-maestroni on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class TemplateContextInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT>
-        implements ContextInvocation<INPUT, OUTPUT> {
+public abstract class TemplateContextInvocation<INPUT, OUTPUT>
+        extends TemplateInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
 
     private Context mContext;
 

@@ -39,7 +39,7 @@ public class InvocationsTest {
     public void testFunction() {
 
         final Routine<Object, String> routine =
-                JRoutine.on(Invocations.factoryOn(new Function<String>() {
+                JRoutine.on(Invocations.factoryOf(new Function<String>() {
 
                     public String call(@Nonnull final Object... params) {
 
@@ -95,7 +95,7 @@ public class InvocationsTest {
 
         try {
 
-            Invocations.factoryOn(null);
+            Invocations.factoryOf((Function<Object>) null);
 
             fail();
 

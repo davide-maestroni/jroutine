@@ -93,7 +93,7 @@ public class Invocations {
      * @return the builder instance.
      */
     @Nonnull
-    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryOn(
+    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryOf(
             @Nonnull final Function<OUTPUT> function) {
 
         return new FunctionInvocationFactory<OUTPUT>(function);

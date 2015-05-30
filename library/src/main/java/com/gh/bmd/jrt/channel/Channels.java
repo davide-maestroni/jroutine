@@ -53,14 +53,8 @@ public class Channels {
     public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> asSelectable(final int index,
             @Nullable final OutputChannel<? extends OUTPUT> channel) {
 
-        return JRoutine.on(new FilterInvocation<OUTPUT, Selectable<OUTPUT>>() {
-
-            public void onInput(final OUTPUT output,
-                    @Nonnull final ResultChannel<Selectable<OUTPUT>> result) {
-
-                result.pass(new Selectable<OUTPUT>(output, channel, index));
-            }
-        }).callSync(channel);
+        return JRoutine.on(new SelectableFilterInvocation<OUTPUT>(index, channel))
+                       .callSync(channel);
     }
 
     /**
@@ -131,6 +125,38 @@ public class Channels {
             this.data = data;
             this.channel = channel;
             this.index = index;
+        }
+    }
+
+    /**
+     * Filter invocation making the inputs selectable.
+     *
+     * @param <INPUT> the input data type.
+     */
+    private static class SelectableFilterInvocation<INPUT>
+            extends FilterInvocation<INPUT, Selectable<INPUT>> {
+
+        private final OutputChannel<? extends INPUT> mChannel;
+
+        private final int mIndex;
+
+        /**
+         * Constructor.
+         *
+         * @param index   the channel index.
+         * @param channel the channel to make selectable.
+         */
+        private SelectableFilterInvocation(final int index,
+                @Nullable final OutputChannel<? extends INPUT> channel) {
+
+            mChannel = channel;
+            mIndex = index;
+        }
+
+        public void onInput(final INPUT input,
+                @Nonnull final ResultChannel<Selectable<INPUT>> result) {
+
+            result.pass(new Selectable<INPUT>(input, mChannel, mIndex));
         }
     }
 }

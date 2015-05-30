@@ -22,6 +22,7 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
+import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
@@ -29,6 +30,7 @@ import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -179,15 +181,29 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
         try {
 
-            invocation.onInit();
+            invocation.onInitialize();
 
             for (final INPUT input : mInputs) {
 
                 invocation.onInput(input, channel);
+                abortException = channel.getAbortException();
+
+                if (abortException != null) {
+
+                    break;
+                }
             }
 
-            invocation.onResult(channel);
-            invocation.onReturn();
+            if (abortException == null) {
+
+                invocation.onResult(channel);
+                abortException = channel.getAbortException();
+
+                if (abortException == null) {
+
+                    invocation.onTerminate();
+                }
+            }
 
         } catch (final InvocationException e) {
 
@@ -274,6 +290,8 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      */
     private static class LoaderResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
+        private final AtomicReference<Throwable> mAbortException = new AtomicReference<Throwable>();
+
         private final TransportChannel<OUTPUT> mTransportChannel;
 
         private final TransportInput<OUTPUT> mTransportInput;
@@ -300,12 +318,26 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
         public boolean abort() {
 
-            return mTransportInput.abort();
+            final boolean isAbort = mTransportInput.abort();
+
+            if (isAbort) {
+
+                mAbortException.set(new AbortException(null));
+            }
+
+            return isAbort;
         }
 
         public boolean abort(@Nullable final Throwable reason) {
 
-            return mTransportInput.abort(reason);
+            final boolean isAbort = mTransportInput.abort(reason);
+
+            if (isAbort) {
+
+                mAbortException.set(new AbortException(reason));
+            }
+
+            return isAbort;
         }
 
         public boolean isOpen() {
@@ -365,6 +397,11 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         private void close() {
 
             mTransportInput.close();
+        }
+
+        private Throwable getAbortException() {
+
+            return mAbortException.get();
         }
 
         @Nonnull

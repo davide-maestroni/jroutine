@@ -33,16 +33,7 @@ import javax.annotation.Nullable;
  */
 public final class ServiceConfiguration {
 
-    private static final Configurable<ServiceConfiguration> sDefaultConfigurable =
-            new Configurable<ServiceConfiguration>() {
-
-                @Nonnull
-                public ServiceConfiguration setConfiguration(
-                        @Nonnull final ServiceConfiguration configuration) {
-
-                    return configuration;
-                }
-            };
+    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
@@ -418,6 +409,19 @@ public final class ServiceConfiguration {
             mServiceClass = configuration.mServiceClass;
             mRunnerClass = configuration.mRunnerClass;
             mLogClass = configuration.mLogClass;
+        }
+    }
+
+    /**
+     * Default configurable implementation.
+     */
+    private static class DefaultConfigurable implements Configurable<ServiceConfiguration> {
+
+        @Nonnull
+        public ServiceConfiguration setConfiguration(
+                @Nonnull final ServiceConfiguration configuration) {
+
+            return configuration;
         }
     }
 }

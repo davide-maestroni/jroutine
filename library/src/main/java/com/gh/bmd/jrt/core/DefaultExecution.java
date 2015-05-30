@@ -135,7 +135,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                     try {
 
-                        invocation.onReturn();
+                        invocation.onTerminate();
                         manager.recycle(invocation);
 
                     } catch (final Throwable ignored) {
@@ -169,7 +169,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             invocation = (mInvocation = mInvocationManager.create());
             mLogger.dbg("initializing invocation: %s", invocation);
-            invocation.onInit();
+            invocation.onInitialize();
         }
 
         return invocation;
@@ -263,7 +263,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                     invocation = initInvocation();
                     invocation.onAbort(exception);
-                    invocation.onReturn();
+                    invocation.onTerminate();
                     manager.recycle(invocation);
                     resultChannel.close(exception);
 

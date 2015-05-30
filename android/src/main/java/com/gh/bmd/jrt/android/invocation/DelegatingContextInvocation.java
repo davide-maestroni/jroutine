@@ -51,37 +51,63 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
      * @return the factory.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
     public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryWith(
             @Nonnull final Routine<INPUT, OUTPUT> routine, @Nonnull final String invocationType) {
 
-        if (routine == null) {
-
-            throw new NullPointerException("the routine must not be null");
-        }
-
-        if (invocationType == null) {
-
-            throw new NullPointerException("the invocation type must not be null");
-        }
-
-        return new ContextInvocationFactory<INPUT, OUTPUT>() {
-
-            @Nonnull
-            public String getInvocationType() {
-
-                return invocationType;
-            }
-
-            @Nonnull
-            public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-                return new DelegatingContextInvocation<INPUT, OUTPUT>(routine);
-            }
-        };
+        return new DelegatingContextInvocationFactory<INPUT, OUTPUT>(routine, invocationType);
     }
 
     public void onContext(@Nonnull final Context context) {
 
+    }
+
+    /**
+     * Factory creating delegating context invocation instances.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class DelegatingContextInvocationFactory<INPUT, OUTPUT>
+            implements ContextInvocationFactory<INPUT, OUTPUT> {
+
+        private final String mInvocationType;
+
+        private final Routine<INPUT, OUTPUT> mRoutine;
+
+        /**
+         * Constructor.
+         *
+         * @param routine        the delegated routine.
+         * @param invocationType the invocation type.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private DelegatingContextInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine,
+                @Nonnull final String invocationType) {
+
+            if (routine == null) {
+
+                throw new NullPointerException("the routine must not be null");
+            }
+
+            if (invocationType == null) {
+
+                throw new NullPointerException("the invocation type must not be null");
+            }
+
+            mRoutine = routine;
+            mInvocationType = invocationType;
+        }
+
+        @Nonnull
+        public String getInvocationType() {
+
+            return mInvocationType;
+        }
+
+        @Nonnull
+        public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+
+            return new DelegatingContextInvocation<INPUT, OUTPUT>(mRoutine);
+        }
     }
 }

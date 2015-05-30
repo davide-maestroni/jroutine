@@ -30,6 +30,11 @@ import javax.annotation.Nullable;
 interface InvocationResult<OUTPUT> {
 
     /**
+     * Aborts the loader invocation.
+     */
+    void abort();
+
+    /**
      * Returns the abort exception.
      *
      * @return the exception.
@@ -47,10 +52,12 @@ interface InvocationResult<OUTPUT> {
     /**
      * Passes the cached results to the specified channels.
      *
-     * @param newChannels new channels freshly created.
-     * @param oldChannels old channels already fed with previous results.
+     * @param newChannels     new channels freshly created.
+     * @param oldChannels     old channels already fed with previous results.
+     * @param abortedChannels TODO
      * @return whether the invocation is complete.
      */
     boolean passTo(@Nonnull final Collection<TransportInput<OUTPUT>> newChannels,
-            @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels);
+            @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels,
+            @Nonnull final Collection<TransportInput<OUTPUT>> abortedChannels);
 }

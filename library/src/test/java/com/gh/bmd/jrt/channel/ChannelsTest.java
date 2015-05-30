@@ -76,7 +76,7 @@ public class ChannelsTest {
         private int mFirstIndex;
 
         @Override
-        public void onInit() {
+        public void onInitialize() {
 
             mFirstIndex = -1;
         }

@@ -520,13 +520,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
 
         if (clashType == ClashType.ABORT_BOTH) {
 
+            final InvocationClashException clashException = new InvocationClashException(loaderId);
+
             if (callbacks != null) {
 
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
-                callbacks.reset();
+                callbacks.reset(clashException);
             }
 
-            throw new InvocationClashException(loaderId);
+            throw clashException;
         }
 
         if ((callbacks == null) || (loader == null) || (clashType != ClashType.NONE)) {
@@ -549,7 +551,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             if (callbacks != null) {
 
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
-                callbacks.reset();
+                callbacks.reset(new InvocationClashException(loaderId));
             }
 
             callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(newCallbacks));
@@ -558,8 +560,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
 
         logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheStrategyType);
         callbacks.setCacheStrategy(mCacheStrategyType);
-
-        final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel(mLooper);
+        result.pass(callbacks.newChannel(mLooper));
 
         if (clashType == ClashType.ABORT_THAT) {
 
@@ -571,8 +572,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             logger.dbg("initializing loader [%d]", loaderId);
             loaderManager.initLoader(loaderId, Bundle.EMPTY, callbacks);
         }
-
-        result.pass(outputChannel);
     }
 
     private RoutineLoaderCallbacks<OUTPUT> createCallbacks(@Nonnull final Context loaderContext,
@@ -688,6 +687,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
+        private final ArrayList<TransportInput<OUTPUT>> mAbortedChannels =
+                new ArrayList<TransportInput<OUTPUT>>();
+
         private final ArrayList<TransportInput<OUTPUT>> mChannels =
                 new ArrayList<TransportInput<OUTPUT>>();
 
@@ -742,8 +744,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
                                                              .set()
                                                              .buildChannel();
             channels.add(channel.input());
-            internalLoader.setInvocationCount(
-                    Math.max(channels.size(), internalLoader.getInvocationCount()));
+            internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
+                                                       internalLoader.getInvocationCount()));
 
             if ((looper != null) && (looper != Looper.getMainLooper())) {
 
@@ -773,11 +775,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
                 final InvocationResult<OUTPUT> data) {
 
             final Logger logger = mLogger;
+            final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<TransportInput<OUTPUT>> channels = mChannels;
             final ArrayList<TransportInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<TransportInput<OUTPUT>> abortedChannels = mAbortedChannels;
             logger.dbg("dispatching invocation result: %s", data);
 
-            if (data.passTo(newChannels, channels)) {
+            if (data.passTo(newChannels, channels, abortedChannels)) {
 
                 final ArrayList<TransportInput<OUTPUT>> channelsToClose =
                         new ArrayList<TransportInput<OUTPUT>>(channels);
@@ -785,7 +789,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
                 mResultCount += channels.size() + newChannels.size();
                 channels.clear();
                 newChannels.clear();
-                final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
+                abortedChannels.clear();
 
                 if (mResultCount >= internalLoader.getInvocationCount()) {
 
@@ -822,23 +826,29 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
 
             } else {
 
+                mResultCount += abortedChannels.size();
                 channels.addAll(newChannels);
+                channels.removeAll(abortedChannels);
                 newChannels.clear();
+
+                if (channels.isEmpty() && (mResultCount >= internalLoader.getInvocationCount())) {
+
+                    data.abort();
+                }
             }
         }
 
         public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());
-            reset();
+            reset(new InvocationClashException(mLoader.getId()));
         }
 
-        private void reset() {
+        private void reset(@Nullable final Throwable reason) {
 
             mLogger.dbg("aborting result channels");
             final ArrayList<TransportInput<OUTPUT>> channels = mChannels;
             final ArrayList<TransportInput<OUTPUT>> newChannels = mNewChannels;
-            final InvocationClashException reason = new InvocationClashException(mLoader.getId());
 
             for (final InputChannel<OUTPUT> channel : channels) {
 

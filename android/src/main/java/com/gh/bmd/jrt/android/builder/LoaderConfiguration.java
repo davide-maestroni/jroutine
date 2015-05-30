@@ -37,16 +37,7 @@ public final class LoaderConfiguration {
      */
     public static final int AUTO = Integer.MIN_VALUE;
 
-    private static final Configurable<LoaderConfiguration> sDefaultConfigurable =
-            new Configurable<LoaderConfiguration>() {
-
-                @Nonnull
-                public LoaderConfiguration setConfiguration(
-                        @Nonnull final LoaderConfiguration configuration) {
-
-                    return configuration;
-                }
-            };
+    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
@@ -508,6 +499,19 @@ public final class LoaderConfiguration {
             mResolutionType = configuration.mResolutionType;
             mInputResolutionType = configuration.mInputResolutionType;
             mStrategyType = configuration.mStrategyType;
+        }
+    }
+
+    /**
+     * Default configurable implementation.
+     */
+    private static class DefaultConfigurable implements Configurable<LoaderConfiguration> {
+
+        @Nonnull
+        public LoaderConfiguration setConfiguration(
+                @Nonnull final LoaderConfiguration configuration) {
+
+            return configuration;
         }
     }
 }

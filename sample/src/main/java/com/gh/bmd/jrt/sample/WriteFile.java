@@ -56,7 +56,7 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
     }
 
     @Override
-    public void onInit() {
+    public void onInitialize() {
 
         try {
 

@@ -457,6 +457,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private boolean abort(@Nullable final Throwable throwable, final boolean isImmediate) {
 
         final TimeDuration delay;
+        final Throwable abortException =
+                (isImmediate || (throwable instanceof AbortException)) ? throwable
+                        : new AbortException(throwable);
 
         synchronized (mMutex) {
 
@@ -473,19 +476,18 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mLogger.dbg(throwable, "aborting channel");
                 mOutputQueue.clear();
                 mIsException = true;
-                mAbortException = (isImmediate || (throwable instanceof AbortException)) ? throwable
-                        : new AbortException(throwable);
+                mAbortException = abortException;
                 mState = ChannelState.EXCEPTION;
             }
         }
 
         if (delay.isZero()) {
 
-            mHandler.onAbort(throwable, 0, TimeUnit.MILLISECONDS);
+            mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
 
         } else {
 
-            mRunner.run(new DelayedAbortExecution(throwable), delay.time, delay.unit);
+            mRunner.run(new DelayedAbortExecution(abortException), delay.time, delay.unit);
         }
 
         return true;
@@ -1313,6 +1315,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         public boolean abort(@Nullable final Throwable reason) {
 
+            final Throwable abortException =
+                    (reason instanceof AbortException) ? reason : new AbortException(reason);
+
             synchronized (mMutex) {
 
                 if (isResultComplete()) {
@@ -1324,12 +1329,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mSubLogger.dbg(reason, "aborting output");
                 mOutputQueue.clear();
                 mIsException = true;
-                mAbortException =
-                        (reason instanceof AbortException) ? reason : new AbortException(reason);
+                mAbortException = abortException;
                 mState = ChannelState.EXCEPTION;
             }
 
-            mHandler.onAbort(reason, 0, TimeUnit.MILLISECONDS);
+            mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
             return true;
         }
 

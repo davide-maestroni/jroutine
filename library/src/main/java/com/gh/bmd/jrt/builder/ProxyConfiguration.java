@@ -32,16 +32,7 @@ import javax.annotation.Nullable;
  */
 public final class ProxyConfiguration {
 
-    private static final Configurable<ProxyConfiguration> sDefaultConfigurable =
-            new Configurable<ProxyConfiguration>() {
-
-                @Nonnull
-                public ProxyConfiguration setConfiguration(
-                        @Nonnull final ProxyConfiguration configuration) {
-
-                    return configuration;
-                }
-            };
+    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
@@ -266,6 +257,19 @@ public final class ProxyConfiguration {
         private void setConfiguration(@Nonnull final ProxyConfiguration configuration) {
 
             mGroupName = configuration.mGroupName;
+        }
+    }
+
+    /**
+     * Default configurable implementation.
+     */
+    private static class DefaultConfigurable implements Configurable<ProxyConfiguration> {
+
+        @Nonnull
+        public ProxyConfiguration setConfiguration(
+                @Nonnull final ProxyConfiguration configuration) {
+
+            return configuration;
         }
     }
 }

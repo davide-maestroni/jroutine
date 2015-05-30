@@ -32,7 +32,20 @@ import javax.annotation.Nonnull;
  */
 public class MainRunner extends LooperRunner {
 
-    private static final Runner sSameThreadRunner = new Runner() {
+    private static final SameThreadRunner sSameThreadRunner = new SameThreadRunner();
+
+    /**
+     * Constructor.
+     */
+    public MainRunner() {
+
+        super(Looper.getMainLooper(), sSameThreadRunner);
+    }
+
+    /**
+     * Runner handling execution started from the main thread.
+     */
+    private static class SameThreadRunner implements Runner {
 
         private final Runner mMain = new LooperRunner(Looper.getMainLooper(), null);
 
@@ -55,13 +68,5 @@ public class MainRunner extends LooperRunner {
                 mMain.run(execution, delay, timeUnit);
             }
         }
-    };
-
-    /**
-     * Constructor.
-     */
-    public MainRunner() {
-
-        super(Looper.getMainLooper(), sSameThreadRunner);
     }
 }

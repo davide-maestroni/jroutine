@@ -145,7 +145,7 @@ public class ContextInvocations {
      *                                            static.
      */
     @Nonnull
-    public static <OUTPUT> ContextInvocationFactory<Object, OUTPUT> factoryOn(
+    public static <OUTPUT> ContextInvocationFactory<Object, OUTPUT> factoryOf(
             @Nonnull final Function<OUTPUT> function) {
 
         return new FunctionContextInvocationFactory<OUTPUT>(function);

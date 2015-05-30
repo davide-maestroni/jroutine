@@ -45,7 +45,7 @@ public abstract class FilterInvocation<INPUT, OUTPUT>
 
     }
 
-    public final void onInit() {
+    public final void onInitialize() {
 
     }
 
@@ -53,7 +53,7 @@ public abstract class FilterInvocation<INPUT, OUTPUT>
 
     }
 
-    public final void onReturn() {
+    public final void onTerminate() {
 
     }
 }

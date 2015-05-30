@@ -35,14 +35,7 @@ class LocalQueue {
 
     private static final int INITIAL_CAPACITY = 10;
 
-    private static final ThreadLocal<LocalQueue> sQueue = new ThreadLocal<LocalQueue>() {
-
-        @Override
-        protected LocalQueue initialValue() {
-
-            return new LocalQueue();
-        }
-    };
+    private static final LocalQueueThreadLocal sQueue = new LocalQueueThreadLocal();
 
     private TimeDuration[] mDelays;
 
@@ -279,6 +272,18 @@ class LocalQueue {
         } finally {
 
             mIsRunning = false;
+        }
+    }
+
+    /**
+     * Thread local initializing the queue instance.
+     */
+    private static class LocalQueueThreadLocal extends ThreadLocal<LocalQueue> {
+
+        @Override
+        protected LocalQueue initialValue() {
+
+            return new LocalQueue();
         }
     }
 }

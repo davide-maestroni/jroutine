@@ -54,7 +54,8 @@ interface InvocationResult<OUTPUT> {
      *
      * @param newChannels     new channels freshly created.
      * @param oldChannels     old channels already fed with previous results.
-     * @param abortedChannels TODO
+     * @param abortedChannels list to be filled with the channels, from the other lists, that are
+     *                        aborted while passing the results.
      * @return whether the invocation is complete.
      */
     boolean passTo(@Nonnull final Collection<TransportInput<OUTPUT>> newChannels,

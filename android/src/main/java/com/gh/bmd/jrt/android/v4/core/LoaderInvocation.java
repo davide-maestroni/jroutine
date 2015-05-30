@@ -847,6 +847,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         private void reset(@Nullable final Throwable reason) {
 
             mLogger.dbg("aborting result channels");
+            mResultCount = 0;
             final ArrayList<TransportInput<OUTPUT>> channels = mChannels;
             final ArrayList<TransportInput<OUTPUT>> newChannels = mNewChannels;
 
@@ -863,6 +864,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             }
 
             newChannels.clear();
+            mAbortedChannels.clear();
         }
 
         private void setCacheStrategy(@Nonnull final CacheStrategyType strategyType) {

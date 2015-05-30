@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.runner;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -232,7 +233,10 @@ public class PriorityRunner {
     /**
      * Comparator of priority execution instances.
      */
-    private static class PriorityExecutionComparator implements Comparator<PriorityExecution> {
+    private static class PriorityExecutionComparator
+            implements Comparator<PriorityExecution>, Serializable {
+
+        private static final long serialVersionUID = -1;
 
         public int compare(final PriorityExecution o1, final PriorityExecution o2) {
 

@@ -38,6 +38,7 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
@@ -49,7 +50,10 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -441,9 +445,95 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             }
 
             return hashCode;
+
+        } else if (object instanceof Collection) {
+
+            int hashCode = 0;
+
+            for (final Object o : ((Collection<?>) object)) {
+
+                hashCode = 31 * hashCode + recursiveHashCode(o);
+            }
+
+            return hashCode;
+
+        } else if (object instanceof Map) {
+
+            int hashCode = 0;
+
+            for (final Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
+
+                hashCode = 31 * hashCode + recursiveHashCode(entry.getKey());
+                hashCode = 31 * hashCode + recursiveHashCode(entry.getValue());
+            }
+
+            return hashCode;
         }
 
         return object.hashCode();
+    }
+
+    @Override
+    public void onAbort(@Nullable final Throwable reason) {
+
+        super.onAbort(reason);
+        final Logger logger = mLogger;
+        final Object context = mContext.get();
+
+        if (context == null) {
+
+            logger.dbg("avoiding aborting invocation since context is null");
+            return;
+        }
+
+        final Context loaderContext;
+
+        if (context instanceof FragmentActivity) {
+
+            final FragmentActivity activity = (FragmentActivity) context;
+            loaderContext = activity.getApplicationContext();
+            logger.dbg("aborting invocation bound to activity: %s", activity);
+
+        } else if (context instanceof Fragment) {
+
+            final Fragment fragment = (Fragment) context;
+            loaderContext = fragment.getActivity().getApplicationContext();
+            logger.dbg("aborting invocation bound to fragment: %s", fragment);
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "invalid context type: " + context.getClass().getName());
+        }
+
+        final ContextInvocation<INPUT, OUTPUT> invocation =
+                createInvocation(loaderContext, mLoaderId);
+
+        try {
+
+            invocation.onInitialize();
+            invocation.onAbort(reason);
+            invocation.onTerminate();
+
+        } catch (final InvocationInterruptedException e) {
+
+            throw e;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        try {
+
+            invocation.onDestroy();
+
+        } catch (final InvocationInterruptedException e) {
+
+            throw e;
+
+        } catch (final Throwable ignored) {
+
+        }
     }
 
     @Override
@@ -574,10 +664,24 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         }
     }
 
+    @Nonnull
     private RoutineLoaderCallbacks<OUTPUT> createCallbacks(@Nonnull final Context loaderContext,
             @Nonnull final LoaderManager loaderManager,
             @Nullable final RoutineLoader<INPUT, OUTPUT> loader,
             @Nonnull final List<? extends INPUT> inputs, final int loaderId) {
+
+        final Logger logger = mLogger;
+        final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
+                : new RoutineLoader<INPUT, OUTPUT>(loaderContext,
+                                                   createInvocation(loaderContext, loaderId),
+                                                   mFactory.getInvocationType(), mArgs, inputs,
+                                                   mOrderType, logger);
+        return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
+    }
+
+    @Nonnull
+    private ContextInvocation<INPUT, OUTPUT> createInvocation(@Nonnull final Context loaderContext,
+            final int loaderId) {
 
         final Logger logger = mLogger;
         final Object[] args = mArgs;
@@ -602,13 +706,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             throw new InvocationException(t);
         }
 
-        final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
-                : new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation,
-                                                   factory.getInvocationType(), args, inputs,
-                                                   mOrderType, logger);
-        return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
+        return invocation;
     }
 
+    @Nonnull
     @SuppressWarnings("unchecked")
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")

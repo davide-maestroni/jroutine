@@ -201,11 +201,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
                 invocation.onResult(channel);
                 abortException = channel.getAbortException();
-
-                if (abortException == null) {
-
-                    invocation.onTerminate();
-                }
             }
 
         } catch (final InvocationException e) {
@@ -224,6 +219,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             try {
 
                 invocation.onAbort(abortException);
+                invocation.onTerminate();
 
             } catch (final InvocationException e) {
 
@@ -237,6 +233,20 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             logger.dbg(abortException, "aborted invocation");
             channel.abort(abortException);
             return consumer.createResult();
+
+        } else {
+
+            try {
+
+                invocation.onTerminate();
+
+            } catch (final InvocationInterruptedException e) {
+
+                throw e;
+
+            } catch (final Throwable ignored) {
+
+            }
         }
 
         logger.dbg("reading invocation results");
@@ -402,6 +412,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             mTransportInput.close();
         }
 
+        @Nullable
         private Throwable getAbortException() {
 
             return mAbortException.get();

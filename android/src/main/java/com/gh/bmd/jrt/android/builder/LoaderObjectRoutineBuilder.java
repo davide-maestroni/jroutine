@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
 
@@ -143,11 +143,11 @@ public interface LoaderObjectRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxy();
+    InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withInvocation();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withRoutine();
+    ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxy();
 }

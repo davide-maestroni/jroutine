@@ -23,7 +23,7 @@ import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
@@ -46,15 +46,16 @@ import javax.annotation.Nullable;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class DefaultLoaderChannelBuilder
         implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
-        RoutineConfiguration.Configurable<LoaderChannelBuilder> {
+        InvocationConfiguration.Configurable<LoaderChannelBuilder> {
 
     private final WeakReference<Object> mContext;
 
     private final int mLoaderId;
 
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -126,19 +127,19 @@ class DefaultLoaderChannelBuilder
                     "invalid context type: " + context.getClass().getName());
         }
 
-        final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
+        final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
         final ClashResolutionType resolutionType =
                 loaderConfiguration.getClashResolutionTypeOr(null);
 
         if (resolutionType != null) {
 
-            final Logger logger = routineConfiguration.newLogger(this);
+            final Logger logger = invocationConfiguration.newLogger(this);
             logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
         }
 
-        return builder.withRoutine()
-                      .with(routineConfiguration)
+        return builder.withInvocation()
+                      .with(invocationConfiguration)
                       .set()
                       .withLoader()
                       .withId(mLoaderId)
@@ -216,17 +217,17 @@ class DefaultLoaderChannelBuilder
     }
 
     @Nonnull
+    public InvocationConfiguration.Builder<? extends LoaderChannelBuilder> withInvocation() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderChannelBuilder>(this, config);
+    }
+
+    @Nonnull
     public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
-    }
-
-    @Nonnull
-    public RoutineConfiguration.Builder<? extends LoaderChannelBuilder> withRoutine() {
-
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @Nonnull
@@ -245,14 +246,14 @@ class DefaultLoaderChannelBuilder
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public LoaderChannelBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 

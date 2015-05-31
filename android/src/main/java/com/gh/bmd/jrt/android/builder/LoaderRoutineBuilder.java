@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.android.routine.LoaderRoutine;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
@@ -50,8 +50,8 @@ public interface LoaderRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPU
      * Note that all the options related to the output and input channels size and timeout will be
      * ignored.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> withRoutine();
+    Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> withInvocation();
 }

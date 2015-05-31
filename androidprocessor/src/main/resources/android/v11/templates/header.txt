@@ -26,26 +26,26 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     public ${generatedClassName}(@javax.annotation.Nonnull final android.app.Activity activity,
             @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        this((Object) activity, targetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
+        this((Object) activity, targetClass, invocationConfiguration, proxyConfiguration, loaderConfiguration);
     }
 
     public ${generatedClassName}(@javax.annotation.Nonnull final android.app.Fragment fragment,
             @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        this((Object) fragment, targetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
+        this((Object) fragment, targetClass, invocationConfiguration, proxyConfiguration, loaderConfiguration);
     }
 
     @SuppressWarnings("ConstantConditions")
     private ${generatedClassName}(@javax.annotation.Nonnull final Object context,
             @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
@@ -177,10 +177,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @Override
         @javax.annotation.Nonnull
         protected ${interfaceFullName} newProxy(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-            return new ${generatedClassName}${genericTypes}(mContext, mTargetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
+            return new ${generatedClassName}${genericTypes}(mContext, mTargetClass, invocationConfiguration, proxyConfiguration, loaderConfiguration);
         }
     }

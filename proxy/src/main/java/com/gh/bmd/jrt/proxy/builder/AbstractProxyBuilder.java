@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.proxy.builder;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
@@ -35,15 +35,16 @@ import javax.annotation.Nonnull;
  * @param <TYPE> the interface type.
  */
 public abstract class AbstractProxyBuilder<TYPE>
-        implements ProxyBuilder<TYPE>, RoutineConfiguration.Configurable<ProxyBuilder<TYPE>>,
+        implements ProxyBuilder<TYPE>, InvocationConfiguration.Configurable<ProxyBuilder<TYPE>>,
         ProxyConfiguration.Configurable<ProxyBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
     public TYPE buildProxy() {
@@ -60,11 +61,11 @@ public abstract class AbstractProxyBuilder<TYPE>
                 classMap.put(target, classes);
             }
 
-            final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
+            final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo =
-                    new ClassInfo(token, routineConfiguration, proxyConfiguration);
+                    new ClassInfo(token, invocationConfiguration, proxyConfiguration);
             final Object instance = classes.get(classInfo);
 
             if (instance != null) {
@@ -72,11 +73,11 @@ public abstract class AbstractProxyBuilder<TYPE>
                 return token.cast(instance);
             }
 
-            warn(routineConfiguration);
+            warn(invocationConfiguration);
 
             try {
 
-                final TYPE newInstance = newProxy(routineConfiguration, proxyConfiguration);
+                final TYPE newInstance = newProxy(invocationConfiguration, proxyConfiguration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -88,21 +89,23 @@ public abstract class AbstractProxyBuilder<TYPE>
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ProxyBuilder<TYPE>> withRoutine() {
+    public InvocationConfiguration.Builder<? extends ProxyBuilder<TYPE>> withInvocation() {
 
-        return new RoutineConfiguration.Builder<ProxyBuilder<TYPE>>(this, mRoutineConfiguration);
+        return new InvocationConfiguration.Builder<ProxyBuilder<TYPE>>(this,
+                                                                       mInvocationConfiguration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ProxyBuilder<TYPE> setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+    public ProxyBuilder<TYPE> setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 
@@ -144,20 +147,20 @@ public abstract class AbstractProxyBuilder<TYPE>
     /**
      * Creates and return a new proxy instance.
      *
-     * @param routineConfiguration the routine configuration.
-     * @param proxyConfiguration   the proxy configuration.
+     * @param invocationConfiguration the invocation configuration.
+     * @param proxyConfiguration      the proxy configuration.
      * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+    protected abstract TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ProxyConfiguration proxyConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
-    private void warn(@Nonnull final RoutineConfiguration configuration) {
+    private void warn(@Nonnull final InvocationConfiguration configuration) {
 
         Logger logger = null;
         final Object[] args = configuration.getFactoryArgsOr(null);
@@ -181,9 +184,9 @@ public abstract class AbstractProxyBuilder<TYPE>
             logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
-        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
-        if (inputSize != RoutineConfiguration.DEFAULT) {
+        if (inputSize != InvocationConfiguration.DEFAULT) {
 
             if (logger == null) {
 
@@ -217,9 +220,9 @@ public abstract class AbstractProxyBuilder<TYPE>
             logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
 
-        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
+        final int outputSize = configuration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
-        if (outputSize != RoutineConfiguration.DEFAULT) {
+        if (outputSize != InvocationConfiguration.DEFAULT) {
 
             if (logger == null) {
 
@@ -247,25 +250,25 @@ public abstract class AbstractProxyBuilder<TYPE>
      */
     private static class ClassInfo {
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final InvocationConfiguration mInvocationConfiguration;
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
         private final Type mType;
 
         /**
          * Constructor.
          *
-         * @param token                the proxy interface token.
-         * @param routineConfiguration the routine configuration.
-         * @param proxyConfiguration   the proxy configuration.
+         * @param token                   the proxy interface token.
+         * @param invocationConfiguration the invocation configuration.
+         * @param proxyConfiguration      the proxy configuration.
          */
         private ClassInfo(@Nonnull final ClassToken<?> token,
-                @Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration) {
 
             mType = token.getRawClass();
-            mRoutineConfiguration = routineConfiguration;
+            mInvocationConfiguration = invocationConfiguration;
             mProxyConfiguration = proxyConfiguration;
         }
 
@@ -274,7 +277,7 @@ public abstract class AbstractProxyBuilder<TYPE>
 
             // auto-generated code
             int result = mProxyConfiguration.hashCode();
-            result = 31 * result + mRoutineConfiguration.hashCode();
+            result = 31 * result + mInvocationConfiguration.hashCode();
             result = 31 * result + mType.hashCode();
             return result;
         }
@@ -295,7 +298,7 @@ public abstract class AbstractProxyBuilder<TYPE>
 
             final ClassInfo classInfo = (ClassInfo) o;
             return mProxyConfiguration.equals(classInfo.mProxyConfiguration)
-                    && mRoutineConfiguration.equals(classInfo.mRoutineConfiguration)
+                    && mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
                     && mType.equals(classInfo.mType);
         }
     }

@@ -18,13 +18,13 @@
 
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final Object[] args = routineConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.common.Reflection.NO_ARGS);
+        final Object[] args = invocationConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.common.Reflection.NO_ARGS);
         return getBuilder(mContext, new com.gh.bmd.jrt.common.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {})
-                                           .withRoutine()
-                                           .with(routineConfiguration)
+                                           .withInvocation()
+                                           .with(invocationConfiguration)
                                            ${routineBuilderOptions}
                                            .withFactoryArgs(mTargetClass, ${shareGroup}, args)
                                            .withInputMaxSize(Integer.MAX_VALUE)

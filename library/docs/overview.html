@@ -192,7 +192,7 @@
                 final ClassRoutineBuilder builder = on(Main.class).withProxy()
                                                                   .withShareGroup(ShareGroup.NONE)
                                                                   .set()
-                                                                  .withRoutine()
+                                                                  .withInvocation()
                                                                   .withReadTimeout(TimeDuration.INFINITY)
                                                                   .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
@@ -254,7 +254,7 @@
                 final AsyncMain proxy = on(instance).withProxy()
                                                     .withShareGroup(ShareGroup.NONE)
                                                     .set()
-                                                    .withRoutine()
+                                                    .withInvocation()
                                                     .withReadTimeout(TimeDuration.INFINITY)
                                                     .set()
                                                     .buildProxy(AsyncMain.class);

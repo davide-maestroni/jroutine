@@ -24,8 +24,8 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.Reflection;
@@ -72,19 +72,19 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
     /**
      * Constructor.
      *
-     * @param context              the context reference.
-     * @param factory              the invocation factory.
-     * @param routineConfiguration the routine configuration.
-     * @param loaderConfiguration  the loader configuration.
+     * @param context                 the context reference.
+     * @param factory                 the invocation factory.
+     * @param invocationConfiguration the invocation configuration.
+     * @param loaderConfiguration     the loader configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutine(@Nonnull final WeakReference<Object> context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
-            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final LoaderConfiguration loaderConfiguration) {
 
-        super(routineConfiguration);
+        super(invocationConfiguration);
 
         if (context == null) {
 
@@ -105,8 +105,8 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
         mFactory = factory;
         mConfiguration = loaderConfiguration;
         mLoaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
-        mArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        mOrderType = routineConfiguration.getOutputOrderTypeOr(null);
+        mArgs = invocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+        mOrderType = invocationConfiguration.getOutputOrderTypeOr(null);
         getLogger().dbg("building context routine with invocation type %s and configuration: %s",
                         factory.getInvocationType(), loaderConfiguration);
     }

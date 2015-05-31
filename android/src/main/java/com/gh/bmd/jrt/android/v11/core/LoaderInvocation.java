@@ -33,7 +33,7 @@ import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -840,7 +840,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<TransportInput<OUTPUT>> channels = mNewChannels;
             final TransportChannel<OUTPUT> channel = JRoutine.transport()
-                                                             .withRoutine()
+                                                             .withInvocation()
                                                              .withOutputMaxSize(Integer.MAX_VALUE)
                                                              .withOutputTimeout(TimeDuration.ZERO)
                                                              .withLog(logger.getLog())
@@ -854,7 +854,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
             if ((looper != null) && (looper != Looper.getMainLooper())) {
 
                 return JRoutine.on(PassingInvocation.<OUTPUT>factoryOf())
-                               .withRoutine()
+                               .withInvocation()
                                .withAsyncRunner(Runners.looperRunner(looper))
                                .withInputMaxSize(Integer.MAX_VALUE)
                                .withInputTimeout(TimeDuration.ZERO)

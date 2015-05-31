@@ -28,7 +28,7 @@
                                                      .withProxy()
                                                      .withShareGroup(ShareGroup.NONE)
                                                      .set()
-                                                     .withRoutine()
+                                                     .withInvocation()
                                                      .withReadTimeout(TimeDuration.INFINITY)
                                                      .set()
                                                      .buildProxy(AsyncMain.class);
@@ -97,7 +97,7 @@
                                                             .withProxy()
                                                             .withShareGroup(ShareGroup.NONE)
                                                             .set()
-                                                            .withRoutine()
+                                                            .withInvocation()
                                                             .withReadTimeout(TimeDuration.INFINITY)
                                                             .set()
                                                             .buildProxy();

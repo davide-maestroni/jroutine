@@ -35,8 +35,8 @@ import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
 import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineChannel;
@@ -62,7 +62,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -135,7 +135,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .with(builder().withInputOrder(OrderType.PASS_ORDER)
                                        .withOutputOrder(OrderType.PASS_ORDER)
                                        .set())
@@ -156,7 +156,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .with(builder().withInputOrder(OrderType.PASS_ORDER)
                                        .withOutputOrder(OrderType.PASS_ORDER)
                                        .set())
@@ -585,7 +585,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .with(builder().withInputOrder(OrderType.PASS_ORDER)
                                        .withOutputOrder(OrderType.PASS_ORDER)
                                        .set())
@@ -606,7 +606,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
@@ -650,16 +650,17 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testChannelBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
-                                                            .withInputMaxSize(3)
-                                                            .withInputTimeout(seconds(10))
-                                                            .withOutputMaxSize(3)
-                                                            .withOutputTimeout(seconds(10))
-                                                            .withLogLevel(LogLevel.DEBUG)
-                                                            .withLog(countLog)
-                                                            .set();
+        final InvocationConfiguration configuration =
+                builder().withAsyncRunner(Runners.taskRunner())
+                         .withInputMaxSize(3)
+                         .withInputTimeout(seconds(10))
+                         .withOutputMaxSize(3)
+                         .withOutputTimeout(seconds(10))
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(countLog)
+                         .set();
         JRoutine.onActivity(getActivity(), 0)
-                .withRoutine()
+                .withInvocation()
                 .with(configuration)
                 .set()
                 .buildChannel();
@@ -668,7 +669,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        JRoutine.onFragment(fragment, 0).withRoutine().with(configuration).set().buildChannel();
+        JRoutine.onFragment(fragment, 0).withInvocation().with(configuration).set().buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
 
@@ -719,7 +720,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             new DefaultLoaderRoutineBuilder<Object, Object>(getActivity(),
                                                             factory).setConfiguration(
-                    (RoutineConfiguration) null);
+                    (InvocationConfiguration) null);
 
             fail();
 
@@ -776,7 +777,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
@@ -799,7 +800,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
@@ -838,7 +839,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                         .withLoader()
                         .withId(0)
                         .set()
-                        .withRoutine()
+                        .withInvocation()
                         .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
                         .buildRoutine();
@@ -1078,7 +1079,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
@@ -1101,7 +1102,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
                         .set()
@@ -1150,7 +1151,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onActivity(getActivity(), PassingContextInvocation.<String>factoryOf())
-                        .withRoutine()
+                        .withInvocation()
                         .withSyncRunner(Runners.queuedRunner())
                         .withLog(Logs.androidLog())
                         .withLogLevel(LogLevel.WARNING)
@@ -1169,7 +1170,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final ClassToken<StringProcedureInvocation> token2 =
                 ClassToken.tokenOf(StringProcedureInvocation.class);
         final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(), token2)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withLog(Logs.androidLog())
                                                          .withLogLevel(LogLevel.WARNING)
@@ -1252,16 +1253,17 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testRoutineBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
-                                                            .withInputMaxSize(3)
-                                                            .withInputTimeout(seconds(10))
-                                                            .withOutputMaxSize(3)
-                                                            .withOutputTimeout(seconds(10))
-                                                            .withLogLevel(LogLevel.DEBUG)
-                                                            .withLog(countLog)
-                                                            .set();
+        final InvocationConfiguration configuration =
+                builder().withAsyncRunner(Runners.taskRunner())
+                         .withInputMaxSize(3)
+                         .withInputTimeout(seconds(10))
+                         .withOutputMaxSize(3)
+                         .withOutputTimeout(seconds(10))
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(countLog)
+                         .set();
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                .withRoutine()
+                .withInvocation()
                 .with(configuration)
                 .set()
                 .withLoader()
@@ -1275,7 +1277,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                .withRoutine()
+                .withInvocation()
                 .with(configuration)
                 .set()
                 .withLoader()
@@ -1295,7 +1297,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(null, factoryOf(ToUpperCase.class),
-                                                     RoutineConfiguration.DEFAULT_CONFIGURATION,
+                                                     InvocationConfiguration.DEFAULT_CONFIGURATION,
                                                      configuration);
 
             fail();
@@ -1307,7 +1309,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(reference, null,
-                                                     RoutineConfiguration.DEFAULT_CONFIGURATION,
+                                                     InvocationConfiguration.DEFAULT_CONFIGURATION,
                                                      configuration);
 
             fail();
@@ -1330,7 +1332,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(reference, factoryOf(ToUpperCase.class),
-                                                     RoutineConfiguration.DEFAULT_CONFIGURATION,
+                                                     InvocationConfiguration.DEFAULT_CONFIGURATION,
                                                      null);
 
             fail();

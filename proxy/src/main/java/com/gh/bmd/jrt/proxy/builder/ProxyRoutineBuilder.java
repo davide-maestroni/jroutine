@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.proxy.builder;
 
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -88,8 +88,8 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
     /**
      * Note that all the options related to the output and input channels will be ignored.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends ProxyRoutineBuilder> withRoutine();
+    Builder<? extends ProxyRoutineBuilder> withInvocation();
 }

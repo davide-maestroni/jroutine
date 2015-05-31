@@ -96,7 +96,7 @@ public class Runners {
     @Nonnull
     public static PriorityRunner priorityRunner(@Nonnull final Runner wrapped) {
 
-        return new PriorityRunner(wrapped);
+        return PriorityRunner.getInstance(wrapped);
     }
 
     /**

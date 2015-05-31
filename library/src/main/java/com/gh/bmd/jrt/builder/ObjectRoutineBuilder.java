@@ -89,11 +89,11 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy();
+    InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> withInvocation();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withRoutine();
+    ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy();
 }

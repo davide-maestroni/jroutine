@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
@@ -50,9 +50,9 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
-    DefaultTransportChannel(@Nonnull final RoutineConfiguration configuration) {
+    DefaultTransportChannel(@Nonnull final InvocationConfiguration configuration) {
 
         final Logger logger = configuration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
@@ -71,10 +71,10 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
      * Logs any warning related to ignored options in the specified configuration.
      *
      * @param logger        the logger instance.
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
     private static void warn(@Nonnull final Logger logger,
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         final Object[] args = configuration.getFactoryArgsOr(null);
 
@@ -91,23 +91,24 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
             logger.wrn("the specified synchronous runner will be ignored: %s", syncRunner);
         }
 
-        final int maxInvocations = configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT);
+        final int maxInvocations =
+                configuration.getMaxInvocationsOr(InvocationConfiguration.DEFAULT);
 
-        if (maxInvocations != RoutineConfiguration.DEFAULT) {
+        if (maxInvocations != InvocationConfiguration.DEFAULT) {
 
             logger.wrn("the specified maximum running invocations will be ignored: %d",
                        maxInvocations);
         }
 
         final int coreInvocations =
-                configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT);
+                configuration.getCoreInvocationsOr(InvocationConfiguration.DEFAULT);
 
-        if (coreInvocations != RoutineConfiguration.DEFAULT) {
+        if (coreInvocations != InvocationConfiguration.DEFAULT) {
 
             logger.wrn("the specified core invocations will be ignored: %d", coreInvocations);
         }
 
-        final TimeDuration availableTimeout = configuration.getAvailInvocationTimeoutOr(null);
+        final TimeDuration availableTimeout = configuration.getAvailInstanceTimeoutOr(null);
 
         if (availableTimeout != null) {
 
@@ -122,9 +123,9 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
             logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
-        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
-        if (inputSize != RoutineConfiguration.DEFAULT) {
+        if (inputSize != InvocationConfiguration.DEFAULT) {
 
             logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
         }

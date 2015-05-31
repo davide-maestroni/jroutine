@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.channel.TransportChannel;
 
 import javax.annotation.Nonnull;
@@ -37,8 +37,8 @@ public interface TransportChannelBuilder extends ConfigurableBuilder<TransportCh
      * Note that only options related to the output channel, the asynchronous runner and the logs
      * will be employed.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends TransportChannelBuilder> withRoutine();
+    Builder<? extends TransportChannelBuilder> withInvocation();
 }

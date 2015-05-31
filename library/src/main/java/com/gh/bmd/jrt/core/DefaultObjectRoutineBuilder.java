@@ -15,18 +15,22 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineBuilders.MethodInfo;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.runner.PriorityRunner;
+import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -63,12 +67,12 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 }
             };
 
-    private final RoutineConfiguration.Configurable<ObjectRoutineBuilder> mRoutineConfigurable =
-            new RoutineConfiguration.Configurable<ObjectRoutineBuilder>() {
+    private final InvocationConfiguration.Configurable<ObjectRoutineBuilder> mRoutineConfigurable =
+            new InvocationConfiguration.Configurable<ObjectRoutineBuilder>() {
 
                 @Nonnull
                 public ObjectRoutineBuilder setConfiguration(
-                        @Nonnull final RoutineConfiguration configuration) {
+                        @Nonnull final InvocationConfiguration configuration) {
 
                     return DefaultObjectRoutineBuilder.this.setConfiguration(configuration);
                 }
@@ -103,16 +107,16 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @Nonnull
     @Override
     @SuppressWarnings("unchecked")
-    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withRoutine() {
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> withInvocation() {
 
-        return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
-                                                                      getRoutineConfiguration());
+        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
+                                                                         getInvocationConfiguration());
     }
 
     @Nonnull
     @Override
     public ObjectRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         super.setConfiguration(configuration);
         return this;
@@ -171,24 +175,43 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final InvocationConfiguration mInvocationConfiguration;
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final PriorityRunner mPriorityRunner;
+
+        private final ProxyConfiguration mProxyConfiguration;
 
         /**
          * Constructor.
          */
         private InterfaceInvocationHandler() {
 
-            mRoutineConfiguration = getRoutineConfiguration();
+            mInvocationConfiguration = getInvocationConfiguration();
             mProxyConfiguration = getProxyConfiguration();
+            mPriorityRunner = Runners.priorityRunner(
+                    mInvocationConfiguration.getAsyncRunnerOr(Runners.sharedRunner()));
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
+            final InvocationConfiguration invocationConfiguration;
+            final Priority priorityAnnotation = method.getAnnotation(Priority.class);
+
+            if (priorityAnnotation != null) {
+
+                final Runner priorityRunner = mPriorityRunner.getRunner(priorityAnnotation.value());
+                invocationConfiguration = mInvocationConfiguration.builderFrom()
+                                                                  .withAsyncRunner(priorityRunner)
+                                                                  .set();
+
+            } else {
+
+                invocationConfiguration = mInvocationConfiguration;
+            }
+
             final OutputChannel<Object> outputChannel =
-                    method(mRoutineConfiguration, mProxyConfiguration, method).callAsync(args);
+                    method(invocationConfiguration, mProxyConfiguration, method).callAsync(args);
             final Class<?> returnType = method.getReturnType();
 
             if (!Void.class.equals(boxingClass(returnType))) {
@@ -239,17 +262,21 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      */
     private class ProxyInvocationHandler implements InvocationHandler {
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final InvocationConfiguration mInvocationConfiguration;
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final PriorityRunner mPriorityRunner;
+
+        private final ProxyConfiguration mProxyConfiguration;
 
         /**
          * Constructor.
          */
         private ProxyInvocationHandler() {
 
-            mRoutineConfiguration = getRoutineConfiguration();
+            mInvocationConfiguration = getInvocationConfiguration();
             mProxyConfiguration = getProxyConfiguration();
+            mPriorityRunner = Runners.priorityRunner(
+                    mInvocationConfiguration.getAsyncRunnerOr(Runners.sharedRunner()));
         }
 
         @Nonnull
@@ -258,16 +285,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 @Nullable final OutputMode outputMode) {
 
             String shareGroup = mProxyConfiguration.getShareGroupOr(null);
-            final RoutineConfiguration configuration = mRoutineConfiguration;
-            final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+            final InvocationConfiguration configuration = mInvocationConfiguration;
+            final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                     configuration.builderFrom();
-            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
-
-            if (shareGroupAnnotation != null) {
-
-                shareGroup = shareGroupAnnotation.value();
-            }
-
             warn(configuration);
             builder.withInputOrder(
                     (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER)
@@ -277,6 +297,21 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                                             : OrderType.NONE)
                    .withOutputMaxSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
+            final Priority priorityAnnotation = method.getAnnotation(Priority.class);
+
+            if (priorityAnnotation != null) {
+
+                final Runner priorityRunner = mPriorityRunner.getRunner(priorityAnnotation.value());
+                builder.withAsyncRunner(priorityRunner);
+            }
+
+            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+
+            if (shareGroupAnnotation != null) {
+
+                shareGroup = shareGroupAnnotation.value();
+            }
+
             final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
             if (timeoutAnnotation != null) {

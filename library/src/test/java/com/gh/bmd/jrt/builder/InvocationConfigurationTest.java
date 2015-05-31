@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logs;
 import com.gh.bmd.jrt.log.NullLog;
@@ -25,30 +25,31 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builderFrom;
+import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
+import static com.gh.bmd.jrt.builder.InvocationConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Routine configuration unit tests.
+ * Invocation configuration unit tests.
  * <p/>
  * Created by davide-maestroni on 11/22/14.
  */
-public class RoutineConfigurationTest {
+public class InvocationConfigurationTest {
 
     @Test
     public void testArgsEquals() {
 
-        final RoutineConfiguration configuration = builder().withFactoryArgs((Object[]) null)
-                                                            .withAvailInvocationTimeout(
-                                                                    TimeDuration.millis(100))
-                                                            .withCoreInvocations(27)
-                                                            .withInputOrder(OrderType.PASS_ORDER)
-                                                            .withAsyncRunner(Runners.queuedRunner())
-                                                            .withLog(new NullLog())
-                                                            .withOutputMaxSize(100)
-                                                            .set();
+        final InvocationConfiguration configuration = builder().withFactoryArgs((Object[]) null)
+                                                               .withAvailInstanceTimeout(
+                                                                       TimeDuration.millis(100))
+                                                               .withCoreInvocations(27)
+                                                               .withInputOrder(OrderType.PASS_ORDER)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withFactoryArgs(3).set());
         assertThat(configuration.builderFrom().withFactoryArgs(27).set()).isNotEqualTo(
                 builder().withFactoryArgs(27).set());
@@ -57,8 +58,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testAsyncRunnerEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -75,28 +76,28 @@ public class RoutineConfigurationTest {
     @Test
     public void testAvailableTimeoutEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
         assertThat(configuration).isNotEqualTo(
-                builder().withAvailInvocationTimeout(TimeDuration.ZERO).set());
+                builder().withAvailInstanceTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
-                builder().withAvailInvocationTimeout(1, TimeUnit.MILLISECONDS).set());
+                builder().withAvailInstanceTimeout(1, TimeUnit.MILLISECONDS).set());
         assertThat(configuration.builderFrom()
-                                .withAvailInvocationTimeout(TimeDuration.millis(1))
+                                .withAvailInstanceTimeout(TimeDuration.millis(1))
                                 .set()).isNotEqualTo(
-                builder().withAvailInvocationTimeout(1, TimeUnit.MILLISECONDS).set());
+                builder().withAvailInstanceTimeout(1, TimeUnit.MILLISECONDS).set());
     }
 
     @Test
     public void testBuildFrom() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -104,7 +105,8 @@ public class RoutineConfigurationTest {
                          .set();
 
         assertThat(builderFrom(configuration).set()).isEqualTo(configuration);
-        assertThat(builderFrom(null).set()).isEqualTo(RoutineConfiguration.DEFAULT_CONFIGURATION);
+        assertThat(builderFrom(null).set()).isEqualTo(
+                InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
@@ -123,7 +125,7 @@ public class RoutineConfigurationTest {
 
         try {
 
-            new Builder<Object>(null, RoutineConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, InvocationConfiguration.DEFAULT_CONFIGURATION);
 
             fail();
 
@@ -135,8 +137,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testBuilderFromEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -145,14 +147,14 @@ public class RoutineConfigurationTest {
         assertThat(builder().with(configuration).set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).set()).isEqualTo(
-                RoutineConfiguration.DEFAULT_CONFIGURATION);
+                InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
     public void testCoreInvocationsEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withCoreInvocations(27)
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
@@ -182,8 +184,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testInputOrderEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -199,8 +201,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testInputSizeEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -229,8 +231,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testInputTimeoutEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -273,8 +275,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testLogEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -288,8 +290,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testLogLevelEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -303,8 +305,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testMaxInvocationsEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -333,8 +335,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testOutputOrderEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -350,8 +352,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testOutputSizeEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -380,8 +382,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testOutputTimeoutEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -425,8 +427,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testReadTimeoutEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -444,8 +446,8 @@ public class RoutineConfigurationTest {
     @Test
     public void testSyncRunnerEquals() {
 
-        final RoutineConfiguration configuration =
-                builder().withAvailInvocationTimeout(TimeDuration.millis(100))
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())

@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.core.JRoutine;
@@ -53,7 +53,7 @@ public class InvocationsTest {
                         return builder.toString();
                     }
                 }))
-                        .withRoutine()
+                        .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withReadTimeout(TimeDuration.seconds(1))
                         .set()

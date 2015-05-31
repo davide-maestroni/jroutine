@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
@@ -63,7 +63,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final TimeDuration mAvailTimeout;
 
-    private final RoutineConfiguration mConfiguration;
+    private final InvocationConfiguration mConfiguration;
 
     private final int mCoreInvocations;
 
@@ -99,17 +99,17 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
     @SuppressWarnings("ConstantConditions")
-    protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {
+    protected AbstractRoutine(@Nonnull final InvocationConfiguration configuration) {
 
         mConfiguration = configuration;
         mSyncRunner = configuration.getSyncRunnerOr(Runners.queuedRunner());
         mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
         mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInvocationsOr(DEFAULT_CORE_INVOCATIONS);
-        mAvailTimeout = configuration.getAvailInvocationTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
+        mAvailTimeout = configuration.getAvailInstanceTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
         mLogger = configuration.newLogger(this);
         mLogger.dbg("building routine with configuration: %s", configuration);
     }
@@ -117,12 +117,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      * @param syncRunner    the runner used for synchronous invocation.
      * @param asyncRunner   the runner used for asynchronous invocation.
      * @param logger        the logger instance.
      */
-    private AbstractRoutine(@Nonnull final RoutineConfiguration configuration,
+    private AbstractRoutine(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
             @Nonnull final Logger logger) {
 

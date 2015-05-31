@@ -17,7 +17,7 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
@@ -315,7 +315,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         private LoaderResultChannel(@Nullable final OrderType order, @Nonnull final Logger logger) {
 
             mTransportChannel = JRoutine.transport()
-                                        .withRoutine()
+                                        .withInvocation()
                                         .withOutputOrder(order)
                                         .withOutputMaxSize(Integer.MAX_VALUE)
                                         .withOutputTimeout(TimeDuration.ZERO)

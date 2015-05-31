@@ -13,8 +13,11 @@
  */
 package com.gh.bmd.jrt.runner;
 
+import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.WeakHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -42,6 +45,9 @@ public class PriorityRunner {
     private static final PriorityExecutionComparator PRIORITY_EXECUTION_COMPARATOR =
             new PriorityExecutionComparator();
 
+    private static final WeakIdentityHashMap<Runner, PriorityRunner> sRunnerMap =
+            new WeakIdentityHashMap<Runner, PriorityRunner>();
+
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
 
     private final PriorityBlockingQueue<PriorityExecution> mQueue;
@@ -61,13 +67,16 @@ public class PriorityRunner {
 
     private final Runner mRunner;
 
+    private final WeakHashMap<EnqueuingRunner, Void> mRunnerMap =
+            new WeakHashMap<EnqueuingRunner, Void>();
+
     /**
      * Constructor.
      *
      * @param wrapped the wrapped instance.
      */
     @SuppressWarnings("ConstantConditions")
-    PriorityRunner(@Nonnull final Runner wrapped) {
+    private PriorityRunner(@Nonnull final Runner wrapped) {
 
         if (wrapped == null) {
 
@@ -76,6 +85,24 @@ public class PriorityRunner {
 
         mRunner = wrapped;
         mQueue = new PriorityBlockingQueue<PriorityExecution>(10, PRIORITY_EXECUTION_COMPARATOR);
+    }
+
+    @Nonnull
+    static PriorityRunner getInstance(@Nonnull final Runner wrapped) {
+
+        synchronized (sRunnerMap) {
+
+            final WeakIdentityHashMap<Runner, PriorityRunner> runnerMap = sRunnerMap;
+            PriorityRunner runner = runnerMap.get(wrapped);
+
+            if (runner == null) {
+
+                runner = new PriorityRunner(wrapped);
+                runnerMap.put(wrapped, runner);
+            }
+
+            return runner;
+        }
     }
 
     private static int compareLong(long x, long y) {
@@ -92,7 +119,22 @@ public class PriorityRunner {
     @Nonnull
     public Runner getRunner(final int priority) {
 
-        return new EnqueuingRunner(priority);
+        synchronized (mRunnerMap) {
+
+            final WeakHashMap<EnqueuingRunner, Void> runnerMap = mRunnerMap;
+
+            for (final EnqueuingRunner runner : runnerMap.keySet()) {
+
+                if (runner.mPriority == priority) {
+
+                    return runner;
+                }
+            }
+
+            final EnqueuingRunner runner = new EnqueuingRunner(priority);
+            runnerMap.put(runner, null);
+            return runner;
+        }
     }
 
     /**

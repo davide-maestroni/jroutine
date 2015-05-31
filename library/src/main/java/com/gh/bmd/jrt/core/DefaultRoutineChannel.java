@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.InputDeadlockException;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.RoutineChannel;
@@ -89,13 +89,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      * @param manager       the invocation manager.
      * @param runner        the runner instance.
      * @param logger        the logger instance.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
-    DefaultRoutineChannel(@Nonnull final RoutineConfiguration configuration,
+    DefaultRoutineChannel(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final InvocationManager<INPUT, OUTPUT> manager, @Nonnull final Runner runner,
             @Nonnull final Logger logger) {
 

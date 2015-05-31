@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
@@ -42,5 +42,5 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * {@inheritDoc}
      */
     @Nonnull
-    Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withRoutine();
+    Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> withInvocation();
 }

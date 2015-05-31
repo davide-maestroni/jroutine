@@ -13,10 +13,10 @@
  */
 package com.gh.bmd.jrt.core;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
@@ -113,13 +113,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      * @param handler       the abort handler.
      * @param runner        the runner instance.
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultResultChannel(@Nonnull final RoutineConfiguration configuration,
+    DefaultResultChannel(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final AbortHandler handler, @Nonnull final Runner runner,
             @Nonnull final Logger logger) {
 

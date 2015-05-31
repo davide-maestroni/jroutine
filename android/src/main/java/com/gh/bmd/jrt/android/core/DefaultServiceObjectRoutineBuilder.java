@@ -24,10 +24,10 @@ import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineBuilders.MethodInfo;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
@@ -62,7 +62,7 @@ import static com.gh.bmd.jrt.common.Reflection.findMethod;
  * Created by davide-maestroni on 3/29/15.
  */
 class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
-        RoutineConfiguration.Configurable<ServiceObjectRoutineBuilder>,
+        InvocationConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ProxyConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceObjectRoutineBuilder> {
 
@@ -76,9 +76,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     private final Class<?> mTargetClass;
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
@@ -107,11 +108,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static RoutineConfiguration configurationWithTimeout(
-            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
+    private static InvocationConfiguration configurationWithTimeout(
+            @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
 
-        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                RoutineConfiguration.builderFrom(configuration);
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builderFrom(configuration);
         final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
@@ -216,10 +217,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * Logs any warning related to ignored options in the specified configuration.
      *
      * @param logClass      the log class.
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
     private static void warn(@Nullable final Class<? extends Log> logClass,
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         Log log = null;
 
@@ -279,15 +280,15 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     "no annotated method with name '" + name + "' has been found");
         }
 
-        final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
+        final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        final Object[] args = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        warn(serviceConfiguration.getLogClassOr(null), routineConfiguration);
+        final Object[] args = invocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+        warn(serviceConfiguration.getLogClassOr(null), invocationConfiguration);
         final AliasMethodToken<INPUT, OUTPUT> classToken = new AliasMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
-                       .withRoutine()
-                       .with(configurationWithTimeout(routineConfiguration, targetMethod))
+                       .withInvocation()
+                       .with(configurationWithTimeout(invocationConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
                        .withInputOrder(OrderType.PASS_ORDER)
                        .set()
@@ -309,16 +310,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final Class<?> targetClass = mTargetClass;
         final Method targetMethod = findMethod(targetClass, name, parameterTypes);
-        final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
+        final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        final Object[] args = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        warn(serviceConfiguration.getLogClassOr(null), routineConfiguration);
+        final Object[] args = invocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+        warn(serviceConfiguration.getLogClassOr(null), invocationConfiguration);
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
-                       .withRoutine()
-                       .with(configurationWithTimeout(routineConfiguration, targetMethod))
+                       .withInvocation()
+                       .with(configurationWithTimeout(invocationConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
                                         toNames(parameterTypes))
                        .withInputOrder(OrderType.PASS_ORDER)
@@ -338,7 +339,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     "the specified class is not an interface: " + itf.getName());
         }
 
-        warn(mServiceConfiguration.getLogClassOr(null), mRoutineConfiguration);
+        warn(mServiceConfiguration.getLogClassOr(null), mInvocationConfiguration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this));
         return itf.cast(proxy);
@@ -381,14 +382,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public ServiceObjectRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 
@@ -400,10 +401,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withRoutine() {
+    public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withInvocation() {
 
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
@@ -694,9 +695,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Context mContext;
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final InvocationConfiguration mInvocationConfiguration;
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
         private final ServiceConfiguration mServiceConfiguration;
 
@@ -711,10 +712,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
-            mRoutineConfiguration = builder.mRoutineConfiguration;
+            mInvocationConfiguration = builder.mInvocationConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mServiceConfiguration = builder.mServiceConfiguration;
-            mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+            mArgs = mInvocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -735,9 +736,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final OrderType outputOrder =
                     (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
             final Routine<Object, Object> routine = JRoutine.onService(mContext, PROXY_TOKEN)
-                                                            .withRoutine()
+                                                            .withInvocation()
                                                             .with(configurationWithTimeout(
-                                                                    mRoutineConfiguration, method))
+                                                                    mInvocationConfiguration,
+                                                                    method))
                                                             .withFactoryArgs(factoryArgs)
                                                             .withInputOrder(inputOrder)
                                                             .withOutputOrder(outputOrder)

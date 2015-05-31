@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Configurable;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.channel.TransportChannel;
 
@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 class DefaultTransportChannelBuilder
         implements TransportChannelBuilder, Configurable<TransportChannelBuilder> {
 
-    private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Avoid direct instantiation.
@@ -45,7 +45,7 @@ class DefaultTransportChannelBuilder
     }
 
     @Nonnull
-    public Builder<TransportChannelBuilder> withRoutine() {
+    public Builder<TransportChannelBuilder> withInvocation() {
 
         return new Builder<TransportChannelBuilder>(this, mConfiguration);
     }
@@ -53,7 +53,7 @@ class DefaultTransportChannelBuilder
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public TransportChannelBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 

@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
- * Class storing the routine configuration.
+ * Class storing the invocation configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
@@ -66,7 +66,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide-maestroni on 11/15/14.
  */
-public final class RoutineConfiguration {
+public final class InvocationConfiguration {
 
     /**
      * Constant indicating the default value of an integer attribute.
@@ -78,7 +78,8 @@ public final class RoutineConfiguration {
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
      */
-    public static final RoutineConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
+    public static final InvocationConfiguration DEFAULT_CONFIGURATION =
+            builder().buildConfiguration();
 
     private final Runner mAsyncRunner;
 
@@ -137,7 +138,7 @@ public final class RoutineConfiguration {
      * @param log              the log instance.
      * @param logLevel         the log level.
      */
-    private RoutineConfiguration(@Nullable final Object[] factoryArgs,
+    private InvocationConfiguration(@Nullable final Object[] factoryArgs,
             @Nullable final Runner syncRunner, @Nullable final Runner asyncRunner,
             final int maxInvocations, final int coreInvocations,
             @Nullable final TimeDuration availableTimeout, @Nullable final TimeDuration readTimeout,
@@ -166,37 +167,37 @@ public final class RoutineConfiguration {
     }
 
     /**
-     * Returns a routine configuration builder.
+     * Returns an invocation configuration builder.
      *
      * @return the builder.
      */
     @Nonnull
-    public static Builder<RoutineConfiguration> builder() {
+    public static Builder<InvocationConfiguration> builder() {
 
-        return new Builder<RoutineConfiguration>(sDefaultConfigurable);
+        return new Builder<InvocationConfiguration>(sDefaultConfigurable);
     }
 
     /**
-     * Returns a routine configuration builder initialized with the specified configuration.
+     * Returns an invocation configuration builder initialized with the specified configuration.
      *
      * @param initialConfiguration the initial configuration.
      * @return the builder.
      */
     @Nonnull
-    public static Builder<RoutineConfiguration> builderFrom(
-            @Nullable final RoutineConfiguration initialConfiguration) {
+    public static Builder<InvocationConfiguration> builderFrom(
+            @Nullable final InvocationConfiguration initialConfiguration) {
 
         return (initialConfiguration == null) ? builder()
-                : new Builder<RoutineConfiguration>(sDefaultConfigurable, initialConfiguration);
+                : new Builder<InvocationConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
     /**
-     * Returns a routine configuration builder initialized with this configuration.
+     * Returns an invocation configuration builder initialized with this configuration.
      *
      * @return the builder.
      */
     @Nonnull
-    public Builder<RoutineConfiguration> builderFrom() {
+    public Builder<InvocationConfiguration> builderFrom() {
 
         return builderFrom(this);
     }
@@ -220,7 +221,7 @@ public final class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getAvailInvocationTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getAvailInstanceTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration availableTimeout = mAvailableTimeout;
         return (availableTimeout != null) ? availableTimeout : valueIfNotSet;
@@ -432,12 +433,12 @@ public final class RoutineConfiguration {
             return true;
         }
 
-        if (!(o instanceof RoutineConfiguration)) {
+        if (!(o instanceof InvocationConfiguration)) {
 
             return false;
         }
 
-        final RoutineConfiguration that = (RoutineConfiguration) o;
+        final InvocationConfiguration that = (InvocationConfiguration) o;
 
         if (mCoreInvocations != that.mCoreInvocations) {
 
@@ -526,7 +527,7 @@ public final class RoutineConfiguration {
     @Override
     public String toString() {
 
-        return "RoutineConfiguration{" +
+        return "InvocationConfiguration{" +
                 "mAsyncRunner=" + mAsyncRunner +
                 ", mAvailableTimeout=" + mAvailableTimeout +
                 ", mCoreInvocations=" + mCoreInvocations +
@@ -615,11 +616,11 @@ public final class RoutineConfiguration {
          * @return the configurable instance.
          */
         @Nonnull
-        TYPE setConfiguration(@Nonnull RoutineConfiguration configuration);
+        TYPE setConfiguration(@Nonnull InvocationConfiguration configuration);
     }
 
     /**
-     * Builder of routine configurations.
+     * Builder of invocation configurations.
      *
      * @param <TYPE> the configurable object type.
      */
@@ -687,7 +688,7 @@ public final class RoutineConfiguration {
          */
         @SuppressWarnings("ConstantConditions")
         public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final RoutineConfiguration initialConfiguration) {
+                @Nonnull final InvocationConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -714,11 +715,11 @@ public final class RoutineConfiguration {
          * configuration options need to be set to their default value, otherwise only the set
          * options will be applied.
          *
-         * @param configuration the routine configuration.
+         * @param configuration the invocation configuration.
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> with(@Nullable final RoutineConfiguration configuration) {
+        public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
 
             if (configuration == null) {
 
@@ -755,10 +756,10 @@ public final class RoutineConfiguration {
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @Nonnull
-        public Builder<TYPE> withAvailInvocationTimeout(final long timeout,
+        public Builder<TYPE> withAvailInstanceTimeout(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
-            return withAvailInvocationTimeout(fromUnit(timeout, timeUnit));
+            return withAvailInstanceTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -769,7 +770,7 @@ public final class RoutineConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withAvailInvocationTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withAvailInstanceTimeout(@Nullable final TimeDuration timeout) {
 
             mAvailableTimeout = timeout;
             return this;
@@ -777,7 +778,7 @@ public final class RoutineConfiguration {
 
         /**
          * Sets the number of invocation instances which represents the core pool of reusable
-         * invocations. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
+         * invocations. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
          * framework to choose a default number.
          *
          * @param coreInvocations the max number of instances.
@@ -818,7 +819,7 @@ public final class RoutineConfiguration {
 
         /**
          * Sets the maximum number of data that the input channel can retain before they are
-         * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
+         * consumed. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
          * framework to choose a default size.
          *
          * @param inputMaxSize the maximum size.
@@ -911,7 +912,8 @@ public final class RoutineConfiguration {
 
         /**
          * Sets the max number of concurrently running invocation instances. A
-         * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to choose
+         * {@link InvocationConfiguration#DEFAULT} value means that it is up to the framework to
+         * choose
          * a default number.
          *
          * @param maxInvocations the max number of instances.
@@ -934,7 +936,7 @@ public final class RoutineConfiguration {
 
         /**
          * Sets the maximum number of data that the result channel can retain before they are
-         * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
+         * consumed. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
          * framework to choose a default size.
          *
          * @param outputMaxSize the maximum size.
@@ -1053,7 +1055,8 @@ public final class RoutineConfiguration {
             return this;
         }
 
-        private void applyChannelConfiguration(@Nonnull final RoutineConfiguration configuration) {
+        private void applyChannelConfiguration(
+                @Nonnull final InvocationConfiguration configuration) {
 
             final OrderType inputOrderType = configuration.mInputOrderType;
 
@@ -1099,7 +1102,7 @@ public final class RoutineConfiguration {
         }
 
         private void applyInvocationConfiguration(
-                @Nonnull final RoutineConfiguration configuration) {
+                @Nonnull final InvocationConfiguration configuration) {
 
             final Object[] args = configuration.mFactoryArgs;
 
@@ -1140,7 +1143,7 @@ public final class RoutineConfiguration {
 
             if (availTimeout != null) {
 
-                withAvailInvocationTimeout(availTimeout);
+                withAvailInstanceTimeout(availTimeout);
             }
 
             final TimeDuration readTimeout = configuration.mReadTimeout;
@@ -1158,7 +1161,7 @@ public final class RoutineConfiguration {
             }
         }
 
-        private void applyLogConfiguration(@Nonnull final RoutineConfiguration configuration) {
+        private void applyLogConfiguration(@Nonnull final InvocationConfiguration configuration) {
 
             final Log log = configuration.mLog;
 
@@ -1176,16 +1179,16 @@ public final class RoutineConfiguration {
         }
 
         @Nonnull
-        private RoutineConfiguration buildConfiguration() {
+        private InvocationConfiguration buildConfiguration() {
 
-            return new RoutineConfiguration(mArgs, mSyncRunner, mAsyncRunner, mMaxInvocations,
-                                            mCoreInvocations, mAvailableTimeout, mReadTimeout,
-                                            mTimeoutActionType, mInputOrderType, mInputMaxSize,
-                                            mInputTimeout, mOutputOrderType, mOutputMaxSize,
-                                            mOutputTimeout, mLog, mLogLevel);
+            return new InvocationConfiguration(mArgs, mSyncRunner, mAsyncRunner, mMaxInvocations,
+                                               mCoreInvocations, mAvailableTimeout, mReadTimeout,
+                                               mTimeoutActionType, mInputOrderType, mInputMaxSize,
+                                               mInputTimeout, mOutputOrderType, mOutputMaxSize,
+                                               mOutputTimeout, mLog, mLogLevel);
         }
 
-        private void setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+        private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {
 
             mArgs = configuration.mFactoryArgs;
             mSyncRunner = configuration.mSyncRunner;
@@ -1209,11 +1212,11 @@ public final class RoutineConfiguration {
     /**
      * Default configurable implementation.
      */
-    private static class DefaultConfigurable implements Configurable<RoutineConfiguration> {
+    private static class DefaultConfigurable implements Configurable<InvocationConfiguration> {
 
         @Nonnull
-        public RoutineConfiguration setConfiguration(
-                @Nonnull final RoutineConfiguration configuration) {
+        public InvocationConfiguration setConfiguration(
+                @Nonnull final InvocationConfiguration configuration) {
 
             return configuration;
         }

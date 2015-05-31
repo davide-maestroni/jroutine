@@ -16,9 +16,9 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.log.Log;
@@ -53,7 +53,7 @@ public class ClassRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine = JRoutine.on(TestStatic.class)
-                                                        .withRoutine()
+                                                        .withInvocation()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -85,7 +85,7 @@ public class ClassRoutineTest {
         try {
 
             new DefaultClassRoutineBuilder(TestStatic.class).setConfiguration(
-                    (RoutineConfiguration) null);
+                    (InvocationConfiguration) null);
 
             fail();
 
@@ -110,7 +110,7 @@ public class ClassRoutineTest {
 
         final CountLog countLog = new CountLog();
         JRoutine.on(TestStatic.class)
-                .withRoutine()
+                .withInvocation()
                 .withFactoryArgs()
                 .withInputOrder(OrderType.NONE)
                 .withInputMaxSize(3)
@@ -181,12 +181,12 @@ public class ClassRoutineTest {
         final TimeDuration timeout = seconds(1);
         final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withCoreInvocations(0)
-                                                         .withAvailInvocationTimeout(1, timeUnit)
+                                                         .withAvailInstanceTimeout(1, timeUnit)
                                                          .set()
                                                          .withProxy()
                                                          .withShareGroup("test")
@@ -202,11 +202,11 @@ public class ClassRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
-                                                         .withAvailInvocationTimeout(
+                                                         .withAvailInstanceTimeout(
                                                                  TimeDuration.ZERO)
                                                          .set()
                                                          .method("getLong");
@@ -259,7 +259,7 @@ public class ClassRoutineTest {
 
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -270,7 +270,7 @@ public class ClassRoutineTest {
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -282,7 +282,7 @@ public class ClassRoutineTest {
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutine.on(TestStatic.class)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -295,7 +295,7 @@ public class ClassRoutineTest {
         assertThat(routine2).isNotEqualTo(routine3);
 
         final Routine<Object, Object> routine4 = JRoutine.on(TestStatic.class)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
@@ -307,7 +307,7 @@ public class ClassRoutineTest {
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutine.on(TestStatic.class)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
@@ -323,7 +323,7 @@ public class ClassRoutineTest {
     public void testShareGroup() throws NoSuchMethodException {
 
         final ClassRoutineBuilder builder =
-                JRoutine.on(TestStatic2.class).withRoutine().withReadTimeout(seconds(2)).set();
+                JRoutine.on(TestStatic2.class).withInvocation().withReadTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 

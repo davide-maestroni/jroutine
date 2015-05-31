@@ -24,7 +24,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@javax.annotation.Nonnull final ${classFullName} wrapped,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
         if (wrapped == null) {
@@ -88,9 +88,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @Override
         @javax.annotation.Nonnull
         protected ${interfaceFullName} newProxy(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-            return new ${generatedClassName}${genericTypes}(mTarget, routineConfiguration, proxyConfiguration);
+            return new ${generatedClassName}${genericTypes}(mTarget, invocationConfiguration, proxyConfiguration);
         }
     }

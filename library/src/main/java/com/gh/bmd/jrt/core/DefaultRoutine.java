@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.common.RoutineException;
@@ -40,11 +40,11 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      * @param factory       the invocation factory.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultRoutine(@Nonnull final RoutineConfiguration configuration,
+    DefaultRoutine(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         super(configuration);

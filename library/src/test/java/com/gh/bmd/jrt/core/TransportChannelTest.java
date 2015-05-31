@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.RoutineChannel;
@@ -237,7 +237,7 @@ public class TransportChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final TransportChannel<String> transportChannel1 = JRoutine.transport()
-                                                                   .withRoutine()
+                                                                   .withInvocation()
                                                                    .withOutputOrder(
                                                                            OrderType.PASS_ORDER)
                                                                    .set()
@@ -284,12 +284,12 @@ public class TransportChannelTest {
 
         final CountLog countLog = new CountLog();
         JRoutine.transport()
-                .withRoutine()
+                .withInvocation()
                 .withFactoryArgs()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withMaxInvocations(3)
                 .withCoreInvocations(3)
-                .withAvailInvocationTimeout(seconds(1))
+                .withAvailInstanceTimeout(seconds(1))
                 .withInputOrder(OrderType.NONE)
                 .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))
@@ -449,7 +449,7 @@ public class TransportChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final TransportChannel<Object> channel = JRoutine.transport()
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withOutputOrder(OrderType.PASS_ORDER)
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withOutputMaxSize(1)
@@ -470,7 +470,7 @@ public class TransportChannelTest {
         assertThat(transportChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
         final TransportChannel<Object> transportChannel2 = JRoutine.transport()
-                                                                   .withRoutine()
+                                                                   .withInvocation()
                                                                    .withOutputOrder(
                                                                            OrderType.PASS_ORDER)
                                                                    .set()
@@ -530,7 +530,7 @@ public class TransportChannelTest {
     public void testReadTimeout() {
 
         final TransportChannel<Object> channel1 = JRoutine.transport()
-                                                          .withRoutine()
+                                                          .withInvocation()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.EXIT)
@@ -544,7 +544,7 @@ public class TransportChannelTest {
     public void testReadTimeout2() {
 
         final TransportChannel<Object> channel2 = JRoutine.transport()
-                                                          .withRoutine()
+                                                          .withInvocation()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.ABORT)
@@ -566,7 +566,7 @@ public class TransportChannelTest {
     public void testReadTimeout3() {
 
         final TransportChannel<Object> channel3 = JRoutine.transport()
-                                                          .withRoutine()
+                                                          .withInvocation()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.DEADLOCK)

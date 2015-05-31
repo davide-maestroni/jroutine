@@ -28,8 +28,8 @@ import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.InvocationException;
@@ -174,19 +174,19 @@ public class RoutineService extends Service {
     /**
      * Puts the specified asynchronous invocation info into the passed bundle.
      *
-     * @param bundle               the bundle to fill.
-     * @param invocationId         the invocation ID.
-     * @param invocationClass      the invocation class.
-     * @param routineConfiguration the routine configuration.
-     * @param serviceConfiguration the service configuration.
+     * @param bundle                  the bundle to fill.
+     * @param invocationId            the invocation ID.
+     * @param invocationClass         the invocation class.
+     * @param invocationConfiguration the invocation configuration.
+     * @param serviceConfiguration    the service configuration.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
-        putInvocation(bundle, false, invocationId, invocationClass, routineConfiguration,
+        putInvocation(bundle, false, invocationId, invocationClass, invocationConfiguration,
                       serviceConfiguration);
     }
 
@@ -219,19 +219,19 @@ public class RoutineService extends Service {
     /**
      * Puts the specified parallel invocation info into the passed bundle.
      *
-     * @param bundle               the bundle to fill.
-     * @param invocationId         the invocation ID.
-     * @param invocationClass      the invocation class.
-     * @param routineConfiguration the routine configuration.
-     * @param serviceConfiguration the service configuration.
+     * @param bundle                  the bundle to fill.
+     * @param invocationId            the invocation ID.
+     * @param invocationClass         the invocation class.
+     * @param invocationConfiguration the invocation configuration.
+     * @param serviceConfiguration    the service configuration.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
-        putInvocation(bundle, true, invocationId, invocationClass, routineConfiguration,
+        putInvocation(bundle, true, invocationId, invocationClass, invocationConfiguration,
                       serviceConfiguration);
     }
 
@@ -257,13 +257,14 @@ public class RoutineService extends Service {
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
-        final Object[] invocationArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+        final Object[] invocationArgs =
+                invocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         final int length = invocationArgs.length;
         final ParcelableValue[] argValues = new ParcelableValue[length];
 
@@ -273,11 +274,11 @@ public class RoutineService extends Service {
         }
 
         bundle.putParcelableArray(KEY_INVOCATION_ARGS, argValues);
-        bundle.putInt(KEY_CORE_INVOCATIONS,
-                      routineConfiguration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
+        bundle.putInt(KEY_CORE_INVOCATIONS, invocationConfiguration.getCoreInvocationsOr(
+                InvocationConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
-                      routineConfiguration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT));
-        final TimeDuration availTimeout = routineConfiguration.getAvailInvocationTimeoutOr(null);
+                      invocationConfiguration.getMaxInvocationsOr(InvocationConfiguration.DEFAULT));
+        final TimeDuration availTimeout = invocationConfiguration.getAvailInstanceTimeoutOr(null);
 
         if (availTimeout != null) {
 
@@ -285,9 +286,10 @@ public class RoutineService extends Service {
             bundle.putSerializable(KEY_AVAILABLE_UNIT, availTimeout.unit);
         }
 
-        bundle.putSerializable(KEY_INPUT_ORDER, routineConfiguration.getInputOrderTypeOr(null));
-        bundle.putSerializable(KEY_OUTPUT_ORDER, routineConfiguration.getOutputOrderTypeOr(null));
-        bundle.putSerializable(KEY_LOG_LEVEL, routineConfiguration.getLogLevelOr(null));
+        bundle.putSerializable(KEY_INPUT_ORDER, invocationConfiguration.getInputOrderTypeOr(null));
+        bundle.putSerializable(KEY_OUTPUT_ORDER,
+                               invocationConfiguration.getOutputOrderTypeOr(null));
+        bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
         bundle.putSerializable(KEY_RUNNER_CLASS, serviceConfiguration.getRunnerClassOr(null));
         bundle.putSerializable(KEY_LOG_CLASS, serviceConfiguration.getLogClassOr(null));
     }
@@ -452,8 +454,8 @@ public class RoutineService extends Service {
 
             if (routineState == null) {
 
-                final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                        RoutineConfiguration.builder();
+                final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                        InvocationConfiguration.builder();
 
                 if (runnerClass != null) {
 
@@ -483,7 +485,7 @@ public class RoutineService extends Service {
 
                 builder.withCoreInvocations(coreInvocations)
                        .withMaxInvocations(maxInvocations)
-                       .withAvailInvocationTimeout(availTimeout)
+                       .withAvailInstanceTimeout(availTimeout)
                        .withInputOrder(inputOrderType)
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
@@ -519,12 +521,12 @@ public class RoutineService extends Service {
          * Constructor.
          *
          * @param context        the routine context.
-         * @param configuration  the routine configuration.
+         * @param configuration  the invocation configuration.
          * @param factory        the invocation factory.
          * @param invocationArgs the invocation constructor arguments.
          */
         private AndroidRoutine(@Nonnull final Context context,
-                @Nonnull final RoutineConfiguration configuration,
+                @Nonnull final InvocationConfiguration configuration,
                 @Nonnull final ContextInvocationFactory<Object, Object> factory,
                 @Nonnull final Object[] invocationArgs) {
 

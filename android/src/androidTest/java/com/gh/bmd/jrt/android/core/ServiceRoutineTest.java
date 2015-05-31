@@ -29,9 +29,9 @@ import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -143,7 +143,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
             new DefaultServiceRoutineBuilder<Object, Object>(getActivity(),
                                                              classToken).setConfiguration(
-                    (RoutineConfiguration) null);
+                    (InvocationConfiguration) null);
 
             fail();
 
@@ -170,7 +170,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final ClassToken<PassingDecorator<String>> token =
                 ClassToken.tokenOf(new PassingDecorator<String>());
         final Routine<String, String> routine = JRoutine.onService(getActivity(), token)
-                                                        .withRoutine()
+                                                        .withInvocation()
                                                         .withSyncRunner(Runners.queuedRunner())
                                                         .withInputOrder(OrderType.NONE)
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -189,7 +189,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                        .withRoutine()
+                        .withInvocation()
                         .withSyncRunner(Runners.queuedRunner())
                         .withInputOrder(OrderType.NONE)
                         .withLogLevel(LogLevel.DEBUG)
@@ -215,7 +215,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final ClassToken<StringProcedureInvocation> token =
                 ClassToken.tokenOf(StringProcedureInvocation.class);
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withOutputOrder(OrderType.NONE)
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -241,7 +241,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final ClassToken<StringProcedureInvocation> token =
                 ClassToken.tokenOf(StringProcedureInvocation.class);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withInputOrder(OrderType.PASS_ORDER)
                                                          .withOutputOrder(OrderType.PASS_ORDER)
                                                          .set()
@@ -263,11 +263,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final ClassToken<StringProcedureInvocation> token =
                 ClassToken.tokenOf(StringProcedureInvocation.class);
         final Routine<String, String> routine4 = JRoutine.onService(getActivity(), token)
-                                                         .withRoutine()
+                                                         .withInvocation()
                                                          .withCoreInvocations(0)
                                                          .withMaxInvocations(2)
-                                                         .withAvailInvocationTimeout(1, SECONDS)
-                                                         .withAvailInvocationTimeout(
+                                                         .withAvailInstanceTimeout(1, SECONDS)
+                                                         .withAvailInstanceTimeout(
                                                                  TimeDuration.millis(200))
                                                          .set()
                                                          .buildRoutine();
@@ -298,7 +298,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final ClassToken<PassingContextInvocation<String>> classToken =
                 new ClassToken<PassingContextInvocation<String>>() {};
         assertThat(JRoutine.onService(getActivity(), classToken)
-                           .withRoutine()
+                           .withInvocation()
                            .withReadTimeout(millis(10))
                            .withReadTimeoutAction(TimeoutActionType.EXIT)
                            .set()
@@ -317,7 +317,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         try {
 
             JRoutine.onService(getActivity(), classToken)
-                    .withRoutine()
+                    .withInvocation()
                     .withReadTimeout(millis(10))
                     .withReadTimeoutAction(TimeoutActionType.ABORT)
                     .set()
@@ -342,7 +342,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         try {
 
             JRoutine.onService(getActivity(), classToken)
-                    .withRoutine()
+                    .withInvocation()
                     .withReadTimeout(millis(10))
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -383,7 +383,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final CountLog countLog = new CountLog();
         JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                .withRoutine()
+                .withInvocation()
                 .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))
                 .withOutputMaxSize(3)

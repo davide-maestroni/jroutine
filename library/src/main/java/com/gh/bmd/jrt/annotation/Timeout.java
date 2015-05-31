@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.annotation;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -50,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide-maestroni on 9/21/14.
  *
- * @see com.gh.bmd.jrt.builder.RoutineConfiguration
+ * @see InvocationConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

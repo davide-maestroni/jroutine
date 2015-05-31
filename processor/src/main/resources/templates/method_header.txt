@@ -28,10 +28,10 @@
 
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration configuration) {
 
         return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}())
-                                           .withRoutine()
+                                           .withInvocation()
                                            .with(configuration)
                                            ${routineBuilderOptions}
                                            .withFactoryArgs(mWrapped, getMutex(${shareGroup}))

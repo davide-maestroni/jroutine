@@ -19,9 +19,9 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -51,7 +51,7 @@ import static com.gh.bmd.jrt.common.Reflection.findMethod;
  * Created by davide-maestroni on 9/21/14.
  */
 class DefaultClassRoutineBuilder
-        implements ClassRoutineBuilder, RoutineConfiguration.Configurable<ClassRoutineBuilder>,
+        implements ClassRoutineBuilder, InvocationConfiguration.Configurable<ClassRoutineBuilder>,
         ProxyConfiguration.Configurable<ClassRoutineBuilder> {
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
@@ -63,9 +63,10 @@ class DefaultClassRoutineBuilder
 
     private final WeakReference<?> mTargetReference;
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -117,7 +118,7 @@ class DefaultClassRoutineBuilder
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(mRoutineConfiguration, mProxyConfiguration, method);
+        return method(mInvocationConfiguration, mProxyConfiguration, method);
     }
 
     @Nonnull
@@ -128,21 +129,23 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withRoutine() {
+    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> withInvocation() {
 
-        return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
+        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this,
+                                                                        mInvocationConfiguration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+    public ClassRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 
@@ -166,6 +169,17 @@ class DefaultClassRoutineBuilder
     }
 
     /**
+     * Returns the internal invocation configuration.
+     *
+     * @return the configuration.
+     */
+    @Nonnull
+    protected InvocationConfiguration getInvocationConfiguration() {
+
+        return mInvocationConfiguration;
+    }
+
+    /**
      * Returns the internal share configuration.
      *
      * @return the configuration.
@@ -179,7 +193,7 @@ class DefaultClassRoutineBuilder
     /**
      * Gets or creates the routine.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      * @param shareGroup    the share group name.
      * @param method        the method to wrap.
      * @param inputMode     the input transfer mode.
@@ -189,7 +203,7 @@ class DefaultClassRoutineBuilder
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
+            @Nonnull final InvocationConfiguration configuration, @Nullable final String shareGroup,
             @Nonnull final Method method, @Nullable final InputMode inputMode,
             @Nullable final OutputMode outputMode) {
 
@@ -230,7 +244,7 @@ class DefaultClassRoutineBuilder
                     mutex = null;
                 }
 
-                final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+                final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                         configuration.builderFrom();
                 final InvocationFactory<Object, Object> factory = sMethodInvocationFactory;
                 routine = new DefaultRoutine<Object, Object>(
@@ -241,17 +255,6 @@ class DefaultClassRoutineBuilder
 
             return (Routine<INPUT, OUTPUT>) routine;
         }
-    }
-
-    /**
-     * Returns the internal routine configuration.
-     *
-     * @return the configuration.
-     */
-    @Nonnull
-    protected RoutineConfiguration getRoutineConfiguration() {
-
-        return mRoutineConfiguration;
     }
 
     /**
@@ -279,20 +282,20 @@ class DefaultClassRoutineBuilder
     /**
      * Returns a routine used to call the specified method.
      *
-     * @param routineConfiguration the routine configuration.
-     * @param proxyConfiguration   the share configuration.
-     * @param targetMethod         the target method.
+     * @param invocationConfiguration the invocation configuration.
+     * @param proxyConfiguration      the share configuration.
+     * @param targetMethod            the target method.
      * @return the routine.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
-            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ProxyConfiguration proxyConfiguration,
             @Nonnull final Method targetMethod) {
 
         String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
-        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                routineConfiguration.builderFrom();
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                invocationConfiguration.builderFrom();
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {
@@ -300,7 +303,7 @@ class DefaultClassRoutineBuilder
             methodShareGroup = shareGroupAnnotation.value();
         }
 
-        warn(routineConfiguration);
+        warn(invocationConfiguration);
         builder.withInputOrder(OrderType.PASS_ORDER)
                .withInputMaxSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
@@ -326,9 +329,9 @@ class DefaultClassRoutineBuilder
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
-    protected void warn(@Nonnull final RoutineConfiguration configuration) {
+    protected void warn(@Nonnull final InvocationConfiguration configuration) {
 
         Logger logger = null;
         final Object[] args = configuration.getFactoryArgsOr(null);
@@ -352,9 +355,9 @@ class DefaultClassRoutineBuilder
             logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
-        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
+        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
-        if (inputSize != RoutineConfiguration.DEFAULT) {
+        if (inputSize != InvocationConfiguration.DEFAULT) {
 
             if (logger == null) {
 
@@ -388,9 +391,9 @@ class DefaultClassRoutineBuilder
             logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
 
-        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
+        final int outputSize = configuration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
-        if (outputSize != RoutineConfiguration.DEFAULT) {
+        if (outputSize != InvocationConfiguration.DEFAULT) {
 
             if (logger == null) {
 
@@ -481,7 +484,7 @@ class DefaultClassRoutineBuilder
      */
     private static final class RoutineInfo {
 
-        private final RoutineConfiguration mConfiguration;
+        private final InvocationConfiguration mConfiguration;
 
         private final InputMode mInputMode;
 
@@ -494,13 +497,13 @@ class DefaultClassRoutineBuilder
         /**
          * Constructor.
          *
-         * @param configuration the routine configuration.
+         * @param configuration the invocation configuration.
          * @param method        the method to wrap.
          * @param shareGroup    the group name.
          * @param inputMode     the input transfer mode.
          * @param outputMode    the output transfer mode.
          */
-        public RoutineInfo(@Nonnull final RoutineConfiguration configuration,
+        public RoutineInfo(@Nonnull final InvocationConfiguration configuration,
                 @Nonnull final Method method, @Nonnull final String shareGroup,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 

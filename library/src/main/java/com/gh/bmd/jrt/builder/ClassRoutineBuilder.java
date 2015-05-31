@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.reflect.Method;
@@ -91,8 +91,8 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
     /**
      * Note that all the options related to the output and input channels will be ignored.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends ClassRoutineBuilder> withRoutine();
+    Builder<? extends ClassRoutineBuilder> withInvocation();
 }

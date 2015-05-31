@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.channel.Channels.Selectable;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -42,7 +42,7 @@ public class ChannelsTest {
     public void testSelect() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().withRoutine().withOutputOrder(OrderType.PASS_ORDER).set();
+                JRoutine.transport().withInvocation().withOutputOrder(OrderType.PASS_ORDER).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<String> channel2 = builder.buildChannel();
         final TransportChannel<String> channel3 = builder.buildChannel();

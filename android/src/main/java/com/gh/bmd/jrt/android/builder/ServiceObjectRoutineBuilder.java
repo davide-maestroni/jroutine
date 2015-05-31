@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 
 import javax.annotation.Nonnull;
 
@@ -40,13 +40,13 @@ public interface ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy();
+    InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withInvocation();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withRoutine();
+    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy();
 
     /**
      * {@inheritDoc}

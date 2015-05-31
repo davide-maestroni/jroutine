@@ -33,10 +33,10 @@ import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineBuilders.MethodInfo;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
@@ -72,7 +72,7 @@ import static com.gh.bmd.jrt.common.Reflection.findMethod;
 class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         LoaderConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
-        RoutineConfiguration.Configurable<LoaderObjectRoutineBuilder> {
+        InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
@@ -83,11 +83,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     private final Class<?> mTargetClass;
 
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
+
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
-
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -177,10 +178,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static RoutineConfiguration configurationWithTimeout(
-            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
+    private static InvocationConfiguration configurationWithTimeout(
+            @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
 
-        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 configuration.builderFrom();
         final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
@@ -279,19 +280,19 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     "no annotated method with name '" + name + "' has been found");
         }
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
+        final InvocationConfiguration configuration = mInvocationConfiguration;
         warn(configuration);
         final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] invocationArgs = new Object[]{targetClass, args, shareGroup, name};
         final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
                 new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod);
-        final RoutineConfiguration routineConfiguration =
+        final InvocationConfiguration invocationConfiguration =
                 configurationWithTimeout(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
-        return getBuilder(mContext, factory).withRoutine()
-                                            .with(routineConfiguration)
+        return getBuilder(mContext, factory).withInvocation()
+                                            .with(invocationConfiguration)
                                             .withFactoryArgs(invocationArgs)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
@@ -305,19 +306,19 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @SuppressWarnings("unchecked")
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
+        final InvocationConfiguration configuration = mInvocationConfiguration;
         warn(configuration);
         final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
         final Object[] invocationArgs = new Object[]{mTargetClass, args, shareGroup, method};
         final MethodInvocationFactory<INPUT, OUTPUT> factory =
                 new MethodInvocationFactory<INPUT, OUTPUT>(method);
-        final RoutineConfiguration routineConfiguration =
+        final InvocationConfiguration invocationConfiguration =
                 configurationWithTimeout(configuration, method);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, method);
-        return getBuilder(mContext, factory).withRoutine()
-                                            .with(routineConfiguration)
+        return getBuilder(mContext, factory).withInvocation()
+                                            .with(invocationConfiguration)
                                             .withFactoryArgs(invocationArgs)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
@@ -343,7 +344,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     "the specified class is not an interface: " + itf.getName());
         }
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
+        final InvocationConfiguration configuration = mInvocationConfiguration;
         warn(configuration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this));
@@ -357,6 +358,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
+    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withInvocation() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
+    }
+
+    @Nonnull
     public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxy() {
 
         final ProxyConfiguration config = mProxyConfiguration;
@@ -364,23 +372,16 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withRoutine() {
-
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
-    }
-
-    @Nonnull
     @SuppressWarnings("ConstantConditions")
     public LoaderObjectRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
             throw new NullPointerException("the configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 
@@ -422,9 +423,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
-    private void warn(@Nonnull final RoutineConfiguration configuration) {
+    private void warn(@Nonnull final InvocationConfiguration configuration) {
 
         Logger logger = null;
         final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
@@ -783,11 +784,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final WeakReference<Object> mContext;
 
+        private final InvocationConfiguration mInvocationConfiguration;
+
         private final LoaderConfiguration mLoaderConfiguration;
 
         private final ProxyConfiguration mProxyConfiguration;
-
-        private final RoutineConfiguration mRoutineConfiguration;
 
         private final Class<?> mTargetClass;
 
@@ -800,10 +801,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
-            mRoutineConfiguration = builder.mRoutineConfiguration;
+            mInvocationConfiguration = builder.mInvocationConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mLoaderConfiguration = builder.mLoaderConfiguration;
-            mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+            mArgs = mInvocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -823,12 +824,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
             final LoaderRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, sProxyFactory);
-            final RoutineConfiguration routineConfiguration =
-                    configurationWithTimeout(mRoutineConfiguration, method);
+            final InvocationConfiguration invocationConfiguration =
+                    configurationWithTimeout(mInvocationConfiguration, method);
             final LoaderConfiguration loaderConfiguration =
                     configurationWithAnnotations(mLoaderConfiguration, method);
-            final Routine<Object, Object> routine = routineBuilder.withRoutine()
-                                                                  .with(routineConfiguration)
+            final Routine<Object, Object> routine = routineBuilder.withInvocation()
+                                                                  .with(invocationConfiguration)
                                                                   .withFactoryArgs(invocationArgs)
                                                                   .withInputOrder(inputOrderType)
                                                                   .withOutputOrder(outputOrderType)

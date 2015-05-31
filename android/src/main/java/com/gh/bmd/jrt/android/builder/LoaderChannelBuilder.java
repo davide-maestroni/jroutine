@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 
 import javax.annotation.Nonnull;
@@ -67,18 +67,18 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
     void purge();
 
     /**
+     * Note that only the options related to logs will be employed.
+     *
+     * @return the invocation configuration builder.
+     */
+    @Nonnull
+    InvocationConfiguration.Builder<? extends LoaderChannelBuilder> withInvocation();
+
+    /**
      * Note that the clash resolution type will be ignored.
      *
      * @return the loader configuration builder.
      */
     @Nonnull
     LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader();
-
-    /**
-     * Note that only the options related to logs will be employed.
-     *
-     * @return the routine configuration builder.
-     */
-    @Nonnull
-    RoutineConfiguration.Builder<? extends LoaderChannelBuilder> withRoutine();
 }

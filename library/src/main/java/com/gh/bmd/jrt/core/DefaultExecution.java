@@ -105,14 +105,15 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         synchronized (mMutex) {
 
             final InputIterator<INPUT> inputIterator = mInputIterator;
+            final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+            Invocation<INPUT, OUTPUT> invocation = null;
 
             try {
 
                 inputIterator.onConsumeStart();
                 mLogger.dbg("running execution");
                 final boolean isComplete;
-                final Invocation<INPUT, OUTPUT> invocation;
 
                 try {
 
@@ -130,7 +131,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 if (isComplete) {
 
-                    final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
                     invocation.onResult(resultChannel);
 
                     try {
@@ -151,7 +151,19 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             } catch (final Throwable t) {
 
-                resultChannel.abortImmediately(t);
+                if (invocation != null) {
+
+                    resultChannel.abortImmediately(t);
+
+                } else {
+
+                    if (mInvocation != null) {
+
+                        manager.discard(mInvocation);
+                    }
+
+                    resultChannel.close(t);
+                }
             }
         }
     }
@@ -246,9 +258,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
             synchronized (mMutex) {
 
                 final InputIterator<INPUT> inputIterator = mInputIterator;
-                final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
-                final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-                Invocation<INPUT, OUTPUT> invocation = null;
 
                 if (!inputIterator.isAborting()) {
 
@@ -256,12 +265,14 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                     return;
                 }
 
+                final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
+                final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
                 final Throwable exception = inputIterator.getAbortException();
                 mLogger.dbg(exception, "aborting invocation");
 
                 try {
 
-                    invocation = initInvocation();
+                    final Invocation<INPUT, OUTPUT> invocation = initInvocation();
                     invocation.onAbort(exception);
                     invocation.onTerminate();
                     manager.recycle(invocation);
@@ -269,9 +280,9 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 } catch (final Throwable t) {
 
-                    if (invocation != null) {
+                    if (mInvocation != null) {
 
-                        manager.discard(invocation);
+                        manager.discard(mInvocation);
                     }
 
                     resultChannel.close(t);

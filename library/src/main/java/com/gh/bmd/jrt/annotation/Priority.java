@@ -20,7 +20,32 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * TODO
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * the framework as well.
+ * <p/>
+ * Through this annotation it is possible to indicate the priority of the specific method
+ * invocation.
+ * <p/>
+ * Finally, be aware that a method might need to be made accessible in order to be called. That
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * be raised based on the specific policy implemented.
+ * <p/>
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.gh.bmd.jrt.annotation.Priority *;
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 31/05/15.
  */

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * the framework as well.
  * <p/>
  * Through this annotation it is possible to indicate the timeout for a readable result to become
- * available, and the action to be taken when it elapses.
+ * available.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might

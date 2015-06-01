@@ -1315,6 +1315,7 @@ public final class InvocationConfiguration {
             mArgs = configuration.mFactoryArgs;
             mSyncRunner = configuration.mSyncRunner;
             mAsyncRunner = configuration.mAsyncRunner;
+            mPriority = configuration.mPriority;
             mMaxInvocations = configuration.mMaxInvocations;
             mCoreInvocations = configuration.mCoreInvocations;
             mAvailableTimeout = configuration.mAvailableTimeout;

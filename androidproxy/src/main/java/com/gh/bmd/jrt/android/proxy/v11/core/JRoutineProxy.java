@@ -46,6 +46,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.gh.bmd.jrt.annotation.Input
  * @see com.gh.bmd.jrt.annotation.Inputs
  * @see com.gh.bmd.jrt.annotation.Output
+ * @see com.gh.bmd.jrt.annotation.Priority
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction

@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -296,6 +297,12 @@ class DefaultClassRoutineBuilder
         String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 invocationConfiguration.builderFrom();
+        warn(invocationConfiguration);
+        builder.withInputOrder(OrderType.PASS_ORDER)
+               .withInputMaxSize(Integer.MAX_VALUE)
+               .withInputTimeout(TimeDuration.ZERO)
+               .withOutputMaxSize(Integer.MAX_VALUE)
+               .withOutputTimeout(TimeDuration.ZERO);
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {
@@ -303,12 +310,13 @@ class DefaultClassRoutineBuilder
             methodShareGroup = shareGroupAnnotation.value();
         }
 
-        warn(invocationConfiguration);
-        builder.withInputOrder(OrderType.PASS_ORDER)
-               .withInputMaxSize(Integer.MAX_VALUE)
-               .withInputTimeout(TimeDuration.ZERO)
-               .withOutputMaxSize(Integer.MAX_VALUE)
-               .withOutputTimeout(TimeDuration.ZERO);
+        final Priority priorityAnnotation = targetMethod.getAnnotation(Priority.class);
+
+        if (priorityAnnotation != null) {
+
+            builder.withPriority(priorityAnnotation.value());
+        }
+
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {

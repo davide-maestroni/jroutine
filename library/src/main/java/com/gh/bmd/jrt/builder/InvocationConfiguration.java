@@ -45,6 +45,13 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * The default asynchronous runner is shared among all the routines, but a custom one can be set
  * through the builder.
  * <p/>
+ * A specific priority can be set. Each invocation will age each time an higher priority one takes
+ * the precedence, so that older invocations slowly increases their priority. Such mechanism has
+ * been implemented to avoid starvation of low priority invocations. Hence, when assigning
+ * priority values, it is important to keep in mind that the difference between two priorities
+ * corresponds to the maximum age the lower priority invocation will have, before getting precedence
+ * over the higher priority one.
+ * <p/>
  * Additionally, a recycling mechanism is provided so that, when an invocation successfully
  * completes, the instance is retained for future executions. Moreover, the maximum running
  * invocation instances at one time can be limited by calling the specific builder method. When the
@@ -105,6 +112,8 @@ public final class InvocationConfiguration {
 
     private final TimeDuration mOutputTimeout;
 
+    private final int mPriority;
+
     private final TimeDuration mReadTimeout;
 
     private final Runner mSyncRunner;
@@ -119,6 +128,7 @@ public final class InvocationConfiguration {
      * @param factoryArgs      the invocation factory arguments.
      * @param syncRunner       the runner used for synchronous invocations.
      * @param asyncRunner      the runner used for asynchronous invocations.
+     * @param priority         the invocation priority.
      * @param maxInvocations   the maximum number of parallel running invocations. Must be positive.
      * @param coreInvocations  the maximum number of retained invocation instances. Must be 0 or a
      *                         positive number.
@@ -140,7 +150,7 @@ public final class InvocationConfiguration {
      */
     private InvocationConfiguration(@Nullable final Object[] factoryArgs,
             @Nullable final Runner syncRunner, @Nullable final Runner asyncRunner,
-            final int maxInvocations, final int coreInvocations,
+            final int priority, final int maxInvocations, final int coreInvocations,
             @Nullable final TimeDuration availableTimeout, @Nullable final TimeDuration readTimeout,
             @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
@@ -151,6 +161,7 @@ public final class InvocationConfiguration {
         mFactoryArgs = factoryArgs;
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
+        mPriority = priority;
         mMaxInvocations = maxInvocations;
         mCoreInvocations = coreInvocations;
         mAvailableTimeout = availableTimeout;
@@ -362,6 +373,18 @@ public final class InvocationConfiguration {
     }
 
     /**
+     * Returns the invocation priority (DEFAULT by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the priority.
+     */
+    public int getPriorityOr(final int valueIfNotSet) {
+
+        final int priority = mPriority;
+        return (priority != DEFAULT) ? priority : valueIfNotSet;
+    }
+
+    /**
      * Returns the action to be taken if the timeout elapses before a readable result is available
      * (null by default).
      *
@@ -416,6 +439,7 @@ public final class InvocationConfiguration {
         result = 31 * result + mOutputMaxSize;
         result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
+        result = 31 * result + mPriority;
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
@@ -456,6 +480,11 @@ public final class InvocationConfiguration {
         }
 
         if (mOutputMaxSize != that.mOutputMaxSize) {
+
+            return false;
+        }
+
+        if (mPriority != that.mPriority) {
 
             return false;
         }
@@ -540,6 +569,7 @@ public final class InvocationConfiguration {
                 ", mOutputMaxSize=" + mOutputMaxSize +
                 ", mOutputOrderType=" + mOutputOrderType +
                 ", mOutputTimeout=" + mOutputTimeout +
+                ", mPriority=" + mPriority +
                 ", mReadTimeout=" + mReadTimeout +
                 ", mSyncRunner=" + mSyncRunner +
                 ", mTimeoutActionType=" + mTimeoutActionType +
@@ -603,6 +633,39 @@ public final class InvocationConfiguration {
     }
 
     /**
+     * Interface exposing constants which can be used as a common set of priorities.<br/>
+     * Note that, since the priority value can be any in an integer range, it is always possible to
+     * customize the values so to create a personalized set.
+     */
+    public interface AgingPriority {
+
+        /**
+         * High priority.
+         */
+        int HIGH_PRIORITY = 10;
+
+        /**
+         * Highest priority.
+         */
+        int HIGHEST_PRIORITY = HIGH_PRIORITY << 1;
+
+        /**
+         * Low priority.
+         */
+        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
+
+        /**
+         * Lowest priority.
+         */
+        int LOW_PRIORITY = -HIGH_PRIORITY;
+
+        /**
+         * Normal priority.
+         */
+        int NORMAL_PRIORITY = 0;
+    }
+
+    /**
      * Interface defining a configurable object.
      *
      * @param <TYPE> the configurable object type.
@@ -617,6 +680,40 @@ public final class InvocationConfiguration {
          */
         @Nonnull
         TYPE setConfiguration(@Nonnull InvocationConfiguration configuration);
+    }
+
+    /**
+     * Interface exposing constants which can be used as a set of priorities ignoring the aging of
+     * executions.<br/>
+     * Note that, since the priority value can be any in an integer range, it is always possible to
+     * customize the values so to create a personalized set.
+     */
+    public interface NotAgingPriority {
+
+        /**
+         * Highest priority.
+         */
+        int HIGHEST_PRIORITY = Integer.MAX_VALUE;
+
+        /**
+         * High priority.
+         */
+        int HIGH_PRIORITY = HIGHEST_PRIORITY >> 1;
+
+        /**
+         * Low priority.
+         */
+        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
+
+        /**
+         * Lowest priority.
+         */
+        int LOW_PRIORITY = -HIGH_PRIORITY;
+
+        /**
+         * Normal priority.
+         */
+        int NORMAL_PRIORITY = 0;
     }
 
     /**
@@ -654,6 +751,8 @@ public final class InvocationConfiguration {
 
         private TimeDuration mOutputTimeout;
 
+        private int mPriority;
+
         private TimeDuration mReadTimeout;
 
         private Runner mSyncRunner;
@@ -674,6 +773,7 @@ public final class InvocationConfiguration {
             }
 
             mConfigurable = configurable;
+            mPriority = DEFAULT;
             mMaxInvocations = DEFAULT;
             mCoreInvocations = DEFAULT;
             mInputMaxSize = DEFAULT;
@@ -1000,6 +1100,21 @@ public final class InvocationConfiguration {
         }
 
         /**
+         * Sets the invocation priority. A {@link InvocationConfiguration#DEFAULT} value means that
+         * the invocations will be executed with no specific priority.
+         *
+         * @param priority the priority.
+         * @return this builder.
+         * @see com.gh.bmd.jrt.runner.PriorityRunner
+         */
+        @Nonnull
+        public Builder<TYPE> withPriority(final int priority) {
+
+            mPriority = priority;
+            return this;
+        }
+
+        /**
          * Sets the timeout for an invocation instance to produce a readable result.
          *
          * @param timeout  the timeout.
@@ -1125,6 +1240,13 @@ public final class InvocationConfiguration {
                 withAsyncRunner(asyncRunner);
             }
 
+            final int priority = configuration.mPriority;
+
+            if (priority != DEFAULT) {
+
+                withPriority(priority);
+            }
+
             final int maxInvocations = configuration.mMaxInvocations;
 
             if (maxInvocations != DEFAULT) {
@@ -1181,11 +1303,11 @@ public final class InvocationConfiguration {
         @Nonnull
         private InvocationConfiguration buildConfiguration() {
 
-            return new InvocationConfiguration(mArgs, mSyncRunner, mAsyncRunner, mMaxInvocations,
-                                               mCoreInvocations, mAvailableTimeout, mReadTimeout,
-                                               mTimeoutActionType, mInputOrderType, mInputMaxSize,
-                                               mInputTimeout, mOutputOrderType, mOutputMaxSize,
-                                               mOutputTimeout, mLog, mLogLevel);
+            return new InvocationConfiguration(mArgs, mSyncRunner, mAsyncRunner, mPriority,
+                                               mMaxInvocations, mCoreInvocations, mAvailableTimeout,
+                                               mReadTimeout, mTimeoutActionType, mInputOrderType,
+                                               mInputMaxSize, mInputTimeout, mOutputOrderType,
+                                               mOutputMaxSize, mOutputTimeout, mLog, mLogLevel);
         }
 
         private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {

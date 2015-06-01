@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.Input
  * @see com.gh.bmd.jrt.annotation.Inputs
  * @see com.gh.bmd.jrt.annotation.Output
+ * @see com.gh.bmd.jrt.annotation.Priority
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
@@ -39,9 +40,9 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and
-     * {@link com.gh.bmd.jrt.annotation.ShareGroup} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
@@ -64,9 +65,9 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and
-     * {@link com.gh.bmd.jrt.annotation.ShareGroup} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * In case the wrapped object does not implement the specified interface, the binding annotation

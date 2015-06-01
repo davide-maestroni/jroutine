@@ -21,6 +21,7 @@ import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -108,11 +109,18 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static InvocationConfiguration configurationWithTimeout(
+    private static InvocationConfiguration configurationWithAnnotation(
             @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
+        final Priority priorityAnnotation = method.getAnnotation(Priority.class);
+
+        if (priorityAnnotation != null) {
+
+            builder.withPriority(priorityAnnotation.value());
+        }
+
         final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
@@ -288,7 +296,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
                        .withInvocation()
-                       .with(configurationWithTimeout(invocationConfiguration, targetMethod))
+                       .with(configurationWithAnnotation(invocationConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
                        .withInputOrder(OrderType.PASS_ORDER)
                        .set()
@@ -319,7 +327,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
                        .withInvocation()
-                       .with(configurationWithTimeout(invocationConfiguration, targetMethod))
+                       .with(configurationWithAnnotation(invocationConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
                                         toNames(parameterTypes))
                        .withInputOrder(OrderType.PASS_ORDER)
@@ -394,17 +402,17 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy() {
-
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
-    }
-
-    @Nonnull
     public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withInvocation() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
+    }
+
+    @Nonnull
+    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy() {
+
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
@@ -737,7 +745,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
             final Routine<Object, Object> routine = JRoutine.onService(mContext, PROXY_TOKEN)
                                                             .withInvocation()
-                                                            .with(configurationWithTimeout(
+                                                            .with(configurationWithAnnotation(
                                                                     mInvocationConfiguration,
                                                                     method))
                                                             .withFactoryArgs(factoryArgs)

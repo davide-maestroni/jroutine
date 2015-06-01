@@ -41,6 +41,7 @@ public class InvocationConfigurationTest {
     public void testArgsEquals() {
 
         final InvocationConfiguration configuration = builder().withFactoryArgs((Object[]) null)
+                                                               .withPriority(11)
                                                                .withAvailInstanceTimeout(
                                                                        TimeDuration.millis(100))
                                                                .withCoreInvocations(27)
@@ -60,6 +61,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
+                         .withPriority(11)
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -78,6 +80,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
+                         .withPriority(11)
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -98,6 +101,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
+                         .withPriority(11)
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -139,6 +143,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
+                         .withPriority(11)
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
@@ -422,6 +427,23 @@ public class InvocationConfigurationTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testPriorityEquals() {
+
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
+                         .withPriority(17)
+                         .withCoreInvocations(27)
+                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withAsyncRunner(Runners.queuedRunner())
+                         .withLog(new NullLog())
+                         .withOutputMaxSize(100)
+                         .set();
+        assertThat(configuration).isNotEqualTo(builder().withPriority(3).set());
+        assertThat(configuration.builderFrom().withPriority(17).set()).isNotEqualTo(
+                builder().withPriority(17).set());
     }
 
     @Test

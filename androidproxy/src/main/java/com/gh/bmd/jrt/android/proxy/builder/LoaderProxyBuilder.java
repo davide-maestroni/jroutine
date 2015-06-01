@@ -37,6 +37,7 @@ public interface LoaderProxyBuilder<TYPE>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
      * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
      * {@link com.gh.bmd.jrt.annotation.Timeout} and
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},

@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -139,6 +140,36 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
+    private static InvocationConfiguration configurationWithAnnotation(
+            @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                configuration.builderFrom();
+        final Priority priorityAnnotation = method.getAnnotation(Priority.class);
+
+        if (priorityAnnotation != null) {
+
+            builder.withPriority(priorityAnnotation.value());
+        }
+
+        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+        }
+
+        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.withReadTimeoutAction(actionAnnotation.value());
+        }
+
+        return builder.set();
+    }
+
+    @Nonnull
     private static LoaderConfiguration configurationWithAnnotations(
             @Nonnull final LoaderConfiguration configuration, @Nonnull final Method method) {
 
@@ -172,29 +203,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         if (cacheAnnotation != null) {
 
             builder.withCacheStrategy(cacheAnnotation.value());
-        }
-
-        return builder.set();
-    }
-
-    @Nonnull
-    private static InvocationConfiguration configurationWithTimeout(
-            @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
-
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                configuration.builderFrom();
-        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
-
-        if (timeoutAnnotation != null) {
-
-            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
-        }
-
-        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
-
-        if (actionAnnotation != null) {
-
-            builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
         return builder.set();
@@ -288,7 +296,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
                 new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod);
         final InvocationConfiguration invocationConfiguration =
-                configurationWithTimeout(configuration, targetMethod);
+                configurationWithAnnotation(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
         return getBuilder(mContext, factory).withInvocation()
@@ -314,7 +322,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final MethodInvocationFactory<INPUT, OUTPUT> factory =
                 new MethodInvocationFactory<INPUT, OUTPUT>(method);
         final InvocationConfiguration invocationConfiguration =
-                configurationWithTimeout(configuration, method);
+                configurationWithAnnotation(configuration, method);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, method);
         return getBuilder(mContext, factory).withInvocation()
@@ -825,7 +833,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final LoaderRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, sProxyFactory);
             final InvocationConfiguration invocationConfiguration =
-                    configurationWithTimeout(mInvocationConfiguration, method);
+                    configurationWithAnnotation(mInvocationConfiguration, method);
             final LoaderConfiguration loaderConfiguration =
                     configurationWithAnnotations(mLoaderConfiguration, method);
             final Routine<Object, Object> routine = routineBuilder.withInvocation()

@@ -106,7 +106,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         mConfiguration = configuration;
         mSyncRunner = configuration.getSyncRunnerOr(Runners.queuedRunner());
-        mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
+
+        final int priority = configuration.getPriorityOr(InvocationConfiguration.DEFAULT);
+
+        if (priority != InvocationConfiguration.DEFAULT) {
+
+            final Runner asyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
+            mAsyncRunner = Runners.priorityRunner(asyncRunner).getRunner(priority);
+
+        } else {
+
+            mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
+        }
+
         mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInvocationsOr(DEFAULT_CORE_INVOCATIONS);
         mAvailTimeout = configuration.getAvailInstanceTimeoutOr(DEFAULT_AVAIL_TIMEOUT);

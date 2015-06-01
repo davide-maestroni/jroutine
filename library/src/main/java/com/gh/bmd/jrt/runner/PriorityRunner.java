@@ -33,8 +33,8 @@ import javax.annotation.Nonnull;
  * older executions slowly increases their priority. Such mechanism has been implemented to avoid
  * starvation of low priority executions. Hence, when assigning priority to different runners, it is
  * important to keep in mind that the difference between two priorities corresponds to the maximum
- * age the lower priority execution will have, before getting the precedence over the higher
- * priority one.
+ * age the lower priority execution will have, before getting precedence over the higher priority
+ * one.
  * <p/>
  * Note that the queue is not share between different instances of this class.
  * <p/>
@@ -90,6 +90,11 @@ public class PriorityRunner {
     @Nonnull
     static PriorityRunner getInstance(@Nonnull final Runner wrapped) {
 
+        if (wrapped instanceof PriorityRunner) {
+
+            return (PriorityRunner) wrapped;
+        }
+
         synchronized (sRunnerMap) {
 
             final WeakIdentityHashMap<Runner, PriorityRunner> runnerMap = sRunnerMap;
@@ -135,73 +140,6 @@ public class PriorityRunner {
             runnerMap.put(runner, null);
             return runner;
         }
-    }
-
-    /**
-     * Interface exposing constants which can be used as a common set of priorities.<br/>
-     * Note that, since the priority value can be any in an integer range, it is always possible to
-     * customize the values so to create a personalized set.
-     */
-    public interface AgingPriority {
-
-        /**
-         * High priority.
-         */
-        int HIGH_PRIORITY = 10;
-
-        /**
-         * Highest priority.
-         */
-        int HIGHEST_PRIORITY = HIGH_PRIORITY << 1;
-
-        /**
-         * Low priority.
-         */
-        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
-
-        /**
-         * Lowest priority.
-         */
-        int LOW_PRIORITY = -HIGH_PRIORITY;
-
-        /**
-         * Normal priority.
-         */
-        int NORMAL_PRIORITY = 0;
-    }
-
-    /**
-     * Interface exposing constants which can be used as a set of priorities ignoring the aging of
-     * executions.<br/>
-     * Note that, since the priority value can be any in an integer range, it is always possible to
-     * customize the values so to create a personalized set.
-     */
-    public interface NotAgingPriority {
-
-        /**
-         * Highest priority.
-         */
-        int HIGHEST_PRIORITY = Integer.MAX_VALUE;
-
-        /**
-         * High priority.
-         */
-        int HIGH_PRIORITY = HIGHEST_PRIORITY >> 1;
-
-        /**
-         * Low priority.
-         */
-        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
-
-        /**
-         * Lowest priority.
-         */
-        int LOW_PRIORITY = -HIGH_PRIORITY;
-
-        /**
-         * Normal priority.
-         */
-        int NORMAL_PRIORITY = 0;
     }
 
     /**

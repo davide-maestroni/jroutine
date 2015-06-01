@@ -19,6 +19,7 @@ import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Inputs;
 import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
@@ -460,19 +461,35 @@ public class RoutineProcessor extends AbstractProcessor {
     /**
      * Builds the string used to replace "${routineBuilderOptions}" in the template.
      *
-     * @param inputMode  the input transfer mode.
-     * @param outputMode the output transfer mode.
+     * @param methodElement the method element.
+     * @param inputMode     the input transfer mode.
+     * @param outputMode    the output transfer mode.
      * @return the string.
      */
     @Nonnull
-    protected String buildRoutineOptions(@Nullable final InputMode inputMode,
-            @Nullable final OutputMode outputMode) {
+    protected String buildRoutineOptions(@Nonnull final ExecutableElement methodElement,
+            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-        return ".withInputOrder(" + OrderType.class.getCanonicalName() + "." + (
-                (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER)
-                + ").withOutputOrder(" + OrderType.class.getCanonicalName() + "." + (
-                (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE) +
-                ")";
+        final StringBuilder builder = new StringBuilder();
+        final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
+
+        if (priorityAnnotation != null) {
+
+            builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
+        }
+
+        return builder.append(".withInputOrder(")
+                      .append(OrderType.class.getCanonicalName())
+                      .append(".")
+                      .append(((inputMode == InputMode.ELEMENT) ? OrderType.NONE
+                              : OrderType.PASS_ORDER))
+                      .append(").withOutputOrder(")
+                      .append(OrderType.class.getCanonicalName())
+                      .append(".")
+                      .append(((outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER
+                              : OrderType.NONE))
+                      .append(")")
+                      .toString();
     }
 
     /**
@@ -1935,7 +1952,8 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
         methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
-                                            buildRoutineOptions(inputMode, outputMode));
+                                            buildRoutineOptions(methodElement, inputMode,
+                                                                outputMode));
 
         final ShareGroup shareGroupAnnotation = methodElement.getAnnotation(ShareGroup.class);
 

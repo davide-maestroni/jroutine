@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.annotation;
 
-import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 
 import java.lang.annotation.ElementType;
@@ -52,7 +51,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 4/8/2015.
  *
- * @see InvocationConfiguration
+ * @see com.gh.bmd.jrt.builder.InvocationConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

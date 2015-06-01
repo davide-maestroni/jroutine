@@ -28,9 +28,6 @@ import com.gh.bmd.jrt.builder.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.runner.PriorityRunner;
-import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -177,8 +174,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final PriorityRunner mPriorityRunner;
-
         private final ProxyConfiguration mProxyConfiguration;
 
         /**
@@ -188,8 +183,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             mInvocationConfiguration = getInvocationConfiguration();
             mProxyConfiguration = getProxyConfiguration();
-            mPriorityRunner = Runners.priorityRunner(
-                    mInvocationConfiguration.getAsyncRunnerOr(Runners.sharedRunner()));
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -200,10 +193,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             if (priorityAnnotation != null) {
 
-                final Runner priorityRunner = mPriorityRunner.getRunner(priorityAnnotation.value());
-                invocationConfiguration = mInvocationConfiguration.builderFrom()
-                                                                  .withAsyncRunner(priorityRunner)
-                                                                  .set();
+                final int priority = priorityAnnotation.value();
+                invocationConfiguration =
+                        mInvocationConfiguration.builderFrom().withPriority(priority).set();
 
             } else {
 
@@ -264,8 +256,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final PriorityRunner mPriorityRunner;
-
         private final ProxyConfiguration mProxyConfiguration;
 
         /**
@@ -275,8 +265,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             mInvocationConfiguration = getInvocationConfiguration();
             mProxyConfiguration = getProxyConfiguration();
-            mPriorityRunner = Runners.priorityRunner(
-                    mInvocationConfiguration.getAsyncRunnerOr(Runners.sharedRunner()));
         }
 
         @Nonnull
@@ -297,19 +285,18 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                                             : OrderType.NONE)
                    .withOutputMaxSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
-            final Priority priorityAnnotation = method.getAnnotation(Priority.class);
-
-            if (priorityAnnotation != null) {
-
-                final Runner priorityRunner = mPriorityRunner.getRunner(priorityAnnotation.value());
-                builder.withAsyncRunner(priorityRunner);
-            }
-
             final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
 
             if (shareGroupAnnotation != null) {
 
                 shareGroup = shareGroupAnnotation.value();
+            }
+
+            final Priority priorityAnnotation = method.getAnnotation(Priority.class);
+
+            if (priorityAnnotation != null) {
+
+                builder.withPriority(priorityAnnotation.value());
             }
 
             final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);

@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.runner;
 
-import com.gh.bmd.jrt.runner.PriorityRunner.AgingPriority;
-import com.gh.bmd.jrt.runner.PriorityRunner.NotAgingPriority;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.AgingPriority;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.NotAgingPriority;
 import com.gh.bmd.jrt.time.Time;
 import com.gh.bmd.jrt.time.TimeDuration;
 

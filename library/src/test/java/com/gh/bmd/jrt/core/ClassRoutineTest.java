@@ -61,7 +61,7 @@ public class ClassRoutineTest {
                                                         .set()
                                                         .aliasMethod(TestStatic.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -150,7 +150,7 @@ public class ClassRoutineTest {
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).readAll();
+            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -194,7 +194,7 @@ public class ClassRoutineTest {
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -211,7 +211,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
 
     }
 
@@ -267,7 +267,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().all()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
                                                          .withInvocation()
@@ -278,7 +278,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutine.on(TestStatic.class)
@@ -290,7 +290,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine3.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine3.callSync().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
@@ -303,7 +303,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine4.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine4.callSync().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutine.on(TestStatic.class)
@@ -315,7 +315,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine5.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine5.callSync().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 

@@ -336,11 +336,16 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         @Nonnull
-        public TransportOutput<OUTPUT> readAllInto(
-                @Nonnull final Collection<? super OUTPUT> result) {
+        public TransportOutput<OUTPUT> allInto(@Nonnull final Collection<? super OUTPUT> result) {
 
-            mChannel.readAllInto(result);
+            mChannel.allInto(result);
             return this;
+        }
+
+        @Nonnull
+        public List<OUTPUT> all() {
+
+            return mChannel.all();
         }
 
         public boolean checkComplete() {
@@ -353,23 +358,17 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
             return mChannel.isBound();
         }
 
+        public OUTPUT next() {
+
+            return mChannel.next();
+        }
+
         @Nonnull
         public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
                 @Nonnull final INPUT channel) {
 
             channel.pass(this);
             return channel;
-        }
-
-        @Nonnull
-        public List<OUTPUT> readAll() {
-
-            return mChannel.readAll();
-        }
-
-        public OUTPUT readNext() {
-
-            return mChannel.readNext();
         }
 
         public Iterator<OUTPUT> iterator() {

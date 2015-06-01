@@ -233,9 +233,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     /**
-     * Converts an invocation instance from synchronous to asynchronous or the contrary.
+     * Converts an invocation instance from synchronous to asynchronous, or the contrary.
      *
-     * @param async      whether the converted invocation is asynchronous.
+     * @param async      whether the converted invocation must be asynchronous.
      * @param invocation the invocation to convert.
      * @return the converted invocation.
      */

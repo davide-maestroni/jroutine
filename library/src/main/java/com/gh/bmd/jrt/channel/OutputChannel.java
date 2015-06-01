@@ -66,6 +66,49 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
+     * Consumes all the results by waiting for the routine to complete at the maximum for the set
+     * timeout.
+     *
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
+     *                                                      exception when the timeout elapses.
+     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
+     * @throws java.lang.IllegalStateException              if this channel is already bound to a
+     *                                                      consumer.
+     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
+     * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
+     */
+    @Nonnull
+    List<OUTPUT> all();
+
+    /**
+     * Consumes all the results by waiting for the routine to complete at the maximum for the set
+     * timeout, and put them into the specified collection.
+     *
+     * @param results the collection to fill.
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
+     *                                                      exception when the timeout elapses.
+     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
+     * @throws java.lang.IllegalStateException              if this channel is already bound to a
+     *                                                      consumer.
+     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
+     * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> allInto(@Nonnull Collection<? super OUTPUT> results);
+
+    /**
      * Checks if the routine is complete waiting at the maximum for the set timeout.
      *
      * @return whether the routine execution has complete.
@@ -159,6 +202,29 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     boolean isBound();
 
     /**
+     * Consumes the first available result by waiting at the maximum for the set timeout.
+     *
+     * @return the first available result.
+     * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
+     *                                                      exception when the timeout elapses.
+     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
+     * @throws java.lang.IllegalStateException              if this channel is already bound to a
+     *                                                      consumer.
+     * @throws java.util.NoSuchElementException             if no output is available (it might be
+     *                                                      thrown also in the case the read timeout
+     *                                                      elapses and no deadlock exception is set
+     *                                                      to be thrown).
+     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
+     * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
+     */
+    OUTPUT next();
+
+    /**
      * Binds this channel to the specified one. After the call, all the output will be passed
      * only to the specified input channel. Attempting to read through the dedicated methods will
      * cause an {@link java.lang.IllegalStateException} to be thrown.
@@ -182,70 +248,4 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      */
     @Nonnull
     OutputChannel<OUTPUT> passTo(@Nonnull OutputConsumer<? super OUTPUT> consumer);
-
-    /**
-     * Reads all the results by waiting for the routine to complete at the maximum for the set
-     * timeout.
-     *
-     * @return this channel.
-     * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
-     *                                                      exception when the timeout elapses.
-     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
-     * @throws java.lang.IllegalStateException              if this channel is already bound to a
-     *                                                      consumer.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
-     * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
-     * @see #immediately()
-     * @see #eventuallyAbort()
-     * @see #eventuallyDeadlock()
-     * @see #eventuallyExit()
-     */
-    @Nonnull
-    List<OUTPUT> readAll();
-
-    /**
-     * Reads all the results by waiting for the routine to complete at the maximum for the set
-     * timeout, and put them into the specified collection.
-     *
-     * @param results the collection to fill.
-     * @return this channel.
-     * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
-     *                                                      exception when the timeout elapses.
-     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
-     * @throws java.lang.IllegalStateException              if this channel is already bound to a
-     *                                                      consumer.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
-     * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
-     * @see #immediately()
-     * @see #eventuallyAbort()
-     * @see #eventuallyDeadlock()
-     * @see #eventuallyExit()
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
-
-    /**
-     * Reads the first available result by waiting at the maximum for the set timeout.
-     *
-     * @return the first available result.
-     * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
-     *                                                      exception when the timeout elapses.
-     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
-     * @throws java.lang.IllegalStateException              if this channel is already bound to a
-     *                                                      consumer.
-     * @throws java.util.NoSuchElementException             if no output is available (it might be
-     *                                                      thrown also in the case the read timeout
-     *                                                      elapses and no deadlock exception is set
-     *                                                      to be thrown).
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
-     * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
-     * @see #immediately()
-     * @see #eventuallyAbort()
-     * @see #eventuallyDeadlock()
-     * @see #eventuallyExit()
-     */
-    OUTPUT readNext();
 }

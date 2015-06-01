@@ -242,7 +242,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     outputChannel.eventuallyAbort();
                 }
 
-                return outputChannel.readNext();
+                return outputChannel.next();
             }
 
             return null;
@@ -285,18 +285,18 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                                             : OrderType.NONE)
                    .withOutputMaxSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
-            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
-
-            if (shareGroupAnnotation != null) {
-
-                shareGroup = shareGroupAnnotation.value();
-            }
-
             final Priority priorityAnnotation = method.getAnnotation(Priority.class);
 
             if (priorityAnnotation != null) {
 
                 builder.withPriority(priorityAnnotation.value());
+            }
+
+            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+
+            if (shareGroupAnnotation != null) {
+
+                shareGroup = shareGroupAnnotation.value();
             }
 
             final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);

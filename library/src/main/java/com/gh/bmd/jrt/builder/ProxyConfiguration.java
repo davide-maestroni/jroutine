@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * Class storing the proxy configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration instance.
+ * must be created starting from the specific configuration.
  * <p/>
  * The configuration has a share group associated. Every method within a specific group is protected
  * so that shared class members can be safely accessed only from the other methods sharing the same

@@ -73,9 +73,7 @@ class DefaultClassRoutineBuilder
      * Constructor.
      *
      * @param targetClass the target class.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected, or the specified class represents an
-     *                                            interface.
+     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     DefaultClassRoutineBuilder(@Nonnull final Class<?> targetClass) {
 
@@ -93,8 +91,6 @@ class DefaultClassRoutineBuilder
      * Constructor.
      *
      * @param target the target object.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
      */
     DefaultClassRoutineBuilder(@Nonnull final Object target) {
 
@@ -132,8 +128,8 @@ class DefaultClassRoutineBuilder
     @Nonnull
     public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> withInvocation() {
 
-        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this,
-                                                                        mInvocationConfiguration);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
@@ -166,7 +162,8 @@ class DefaultClassRoutineBuilder
     @Nonnull
     public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy() {
 
-        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     /**
@@ -181,7 +178,7 @@ class DefaultClassRoutineBuilder
     }
 
     /**
-     * Returns the internal share configuration.
+     * Returns the internal proxy configuration.
      *
      * @return the configuration.
      */
@@ -303,18 +300,18 @@ class DefaultClassRoutineBuilder
                .withInputTimeout(TimeDuration.ZERO)
                .withOutputMaxSize(Integer.MAX_VALUE)
                .withOutputTimeout(TimeDuration.ZERO);
-        final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
-
-        if (shareGroupAnnotation != null) {
-
-            methodShareGroup = shareGroupAnnotation.value();
-        }
-
         final Priority priorityAnnotation = targetMethod.getAnnotation(Priority.class);
 
         if (priorityAnnotation != null) {
 
             builder.withPriority(priorityAnnotation.value());
+        }
+
+        final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
+
+        if (shareGroupAnnotation != null) {
+
+            methodShareGroup = shareGroupAnnotation.value();
         }
 
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);

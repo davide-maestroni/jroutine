@@ -91,8 +91,8 @@ public abstract class AbstractProxyBuilder<TYPE>
     @Nonnull
     public InvocationConfiguration.Builder<? extends ProxyBuilder<TYPE>> withInvocation() {
 
-        return new InvocationConfiguration.Builder<ProxyBuilder<TYPE>>(this,
-                                                                       mInvocationConfiguration);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyBuilder<TYPE>>(this, configuration);
     }
 
     @Nonnull
@@ -125,7 +125,8 @@ public abstract class AbstractProxyBuilder<TYPE>
     @Nonnull
     public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> withProxy() {
 
-        return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, mProxyConfiguration);
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, configuration);
     }
 
     /**

@@ -73,7 +73,7 @@ public interface InputChannel<INPUT> extends Channel {
      * Passes the specified channel to this one.
      * <p/>
      * Note that the output channel will be bound as a result of the call, thus effectively
-     * preventing any other reader from getting data from it.
+     * preventing any other consumer from getting data from it.
      *
      * @param channel the output channel.
      * @return this channel.

@@ -1020,144 +1020,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return afterMax(fromUnit(timeout, timeUnit));
         }
 
-        public boolean checkComplete() {
-
-            final boolean isDone;
-
-            synchronized (mMutex) {
-
-                final TimeDuration timeout = mReadTimeout;
-
-                if (!timeout.isZero() && mRunner.isRunnerThread()) {
-
-                    throw new DeadlockException("cannot wait on the same runner thread");
-                }
-
-                try {
-
-                    isDone = timeout.waitTrue(mMutex, new Check() {
-
-                        public boolean isTrue() {
-
-                            return (mState == ChannelState.DONE);
-                        }
-                    });
-
-                } catch (final InterruptedException e) {
-
-                    throw new InvocationInterruptedException(e);
-                }
-
-                if (!isDone) {
-
-                    mSubLogger.wrn("waiting complete timeout: [%s]", timeout);
-                }
-            }
-
-            return isDone;
-        }
-
         @Nonnull
-        public OutputChannel<OUTPUT> eventually() {
-
-            return afterMax(INFINITY);
-        }
-
-        @Nonnull
-        public OutputChannel<OUTPUT> eventuallyAbort() {
-
-            synchronized (mMutex) {
-
-                mTimeoutActionType = TimeoutActionType.ABORT;
-            }
-
-            return this;
-        }
-
-        @Nonnull
-        public OutputChannel<OUTPUT> eventuallyDeadlock() {
-
-            synchronized (mMutex) {
-
-                mTimeoutActionType = TimeoutActionType.DEADLOCK;
-            }
-
-            return this;
-        }
-
-        @Nonnull
-        public OutputChannel<OUTPUT> eventuallyExit() {
-
-            synchronized (mMutex) {
-
-                mTimeoutActionType = TimeoutActionType.EXIT;
-            }
-
-            return this;
-        }
-
-        @Nonnull
-        public OutputChannel<OUTPUT> immediately() {
-
-            return afterMax(ZERO);
-        }
-
-        public boolean isBound() {
-
-            synchronized (mMutex) {
-
-                return (mOutputConsumer != null);
-            }
-        }
-
-        @Nonnull
-        public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
-                @Nonnull final INPUT channel) {
-
-            channel.pass(this);
-            return channel;
-        }
-
-        @Nonnull
-        @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUTPUT> passTo(
-                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
-
-            final boolean forceClose;
-            final ChannelState state;
-
-            synchronized (mMutex) {
-
-                verifyBound();
-
-                if (consumer == null) {
-
-                    mSubLogger.err("invalid null consumer");
-                    throw new NullPointerException("the output consumer must not be null");
-                }
-
-                state = mState;
-                forceClose = (state == ChannelState.DONE);
-                mOutputConsumer = consumer;
-                mConsumerMutex = getMutex(consumer);
-            }
-
-            flushOutput(forceClose);
-            return this;
-        }
-
-        @Nonnull
-        public List<OUTPUT> readAll() {
+        public List<OUTPUT> all() {
 
             final ArrayList<OUTPUT> results = new ArrayList<OUTPUT>();
-            readAllInto(results);
+            allInto(results);
             return results;
         }
 
         @Nonnull
         @SuppressWarnings({"unchecked", "ConstantConditions"})
-        public OutputChannel<OUTPUT> readAllInto(
-                @Nonnull final Collection<? super OUTPUT> results) {
+        public OutputChannel<OUTPUT> allInto(@Nonnull final Collection<? super OUTPUT> results) {
 
             boolean isAbort = false;
 
@@ -1265,7 +1138,97 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return this;
         }
 
-        public OUTPUT readNext() {
+        public boolean checkComplete() {
+
+            final boolean isDone;
+
+            synchronized (mMutex) {
+
+                final TimeDuration timeout = mReadTimeout;
+
+                if (!timeout.isZero() && mRunner.isRunnerThread()) {
+
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
+
+                try {
+
+                    isDone = timeout.waitTrue(mMutex, new Check() {
+
+                        public boolean isTrue() {
+
+                            return (mState == ChannelState.DONE);
+                        }
+                    });
+
+                } catch (final InterruptedException e) {
+
+                    throw new InvocationInterruptedException(e);
+                }
+
+                if (!isDone) {
+
+                    mSubLogger.wrn("waiting complete timeout: [%s]", timeout);
+                }
+            }
+
+            return isDone;
+        }
+
+        @Nonnull
+        public OutputChannel<OUTPUT> eventually() {
+
+            return afterMax(INFINITY);
+        }
+
+        @Nonnull
+        public OutputChannel<OUTPUT> eventuallyAbort() {
+
+            synchronized (mMutex) {
+
+                mTimeoutActionType = TimeoutActionType.ABORT;
+            }
+
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUTPUT> eventuallyDeadlock() {
+
+            synchronized (mMutex) {
+
+                mTimeoutActionType = TimeoutActionType.DEADLOCK;
+            }
+
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUTPUT> eventuallyExit() {
+
+            synchronized (mMutex) {
+
+                mTimeoutActionType = TimeoutActionType.EXIT;
+            }
+
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUTPUT> immediately() {
+
+            return afterMax(ZERO);
+        }
+
+        public boolean isBound() {
+
+            synchronized (mMutex) {
+
+                return (mOutputConsumer != null);
+            }
+        }
+
+        public OUTPUT next() {
 
             boolean isAbort = false;
 
@@ -1289,6 +1252,42 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 throw e;
             }
+        }
+
+        @Nonnull
+        public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
+                @Nonnull final INPUT channel) {
+
+            channel.pass(this);
+            return channel;
+        }
+
+        @Nonnull
+        @SuppressWarnings("ConstantConditions")
+        public OutputChannel<OUTPUT> passTo(
+                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
+
+            final boolean forceClose;
+            final ChannelState state;
+
+            synchronized (mMutex) {
+
+                verifyBound();
+
+                if (consumer == null) {
+
+                    mSubLogger.err("invalid null consumer");
+                    throw new NullPointerException("the output consumer must not be null");
+                }
+
+                state = mState;
+                forceClose = (state == ChannelState.DONE);
+                mOutputConsumer = consumer;
+                mConsumerMutex = getMutex(consumer);
+            }
+
+            flushOutput(forceClose);
+            return this;
         }
 
         @Nonnull

@@ -205,7 +205,7 @@ public class Downloader {
                     downloadMap.remove(uri);
 
                     // read the result
-                    if (channel.readNext()) {
+                    if (channel.next()) {
 
                         // if successful, add the resource to the downloaded set
                         mDownloadedSet.add(uri);

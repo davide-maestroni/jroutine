@@ -114,7 +114,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
                     }
                 };
             }
-        }).callAsync(channel).afterMax(seconds(30)).readNext()).isEqualTo(true);
+        }).callAsync(channel).afterMax(seconds(30)).next()).isEqualTo(true);
     }
 
     public void testMainRunner() throws InterruptedException {

@@ -91,7 +91,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
@@ -103,7 +103,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .method("getId")
                            .callAsync()
                            .eventually()
-                           .readNext()).isEqualTo(17);
+                           .next()).isEqualTo(17);
     }
 
     public void testAsyncInputProxyRoutine() {
@@ -143,11 +143,11 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                             .withReadTimeout(timeout)
                                             .set()
                                             .buildProxy(CountItf.class);
-        assertThat(countAsync.count(3).readAll()).containsExactly(0, 1, 2);
-        assertThat(countAsync.count1(3).readAll()).containsExactly(new int[]{0, 1, 2});
-        assertThat(countAsync.count2(2).readAll()).containsExactly(0, 1);
-        assertThat(countAsync.countList(3).readAll()).containsExactly(0, 1, 2);
-        assertThat(countAsync.countList1(3).readAll()).containsExactly(0, 1, 2);
+        assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
+        assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
+        assertThat(countAsync.count2(2).all()).containsExactly(0, 1);
+        assertThat(countAsync.countList(3).all()).containsExactly(0, 1, 2);
+        assertThat(countAsync.countList1(3).all()).containsExactly(0, 1, 2);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -243,7 +243,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).readAll();
+            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -525,7 +525,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMethodBySignature() throws NoSuchMethodException {
@@ -538,7 +538,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMissingAliasMethodError() {
@@ -621,18 +621,16 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final TransportChannel<Character> channel2 = JRoutine.transport().buildChannel();
         channel2.input().pass('d', 'e', 'f').close();
         assertThat(itf.add2(channel2.output())).isIn((int) 'd', (int) 'e', (int) 'f');
-        assertThat(itf.add3('c').readAll()).containsExactly((int) 'c');
+        assertThat(itf.add3('c').all()).containsExactly((int) 'c');
         final TransportChannel<Character> channel3 = JRoutine.transport().buildChannel();
         channel3.input().pass('a').close();
-        assertThat(itf.add4(channel3.output()).readAll()).containsExactly((int) 'a');
+        assertThat(itf.add4(channel3.output()).all()).containsExactly((int) 'a');
         final TransportChannel<Character> channel4 = JRoutine.transport().buildChannel();
         channel4.input().pass('d', 'e', 'f').close();
-        assertThat(itf.add5(channel4.output()).readAll()).containsOnly((int) 'd', (int) 'e',
-                                                                       (int) 'f');
-        assertThat(itf.add6().pass('d').result().readAll()).containsOnly((int) 'd');
-        assertThat(itf.add7().pass('d', 'e', 'f').result().readAll()).containsOnly((int) 'd',
-                                                                                   (int) 'e',
-                                                                                   (int) 'f');
+        assertThat(itf.add5(channel4.output()).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
+        assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
+        assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
+                                                                               (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
         channel5.input().pass(new char[]{'a', 'z'}).close();
@@ -646,36 +644,34 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                 .close();
         assertThat(itf.addA03(channel7.output())).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                                        new int[]{'f', 'z'});
-        assertThat(itf.addA04(new char[]{'c', 'z'}).readAll()).containsExactly(new int[]{'c', 'z'});
+        assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel8 = JRoutine.transport().buildChannel();
         channel8.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA05(channel8.output()).readAll()).containsExactly(new int[]{'a', 'z'});
+        assertThat(itf.addA05(channel8.output()).all()).containsExactly(new int[]{'a', 'z'});
         final TransportChannel<Character> channel9 = JRoutine.transport().buildChannel();
         channel9.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA06(channel9.output()).readAll()).containsExactly(
-                new int[]{'d', 'e', 'f'});
+        assertThat(itf.addA06(channel9.output()).all()).containsExactly(new int[]{'d', 'e', 'f'});
         final TransportChannel<char[]> channel10 = JRoutine.transport().buildChannel();
         channel10.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
-        assertThat(itf.addA07(channel10.output()).readAll()).containsOnly(new int[]{'d', 'z'},
-                                                                          new int[]{'e', 'z'},
-                                                                          new int[]{'f', 'z'});
-        assertThat(itf.addA08(new char[]{'c', 'z'}).readAll()).containsExactly((int) 'c',
-                                                                               (int) 'z');
+        assertThat(itf.addA07(channel10.output()).all()).containsOnly(new int[]{'d', 'z'},
+                                                                      new int[]{'e', 'z'},
+                                                                      new int[]{'f', 'z'});
+        assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
         final TransportChannel<char[]> channel11 = JRoutine.transport().buildChannel();
         channel11.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA09(channel11.output()).readAll()).containsExactly((int) 'a', (int) 'z');
+        assertThat(itf.addA09(channel11.output()).all()).containsExactly((int) 'a', (int) 'z');
         final TransportChannel<Character> channel12 = JRoutine.transport().buildChannel();
         channel12.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA10(channel12.output()).readAll()).containsExactly((int) 'd', (int) 'e',
-                                                                             (int) 'f');
+        assertThat(itf.addA10(channel12.output()).all()).containsExactly((int) 'd', (int) 'e',
+                                                                         (int) 'f');
         final TransportChannel<char[]> channel13 = JRoutine.transport().buildChannel();
         channel13.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
-        assertThat(itf.addA11(channel13.output()).readAll()).containsOnly((int) 'd', (int) 'e',
-                                                                          (int) 'f', (int) 'z');
+        assertThat(itf.addA11(channel13.output()).all()).containsOnly((int) 'd', (int) 'e',
+                                                                      (int) 'f', (int) 'z');
         assertThat(itf.addA12(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel14 = JRoutine.transport().buildChannel();
         channel14.input().pass(new char[]{'a', 'z'}).close();
@@ -704,14 +700,14 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(itf.addA19(channel19.output())).containsOnly(new int[]{'d', 'z'},
                                                                 new int[]{'e', 'z'},
                                                                 new int[]{'f', 'z'});
-        assertThat(itf.addA20().pass(new char[]{'c', 'z'}).result().readAll()).containsOnly(
+        assertThat(itf.addA20().pass(new char[]{'c', 'z'}).result().all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA21()
                       .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                       .result()
-                      .readAll()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-                                               new int[]{'f', 'z'});
-        assertThat(itf.addA22().pass('d', 'e', 'f').result().readAll()).containsOnly(
+                      .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                           new int[]{'f', 'z'});
+        assertThat(itf.addA22().pass('d', 'e', 'f').result().all()).containsOnly(
                 new int[]{'d', 'e', 'f'});
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
@@ -729,38 +725,37 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(itf.addL03(channel22.output())).isIn(Arrays.asList((int) 'd', (int) 'z'),
                                                         Arrays.asList((int) 'e', (int) 'z'),
                                                         Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL04(Arrays.asList('c', 'z')).readAll()).containsExactly(
+        assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel23 = JRoutine.transport().buildChannel();
         channel23.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL05(channel23.output()).readAll()).containsExactly(
+        assertThat(itf.addL05(channel23.output()).all()).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
         final TransportChannel<Character> channel24 = JRoutine.transport().buildChannel();
         channel24.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL06(channel24.output()).readAll()).containsExactly(
+        assertThat(itf.addL06(channel24.output()).all()).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         final TransportChannel<List<Character>> channel25 = JRoutine.transport().buildChannel();
         channel25.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL07(channel25.output()).readAll()).containsOnly(
+        assertThat(itf.addL07(channel25.output()).all()).containsOnly(
                 Arrays.asList((int) 'd', (int) 'z'), Arrays.asList((int) 'e', (int) 'z'),
                 Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL08(Arrays.asList('c', 'z')).readAll()).containsExactly((int) 'c',
-                                                                                  (int) 'z');
+        assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
         final TransportChannel<List<Character>> channel26 = JRoutine.transport().buildChannel();
         channel26.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL09(channel26.output()).readAll()).containsExactly((int) 'a', (int) 'z');
+        assertThat(itf.addL09(channel26.output()).all()).containsExactly((int) 'a', (int) 'z');
         final TransportChannel<Character> channel27 = JRoutine.transport().buildChannel();
         channel27.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL10(channel27.output()).readAll()).containsExactly((int) 'd', (int) 'e',
-                                                                             (int) 'f');
+        assertThat(itf.addL10(channel27.output()).all()).containsExactly((int) 'd', (int) 'e',
+                                                                         (int) 'f');
         final TransportChannel<List<Character>> channel28 = JRoutine.transport().buildChannel();
         channel28.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL11(channel28.output()).readAll()).containsOnly((int) 'd', (int) 'e',
-                                                                          (int) 'f', (int) 'z');
+        assertThat(itf.addL11(channel28.output()).all()).containsOnly((int) 'd', (int) 'e',
+                                                                      (int) 'f', (int) 'z');
         assertThat(itf.addL12(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel29 = JRoutine.transport().buildChannel();
@@ -797,30 +792,30 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                                 Arrays.asList((int) 'e', (int) 'z'),
                                                                 Arrays.asList((int) 'f',
                                                                               (int) 'z'));
-        assertThat(itf.addL20().pass(Arrays.asList('c', 'z')).result().readAll()).containsOnly(
+        assertThat(itf.addL20().pass(Arrays.asList('c', 'z')).result().all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL21()
                       .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                             Arrays.asList('f', 'z'))
                       .result()
-                      .readAll()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                               Arrays.asList((int) 'e', (int) 'z'),
-                                               Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL22().pass('d', 'e', 'f').result().readAll()).containsOnly(
+                      .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                           Arrays.asList((int) 'e', (int) 'z'),
+                                           Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL22().pass('d', 'e', 'f').result().all()).containsOnly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         assertThat(itf.get0()).isEqualTo(31);
-        assertThat(itf.get1().readAll()).containsExactly(31);
-        assertThat(itf.get2().result().readAll()).containsExactly(31);
+        assertThat(itf.get1().all()).containsExactly(31);
+        assertThat(itf.get2().result().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
-        assertThat(itf.getA1().readAll()).containsExactly(1, 2, 3);
+        assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA4().result().readAll()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA4().result().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL1().readAll()).containsExactly(1, 2, 3);
+        assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL4().result().readAll()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL4().result().all()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
         channel35.input().pass(-17).close();
@@ -865,22 +860,20 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.compute1(3)).containsExactly(9);
         assertThat(squareAsync.compute2(3)).containsExactly(9);
-        assertThat(squareAsync.computeParallel1(1, 2, 3).afterMax(timeout).readAll()).contains(1, 4,
-                                                                                               9);
-        assertThat(squareAsync.computeParallel1().afterMax(timeout).readAll()).isEmpty();
-        assertThat(squareAsync.computeParallel1(null).afterMax(timeout).readAll()).isEmpty();
-        assertThat(squareAsync.computeParallel2(1, 2, 3).afterMax(timeout).readAll()).contains(1, 4,
-                                                                                               9);
-        assertThat(squareAsync.computeParallel2().afterMax(timeout).readAll()).isEmpty();
-        assertThat(squareAsync.computeParallel2((Integer[]) null)
+        assertThat(squareAsync.computeParallel1(1, 2, 3).afterMax(timeout).all()).contains(1, 4, 9);
+        assertThat(squareAsync.computeParallel1().afterMax(timeout).all()).isEmpty();
+        assertThat(squareAsync.computeParallel1(null).afterMax(timeout).all()).isEmpty();
+        assertThat(squareAsync.computeParallel2(1, 2, 3).afterMax(timeout).all()).contains(1, 4, 9);
+        assertThat(squareAsync.computeParallel2().afterMax(timeout).all()).isEmpty();
+        assertThat(
+                squareAsync.computeParallel2((Integer[]) null).afterMax(timeout).all()).isEmpty();
+        assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3))
                               .afterMax(timeout)
-                              .readAll()).isEmpty();
-        assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3)).afterMax(timeout).readAll())
-                .contains(1, 4, 9);
+                              .all()).contains(1, 4, 9);
         assertThat(squareAsync.computeParallel3(Collections.<Integer>emptyList())
                               .afterMax(timeout)
-                              .readAll()).isEmpty();
-        assertThat(squareAsync.computeParallel3(null).afterMax(timeout).readAll()).isEmpty();
+                              .all()).isEmpty();
+        assertThat(squareAsync.computeParallel3(null).afterMax(timeout).all()).isEmpty();
 
         final TransportChannel<Integer> channel1 = JRoutine.transport().buildChannel();
         channel1.input().pass(4).close();
@@ -888,9 +881,10 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         final TransportChannel<Integer> channel2 = JRoutine.transport().buildChannel();
         channel2.input().pass(1, 2, 3).close();
-        assertThat(squareAsync.computeParallel4(channel2.output())
-                              .afterMax(timeout)
-                              .readAll()).contains(1, 4, 9);
+        assertThat(
+                squareAsync.computeParallel4(channel2.output()).afterMax(timeout).all()).contains(1,
+                                                                                                  4,
+                                                                                                  9);
 
         final IncItf incItf = JRoutine.onService(getActivity(), Inc.class)
                                       .buildProxy(ClassToken.tokenOf(IncItf.class));
@@ -937,7 +931,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .set()
                            .aliasMethod("test")
                            .callAsync()
-                           .readNext()).isEqualTo(31);
+                           .next()).isEqualTo(31);
 
         try {
 
@@ -947,7 +941,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .set()
                     .aliasMethod("test")
                     .callAsync()
-                    .readNext();
+                    .next();
 
             fail();
 
@@ -961,7 +955,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .set()
                            .method("getInt")
                            .callAsync()
-                           .readNext()).isEqualTo(31);
+                           .next()).isEqualTo(31);
 
         try {
 
@@ -971,7 +965,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .set()
                     .method("getInt")
                     .callAsync()
-                    .readNext();
+                    .next();
 
             fail();
 
@@ -985,7 +979,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .callAsync()
-                           .readNext()).isEqualTo(31);
+                           .next()).isEqualTo(31);
 
         try {
 
@@ -995,7 +989,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .callAsync()
-                    .readNext();
+                    .next();
 
             fail();
 

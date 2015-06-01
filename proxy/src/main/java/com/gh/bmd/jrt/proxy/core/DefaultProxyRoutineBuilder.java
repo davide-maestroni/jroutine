@@ -103,8 +103,8 @@ class DefaultProxyRoutineBuilder
     @Nonnull
     public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> withInvocation() {
 
-        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this,
-                                                                        mInvocationConfiguration);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
@@ -137,7 +137,8 @@ class DefaultProxyRoutineBuilder
     @Nonnull
     public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxy() {
 
-        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, mProxyConfiguration);
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     /**

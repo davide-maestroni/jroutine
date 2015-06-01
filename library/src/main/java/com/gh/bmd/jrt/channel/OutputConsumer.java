@@ -23,20 +23,20 @@ import javax.annotation.Nullable;
  * <pre>
  *     <code>
  *
- *                           ------
- *                     |    |      |
- *                     V    V      |
- *               --------------    |
- *               | onOutput() |----
- *               --------------
- *                   |    |
- *                   |    |
- *             ------      ------
- *       |    |                  |    |
- *       V    V                  V    V
- *   --------------          --------------
- *   |onComplete()|          | onError()  |
- *   --------------          --------------
+ *                           --------
+ *                     |    |        |
+ *                     V    V        |
+ *               ----------------    |
+ *               |  onOutput()  |----
+ *               ----------------
+ *                     |    |
+ *                     |    |
+ *               ------      ------
+ *       |      |                  |      |
+ *       V      V                  V      V
+ *   ----------------          ----------------
+ *   | onComplete() |          |  onError()   |
+ *   ----------------          ----------------
  *     </code>
  * </pre>
  * <p/>
@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
 public interface OutputConsumer<OUTPUT> {
 
     /**
-     * Called when the channel closes after the routine completes its execution.
+     * Called when the channel closes after the invocation completes its execution.
      */
     void onComplete();
 

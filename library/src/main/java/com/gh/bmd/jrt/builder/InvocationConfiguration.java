@@ -31,7 +31,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * Class storing the invocation configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration instance.
+ * must be created starting from the specific configuration.
  * <p/>
  * The configuration has a synchronous and an asynchronous runner associated. The synchronous
  * implementation already included in the library are queued (the default one) and sequential.<br/>

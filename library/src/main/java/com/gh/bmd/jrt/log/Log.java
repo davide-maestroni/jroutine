@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a log object responsible for formatting and writing the framework log
+ * Interface defining a log object responsible for the formatting and writing the framework log
  * messages.
  * <p/>
  * A default global log instance can be set by invoking the proper logger methods. Note, however,

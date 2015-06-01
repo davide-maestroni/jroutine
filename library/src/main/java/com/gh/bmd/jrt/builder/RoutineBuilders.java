@@ -799,12 +799,12 @@ public class RoutineBuilders {
 
                 if (returnType.isAssignableFrom(List.class)) {
 
-                    return outputChannel.readAll();
+                    return outputChannel.all();
                 }
 
                 if (returnType.isArray()) {
 
-                    final List<Object> results = outputChannel.readAll();
+                    final List<Object> results = outputChannel.all();
                     final int size = results.size();
                     final Object array = Array.newInstance(returnType.getComponentType(), size);
 
@@ -817,7 +817,7 @@ public class RoutineBuilders {
                 }
             }
 
-            return outputChannel.readAll().iterator().next();
+            return outputChannel.all().iterator().next();
         }
 
         return null;

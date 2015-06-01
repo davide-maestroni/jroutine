@@ -125,6 +125,10 @@ public @interface Proxy {
     /**
      * The generated class name. By default the name is obtained by the interface simple name,
      * prepending all the outer class names in case it is not a top level class.
+     * <p/>
+     * For instance, an interface named <code>MyItf</code> defined inside a class named
+     * <code>MyClass</code>, will result in the generation of a class named
+     * <code>Proxy_MyClass_MyItf</code>.
      *
      * @return the class name.
      */

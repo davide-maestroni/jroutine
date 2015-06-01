@@ -48,8 +48,8 @@ import javax.annotation.Nonnull;
  * waiting for them to be available.<br/>
  * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
  * through annotation pre-processing and compile-time code generation. In order to activate the
- * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
- * or module in the project dependencies.
+ * processing of annotations, it is simply necessary to include the "jroutine-proxy" artifact or
+ * module in the project dependencies.
  * <p/>
  * This class provides also a way to build transport channel instances, which can be used to pass
  * data without the need to start a routine invocation.
@@ -67,7 +67,7 @@ import javax.annotation.Nonnull;
  *                .close();
  *         channel.output()
  *                .eventually()
- *                .readAllInto(results);
+ *                .allInto(results);
  *     </code>
  * </pre>
  * Or simply:
@@ -76,8 +76,8 @@ import javax.annotation.Nonnull;
  *
  *         final OutputChannel&lt;Result&gt; output1 = doSomething1.callAsync();
  *         final OutputChannel&lt;Result&gt; output2 = doSomething2.callAsync();
- *         output1.eventually().readAllInto(results);
- *         output2.eventually().readAllInto(results);
+ *         output1.eventually().allInto(results);
+ *         output2.eventually().allInto(results);
  *     </code>
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless the
@@ -87,7 +87,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         doSomething1.callAsync(doSomething2.callAsync())).eventually().readAllInto(results);
+ *         doSomething1.callAsync(doSomething2.callAsync())).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -129,7 +129,7 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                          .buildRoutine();
- *         routine.callAsync(channel.output()).eventually().readAllInto(results);
+ *         routine.callAsync(channel.output()).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -158,8 +158,7 @@ public class JRoutine {
      *
      * @param target the target class.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
+     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     @Nonnull
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
@@ -210,8 +209,6 @@ public class JRoutine {
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
      */
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {

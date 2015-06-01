@@ -132,6 +132,12 @@ public interface TransportChannel<DATA> {
          * {@inheritDoc}
          */
         @Nonnull
+        TransportOutput<OUTPUT> allInto(@Nonnull Collection<? super OUTPUT> results);
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
         TransportOutput<OUTPUT> eventually();
 
         /**
@@ -163,11 +169,5 @@ public interface TransportChannel<DATA> {
          */
         @Nonnull
         TransportOutput<OUTPUT> passTo(@Nonnull OutputConsumer<? super OUTPUT> consumer);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
     }
 }

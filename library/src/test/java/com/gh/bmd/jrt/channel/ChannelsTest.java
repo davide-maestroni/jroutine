@@ -68,7 +68,7 @@ public class ChannelsTest {
         channel3.input().close();
         channel4.input().close();
 
-        assertThat(outputChannel.eventually().readAll()).containsExactly("0", "1", "2", "3");
+        assertThat(outputChannel.eventually().all()).containsExactly("0", "1", "2", "3");
     }
 
     private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {

@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 public interface Channel {
 
     /**
-     * Closes the channel and abort the transfer of data, thus aborting the routine execution.
+     * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
      * <p/>
      * Note that, in case the channel was already closed, the call to this method has no effect.
      *
@@ -35,7 +35,7 @@ public interface Channel {
     boolean abort();
 
     /**
-     * Closes the channel and abort the transfer of data, thus aborting the routine execution and
+     * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
      * causing the specified throwable to be passed as the abortion reason.<br/>
      * The throwable will be wrapped as the cause of an {@link com.gh.bmd.jrt.common.AbortException}
      * instance.
@@ -48,7 +48,7 @@ public interface Channel {
     boolean abort(@Nullable Throwable reason);
 
     /**
-     * Checks if the channel is open, that is, data can be written or read.
+     * Checks if the channel is open, that is, data can be passed or consumed.
      *
      * @return whether the channel is open.
      */

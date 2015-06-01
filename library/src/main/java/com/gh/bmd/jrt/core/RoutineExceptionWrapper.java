@@ -72,7 +72,7 @@ class RoutineExceptionWrapper {
      * @return the cause.
      */
     @Nullable
-    public Throwable getCause() {
+    Throwable getCause() {
 
         final Throwable cause = mCause;
 

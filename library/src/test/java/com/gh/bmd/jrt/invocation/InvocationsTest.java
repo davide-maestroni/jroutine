@@ -58,9 +58,9 @@ public class InvocationsTest {
                         .withReadTimeout(TimeDuration.seconds(1))
                         .set()
                         .buildRoutine();
-        assertThat(routine.callAsync("test1", "test2", "test3", "test4").readNext()).isEqualTo(
+        assertThat(routine.callAsync("test1", "test2", "test3", "test4").next()).isEqualTo(
                 "test1, test2, test3, test4");
-        assertThat(routine.callParallel("test1", "test2", "test3", "test4").readAll()).containsOnly(
+        assertThat(routine.callParallel("test1", "test2", "test3", "test4").all()).containsOnly(
                 "test1", "test2", "test3", "test4");
     }
 

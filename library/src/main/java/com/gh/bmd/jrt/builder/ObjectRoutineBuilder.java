@@ -45,7 +45,7 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
-     * In case the wrapped object does not implement the specified interface, the binding annotation
+     * In case the wrapped object does not implement the specified interface, the alias annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
@@ -70,7 +70,7 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
-     * In case the wrapped object does not implement the specified interface, the binding annotation
+     * In case the wrapped object does not implement the specified interface, the alias annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional

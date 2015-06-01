@@ -79,7 +79,7 @@ public class LoaderRoutineRotationTest
 
         final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
 
-        assertThat(channel.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
+        assertThat(channel.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
     }
 
     public void testActivityRotationInputs() throws InterruptedException {
@@ -116,8 +116,8 @@ public class LoaderRoutineRotationTest
         final OutputChannel<String> result1 = routine2.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine2.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readNext()).isEqualTo("TEST1");
-        assertThat(result2.readNext()).isEqualTo("TEST2");
+        assertThat(result1.next()).isEqualTo("TEST1");
+        assertThat(result2.next()).isEqualTo("TEST2");
     }
 
     public void testActivityRotationSame() throws InterruptedException {
@@ -153,8 +153,8 @@ public class LoaderRoutineRotationTest
         final OutputChannel<Data> result1 = routine2.callAsync(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine2.callAsync(data1).afterMax(timeout);
 
-        assertThat(result1.readNext()).isSameAs(data1);
-        assertThat(result2.readNext()).isSameAs(data1);
+        assertThat(result1.next()).isSameAs(data1);
+        assertThat(result2.next()).isSameAs(data1);
     }
 
     private static class Data {

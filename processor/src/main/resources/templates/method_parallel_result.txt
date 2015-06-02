@@ -25,5 +25,5 @@
             $$channel.pass($$object);
         }
 
-        return $$channel.result()${outputOptions}.readAll().iterator().next();
+        return $$channel.result()${outputOptions}.all().iterator().next();
     }

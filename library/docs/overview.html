@@ -26,7 +26,7 @@
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                    .eventually()
-                                   .readNext();
+                                   .next();
 
                 System.out.println(rms);
 
@@ -112,7 +112,7 @@
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                    .eventually()
-                                   .readNext();
+                                   .next();
 
                 System.out.println(rms);
 
@@ -200,7 +200,7 @@
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
 
                 final Double rms = meanRoutine.callAsync(
-                        squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll()).readNext();
+                        squareRoutine.callParallel(parseRoutine.callParallel(args)).all()).next();
 
                 System.out.println(rms);
 

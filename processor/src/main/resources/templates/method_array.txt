@@ -18,7 +18,7 @@
     public ${resultType} ${methodName}(${paramTypes}) {
 
         final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        final java.util.List<${resultClassName}> $$list = $$routine.${invokeMethod}()${inputParams}.result()${outputOptions}.readAll();
+        final java.util.List<${resultClassName}> $$list = $$routine.${invokeMethod}()${inputParams}.result()${outputOptions}.all();
         final int $$size = $$list.size();
         final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
 

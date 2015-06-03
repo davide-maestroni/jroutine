@@ -25,6 +25,7 @@ import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -200,10 +201,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
                 abortException = channel.getAbortException();
             }
 
-        } catch (final InvocationException e) {
-
-            abortException = e.getCause();
-
         } catch (final Throwable t) {
 
             abortException = t;
@@ -344,7 +341,8 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
             if (isAbort) {
 
-                mAbortException.set(new AbortException(reason));
+                mAbortException.set(
+                        (reason instanceof RoutineException) ? reason : new AbortException(reason));
             }
 
             return isAbort;

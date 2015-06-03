@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 1/27/15.
  */
-public class AbortException extends InvocationException {
+public class AbortException extends RoutineException {
 
     /**
      * Constructor.

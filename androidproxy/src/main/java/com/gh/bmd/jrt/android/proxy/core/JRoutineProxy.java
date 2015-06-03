@@ -43,7 +43,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility class")
+        justification = "utility class extending the functions of another utility class")
 public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
 
     /**

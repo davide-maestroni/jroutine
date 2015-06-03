@@ -25,8 +25,8 @@ import com.gh.bmd.jrt.invocation.Invocations;
 import javax.annotation.Nonnull;
 
 /**
- * This utility class represents the entry point to the framework functionalities by acting as a
- * factory of routine builders.
+ * This utility class represents the entry point to the framework by acting as a factory of routine
+ * builders.
  * <p/>
  * There are mainly two ways to create a routine object:
  * <p/>
@@ -41,15 +41,15 @@ import javax.annotation.Nonnull;
  * in turn asynchronously invoke the target object ones.<br/>
  * Note that a proxy object can be simply defined as an interface implemented by the target, but
  * also as a completely unrelated one mirroring the target methods. In this way it is possible to
- * apply the framework functionalities to objects defined by third party libraries which are not
- * under direct control.<br/>
+ * apply the framework functionality to objects defined by third party libraries which are not under
+ * direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
  * channels, so that data are transferred asynchronously, avoiding the need to block execution while
  * waiting for them to be available.<br/>
  * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
  * through annotation pre-processing and compile-time code generation. In order to activate the
- * processing of annotations, it is simply necessary to include the "jroutine-proxy" artifact or
- * module in the project dependencies.
+ * processing of annotations, it is simply necessary to include the proxy artifact or module in the
+ * project dependencies.
  * <p/>
  * This class provides also a way to build transport channel instances, which can be used to pass
  * data without the need to start a routine invocation.

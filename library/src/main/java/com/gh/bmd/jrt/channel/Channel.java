@@ -28,6 +28,9 @@ public interface Channel {
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
      * <p/>
+     * An instance of {@link com.gh.bmd.jrt.common.AbortException} will be passed as the abortion
+     * reason.
+     * <p/>
      * Note that, in case the channel was already closed, the call to this method has no effect.
      *
      * @return whether the channel status changed as a result of the call.
@@ -37,8 +40,8 @@ public interface Channel {
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
      * causing the specified throwable to be passed as the abortion reason.<br/>
-     * The throwable will be wrapped as the cause of an {@link com.gh.bmd.jrt.common.AbortException}
-     * instance.
+     * The throwable, unless it extends the base {@link com.gh.bmd.jrt.common.RoutineException},
+     * will be wrapped as the cause of an {@link com.gh.bmd.jrt.common.AbortException} instance.
      * <p/>
      * Note that, in case the channel was already closed, the call to this method has no effect.
      *

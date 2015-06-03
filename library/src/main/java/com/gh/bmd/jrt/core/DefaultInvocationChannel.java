@@ -21,6 +21,7 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -177,6 +178,8 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     public boolean abort(@Nullable final Throwable reason) {
 
         final TimeDuration delay;
+        final Throwable abortException =
+                (reason instanceof RoutineException) ? reason : new AbortException(reason);
 
         synchronized (mMutex) {
 
@@ -191,8 +194,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             if (delay.isZero()) {
 
                 mLogger.dbg(reason, "aborting channel");
-                mAbortException =
-                        (reason instanceof AbortException) ? reason : new AbortException(reason);
+                mAbortException = abortException;
                 mState = ChannelState.EXCEPTION;
             }
         }
@@ -203,7 +205,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         } else {
 
-            mRunner.run(new DelayedAbortExecution(reason), delay.time, delay.unit);
+            mRunner.run(new DelayedAbortExecution(abortException), delay.time, delay.unit);
         }
 
         return true;
@@ -238,7 +240,8 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+    public InvocationChannel<INPUT, OUTPUT> after(final long delay,
+            @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }

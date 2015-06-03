@@ -24,7 +24,9 @@ import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.DeadlockException;
+import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
@@ -357,7 +359,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     void abortImmediately(@Nullable final Throwable throwable) {
 
-        abort(throwable, true);
+        final Throwable abortException = (throwable instanceof RoutineException) ? throwable
+                : new InvocationException(throwable);
+        abort(abortException, true);
     }
 
     /**
@@ -368,6 +372,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     void close(@Nullable final Throwable throwable) {
 
         final ArrayList<OutputChannel<?>> channels;
+        final Throwable abortException = (throwable instanceof RoutineException) ? throwable
+                : new InvocationException(throwable);
 
         synchronized (mMutex) {
 
@@ -379,7 +385,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (mAbortException == null) {
 
-                mAbortException = throwable;
+                mAbortException = abortException;
             }
 
             mState = ChannelState.ABORTED;
@@ -388,7 +394,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         for (final OutputChannel<?> channel : channels) {
 
-            channel.abort(throwable);
+            channel.abort(abortException);
         }
 
         flushOutput(false);
@@ -458,7 +464,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         final TimeDuration delay;
         final Throwable abortException =
-                (isImmediate || (throwable instanceof AbortException)) ? throwable
+                (isImmediate || (throwable instanceof RoutineException)) ? throwable
                         : new AbortException(throwable);
 
         synchronized (mMutex) {
@@ -1315,7 +1321,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public boolean abort(@Nullable final Throwable reason) {
 
             final Throwable abortException =
-                    (reason instanceof AbortException) ? reason : new AbortException(reason);
+                    (reason instanceof RoutineException) ? reason : new AbortException(reason);
 
             synchronized (mMutex) {
 

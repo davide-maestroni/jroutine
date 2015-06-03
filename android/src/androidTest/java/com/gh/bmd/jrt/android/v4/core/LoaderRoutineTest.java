@@ -40,6 +40,7 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
@@ -207,7 +208,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationException ignored) {
+        } catch (final AbortException ignored) {
 
         }
 
@@ -253,7 +254,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(result1.next()).isSameAs(data1);
         result1.checkComplete();
 
-        InvocationException error = null;
+        AbortException error = null;
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
                         .withLoader()
@@ -269,7 +270,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             error = e;
         }
@@ -292,7 +293,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             assertThat(e.getCause()).isSameAs(error.getCause());
         }
@@ -332,7 +333,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             channel.result().next();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }
@@ -458,7 +459,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testActivityRestart() {
 
-        final TimeDuration timeout = TimeDuration.seconds(1000);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
@@ -535,7 +536,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(result2.next()).isSameAs(data1);
         result2.checkComplete();
 
-        InvocationException error = null;
+        AbortException error = null;
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
                         .withLoader()
@@ -551,7 +552,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             error = e;
         }
@@ -572,7 +573,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             assertThat(e.getCause()).isSameAs(error.getCause());
         }
@@ -872,7 +873,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             channel.result().next();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }

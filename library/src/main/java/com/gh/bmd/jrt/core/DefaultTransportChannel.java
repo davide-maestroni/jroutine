@@ -293,6 +293,13 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         @Nonnull
+        public TransportOutput<OUTPUT> allInto(@Nonnull final Collection<? super OUTPUT> result) {
+
+            mChannel.allInto(result);
+            return this;
+        }
+
+        @Nonnull
         public TransportOutput<OUTPUT> eventually() {
 
             mChannel.eventually();
@@ -332,13 +339,6 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
                 @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
             mChannel.passTo(consumer);
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> allInto(@Nonnull final Collection<? super OUTPUT> result) {
-
-            mChannel.allInto(result);
             return this;
         }
 

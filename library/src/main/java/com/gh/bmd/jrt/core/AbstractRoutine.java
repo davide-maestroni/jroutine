@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.InvocationChannel;
+import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -40,8 +40,8 @@ import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
 /**
  * Basic abstract implementation of a routine.
  * <p/>
- * This class provides a default implementation of all the routine functionalities. The inheriting
- * class just need to create invocation objects when required.
+ * This class provides a default implementation of all the routine features. The inheriting class
+ * just need to create invocation objects when required.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *
@@ -293,9 +293,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
-        return new DefaultInvocationChannel<INPUT, OUTPUT>(mConfiguration, getInvocationManager(async),
-                                                        (async) ? mAsyncRunner : mSyncRunner,
-                                                        logger);
+        return new DefaultInvocationChannel<INPUT, OUTPUT>(mConfiguration,
+                                                           getInvocationManager(async),
+                                                           (async) ? mAsyncRunner : mSyncRunner,
+                                                           logger);
     }
 
     /**

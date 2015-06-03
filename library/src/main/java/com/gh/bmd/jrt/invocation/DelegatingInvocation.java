@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;

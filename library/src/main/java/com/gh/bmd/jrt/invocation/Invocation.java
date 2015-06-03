@@ -72,6 +72,10 @@ import javax.annotation.Nullable;
  * The <b><code>onDestroy()</code></b> method is meant to indicate that the invocation object is no
  * longer needed, so any associated resource can be safely released.
  * <p/>
+ * Any exception escaping the invocation methods, unless it extends the base
+ * {@link com.gh.bmd.jrt.common.RoutineException}, will be wrapped as the cause of an
+ * {@link com.gh.bmd.jrt.common.InvocationException} instance.
+ * <p/>
  * Created by davide-maestroni on 9/7/14.
  *
  * @param <INPUT>  the input data type.

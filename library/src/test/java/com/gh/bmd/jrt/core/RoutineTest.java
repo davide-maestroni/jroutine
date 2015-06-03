@@ -23,11 +23,11 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.InputChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -35,8 +35,8 @@ import com.gh.bmd.jrt.common.DeadlockException;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
-import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -125,7 +125,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationException ex) {
+        } catch (final AbortException ex) {
 
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
             assertThat(ex.getCause().getMessage()).isEqualTo("test2");
@@ -146,7 +146,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationException ex) {
+        } catch (final AbortException ex) {
 
             assertThat(ex.getCause()).isNull();
         }
@@ -189,7 +189,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationException ex) {
+        } catch (final AbortException ex) {
 
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
             assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
@@ -218,7 +218,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationException ex) {
+        } catch (final AbortException ex) {
 
             assertThat(ex.getCause()).isNull();
         }
@@ -305,7 +305,7 @@ public class RoutineTest {
 
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
 
-        assertThat(abortReason.get()).isEqualTo(exception);
+        assertThat(abortReason.get().getCause()).isEqualTo(exception);
 
         final InvocationChannel<String, String> channel1 = routine.invokeAsync();
         final IllegalAccessError exception1 = new IllegalAccessError();
@@ -946,7 +946,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationException ignored) {
+        } catch (final AbortException ignored) {
 
         }
 
@@ -969,7 +969,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationException ignored) {
+        } catch (final AbortException ignored) {
 
         }
     }
@@ -1013,7 +1013,7 @@ public class RoutineTest {
 
             channel.result().next();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }
@@ -1679,8 +1679,9 @@ public class RoutineTest {
 
         try {
 
-            new DefaultInvocationChannel<Object, Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                      null, Runners.sharedRunner(), logger);
+            new DefaultInvocationChannel<Object, Object>(
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, null, Runners.sharedRunner(),
+                    logger);
 
             fail();
 
@@ -1690,8 +1691,9 @@ public class RoutineTest {
 
         try {
 
-            new DefaultInvocationChannel<Object, Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                      new TestInvocationManager(), null, logger);
+            new DefaultInvocationChannel<Object, Object>(
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
+                    null, logger);
 
             fail();
 
@@ -1701,9 +1703,9 @@ public class RoutineTest {
 
         try {
 
-            new DefaultInvocationChannel<Object, Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                      new TestInvocationManager(),
-                                                      Runners.sharedRunner(), null);
+            new DefaultInvocationChannel<Object, Object>(
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
+                    Runners.sharedRunner(), null);
 
             fail();
 
@@ -1714,7 +1716,7 @@ public class RoutineTest {
         try {
 
             new DefaultInvocationChannel<Object, Object>(null, new TestInvocationManager(),
-                                                      Runners.sharedRunner(), logger);
+                                                         Runners.sharedRunner(), logger);
 
             fail();
 

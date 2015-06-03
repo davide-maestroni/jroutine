@@ -37,7 +37,6 @@ import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Log;
@@ -86,7 +85,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
             fail();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
@@ -100,7 +99,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
             fail();
 
-        } catch (final InvocationException e) {
+        } catch (final AbortException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }

@@ -25,8 +25,8 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.SparseArray;
 
-import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
+import com.gh.bmd.jrt.android.builder.InvocationTypeException;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
@@ -729,7 +729,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         if (loader.getClass() != RoutineLoader.class) {
 
             logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
-            throw new InvocationClashException(loaderId);
+            throw new InvocationTypeException(loaderId);
         }
 
         final RoutineLoader<INPUT, OUTPUT> routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
@@ -740,7 +740,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
                         routineLoader.getInvocationArgs(), mArgs))) {
 
             logger.wrn("clashing loader ID [%d]: %s", loaderId, routineLoader.getInvocationType());
-            throw new InvocationClashException(loaderId);
+            throw new InvocationTypeException(loaderId);
         }
 
         final ClashResolutionType resolution =
@@ -765,7 +765,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         } else if (resolution == ClashResolutionType.ABORT_THIS) {
 
             logger.dbg("aborting invocation [%d]", loaderId);
-            throw new InputClashException(loaderId);
+            throw new InvocationClashException(loaderId);
         }
 
         return ClashType.ABORT_BOTH;
@@ -945,7 +945,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());
-            reset(new InvocationClashException(mLoader.getId()));
+            reset(new InvocationTypeException(mLoader.getId()));
         }
 
         private void reset(@Nullable final Throwable reason) {

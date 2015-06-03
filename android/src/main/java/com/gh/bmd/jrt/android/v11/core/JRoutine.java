@@ -19,6 +19,7 @@ import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
+import com.gh.bmd.jrt.android.builder.InvocationTypeException;
 import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
@@ -52,7 +53,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * an already running invocation with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
  * resolved, for example when invocations with different implementations share the same ID, the new
- * invocation is aborted with a {@link com.gh.bmd.jrt.android.builder.InvocationClashException}.
+ * invocation is aborted with a {@link InvocationTypeException}.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>

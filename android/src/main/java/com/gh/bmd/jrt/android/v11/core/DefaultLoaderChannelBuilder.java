@@ -22,6 +22,7 @@ import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -101,10 +102,12 @@ class DefaultLoaderChannelBuilder
     public <OUTPUT> OutputChannel<OUTPUT> buildChannel() {
 
         final Object context = mContext.get();
+        final ContextInvocationFactory<OUTPUT, OUTPUT> factory =
+                MissingLoaderInvocation.factoryOf(mLoaderId);
 
         if (context == null) {
 
-            return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf()).callSync();
+            return JRoutine.on(factory).callSync();
         }
 
         final LoaderRoutineBuilder<OUTPUT, OUTPUT> builder;
@@ -112,14 +115,12 @@ class DefaultLoaderChannelBuilder
         if (context instanceof Activity) {
 
             final Activity activity = (Activity) context;
-            builder = JRoutine.onActivity(activity,
-                                          MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf());
+            builder = JRoutine.onActivity(activity, factory);
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment,
-                                          MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf());
+            builder = JRoutine.onFragment(fragment, factory);
 
         } else {
 

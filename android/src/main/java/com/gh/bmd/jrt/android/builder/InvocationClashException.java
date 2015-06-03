@@ -13,14 +13,14 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
-import com.gh.bmd.jrt.common.RoutineException;
+import com.gh.bmd.jrt.common.AbortException;
 
 /**
- * Exception indicating a clash of routine invocations with the same ID.
+ * Exception indicating a clash of routine invocations sharing the same ID and type.
  * <p/>
  * Created by davide-maestroni on 12/14/14.
  */
-public class InvocationClashException extends RoutineException {
+public class InvocationClashException extends AbortException {
 
     private final int mId;
 
@@ -31,6 +31,7 @@ public class InvocationClashException extends RoutineException {
      */
     public InvocationClashException(final int id) {
 
+        super(null);
         mId = id;
     }
 

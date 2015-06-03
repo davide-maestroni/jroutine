@@ -38,8 +38,6 @@ public interface LoaderRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPU
         LoaderConfigurableBuilder<LoaderRoutineBuilder<INPUT, OUTPUT>>,
         LoaderRoutine<INPUT, OUTPUT> {
 
-    //TODO: kill the loader???, @Priority
-
     /**
      * {@inheritDoc}
      */

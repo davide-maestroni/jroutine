@@ -17,8 +17,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a factory providing wrapped object instances, whose methods are to be called
- * inside asynchronous invocations.
+ * Interface defining a factory providing object instances whose methods are to be called inside
+ * asynchronous invocations.
  * <p/>
  * Created by davide-maestroni on 4/6/2015.
  */

@@ -246,7 +246,7 @@ public final class LoaderConfiguration {
 
     /**
      * Invocation clash resolution enumeration.<br/>
-     * The clash of two invocation happens when the same loader ID is already in use at the time of
+     * The clash of two invocations happens when the same loader ID is already in use at the time of
      * the routine execution. The possible outcomes are:
      * <ul>
      * <li>the running invocation is retained and merged with the current one</li>
@@ -254,7 +254,8 @@ public final class LoaderConfiguration {
      * <li>the current invocation is aborted</li>
      * <li>both running and current invocations are aborted</li>
      * </ul>
-     * Two different types of resolution can be set based on whether the input data are different.
+     * Two different types of resolution can be set based on whether the input data are different or
+     * not.
      */
     public enum ClashResolutionType {
 
@@ -268,7 +269,7 @@ public final class LoaderConfiguration {
         ABORT_THAT,
         /**
          * The clash is resolved by aborting the invocation with an
-         * {@link com.gh.bmd.jrt.android.builder.InputClashException}.
+         * {@link com.gh.bmd.jrt.android.builder.InvocationClashException}.
          */
         ABORT_THIS,
         /**

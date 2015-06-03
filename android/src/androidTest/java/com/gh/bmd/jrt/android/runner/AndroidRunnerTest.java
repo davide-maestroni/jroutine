@@ -84,7 +84,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
         final OutputChannel<Object> channel = JRoutine.on(ClassToken.tokenOf(invocation))
                                                       .withInvocation()
                                                       .withFactoryArgs(this)
-                                                      .withAsyncRunner(Runners.threadRunner(
+                                                      .withAsyncRunner(Runners.handlerRunner(
                                                               new HandlerThread("test")))
                                                       .set()
                                                       .callAsync();
@@ -138,7 +138,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
     public void testThreadRunner() throws InterruptedException {
 
-        testRunner(Runners.threadRunner(new HandlerThread("test")));
+        testRunner(Runners.handlerRunner(new HandlerThread("test")));
     }
 
     private void testRunner(final Runner runner) throws InterruptedException {

@@ -65,7 +65,7 @@ class AsyncTaskRunner extends MainRunner {
             @Nonnull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
-        // the super method is called to ensure that a task is always started in the main thread
+        // the super method is called to ensure that a task is always started from the main thread
         super.run(task, delay, timeUnit);
     }
 

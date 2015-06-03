@@ -37,16 +37,20 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
     private static final Runner sMainRunner = new MainRunner();
 
     /**
-     * Returns a runner employing the specified looper.<br/>
-     * Note that, waiting for results in the very same thread may result in a deadlock exception.
+     * Returns a runner employing the specified handler thread.
      *
-     * @param looper the looper instance.
+     * @param thread the thread.
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner looperRunner(@Nonnull final Looper looper) {
+    public static Runner handlerRunner(@Nonnull final HandlerThread thread) {
 
-        return looperRunner(looper, null);
+        if (!thread.isAlive()) {
+
+            thread.start();
+        }
+
+        return looperRunner(thread.getLooper(), queuedRunner());
     }
 
     /**
@@ -65,6 +69,19 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
             @Nullable final Runner sameThreadRunner) {
 
         return new LooperRunner(looper, sameThreadRunner);
+    }
+
+    /**
+     * Returns a runner employing the specified looper.<br/>
+     * Note that, waiting for results in the very same thread may result in a deadlock exception.
+     *
+     * @param looper the looper instance.
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner looperRunner(@Nonnull final Looper looper) {
+
+        return looperRunner(looper, null);
     }
 
     /**
@@ -93,21 +110,6 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
     }
 
     /**
-     * Returns a runner employing async tasks.
-     * <p/>
-     * Beware of the caveats of using
-     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
-     * especially on some platform versions.
-     *
-     * @return the runner instance.
-     */
-    @Nonnull
-    public static Runner taskRunner() {
-
-        return taskRunner(null);
-    }
-
-    /**
      * Returns a runner employing async tasks running on the specified executor.
      * <p/>
      * Beware of the caveats of using
@@ -127,19 +129,17 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
     }
 
     /**
-     * Returns a runner employing the specified handler thread.
+     * Returns a runner employing async tasks.
+     * <p/>
+     * Beware of the caveats of using
+     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
+     * especially on some platform versions.
      *
-     * @param thread the thread.
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner threadRunner(@Nonnull final HandlerThread thread) {
+    public static Runner taskRunner() {
 
-        if (!thread.isAlive()) {
-
-            thread.start();
-        }
-
-        return looperRunner(thread.getLooper(), queuedRunner());
+        return taskRunner(null);
     }
 }

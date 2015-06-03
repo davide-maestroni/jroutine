@@ -37,27 +37,30 @@ final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvoca
      */
     static final String TYPE = MissingLoaderInvocation.class.getName();
 
-    private static final MissingLoaderInvocation<Object, Object> sInvocation =
-            new MissingLoaderInvocation<Object, Object>();
+    private final int mId;
 
     /**
-     * Avoid instantiation.
+     * Constructor.
+     *
+     * @param id the loader ID.
      */
-    private MissingLoaderInvocation() {
+    private MissingLoaderInvocation(final int id) {
 
+        mId = id;
     }
 
     /**
      * Returns a factory of missing loader invocations.
      *
+     * @param id       the loader ID.
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the factory.
      */
     @SuppressWarnings("unchecked")
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf() {
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(final int id) {
 
-        return (ContextInvocationFactory<INPUT, OUTPUT>) sInvocation;
+        return new MissingLoaderInvocation<INPUT, OUTPUT>(id);
     }
 
     @Nonnull
@@ -75,6 +78,6 @@ final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvoca
     @Override
     public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
-        result.abort(new InvocationMissingException());
+        result.abort(new InvocationMissingException(mId));
     }
 }

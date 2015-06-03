@@ -19,9 +19,9 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.R;
-import com.gh.bmd.jrt.android.builder.InputClashException;
 import com.gh.bmd.jrt.android.builder.InvocationClashException;
 import com.gh.bmd.jrt.android.builder.InvocationMissingException;
+import com.gh.bmd.jrt.android.builder.InvocationTypeException;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
@@ -100,7 +100,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InputClashException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
     }
@@ -126,7 +126,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InputClashException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
     }
@@ -475,7 +475,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationClashException ignored) {
+        } catch (final InvocationTypeException ignored) {
 
         }
 
@@ -501,7 +501,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationClashException ignored) {
+        } catch (final InvocationTypeException ignored) {
 
         }
 
@@ -702,7 +702,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationClashException ignored) {
+        } catch (final InvocationTypeException ignored) {
 
         }
 
@@ -764,7 +764,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InputClashException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
     }
@@ -1034,7 +1034,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationClashException ignored) {
+        } catch (final InvocationTypeException ignored) {
 
         }
 
@@ -1063,7 +1063,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationClashException ignored) {
+        } catch (final InvocationTypeException ignored) {
 
         }
 

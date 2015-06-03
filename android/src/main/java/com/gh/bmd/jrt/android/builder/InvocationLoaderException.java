@@ -13,20 +13,35 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.common.RoutineException;
+
 /**
- * Exception indicating that a routine invocation with a specified ID is not running.
+ * Base exception indicating that an unrecoverable error occurred during a loader invocation
+ * execution.
  * <p/>
- * Created by davide-maestroni on 1/14/15.
+ * Created by davide-maestroni on 03/06/15.
  */
-public class InvocationMissingException extends InvocationLoaderException {
+public class InvocationLoaderException extends RoutineException {
+
+    private final int mId;
 
     /**
      * Constructor.
      *
      * @param id the loader ID.
      */
-    public InvocationMissingException(final int id) {
+    public InvocationLoaderException(final int id) {
 
-        super(id);
+        mId = id;
+    }
+
+    /**
+     * Returns the loader ID.
+     *
+     * @return the loader ID.
+     */
+    public int getId() {
+
+        return mId;
     }
 }

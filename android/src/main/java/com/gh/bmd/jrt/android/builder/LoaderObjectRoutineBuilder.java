@@ -35,13 +35,14 @@ public interface LoaderObjectRoutineBuilder
         extends ObjectRoutineBuilder, LoaderConfigurableBuilder<LoaderObjectRoutineBuilder> {
 
     /**
-     * Returns a routine used to call the method whose identifying name is specified in a
+     * Returns a routine used to call the method whose identifying name is specified in an
      * {@link com.gh.bmd.jrt.annotation.Alias} annotation.<br/>
      * Optional {@link com.gh.bmd.jrt.annotation.Priority},
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
      * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -58,12 +59,13 @@ public interface LoaderObjectRoutineBuilder
     /**
      * Returns a routine used to call the specified method.
      * <p/>
-     * The method is invoked ignoring a name specified in a
+     * The method is invoked ignoring a name specified in an
      * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
      * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
      * {@link com.gh.bmd.jrt.annotation.Timeout}, {@link com.gh.bmd.jrt.annotation.TimeoutAction},
      * as well as {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
      * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -79,12 +81,13 @@ public interface LoaderObjectRoutineBuilder
     /**
      * Returns a routine used to call the specified method.
      * <p/>
-     * The method is searched via reflection ignoring a name specified in a
+     * The method is searched via reflection ignoring a name specified in an
      * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
      * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
      * {@link com.gh.bmd.jrt.annotation.Timeout}, {@link com.gh.bmd.jrt.annotation.TimeoutAction},
      * as well as {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
      * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -106,7 +109,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
      * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -127,7 +131,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout},
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
      * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *

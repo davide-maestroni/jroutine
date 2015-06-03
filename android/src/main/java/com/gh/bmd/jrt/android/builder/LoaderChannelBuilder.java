@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of output channels bound to routine invocations.<br/>
+ * Interface defining a builder of output channels bound to loader invocations.<br/>
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
  * and still running (or cached) at the time of the channel creation.
  * <p/>

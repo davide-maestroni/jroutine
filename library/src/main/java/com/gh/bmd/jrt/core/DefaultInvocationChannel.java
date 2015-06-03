@@ -16,9 +16,9 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.InputDeadlockException;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
@@ -50,7 +50,7 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
+class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT, OUTPUT> {
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
@@ -95,7 +95,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
      * @param logger        the logger instance.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
-    DefaultRoutineChannel(@Nonnull final InvocationConfiguration configuration,
+    DefaultInvocationChannel(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final InvocationManager<INPUT, OUTPUT> manager, @Nonnull final Runner runner,
             @Nonnull final Logger logger) {
 
@@ -219,7 +219,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public RoutineChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
+    public InvocationChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
         synchronized (mMutex) {
 
@@ -238,19 +238,19 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+    public InvocationChannel<INPUT, OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> now() {
+    public InvocationChannel<INPUT, OUTPUT> now() {
 
         return after(ZERO);
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> pass(
+    public InvocationChannel<INPUT, OUTPUT> pass(
             @Nullable final OutputChannel<? extends INPUT> channel) {
 
         final TimeDuration delay;
@@ -278,7 +278,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
+    public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
         NestedQueue<INPUT> inputQueue;
         ArrayList<INPUT> list = null;
@@ -355,7 +355,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
+    public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
         NestedQueue<INPUT> inputQueue;
         boolean needsExecution = false;
@@ -411,7 +411,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
+    public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
         synchronized (mMutex) {
 

@@ -22,7 +22,7 @@ import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.RoutineChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
@@ -375,7 +375,7 @@ public class RoutineBuilders {
                             + " must have no input parameters: " + method);
         }
 
-        if (!method.getReturnType().isAssignableFrom(RoutineChannel.class)) {
+        if (!method.getReturnType().isAssignableFrom(InvocationChannel.class)) {
 
             throw new IllegalArgumentException(
                     "the proxy method has incompatible return type: " + method);
@@ -724,17 +724,17 @@ public class RoutineBuilders {
 
         if (inputMode == InputMode.ELEMENT) {
 
-            final RoutineChannel<Object, Object> routineChannel = routine.invokeParallel();
+            final InvocationChannel<Object, Object> invocationChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
             final Object arg = args[0];
 
             if (arg == null) {
 
-                routineChannel.pass((Iterable<Object>) null);
+                invocationChannel.pass((Iterable<Object>) null);
 
             } else if (OutputChannel.class.isAssignableFrom(parameterType)) {
 
-                routineChannel.pass((OutputChannel<Object>) arg);
+                invocationChannel.pass((OutputChannel<Object>) arg);
 
             } else if (parameterType.isArray()) {
 
@@ -742,7 +742,7 @@ public class RoutineBuilders {
 
                 for (int i = 0; i < length; i++) {
 
-                    routineChannel.pass(Array.get(arg, i));
+                    invocationChannel.pass(Array.get(arg, i));
                 }
 
             } else {
@@ -751,15 +751,15 @@ public class RoutineBuilders {
 
                 for (final Object input : iterable) {
 
-                    routineChannel.pass(input);
+                    invocationChannel.pass(input);
                 }
             }
 
-            outputChannel = routineChannel.result();
+            outputChannel = invocationChannel.result();
 
         } else if (inputMode == InputMode.VALUE) {
 
-            final RoutineChannel<Object, Object> routineChannel = routine.invokeAsync();
+            final InvocationChannel<Object, Object> invocationChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
 
@@ -769,15 +769,15 @@ public class RoutineBuilders {
 
                 if (OutputChannel.class.isAssignableFrom(parameterTypes[i])) {
 
-                    routineChannel.pass((OutputChannel<Object>) arg);
+                    invocationChannel.pass((OutputChannel<Object>) arg);
 
                 } else {
 
-                    routineChannel.pass(arg);
+                    invocationChannel.pass(arg);
                 }
             }
 
-            outputChannel = routineChannel.result();
+            outputChannel = invocationChannel.result();
 
         } else if (inputMode == InputMode.COLLECTION) {
 

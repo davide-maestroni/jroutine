@@ -945,7 +945,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
         public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());
-            reset(new InvocationTypeException(mLoader.getId()));
+            reset(new InvocationClashException(mLoader.getId()));
         }
 
         private void reset(@Nullable final Throwable reason) {

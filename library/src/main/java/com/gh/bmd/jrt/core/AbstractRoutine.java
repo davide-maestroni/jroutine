@@ -15,9 +15,9 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.RoutineChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
-import com.gh.bmd.jrt.core.DefaultRoutineChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Logger;
@@ -148,13 +148,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> invokeAsync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
 
         return invoke(true);
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> invokeParallel() {
+    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
 
         synchronized (mParallelMutex) {
 
@@ -179,7 +179,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> invokeSync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
 
         return invoke(false);
     }
@@ -289,11 +289,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    private RoutineChannel<INPUT, OUTPUT> invoke(final boolean async) {
+    private InvocationChannel<INPUT, OUTPUT> invoke(final boolean async) {
 
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
-        return new DefaultRoutineChannel<INPUT, OUTPUT>(mConfiguration, getInvocationManager(async),
+        return new DefaultInvocationChannel<INPUT, OUTPUT>(mConfiguration, getInvocationManager(async),
                                                         (async) ? mAsyncRunner : mSyncRunner,
                                                         logger);
     }

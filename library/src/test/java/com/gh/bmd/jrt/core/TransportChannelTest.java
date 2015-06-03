@@ -17,7 +17,7 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
-import com.gh.bmd.jrt.channel.RoutineChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
@@ -58,10 +58,10 @@ public class TransportChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        final RoutineChannel<String, String> routineChannel =
+        final InvocationChannel<String, String> invocationChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync();
         final OutputChannel<String> outputChannel =
-                transportChannel.output().passTo(routineChannel).result();
+                transportChannel.output().passTo(invocationChannel).result();
 
         transportChannel.input().abort(new IllegalStateException());
 

@@ -48,7 +48,7 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         &#64;Inputs({int.class, int.class})
- *         public RoutineChannel&lt;Integer, Integer&gt; sum();
+ *         public InvocationChannel&lt;Integer, Integer&gt; sum();
  *     </code>
  * </pre>
  * <p/>

@@ -29,49 +29,49 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface RoutineChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
+public interface InvocationChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineChannel<INPUT, OUTPUT> after(@Nonnull TimeDuration delay);
+    InvocationChannel<INPUT, OUTPUT> after(@Nonnull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    InvocationChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineChannel<INPUT, OUTPUT> now();
+    InvocationChannel<INPUT, OUTPUT> now();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
+    InvocationChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+    InvocationChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
+    InvocationChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
+    InvocationChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
 
     /**
      * Closes the input channel and returns the output one.

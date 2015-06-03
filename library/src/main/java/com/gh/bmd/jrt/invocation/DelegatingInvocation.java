@@ -13,8 +13,9 @@
  */
 package com.gh.bmd.jrt.invocation;
 
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.RoutineChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
@@ -31,7 +32,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
-    private RoutineChannel<INPUT, OUTPUT> mChannel = null;
+    private InvocationChannel<INPUT, OUTPUT> mChannel = null;
 
     /**
      * Constructor.

@@ -32,9 +32,9 @@ import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
@@ -162,7 +162,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> invokeAsync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
 
         return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationClass,
                                                  mInvocationConfiguration, mServiceConfiguration,
@@ -170,7 +170,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> invokeParallel() {
+    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
 
         return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationClass,
                                                  mInvocationConfiguration, mServiceConfiguration,
@@ -178,7 +178,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public RoutineChannel<INPUT, OUTPUT> invokeSync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
 
         return mRoutine.invokeSync();
     }
@@ -195,7 +195,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class ServiceChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
+    private static class ServiceChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT, OUTPUT> {
 
         private final Context mContext;
 
@@ -315,14 +315,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public RoutineChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
+        public InvocationChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mTransportParamInput.after(delay);
             return this;
         }
 
         @Nonnull
-        public RoutineChannel<INPUT, OUTPUT> after(final long delay,
+        public InvocationChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
             mTransportParamInput.after(delay, timeUnit);
@@ -330,14 +330,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public RoutineChannel<INPUT, OUTPUT> now() {
+        public InvocationChannel<INPUT, OUTPUT> now() {
 
             mTransportParamInput.now();
             return this;
         }
 
         @Nonnull
-        public RoutineChannel<INPUT, OUTPUT> pass(
+        public InvocationChannel<INPUT, OUTPUT> pass(
                 @Nullable final OutputChannel<? extends INPUT> channel) {
 
             bindService();
@@ -346,7 +346,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public RoutineChannel<INPUT, OUTPUT> pass(
+        public InvocationChannel<INPUT, OUTPUT> pass(
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
             bindService();
@@ -355,7 +355,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
+        public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
             mTransportParamInput.pass(input);
@@ -363,7 +363,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public RoutineChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
+        public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
             mTransportParamInput.pass(inputs);

@@ -25,8 +25,8 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.RoutineChannel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -81,6 +81,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private final byte[] mByteBuffer = new byte[2048];
 
+    protected TypeMirror invocationChannelType;
+
     protected TypeMirror iterableType;
 
     protected TypeMirror listType;
@@ -88,8 +90,6 @@ public class RoutineProcessor extends AbstractProcessor {
     protected TypeMirror objectType;
 
     protected TypeMirror outputChannelType;
-
-    protected TypeMirror routineChannelType;
 
     private String mFooter;
 
@@ -176,7 +176,8 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        routineChannelType = getTypeFromName(RoutineChannel.class.getCanonicalName()).asType();
+        invocationChannelType =
+                getTypeFromName(InvocationChannel.class.getCanonicalName()).asType();
         outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
         iterableType = getTypeFromName(Iterable.class.getCanonicalName()).asType();
         listType = getTypeFromName(List.class.getCanonicalName()).asType();
@@ -911,7 +912,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
 
-        if (!typeUtils.isAssignable(this.routineChannelType,
+        if (!typeUtils.isAssignable(this.invocationChannelType,
                                     typeUtils.erasure(methodElement.getReturnType()))) {
 
             throw new IllegalArgumentException(

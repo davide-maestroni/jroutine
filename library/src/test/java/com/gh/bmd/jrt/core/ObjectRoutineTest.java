@@ -28,8 +28,8 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.InputChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -1183,11 +1183,11 @@ public class ObjectRoutineTest {
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.VALUE)
-        RoutineChannel<Character, Integer> add6();
+        InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.ELEMENT)
-        RoutineChannel<Character, Integer> add7();
+        InvocationChannel<Character, Integer> add7();
 
         @Alias("aa")
         int[] addA00(char[] c);
@@ -1282,15 +1282,15 @@ public class ObjectRoutineTest {
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.VALUE)
-        RoutineChannel<char[], int[]> addA20();
+        InvocationChannel<char[], int[]> addA20();
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.ELEMENT)
-        RoutineChannel<char[], int[]> addA21();
+        InvocationChannel<char[], int[]> addA21();
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.COLLECTION)
-        RoutineChannel<Character, int[]> addA22();
+        InvocationChannel<Character, int[]> addA22();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
@@ -1385,15 +1385,15 @@ public class ObjectRoutineTest {
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.VALUE)
-        RoutineChannel<List<Character>, List<Integer>> addL20();
+        InvocationChannel<List<Character>, List<Integer>> addL20();
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.ELEMENT)
-        RoutineChannel<List<Character>, List<Integer>> addL21();
+        InvocationChannel<List<Character>, List<Integer>> addL21();
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.COLLECTION)
-        RoutineChannel<Character, List<Integer>> addL22();
+        InvocationChannel<Character, List<Integer>> addL22();
 
         @Alias("g")
         int get0();
@@ -1410,7 +1410,7 @@ public class ObjectRoutineTest {
 
         @Alias("g")
         @Inputs({})
-        RoutineChannel<Void, Integer> get2();
+        InvocationChannel<Void, Integer> get2();
 
         @Alias("s")
         void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
@@ -1445,7 +1445,7 @@ public class ObjectRoutineTest {
 
         @Alias("ga")
         @Inputs({})
-        RoutineChannel<Void, int[]> getA4();
+        InvocationChannel<Void, int[]> getA4();
 
         @Alias("gl")
         List<Integer> getL0();
@@ -1479,27 +1479,27 @@ public class ObjectRoutineTest {
 
         @Alias("gl")
         @Inputs({})
-        RoutineChannel<Void, List> getL4();
+        InvocationChannel<Void, List> getL4();
 
         @Alias("s")
         @Inputs(value = int.class, mode = InputMode.VALUE)
-        RoutineChannel<Integer, Void> set3();
+        InvocationChannel<Integer, Void> set3();
 
         @Alias("sa")
         @Inputs(value = int[].class, mode = InputMode.VALUE)
-        RoutineChannel<int[], Void> setA4();
+        InvocationChannel<int[], Void> setA4();
 
         @Alias("sa")
         @Inputs(value = int[].class, mode = InputMode.COLLECTION)
-        RoutineChannel<Integer, Void> setA5();
+        InvocationChannel<Integer, Void> setA5();
 
         @Alias("sl")
         @Inputs(value = List.class, mode = InputMode.VALUE)
-        RoutineChannel<List<Integer>, Void> setL4();
+        InvocationChannel<List<Integer>, Void> setL4();
 
         @Alias("sl")
         @Inputs(value = List.class, mode = InputMode.COLLECTION)
-        RoutineChannel<Integer, Void> setL5();
+        InvocationChannel<Integer, Void> setL5();
     }
 
     public interface SumError2 {
@@ -1674,11 +1674,11 @@ public class ObjectRoutineTest {
 
         @Alias("compute")
         @Inputs(int[].class)
-        RoutineChannel<Integer, Integer> compute2();
+        InvocationChannel<Integer, Integer> compute2();
 
         @Alias("compute")
         @Inputs(int.class)
-        RoutineChannel<Integer, Integer> compute3();
+        InvocationChannel<Integer, Integer> compute3();
 
         @Alias("compute")
         int computeList(@Input(List.class) OutputChannel<Integer> ints);

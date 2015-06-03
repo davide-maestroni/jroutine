@@ -37,9 +37,9 @@ import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.RoutineChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
@@ -324,7 +324,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         assertThat(routine2.callAsync("test1").afterMax(timeout).all()).containsExactly("test1");
 
-        final RoutineChannel<Object, Object> channel =
+        final InvocationChannel<Object, Object> channel =
                 routine2.invokeAsync().after(timeout).pass("test2");
         channel.now().abort(new IllegalArgumentException());
 
@@ -458,7 +458,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testActivityRestart() {
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = TimeDuration.seconds(1000);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withLoader()
@@ -475,7 +475,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationTypeException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -501,7 +501,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationTypeException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -864,7 +864,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         assertThat(routine2.callAsync("test1").afterMax(timeout).all()).containsExactly("test1");
 
-        final RoutineChannel<Object, Object> channel =
+        final InvocationChannel<Object, Object> channel =
                 routine2.invokeAsync().after(timeout).pass("test2");
         channel.now().abort(new IllegalArgumentException());
 
@@ -1034,7 +1034,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationTypeException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -1063,7 +1063,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationTypeException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 

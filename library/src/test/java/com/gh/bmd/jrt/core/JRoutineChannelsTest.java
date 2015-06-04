@@ -18,10 +18,10 @@ import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.core.JRoutineChannels.Selectable;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import org.junit.Test;
 

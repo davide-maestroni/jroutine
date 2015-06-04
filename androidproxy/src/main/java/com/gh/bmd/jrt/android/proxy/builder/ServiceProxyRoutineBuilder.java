@@ -17,8 +17,8 @@ import com.gh.bmd.jrt.android.builder.ServiceConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 

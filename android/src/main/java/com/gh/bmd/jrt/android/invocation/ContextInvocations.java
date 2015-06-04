@@ -16,11 +16,11 @@ package com.gh.bmd.jrt.android.invocation;
 import android.content.Context;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.reflect.Modifier;
 import java.util.List;

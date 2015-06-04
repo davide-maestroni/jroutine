@@ -32,7 +32,6 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.core.AbstractRoutine;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
@@ -41,6 +40,7 @@ import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Basic implementation of a service running routine invocations.

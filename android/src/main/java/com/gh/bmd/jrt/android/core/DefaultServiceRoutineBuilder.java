@@ -20,8 +20,8 @@ import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 

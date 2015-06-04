@@ -58,7 +58,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final ${classFullName} mTarget;
 
-        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+        private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
         private ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
@@ -73,7 +73,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         @Override
         @javax.annotation.Nonnull
-        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
+        protected com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }

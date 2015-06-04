@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 

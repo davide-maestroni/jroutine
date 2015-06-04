@@ -39,7 +39,6 @@ import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
-import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
@@ -47,6 +46,7 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +60,7 @@ import static com.gh.bmd.jrt.android.service.RoutineService.putError;
 import static com.gh.bmd.jrt.android.service.RoutineService.putInvocationId;
 import static com.gh.bmd.jrt.android.service.RoutineService.putParallelInvocation;
 import static com.gh.bmd.jrt.android.service.RoutineService.putValue;
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 import static java.util.UUID.randomUUID;
 
 /**

@@ -58,7 +58,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @javax.annotation.Nonnull
     private static <OUTPUT> com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder<Object, OUTPUT> getBuilder(
             @javax.annotation.Nonnull final java.lang.ref.WeakReference<android.content.Context> contextReference,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.common.ClassToken<? extends com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, OUTPUT>> classToken) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.util.ClassToken<? extends com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, OUTPUT>> classToken) {
 
         final android.content.Context context = contextReference.get();
 
@@ -89,7 +89,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (target == null) {
 
-            target = com.gh.bmd.jrt.common.Reflection.findConstructor(targetClass, args).newInstance(args);
+            target = com.gh.bmd.jrt.util.Reflection.findConstructor(targetClass, args).newInstance(args);
 
         } else if (!targetClass.isInstance(target)) {
 
@@ -117,7 +117,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final Class<?> mTargetClass;
 
-        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+        private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         private ServiceProxyBuilder(@javax.annotation.Nonnull final android.content.Context context,
                 @javax.annotation.Nonnull final Class<?> targetClass) {
@@ -128,7 +128,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         @Override
         @javax.annotation.Nonnull
-        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
+        protected com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }

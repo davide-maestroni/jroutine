@@ -18,7 +18,7 @@ import android.content.Context;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 

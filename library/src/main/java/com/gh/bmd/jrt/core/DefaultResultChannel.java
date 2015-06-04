@@ -25,7 +25,6 @@ import com.gh.bmd.jrt.channel.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
@@ -33,6 +32,7 @@ import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.time.TimeDuration.Check;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;

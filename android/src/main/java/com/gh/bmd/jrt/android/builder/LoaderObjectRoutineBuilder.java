@@ -16,8 +16,8 @@ package com.gh.bmd.jrt.android.builder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.reflect.Method;
 

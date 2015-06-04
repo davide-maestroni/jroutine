@@ -24,13 +24,13 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.callFromInvocation;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedStaticMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.common.Reflection.findMethod;
+import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
  * Class implementing a builder of routines wrapping a class method.

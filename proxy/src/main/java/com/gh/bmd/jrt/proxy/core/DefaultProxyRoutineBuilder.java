@@ -15,17 +15,17 @@ package com.gh.bmd.jrt.proxy.core;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a proxy builder.

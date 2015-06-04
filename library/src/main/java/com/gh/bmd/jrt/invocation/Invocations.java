@@ -15,14 +15,14 @@ package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Utility class for creating invocation factory objects.

@@ -17,10 +17,10 @@ import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 

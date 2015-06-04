@@ -26,9 +26,9 @@ import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
@@ -41,9 +41,9 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getTargetMethodInfo;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.invokeRoutine;
-import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
-import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
+import static com.gh.bmd.jrt.util.Reflection.NO_ARGS;
+import static com.gh.bmd.jrt.util.Reflection.boxingClass;
 
 /**
  * Class implementing a builder of routines wrapping an object instance.

@@ -31,12 +31,12 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.builder.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -54,8 +54,8 @@ import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedMethod;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.getTargetMethodInfo;
 import static com.gh.bmd.jrt.builder.RoutineBuilders.invokeRoutine;
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
-import static com.gh.bmd.jrt.common.Reflection.findMethod;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
  * Class implementing a builder of routine objects based on methods of a concrete object instance.

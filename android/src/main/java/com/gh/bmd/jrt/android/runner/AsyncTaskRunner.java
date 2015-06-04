@@ -18,8 +18,8 @@ import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.runner.Execution;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.util.Collections;
 import java.util.Map;

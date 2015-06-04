@@ -22,15 +22,15 @@ import com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a context proxy builder.

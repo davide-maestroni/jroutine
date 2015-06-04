@@ -22,9 +22,9 @@ import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.util.concurrent.Semaphore;
 

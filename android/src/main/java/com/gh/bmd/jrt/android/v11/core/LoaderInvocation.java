@@ -40,13 +40,13 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;

@@ -25,7 +25,7 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Test application.

@@ -38,7 +38,6 @@ import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
@@ -46,6 +45,7 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;

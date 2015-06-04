@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.proxy.builder;
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
-import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 

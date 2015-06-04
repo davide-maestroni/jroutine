@@ -24,9 +24,9 @@ import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -43,9 +43,9 @@ import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.gh.bmd.jrt.common.Reflection.boxingClass;
-import static com.gh.bmd.jrt.common.Reflection.findMethod;
-import static com.gh.bmd.jrt.common.Reflection.makeAccessible;
+import static com.gh.bmd.jrt.util.Reflection.boxingClass;
+import static com.gh.bmd.jrt.util.Reflection.findMethod;
+import static com.gh.bmd.jrt.util.Reflection.makeAccessible;
 
 /**
  * Utility class used to manage cached objects shared by routine builders.

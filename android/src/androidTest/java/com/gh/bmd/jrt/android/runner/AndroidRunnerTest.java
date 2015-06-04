@@ -20,7 +20,6 @@ import android.test.AndroidTestCase;
 import com.gh.bmd.jrt.android.v11.core.JRoutine;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
@@ -30,6 +29,7 @@ import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.util.ArrayList;
 import java.util.List;

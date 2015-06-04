@@ -31,7 +31,6 @@ import com.gh.bmd.jrt.channel.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
@@ -52,6 +51,7 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import org.junit.Test;
 

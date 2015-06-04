@@ -124,7 +124,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (target == null) {
 
-            target = com.gh.bmd.jrt.common.Reflection.findConstructor(targetClass, args).newInstance(args);
+            target = com.gh.bmd.jrt.util.Reflection.findConstructor(targetClass, args).newInstance(args);
 
         } else if (!targetClass.isInstance(target)) {
 
@@ -152,7 +152,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final Class<?> mTargetClass;
 
-        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+        private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         private LoaderProxyBuilder(@javax.annotation.Nonnull final Object context, @javax.annotation.Nonnull final Class<?> targetClass) {
 
@@ -162,7 +162,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         @Override
         @javax.annotation.Nonnull
-        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
+        protected com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }

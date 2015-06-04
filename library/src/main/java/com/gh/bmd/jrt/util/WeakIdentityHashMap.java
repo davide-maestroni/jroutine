@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.common;
+package com.gh.bmd.jrt.util;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;

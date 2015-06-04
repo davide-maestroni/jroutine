@@ -16,9 +16,9 @@ package com.gh.bmd.jrt.android.builder;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
-import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.util.Reflection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

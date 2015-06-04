@@ -36,13 +36,13 @@ import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.util.List;
 

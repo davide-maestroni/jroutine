@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 /**
- * Routine helper classes and exception definitions.
+ * Routine helper classes definitions.
  * <p/>
  * Created by davide-maestroni on 9/25/14.
  */
-package com.gh.bmd.jrt.common;
+package com.gh.bmd.jrt.util;

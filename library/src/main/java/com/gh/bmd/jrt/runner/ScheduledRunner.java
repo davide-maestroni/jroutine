@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.runner;
 
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.util.Collections;
 import java.util.Map;

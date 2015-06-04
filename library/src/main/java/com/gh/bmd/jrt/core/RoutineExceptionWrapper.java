@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.RoutineException;
+import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.invocation.InvocationException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +43,7 @@ class RoutineExceptionWrapper {
      * If the specified object is a wrapper instance, the wrapped routine exception is thrown.
      *
      * @param obj the object to check.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the specified object is an exception
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the specified object is an exception
      *                                                wrapper instance.
      */
     static void raise(@Nullable final Object obj) {

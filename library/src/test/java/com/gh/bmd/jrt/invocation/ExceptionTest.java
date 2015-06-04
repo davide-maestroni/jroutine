@@ -11,22 +11,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.routine;
+package com.gh.bmd.jrt.invocation;
 
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Exception unit tests.
+ * Exceptions unit tests.
  * <p/>
- * Created by davide-maestroni on 10/3/14.
+ * Created by davide-maestroni on 10/2/14.
  */
 public class ExceptionTest {
 
     @Test
-    public void testExceptions() {
+    public void tesInvocationDeadlockException() {
 
         assertThat(new InvocationDeadlockException("")).hasNoCause();
+    }
+
+    @Test
+    public void testInvocationException() {
+
+        assertThat(
+                new InvocationException(new NullPointerException()).getCause()).isExactlyInstanceOf(
+                NullPointerException.class);
+        assertThat(new InvocationException(null)).hasNoCause();
+    }
+
+    @Test
+    public void testInvocationInterruptedException() {
+
+        assertThat(new InvocationInterruptedException(
+                new InterruptedException()).getCause()).isExactlyInstanceOf(
+                InterruptedException.class);
+        assertThat(new InvocationInterruptedException(null)).hasNoCause();
     }
 }

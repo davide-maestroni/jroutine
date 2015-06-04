@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.runner;
 
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 
 import java.util.concurrent.TimeUnit;
 

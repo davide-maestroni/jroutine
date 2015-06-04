@@ -25,8 +25,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ExceptionTest {
 
     @Test
+    public void testAbortException() {
+
+        assertThat(new AbortException(new NullPointerException()).getCause()).isExactlyInstanceOf(
+                NullPointerException.class);
+        assertThat(new AbortException(null)).hasNoCause();
+    }
+
+    @Test
+    public void testDeadlockException() {
+
+        assertThat(new DeadlockException("")).hasNoCause();
+    }
+
+    @Test
     public void testExceptions() {
 
         assertThat(new ReadDeadlockException("")).hasNoCause();
+    }
+
+    @Test
+    public void testInputDeadlockException() {
+
+        assertThat(new InputDeadlockException("")).hasNoCause();
+    }
+
+    @Test
+    public void testOutputDeadlockException() {
+
+        assertThat(new OutputDeadlockException("")).hasNoCause();
     }
 }

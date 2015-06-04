@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.builder;
-
-import com.gh.bmd.jrt.common.DeadlockException;
+package com.gh.bmd.jrt.channel;
 
 import javax.annotation.Nullable;
 

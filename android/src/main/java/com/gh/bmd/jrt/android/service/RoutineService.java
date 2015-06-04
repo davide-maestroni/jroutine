@@ -31,11 +31,11 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.common.Reflection;
-import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.core.AbstractRoutine;
 import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -943,8 +943,8 @@ public class RoutineService extends Service {
          * Passes the specified input to the invocation parameter channel.
          *
          * @param input the input.
-         * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException        if the channel is already closed.
+         * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException         if the channel is already closed.
          */
         public void pass(@Nullable final Object input) {
 
@@ -970,9 +970,9 @@ public class RoutineService extends Service {
         /**
          * Closes the input channel and binds the specified consumer to the output one.
          *
-         * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException        if the channel is already closed or
-         *                                                already bound to a consumer.
+         * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException         if the channel is already closed or
+         *                                                 already bound to a consumer.
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 

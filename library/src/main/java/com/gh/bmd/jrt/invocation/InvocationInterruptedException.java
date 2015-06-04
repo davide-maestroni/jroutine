@@ -11,39 +11,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.common;
+package com.gh.bmd.jrt.invocation;
+
+import javax.annotation.Nullable;
 
 /**
- * Common base class for all the exceptions defined in the framework.
+ * Exception wrapping a thread interrupted exception caught inside a routine execution.
  * <p/>
- * Created by davide-maestroni on 1/23/15.
+ * Created by davide-maestroni on 9/8/14.
  */
-public class RoutineException extends RuntimeException {
-
-    /**
-     * Constructor.
-     */
-    public RoutineException() {
-
-    }
+public class InvocationInterruptedException extends InvocationException {
 
     /**
      * Constructor.
      *
-     * @param message the error message.
+     * @param cause the wrapped exception.
      */
-    public RoutineException(final String message) {
-
-        super(message);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param cause the error cause.
-     */
-    public RoutineException(final Throwable cause) {
+    public InvocationInterruptedException(@Nullable final InterruptedException cause) {
 
         super(cause);
+        Thread.currentThread().interrupt();
     }
 }

@@ -14,9 +14,8 @@
 package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.RoutineException;
 
 import java.lang.reflect.Constructor;
 import java.util.List;

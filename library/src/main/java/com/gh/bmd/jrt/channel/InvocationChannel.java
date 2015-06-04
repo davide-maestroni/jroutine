@@ -77,8 +77,8 @@ public interface InvocationChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * Closes the input channel and returns the output one.
      *
      * @return the routine output channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     OutputChannel<OUTPUT> result();

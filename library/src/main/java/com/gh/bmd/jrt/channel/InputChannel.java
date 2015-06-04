@@ -38,8 +38,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param delay the delay.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> after(@Nonnull TimeDuration delay);
@@ -52,9 +52,9 @@ public interface InputChannel<INPUT> extends Channel {
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalArgumentException     if the specified delay is negative.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalArgumentException      if the specified delay is negative.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
@@ -63,8 +63,8 @@ public interface InputChannel<INPUT> extends Channel {
      * Tells the channel to not delay the transfer of data.
      *
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> now();
@@ -77,8 +77,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param channel the output channel.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      * @see com.gh.bmd.jrt.channel.OutputChannel#passTo(InputChannel)
      */
     @Nonnull
@@ -89,8 +89,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the iterable returning the input data.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
@@ -100,8 +100,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param input the input.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable INPUT input);
@@ -111,8 +111,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the input data.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable INPUT... inputs);

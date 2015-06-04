@@ -11,28 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.builder;
-
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package com.gh.bmd.jrt.android.invocation;
 
 /**
- * Exception unit tests.
+ * Exception indicating a clash of routine invocations sharing the same ID and type.
  * <p/>
- * Created by davide-maestroni on 3/26/15.
+ * Created by davide-maestroni on 12/14/14.
  */
-public class ExceptionTest {
+public class InvocationClashException extends LoaderInvocationException {
 
-    @Test
-    public void testInputDeadlockException() {
+    /**
+     * Constructor.
+     *
+     * @param id the loader ID.
+     */
+    public InvocationClashException(final int id) {
 
-        assertThat(new InputDeadlockException("")).hasNoCause();
-    }
-
-    @Test
-    public void testOutputDeadlockException() {
-
-        assertThat(new OutputDeadlockException("")).hasNoCause();
+        super(id);
     }
 }

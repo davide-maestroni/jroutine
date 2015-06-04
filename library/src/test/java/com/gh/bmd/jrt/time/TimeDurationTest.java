@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.time;
 
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.time.TimeDuration.Check;
 
 import org.junit.Test;

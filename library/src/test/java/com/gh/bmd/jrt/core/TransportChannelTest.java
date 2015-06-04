@@ -15,13 +15,13 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.TimeoutAction.TimeoutActionType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
-import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;

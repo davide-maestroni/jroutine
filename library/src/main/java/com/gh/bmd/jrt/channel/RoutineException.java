@@ -11,24 +11,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.common;
-
-import javax.annotation.Nullable;
+package com.gh.bmd.jrt.channel;
 
 /**
- * Exception indicating a possible deadlock.
+ * Common base class for all the exceptions defined in the framework.
  * <p/>
- * Created by davide-maestroni on 11/25/14.
+ * Created by davide-maestroni on 1/23/15.
  */
-public class DeadlockException extends RoutineException {
+public class RoutineException extends RuntimeException {
+
+    /**
+     * Constructor.
+     */
+    public RoutineException() {
+
+    }
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public DeadlockException(@Nullable final String message) {
+    public RoutineException(final String message) {
 
         super(message);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param cause the error cause.
+     */
+    public RoutineException(final Throwable cause) {
+
+        super(cause);
     }
 }

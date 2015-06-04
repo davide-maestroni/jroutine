@@ -16,8 +16,8 @@ package com.gh.bmd.jrt.android.proxy.app;
 import android.app.Application;
 
 import com.gh.bmd.jrt.android.builder.FactoryContext;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.RoutineException;
+import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.invocation.InvocationException;
 
 import java.util.Arrays;
 import java.util.HashMap;

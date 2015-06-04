@@ -41,9 +41,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param timeout the maximum timeout.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already bound to a
-     *                                                consumer.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already bound to a
+     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
@@ -57,10 +57,10 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @param timeout  the maximum timeout value.
      * @param timeUnit the timeout time unit.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalArgumentException     if the specified timeout is negative.
-     * @throws java.lang.IllegalStateException        if this channel is already bound to a
-     *                                                consumer.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalArgumentException      if the specified timeout is negative.
+     * @throws java.lang.IllegalStateException         if this channel is already bound to a
+     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
@@ -72,7 +72,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
      *                                                      exception when the timeout elapses.
-     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
+     * @throws com.gh.bmd.jrt.channel.RoutineException      if the execution has been aborted.
      * @throws java.lang.IllegalStateException              if this channel is already bound to a
      *                                                      consumer.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
@@ -94,7 +94,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
      *                                                      exception when the timeout elapses.
-     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
+     * @throws com.gh.bmd.jrt.channel.RoutineException      if the execution has been aborted.
      * @throws java.lang.IllegalStateException              if this channel is already bound to a
      *                                                      consumer.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
@@ -124,9 +124,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already bound to a
-     *                                                consumer.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already bound to a
+     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> eventually();
@@ -185,9 +185,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already bound to a
-     *                                                consumer.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already bound to a
+     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> immediately();
@@ -207,7 +207,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @return the first available result.
      * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
      *                                                      exception when the timeout elapses.
-     * @throws com.gh.bmd.jrt.common.RoutineException       if the execution has been aborted.
+     * @throws com.gh.bmd.jrt.channel.RoutineException      if the execution has been aborted.
      * @throws java.lang.IllegalStateException              if this channel is already bound to a
      *                                                      consumer.
      * @throws java.util.NoSuchElementException             if no output is available (it might be

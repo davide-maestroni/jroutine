@@ -73,8 +73,8 @@ import javax.annotation.Nullable;
  * longer needed, so any associated resource can be safely released.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
- * {@link com.gh.bmd.jrt.common.RoutineException}, will be wrapped as the cause of an
- * {@link com.gh.bmd.jrt.common.InvocationException} instance.
+ * {@link com.gh.bmd.jrt.channel.RoutineException}, will be wrapped as the cause of an
+ * {@link com.gh.bmd.jrt.invocation.InvocationException} instance.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *

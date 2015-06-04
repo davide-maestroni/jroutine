@@ -11,24 +11,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.common;
+package com.gh.bmd.jrt.channel;
 
 import javax.annotation.Nullable;
 
 /**
- * Exception wrapping any throwable escaping a routine execution.
+ * Exception indicating that no room in the input channel buffer became available before the
+ * specific timeout elapsed.
  * <p/>
- * Created by davide-maestroni on 9/8/14.
+ * Created by davide-maestroni on 11/25/14.
  */
-public class InvocationException extends RoutineException {
+public class InputDeadlockException extends DeadlockException {
 
     /**
      * Constructor.
      *
-     * @param cause the wrapped exception.
+     * @param message the error message.
      */
-    public InvocationException(@Nullable final Throwable cause) {
+    public InputDeadlockException(@Nullable final String message) {
 
-        super(cause);
+        super(message);
     }
 }

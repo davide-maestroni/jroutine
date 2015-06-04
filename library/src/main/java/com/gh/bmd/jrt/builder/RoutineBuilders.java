@@ -23,9 +23,9 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.RoutineException;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.annotation.Annotation;
@@ -83,7 +83,7 @@ public class RoutineBuilders {
      * @param targetMethod the target method.
      * @param inputMode    the input transfer mode.
      * @param outputMode   the output transfer mode.
-     * @throws com.gh.bmd.jrt.common.RoutineException in case of errors.
+     * @throws com.gh.bmd.jrt.channel.RoutineException in case of errors.
      */
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public static void callFromInvocation(@Nonnull final Object target, @Nonnull final Object mutex,
@@ -705,7 +705,7 @@ public class RoutineBuilders {
      * @param inputMode  the input transfer mode.
      * @param outputMode the output transfer mode.
      * @return the invocation output.
-     * @throws com.gh.bmd.jrt.common.RoutineException in case of errors.
+     * @throws com.gh.bmd.jrt.channel.RoutineException in case of errors.
      */
     @Nullable
     @SuppressWarnings("unchecked")

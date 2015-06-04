@@ -11,11 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.builder;
+package com.gh.bmd.jrt.android.service;
 
 import android.content.ComponentName;
 
-import com.gh.bmd.jrt.common.RoutineException;
+import com.gh.bmd.jrt.channel.RoutineException;
 
 import javax.annotation.Nullable;
 

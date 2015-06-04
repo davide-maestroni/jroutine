@@ -11,22 +11,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.builder;
+package com.gh.bmd.jrt.android.invocation;
+
+import com.gh.bmd.jrt.channel.RoutineException;
 
 /**
- * Exception indicating a clash of routine invocations with same ID but different types.
+ * Base exception indicating that an unrecoverable error occurred during a loader invocation
+ * execution.
  * <p/>
- * Created by davide-maestroni on 12/14/14.
+ * Created by davide-maestroni on 03/06/15.
  */
-public class InvocationTypeException extends InvocationLoaderException {
+public class LoaderInvocationException extends RoutineException {
+
+    private final int mId;
 
     /**
      * Constructor.
      *
      * @param id the loader ID.
      */
-    public InvocationTypeException(final int id) {
+    public LoaderInvocationException(final int id) {
 
-        super(id);
+        mId = id;
+    }
+
+    /**
+     * Returns the loader ID.
+     *
+     * @return the loader ID.
+     */
+    public int getId() {
+
+        return mId;
     }
 }

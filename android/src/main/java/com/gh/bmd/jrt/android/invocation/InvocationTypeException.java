@@ -11,37 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.builder;
-
-import com.gh.bmd.jrt.common.AbortException;
+package com.gh.bmd.jrt.android.invocation;
 
 /**
- * Exception indicating a clash of routine invocations sharing the same ID and type.
+ * Exception indicating a clash of routine invocations with same ID but different types.
  * <p/>
  * Created by davide-maestroni on 12/14/14.
  */
-public class InvocationClashException extends AbortException {
-
-    private final int mId;
+public class InvocationTypeException extends LoaderInvocationException {
 
     /**
      * Constructor.
      *
      * @param id the loader ID.
      */
-    public InvocationClashException(final int id) {
+    public InvocationTypeException(final int id) {
 
-        super(null);
-        mId = id;
-    }
-
-    /**
-     * Returns the loader ID.
-     *
-     * @return the loader ID.
-     */
-    public int getId() {
-
-        return mId;
+        super(id);
     }
 }

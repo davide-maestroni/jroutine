@@ -11,25 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.common;
+package com.gh.bmd.jrt.channel;
 
 import javax.annotation.Nullable;
 
 /**
- * Exception wrapping a thread interrupted exception caught inside a routine execution.
+ * Exception indicating that an invocation has been explicitly aborted.
  * <p/>
- * Created by davide-maestroni on 9/8/14.
+ * Created by davide-maestroni on 1/27/15.
  */
-public class InvocationInterruptedException extends RoutineException {
+public class AbortException extends RoutineException {
 
     /**
      * Constructor.
      *
      * @param cause the wrapped exception.
      */
-    public InvocationInterruptedException(@Nullable final InterruptedException cause) {
+    public AbortException(@Nullable final Throwable cause) {
 
         super(cause);
-        Thread.currentThread().interrupt();
     }
 }

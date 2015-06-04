@@ -19,9 +19,6 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.R;
-import com.gh.bmd.jrt.android.builder.InvocationClashException;
-import com.gh.bmd.jrt.android.builder.InvocationMissingException;
-import com.gh.bmd.jrt.android.builder.InvocationTypeException;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
@@ -29,6 +26,9 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.android.invocation.DelegatingContextInvocation;
+import com.gh.bmd.jrt.android.invocation.InvocationClashException;
+import com.gh.bmd.jrt.android.invocation.InvocationTypeException;
+import com.gh.bmd.jrt.android.invocation.MissingInvocationException;
 import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
@@ -37,14 +37,14 @@ import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.Reflection;
+import com.gh.bmd.jrt.invocation.InvocationException;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log;
@@ -417,7 +417,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationMissingException ignored) {
+        } catch (final MissingInvocationException ignored) {
 
         }
     }
@@ -971,7 +971,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationMissingException ignored) {
+        } catch (final MissingInvocationException ignored) {
 
         }
     }

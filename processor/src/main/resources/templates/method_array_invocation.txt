@@ -53,13 +53,13 @@
 
                     result.pass(wrapped.${targetMethodName}(array));
 
-                } catch (final com.gh.bmd.jrt.common.RoutineException e) {
+                } catch (final com.gh.bmd.jrt.channel.RoutineException e) {
 
                     throw e;
 
                 } catch (final Throwable t) {
 
-                    throw new com.gh.bmd.jrt.common.InvocationException(t);
+                    throw new com.gh.bmd.jrt.invocation.InvocationException(t);
                 }
             }
         }

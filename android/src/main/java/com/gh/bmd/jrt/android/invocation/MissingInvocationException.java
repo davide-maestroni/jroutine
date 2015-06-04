@@ -11,24 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.common;
-
-import javax.annotation.Nullable;
+package com.gh.bmd.jrt.android.invocation;
 
 /**
- * Exception indicating that an invocation has been explicitly aborted.
+ * Exception indicating that a routine invocation with a specified ID is not running.
  * <p/>
- * Created by davide-maestroni on 1/27/15.
+ * Created by davide-maestroni on 1/14/15.
  */
-public class AbortException extends RoutineException {
+public class MissingInvocationException extends LoaderInvocationException {
 
     /**
      * Constructor.
      *
-     * @param cause the wrapped exception.
+     * @param id the loader ID.
      */
-    public AbortException(@Nullable final Throwable cause) {
+    public MissingInvocationException(final int id) {
 
-        super(cause);
+        super(id);
     }
 }

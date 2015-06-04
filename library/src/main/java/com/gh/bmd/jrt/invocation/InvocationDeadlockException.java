@@ -11,26 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.builder;
+package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.common.DeadlockException;
+import com.gh.bmd.jrt.channel.DeadlockException;
 
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no room in the input channel buffer became available before the
- * specific timeout elapsed.
+ * Exception indicating that no invocation instance became available before the specific timeout
+ * elapsed.
  * <p/>
- * Created by davide-maestroni on 11/25/14.
+ * Created by davide-maestroni on 9/20/14.
  */
-public class InputDeadlockException extends DeadlockException {
+public class InvocationDeadlockException extends DeadlockException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public InputDeadlockException(@Nullable final String message) {
+    public InvocationDeadlockException(@Nullable final String message) {
 
         super(message);
     }

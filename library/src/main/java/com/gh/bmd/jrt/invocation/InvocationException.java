@@ -11,27 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.routine;
+package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.common.DeadlockException;
+import com.gh.bmd.jrt.channel.RoutineException;
 
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no invocation instance became available before the specific timeout
- * elapsed.
+ * Exception wrapping any throwable escaping an invocation execution.
  * <p/>
- * Created by davide-maestroni on 9/20/14.
+ * Created by davide-maestroni on 9/8/14.
  */
-public class InvocationDeadlockException extends DeadlockException {
+public class InvocationException extends RoutineException {
 
     /**
      * Constructor.
      *
-     * @param message the error message.
+     * @param cause the wrapped exception.
      */
-    public InvocationDeadlockException(@Nullable final String message) {
+    public InvocationException(@Nullable final Throwable cause) {
 
-        super(message);
+        super(cause);
     }
 }

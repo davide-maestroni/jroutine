@@ -48,11 +48,11 @@ public final class LoaderConfiguration {
 
     private final int mLoaderId;
 
+    private final Looper mLooper;
+
     private final ClashResolutionType mResolutionType;
 
     private final CacheStrategyType mStrategyType;
-
-    private Looper mLooper;
 
     /**
      * Constructor.
@@ -269,7 +269,7 @@ public final class LoaderConfiguration {
         ABORT_THAT,
         /**
          * The clash is resolved by aborting the invocation with an
-         * {@link com.gh.bmd.jrt.android.builder.InvocationClashException}.
+         * {@link com.gh.bmd.jrt.android.invocation.InvocationClashException}.
          */
         ABORT_THIS,
         /**

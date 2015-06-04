@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.android.v4.core;
 
-import com.gh.bmd.jrt.android.builder.InvocationMissingException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.MissingInvocationException;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.channel.ResultChannel;
 
@@ -78,6 +78,6 @@ final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvoca
     @Override
     public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
-        result.abort(new InvocationMissingException(mId));
+        result.abort(new MissingInvocationException(mId));
     }
 }

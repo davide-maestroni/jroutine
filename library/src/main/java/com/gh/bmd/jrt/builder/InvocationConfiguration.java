@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.annotation.TimeoutAction.TimeoutActionType;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -606,6 +605,31 @@ public final class InvocationConfiguration {
          * There is no guarantee about the data order.
          */
         NONE
+    }
+
+    /**
+     * Enumeration indicating the type of action to be taken on output channel timeout.
+     */
+    public enum TimeoutActionType {
+
+        /**
+         * Deadlock.<br/>
+         * If no result is available after the specified timeout, the called method will throw a
+         * {@link com.gh.bmd.jrt.channel.ReadDeadlockException}.
+         */
+        DEADLOCK,
+        /**
+         * Break execution.<br/>
+         * If no result is available after the specified timeout, the called method will stop its
+         * execution and exit immediately.
+         */
+        EXIT,
+        /**
+         * Abort invocation.<br/>
+         * If no result is available after the specified timeout, the invocation will be aborted and
+         * the method will immediately exit.
+         */
+        ABORT
     }
 
     /**

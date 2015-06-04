@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.annotation;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -62,29 +64,4 @@ public @interface TimeoutAction {
      * @return the action type.
      */
     TimeoutActionType value();
-
-    /**
-     * Enumeration indicating the type of action to be taken on output channel timeout.
-     */
-    enum TimeoutActionType {
-
-        /**
-         * Deadlock.<br/>
-         * If no result is available after the specified timeout, the called method will throw a
-         * {@link com.gh.bmd.jrt.channel.ReadDeadlockException}.
-         */
-        DEADLOCK,
-        /**
-         * Break execution.<br/>
-         * If no result is available after the specified timeout, the called method will stop its
-         * execution and exit immediately.
-         */
-        EXIT,
-        /**
-         * Abort invocation.<br/>
-         * If no result is available after the specified timeout, the invocation will be aborted and
-         * the method will immediately exit.
-         */
-        ABORT
-    }
 }

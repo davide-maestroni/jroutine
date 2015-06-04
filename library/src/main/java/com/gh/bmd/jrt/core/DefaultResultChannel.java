@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.TimeoutAction.TimeoutActionType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.DeadlockException;
 import com.gh.bmd.jrt.channel.InputChannel;

@@ -41,9 +41,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.callFromInvocation;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getAnnotatedStaticMethod;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
+import static com.gh.bmd.jrt.core.RoutineBuilders.callFromInvocation;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedStaticMethod;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**

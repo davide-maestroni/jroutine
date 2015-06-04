@@ -108,7 +108,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             return null;
         }
 
-        return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(target, shareGroup);
+        return com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
     }
 
     private static class ServiceProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {

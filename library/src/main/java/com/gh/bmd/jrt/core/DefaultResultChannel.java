@@ -30,8 +30,8 @@ import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.time.TimeDuration;
-import com.gh.bmd.jrt.time.TimeDuration.Check;
+import com.gh.bmd.jrt.util.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration.Check;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.util.ArrayList;
@@ -47,9 +47,9 @@ import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
-import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
+import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
+import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
+import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 
 /**
  * Class handling the routine output.

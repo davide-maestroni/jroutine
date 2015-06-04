@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.time;
+package com.gh.bmd.jrt.util;
 
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
-import com.gh.bmd.jrt.time.TimeDuration.Check;
+import com.gh.bmd.jrt.util.TimeDuration.Check;
 
 import org.junit.Test;
 

@@ -37,8 +37,8 @@ import com.gh.bmd.jrt.proxy.builder.ProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -53,8 +53,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
-import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -978,8 +978,8 @@ public class ProxyRoutineTest {
         List<TYPE> getList(int i);
     }
 
-    @Proxy(value = TestClass.class, generatedClassName = "Test",
-            generatedClassPackage = "com.gh.bmd.jrt.proxy")
+    @Proxy(value = TestClass.class, className = "Test",
+            classPackage = "com.gh.bmd.jrt.proxy")
     public interface TestProxy {
 
         @Timeout(300)

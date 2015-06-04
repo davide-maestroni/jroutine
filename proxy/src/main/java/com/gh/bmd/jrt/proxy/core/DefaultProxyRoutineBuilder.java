@@ -189,7 +189,7 @@ class DefaultProxyRoutineBuilder
                 final Object target = mTarget;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
-                String packageName = annotation.generatedClassPackage();
+                String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {
 
@@ -201,7 +201,7 @@ class DefaultProxyRoutineBuilder
                     packageName += ".";
                 }
 
-                String className = annotation.generatedClassName();
+                String className = annotation.className();
 
                 if (className.equals(Proxy.DEFAULT)) {
 
@@ -215,9 +215,8 @@ class DefaultProxyRoutineBuilder
                     }
                 }
 
-                final String fullClassName =
-                        packageName + annotation.generatedClassPrefix() + className
-                                + annotation.generatedClassSuffix();
+                final String fullClassName = packageName + annotation.classPrefix() + className
+                        + annotation.classSuffix();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), target,
                                         invocationConfiguration, proxyConfiguration);

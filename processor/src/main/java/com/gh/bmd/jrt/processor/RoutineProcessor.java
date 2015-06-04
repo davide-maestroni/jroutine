@@ -657,8 +657,8 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String getGeneratedClassName(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        String className = (String) getAnnotationValue(element, annotationElement.asType(),
-                                                       "generatedClassName");
+        String className =
+                (String) getAnnotationValue(element, annotationElement.asType(), "className");
 
         if ((className == null) || className.equals("*")) {
 
@@ -688,8 +688,8 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String getGeneratedClassPackage(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        String classPackage = (String) getAnnotationValue(element, annotationElement.asType(),
-                                                          "generatedClassPackage");
+        String classPackage =
+                (String) getAnnotationValue(element, annotationElement.asType(), "classPackage");
 
         if ((classPackage == null) || classPackage.equals("*")) {
 
@@ -712,8 +712,8 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String getGeneratedClassPrefix(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        final String classPrefix = (String) getAnnotationValue(element, annotationElement.asType(),
-                                                               "generatedClassPrefix");
+        final String classPrefix =
+                (String) getAnnotationValue(element, annotationElement.asType(), "classPrefix");
         return (classPrefix == null) ? getDefaultClassPrefix(annotationElement, element,
                                                              targetElement) : classPrefix;
     }
@@ -731,8 +731,8 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String getGeneratedClassSuffix(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        final String classSuffix = (String) getAnnotationValue(element, annotationElement.asType(),
-                                                               "generatedClassSuffix");
+        final String classSuffix =
+                (String) getAnnotationValue(element, annotationElement.asType(), "classSuffix");
         return (classSuffix == null) ? getDefaultClassSuffix(annotationElement, element,
                                                              targetElement) : classSuffix;
     }
@@ -912,7 +912,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
 
-        if (!typeUtils.isAssignable(this.invocationChannelType,
+        if (!typeUtils.isAssignable(invocationChannelType,
                                     typeUtils.erasure(methodElement.getReturnType()))) {
 
             throw new IllegalArgumentException(

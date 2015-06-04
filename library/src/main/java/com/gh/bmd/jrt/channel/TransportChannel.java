@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;

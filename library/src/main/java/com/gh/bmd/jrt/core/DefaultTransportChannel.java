@@ -23,7 +23,7 @@ import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.Arrays;
 import java.util.Collection;

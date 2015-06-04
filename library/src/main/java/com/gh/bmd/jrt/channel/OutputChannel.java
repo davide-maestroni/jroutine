@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.Collection;
 import java.util.List;
@@ -75,7 +75,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.gh.bmd.jrt.channel.RoutineException      if the execution has been aborted.
      * @throws java.lang.IllegalStateException              if this channel is already bound to a
      *                                                      consumer.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #eventually()
      * @see #immediately()
@@ -97,7 +97,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.gh.bmd.jrt.channel.RoutineException      if the execution has been aborted.
      * @throws java.lang.IllegalStateException              if this channel is already bound to a
      *                                                      consumer.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #eventually()
      * @see #immediately()
@@ -112,7 +112,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Checks if the routine is complete waiting at the maximum for the set timeout.
      *
      * @return whether the routine execution has complete.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      */
@@ -138,7 +138,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} exception will be thrown.
      *
      * @return this channel.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyDeadlock()
@@ -154,7 +154,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * This is the default behavior.
      *
      * @return this channel.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
@@ -170,7 +170,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} exception will be thrown.
      *
      * @return this channel.
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
@@ -214,7 +214,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                                      thrown also in the case the read timeout
      *                                                      elapses and no deadlock exception is set
      *                                                      to be thrown).
-     * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #eventually()
      * @see #immediately()

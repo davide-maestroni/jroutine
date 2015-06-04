@@ -264,7 +264,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 final Class<?> targetClass = mTargetClass;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final V11Proxy annotation = interfaceClass.getAnnotation(V11Proxy.class);
-                String packageName = annotation.generatedClassPackage();
+                String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {
 
@@ -276,7 +276,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                     packageName += ".";
                 }
 
-                String className = annotation.generatedClassName();
+                String className = annotation.className();
 
                 if (className.equals(Proxy.DEFAULT)) {
 
@@ -291,8 +291,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 }
 
                 final String fullClassName =
-                        packageName + annotation.generatedClassPrefix() + className
-                                + annotation.generatedClassSuffix();
+                        packageName + annotation.classPrefix() + className
+                                + annotation.classSuffix();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), context, targetClass,
                                         invocationConfiguration, proxyConfiguration,

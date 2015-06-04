@@ -39,8 +39,8 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.Reflection;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;

@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.time.TimeDuration.millis;
+import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

@@ -18,7 +18,7 @@ import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 
 /**
  * The downloader implementation.

@@ -45,7 +45,7 @@ import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.ref.WeakReference;

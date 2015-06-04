@@ -50,8 +50,8 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -71,9 +71,9 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
-import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.gh.bmd.jrt.time.TimeDuration.millis;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
+import static com.gh.bmd.jrt.util.TimeDuration.millis;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

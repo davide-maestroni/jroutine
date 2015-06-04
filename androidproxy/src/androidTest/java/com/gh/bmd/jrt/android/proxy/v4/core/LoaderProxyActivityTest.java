@@ -40,8 +40,8 @@ import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,8 +54,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
-import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -949,8 +949,8 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         List<TYPE> getList(int i);
     }
 
-    @V4Proxy(value = TestClass.class, generatedClassName = "TestActivity",
-            generatedClassPackage = "com.gh.bmd.jrt.android.proxy")
+    @V4Proxy(value = TestClass.class, className = "TestActivity",
+            classPackage = "com.gh.bmd.jrt.android.proxy")
     public interface TestProxy {
 
         @Timeout(3000)

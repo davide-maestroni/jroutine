@@ -15,8 +15,8 @@ package com.gh.bmd.jrt.runner;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration.AgingPriority;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.NotAgingPriority;
-import com.gh.bmd.jrt.time.Time;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.Time;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -26,11 +26,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.gh.bmd.jrt.time.Time.current;
-import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
-import static com.gh.bmd.jrt.time.TimeDuration.micros;
-import static com.gh.bmd.jrt.time.TimeDuration.millis;
-import static com.gh.bmd.jrt.time.TimeDuration.nanos;
+import static com.gh.bmd.jrt.util.Time.current;
+import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
+import static com.gh.bmd.jrt.util.TimeDuration.micros;
+import static com.gh.bmd.jrt.util.TimeDuration.millis;
+import static com.gh.bmd.jrt.util.TimeDuration.nanos;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

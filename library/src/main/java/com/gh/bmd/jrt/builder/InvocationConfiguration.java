@@ -18,7 +18,7 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
+import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 
 /**
  * Class storing the invocation configuration.

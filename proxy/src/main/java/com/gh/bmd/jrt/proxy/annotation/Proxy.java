@@ -132,28 +132,28 @@ public @interface Proxy {
      *
      * @return the class name.
      */
-    String generatedClassName() default DEFAULT;
+    String className() default DEFAULT;
 
     /**
      * The generated class package. By default it is the same as the interface.
      *
      * @return the package.
      */
-    String generatedClassPackage() default DEFAULT;
+    String classPackage() default DEFAULT;
 
     /**
      * The generated class name prefix.
      *
      * @return the name prefix.
      */
-    String generatedClassPrefix() default DEFAULT_CLASS_PREFIX;
+    String classPrefix() default DEFAULT_CLASS_PREFIX;
 
     /**
      * The generated class name suffix.
      *
      * @return the name suffix.
      */
-    String generatedClassSuffix() default DEFAULT_CLASS_SUFFIX;
+    String classSuffix() default DEFAULT_CLASS_SUFFIX;
 
     /**
      * The wrapped class.

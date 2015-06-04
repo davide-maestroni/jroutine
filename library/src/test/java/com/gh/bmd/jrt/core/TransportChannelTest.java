@@ -27,7 +27,7 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -40,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.time.TimeDuration.millis;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.millis;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

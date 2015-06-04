@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.time;
+package com.gh.bmd.jrt.util;
 
 import org.junit.Test;
 

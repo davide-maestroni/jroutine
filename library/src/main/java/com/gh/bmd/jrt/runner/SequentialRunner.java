@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
+import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 
 /**
  * Class implementing a sequential synchronous runner.

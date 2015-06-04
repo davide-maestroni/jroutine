@@ -26,8 +26,8 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
-import com.gh.bmd.jrt.time.TimeDuration.Check;
+import com.gh.bmd.jrt.util.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration.Check;
 
 import java.util.LinkedList;
 
@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
+import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 
 /**
  * Basic abstract implementation of a routine.

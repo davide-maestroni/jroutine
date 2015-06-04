@@ -43,9 +43,9 @@
                                            ${routineBuilderOptions}
                                            .withFactoryArgs(mTargetClass, ${shareGroup}, args)
                                            .withInputMaxSize(Integer.MAX_VALUE)
-                                           .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withInputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
                                            .withOutputMaxSize(Integer.MAX_VALUE)
-                                           .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withOutputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
                                            .set()
                                            .withLoader()
                                            .with(loaderConfiguration)

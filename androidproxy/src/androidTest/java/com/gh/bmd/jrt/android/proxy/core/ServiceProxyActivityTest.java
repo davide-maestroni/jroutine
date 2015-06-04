@@ -41,8 +41,8 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,8 +55,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
-import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -985,8 +985,8 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         List<TYPE> getList(int i);
     }
 
-    @ServiceProxy(value = TestClass.class, generatedClassName = "Test",
-            generatedClassPackage = "com.gh.bmd.jrt.android.proxy")
+    @ServiceProxy(value = TestClass.class, className = "Test",
+            classPackage = "com.gh.bmd.jrt.android.proxy")
     public interface TestProxy {
 
         @Timeout(3000)

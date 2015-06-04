@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Routine helper classes definitions.
+ * Utility classes definitions.
  * <p/>
  * Created by davide-maestroni on 9/25/14.
  */

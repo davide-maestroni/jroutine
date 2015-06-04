@@ -239,7 +239,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                 final Class<?> targetClass = mTargetClass;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
-                String packageName = annotation.generatedClassPackage();
+                String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {
 
@@ -251,7 +251,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                     packageName += ".";
                 }
 
-                String className = annotation.generatedClassName();
+                String className = annotation.className();
 
                 if (className.equals(Proxy.DEFAULT)) {
 
@@ -266,8 +266,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                 }
 
                 final String fullClassName =
-                        packageName + annotation.generatedClassPrefix() + className
-                                + annotation.generatedClassSuffix();
+                        packageName + annotation.classPrefix() + className
+                                + annotation.classSuffix();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), context, targetClass,
                                         invocationConfiguration, proxyConfiguration,

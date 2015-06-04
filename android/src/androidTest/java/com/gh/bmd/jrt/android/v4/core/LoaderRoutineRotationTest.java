@@ -23,8 +23,8 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.concurrent.Semaphore;
 

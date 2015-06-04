@@ -45,8 +45,8 @@ import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.Reflection;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 

@@ -44,7 +44,7 @@ class RoutineExceptionWrapper {
      *
      * @param obj the object to check.
      * @throws com.gh.bmd.jrt.channel.RoutineException if the specified object is an exception
-     *                                                wrapper instance.
+     *                                                 wrapper instance.
      */
     static void raise(@Nullable final Object obj) {
 

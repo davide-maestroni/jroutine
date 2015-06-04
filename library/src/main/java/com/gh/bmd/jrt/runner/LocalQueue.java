@@ -14,14 +14,14 @@
 package com.gh.bmd.jrt.runner;
 
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
-import static com.gh.bmd.jrt.time.TimeDuration.nanos;
+import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
+import static com.gh.bmd.jrt.util.TimeDuration.nanos;
 
 /**
  * Class maintaining a queue of executions which is local to the calling thread.

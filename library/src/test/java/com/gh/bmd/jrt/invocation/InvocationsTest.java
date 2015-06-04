@@ -18,8 +18,8 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 

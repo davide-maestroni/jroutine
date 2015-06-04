@@ -50,9 +50,9 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -65,7 +65,7 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

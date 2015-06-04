@@ -28,8 +28,8 @@ import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
-import com.gh.bmd.jrt.time.TimeDuration;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +39,11 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
-import static com.gh.bmd.jrt.time.TimeDuration.micros;
-import static com.gh.bmd.jrt.time.TimeDuration.millis;
-import static com.gh.bmd.jrt.time.TimeDuration.nanos;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
+import static com.gh.bmd.jrt.util.TimeDuration.micros;
+import static com.gh.bmd.jrt.util.TimeDuration.millis;
+import static com.gh.bmd.jrt.util.TimeDuration.nanos;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

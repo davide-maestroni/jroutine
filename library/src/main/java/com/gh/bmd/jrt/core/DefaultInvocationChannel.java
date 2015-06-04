@@ -548,7 +548,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
      */
     private class AbortResultExecution implements Execution {
 
-        private Throwable mReason;
+        private final Throwable mReason;
 
         /**
          * Constructor.

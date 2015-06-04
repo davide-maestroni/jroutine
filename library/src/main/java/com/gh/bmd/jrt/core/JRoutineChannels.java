@@ -11,10 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.channel;
+package com.gh.bmd.jrt.core;
 
+import com.gh.bmd.jrt.channel.Channel;
+import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
-import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 
 import java.util.List;
@@ -25,16 +28,16 @@ import javax.annotation.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Utility class for handling channels.
+ * Utility class for handling routine channels.
  * <p/>
  * Created by davide-maestroni on 3/15/15.
  */
-public class Channels {
+public class JRoutineChannels {
 
     /**
      * Avoid direct instantiation.
      */
-    protected Channels() {
+    protected JRoutineChannels() {
 
     }
 

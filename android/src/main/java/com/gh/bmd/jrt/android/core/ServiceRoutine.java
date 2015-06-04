@@ -29,9 +29,9 @@ import com.gh.bmd.jrt.android.builder.ServiceDisconnectedException;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.android.service.RoutineService;
+import com.gh.bmd.jrt.annotation.TimeoutAction.TimeoutActionType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
@@ -556,19 +556,24 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 final Logger logger = mLogger;
                 logger.dbg("service connected: %s", name);
                 mOutMessenger = new Messenger(service);
+                final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
                 final Message message = Message.obtain(null, RoutineService.MSG_INIT);
 
                 if (mIsParallel) {
 
                     logger.dbg("sending parallel invocation message");
                     putParallelInvocation(message.getData(), mUUID, mInvocationClass,
-                                          mInvocationConfiguration, mServiceConfiguration);
+                                          mInvocationConfiguration,
+                                          serviceConfiguration.getRunnerClassOr(null),
+                                          serviceConfiguration.getLogClassOr(null));
 
                 } else {
 
                     logger.dbg("sending async invocation message");
                     putAsyncInvocation(message.getData(), mUUID, mInvocationClass,
-                                       mInvocationConfiguration, mServiceConfiguration);
+                                       mInvocationConfiguration,
+                                       serviceConfiguration.getRunnerClassOr(null),
+                                       serviceConfiguration.getLogClassOr(null));
                 }
 
                 message.replyTo = mInMessenger;

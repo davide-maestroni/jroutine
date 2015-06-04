@@ -55,10 +55,11 @@ class DefaultClassRoutineBuilder
         implements ClassRoutineBuilder, InvocationConfiguration.Configurable<ClassRoutineBuilder>,
         ProxyConfiguration.Configurable<ClassRoutineBuilder> {
 
+    private static final MethodInvocationFactory sMethodInvocationFactory =
+            new MethodInvocationFactory();
+
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
-
-    private static MethodInvocationFactory sMethodInvocationFactory = new MethodInvocationFactory();
 
     private final Class<?> mTargetClass;
 

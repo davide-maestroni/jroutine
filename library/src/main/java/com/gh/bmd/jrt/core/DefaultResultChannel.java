@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.core;
 
+import com.gh.bmd.jrt.annotation.TimeoutAction.TimeoutActionType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -82,6 +82,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private final Object mMutex = new Object();
 
+    private final NestedQueue<Object> mOutputQueue;
+
     private final TimeDuration mOutputTimeout;
 
     private final TimeDuration mReadTimeout;
@@ -103,8 +105,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private Check mOutputHasNext;
 
     private Check mOutputNotEmpty;
-
-    private NestedQueue<Object> mOutputQueue;
 
     private int mPendingOutputCount;
 

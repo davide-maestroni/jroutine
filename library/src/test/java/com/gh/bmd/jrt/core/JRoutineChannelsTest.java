@@ -11,13 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.channel;
+package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
-import com.gh.bmd.jrt.channel.Channels.Selectable;
+import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.core.JRoutine;
+import com.gh.bmd.jrt.core.JRoutineChannels.Selectable;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.routine.Routine;
 
@@ -31,11 +33,11 @@ import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Channels unit tests.
+ * Routine channels unit tests.
  * <p/>
  * Created by davide-maestroni on 3/18/15.
  */
-public class ChannelsTest {
+public class JRoutineChannelsTest {
 
     @Test
     @SuppressWarnings("unchecked")
@@ -50,7 +52,7 @@ public class ChannelsTest {
 
         final Routine<Selectable<String>, String> routine =
                 JRoutine.on(new ClassToken<Amb<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(Channels.selectFrom(
+        final OutputChannel<String> outputChannel = routine.callAsync(JRoutineChannels.selectFrom(
                 Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
                               channel4.output())));
 

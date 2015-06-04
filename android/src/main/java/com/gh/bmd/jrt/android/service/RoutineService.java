@@ -24,7 +24,6 @@ import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.RemoteException;
 
-import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
@@ -178,16 +177,18 @@ public class RoutineService extends Service {
      * @param invocationId            the invocation ID.
      * @param invocationClass         the invocation class.
      * @param invocationConfiguration the invocation configuration.
-     * @param serviceConfiguration    the service configuration.
+     * @param runnerClass             the invocation runner class.
+     * @param logClass                the invocation log class.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
             @Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final ServiceConfiguration serviceConfiguration) {
+            @Nullable final Class<? extends Runner> runnerClass,
+            @Nullable final Class<? extends Log> logClass) {
 
         putInvocation(bundle, false, invocationId, invocationClass, invocationConfiguration,
-                      serviceConfiguration);
+                      runnerClass, logClass);
     }
 
     /**
@@ -223,16 +224,18 @@ public class RoutineService extends Service {
      * @param invocationId            the invocation ID.
      * @param invocationClass         the invocation class.
      * @param invocationConfiguration the invocation configuration.
-     * @param serviceConfiguration    the service configuration.
+     * @param runnerClass             the invocation runner class.
+     * @param logClass                the invocation log class.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
             @Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final ServiceConfiguration serviceConfiguration) {
+            @Nullable final Class<? extends Runner> runnerClass,
+            @Nullable final Class<? extends Log> logClass) {
 
         putInvocation(bundle, true, invocationId, invocationClass, invocationConfiguration,
-                      serviceConfiguration);
+                      runnerClass, logClass);
     }
 
     /**
@@ -258,7 +261,8 @@ public class RoutineService extends Service {
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
             @Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final ServiceConfiguration serviceConfiguration) {
+            @Nullable final Class<? extends Runner> runnerClass,
+            @Nullable final Class<? extends Log> logClass) {
 
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
@@ -290,8 +294,8 @@ public class RoutineService extends Service {
         bundle.putSerializable(KEY_OUTPUT_ORDER,
                                invocationConfiguration.getOutputOrderTypeOr(null));
         bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
-        bundle.putSerializable(KEY_RUNNER_CLASS, serviceConfiguration.getRunnerClassOr(null));
-        bundle.putSerializable(KEY_LOG_CLASS, serviceConfiguration.getLogClassOr(null));
+        bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
+        bundle.putSerializable(KEY_LOG_CLASS, logClass);
     }
 
     private static void putValue(@Nonnull final Bundle bundle, @Nullable final Object value) {

@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of an loader routine builder.
+ * Default implementation of a loader routine builder.
  * <p/>
  * Created by davide-maestroni on 12/9/14.
  *
@@ -212,7 +212,7 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
         if (asyncRunner != null) {
 
             logger = configuration.newLogger(this);
-            logger.wrn("the specified runner will be ignored: %s", asyncRunner);
+            logger.wrn("the specified async runner will be ignored: %s", asyncRunner);
         }
 
         final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);

@@ -26,7 +26,9 @@ import javax.annotation.Nullable;
  * <p/>
  * The configuration is used to set a specific ID to each invocation created by a routine.<br/>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
- * is, they share the same ID, and to set a specific type of caching of the invocation results.
+ * is, they share the same ID, and to set a specific type of caching of the invocation results.<br/>
+ * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
+ * coming from the invocation.
  * <p/>
  * Created by davide-maestroni on 19/04/15.
  */

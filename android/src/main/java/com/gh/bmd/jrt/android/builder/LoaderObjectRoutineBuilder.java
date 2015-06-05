@@ -117,7 +117,7 @@ public interface LoaderObjectRoutineBuilder
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      */
     @Nonnull

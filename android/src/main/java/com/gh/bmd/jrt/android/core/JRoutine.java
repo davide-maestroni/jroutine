@@ -25,9 +25,9 @@ import javax.annotation.Nonnull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * This utility class extends the base Java routine in order to support additional routine builders
- * specific to the Android platform.<br/>
- * Routine invocations created through the returned builder will be execute inside a service
+ * This utility class extends the base one in order to support additional routine builders specific
+ * to the Android platform.<br/>
+ * Routine invocations created through the returned builder will be executed inside a service
  * specified through the routine builder. Be aware, though, that the invocation results will be
  * dispatched in the specified looper, so that, waiting for the outputs on the very same looper
  * thread, immediately after its invocation, will result in a deadlock.<br/>

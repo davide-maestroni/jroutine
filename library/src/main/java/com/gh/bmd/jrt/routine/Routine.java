@@ -219,7 +219,7 @@ public interface Routine<INPUT, OUTPUT> {
     /**
      * Invokes the execution of this routine in asynchronous mode.
      *
-     * @return the invocation parameter channel.
+     * @return the invocation channel.
      */
     @Nonnull
     InvocationChannel<INPUT, OUTPUT> invokeAsync();
@@ -227,7 +227,7 @@ public interface Routine<INPUT, OUTPUT> {
     /**
      * Invokes the execution of this routine in parallel mode.
      *
-     * @return the invocation parameter channel.
+     * @return the invocation channel.
      */
     @Nonnull
     InvocationChannel<INPUT, OUTPUT> invokeParallel();
@@ -235,7 +235,7 @@ public interface Routine<INPUT, OUTPUT> {
     /**
      * Invokes the execution of this routine in synchronous mode.
      *
-     * @return the invocation parameter channel.
+     * @return the invocation channel.
      */
     @Nonnull
     InvocationChannel<INPUT, OUTPUT> invokeSync();

@@ -45,8 +45,8 @@ public class ContextInvocations {
      * Builds and returns a new context invocation factory creating instances of the specified class
      * token.
      * <p/>
-     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
-     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
+     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
      * instance as first constructor parameter, and anonymous classes has both the outer instance
      * and all the variables captured in the closure.
@@ -68,7 +68,7 @@ public class ContextInvocations {
      * class.
      * <p/>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructor for such classes, so be sure to specify the correct arguments
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
      * first constructor parameter, and anonymous classes has both the outer instance and all the
      * variables captured in the closure.
@@ -89,8 +89,8 @@ public class ContextInvocations {
      * Builds and returns a new context invocation factory creating instances of the specified class
      * token.
      * <p/>
-     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
-     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
+     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
      * instance as first constructor parameter, and anonymous classes has both the outer instance
      * and all the variables captured in the closure.
@@ -112,7 +112,7 @@ public class ContextInvocations {
      * class.
      * <p/>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructor for such classes, so be sure to specify the correct arguments
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
      * first constructor parameter, and anonymous classes has both the outer instance and all the
      * variables captured in the closure.
@@ -177,8 +177,8 @@ public class ContextInvocations {
     /**
      * Builds and returns a new invocation factory creating instances of the specified class token.
      * <p/>
-     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
-     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
+     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
      * instance as first constructor parameter, and anonymous classes has both the outer instance
      * and all the variables captured in the closure.

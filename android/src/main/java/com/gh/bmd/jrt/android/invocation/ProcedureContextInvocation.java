@@ -20,7 +20,7 @@ import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import javax.annotation.Nonnull;
 
 /**
- * Single call invocation implementing an Android invocation.
+ * Procedure invocation implementing a context invocation.
  * <p/>
  * Created by davide-maestroni on 1/8/15.
  *

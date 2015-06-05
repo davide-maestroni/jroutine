@@ -1240,7 +1240,8 @@ public class RoutineTest {
 
                 @Nonnull
                 @Override
-                protected Invocation<Object, Object> newInvocation(final boolean async) {
+                protected Invocation<Object, Object> newInvocation(
+                        @Nonnull final InvocationType type) {
 
                     return new ConstructorException();
                 }
@@ -3208,7 +3209,7 @@ public class RoutineTest {
 
         @Nonnull
         @Override
-        protected Invocation<Object, Object> newInvocation(final boolean async) {
+        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
 
             throw new IllegalStateException();
         }
@@ -3224,7 +3225,7 @@ public class RoutineTest {
         @Nonnull
         @Override
         @SuppressWarnings("ConstantConditions")
-        protected Invocation<Object, Object> newInvocation(final boolean async) {
+        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
 
             return null;
         }

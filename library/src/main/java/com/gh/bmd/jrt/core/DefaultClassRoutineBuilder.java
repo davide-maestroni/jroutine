@@ -107,7 +107,7 @@ class DefaultClassRoutineBuilder
         if (method == null) {
 
             throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
+                    "no annotated method with alias '" + name + "' has been found");
         }
 
         return method(method);

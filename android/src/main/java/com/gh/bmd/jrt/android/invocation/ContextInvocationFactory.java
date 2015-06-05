@@ -43,5 +43,5 @@ public interface ContextInvocationFactory<INPUT, OUTPUT> extends InvocationFacto
      * @return the context invocation instance.
      */
     @Nonnull
-    ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args);
+    ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull Object... args);
 }

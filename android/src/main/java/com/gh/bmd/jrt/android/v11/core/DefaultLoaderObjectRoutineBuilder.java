@@ -37,9 +37,9 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
@@ -140,7 +140,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static InvocationConfiguration configurationWithAnnotation(
+    private static InvocationConfiguration configurationWithAnnotations(
             @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
@@ -285,7 +285,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         if (targetMethod == null) {
 
             throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
+                    "no annotated method with alias '" + name + "' has been found");
         }
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
@@ -296,7 +296,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
                 new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod);
         final InvocationConfiguration invocationConfiguration =
-                configurationWithAnnotation(configuration, targetMethod);
+                configurationWithAnnotations(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
         return getBuilder(mContext, factory).withInvocation()
@@ -322,7 +322,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final MethodInvocationFactory<INPUT, OUTPUT> factory =
                 new MethodInvocationFactory<INPUT, OUTPUT>(method);
         final InvocationConfiguration invocationConfiguration =
-                configurationWithAnnotation(configuration, method);
+                configurationWithAnnotations(configuration, method);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, method);
         return getBuilder(mContext, factory).withInvocation()
@@ -833,7 +833,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final LoaderRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, sProxyFactory);
             final InvocationConfiguration invocationConfiguration =
-                    configurationWithAnnotation(mInvocationConfiguration, method);
+                    configurationWithAnnotations(mInvocationConfiguration, method);
             final LoaderConfiguration loaderConfiguration =
                     configurationWithAnnotations(mLoaderConfiguration, method);
             final Routine<Object, Object> routine = routineBuilder.withInvocation()

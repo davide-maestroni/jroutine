@@ -252,7 +252,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Gets the constructor arguments of this loader invocation.
+     * Gets the factory arguments of this loader invocation.
      *
      * @return the array of arguments.
      */

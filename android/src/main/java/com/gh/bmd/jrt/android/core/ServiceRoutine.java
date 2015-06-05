@@ -190,7 +190,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     /**
-     * Service parameter channel implementation.
+     * Service invocation channel implementation.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.

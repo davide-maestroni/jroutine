@@ -209,7 +209,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
     }
 
     /**
-     * Destroys all loaders with the specified invocation class and the specified inputs.
+     * Destroys all loaders with the specified invocation type and inputs.
      *
      * @param context        the context.
      * @param loaderId       the loader ID.
@@ -357,7 +357,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends ProcedureInvocation<INPUT, OUTPUT>
     }
 
     /**
-     * Destroys all loaders with the specified invocation class.
+     * Destroys all loaders with the specified invocation type.
      *
      * @param context        the context.
      * @param loaderId       the loader ID.

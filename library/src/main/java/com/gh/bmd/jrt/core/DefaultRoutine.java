@@ -60,7 +60,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     @Nonnull
     @Override
-    protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
+    protected Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final InvocationType type) {
 
         final Logger logger = getLogger();
 

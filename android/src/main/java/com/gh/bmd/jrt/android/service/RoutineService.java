@@ -495,9 +495,9 @@ public class RoutineService extends Service {
                        .withLogLevel(logLevel);
                 final ContextInvocationFactory<Object, Object> factory =
                         getInvocationFactory(invocationClass);
-                final AndroidRoutine androidRoutine =
-                        new AndroidRoutine(this, builder.set(), factory, invocationArgs);
-                routineState = new RoutineState(androidRoutine);
+                final SyncContextRoutine syncContextRoutine =
+                        new SyncContextRoutine(this, builder.set(), factory, invocationArgs);
+                routineState = new RoutineState(syncContextRoutine);
                 routineMap.put(routineInfo, routineState);
             }
 
@@ -507,63 +507,6 @@ public class RoutineService extends Service {
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
             invocationMap.put(invocationId, routineInvocation);
-        }
-    }
-
-    /**
-     * Synchronous Android routine implementation.
-     */
-    private static class AndroidRoutine extends AbstractRoutine<Object, Object> {
-
-        private final Object[] mArgs;
-
-        private final Context mContext;
-
-        private final ContextInvocationFactory<Object, Object> mFactory;
-
-        /**
-         * Constructor.
-         *
-         * @param context        the routine context.
-         * @param configuration  the invocation configuration.
-         * @param factory        the invocation factory.
-         * @param invocationArgs the invocation constructor arguments.
-         */
-        private AndroidRoutine(@Nonnull final Context context,
-                @Nonnull final InvocationConfiguration configuration,
-                @Nonnull final ContextInvocationFactory<Object, Object> factory,
-                @Nonnull final Object[] invocationArgs) {
-
-            super(configuration);
-            mContext = context;
-            mFactory = factory;
-            mArgs = invocationArgs;
-        }
-
-        @Nonnull
-        @Override
-        protected Invocation<Object, Object> newInvocation(final boolean async) {
-
-            final Logger logger = getLogger();
-
-            try {
-
-                final ContextInvocationFactory<Object, Object> factory = mFactory;
-                logger.dbg("creating a new instance of type: %s", factory.getInvocationType());
-                final ContextInvocation<Object, Object> invocation = factory.newInvocation(mArgs);
-                invocation.onContext(mContext);
-                return invocation;
-
-            } catch (final RoutineException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw e;
-
-            } catch (final Throwable t) {
-
-                logger.err(t, "error creating the invocation instance");
-                throw new InvocationException(t);
-            }
         }
     }
 
@@ -767,7 +710,7 @@ public class RoutineService extends Service {
      */
     private static class RoutineState {
 
-        private final AndroidRoutine mRoutine;
+        private final SyncContextRoutine mRoutine;
 
         private int mInvocationCount;
 
@@ -776,7 +719,7 @@ public class RoutineService extends Service {
          *
          * @param routine the routine instance.
          */
-        private RoutineState(@Nonnull final AndroidRoutine routine) {
+        private RoutineState(@Nonnull final SyncContextRoutine routine) {
 
             mRoutine = routine;
         }
@@ -784,7 +727,7 @@ public class RoutineService extends Service {
         /**
          * Increments count of the running routines and starts an asynchronous invocation.
          *
-         * @return the invocation parameter channel.
+         * @return the invocation channel.
          */
         @Nonnull
         public InvocationChannel<Object, Object> invokeAsync() {
@@ -796,7 +739,7 @@ public class RoutineService extends Service {
         /**
          * Increments count of the running routines and starts a parallel invocation.
          *
-         * @return the invocation parameter channel.
+         * @return the invocation channel.
          */
         @Nonnull
         public InvocationChannel<Object, Object> invokeParallel() {
@@ -899,6 +842,63 @@ public class RoutineService extends Service {
     }
 
     /**
+     * Synchronous context routine implementation.
+     */
+    private static class SyncContextRoutine extends AbstractRoutine<Object, Object> {
+
+        private final Object[] mArgs;
+
+        private final Context mContext;
+
+        private final ContextInvocationFactory<Object, Object> mFactory;
+
+        /**
+         * Constructor.
+         *
+         * @param context        the routine context.
+         * @param configuration  the invocation configuration.
+         * @param factory        the invocation factory.
+         * @param invocationArgs the invocation constructor arguments.
+         */
+        private SyncContextRoutine(@Nonnull final Context context,
+                @Nonnull final InvocationConfiguration configuration,
+                @Nonnull final ContextInvocationFactory<Object, Object> factory,
+                @Nonnull final Object[] invocationArgs) {
+
+            super(configuration);
+            mContext = context;
+            mFactory = factory;
+            mArgs = invocationArgs;
+        }
+
+        @Nonnull
+        @Override
+        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
+
+            final Logger logger = getLogger();
+
+            try {
+
+                final ContextInvocationFactory<Object, Object> factory = mFactory;
+                logger.dbg("creating a new instance of type: %s", factory.getInvocationType());
+                final ContextInvocation<Object, Object> invocation = factory.newInvocation(mArgs);
+                invocation.onContext(mContext);
+                return invocation;
+
+            } catch (final RoutineException e) {
+
+                logger.err(e, "error creating the invocation instance");
+                throw e;
+
+            } catch (final Throwable t) {
+
+                logger.err(t, "error creating the invocation instance");
+                throw new InvocationException(t);
+            }
+        }
+    }
+
+    /**
      * Class storing the routine invocation information.
      */
     private class RoutineInvocation {
@@ -915,7 +915,7 @@ public class RoutineService extends Service {
          * Constructor.
          *
          * @param id      the invocation ID.
-         * @param channel the invocation parameter channel.
+         * @param channel the invocation channel.
          * @param info    the routine info.
          * @param state   the routine state.
          */
@@ -940,7 +940,7 @@ public class RoutineService extends Service {
         }
 
         /**
-         * Passes the specified input to the invocation parameter channel.
+         * Passes the specified input to the invocation channel.
          *
          * @param input the input.
          * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.

@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Class storing the invocation loader results.
+ * Class consuming the invocation loader results.
  * <p/>
  * Created by davide-maestroni on 12/12/14.
  *

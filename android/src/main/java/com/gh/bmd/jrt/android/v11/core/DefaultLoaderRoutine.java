@@ -76,7 +76,6 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
      * @param factory                 the invocation factory.
      * @param invocationConfiguration the invocation configuration.
      * @param loaderConfiguration     the loader configuration.
-     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutine(@Nonnull final WeakReference<Object> context,
@@ -127,8 +126,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
     @Nonnull
     @Override
-    protected Invocation<INPUT, OUTPUT> convertInvocation(final boolean async,
-            @Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+    protected Invocation<INPUT, OUTPUT> convertInvocation(
+            @Nonnull final Invocation<INPUT, OUTPUT> invocation,
+            @Nonnull final InvocationType type) {
 
         try {
 
@@ -143,16 +143,16 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             getLogger().wrn(ignored, "ignoring exception while destroying invocation instance");
         }
 
-        return newInvocation(async);
+        return newInvocation(type);
     }
 
     @Nonnull
     @Override
-    protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
+    protected Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final InvocationType type) {
 
         final Logger logger = getLogger();
 
-        if (async) {
+        if (type == InvocationType.ASYNC) {
 
             return new LoaderInvocation<INPUT, OUTPUT>(mContext, mFactory, mArgs, mConfiguration,
                                                        mOrderType, logger);

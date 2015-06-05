@@ -290,9 +290,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                     }
                 }
 
-                final String fullClassName =
-                        packageName + annotation.classPrefix() + className
-                                + annotation.classSuffix();
+                final String fullClassName = packageName + annotation.classPrefix() + className
+                        + annotation.classSuffix();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), context, targetClass,
                                         invocationConfiguration, proxyConfiguration,

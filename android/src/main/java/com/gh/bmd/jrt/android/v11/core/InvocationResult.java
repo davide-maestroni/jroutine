@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining an Android invocation result.
+ * Interface defining a loader invocation result.
  * <p/>
  * Created by davide-maestroni on 1/4/15.
  *

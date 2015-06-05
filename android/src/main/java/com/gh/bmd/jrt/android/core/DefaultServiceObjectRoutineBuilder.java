@@ -28,9 +28,9 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Logger;
@@ -109,7 +109,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static InvocationConfiguration configurationWithAnnotation(
+    private static InvocationConfiguration configurationWithAnnotations(
             @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
@@ -285,7 +285,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         if (targetMethod == null) {
 
             throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
+                    "no annotated method with alias '" + name + "' has been found");
         }
 
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
@@ -296,7 +296,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
                        .withInvocation()
-                       .with(configurationWithAnnotation(invocationConfiguration, targetMethod))
+                       .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
                        .withInputOrder(OrderType.PASS_ORDER)
                        .set()
@@ -327,7 +327,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         return JRoutine.onService(mContext, classToken)
                        .withInvocation()
-                       .with(configurationWithAnnotation(invocationConfiguration, targetMethod))
+                       .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
                        .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
                                         toNames(parameterTypes))
                        .withInputOrder(OrderType.PASS_ORDER)
@@ -745,7 +745,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
             final Routine<Object, Object> routine = JRoutine.onService(mContext, PROXY_TOKEN)
                                                             .withInvocation()
-                                                            .with(configurationWithAnnotation(
+                                                            .with(configurationWithAnnotations(
                                                                     mInvocationConfiguration,
                                                                     method))
                                                             .withFactoryArgs(factoryArgs)

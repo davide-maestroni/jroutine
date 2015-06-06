@@ -572,14 +572,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class StringPassingInvocation extends FilterContextInvocation<String, String> {
-
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
-
-            result.pass(s);
-        }
-    }
-
     private static class StringFunctionInvocation
             extends FunctionContextInvocation<String, String> {
 
@@ -588,6 +580,14 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 @Nonnull final ResultChannel<String> result) {
 
             result.pass(strings);
+        }
+    }
+
+    private static class StringPassingInvocation extends FilterContextInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            result.pass(s);
         }
     }
 }

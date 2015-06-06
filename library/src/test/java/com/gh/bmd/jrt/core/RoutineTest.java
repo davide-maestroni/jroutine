@@ -42,8 +42,8 @@ import com.gh.bmd.jrt.invocation.InvocationDeadlockException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
-import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
+import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -154,32 +154,9 @@ public class RoutineTest {
         assertThat(channel1.checkComplete()).isTrue();
         assertThat(channel1.isOpen()).isFalse();
 
-        final FilterInvocation<String, String> abortInvocation =
-                new FilterInvocation<String, String>() {
-
-                    public void onInput(final String s,
-                            @Nonnull final ResultChannel<String> result) {
-
-                        assertThat(result.isOpen()).isTrue();
-                        assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
-                        assertThat(result.abort()).isFalse();
-                        assertThat(result.isOpen()).isFalse();
-
-                        try {
-
-                            result.pass(s);
-
-                            fail();
-
-                        } catch (final InvocationException ignored) {
-
-                        }
-                    }
-                };
-
         try {
 
-            JRoutine.on(abortInvocation)
+            JRoutine.on(new AbortInvocation())
                     .invokeAsync()
                     .after(millis(10))
                     .pass("test_abort")
@@ -195,20 +172,9 @@ public class RoutineTest {
             assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
         }
 
-        final FilterInvocation<String, String> abortInvocation2 =
-                new FilterInvocation<String, String>() {
-
-                    public void onInput(final String s,
-                            @Nonnull final ResultChannel<String> result) {
-
-                        assertThat(result.abort()).isTrue();
-                        assertThat(result.abort(new IllegalArgumentException(s))).isFalse();
-                    }
-                };
-
         try {
 
-            JRoutine.on(abortInvocation2)
+            JRoutine.on(new AbortInvocation2())
                     .invokeAsync()
                     .after(millis(10))
                     .pass("test_abort")
@@ -223,47 +189,9 @@ public class RoutineTest {
             assertThat(ex.getCause()).isNull();
         }
 
-        final AtomicBoolean isFailed = new AtomicBoolean(false);
         final Semaphore semaphore = new Semaphore(0);
-        final FilterInvocation<String, String> closeInvocation =
-                new FilterInvocation<String, String>() {
-
-                    public void onInput(final String s,
-                            @Nonnull final ResultChannel<String> result) {
-
-                        new Thread() {
-
-                            @Override
-                            public void run() {
-
-                                super.run();
-
-                                try {
-
-                                    Thread.sleep(100);
-
-                                    try {
-
-                                        result.pass(s);
-
-                                        isFailed.set(true);
-
-                                    } catch (final IllegalStateException ignored) {
-
-                                    }
-
-                                    semaphore.release();
-
-                                } catch (final InterruptedException ignored) {
-
-                                }
-                            }
-
-                        }.start();
-                    }
-                };
-
-        assertThat(JRoutine.on(closeInvocation)
+        final AtomicBoolean isFailed = new AtomicBoolean(false);
+        assertThat(JRoutine.on(new CloseInvocation(semaphore, isFailed))
                            .withInvocation()
                            .withLogLevel(LogLevel.SILENT)
                            .set()
@@ -466,19 +394,8 @@ public class RoutineTest {
                                                              .withFactoryArgs(this)
                                                              .set()
                                                              .buildRoutine();
-
-        final FilterInvocation<Integer, Integer> invokeSquare =
-                new FilterInvocation<Integer, Integer>() {
-
-                    public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> result) {
-
-                        final int input = integer;
-                        result.pass(input * input);
-                    }
-                };
-
-        final Routine<Integer, Integer> squareRoutine = JRoutine.on(invokeSquare).buildRoutine();
+        final Routine<Integer, Integer> squareRoutine =
+                JRoutine.on(new SquareInvocation()).buildRoutine();
 
         assertThat(sumRoutine.callSync(squareRoutine.callSync(1, 2, 3, 4))
                              .afterMax(timeout)
@@ -527,19 +444,8 @@ public class RoutineTest {
                                                              .withFactoryArgs(this)
                                                              .set()
                                                              .buildRoutine();
-
-        final FilterInvocation<Integer, Integer> invokeSquare =
-                new FilterInvocation<Integer, Integer>() {
-
-                    public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> result) {
-
-                        final int input = integer;
-                        result.pass(input * input);
-                    }
-                };
-
-        final Routine<Integer, Integer> squareRoutine = JRoutine.on(invokeSquare).buildRoutine();
+        final Routine<Integer, Integer> squareRoutine =
+                JRoutine.on(new SquareInvocation()).buildRoutine();
 
         final TemplateInvocation<Integer, Integer> invokeSquareSum =
                 new TemplateInvocation<Integer, Integer>() {
@@ -602,23 +508,26 @@ public class RoutineTest {
     }
 
     @Test
+    public void testDeadlockOnAll() {
+
+        final Routine<Object, Object> routine2 = JRoutine.on(new AllInvocation()).buildRoutine();
+
+        try {
+
+            routine2.callAsync("test").eventually().all();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+    }
+
+    @Test
     public void testDeadlockOnCheckComplete() {
 
         final Routine<Object, Object> routine1 =
-                JRoutine.on(new FilterInvocation<Object, Object>() {
-
-                    public void onInput(final Object o,
-                            @Nonnull final ResultChannel<Object> result) {
-
-                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                                .withInvocation()
-                                .withFactoryArgs(millis(100))
-                                .set()
-                                .callAsync("test")
-                                .eventually()
-                                .checkComplete();
-                    }
-                }).buildRoutine();
+                JRoutine.on(new CheckCompleteInvocation()).buildRoutine();
 
         try {
 
@@ -635,21 +544,7 @@ public class RoutineTest {
     public void testDeadlockOnHasNext() {
 
         final Routine<Object, Object> routine3 =
-                JRoutine.on(new FilterInvocation<Object, Object>() {
-
-                    public void onInput(final Object o,
-                            @Nonnull final ResultChannel<Object> result) {
-
-                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                                .withInvocation()
-                                .withFactoryArgs(millis(100))
-                                .set()
-                                .callAsync("test")
-                                .eventually()
-                                .iterator()
-                                .hasNext();
-                    }
-                }).buildRoutine();
+                JRoutine.on(new HasNextInvocation()).buildRoutine();
 
         try {
 
@@ -665,56 +560,11 @@ public class RoutineTest {
     @Test
     public void testDeadlockOnNext() {
 
-        final Routine<Object, Object> routine4 =
-                JRoutine.on(new FilterInvocation<Object, Object>() {
-
-                    public void onInput(final Object o,
-                            @Nonnull final ResultChannel<Object> result) {
-
-                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                                .withInvocation()
-                                .withFactoryArgs(millis(100))
-                                .set()
-                                .callAsync("test")
-                                .eventually()
-                                .iterator()
-                                .next();
-                    }
-                }).buildRoutine();
+        final Routine<Object, Object> routine4 = JRoutine.on(new NextInvocation()).buildRoutine();
 
         try {
 
             routine4.callAsync("test").eventually().all();
-
-            fail();
-
-        } catch (final DeadlockException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testDeadlockOnReadAll() {
-
-        final Routine<Object, Object> routine2 =
-                JRoutine.on(new FilterInvocation<Object, Object>() {
-
-                    public void onInput(final Object o,
-                            @Nonnull final ResultChannel<Object> result) {
-
-                        JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
-                                .withInvocation()
-                                .withFactoryArgs(millis(100))
-                                .set()
-                                .callAsync("test")
-                                .eventually()
-                                .all();
-                    }
-                }).buildRoutine();
-
-        try {
-
-            routine2.callAsync("test").eventually().all();
 
             fail();
 
@@ -1462,6 +1312,30 @@ public class RoutineTest {
     }
 
     @Test
+    public void testFactoryError() {
+
+        try {
+
+            final FilterInvocation<Object, Object> anonymousFactory =
+                    new FilterInvocation<Object, Object>() {
+
+                        @Override
+                        public void onInput(final Object o,
+                                @Nonnull final ResultChannel<Object> result) {
+
+                        }
+                    };
+
+            JRoutine.on(anonymousFactory);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testInitInvocationException() {
 
         final ExceptionRoutine routine =
@@ -1532,29 +1406,18 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() throws InterruptedException {
 
-        final Routine<Object, String> routine = JRoutine.on(factoryOf(new Function<String>() {
+        final Routine<Void, Void> routine = JRoutine.on(new SleepInvocation())
+                                                    .withInvocation()
+                                                    .withMaxInvocations(1)
+                                                    .set()
+                                                    .buildRoutine();
 
-            public String call(@Nonnull final Object... params) {
-
-                try {
-
-                    seconds(1).sleepAtLeast();
-
-                } catch (final InterruptedException e) {
-
-                    throw new InvocationInterruptedException(e);
-                }
-
-                return params[0].toString();
-            }
-        })).withInvocation().withMaxInvocations(1).set().buildRoutine();
-
-        routine.callAsync("test1");
+        routine.callAsync();
         millis(100).sleepAtLeast();
 
         try {
 
-            routine.callAsync("test2").eventually().next();
+            routine.callAsync().eventually().next();
 
             fail();
 
@@ -3059,6 +2922,111 @@ public class RoutineTest {
         int take(int i);
     }
 
+    private static class AbortInvocation extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            assertThat(result.isOpen()).isTrue();
+            assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
+            assertThat(result.abort()).isFalse();
+            assertThat(result.isOpen()).isFalse();
+
+            try {
+
+                result.pass(s);
+
+                fail();
+
+            } catch (final InvocationException ignored) {
+
+            }
+        }
+    }
+
+    private static class AbortInvocation2 extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            assertThat(result.abort()).isTrue();
+            assertThat(result.abort(new IllegalArgumentException(s))).isFalse();
+        }
+    }
+
+    private static class AllInvocation extends FilterInvocation<Object, Object> {
+
+        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+
+            JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                    .withInvocation()
+                    .withFactoryArgs(millis(100))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .all();
+        }
+    }
+
+    private static class CheckCompleteInvocation extends FilterInvocation<Object, Object> {
+
+        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+
+            JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                    .withInvocation()
+                    .withFactoryArgs(millis(100))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .checkComplete();
+        }
+    }
+
+    private static class CloseInvocation extends FilterInvocation<String, String> {
+
+        private final AtomicBoolean mIsFailed;
+
+        private final Semaphore mSemaphore;
+
+        private CloseInvocation(@Nonnull final Semaphore semaphore,
+                @Nonnull final AtomicBoolean isFailed) {
+
+            mSemaphore = semaphore;
+            mIsFailed = isFailed;
+        }
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            new Thread() {
+
+                @Override
+                public void run() {
+
+                    super.run();
+
+                    try {
+
+                        Thread.sleep(100);
+
+                        try {
+
+                            result.pass(s);
+
+                            mIsFailed.set(true);
+
+                        } catch (final IllegalStateException ignored) {
+
+                        }
+
+                        mSemaphore.release();
+
+                    } catch (final InterruptedException ignored) {
+
+                    }
+                }
+
+            }.start();
+        }
+    }
+
     private static class ConstructorException extends TemplateInvocation<Object, Object> {
 
         public ConstructorException() {
@@ -3215,6 +3183,36 @@ public class RoutineTest {
         }
     }
 
+    private static class HasNextInvocation extends FilterInvocation<Object, Object> {
+
+        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+
+            JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                    .withInvocation()
+                    .withFactoryArgs(millis(100))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .iterator()
+                    .hasNext();
+        }
+    }
+
+    private static class NextInvocation extends FilterInvocation<Object, Object> {
+
+        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+
+            JRoutine.on(ClassToken.tokenOf(DelayedInvocation.class))
+                    .withInvocation()
+                    .withFactoryArgs(millis(100))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .iterator()
+                    .next();
+        }
+    }
+
     private static class NullRoutine extends AbstractRoutine<Object, Object> {
 
         protected NullRoutine(@Nonnull final InvocationConfiguration configuration) {
@@ -3228,6 +3226,31 @@ public class RoutineTest {
         protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
 
             return null;
+        }
+    }
+
+    private static class SleepInvocation extends ProcedureInvocation<Void> {
+
+        @Override
+        public void onResult(@Nonnull final ResultChannel<Void> result) {
+
+            try {
+
+                seconds(1).sleepAtLeast();
+
+            } catch (final InterruptedException e) {
+
+                throw new InvocationInterruptedException(e);
+            }
+        }
+    }
+
+    private static class SquareInvocation extends FilterInvocation<Integer, Integer> {
+
+        public void onInput(final Integer integer, @Nonnull final ResultChannel<Integer> result) {
+
+            final int input = integer;
+            result.pass(input * input);
         }
     }
 

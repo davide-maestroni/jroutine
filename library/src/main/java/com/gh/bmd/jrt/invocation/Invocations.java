@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.invocation;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -82,6 +83,7 @@ public class Invocations {
 
     /**
      * Builds and returns a new factory of invocations calling the specified function.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must be static.<br/>
      * Remember to force the input order type, in case the function parameter position needs to be
      * preserved.
      * <p/>
@@ -90,6 +92,8 @@ public class Invocations {
      * @param function the function instance.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @Nonnull
     public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryOf(
@@ -193,9 +197,12 @@ public class Invocations {
         @SuppressWarnings("ConstantConditions")
         private FunctionInvocationFactory(@Nonnull final Function<OUTPUT> function) {
 
-            if (function == null) {
+            final Class<? extends Function> functionClass = function.getClass();
 
-                throw new NullPointerException("the function must not be null");
+            if (!Reflection.isStaticClass(functionClass)) {
+
+                throw new IllegalArgumentException(
+                        "the function class must be static: " + functionClass.getName());
             }
 
             mFunction = function;

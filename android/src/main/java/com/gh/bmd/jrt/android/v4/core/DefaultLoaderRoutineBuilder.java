@@ -25,10 +25,10 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.util.Reflection;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Modifier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -110,8 +110,7 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
         final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
 
-        if ((factoryClass.getEnclosingClass() != null) && !Modifier.isStatic(
-                factoryClass.getModifiers())) {
+        if (!Reflection.isStaticClass(factoryClass)) {
 
             throw new IllegalArgumentException(
                     "the factory class must be static: " + factoryClass.getName());

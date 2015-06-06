@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.Reflection;
 
 import javax.annotation.Nonnull;
 
@@ -39,9 +40,12 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT,
     @SuppressWarnings("ConstantConditions")
     DefaultRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
-        if (factory == null) {
+        final Class<? extends InvocationFactory> factoryClass = factory.getClass();
 
-            throw new NullPointerException("the invocation factory must not be null");
+        if (!Reflection.isStaticClass(factoryClass)) {
+
+            throw new IllegalArgumentException(
+                    "the factory class must be static: " + factoryClass.getName());
         }
 
         mFactory = factory;

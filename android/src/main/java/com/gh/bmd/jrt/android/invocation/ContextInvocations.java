@@ -21,8 +21,8 @@ import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
-import java.lang.reflect.Modifier;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -348,8 +348,7 @@ public class ContextInvocations {
 
             final Class<? extends Function> functionClass = function.getClass();
 
-            if ((functionClass.getEnclosingClass() != null) && !Modifier.isStatic(
-                    functionClass.getModifiers())) {
+            if (!Reflection.isStaticClass(functionClass)) {
 
                 throw new IllegalArgumentException(
                         "the function class must be static: " + functionClass.getName());

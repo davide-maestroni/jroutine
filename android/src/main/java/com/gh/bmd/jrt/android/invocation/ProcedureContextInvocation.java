@@ -15,20 +15,21 @@ package com.gh.bmd.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.invocation.FunctionInvocation;
+import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 
 import javax.annotation.Nonnull;
 
 /**
- * Function invocation implementing a context invocation.
+ * Procedure invocation implementing a context invocation.
  * <p/>
- * Created by davide-maestroni on 1/8/15.
+ * Created by davide on 06/06/15.
  *
- * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class FunctionContextInvocation<INPUT, OUTPUT>
-        extends FunctionInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public abstract class ProcedureContextInvocation<OUTPUT> extends ProcedureInvocation<OUTPUT>
+        implements ContextInvocation<Void, OUTPUT> {
+
+    //TODO: use it!!!
 
     private Context mContext;
 

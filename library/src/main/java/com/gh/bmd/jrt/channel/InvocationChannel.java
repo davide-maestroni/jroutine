@@ -21,7 +21,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining an invocation input channel, that is the channel used to pass input data to the
+ * Interface defining an invocation input channel, that is the channel used to pass input data to
+ * the
  * routine invocation.
  * <p/>
  * Created by davide-maestroni on 9/15/14.

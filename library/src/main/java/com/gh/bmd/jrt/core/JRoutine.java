@@ -168,7 +168,8 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified invocation factory.
+     * Returns a routine builder based on the specified invocation factory.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must be static.
      * <p/>
      * The invocation instance is created only when needed, by passing the specified arguments to
      * the factory. Note that the arguments objects should be immutable or, at least, never shared
@@ -178,6 +179,8 @@ public class JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(

@@ -339,12 +339,11 @@ class DefaultClassRoutineBuilder
      */
     protected void warn(@Nonnull final InvocationConfiguration configuration) {
 
-        Logger logger = null;
+        final Logger logger = configuration.newLogger(this);
         final Object[] args = configuration.getFactoryArgsOr(null);
 
         if (args != null) {
 
-            logger = configuration.newLogger(this);
             logger.wrn("the specified factory arguments will be ignored: %s",
                        Arrays.toString(args));
         }
@@ -353,22 +352,12 @@ class DefaultClassRoutineBuilder
 
         if (inputOrderType != null) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
         final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
         if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
 
             logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
         }
@@ -377,22 +366,12 @@ class DefaultClassRoutineBuilder
 
         if (inputTimeout != null) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
         final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
 
         if (outputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
 
             logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
@@ -401,11 +380,6 @@ class DefaultClassRoutineBuilder
 
         if (outputSize != InvocationConfiguration.DEFAULT) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
         }
 
@@ -413,25 +387,7 @@ class DefaultClassRoutineBuilder
 
         if (outputTimeout != null) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
-    }
-
-    /**
-     * Factory creating method invocations.
-     */
-    private static class MethodInvocationFactory implements InvocationFactory<Object, Object> {
-
-        @Nonnull
-        public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
-
-            return new MethodFunctionInvocation(args[0], (Method) args[1], args[2],
-                                                 (InputMode) args[3], (OutputMode) args[4]);
         }
     }
 
@@ -482,6 +438,19 @@ class DefaultClassRoutineBuilder
             }
 
             callFromInvocation(target, mMutex, objects, result, mMethod, mInputMode, mOutputMode);
+        }
+    }
+
+    /**
+     * Factory creating method invocations.
+     */
+    private static class MethodInvocationFactory implements InvocationFactory<Object, Object> {
+
+        @Nonnull
+        public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+
+            return new MethodFunctionInvocation(args[0], (Method) args[1], args[2],
+                                                (InputMode) args[3], (OutputMode) args[4]);
         }
     }
 

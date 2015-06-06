@@ -39,20 +39,7 @@ public class InvocationsTest {
     public void testFunction() {
 
         final Routine<Object, String> routine =
-                JRoutine.on(Invocations.factoryOf(new Function<String>() {
-
-                    public String call(@Nonnull final Object... params) {
-
-                        final StringBuilder builder = new StringBuilder(String.valueOf(params[0]));
-
-                        for (int i = 1; i < params.length; i++) {
-
-                            builder.append(", ").append(params[i]);
-                        }
-
-                        return builder.toString();
-                    }
-                }))
+                JRoutine.on(Invocations.factoryOf(new ToStringFunction()))
                         .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withReadTimeout(TimeDuration.seconds(1))
@@ -62,6 +49,27 @@ public class InvocationsTest {
                 "test1, test2, test3, test4");
         assertThat(routine.callParallel("test1", "test2", "test3", "test4").all()).containsOnly(
                 "test1", "test2", "test3", "test4");
+    }
+
+    @Test
+    public void testFunctionError() {
+
+        try {
+
+            Invocations.factoryOf(new Function<Object>() {
+
+                @Override
+                public Object call(@Nonnull final Object... params) {
+
+                    return null;
+                }
+            });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     @Test
@@ -123,6 +131,21 @@ public class InvocationsTest {
 
         public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
 
+        }
+    }
+
+    private static class ToStringFunction implements Function<String> {
+
+        public String call(@Nonnull final Object... params) {
+
+            final StringBuilder builder = new StringBuilder(String.valueOf(params[0]));
+
+            for (int i = 1; i < params.length; i++) {
+
+                builder.append(", ").append(params[i]);
+            }
+
+            return builder.toString();
         }
     }
 }

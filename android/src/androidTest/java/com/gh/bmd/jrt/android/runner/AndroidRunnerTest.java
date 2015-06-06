@@ -53,95 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class AndroidRunnerTest extends AndroidTestCase {
 
-    @SuppressWarnings("ConstantConditions")
-    public void testError() {
-
-        try {
-
-            new LooperRunner(null, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    public void testLooperRunner() throws InterruptedException {
-
-        testRunner(new LooperRunner(Looper.myLooper(), Runners.queuedRunner()));
-        testRunner(Runners.myRunner());
-
-        final TemplateInvocation<Object, Object> invocation =
-                new TemplateInvocation<Object, Object>() {
-
-                    @Override
-                    public void onResult(@Nonnull final ResultChannel<Object> result) {
-
-                        result.pass(Looper.myLooper()).pass(Runners.myRunner());
-                    }
-                };
-        final OutputChannel<Object> channel = JRoutine.on(ClassToken.tokenOf(invocation))
-                                                      .withInvocation()
-                                                      .withFactoryArgs(this)
-                                                      .withAsyncRunner(Runners.handlerRunner(
-                                                              new HandlerThread("test")))
-                                                      .set()
-                                                      .callAsync();
-
-        assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {
-
-            @Nonnull
-            public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
-
-                return new FunctionInvocation<Object, Object>() {
-
-                    @Override
-                    public void onCall(@Nonnull final List<?> objects,
-                            @Nonnull final ResultChannel<Object> result) {
-
-                        try {
-
-                            testRunner(new LooperRunner((Looper) objects.get(0), null));
-                            testRunner((Runner) objects.get(1));
-
-                            result.pass(true);
-
-                        } catch (final InterruptedException e) {
-
-                            throw new InvocationInterruptedException(e);
-                        }
-                    }
-                };
-            }
-        }).callAsync(channel).afterMax(seconds(30)).next()).isEqualTo(true);
-    }
-
-    public void testMainRunner() throws InterruptedException {
-
-        testRunner(Runners.mainRunner());
-        testRunner(new MainRunner());
-        testRunner(Runners.looperRunner(Looper.getMainLooper()));
-        testRunner(new RunnerDecorator(Runners.looperRunner(Looper.getMainLooper())));
-        testRunner(Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner()));
-        testRunner(new RunnerDecorator(
-                Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner())));
-    }
-
-    public void testTaskRunner() throws InterruptedException {
-
-        testRunner(new AsyncTaskRunner(null));
-        testRunner(Runners.taskRunner());
-        testRunner(Runners.taskRunner(Executors.newCachedThreadPool()));
-        testRunner(new RunnerDecorator(Runners.taskRunner(Executors.newSingleThreadExecutor())));
-    }
-
-    public void testThreadRunner() throws InterruptedException {
-
-        testRunner(Runners.handlerRunner(new HandlerThread("test")));
-    }
-
-    private void testRunner(final Runner runner) throws InterruptedException {
+    private static void testRunner(final Runner runner) throws InterruptedException {
 
         final Random random = new Random(System.currentTimeMillis());
         final ArrayList<TestRunExecution> executions = new ArrayList<TestRunExecution>();
@@ -225,6 +137,99 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
             execution.await();
             assertThat(execution.isPassed()).isTrue();
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testError() {
+
+        try {
+
+            new LooperRunner(null, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    public void testLooperRunner() throws InterruptedException {
+
+        testRunner(new LooperRunner(Looper.myLooper(), Runners.queuedRunner()));
+        testRunner(Runners.myRunner());
+
+        final TemplateInvocation<Object, Object> invocation =
+                new TemplateInvocation<Object, Object>() {
+
+                    @Override
+                    public void onResult(@Nonnull final ResultChannel<Object> result) {
+
+                        result.pass(Looper.myLooper()).pass(Runners.myRunner());
+                    }
+                };
+        final OutputChannel<Object> channel = JRoutine.on(ClassToken.tokenOf(invocation))
+                                                      .withInvocation()
+                                                      .withFactoryArgs(this)
+                                                      .withAsyncRunner(Runners.handlerRunner(
+                                                              new HandlerThread("test")))
+                                                      .set()
+                                                      .callAsync();
+
+        assertThat(JRoutine.on(new LooperInvocationFactory())
+                           .callAsync(channel)
+                           .afterMax(seconds(30))
+                           .next()).isEqualTo(true);
+    }
+
+    public void testMainRunner() throws InterruptedException {
+
+        testRunner(Runners.mainRunner());
+        testRunner(new MainRunner());
+        testRunner(Runners.looperRunner(Looper.getMainLooper()));
+        testRunner(new RunnerDecorator(Runners.looperRunner(Looper.getMainLooper())));
+        testRunner(Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner()));
+        testRunner(new RunnerDecorator(
+                Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner())));
+    }
+
+    public void testTaskRunner() throws InterruptedException {
+
+        testRunner(new AsyncTaskRunner(null));
+        testRunner(Runners.taskRunner());
+        testRunner(Runners.taskRunner(Executors.newCachedThreadPool()));
+        testRunner(new RunnerDecorator(Runners.taskRunner(Executors.newSingleThreadExecutor())));
+    }
+
+    public void testThreadRunner() throws InterruptedException {
+
+        testRunner(Runners.handlerRunner(new HandlerThread("test")));
+    }
+
+    private static class LooperInvocationFactory implements InvocationFactory<Object, Object> {
+
+        @Nonnull
+        public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+
+            return new FunctionInvocation<Object, Object>() {
+
+                @Override
+                public void onCall(@Nonnull final List<?> objects,
+                        @Nonnull final ResultChannel<Object> result) {
+
+                    try {
+
+                        testRunner(new LooperRunner((Looper) objects.get(0), null));
+                        testRunner((Runner) objects.get(1));
+
+                        result.pass(true);
+
+                    } catch (final InterruptedException e) {
+
+                        throw new InvocationInterruptedException(e);
+                    }
+                }
+            };
         }
     }
 

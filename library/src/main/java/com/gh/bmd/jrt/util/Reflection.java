@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -132,6 +133,17 @@ public class Reflection {
         }
 
         return method;
+    }
+
+    /**
+     * Checks if the specified class is static or is a top class.
+     *
+     * @param type the class.
+     * @return whether the class is static or a top class.
+     */
+    public static boolean isStaticClass(@Nonnull final Class<?> type) {
+
+        return ((type.getEnclosingClass() == null) || Modifier.isStatic(type.getModifiers()));
     }
 
     /**

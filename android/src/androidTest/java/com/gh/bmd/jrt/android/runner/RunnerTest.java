@@ -51,7 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide-maestroni on 10/10/14.
  */
-public class AndroidRunnerTest extends AndroidTestCase {
+public class RunnerTest extends AndroidTestCase {
 
     private static void testRunner(final Runner runner) throws InterruptedException {
 

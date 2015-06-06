@@ -52,7 +52,7 @@ import static com.gh.bmd.jrt.util.Reflection.makeAccessible;
  * <p/>
  * Created by davide-maestroni on 3/23/15.
  */
-public class RoutineBuilders {
+public class JRoutineBuilders {
 
     private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasCache =
             new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
@@ -69,7 +69,7 @@ public class RoutineBuilders {
     /**
      * Avoid direct instantiation.
      */
-    protected RoutineBuilders() {
+    protected JRoutineBuilders() {
 
     }
 

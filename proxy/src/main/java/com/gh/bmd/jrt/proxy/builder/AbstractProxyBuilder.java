@@ -163,12 +163,11 @@ public abstract class AbstractProxyBuilder<TYPE>
      */
     private void warn(@Nonnull final InvocationConfiguration configuration) {
 
-        Logger logger = null;
+        final Logger logger = configuration.newLogger(this);
         final Object[] args = configuration.getFactoryArgsOr(null);
 
         if (args != null) {
 
-            logger = configuration.newLogger(this);
             logger.wrn("the specified factory arguments will be ignored: %s",
                        Arrays.toString(args));
         }
@@ -177,22 +176,12 @@ public abstract class AbstractProxyBuilder<TYPE>
 
         if (inputOrderType != null) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
         final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
         if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
 
             logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
         }
@@ -201,22 +190,12 @@ public abstract class AbstractProxyBuilder<TYPE>
 
         if (inputTimeout != null) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
         final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
 
         if (outputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
 
             logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
@@ -225,22 +204,12 @@ public abstract class AbstractProxyBuilder<TYPE>
 
         if (outputSize != InvocationConfiguration.DEFAULT) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
         }
 
         final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
 
         if (outputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
 
             logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
         }

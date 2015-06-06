@@ -51,7 +51,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             return null;
         }
 
-        return com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(mWrapped, shareGroup);
+        return com.gh.bmd.jrt.core.JRoutineBuilders.getSharedMutex(mWrapped, shareGroup);
     }
 
     private static class ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {

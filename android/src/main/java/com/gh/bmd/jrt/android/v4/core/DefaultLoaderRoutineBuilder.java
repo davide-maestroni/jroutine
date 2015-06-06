@@ -202,23 +202,17 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
      */
     private void warn(@Nonnull final InvocationConfiguration configuration) {
 
-        Logger logger = null;
+        final Logger logger = configuration.newLogger(this);
         final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
 
         if (asyncRunner != null) {
 
-            logger = configuration.newLogger(this);
             logger.wrn("the specified async runner will be ignored: %s", asyncRunner);
         }
 
         final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
 
         if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
 
             logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
         }
@@ -227,11 +221,6 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
         if (inputTimeout != null) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
         }
 
@@ -239,22 +228,12 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
         if (outputSize != InvocationConfiguration.DEFAULT) {
 
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
             logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
         }
 
         final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
 
         if (outputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
 
             logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
         }

@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.
  * <p/>
- * The only use case in which this annotation is useful, is when an interface is used as a mirror
+ * The only use case in which this annotation is useful, is when an interface is used as a proxy
  * of another class methods. The interface can take its input parameters in an asynchronous way. In
  * such case, the values specified in the annotation will indicate the type of the parameters
  * expected by the target method.
@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
  *         public int sum(int i1, int i2);
  *     </code>
  * </pre>
- * can be mirrored by a method defined as:
+ * can be proxied by a method defined as:
  * <p/>
  * <pre>
  *     <code>
@@ -83,9 +83,9 @@ public @interface Inputs {
     InputMode mode() default InputMode.AUTO;
 
     /**
-     * The array of parameter classes.
+     * The array of parameter types.
      *
-     * @return the parameter classes.
+     * @return the parameter types.
      */
     Class<?>[] value();
 }

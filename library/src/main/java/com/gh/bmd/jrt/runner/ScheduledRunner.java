@@ -69,7 +69,7 @@ class ScheduledRunner implements Runner {
     }
 
     /**
-     * Class used to keep trace of the threads employed by this runner.
+     * Class used to keep track of the threads employed by this runner.
      */
     private static class ExecutionWrapper implements Execution {
 

@@ -19,9 +19,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining the behavior of a routine invocation.
+ * Interface defining a routine invocation.
  * <p/>
- * The typical lifecycle of an invocation object is the following:
+ * The typical lifecycle of an invocation object is the one depicted below:
  * <pre>
  *     <code>
  *
@@ -121,7 +121,7 @@ public interface Invocation<INPUT, OUTPUT> {
     void onResult(@Nonnull ResultChannel<OUTPUT> result);
 
     /**
-     * Called when the routine execution has completed.
+     * Called when the invocation execution has completed.
      */
     void onTerminate();
 }

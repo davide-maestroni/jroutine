@@ -220,7 +220,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * Gets the next input.
          *
          * @return the input.
-         * @throws java.util.NoSuchElementException if no more input is available.
+         * @throws java.util.NoSuchElementException if no more inputs are available.
          */
         @Nullable
         INPUT nextInput();

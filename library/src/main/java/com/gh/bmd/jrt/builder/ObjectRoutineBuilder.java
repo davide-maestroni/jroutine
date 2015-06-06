@@ -48,11 +48,11 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * In case the wrapped object does not implement the specified interface, the alias annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
-     * The interface will be interpreted as a mirror of the target object methods, and the optional
+     * The interface will be interpreted as a proxy of the target object methods, and the optional
      * {@link com.gh.bmd.jrt.annotation.Input}, {@link com.gh.bmd.jrt.annotation.Inputs} and
      * {@link com.gh.bmd.jrt.annotation.Output} annotations will be honored.
      *
-     * @param itf    the interface implemented by the return object.
+     * @param itf    the interface implemented by the returned object.
      * @param <TYPE> the interface type.
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
@@ -73,11 +73,11 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * In case the wrapped object does not implement the specified interface, the alias annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
-     * The interface will be interpreted as a mirror of the target object methods, and the optional
+     * The interface will be interpreted as a proxy of the target object methods, and the optional
      * {@link com.gh.bmd.jrt.annotation.Input}, {@link com.gh.bmd.jrt.annotation.Inputs} and
      * {@link com.gh.bmd.jrt.annotation.Output} annotations will be honored.
      *
-     * @param itf    the token of the interface implemented by the return object.
+     * @param itf    the token of the interface implemented by the returned object.
      * @param <TYPE> the interface type.
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an

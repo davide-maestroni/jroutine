@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.
  * <p/>
- * The only use case in which this annotation is useful, is when an interface is used as a mirror
+ * The only use case in which this annotation is useful, is when an interface is used as a proxy
  * of another class methods. The interface can take some input parameters in an asynchronous way. In
  * such case, the value specified in the annotation will indicate the type of the parameter expected
  * by the target method.
@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
  *         public int sum(int i1, int i2);
  *     </code>
  * </pre>
- * can be mirrored by a method defined as:
+ * can be proxied by a method defined as:
  * <p/>
  * <pre>
  *     <code>
@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Note that the transfer mode is automatically inferred by the mirror and the target type, unless
+ * Note that the transfer mode is automatically inferred by the proxy and the target types, unless
  * specifically chosen through the annotation <code>mode</code> attribute.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
@@ -96,7 +96,7 @@ public @interface Input {
          * Value mode.<br/>
          * The variable is just read from an output channel.
          * <p/>
-         * The annotated parameter must extends an {@link com.gh.bmd.jrt.channel.OutputChannel}.
+         * The annotated parameters must extend an {@link com.gh.bmd.jrt.channel.OutputChannel}.
          */
         VALUE,
         /**
@@ -104,7 +104,7 @@ public @interface Input {
          * The inputs are collected from the channel and passed as an array or collection to the
          * wrapped method.
          * <p/>
-         * The annotated parameter must extends an {@link com.gh.bmd.jrt.channel.OutputChannel} and
+         * The annotated parameter must extend an {@link com.gh.bmd.jrt.channel.OutputChannel} and
          * must be the only parameter accepted by the method.
          */
         COLLECTION,
@@ -119,8 +119,8 @@ public @interface Input {
         /**
          * Automatic mode.<br/>
          * The mode is automatically assigned based to the parameter or return type. Namely: if the
-         * parameters match the COLLECTION input mode, they are assigned it; if they match the VALUE
-         * input mode, they are assigned the latter; finally the ELEMENT input mode conditions are
+         * parameters match the COLLECTION input mode, that one is chosen; if they match the VALUE
+         * input mode, it is chosen the latter; finally the ELEMENT input mode conditions are
          * checked.
          */
         AUTO

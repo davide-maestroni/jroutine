@@ -19,10 +19,11 @@ import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
+
+import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 
 /**
  * This utility class represents the entry point to the framework by acting as a factory of routine
@@ -80,8 +81,8 @@ import javax.annotation.Nonnull;
  *         output2.eventually().allInto(results);
  *     </code>
  * </pre>
- * (Note that, the order of the input or the output of the routine is not guaranteed unless the
- * proper builder methods are called)
+ * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
+ * configured)
  * <p/>
  * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
  * <pre>
@@ -170,8 +171,8 @@ public class JRoutine {
      * Returns a routine builder based on the specified invocation factory.
      * <p/>
      * The invocation instance is created only when needed, by passing the specified arguments to
-     * the constructor. Note that the arguments objects should be immutable or, at least, never
-     * shared inside and outside the routine in order to avoid concurrency issues.
+     * the factory. Note that the arguments objects should be immutable or, at least, never shared
+     * inside and outside the routine in order to avoid concurrency issues.
      *
      * @param factory  the invocation factory.
      * @param <INPUT>  the input data type.
@@ -199,7 +200,7 @@ public class JRoutine {
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
             @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> token) {
 
-        return on(Invocations.factoryOf(token));
+        return on(factoryOf(token));
     }
 
     /**

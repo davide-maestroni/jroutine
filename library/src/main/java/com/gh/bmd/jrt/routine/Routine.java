@@ -129,7 +129,7 @@ public interface Routine<INPUT, OUTPUT> {
     /**
      * Short for <b><code>invokeParallel().result()</code></b>.
      * <p/>
-     * This method actually makes little sense, thought it is here for completeness.
+     * (This method actually makes little sense, thought it is here for completeness)
      *
      * @return the output channel.
      */
@@ -148,7 +148,7 @@ public interface Routine<INPUT, OUTPUT> {
     /**
      * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
      *
-     * @param inputs the iterable returning the input data.
+     * @param inputs the input data.
      * @return the output channel.
      */
     @Nonnull
@@ -157,7 +157,7 @@ public interface Routine<INPUT, OUTPUT> {
     /**
      * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
      *
-     * @param inputs the output channel returning the input data.
+     * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
     @Nonnull

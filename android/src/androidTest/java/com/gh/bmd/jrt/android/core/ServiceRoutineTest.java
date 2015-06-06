@@ -23,8 +23,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationDecorator;
 import com.gh.bmd.jrt.android.invocation.FilterContextInvocation;
+import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
 import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
-import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
@@ -209,8 +209,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations2() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final ClassToken<StringProcedureInvocation> token =
-                ClassToken.tokenOf(StringProcedureInvocation.class);
+        final ClassToken<StringFunctionInvocation> token =
+                ClassToken.tokenOf(StringFunctionInvocation.class);
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)
                                                          .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
@@ -235,8 +235,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations3() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final ClassToken<StringProcedureInvocation> token =
-                ClassToken.tokenOf(StringProcedureInvocation.class);
+        final ClassToken<StringFunctionInvocation> token =
+                ClassToken.tokenOf(StringFunctionInvocation.class);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
                                                          .withInvocation()
                                                          .withInputOrder(OrderType.PASS_ORDER)
@@ -257,8 +257,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations4() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final ClassToken<StringProcedureInvocation> token =
-                ClassToken.tokenOf(StringProcedureInvocation.class);
+        final ClassToken<StringFunctionInvocation> token =
+                ClassToken.tokenOf(StringFunctionInvocation.class);
         final Routine<String, String> routine4 = JRoutine.onService(getActivity(), token)
                                                          .withInvocation()
                                                          .withCoreInvocations(0)
@@ -580,8 +580,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class StringProcedureInvocation
-            extends ProcedureContextInvocation<String, String> {
+    private static class StringFunctionInvocation
+            extends FunctionContextInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,

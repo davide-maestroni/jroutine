@@ -14,7 +14,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation<Object, ${resultClassName}> {
+    private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
 
         private final Object[] mArgs;
 

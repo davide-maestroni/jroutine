@@ -44,7 +44,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 
 /**
- * Default implementation of a parameter input channel.
+ * Default implementation of a invocation input channel.
  * <p/>
  * Created by davide-maestroni on 9/24/14.
  *
@@ -814,7 +814,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     }
 
     /**
-     * Implementation of an execution handling a delayed abort.
+     * Implementation of an execution handling a delayed abortion.
      */
     private class DelayedAbortExecution implements Execution {
 
@@ -823,7 +823,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         /**
          * Constructor.
          *
-         * @param throwable the reason of the abort.
+         * @param throwable the reason of the abortion.
          */
         private DelayedAbortExecution(@Nullable final Throwable throwable) {
 

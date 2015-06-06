@@ -52,7 +52,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 
 /**
- * Class handling the routine output.
+ * Class handling the invocation output.
  * <p/>
  * This class centralizes the managing of data passing through the routine output and result
  * channels, since, logically, the two objects are part of the same entity. In fact, on one end the
@@ -1475,7 +1475,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
-     * Implementation of an execution handling a delayed abort.
+     * Implementation of an execution handling a delayed abortion.
      */
     private class DelayedAbortExecution implements Execution {
 
@@ -1484,7 +1484,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         /**
          * Constructor.
          *
-         * @param throwable the reason of the abort.
+         * @param throwable the reason of the abortion.
          */
         private DelayedAbortExecution(@Nullable final Throwable throwable) {
 

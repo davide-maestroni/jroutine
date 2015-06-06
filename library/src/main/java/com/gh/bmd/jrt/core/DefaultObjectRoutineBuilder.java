@@ -79,8 +79,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      * Constructor.
      *
      * @param target the target object instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
      */
     DefaultObjectRoutineBuilder(@Nonnull final Object target) {
 
@@ -106,8 +104,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> withInvocation() {
 
+        final InvocationConfiguration config = getInvocationConfiguration();
         return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
-                                                                         getInvocationConfiguration());
+                                                                         config);
     }
 
     @Nonnull
@@ -132,8 +131,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @SuppressWarnings("unchecked")
     public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy() {
 
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
-                                                                    getProxyConfiguration());
+        final ProxyConfiguration config = getProxyConfiguration();
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable, config);
     }
 
     @Nonnull

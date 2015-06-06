@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.invocation.ProcedureInvocation;
+import com.gh.bmd.jrt.invocation.FunctionInvocation;
 
 import javax.annotation.Nonnull;
 
@@ -27,8 +27,8 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class ProcedureContextInvocation<INPUT, OUTPUT>
-        extends ProcedureInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public abstract class FunctionContextInvocation<INPUT, OUTPUT>
+        extends FunctionInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
 
     private Context mContext;
 

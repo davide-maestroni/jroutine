@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
  * age the lower priority execution will have, before getting precedence over the higher priority
  * one.
  * <p/>
- * Note that the queue is not share between different instances of this class.
+ * Note that the queue is not shared between different instances of this class.
  * <p/>
  * Created by davide-maestroni on 28/04/15.
  */
@@ -216,6 +216,7 @@ public class PriorityRunner {
     private static class PriorityExecutionComparator
             implements Comparator<PriorityExecution>, Serializable {
 
+        // just don't care...
         private static final long serialVersionUID = -1;
 
         public int compare(final PriorityExecution o1, final PriorityExecution o2) {

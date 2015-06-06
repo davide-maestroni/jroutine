@@ -18,7 +18,7 @@ import android.content.Context;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
+import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.Priority;
@@ -429,7 +429,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class AliasMethodInvocation<INPUT, OUTPUT>
-            extends ProcedureContextInvocation<INPUT, OUTPUT> {
+            extends FunctionContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -518,7 +518,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class MethodSignatureInvocation<INPUT, OUTPUT>
-            extends ProcedureContextInvocation<INPUT, OUTPUT> {
+            extends FunctionContextInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -609,7 +609,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends ProcedureContextInvocation<Object, Object> {
+    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
 
         private final Object[] mArgs;
 

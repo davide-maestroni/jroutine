@@ -33,8 +33,8 @@ public interface InputChannel<INPUT> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort command will be delayed as well. Note, however, that a delayed abort will
-     * not prevent the invocation from completing, as input data do.
+     * Note that an abortion command will be delayed as well. Note, however, that a delayed abortion
+     * will not prevent the invocation from completing, as input data do.
      *
      * @param delay the delay.
      * @return this channel.
@@ -46,8 +46,8 @@ public interface InputChannel<INPUT> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort command will be delayed as well. Note, however, that a delayed abort will
-     * not prevent the invocation from completing, as input data do.
+     * Note that an abortion command will be delayed as well. Note, however, that a delayed abortion
+     * will not prevent the invocation from completing, as input data do.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.

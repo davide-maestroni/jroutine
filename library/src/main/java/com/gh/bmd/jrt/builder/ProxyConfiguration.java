@@ -35,7 +35,7 @@ public final class ProxyConfiguration {
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
-     * Empty configuration constant.<br/>The configuration has all the values set to their default.
+     * Empty configuration constant.<br/>The configuration has all the options set to their default.
      */
     public static final ProxyConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
@@ -236,7 +236,7 @@ public final class ProxyConfiguration {
 
         /**
          * Sets the share group name. A null value means that it is up to the framework to choose a
-         * default value.
+         * default one.
          *
          * @param groupName the group name.
          * @return this builder.

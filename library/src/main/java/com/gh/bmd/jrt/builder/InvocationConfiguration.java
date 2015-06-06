@@ -34,7 +34,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * must be created starting from the specific configuration.
  * <p/>
  * The configuration has a synchronous and an asynchronous runner associated. The synchronous
- * implementation already included in the library are queued (the default one) and sequential.<br/>
+ * implementation already included in the library are queued and sequential.<br/>
  * The queued one maintains an internal buffer of executions that are consumed only when the
  * last one completes, thus avoiding overflowing the call stack because of nested calls to other
  * routines.<br/>
@@ -45,7 +45,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * The default asynchronous runner is shared among all the routines, but a custom one can be set
  * through the builder.
  * <p/>
- * A specific priority can be set. Each invocation will age each time an higher priority one takes
+ * A specific priority can be set. Every invocation will age each time an higher priority one takes
  * the precedence, so that older invocations slowly increases their priority. Such mechanism has
  * been implemented to avoid starvation of low priority invocations. Hence, when assigning
  * priority values, it is important to keep in mind that the difference between two priorities
@@ -55,7 +55,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * Additionally, a recycling mechanism is provided so that, when an invocation successfully
  * completes, the instance is retained for future executions. Moreover, the maximum running
  * invocation instances at one time can be limited by calling the specific builder method. When the
- * limit is reached and an additional instance is requires, the call is blocked until one becomes
+ * limit is reached and an additional instance is required, the call is blocked until one becomes
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, an
@@ -64,7 +64,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
  * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case a {@link com.gh.bmd.jrt.channel.DeadlockException} will be
+ * timeout elapses. In the latter case, a {@link com.gh.bmd.jrt.channel.DeadlockException} will be
  * thrown.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
@@ -83,7 +83,7 @@ public final class InvocationConfiguration {
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
-     * Empty configuration constant.<br/>The configuration has all the values set to their default.
+     * Empty configuration constant.<br/>The configuration has all the options set to their default.
      */
     public static final InvocationConfiguration DEFAULT_CONFIGURATION =
             builder().buildConfiguration();
@@ -134,9 +134,9 @@ public final class InvocationConfiguration {
      *                         positive number.
      * @param availableTimeout the maximum timeout while waiting for an invocation instance to be
      *                         available.
-     * @param readTimeout      the action to be taken if the timeout elapses before a readable
+     * @param readTimeout      the timeout for an invocation instance to produce a result.
+     * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         result is available.
-     * @param actionType       the timeout for an invocation instance to produce a result.
      * @param inputOrderType   the order in which input data are collected from the input channel.
      * @param inputMaxSize     the maximum number of buffered input data. Must be positive.
      * @param inputTimeout     the maximum timeout while waiting for an input to be passed to the
@@ -827,7 +827,7 @@ public final class InvocationConfiguration {
                 return this;
             }
 
-            applyInvocationConfiguration(configuration);
+            applyBaseConfiguration(configuration);
             applyChannelConfiguration(configuration);
             applyLogConfiguration(configuration);
             return this;
@@ -835,7 +835,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the asynchronous runner instance. A null value means that it is up to the framework
-         * to choose a default instance.
+         * to choose a default one.
          *
          * @param runner the runner instance.
          * @return this builder.
@@ -864,7 +864,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to become available. A null value means that
-         * it is up to the framework to choose a default duration.
+         * it is up to the framework to choose a default one.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -877,9 +877,9 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the number of invocation instances which represents the core pool of reusable
+         * Sets the number of invocation instances, which represents the core pool of reusable
          * invocations. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default number.
+         * framework to choose a default one.
          *
          * @param coreInvocations the max number of instances.
          * @return this builder.
@@ -920,7 +920,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum number of data that the input channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default size.
+         * framework to choose a default one.
          *
          * @param inputMaxSize the maximum size.
          * @return this builder.
@@ -941,7 +941,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the order in which input data are collected from the input channel. A null value
-         * means that it is up to the framework to choose a default order type.
+         * means that it is up to the framework to choose a default one.
          *
          * @param orderType the order type.
          * @return this builder.
@@ -970,7 +970,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for an input channel to have room for additional data. A null value
-         * means that it is up to the framework to choose a default.
+         * means that it is up to the framework to choose a default one.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -984,7 +984,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the log instance. A null value means that it is up to the framework to choose a
-         * default implementation.
+         * default one.
          *
          * @param log the log instance.
          * @return this builder.
@@ -998,7 +998,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the log level. A null value means that it is up to the framework to choose a default
-         * level.
+         * one.
          *
          * @param level the log level.
          * @return this builder.
@@ -1013,8 +1013,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the max number of concurrently running invocation instances. A
          * {@link InvocationConfiguration#DEFAULT} value means that it is up to the framework to
-         * choose
-         * a default number.
+         * choose a default one.
          *
          * @param maxInvocations the max number of instances.
          * @return this builder.
@@ -1037,7 +1036,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum number of data that the result channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default size.
+         * framework to choose a default one.
          *
          * @param outputMaxSize the maximum size.
          * @return this builder.
@@ -1058,7 +1057,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the order in which output data are collected from the result channel. A null value
-         * means that it is up to the framework to choose a default order type.
+         * means that it is up to the framework to choose a default order one.
          *
          * @param orderType the order type.
          * @return this builder.
@@ -1087,7 +1086,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for a result channel to have room for additional data. A null value
-         * means that it is up to the framework to choose a default.
+         * means that it is up to the framework to choose a default one.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -1130,7 +1129,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to produce a readable result. A null value
-         * means that it is up to the framework to choose a default duration.
+         * means that it is up to the framework to choose a default one.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -1144,7 +1143,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the action to be taken if the timeout elapses before a result can be read from the
-         * output channel.
+         * output channel. A null value means that it is up to the framework to choose a default
+         * one.
          *
          * @param actionType the action type.
          * @return this builder.
@@ -1158,7 +1158,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the synchronous runner instance. A null value means that it is up to the framework
-         * to choose a default instance.
+         * to choose a default one.
          *
          * @param runner the runner instance.
          * @return this builder.
@@ -1170,54 +1170,7 @@ public final class InvocationConfiguration {
             return this;
         }
 
-        private void applyChannelConfiguration(
-                @Nonnull final InvocationConfiguration configuration) {
-
-            final OrderType inputOrderType = configuration.mInputOrderType;
-
-            if (inputOrderType != null) {
-
-                withInputOrder(inputOrderType);
-            }
-
-            final int inputSize = configuration.mInputMaxSize;
-
-            if (inputSize != DEFAULT) {
-
-                withInputMaxSize(inputSize);
-            }
-
-            final TimeDuration inputTimeout = configuration.mInputTimeout;
-
-            if (inputTimeout != null) {
-
-                withInputTimeout(inputTimeout);
-            }
-
-            final OrderType outputOrderType = configuration.mOutputOrderType;
-
-            if (outputOrderType != null) {
-
-                withOutputOrder(outputOrderType);
-            }
-
-            final int outputSize = configuration.mOutputMaxSize;
-
-            if (outputSize != DEFAULT) {
-
-                withOutputMaxSize(outputSize);
-            }
-
-            final TimeDuration outputTimeout = configuration.mOutputTimeout;
-
-            if (outputTimeout != null) {
-
-                withOutputTimeout(outputTimeout);
-            }
-        }
-
-        private void applyInvocationConfiguration(
-                @Nonnull final InvocationConfiguration configuration) {
+        private void applyBaseConfiguration(@Nonnull final InvocationConfiguration configuration) {
 
             final Object[] args = configuration.mFactoryArgs;
 
@@ -1280,6 +1233,52 @@ public final class InvocationConfiguration {
             if (timeoutActionType != null) {
 
                 withReadTimeoutAction(timeoutActionType);
+            }
+        }
+
+        private void applyChannelConfiguration(
+                @Nonnull final InvocationConfiguration configuration) {
+
+            final OrderType inputOrderType = configuration.mInputOrderType;
+
+            if (inputOrderType != null) {
+
+                withInputOrder(inputOrderType);
+            }
+
+            final int inputSize = configuration.mInputMaxSize;
+
+            if (inputSize != DEFAULT) {
+
+                withInputMaxSize(inputSize);
+            }
+
+            final TimeDuration inputTimeout = configuration.mInputTimeout;
+
+            if (inputTimeout != null) {
+
+                withInputTimeout(inputTimeout);
+            }
+
+            final OrderType outputOrderType = configuration.mOutputOrderType;
+
+            if (outputOrderType != null) {
+
+                withOutputOrder(outputOrderType);
+            }
+
+            final int outputSize = configuration.mOutputMaxSize;
+
+            if (outputSize != DEFAULT) {
+
+                withOutputMaxSize(outputSize);
+            }
+
+            final TimeDuration outputTimeout = configuration.mOutputTimeout;
+
+            if (outputTimeout != null) {
+
+                withOutputTimeout(outputTimeout);
             }
         }
 

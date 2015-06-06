@@ -26,11 +26,11 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.android.invocation.DelegatingContextInvocation;
+import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
 import com.gh.bmd.jrt.android.invocation.InvocationClashException;
 import com.gh.bmd.jrt.android.invocation.InvocationTypeException;
 import com.gh.bmd.jrt.android.invocation.MissingInvocationException;
 import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
-import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
 import com.gh.bmd.jrt.android.routine.LoaderRoutine;
@@ -1165,8 +1165,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                            .afterMax(timeout)
                            .all()).containsOnly("1", "2", "3", "4", "5");
 
-        final ClassToken<StringProcedureInvocation> token2 =
-                ClassToken.tokenOf(StringProcedureInvocation.class);
+        final ClassToken<StringFunctionInvocation> token2 =
+                ClassToken.tokenOf(StringFunctionInvocation.class);
         final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(), token2)
                                                          .withInvocation()
                                                          .withSyncRunner(Runners.queuedRunner())
@@ -1455,8 +1455,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class StringProcedureInvocation
-            extends ProcedureContextInvocation<String, String> {
+    private static class StringFunctionInvocation
+            extends FunctionContextInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,

@@ -32,5 +32,5 @@ public interface InvocationFactory<INPUT, OUTPUT> {
      * @return the invocation instance.
      */
     @Nonnull
-    Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args);
+    Invocation<INPUT, OUTPUT> newInvocation(@Nonnull Object... args);
 }

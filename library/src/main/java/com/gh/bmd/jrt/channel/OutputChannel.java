@@ -109,7 +109,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     OutputChannel<OUTPUT> allInto(@Nonnull Collection<? super OUTPUT> results);
 
     /**
-     * Checks if the routine is complete waiting at the maximum for the set timeout.
+     * Checks if the routine is complete, waiting at the maximum for the set timeout.
      *
      * @return whether the routine execution has complete.
      * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)

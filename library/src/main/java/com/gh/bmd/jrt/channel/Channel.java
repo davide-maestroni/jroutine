@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a basic communication channel with the routine.
+ * Interface defining a basic communication channel with the routine invocation.
  * <p/>
  * Channel instances are used to transfer data to and from the code executed inside the routine
  * invocation.
@@ -45,7 +45,7 @@ public interface Channel {
      * <p/>
      * Note that, in case the channel was already closed, the call to this method has no effect.
      *
-     * @param reason the throwable object identifying the reason of the routine abortion.
+     * @param reason the throwable object identifying the reason of the invocation abortion.
      * @return whether the channel status changed as a result of the call.
      */
     boolean abort(@Nullable Throwable reason);

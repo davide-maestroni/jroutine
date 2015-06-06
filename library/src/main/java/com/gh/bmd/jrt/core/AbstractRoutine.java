@@ -41,7 +41,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
  * Basic abstract implementation of a routine.
  * <p/>
  * This class provides a default implementation of all the routine features. The inheriting class
- * just need to create invocation objects when required.
+ * just needs to create invocation objects when required.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *

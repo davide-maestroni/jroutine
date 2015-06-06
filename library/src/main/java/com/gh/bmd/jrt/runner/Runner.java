@@ -23,10 +23,10 @@ import javax.annotation.Nonnull;
  * <p/>
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
  * share a pool of them between different instances.<br/>
- * The only requirements is that the specified execution is called each time a run method is
- * invoked.<br/>
+ * The only requirement is that the specified execution is called each time a run method is invoked.
+ * <br/>
  * Note also that the runner methods can be called from different threads, so, it is up to the
- * implementing class to ensure synchronization when needed.
+ * implementing class to ensure synchronization when required.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  */

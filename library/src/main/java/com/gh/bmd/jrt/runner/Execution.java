@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.runner;
 
 /**
- * Interface defining a routine execution.
+ * Interface defining an invocation execution.
  * <p/>
  * This interface is meant to be used by a runner to ensure that the routine execution will take
  * place in the specific handled thread or threads.

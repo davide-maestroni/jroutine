@@ -20,10 +20,10 @@ import android.test.AndroidTestCase;
 import com.gh.bmd.jrt.android.v11.core.JRoutine;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
-import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
@@ -94,7 +94,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
             @Nonnull
             public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
 
-                return new ProcedureInvocation<Object, Object>() {
+                return new FunctionInvocation<Object, Object>() {
 
                     @Override
                     public void onCall(@Nonnull final List<?> objects,

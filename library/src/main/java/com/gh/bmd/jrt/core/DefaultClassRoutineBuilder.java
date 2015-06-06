@@ -24,9 +24,9 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.TimeDuration;
@@ -430,7 +430,7 @@ class DefaultClassRoutineBuilder
         @Nonnull
         public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
 
-            return new MethodProcedureInvocation(args[0], (Method) args[1], args[2],
+            return new MethodFunctionInvocation(args[0], (Method) args[1], args[2],
                                                  (InputMode) args[3], (OutputMode) args[4]);
         }
     }
@@ -438,7 +438,7 @@ class DefaultClassRoutineBuilder
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodProcedureInvocation extends ProcedureInvocation<Object, Object> {
+    private static class MethodFunctionInvocation extends FunctionInvocation<Object, Object> {
 
         private final InputMode mInputMode;
 
@@ -459,9 +459,9 @@ class DefaultClassRoutineBuilder
          * @param inputMode  the input transfer mode.
          * @param outputMode the output transfer mode.
          */
-        public MethodProcedureInvocation(@Nullable final Object target,
-                @Nonnull final Method method, @Nullable final Object mutex,
-                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+        public MethodFunctionInvocation(@Nullable final Object target, @Nonnull final Method method,
+                @Nullable final Object mutex, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) {
 
             mTargetReference = new WeakReference<Object>(target);
             mMethod = method;

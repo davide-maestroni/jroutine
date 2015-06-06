@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.
  * <p/>
- * The only use case in which this annotation is useful, is when an interface is used as a mirror
+ * The only use case in which this annotation is useful, is when an interface is used as a proxy
  * of another class methods. The interface can return the output in an asynchronous way. In such
  * case, the value specified in the annotation will indicate the mode in which the output is
  * transferred outside the routine.
@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
  *         public int sum(int i1, int i2);
  *     </code>
  * </pre>
- * can be mirrored by a method defined as:
+ * can be proxied by a method defined as:
  * <p/>
  * <pre>
  *     <code>
@@ -60,7 +60,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Note that the transfer mode is automatically inferred by the mirror and the target type, unless
+ * Note that the transfer mode is automatically inferred by the proxy and the target types, unless
  * specifically chosen through the annotation value.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
@@ -98,7 +98,7 @@ public @interface Output {
 
         /**
          * Value mode.<br/>
-         * The variable is just read passed to an output channel.
+         * The variable is just passed to an output channel.
          * <p/>
          * The annotated method must return a superclass of
          * {@link com.gh.bmd.jrt.channel.OutputChannel}.
@@ -116,14 +116,14 @@ public @interface Output {
          * Collection mode.<br/>
          * The results are collected before being returned by the annotated method.
          * <p/>
-         * The annotated method must return an array or a superclass of a {@link java.util.List}.
+         * The annotated method must return an array or a superclass of {@link java.util.List}.
          */
         COLLECTION,
         /**
          * Automatic mode.<br/>
-         * The mode is automatically assigned based to the return type. Namely: if the return type
-         * matches the COLLECTION output mode, it is assigned it; if it  matches the ELEMENT output
-         * mode, it is assigned the latter; finally the VALUE output mode conditions are checked.
+         * The mode is automatically assigned based on the return type. Namely: if the return type
+         * matches the COLLECTION output mode, that one is chosen; if it  matches the ELEMENT output
+         * mode, it is chosen the latter; finally the VALUE output mode conditions are checked.
          */
         AUTO
     }

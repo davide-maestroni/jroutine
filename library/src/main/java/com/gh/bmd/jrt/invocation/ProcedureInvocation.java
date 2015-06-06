@@ -15,73 +15,50 @@ package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
- * This is a special abstract implementation that centralizes the routine invocation inside a
- * single method, which gets called only when all the inputs are available.
+ * Abstract implementation of an invocation performing a procedure eventually returning output data.
  * <p/>
- * The implementing class may additionally override the invocation methods to specifically handle
- * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
+ * Note that the implementing class must not retain an internal variable state.
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 05/06/15.
  *
- * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class ProcedureInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT> {
+public abstract class ProcedureInvocation<OUTPUT>
+        implements Invocation<Void, OUTPUT>, InvocationFactory<Void, OUTPUT> {
 
-    private ArrayList<INPUT> mInputs;
-
-    /**
-     * This method is called when all the inputs are available and ready to be processed.
-     *
-     * @param inputs the input list.
-     * @param result the result channel.
-     */
-    public abstract void onCall(@Nonnull List<? extends INPUT> inputs,
-            @Nonnull ResultChannel<OUTPUT> result);
-
+    @Nonnull
     @Override
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public final Invocation<Void, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-        if (mInputs == null) {
-
-            mInputs = new ArrayList<INPUT>();
-        }
-
-        mInputs.add(input);
+        return this;
     }
 
     @Override
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public final void onAbort(@Nullable final Throwable reason) {
 
-        final ArrayList<INPUT> inputs = mInputs;
-        final ArrayList<INPUT> clone;
-
-        if (inputs == null) {
-
-            clone = new ArrayList<INPUT>(0);
-
-        } else {
-
-            clone = new ArrayList<INPUT>(inputs);
-        }
-
-        onCall(clone, result);
     }
 
     @Override
-    public void onTerminate() {
+    public final void onDestroy() {
 
-        final ArrayList<INPUT> inputs = mInputs;
+    }
 
-        if (inputs != null) {
+    @Override
+    public final void onInitialize() {
 
-            inputs.clear();
-        }
+    }
+
+    @Override
+    public final void onInput(final Void input, @Nonnull final ResultChannel<OUTPUT> result) {
+
+    }
+
+    @Override
+    public final void onTerminate() {
+
     }
 }

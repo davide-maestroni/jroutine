@@ -83,7 +83,7 @@ interface NestedQueue<E> {
      *
      * @param collection the collection to fill.
      */
-    void moveTo(@Nonnull final Collection<? super E> collection);
+    void moveTo(@Nonnull Collection<? super E> collection);
 
     /**
      * Removes the first element added into the queue.

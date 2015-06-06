@@ -36,6 +36,7 @@ import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
+import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationDeadlockException;
 import com.gh.bmd.jrt.invocation.InvocationException;
@@ -43,7 +44,6 @@ import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
-import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -443,8 +443,8 @@ public class RoutineTest {
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final ProcedureInvocation<Integer, Integer> execSum =
-                new ProcedureInvocation<Integer, Integer>() {
+        final FunctionInvocation<Integer, Integer> execSum =
+                new FunctionInvocation<Integer, Integer>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends Integer> integers,
@@ -504,8 +504,8 @@ public class RoutineTest {
     public void testComposedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final ProcedureInvocation<Integer, Integer> execSum =
-                new ProcedureInvocation<Integer, Integer>() {
+        final FunctionInvocation<Integer, Integer> execSum =
+                new FunctionInvocation<Integer, Integer>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends Integer> integers,
@@ -1645,7 +1645,7 @@ public class RoutineTest {
     public void testOutputTimeout() {
 
         final Routine<String, String> routine =
-                JRoutine.on(ClassToken.tokenOf(new ProcedureInvocation<String, String>() {
+                JRoutine.on(ClassToken.tokenOf(new FunctionInvocation<String, String>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends String> strings,
@@ -2123,8 +2123,8 @@ public class RoutineTest {
     public void testRoutineFunction() {
 
         final TimeDuration timeout = seconds(1);
-        final ProcedureInvocation<Integer, Integer> execSum =
-                new ProcedureInvocation<Integer, Integer>() {
+        final FunctionInvocation<Integer, Integer> execSum =
+                new FunctionInvocation<Integer, Integer>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends Integer> integers,

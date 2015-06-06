@@ -102,7 +102,7 @@ public interface TransportChannel<DATA> {
 
         /**
          * Closes the channel input.<br/>
-         * If the channel is already close, this method has no effect.
+         * If the channel is already closed, this method has no effect.
          * <p/>
          * Note that this method must be always called when done with the channel.
          */

@@ -44,7 +44,7 @@ public class Invocations {
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * instance as first constructor parameter, and anonymous classes have both the outer instance
      * and all the variables captured in the closure.
      *
      * @param invocationToken the invocation class token.
@@ -65,7 +65,7 @@ public class Invocations {
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes has both the outer instance and all the
+     * first constructor parameter, and anonymous classes have both the outer instance and all the
      * variables captured in the closure.
      *
      * @param invocationClass the invocation class.
@@ -204,7 +204,7 @@ public class Invocations {
         @Nonnull
         public Invocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
-            return new ProcedureInvocation<Object, OUTPUT>() {
+            return new FunctionInvocation<Object, OUTPUT>() {
 
                 @Override
                 public void onCall(@Nonnull final List<?> objects,

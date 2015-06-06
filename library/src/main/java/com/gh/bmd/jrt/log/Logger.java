@@ -597,7 +597,7 @@ public class Logger {
 
     /**
      * Creates a new logger with the same log instance and log level, but adding the specified
-     * contexts to the contexts array.
+     * context to the list of contexts.
      *
      * @param context the context.
      * @return the new logger.

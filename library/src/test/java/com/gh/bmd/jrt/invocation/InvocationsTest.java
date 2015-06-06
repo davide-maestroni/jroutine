@@ -13,13 +13,8 @@
  */
 package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.core.JRoutine;
-import com.gh.bmd.jrt.invocation.Invocations.Function;
-import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -34,43 +29,6 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 2/16/15.
  */
 public class InvocationsTest {
-
-    @Test
-    public void testFunction() {
-
-        final Routine<Object, String> routine =
-                JRoutine.on(Invocations.factoryOf(new ToStringFunction()))
-                        .withInvocation()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withReadTimeout(TimeDuration.seconds(1))
-                        .set()
-                        .buildRoutine();
-        assertThat(routine.callAsync("test1", "test2", "test3", "test4").next()).isEqualTo(
-                "test1, test2, test3, test4");
-        assertThat(routine.callParallel("test1", "test2", "test3", "test4").all()).containsOnly(
-                "test1", "test2", "test3", "test4");
-    }
-
-    @Test
-    public void testFunctionError() {
-
-        try {
-
-            Invocations.factoryOf(new Function<Object>() {
-
-                @Override
-                public Object call(@Nonnull final Object... params) {
-
-                    return null;
-                }
-            });
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
 
     @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
@@ -99,21 +57,6 @@ public class InvocationsTest {
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testNullFunctionError() {
-
-        try {
-
-            Invocations.factoryOf((Function<Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
     public void testNullTokenError() {
 
         try {
@@ -131,21 +74,6 @@ public class InvocationsTest {
 
         public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
 
-        }
-    }
-
-    private static class ToStringFunction implements Function<String> {
-
-        public String call(@Nonnull final Object... params) {
-
-            final StringBuilder builder = new StringBuilder(String.valueOf(params[0]));
-
-            for (int i = 1; i < params.length; i++) {
-
-                builder.append(", ").append(params[i]);
-            }
-
-            return builder.toString();
         }
     }
 }

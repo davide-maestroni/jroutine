@@ -15,15 +15,10 @@ package com.gh.bmd.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
-import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.Reflection;
-
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -127,28 +122,6 @@ public class ContextInvocations {
             @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass) {
 
         return new DefaultContextInvocationFactory<INPUT, OUTPUT>(invocationClass);
-    }
-
-    /**
-     * Builds and returns a new factory of context invocations calling the specified function.<br/>
-     * In order to prevent undesired leaks, the class of the specified function must be static.<br/>
-     * The function class will be used as invocation type.<br/>
-     * Remember to force the input order type, in case the function parameter position needs to be
-     * preserved.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified function is not
-     *                                            static.
-     */
-    @Nonnull
-    public static <OUTPUT> ContextInvocationFactory<Object, OUTPUT> factoryOf(
-            @Nonnull final Function<OUTPUT> function) {
-
-        return new FunctionContextInvocationFactory<OUTPUT>(function);
     }
 
     /**
@@ -323,59 +296,6 @@ public class ContextInvocations {
         public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
 
             return (ContextInvocation<INPUT, OUTPUT>) mFactory.newInvocation(args);
-        }
-    }
-
-    /**
-     * Implementation of a factory of invocations calling a specific function.
-     *
-     * @param <OUTPUT> the output data type.
-     */
-    private static class FunctionContextInvocationFactory<OUTPUT>
-            implements ContextInvocationFactory<Object, OUTPUT> {
-
-        private final Function<OUTPUT> mFunction;
-
-        private final String mInvocationType;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function instance.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private FunctionContextInvocationFactory(@Nonnull final Function<OUTPUT> function) {
-
-            final Class<? extends Function> functionClass = function.getClass();
-
-            if (!Reflection.isStaticClass(functionClass)) {
-
-                throw new IllegalArgumentException(
-                        "the function class must be static: " + functionClass.getName());
-            }
-
-            mFunction = function;
-            mInvocationType = functionClass.getName();
-        }
-
-        @Nonnull
-        public String getInvocationType() {
-
-            return mInvocationType;
-        }
-
-        @Nonnull
-        public ContextInvocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-            return new FunctionContextInvocation<Object, OUTPUT>() {
-
-                @Override
-                public void onCall(@Nonnull final List<?> objects,
-                        @Nonnull final ResultChannel<OUTPUT> result) {
-
-                    result.pass(mFunction.call(objects.toArray()));
-                }
-            };
         }
     }
 }

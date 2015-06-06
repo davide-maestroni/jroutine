@@ -13,13 +13,10 @@
  */
 package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -82,43 +79,6 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new factory of invocations calling the specified function.<br/>
-     * In order to prevent undesired leaks, the class of the specified function must be static.<br/>
-     * Remember to force the input order type, in case the function parameter position needs to be
-     * preserved.
-     * <p/>
-     * Note that the function object must be stateless in order to avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <OUTPUT> the output data type.
-     * @return the builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
-     *                                            static.
-     */
-    @Nonnull
-    public static <OUTPUT> InvocationFactory<Object, OUTPUT> factoryOf(
-            @Nonnull final Function<OUTPUT> function) {
-
-        return new FunctionInvocationFactory<OUTPUT>(function);
-    }
-
-    /**
-     * Interface defining a function taking an undefined number of parameters.
-     *
-     * @param <OUTPUT> the output data type.
-     */
-    public interface Function<OUTPUT> {
-
-        /**
-         * Calls this function.
-         *
-         * @param params the array of parameters.
-         * @return the result.
-         */
-        OUTPUT call(@Nonnull Object... params);
-    }
-
-    /**
      * Default implementation of an invocation factory.
      *
      * @param <INPUT>  the input data type.
@@ -176,50 +136,6 @@ public class Invocations {
 
                 throw new InvocationException(t);
             }
-        }
-    }
-
-    /**
-     * Implementation of a factory of invocations calling a specific function.
-     *
-     * @param <OUTPUT> the output data type.
-     */
-    private static class FunctionInvocationFactory<OUTPUT>
-            implements InvocationFactory<Object, OUTPUT> {
-
-        private final Function<OUTPUT> mFunction;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function instance.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private FunctionInvocationFactory(@Nonnull final Function<OUTPUT> function) {
-
-            final Class<? extends Function> functionClass = function.getClass();
-
-            if (!Reflection.isStaticClass(functionClass)) {
-
-                throw new IllegalArgumentException(
-                        "the function class must be static: " + functionClass.getName());
-            }
-
-            mFunction = function;
-        }
-
-        @Nonnull
-        public Invocation<Object, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-            return new FunctionInvocation<Object, OUTPUT>() {
-
-                @Override
-                public void onCall(@Nonnull final List<?> objects,
-                        @Nonnull final ResultChannel<OUTPUT> result) {
-
-                    result.pass(mFunction.call(objects.toArray()));
-                }
-            };
         }
     }
 }

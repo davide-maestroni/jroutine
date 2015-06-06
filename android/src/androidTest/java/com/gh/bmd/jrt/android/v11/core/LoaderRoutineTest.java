@@ -44,7 +44,6 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
-import com.gh.bmd.jrt.invocation.Invocations.Function;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
@@ -378,19 +377,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }
-    }
-
-    public void testActivityFunction() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<Object, String> routine =
-                JRoutine.onActivity(getActivity(), factoryOf(new TestFunction())).buildRoutine();
-        assertThat(routine.callAsync("test").afterMax(timeout).next()).isEqualTo("TEST");
     }
 
     public void testActivityInputs() {
@@ -1023,22 +1009,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }
-    }
-
-    public void testFragmentFunction() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TimeDuration timeout = TimeDuration.seconds(10);
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        final Routine<Object, String> routine =
-                JRoutine.onFragment(fragment, factoryOf(new TestFunction())).buildRoutine();
-        assertThat(routine.callAsync("test").afterMax(timeout).next()).isEqualTo("TEST");
     }
 
     public void testFragmentInputs() throws InterruptedException {
@@ -1689,14 +1659,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 @Nonnull final ResultChannel<String> result) {
 
             result.pass(strings);
-        }
-    }
-
-    private static class TestFunction implements Function<String> {
-
-        public String call(@Nonnull final Object... params) {
-
-            return params[0].toString().toUpperCase();
         }
     }
 

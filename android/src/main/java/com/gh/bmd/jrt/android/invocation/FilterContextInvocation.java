@@ -35,7 +35,7 @@ public abstract class FilterContextInvocation<INPUT, OUTPUT>
         implements ContextInvocation<INPUT, OUTPUT> {
 
     @Nonnull
-    public final ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+    public final ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
         return this;
     }

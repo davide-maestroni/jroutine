@@ -18,11 +18,23 @@
 
     private static class InvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
 
+        private final Object mMutex;
+
+        private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
+
+        private InvocationFactory${methodCount}(
+                @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped,
+                @javax.annotation.Nonnull final Object mutex) {
+
+            mWrapped = wrapped;
+            mMutex = mutex;
+        }
+
         @javax.annotation.Nonnull
         @SuppressWarnings("unchecked")
-        public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation(@javax.annotation.Nonnull Object... args) {
+        public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
 
-            return new Invocation${methodCount}${genericTypes}((java.lang.ref.WeakReference<${classFullName}>) args[0], args[1]);
+            return new Invocation${methodCount}${genericTypes}(mWrapped, mMutex);
         }
     }
 
@@ -30,11 +42,10 @@
     private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration configuration) {
 
-        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}())
+        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(mWrapped, getMutex(${shareGroup})))
                                            .withInvocation()
                                            .with(configuration)
                                            ${routineBuilderOptions}
-                                           .withFactoryArgs(mWrapped, getMutex(${shareGroup}))
                                            .withInputMaxSize(Integer.MAX_VALUE)
                                            .withInputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
                                            .withOutputMaxSize(Integer.MAX_VALUE)

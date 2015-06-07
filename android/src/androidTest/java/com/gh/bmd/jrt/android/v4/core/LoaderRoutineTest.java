@@ -41,7 +41,6 @@ import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log;
@@ -49,7 +48,6 @@ import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.Reflection;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -302,8 +300,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testActivityContext() {
 
-        assertThat(JRoutine.on(ContextInvocations.invocationFactoryOf(
-                new ClassToken<GetContextInvocation<String>>() {}, getActivity()))
+        assertThat(JRoutine.on(ContextInvocations.invocationFactoryOf(getActivity(),
+                                                                      new ClassToken<GetContextInvocation<String>>() {}))
                            .callSync()
                            .next()).isSameAs(getActivity());
         assertThat(JRoutine.onActivity(getActivity(), ContextInvocations.factoryOf(
@@ -368,14 +366,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class))
-                    .callAsync()
-                    .eventually()
-                    .all();
+            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class));
 
             fail();
 
-        } catch (final InvocationException ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -905,14 +900,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class))
-                    .callAsync()
-                    .eventually()
-                    .all();
+            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class));
 
             fail();
 
-        } catch (final InvocationException ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -1173,18 +1165,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class),
-                                                 Reflection.NO_ARGS, configuration, null, logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(reference, null, Reflection.NO_ARGS, configuration,
+            new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), configuration,
                                                  null, logger);
 
             fail();
@@ -1195,8 +1176,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
+            new LoaderInvocation<String, String>(reference, null, configuration, null, logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
             new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class), null,
-                                                 configuration, null, logger);
+                                                 null, logger);
 
             fail();
 
@@ -1207,18 +1198,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class),
-                                                 Reflection.NO_ARGS, null, null, logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(reference, factoryOf(ToUpperCase.class),
-                                                 Reflection.NO_ARGS, configuration, null, null);
+                                                 configuration, null, null);
 
             fail();
 

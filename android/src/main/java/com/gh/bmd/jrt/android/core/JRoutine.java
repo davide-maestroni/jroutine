@@ -21,6 +21,7 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -84,7 +85,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
     /**
      * Returns a builder of routines running in a service based on the specified context.<br/>
      * In order to customize the invocation creation, the caller must override the method
-     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class)}.
+     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])}.
      * <p/>
      * Note that the built routine results will be dispatched in the looper specified through the
      * builder, thus, waiting for the outputs on the very same looper thread, immediately after its
@@ -93,6 +94,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      *
      * @param context    the routine context.
      * @param classToken the invocation class token.
+     * @param args       the invocation factory arguments.
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
@@ -100,9 +102,10 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
     @Nonnull
     public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> onService(
             @Nonnull final Context context,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken,
+            @Nullable final Object... args) {
 
-        return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken);
+        return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken, args);
     }
 
     /**
@@ -118,12 +121,13 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      *
      * @param context     the routine context.
      * @param targetClass the wrapped object class.
+     * @param args        the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static ServiceObjectRoutineBuilder onService(@Nonnull final Context context,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... args) {
 
-        return new DefaultServiceObjectRoutineBuilder(context, targetClass);
+        return new DefaultServiceObjectRoutineBuilder(context, targetClass, args);
     }
 }

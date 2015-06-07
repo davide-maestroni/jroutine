@@ -25,7 +25,6 @@ import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.util.TimeDuration;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -75,14 +74,6 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
      */
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final InvocationConfiguration configuration) {
-
-        final Object[] args = configuration.getFactoryArgsOr(null);
-
-        if (args != null) {
-
-            logger.wrn("the specified factory arguments will be ignored: %s",
-                       Arrays.toString(args));
-        }
 
         final Runner syncRunner = configuration.getSyncRunnerOr(null);
 

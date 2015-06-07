@@ -28,9 +28,8 @@ public interface InvocationFactory<INPUT, OUTPUT> {
     /**
      * Creates and return a new invocation instance.
      *
-     * @param args the arguments.
      * @return the invocation instance.
      */
     @Nonnull
-    Invocation<INPUT, OUTPUT> newInvocation(@Nonnull Object... args);
+    Invocation<INPUT, OUTPUT> newInvocation();
 }

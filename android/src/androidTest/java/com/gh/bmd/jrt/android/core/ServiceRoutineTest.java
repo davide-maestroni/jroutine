@@ -140,8 +140,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            new DefaultServiceRoutineBuilder<Object, Object>(getActivity(),
-                                                             classToken).setConfiguration(
+            new DefaultServiceRoutineBuilder<Object, Object>(getActivity(), classToken,
+                                                             null).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -152,8 +152,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            new DefaultServiceRoutineBuilder<Object, Object>(getActivity(),
-                                                             classToken).setConfiguration(
+            new DefaultServiceRoutineBuilder<Object, Object>(getActivity(), classToken,
+                                                             null).setConfiguration(
                     (ServiceConfiguration) null);
 
             fail();

@@ -73,6 +73,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
+    private final Object[] mArgs;
+
     private final Context mContext;
 
     private final Class<?> mTargetClass;
@@ -89,10 +91,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      *
      * @param context     the routine context.
      * @param targetClass the target object class.
+     * @param args        the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] args) {
 
         if (context == null) {
 
@@ -106,6 +109,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         mContext = context;
         mTargetClass = targetClass;
+        mArgs = (args != null) ? args : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -290,14 +294,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        final Object[] args = invocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         warn(serviceConfiguration.getLogClassOr(null), invocationConfiguration);
         final AliasMethodToken<INPUT, OUTPUT> classToken = new AliasMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        return JRoutine.onService(mContext, classToken)
+        final Object[] args = new Object[]{targetClass.getName(), mArgs, shareGroup, name};
+        return JRoutine.onService(mContext, classToken, args)
                        .withInvocation()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
-                       .withFactoryArgs(targetClass.getName(), args, shareGroup, name)
                        .withInputOrder(OrderType.PASS_ORDER)
                        .set()
                        .withService()
@@ -320,16 +323,15 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Method targetMethod = findMethod(targetClass, name, parameterTypes);
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        final Object[] args = invocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
         warn(serviceConfiguration.getLogClassOr(null), invocationConfiguration);
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        return JRoutine.onService(mContext, classToken)
+        final Object[] args = new Object[]{targetClass.getName(), mArgs, shareGroup, name,
+                                           toNames(parameterTypes)};
+        return JRoutine.onService(mContext, classToken, args)
                        .withInvocation()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
-                       .withFactoryArgs(targetClass.getName(), args, shareGroup, name,
-                                        toNames(parameterTypes))
                        .withInputOrder(OrderType.PASS_ORDER)
                        .set()
                        .withService()
@@ -723,7 +725,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mInvocationConfiguration = builder.mInvocationConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mServiceConfiguration = builder.mServiceConfiguration;
-            mArgs = mInvocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+            mArgs = builder.mArgs;
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -743,19 +745,17 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER;
             final OrderType outputOrder =
                     (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
-            final Routine<Object, Object> routine = JRoutine.onService(mContext, PROXY_TOKEN)
-                                                            .withInvocation()
-                                                            .with(configurationWithAnnotations(
-                                                                    mInvocationConfiguration,
-                                                                    method))
-                                                            .withFactoryArgs(factoryArgs)
-                                                            .withInputOrder(inputOrder)
-                                                            .withOutputOrder(outputOrder)
-                                                            .set()
-                                                            .withService()
-                                                            .with(mServiceConfiguration)
-                                                            .set()
-                                                            .buildRoutine();
+            final Routine<Object, Object> routine =
+                    JRoutine.onService(mContext, PROXY_TOKEN, factoryArgs)
+                            .withInvocation()
+                            .with(configurationWithAnnotations(mInvocationConfiguration, method))
+                            .withInputOrder(inputOrder)
+                            .withOutputOrder(outputOrder)
+                            .set()
+                            .withService()
+                            .with(mServiceConfiguration)
+                            .set()
+                            .buildRoutine();
             return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
                                  inputMode, outputMode);
         }

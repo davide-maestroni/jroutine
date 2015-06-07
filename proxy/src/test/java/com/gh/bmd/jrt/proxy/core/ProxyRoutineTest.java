@@ -216,7 +216,6 @@ public class ProxyRoutineTest {
         final TestClass test = new TestClass();
         JRoutineProxy.on(test)
                      .withInvocation()
-                     .withFactoryArgs()
                      .withInputOrder(OrderType.NONE)
                      .withInputMaxSize(3)
                      .withInputTimeout(seconds(1))
@@ -228,7 +227,7 @@ public class ProxyRoutineTest {
                      .set()
                      .buildProxy(TestProxy.class)
                      .getOne();
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
     }
 
     @Test

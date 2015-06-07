@@ -54,8 +54,8 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
     }
 
     /**
-     * Returns a builder of routines running in a service based on the specified context, wrapping
-     * the specified object instances.<br/>
+     * Returns a builder of routines, wrapping the specified object instance, running in a service
+     * based on the specified context.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
      * <p/>
@@ -70,7 +70,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
      */
     @Nonnull
     public static ServiceProxyRoutineBuilder onService(@Nonnull final Context context,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target) {//TODO: args???
 
         return new DefaultServiceProxyRoutineBuilder(context, target);
     }

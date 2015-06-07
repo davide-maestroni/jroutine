@@ -24,6 +24,7 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Class implementing a builder of routine objects based on an invocation class token.
@@ -36,6 +37,8 @@ import javax.annotation.Nonnull;
 class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements ServiceRoutineBuilder<INPUT, OUTPUT>,
         ServiceConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>> {
+
+    private final Object[] mArgs;
 
     private final InvocationConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>
             mConfigurable =
@@ -60,10 +63,12 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      *
      * @param context    the routine context.
      * @param classToken the invocation class token.
+     * @param args       the invocation factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken,
+            @Nullable final Object[] args) {
 
         if (context == null) {
 
@@ -72,13 +77,14 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
         mContext = context;
         mInvocationClass = classToken.getRawClass();
+        mArgs = args;
     }
 
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, getConfiguration(),
-                                                 mServiceConfiguration);
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, mArgs,
+                                                 getConfiguration(), mServiceConfiguration);
     }
 
     @Nonnull

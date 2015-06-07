@@ -22,7 +22,6 @@ import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
@@ -164,14 +163,6 @@ public abstract class AbstractProxyBuilder<TYPE>
     private void warn(@Nonnull final InvocationConfiguration configuration) {
 
         final Logger logger = configuration.newLogger(this);
-        final Object[] args = configuration.getFactoryArgsOr(null);
-
-        if (args != null) {
-
-            logger.wrn("the specified factory arguments will be ignored: %s",
-                       Arrays.toString(args));
-        }
-
         final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
 
         if (inputOrderType != null) {

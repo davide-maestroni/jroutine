@@ -115,10 +115,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutine.onFragment(fragment, TestArgs.class)
-                           .withInvocation()
-                           .withFactoryArgs(17)
-                           .set()
+        assertThat(JRoutine.onFragment(fragment, TestArgs.class, 17)
                            .method("getId")
                            .callAsync()
                            .eventually()
@@ -199,7 +196,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class, null).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -210,7 +207,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class, null).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -221,7 +218,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class, null).setConfiguration(
                     (LoaderConfiguration) null);
 
             fail();
@@ -242,8 +239,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final InvocationConfiguration configuration = builder().withFactoryArgs()
-                                                               .withInputOrder(OrderType.NONE)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.NONE)
                                                                .withInputMaxSize(3)
                                                                .withInputTimeout(seconds(10))
                                                                .withOutputOrder(OrderType.NONE)

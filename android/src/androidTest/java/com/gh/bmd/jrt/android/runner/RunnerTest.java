@@ -28,7 +28,6 @@ import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
-import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
+import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.util.TimeDuration.micros;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
@@ -168,9 +168,8 @@ public class RunnerTest extends AndroidTestCase {
                         result.pass(Looper.myLooper()).pass(Runners.myRunner());
                     }
                 };
-        final OutputChannel<Object> channel = JRoutine.on(ClassToken.tokenOf(invocation))
+        final OutputChannel<Object> channel = JRoutine.on(factoryOf(invocation, this))
                                                       .withInvocation()
-                                                      .withFactoryArgs(this)
                                                       .withAsyncRunner(Runners.handlerRunner(
                                                               new HandlerThread("test")))
                                                       .set()
@@ -209,7 +208,7 @@ public class RunnerTest extends AndroidTestCase {
     private static class LooperInvocationFactory implements InvocationFactory<Object, Object> {
 
         @Nonnull
-        public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+        public Invocation<Object, Object> newInvocation() {
 
             return new FunctionInvocation<Object, Object>() {
 

@@ -148,9 +148,8 @@ public class Downloader {
             // routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
-                    JRoutine.on(Invocations.factoryOf(WriteFile.class))
+                    JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile))
                             .withInvocation()
-                            .withFactoryArgs(dstFile)
                             .withInputMaxSize(8)
                             .withInputTimeout(seconds(30))
                             .set()

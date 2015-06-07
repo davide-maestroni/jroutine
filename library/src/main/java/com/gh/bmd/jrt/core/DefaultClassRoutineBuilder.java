@@ -34,7 +34,6 @@ import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,9 +53,6 @@ import static com.gh.bmd.jrt.util.Reflection.findMethod;
 class DefaultClassRoutineBuilder
         implements ClassRoutineBuilder, InvocationConfiguration.Configurable<ClassRoutineBuilder>,
         ProxyConfiguration.Configurable<ClassRoutineBuilder> {
-
-    private static final MethodInvocationFactory sMethodInvocationFactory =
-            new MethodInvocationFactory();
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
@@ -243,12 +239,9 @@ class DefaultClassRoutineBuilder
                     mutex = null;
                 }
 
-                final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                        configuration.builderFrom();
-                final InvocationFactory<Object, Object> factory = sMethodInvocationFactory;
-                routine = new DefaultRoutine<Object, Object>(
-                        builder.withFactoryArgs(target, method, mutex, inputMode, outputMode).set(),
-                        factory);
+                final MethodInvocationFactory factory =
+                        new MethodInvocationFactory(target, method, mutex, inputMode, outputMode);
+                routine = new DefaultRoutine<Object, Object>(configuration, factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -340,14 +333,6 @@ class DefaultClassRoutineBuilder
     protected void warn(@Nonnull final InvocationConfiguration configuration) {
 
         final Logger logger = configuration.newLogger(this);
-        final Object[] args = configuration.getFactoryArgsOr(null);
-
-        if (args != null) {
-
-            logger.wrn("the specified factory arguments will be ignored: %s",
-                       Arrays.toString(args));
-        }
-
         final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
 
         if (inputOrderType != null) {
@@ -409,17 +394,17 @@ class DefaultClassRoutineBuilder
         /**
          * Constructor.
          *
-         * @param target     the target object.
-         * @param method     the method to wrap.
-         * @param mutex      the mutex used for synchronization.
-         * @param inputMode  the input transfer mode.
-         * @param outputMode the output transfer mode.
+         * @param targetReference the reference to target object.
+         * @param method          the method to wrap.
+         * @param mutex           the mutex used for synchronization.
+         * @param inputMode       the input transfer mode.
+         * @param outputMode      the output transfer mode.
          */
-        public MethodFunctionInvocation(@Nullable final Object target, @Nonnull final Method method,
-                @Nullable final Object mutex, @Nullable final InputMode inputMode,
-                @Nullable final OutputMode outputMode) {
+        public MethodFunctionInvocation(@Nonnull final WeakReference<?> targetReference,
+                @Nonnull final Method method, @Nullable final Object mutex,
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-            mTargetReference = new WeakReference<Object>(target);
+            mTargetReference = targetReference;
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
             mInputMode = inputMode;
@@ -446,11 +431,41 @@ class DefaultClassRoutineBuilder
      */
     private static class MethodInvocationFactory implements InvocationFactory<Object, Object> {
 
-        @Nonnull
-        public Invocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+        private final InputMode mInputMode;
 
-            return new MethodFunctionInvocation(args[0], (Method) args[1], args[2],
-                                                (InputMode) args[3], (OutputMode) args[4]);
+        private final Method mMethod;
+
+        private final Object mMutex;
+
+        private final OutputMode mOutputMode;
+
+        private final WeakReference<?> mTargetReference;
+
+        /**
+         * Constructor.
+         *
+         * @param target     the target object.
+         * @param method     the method to wrap.
+         * @param mutex      the mutex used for synchronization.
+         * @param inputMode  the input transfer mode.
+         * @param outputMode the output transfer mode.
+         */
+        public MethodInvocationFactory(@Nonnull final Object target, @Nonnull final Method method,
+                @Nullable final Object mutex, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) {
+
+            mTargetReference = new WeakReference<Object>(target);
+            mMethod = method;
+            mMutex = (mutex != null) ? mutex : this;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
+        }
+
+        @Nonnull
+        public Invocation<Object, Object> newInvocation() {
+
+            return new MethodFunctionInvocation(mTargetReference, mMethod, mMutex, mInputMode,
+                                                mOutputMode);
         }
     }
 

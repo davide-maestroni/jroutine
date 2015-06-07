@@ -111,7 +111,6 @@ public class ClassRoutineTest {
         final CountLog countLog = new CountLog();
         JRoutine.on(TestStatic.class)
                 .withInvocation()
-                .withFactoryArgs()
                 .withInputOrder(OrderType.NONE)
                 .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))
@@ -122,7 +121,7 @@ public class ClassRoutineTest {
                 .withLog(countLog)
                 .set()
                 .aliasMethod(TestStatic.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
     }
 
     @Test

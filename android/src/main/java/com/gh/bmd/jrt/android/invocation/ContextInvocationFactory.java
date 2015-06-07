@@ -28,20 +28,10 @@ import javax.annotation.Nonnull;
 public interface ContextInvocationFactory<INPUT, OUTPUT> extends InvocationFactory<INPUT, OUTPUT> {
 
     /**
-     * Returns the type identifying the created invocations.<br/>
-     * Note that the returned string will be used to detect clashing of invocation instances.
-     *
-     * @return the invocation type.
-     */
-    @Nonnull
-    String getInvocationType();
-
-    /**
      * Creates and return a new context invocation instance.
      *
-     * @param args the arguments.
      * @return the context invocation instance.
      */
     @Nonnull
-    ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull Object... args);
+    ContextInvocation<INPUT, OUTPUT> newInvocation();
 }

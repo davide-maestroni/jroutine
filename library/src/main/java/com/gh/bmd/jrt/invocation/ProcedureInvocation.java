@@ -32,7 +32,7 @@ public abstract class ProcedureInvocation<OUTPUT>
 
     @Nonnull
     @Override
-    public final Invocation<Void, OUTPUT> newInvocation(@Nonnull final Object... args) {
+    public final Invocation<Void, OUTPUT> newInvocation() {
 
         return this;
     }

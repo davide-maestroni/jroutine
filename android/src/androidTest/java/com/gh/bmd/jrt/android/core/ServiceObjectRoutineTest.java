@@ -96,10 +96,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testArgs() {
 
-        assertThat(JRoutine.onService(getActivity(), TestArgs.class)
-                           .withInvocation()
-                           .withFactoryArgs(17)
-                           .set()
+        assertThat(JRoutine.onService(getActivity(), TestArgs.class, 17)
                            .method("getId")
                            .callAsync()
                            .eventually()
@@ -155,7 +152,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class,
+                                                   null).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -166,7 +164,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class,
+                                                   null).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -177,7 +176,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultServiceObjectRoutineBuilder(getActivity(), TestClass.class,
+                                                   null).setConfiguration(
                     (ServiceConfiguration) null);
 
             fail();

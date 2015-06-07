@@ -38,25 +38,6 @@ import static org.junit.Assert.fail;
 public class InvocationConfigurationTest {
 
     @Test
-    public void testArgsEquals() {
-
-        final InvocationConfiguration configuration = builder().withFactoryArgs((Object[]) null)
-                                                               .withPriority(11)
-                                                               .withAvailInstanceTimeout(
-                                                                       TimeDuration.millis(100))
-                                                               .withCoreInvocations(27)
-                                                               .withInputOrder(OrderType.PASS_ORDER)
-                                                               .withAsyncRunner(
-                                                                       Runners.queuedRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .set();
-        assertThat(configuration).isNotEqualTo(builder().withFactoryArgs(3).set());
-        assertThat(configuration.builderFrom().withFactoryArgs(27).set()).isNotEqualTo(
-                builder().withFactoryArgs(27).set());
-    }
-
-    @Test
     public void testAsyncRunnerEquals() {
 
         final InvocationConfiguration configuration =

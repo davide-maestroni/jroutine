@@ -39,7 +39,6 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.util.Reflection;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -176,6 +175,7 @@ public class RoutineService extends Service {
      * @param bundle                  the bundle to fill.
      * @param invocationId            the invocation ID.
      * @param invocationClass         the invocation class.
+     * @param args                    the invocation factory arguments.
      * @param invocationConfiguration the invocation configuration.
      * @param runnerClass             the invocation runner class.
      * @param logClass                the invocation log class.
@@ -183,11 +183,12 @@ public class RoutineService extends Service {
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
+            @Nonnull final Object[] args,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, false, invocationId, invocationClass, invocationConfiguration,
+        putInvocation(bundle, false, invocationId, invocationClass, args, invocationConfiguration,
                       runnerClass, logClass);
     }
 
@@ -223,6 +224,7 @@ public class RoutineService extends Service {
      * @param bundle                  the bundle to fill.
      * @param invocationId            the invocation ID.
      * @param invocationClass         the invocation class.
+     * @param args                    the invocation factory arguments.
      * @param invocationConfiguration the invocation configuration.
      * @param runnerClass             the invocation runner class.
      * @param logClass                the invocation log class.
@@ -230,11 +232,12 @@ public class RoutineService extends Service {
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
+            @Nonnull final Object[] args,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, true, invocationId, invocationClass, invocationConfiguration,
+        putInvocation(bundle, true, invocationId, invocationClass, args, invocationConfiguration,
                       runnerClass, logClass);
     }
 
@@ -260,6 +263,7 @@ public class RoutineService extends Service {
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
+            @Nonnull final Object[] args,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -267,14 +271,12 @@ public class RoutineService extends Service {
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
-        final Object[] invocationArgs =
-                invocationConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        final int length = invocationArgs.length;
+        final int length = args.length;
         final ParcelableValue[] argValues = new ParcelableValue[length];
 
         for (int i = 0; i < length; i++) {
 
-            argValues[i] = new ParcelableValue(invocationArgs[i]);
+            argValues[i] = new ParcelableValue(args[i]);
         }
 
         bundle.putParcelableArray(KEY_INVOCATION_ARGS, argValues);
@@ -307,13 +309,15 @@ public class RoutineService extends Service {
      * Returns a context invocation factory instance creating invocations of the specified type.
      *
      * @param invocationClass the invocation class.
+     * @param args            the invocation factory arguments.
      * @return the context invocation factory.
      */
     @Nonnull
     public ContextInvocationFactory<Object, Object> getInvocationFactory(
-            @Nonnull Class<? extends ContextInvocation<Object, Object>> invocationClass) {
+            @Nonnull final Class<? extends ContextInvocation<Object, Object>> invocationClass,
+            @Nullable final Object[] args) {
 
-        return ContextInvocations.factoryOf(invocationClass);
+        return ContextInvocations.factoryOf(invocationClass, args);
     }
 
     @Override
@@ -494,9 +498,9 @@ public class RoutineService extends Service {
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
                 final ContextInvocationFactory<Object, Object> factory =
-                        getInvocationFactory(invocationClass);
+                        getInvocationFactory(invocationClass, invocationArgs);
                 final SyncContextRoutine syncContextRoutine =
-                        new SyncContextRoutine(this, builder.set(), factory, invocationArgs);
+                        new SyncContextRoutine(this, builder.set(), factory);
                 routineState = new RoutineState(syncContextRoutine);
                 routineMap.put(routineInfo, routineState);
             }
@@ -846,8 +850,6 @@ public class RoutineService extends Service {
      */
     private static class SyncContextRoutine extends AbstractRoutine<Object, Object> {
 
-        private final Object[] mArgs;
-
         private final Context mContext;
 
         private final ContextInvocationFactory<Object, Object> mFactory;
@@ -855,20 +857,17 @@ public class RoutineService extends Service {
         /**
          * Constructor.
          *
-         * @param context        the routine context.
-         * @param configuration  the invocation configuration.
-         * @param factory        the invocation factory.
-         * @param invocationArgs the invocation constructor arguments.
+         * @param context       the routine context.
+         * @param configuration the invocation configuration.
+         * @param factory       the invocation factory.
          */
         private SyncContextRoutine(@Nonnull final Context context,
                 @Nonnull final InvocationConfiguration configuration,
-                @Nonnull final ContextInvocationFactory<Object, Object> factory,
-                @Nonnull final Object[] invocationArgs) {
+                @Nonnull final ContextInvocationFactory<Object, Object> factory) {
 
             super(configuration);
             mContext = context;
             mFactory = factory;
-            mArgs = invocationArgs;
         }
 
         @Nonnull
@@ -880,8 +879,8 @@ public class RoutineService extends Service {
             try {
 
                 final ContextInvocationFactory<Object, Object> factory = mFactory;
-                logger.dbg("creating a new instance of type: %s", factory.getInvocationType());
-                final ContextInvocation<Object, Object> invocation = factory.newInvocation(mArgs);
+                logger.dbg("creating a new instance");
+                final ContextInvocation<Object, Object> invocation = factory.newInvocation();
                 invocation.onContext(mContext);
                 return invocation;
 

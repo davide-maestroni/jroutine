@@ -19,7 +19,6 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.util.TimeDuration;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -94,8 +93,6 @@ public final class InvocationConfiguration {
 
     private final int mCoreInvocations;
 
-    private final Object[] mFactoryArgs;
-
     private final int mInputMaxSize;
 
     private final OrderType mInputOrderType;
@@ -125,7 +122,6 @@ public final class InvocationConfiguration {
     /**
      * Constructor.
      *
-     * @param factoryArgs      the invocation factory arguments.
      * @param syncRunner       the runner used for synchronous invocations.
      * @param asyncRunner      the runner used for asynchronous invocations.
      * @param priority         the invocation priority.
@@ -148,17 +144,15 @@ public final class InvocationConfiguration {
      * @param log              the log instance.
      * @param logLevel         the log level.
      */
-    private InvocationConfiguration(@Nullable final Object[] factoryArgs,
-            @Nullable final Runner syncRunner, @Nullable final Runner asyncRunner,
-            final int priority, final int maxInvocations, final int coreInvocations,
-            @Nullable final TimeDuration availableTimeout, @Nullable final TimeDuration readTimeout,
-            @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
-            final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
-            @Nullable final OrderType outputOrderType, final int outputMaxSize,
-            @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
-            @Nullable final LogLevel logLevel) {
+    private InvocationConfiguration(@Nullable final Runner syncRunner,
+            @Nullable final Runner asyncRunner, final int priority, final int maxInvocations,
+            final int coreInvocations, @Nullable final TimeDuration availableTimeout,
+            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
+            @Nullable final OrderType inputOrderType, final int inputMaxSize,
+            @Nullable final TimeDuration inputTimeout, @Nullable final OrderType outputOrderType,
+            final int outputMaxSize, @Nullable final TimeDuration outputTimeout,
+            @Nullable final Log log, @Nullable final LogLevel logLevel) {
 
-        mFactoryArgs = factoryArgs;
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
         mPriority = priority;
@@ -248,18 +242,6 @@ public final class InvocationConfiguration {
 
         final int coreInvocations = mCoreInvocations;
         return (coreInvocations != DEFAULT) ? coreInvocations : valueIfNotSet;
-    }
-
-    /**
-     * Returns the invocation factory arguments (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the arguments.
-     */
-    public Object[] getFactoryArgsOr(@Nullable final Object[] valueIfNotSet) {
-
-        final Object[] args = mFactoryArgs;
-        return (args != null) ? args : valueIfNotSet;
     }
 
     /**
@@ -443,7 +425,6 @@ public final class InvocationConfiguration {
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
-        result = 31 * result + (mFactoryArgs != null ? Arrays.hashCode(mFactoryArgs) : 0);
         return result;
     }
 
@@ -545,12 +526,7 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mTimeoutActionType != that.mTimeoutActionType) {
-
-            return false;
-        }
-
-        return Arrays.equals(mFactoryArgs, that.mFactoryArgs);
+        return (mTimeoutActionType == that.mTimeoutActionType);
     }
 
     @Override
@@ -573,7 +549,6 @@ public final class InvocationConfiguration {
                 ", mReadTimeout=" + mReadTimeout +
                 ", mSyncRunner=" + mSyncRunner +
                 ", mTimeoutActionType=" + mTimeoutActionType +
-                ", mFactoryArgs=" + Arrays.toString(mFactoryArgs) +
                 '}';
     }
 
@@ -724,8 +699,6 @@ public final class InvocationConfiguration {
     public static final class Builder<TYPE> {
 
         private final Configurable<? extends TYPE> mConfigurable;
-
-        private Object[] mArgs;
 
         private Runner mAsyncRunner;
 
@@ -896,24 +869,6 @@ public final class InvocationConfiguration {
             }
 
             mCoreInvocations = coreInvocations;
-            return this;
-        }
-
-        /**
-         * Sets the arguments to be passed to the invocation factory.
-         * <p/>
-         * Note that, in case no constructor taking the specified arguments as parameters is found,
-         * an exception will be thrown.<br/>
-         * Note also that, the specified objects will be retained, so, they should be immutable or
-         * never change their internal state in order to avoid concurrency issues.
-         *
-         * @param args the arguments.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> withFactoryArgs(@Nullable final Object... args) {
-
-            mArgs = (args != null) ? args.clone() : null;
             return this;
         }
 
@@ -1172,13 +1127,6 @@ public final class InvocationConfiguration {
 
         private void applyBaseConfiguration(@Nonnull final InvocationConfiguration configuration) {
 
-            final Object[] args = configuration.mFactoryArgs;
-
-            if (args != null) {
-
-                withFactoryArgs(args);
-            }
-
             final Runner syncRunner = configuration.mSyncRunner;
 
             if (syncRunner != null) {
@@ -1302,7 +1250,7 @@ public final class InvocationConfiguration {
         @Nonnull
         private InvocationConfiguration buildConfiguration() {
 
-            return new InvocationConfiguration(mArgs, mSyncRunner, mAsyncRunner, mPriority,
+            return new InvocationConfiguration(mSyncRunner, mAsyncRunner, mPriority,
                                                mMaxInvocations, mCoreInvocations, mAvailableTimeout,
                                                mReadTimeout, mTimeoutActionType, mInputOrderType,
                                                mInputMaxSize, mInputTimeout, mOutputOrderType,
@@ -1311,7 +1259,6 @@ public final class InvocationConfiguration {
 
         private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {
 
-            mArgs = configuration.mFactoryArgs;
             mSyncRunner = configuration.mSyncRunner;
             mAsyncRunner = configuration.mAsyncRunner;
             mPriority = configuration.mPriority;

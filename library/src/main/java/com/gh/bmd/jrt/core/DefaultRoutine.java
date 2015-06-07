@@ -19,7 +19,6 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.util.Reflection;
 
 import javax.annotation.Nonnull;
 
@@ -32,8 +31,6 @@ import javax.annotation.Nonnull;
  * @param <OUTPUT> the output data type.
  */
 class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
-
-    private final Object[] mArgs;
 
     private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
@@ -54,7 +51,6 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             throw new NullPointerException("the invocation factory must not be null");
         }
 
-        mArgs = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         mFactory = factory;
     }
 
@@ -68,7 +64,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
             final InvocationFactory<INPUT, OUTPUT> factory = mFactory;
             logger.dbg("creating a new invocation instance with factory: %s", factory);
-            final Invocation<INPUT, OUTPUT> invocation = factory.newInvocation(mArgs);
+            final Invocation<INPUT, OUTPUT> invocation = factory.newInvocation();
             logger.dbg("created a new instance of class: %s", invocation.getClass());
             return invocation;
 

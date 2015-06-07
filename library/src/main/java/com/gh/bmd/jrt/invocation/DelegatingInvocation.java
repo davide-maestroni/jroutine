@@ -123,7 +123,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
         }
 
         @Nonnull
-        public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+        public Invocation<INPUT, OUTPUT> newInvocation() {
 
             return new DelegatingInvocation<INPUT, OUTPUT>(mRoutine);
         }

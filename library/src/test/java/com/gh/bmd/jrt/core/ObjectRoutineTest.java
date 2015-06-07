@@ -172,8 +172,7 @@ public class ObjectRoutineTest {
 
         final TestClass test = new TestClass();
         final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration = builder().withFactoryArgs()
-                                                               .withInputOrder(OrderType.NONE)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.NONE)
                                                                .withInputMaxSize(3)
                                                                .withInputTimeout(seconds(1))
                                                                .withOutputOrder(OrderType.NONE)
@@ -183,7 +182,7 @@ public class ObjectRoutineTest {
                                                                .withLog(countLog)
                                                                .set();
         JRoutine.on(test).withInvocation().with(configuration).set().aliasMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         final Square square = new Square();
         JRoutine.on(square)
@@ -192,7 +191,7 @@ public class ObjectRoutineTest {
                 .set()
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(14);
+        assertThat(countLog.getWrnCount()).isEqualTo(12);
     }
 
     @Test

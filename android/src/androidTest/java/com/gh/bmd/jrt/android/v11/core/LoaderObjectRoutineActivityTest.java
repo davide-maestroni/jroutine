@@ -108,10 +108,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        assertThat(JRoutine.onActivity(getActivity(), TestArgs.class)
-                           .withInvocation()
-                           .withFactoryArgs(17)
-                           .set()
+        assertThat(JRoutine.onActivity(getActivity(), TestArgs.class, 17)
                            .method("getId")
                            .callAsync()
                            .eventually()
@@ -182,7 +179,8 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class,
+                                                  null).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -193,8 +191,8 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
-                    (ProxyConfiguration) null);
+            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class,
+                                                  null).setConfiguration((ProxyConfiguration) null);
 
             fail();
 
@@ -204,7 +202,8 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(getActivity(), TestClass.class,
+                                                  null).setConfiguration(
                     (LoaderConfiguration) null);
 
             fail();
@@ -222,8 +221,7 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration = builder().withFactoryArgs()
-                                                               .withInputOrder(OrderType.NONE)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.NONE)
                                                                .withInputMaxSize(3)
                                                                .withInputTimeout(seconds(10))
                                                                .withOutputOrder(OrderType.NONE)

@@ -284,7 +284,6 @@ public class TransportChannelTest {
         final CountLog countLog = new CountLog();
         JRoutine.transport()
                 .withInvocation()
-                .withFactoryArgs()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withMaxInvocations(3)
                 .withCoreInvocations(3)
@@ -296,7 +295,7 @@ public class TransportChannelTest {
                 .withLog(countLog)
                 .set()
                 .buildChannel();
-        assertThat(countLog.getWrnCount()).isEqualTo(8);
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
     @Test

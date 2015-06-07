@@ -19,6 +19,7 @@ import android.content.Context;
 import android.os.Build.VERSION_CODES;
 
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -49,13 +50,11 @@ import javax.annotation.Nullable;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
 
-    private final Object[] mArgs;
-
     private final List<? extends INPUT> mInputs;
 
     private final ContextInvocation<INPUT, OUTPUT> mInvocation;
 
-    private final String mInvocationType;
+    private final ContextInvocationFactory<INPUT, OUTPUT> mInvocationFactory;
 
     private final Logger mLogger;
 
@@ -68,18 +67,17 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     /**
      * Constructor.
      *
-     * @param context        used to retrieve the application context.
-     * @param invocation     the invocation instance.
-     * @param invocationType the invocation type.
-     * @param args           the invocation factory arguments.
-     * @param inputs         the input data.
-     * @param order          the data order.
-     * @param logger         the logger instance.
+     * @param context           used to retrieve the application context.
+     * @param invocation        the invocation instance.
+     * @param invocationFactory the invocation factory.
+     * @param inputs            the input data.
+     * @param order             the data order.
+     * @param logger            the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
             @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation,
-            @Nonnull final String invocationType, @Nonnull final Object[] args,
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> invocationFactory,
             @Nonnull final List<? extends INPUT> inputs, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
 
@@ -90,14 +88,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             throw new NullPointerException("the invocation instance must not be null");
         }
 
-        if (invocationType == null) {
+        if (invocationFactory == null) {
 
-            throw new NullPointerException("the invocation type must not be null");
-        }
-
-        if (args == null) {
-
-            throw new NullPointerException("the array of arguments must not be null");
+            throw new NullPointerException("the invocation factory must not be null");
         }
 
         if (inputs == null) {
@@ -106,8 +99,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         mInvocation = invocation;
-        mInvocationType = invocationType;
-        mArgs = args;
+        mInvocationFactory = invocationFactory;
         mInputs = inputs;
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
@@ -252,17 +244,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Gets the factory arguments of this loader invocation.
-     *
-     * @return the array of arguments.
-     */
-    @Nonnull
-    Object[] getInvocationArgs() {
-
-        return mArgs;
-    }
-
-    /**
      * Gets this loader invocation count.
      *
      * @return the invocation count.
@@ -283,14 +264,13 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Returns the loader invocation type.
+     * Returns the invocation factory.
      *
-     * @return the invocation type.
+     * @return the factory.
      */
-    @Nonnull
-    String getInvocationType() {
+    ContextInvocationFactory<INPUT, OUTPUT> getInvocationFactory() {
 
-        return mInvocationType;
+        return mInvocationFactory;
     }
 
     /**

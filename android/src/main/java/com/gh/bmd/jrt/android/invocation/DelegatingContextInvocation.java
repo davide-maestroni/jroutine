@@ -105,7 +105,7 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
         }
 
         @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
             return new DelegatingContextInvocation<INPUT, OUTPUT>(mRoutine);
         }

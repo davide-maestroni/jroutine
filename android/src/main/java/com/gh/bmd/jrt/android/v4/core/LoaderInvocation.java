@@ -47,13 +47,8 @@ import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,8 +70,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
             sCallbackMap =
             new WeakIdentityHashMap<Object,
                     SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>();
-
-    private final Object[] mArgs;
 
     private final CacheStrategyType mCacheStrategyType;
 
@@ -101,7 +94,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
      *
      * @param context       the context reference.
      * @param factory       the invocation factory.
-     * @param args          the invocation factory arguments.
      * @param configuration the loader configuration.
      * @param order         the input data order.
      * @param logger        the logger instance.
@@ -109,8 +101,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
-            @Nonnull final Object[] args, @Nonnull final LoaderConfiguration configuration,
-            @Nullable final OrderType order, @Nonnull final Logger logger) {
+            @Nonnull final LoaderConfiguration configuration, @Nullable final OrderType order,
+            @Nonnull final Logger logger) {
 
         if (context == null) {
 
@@ -122,11 +114,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
             throw new NullPointerException("the context invocation factory must not be null");
         }
 
-        if (args == null) {
-
-            throw new NullPointerException("the array of arguments must not be null");
-        }
-
         mContext = context;
         mFactory = factory;
         mLooper = configuration.getResultLooperOr(null);
@@ -136,7 +123,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         mInputClashResolutionType =
                 configuration.getInputClashResolutionTypeOr(ClashResolutionType.MERGE);
         mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
-        mArgs = args;
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }
@@ -208,15 +194,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
     /**
      * Destroys all loaders with the specified invocation type and inputs.
      *
-     * @param context        the context.
-     * @param loaderId       the loader ID.
-     * @param invocationType the invocation type.
-     * @param invocationArgs the invocation factory arguments.
-     * @param inputs         the invocation inputs.
+     * @param context  the context.
+     * @param factory  the invocation factory.
+     * @param loaderId the loader ID.
+     * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final Object context, final int loaderId,
-            @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs,
+    static void purgeLoader(@Nonnull final Object context,
+            @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId,
             @Nonnull final List<?> inputs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -260,8 +245,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
             final RoutineLoader<Object, Object> loader =
                     (RoutineLoader<Object, Object>) callbacks.mLoader;
 
-            if (loader.getInvocationType().equals(invocationType) && Arrays.equals(
-                    loader.getInvocationArgs(), invocationArgs) && (loader.getInvocationCount()
+            if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
                     == 0)) {
 
                 final int id = callbackArray.keyAt(i);
@@ -356,13 +340,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
     /**
      * Destroys all loaders with the specified invocation type.
      *
-     * @param context        the context.
-     * @param loaderId       the loader ID.
-     * @param invocationType the invocation type.
-     * @param invocationArgs the invocation factory arguments.
+     * @param context  the context.
+     * @param factory  the invocation factory.
+     * @param loaderId the loader ID.
      */
-    static void purgeLoaders(@Nonnull final Object context, final int loaderId,
-            @Nonnull final String invocationType, @Nonnull final Object[] invocationArgs) {
+    static void purgeLoaders(@Nonnull final Object context,
+            @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -404,8 +387,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
 
             final RoutineLoader<?, ?> loader = callbacks.mLoader;
 
-            if (loader.getInvocationType().equals(invocationType) && Arrays.equals(
-                    loader.getInvocationArgs(), invocationArgs) && (loader.getInvocationCount()
+            if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
                     == 0)) {
 
                 final int id = callbackArray.keyAt(i);
@@ -425,52 +407,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
 
             sCallbackMap.remove(context);
         }
-    }
-
-    private static int recursiveHashCode(@Nullable final Object object) {
-
-        if (object == null) {
-
-            return 0;
-        }
-
-        if (object.getClass().isArray()) {
-
-            int hashCode = 0;
-            final int length = Array.getLength(object);
-
-            for (int i = 0; i < length; i++) {
-
-                hashCode = 31 * hashCode + recursiveHashCode(Array.get(object, i));
-            }
-
-            return hashCode;
-
-        } else if (object instanceof Collection) {
-
-            int hashCode = 0;
-
-            for (final Object o : ((Collection<?>) object)) {
-
-                hashCode = 31 * hashCode + recursiveHashCode(o);
-            }
-
-            return hashCode;
-
-        } else if (object instanceof Map) {
-
-            int hashCode = 0;
-
-            for (final Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
-
-                hashCode = 31 * hashCode + recursiveHashCode(entry.getKey());
-                hashCode = 31 * hashCode + recursiveHashCode(entry.getValue());
-            }
-
-            return hashCode;
-        }
-
-        return object.hashCode();
     }
 
     @Override
@@ -579,14 +515,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
 
         if (loaderId == LoaderConfiguration.AUTO) {
 
-            loaderId = mFactory.getInvocationType().hashCode();
-
-            for (final Object arg : mArgs) {
-
-                loaderId = 31 * loaderId + recursiveHashCode(arg);
-            }
-
-            loaderId = 31 * loaderId + inputs.hashCode();
+            loaderId = 31 * mFactory.hashCode() + inputs.hashCode();
             logger.dbg("generating loader ID: %d", loaderId);
         }
 
@@ -674,8 +603,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
                 : new RoutineLoader<INPUT, OUTPUT>(loaderContext,
                                                    createInvocation(loaderContext, loaderId),
-                                                   mFactory.getInvocationType(), mArgs, inputs,
-                                                   mOrderType, logger);
+                                                   mFactory, inputs, mOrderType, logger);
         return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
     }
 
@@ -684,15 +612,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
             final int loaderId) {
 
         final Logger logger = mLogger;
-        final Object[] args = mArgs;
         final ContextInvocationFactory<INPUT, OUTPUT> factory = mFactory;
         final ContextInvocation<INPUT, OUTPUT> invocation;
 
         try {
 
-            logger.dbg("creating a new invocation instance of type [%d]: %s", loaderId,
-                       factory.getInvocationType());
-            invocation = factory.newInvocation(args);
+            logger.dbg("creating a new invocation instance [%d]", loaderId);
+            invocation = factory.newInvocation();
             invocation.onContext(loaderContext.getApplicationContext());
 
         } catch (final RoutineException e) {
@@ -729,14 +655,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
             throw new InvocationTypeException(loaderId);
         }
 
+        final ContextInvocationFactory<INPUT, OUTPUT> factory = mFactory;
         final RoutineLoader<INPUT, OUTPUT> routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
-        final String invocationType = mFactory.getInvocationType();
 
-        if (!MissingLoaderInvocation.TYPE.equals(invocationType) && (
-                !routineLoader.getInvocationType().equals(invocationType) || !Arrays.equals(
-                        routineLoader.getInvocationArgs(), mArgs))) {
+        if (!(factory instanceof MissingLoaderInvocation) && !routineLoader.getInvocationFactory()
+                                                                           .equals(factory)) {
 
-            logger.wrn("clashing loader ID [%d]: %s", loaderId, routineLoader.getInvocationType());
+            logger.wrn("clashing loader ID [%d]: %s", loaderId,
+                       routineLoader.getInvocationFactory());
             throw new InvocationTypeException(loaderId);
         }
 

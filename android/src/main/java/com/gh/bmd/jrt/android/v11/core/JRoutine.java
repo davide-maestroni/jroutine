@@ -25,12 +25,14 @@ import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
-import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 
 /**
  * This utility class extends the base one in order to support additional routine builders specific
@@ -42,8 +44,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * deadlock.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
- * objects and the invocation factory arguments, might be employed to check for clashing of
- * invocation instances or compute the loader ID.<br/>
+ * objects and the invocation factory, might be employed to check for clashing of invocation
+ * instances or compute the loader ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or an input independent clash resolution should be used to
  * avoid unexpected results.
@@ -155,11 +157,12 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      *
      * @param activity the invocation activity context.
      * @param target   the wrapped object class.
+     * @param args     the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderObjectRoutineBuilder onActivity(@Nonnull final Activity activity,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target, @Nullable final Object... args) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -169,7 +172,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
                             + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        return new DefaultLoaderObjectRoutineBuilder(activity, target);
+        return new DefaultLoaderObjectRoutineBuilder(activity, target, args);
     }
 
     /**
@@ -228,7 +231,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
                             + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        return onActivity(activity, ContextInvocations.factoryOf(token));
+        return onActivity(activity, factoryOf(token));
     }
 
     /**
@@ -276,13 +279,14 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      *
      * @param fragment the invocation fragment context.
      * @param target   the wrapped object class.
+     * @param args     the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderObjectRoutineBuilder onFragment(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target, @Nullable final Object... args) {
 
-        return new DefaultLoaderObjectRoutineBuilder(fragment, target);
+        return new DefaultLoaderObjectRoutineBuilder(fragment, target, args);
     }
 
     /**
@@ -325,7 +329,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
             @Nonnull final Fragment fragment,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> token) {
 
-        return onFragment(fragment, ContextInvocations.factoryOf(token));
+        return onFragment(fragment, factoryOf(token));
     }
 
     /**

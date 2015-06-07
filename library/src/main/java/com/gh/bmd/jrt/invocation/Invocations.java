@@ -19,7 +19,9 @@ import com.gh.bmd.jrt.util.ClassToken;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.util.Reflection.NO_ARGS;
 import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
@@ -37,6 +39,29 @@ public class Invocations {
     }
 
     /**
+     * Builds and returns a new invocation factory creating instances of the specified object class.
+     * <p/>
+     * Note that inner and anonymous objects can be passed as well. Remember however that Java
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+     * first constructor parameter, and anonymous classes have both the outer instance and all the
+     * variables captured in the closure.
+     *
+     * @param invocation the invocation instance.
+     * @param args       the invocation constructor arguments.
+     * @param <INPUT>    the input data type.
+     * @param <OUTPUT>   the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
+            @Nonnull final Invocation<INPUT, OUTPUT> invocation, @Nullable final Object... args) {
+
+        return factoryOf((Class<? extends Invocation<INPUT, OUTPUT>>) invocation.getClass(), args);
+    }
+
+    /**
      * Builds and returns a new invocation factory creating instances of the specified class token.
      * <p/>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
@@ -46,15 +71,17 @@ public class Invocations {
      * and all the variables captured in the closure.
      *
      * @param invocationToken the invocation class token.
+     * @param args            the invocation constructor arguments.
      * @param <INPUT>         the input data type.
      * @param <OUTPUT>        the output data type.
      * @return the invocation factory.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken) {
+            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken,
+            @Nullable final Object... args) {
 
-        return factoryOf(invocationToken.getRawClass());
+        return factoryOf(invocationToken.getRawClass(), args);
     }
 
     /**
@@ -67,15 +94,17 @@ public class Invocations {
      * variables captured in the closure.
      *
      * @param invocationClass the invocation class.
+     * @param args            the invocation constructor arguments.
      * @param <INPUT>         the input data type.
      * @param <OUTPUT>        the output data type.
      * @return the invocation factory.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass) {
+            @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
+            @Nullable final Object... args) {
 
-        return new DefaultInvocationFactory<INPUT, OUTPUT>(invocationClass);
+        return new DefaultInvocationFactory<INPUT, OUTPUT>(invocationClass, args);
     }
 
     /**
@@ -84,49 +113,34 @@ public class Invocations {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class DefaultInvocationFactory<INPUT, OUTPUT>
+    public static class DefaultInvocationFactory<INPUT, OUTPUT>
             implements InvocationFactory<INPUT, OUTPUT> {
 
-        private final Class<? extends Invocation<INPUT, OUTPUT>> mInvocationClass;
+        private final Object[] mArgs;
 
-        private Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
+        private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
 
         /**
          * Constructor.
          *
          * @param invocationClass the invocation class.
+         * @param args            the invocation constructor arguments.
          */
         @SuppressWarnings("ConstantConditions")
         private DefaultInvocationFactory(
-                @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass) {
+                @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
+                @Nullable final Object[] args) {
 
-            if (invocationClass == null) {
-
-                throw new NullPointerException("the invocation class must be null");
-            }
-
-            mInvocationClass = invocationClass;
+            final Object[] invocationArgs = (mArgs = (args != null) ? args : NO_ARGS);
+            mConstructor = findConstructor(invocationClass, invocationArgs);
         }
 
         @Nonnull
-        public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-            // the arguments should never change, so it is safe to cache the constructor
-            final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor;
-
-            if (mConstructor == null) {
-
-                constructor = findConstructor(mInvocationClass, args);
-                mConstructor = constructor;
-
-            } else {
-
-                constructor = mConstructor;
-            }
+        public Invocation<INPUT, OUTPUT> newInvocation() {
 
             try {
 
-                return constructor.newInstance(args);
+                return mConstructor.newInstance(mArgs);
 
             } catch (final RoutineException e) {
 

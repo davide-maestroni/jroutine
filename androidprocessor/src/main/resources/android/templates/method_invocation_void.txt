@@ -16,7 +16,7 @@
 
     private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
 
-        private final Object[] mArgs;
+        private final Object[] mFactoryArgs;
 
         private final String mShareGroup;
 
@@ -27,11 +27,11 @@
         private ${classFullName} mTarget;
 
         private ContextInvocation${methodCount}(@javax.annotation.Nonnull final Class<?> targetClass,
-                @javax.annotation.Nullable final String shareGroup, @javax.annotation.Nonnull final Object[] args) {
+                @javax.annotation.Nonnull final Object[] factoryArgs, @javax.annotation.Nullable final String shareGroup) {
 
             mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
-            mArgs = args;
         }
 
         @Override
@@ -42,7 +42,7 @@
 
             try {
 
-                final ${classFullName} target = (${classFullName}) getInstance(context, mTargetClass, mArgs);
+                final ${classFullName} target = (${classFullName}) getInstance(context, mTargetClass, mFactoryArgs);
                 final Object mutex = getMutex(target, mShareGroup);
                 mMutex = (mutex != null) ? mutex : this;
                 mTarget = target;

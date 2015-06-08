@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentActivity;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -65,13 +66,14 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      *
      * @param activity the invocation activity context.
      * @param target   the wrapped object class.
+     * @param args     the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target, @Nullable final Object... args) {
 
-        return new DefaultLoaderProxyRoutineBuilder(activity, target);
+        return new DefaultLoaderProxyRoutineBuilder(activity, target, args);
     }
 
     /**
@@ -82,12 +84,13 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      *
      * @param fragment the invocation fragment context.
      * @param target   the wrapped object class.
+     * @param args     the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target, @Nullable final Object... args) {
 
-        return new DefaultLoaderProxyRoutineBuilder(fragment, target);
+        return new DefaultLoaderProxyRoutineBuilder(fragment, target, args);
     }
 }

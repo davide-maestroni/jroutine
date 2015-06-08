@@ -23,11 +23,13 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
@@ -40,6 +42,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ProxyConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
+
+    private final Object[] mArgs;
 
     private final WeakReference<Context> mContextReference;
 
@@ -57,10 +61,11 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      *
      * @param context     the invocation context.
      * @param targetClass the target class.
+     * @param args        the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceProxyRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... args) {
 
         if (context == null) {
 
@@ -74,6 +79,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         mTargetClass = targetClass;
         mContextReference = new WeakReference<Context>(context);
+        mArgs = (args != null) ? args : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -107,8 +113,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             throw new IllegalStateException("the context object has been destroyed");
         }
 
-        final ObjectContextProxyBuilder<TYPE> builder =
-                new ObjectContextProxyBuilder<TYPE>(context, mTargetClass, itf);
+        final ObjectServiceProxyBuilder<TYPE> builder =
+                new ObjectServiceProxyBuilder<TYPE>(context, mTargetClass, mArgs, itf);
         return builder.withInvocation()
                       .with(mInvocationConfiguration)
                       .set()
@@ -189,9 +195,11 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectContextProxyBuilder<TYPE> extends AbstractServiceProxyBuilder<TYPE> {
+    private static class ObjectServiceProxyBuilder<TYPE> extends AbstractServiceProxyBuilder<TYPE> {
 
         private final Object mContext;
+
+        private final Object[] mFactoryArgs;
 
         private final ClassToken<TYPE> mInterfaceToken;
 
@@ -202,14 +210,16 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
          *
          * @param context        the invocation context.
          * @param targetClass    the proxy target class.
+         * @param factoryArgs    the object factory arguments.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectContextProxyBuilder(@Nonnull final Object context,
-                @Nonnull final Class<?> targetClass,
+        private ObjectServiceProxyBuilder(@Nonnull final Object context,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mContext = context;
             mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
             mInterfaceToken = interfaceToken;
         }
 
@@ -237,6 +247,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
                 final Object context = mContext;
                 final Class<?> targetClass = mTargetClass;
+                final Object[] factoryArgs = mFactoryArgs;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
                 String packageName = annotation.classPackage();
@@ -269,11 +280,12 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                         + annotation.classSuffix();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), context, targetClass,
-                                        invocationConfiguration, proxyConfiguration,
+                                        factoryArgs, invocationConfiguration, proxyConfiguration,
                                         serviceConfiguration);
                 return interfaceClass.cast(
-                        constructor.newInstance(context, targetClass, invocationConfiguration,
-                                                proxyConfiguration, serviceConfiguration));
+                        constructor.newInstance(context, targetClass, factoryArgs,
+                                                invocationConfiguration, proxyConfiguration,
+                                                serviceConfiguration));
 
             } catch (final Throwable t) {
 

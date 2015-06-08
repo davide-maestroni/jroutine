@@ -21,12 +21,10 @@
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final Object[] args = invocationConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.util.Reflection.NO_ARGS);
-        return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {})
+        return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, mTargetClass, mFactoryArgs, ${shareGroup})
                                            .withInvocation()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
-                                           .withFactoryArgs(mTargetClass, ${shareGroup}, args)
                                            .withInputMaxSize(Integer.MAX_VALUE)
                                            .withInputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
                                            .withOutputMaxSize(Integer.MAX_VALUE)

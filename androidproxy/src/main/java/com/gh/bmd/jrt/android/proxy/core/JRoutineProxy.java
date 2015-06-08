@@ -18,6 +18,7 @@ import android.content.Context;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -66,12 +67,13 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
      *
      * @param context the invocation context.
      * @param target  the wrapped object class.
+     * @param args    the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static ServiceProxyRoutineBuilder onService(@Nonnull final Context context,
-            @Nonnull final Class<?> target) {//TODO: args???
+            @Nonnull final Class<?> target, @Nullable final Object... args) {
 
-        return new DefaultServiceProxyRoutineBuilder(context, target);
+        return new DefaultServiceProxyRoutineBuilder(context, target, args);
     }
 }

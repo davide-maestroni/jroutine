@@ -20,6 +20,7 @@ import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import javax.annotation.Nonnull;
 
@@ -198,12 +199,13 @@ public class JRoutine {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
             @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> token) {
 
-        return on(factoryOf(token));
+        return on(factoryOf(token, Reflection.NO_ARGS));
     }
 
     /**

@@ -38,20 +38,6 @@ public abstract class ClassToken<TYPE> {
     private Class<TYPE> mRawClass;
 
     /**
-     * Creates a new token from the class of the specified object.
-     *
-     * @param object the object.
-     * @param <TYPE> the class type.
-     * @return the newly created token.
-     */
-    @Nonnull
-    @SuppressWarnings("unchecked")
-    public static <TYPE> ClassToken<TYPE> tokenOf(@Nonnull final TYPE object) {
-
-        return tokenOf((Class<TYPE>) object.getClass());
-    }
-
-    /**
      * Creates a new token from the specified raw class.
      *
      * @param rawClass the raw class.
@@ -71,6 +57,20 @@ public abstract class ClassToken<TYPE> {
         classToken.mGenericType = rawClass;
         classToken.mRawClass = rawClass;
         return classToken;
+    }
+
+    /**
+     * Creates a new token from the class of the specified object.
+     *
+     * @param object the object.
+     * @param <TYPE> the class type.
+     * @return the newly created token.
+     */
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public static <TYPE> ClassToken<TYPE> tokenOf(@Nonnull final TYPE object) {
+
+        return tokenOf((Class<TYPE>) object.getClass());
     }
 
     /**

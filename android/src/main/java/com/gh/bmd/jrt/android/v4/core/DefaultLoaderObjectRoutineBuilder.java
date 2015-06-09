@@ -25,10 +25,10 @@ import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
+import com.gh.bmd.jrt.android.invocation.AbstractContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
-import com.gh.bmd.jrt.android.invocation.TemplateContextInvocationFactory;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.Priority;
@@ -67,7 +67,7 @@ import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
- * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * Class implementing a builder of routines wrapping an object instance.
  * <p/>
  * Created by davide-maestroni on 4/6/2015.
  */
@@ -79,9 +79,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
-    private final Object[] mArgs;
-
     private final WeakReference<Object> mContext;
+
+    private final Object[] mFactoryArgs;
 
     private final Class<?> mTargetClass;
 
@@ -97,12 +97,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      *
      * @param activity    the context activity.
      * @param targetClass the invocation class token.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderObjectRoutineBuilder(@Nonnull final FragmentActivity activity,
-            @Nonnull final Class<?> targetClass, @Nullable final Object[] args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
-        this((Object) activity, targetClass, args);
+        this((Object) activity, targetClass, factoryArgs);
     }
 
     /**
@@ -110,12 +110,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      *
      * @param fragment    the context fragment.
      * @param targetClass the invocation class token.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderObjectRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass, @Nullable final Object[] args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
-        this((Object) fragment, targetClass, args);
+        this((Object) fragment, targetClass, factoryArgs);
     }
 
     /**
@@ -123,11 +123,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      *
      * @param context     the routine context.
      * @param targetClass the target object class.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultLoaderObjectRoutineBuilder(@Nonnull final Object context,
-            @Nonnull final Class<?> targetClass, @Nullable final Object[] args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
 
@@ -141,7 +141,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         mContext = new WeakReference<Object>(context);
         mTargetClass = targetClass;
-        mArgs = (args != null) ? args : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -297,8 +297,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         warn(configuration);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
-                new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod, targetClass, mArgs,
-                                                                shareGroup, name);
+                new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod, targetClass,
+                                                                mFactoryArgs, shareGroup, name);
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
@@ -321,8 +321,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         warn(configuration);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
         final MethodInvocationFactory<INPUT, OUTPUT> factory =
-                new MethodInvocationFactory<INPUT, OUTPUT>(method, mTargetClass, mArgs, shareGroup,
-                                                           method);
+                new MethodInvocationFactory<INPUT, OUTPUT>(method, mTargetClass, mFactoryArgs,
+                                                           shareGroup, method);
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(configuration, method);
         final LoaderConfiguration loaderConfiguration =
@@ -461,9 +461,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static class AliasMethodInvocation<INPUT, OUTPUT>
             extends FunctionContextInvocation<INPUT, OUTPUT> {
 
-        private final Object[] mArgs;
-
         private final String mBindingName;
+
+        private final Object[] mFactoryArgs;
 
         private final String mShareGroup;
 
@@ -477,17 +477,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * Constructor.
          *
          * @param targetClass the target object class.
-         * @param args        the factory constructor arguments.
+         * @param factoryArgs the object factor arguments.
          * @param shareGroup  the share group name.
          * @param name        the alias name.
          */
         @SuppressWarnings("unchecked")
         public AliasMethodInvocation(@Nonnull final Class<?> targetClass,
-                @Nonnull final Object[] args, @Nullable final String shareGroup,
+                @Nonnull final Object[] factoryArgs, @Nullable final String shareGroup,
                 @Nonnull final String name) {
 
             mTargetClass = targetClass;
-            mArgs = args;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
             mBindingName = name;
         }
@@ -511,7 +511,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final Object target = getInstance(context, mTargetClass, mArgs);
+                final Object target = getInstance(context, mTargetClass, mFactoryArgs);
                 mRoutine = JRoutine.on(target)
                                    .withProxy()
                                    .withShareGroup(mShareGroup)
@@ -537,9 +537,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class AliasMethodInvocationFactory<INPUT, OUTPUT>
-            extends TemplateContextInvocationFactory<INPUT, OUTPUT> {
+            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
 
-        private final Object[] mArgs;
+        private final Object[] mFactoryArgs;
 
         private final String mName;
 
@@ -552,17 +552,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          *
          * @param targetMethod the target method.
          * @param targetClass  the target object class.
-         * @param args         the factory constructor arguments.
+         * @param factoryArgs  the object factor arguments.
          * @param shareGroup   the share group name.
          * @param name         the alias name.
          */
         private AliasMethodInvocationFactory(@Nonnull final Method targetMethod,
-                @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nullable final String shareGroup, @Nonnull final String name) {
 
-            super(targetMethod, targetMethod, args, shareGroup, name);
+            super(targetMethod, targetMethod, factoryArgs, shareGroup, name);
             mTargetClass = targetClass;
-            mArgs = args;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
             mName = name;
         }
@@ -570,7 +570,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Nonnull
         public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
-            return new AliasMethodInvocation<INPUT, OUTPUT>(mTargetClass, mArgs, mShareGroup,
+            return new AliasMethodInvocation<INPUT, OUTPUT>(mTargetClass, mFactoryArgs, mShareGroup,
                                                             mName);
         }
     }
@@ -584,7 +584,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static class MethodInvocation<INPUT, OUTPUT>
             extends FunctionContextInvocation<INPUT, OUTPUT> {
 
-        private final Object[] mArgs;
+        private final Object[] mFactoryArgs;
 
         private final Method mMethod;
 
@@ -600,16 +600,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * Constructor.
          *
          * @param targetClass the target object class.
-         * @param args        the factory constructor arguments.
+         * @param factoryArgs the object factor arguments.
          * @param shareGroup  the share group name.
          * @param method      the method.
          */
         @SuppressWarnings("unchecked")
-        public MethodInvocation(@Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
-                @Nullable final String shareGroup, @Nonnull final Method method) {
+        public MethodInvocation(@Nonnull final Class<?> targetClass,
+                @Nonnull final Object[] factoryArgs, @Nullable final String shareGroup,
+                @Nonnull final Method method) {
 
             mTargetClass = targetClass;
-            mArgs = args;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
             mMethod = method;
         }
@@ -633,7 +634,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final Object target = getInstance(context, mTargetClass, mArgs);
+                final Object target = getInstance(context, mTargetClass, mFactoryArgs);
                 mRoutine = JRoutine.on(target)
                                    .withProxy()
                                    .withShareGroup(mShareGroup)
@@ -659,9 +660,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class MethodInvocationFactory<INPUT, OUTPUT>
-            extends TemplateContextInvocationFactory<INPUT, OUTPUT> {
+            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
 
-        private final Object[] mArgs;
+        private final Object[] mFactoryArgs;
 
         private final Method mMethod;
 
@@ -674,17 +675,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          *
          * @param targetMethod the target method.
          * @param targetClass  the target object class.
-         * @param args         the factory constructor arguments.
+         * @param factoryArgs  the object factor arguments.
          * @param shareGroup   the share group name.
          * @param method       the method.
          */
         private MethodInvocationFactory(@Nonnull final Method targetMethod,
-                @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nullable final String shareGroup, @Nonnull final Method method) {
 
-            super(targetMethod, targetClass, args, shareGroup, method);
+            super(targetMethod, targetClass, factoryArgs, shareGroup, method);
             mTargetClass = targetClass;
-            mArgs = args;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
             mMethod = method;
         }
@@ -692,7 +693,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Nonnull
         public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
-            return new MethodInvocation<INPUT, OUTPUT>(mTargetClass, mArgs, mShareGroup, mMethod);
+            return new MethodInvocation<INPUT, OUTPUT>(mTargetClass, mFactoryArgs, mShareGroup,
+                                                       mMethod);
         }
     }
 
@@ -781,9 +783,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * Factory of {@link ProxyInvocation}s.
      */
     private static class ProxyInvocationFactory
-            extends TemplateContextInvocationFactory<Object, Object> {
+            extends AbstractContextInvocationFactory<Object, Object> {
 
-        private final Object[] mArgs;
+        private final Object[] mFactoryArgs;
 
         private final InputMode mInputMode;
 
@@ -800,19 +802,19 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          *
          * @param targetMethod the target method.
          * @param targetClass  the target object class.
-         * @param args         the factory constructor arguments.
+         * @param factoryArgs  the object factor arguments.
          * @param shareGroup   the share group name.
          * @param inputMode    the input transfer mode.
          * @param outputMode   the output transfer mode.
          */
         private ProxyInvocationFactory(@Nonnull final Method targetMethod,
-                @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nullable final String shareGroup, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
 
-            super(targetMethod, targetClass, args, shareGroup, inputMode, outputMode);
+            super(targetMethod, targetClass, factoryArgs, shareGroup, inputMode, outputMode);
             mTargetClass = targetClass;
-            mArgs = args;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
             mTargetMethod = targetMethod;
             mInputMode = inputMode;
@@ -822,8 +824,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Nonnull
         public ContextInvocation<Object, Object> newInvocation() {
 
-            return new ProxyInvocation(mArgs, mShareGroup, mTargetClass, mTargetMethod, mInputMode,
-                                       mOutputMode);
+            return new ProxyInvocation(mFactoryArgs, mShareGroup, mTargetClass, mTargetMethod,
+                                       mInputMode, mOutputMode);
         }
     }
 
@@ -832,9 +834,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocationHandler implements InvocationHandler {
 
-        private final Object[] mArgs;
-
         private final WeakReference<Object> mContext;
+
+        private final Object[] mFactoryArgs;
 
         private final InvocationConfiguration mInvocationConfiguration;
 
@@ -856,7 +858,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mInvocationConfiguration = builder.mInvocationConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mLoaderConfiguration = builder.mLoaderConfiguration;
-            mArgs = builder.mArgs;
+            mFactoryArgs = builder.mFactoryArgs;
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -872,7 +874,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final OrderType outputOrderType =
                     (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
             final ProxyInvocationFactory factory =
-                    new ProxyInvocationFactory(targetMethod, mTargetClass, mArgs, shareGroup,
+                    new ProxyInvocationFactory(targetMethod, mTargetClass, mFactoryArgs, shareGroup,
                                                inputMode, outputMode);
             final LoaderRoutineBuilder<Object, Object> routineBuilder =
                     getBuilder(mContext, factory);

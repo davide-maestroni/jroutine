@@ -93,7 +93,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         try {
 
             JRoutine.onService(getActivity(), ClassToken.tokenOf(Abort.class))
-                    .callAsync(data)
+                    .callAsync()
                     .afterMax(timeout)
                     .next();
 
@@ -395,7 +395,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     private static class Abort extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+        public void onResult(@Nonnull final ResultChannel<Data> result) {
 
             try {
 

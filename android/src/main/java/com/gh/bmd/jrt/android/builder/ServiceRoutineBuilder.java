@@ -19,16 +19,9 @@ import com.gh.bmd.jrt.builder.RoutineBuilder;
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of routine objects based on an invocation class token.<br/>
- * The invocation execution will happen in a dedicated service.
+ * Interface defining a builder of routine objects executed in a dedicated service.
  * <p/>
  * The local context of the invocations will be the specific service instance.
- * <p/>
- * Note that, like the object passed to the service routine input and output channels, the
- * invocation factory arguments must comply with the {@link android.os.Parcel#writeValue(Object)}
- * method. Be aware though, that issues may arise when employing {@link java.io.Serializable}
- * objects on the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable}
- * objects instead.
  * <p/>
  * Created by davide-maestroni on 3/7/15.
  *

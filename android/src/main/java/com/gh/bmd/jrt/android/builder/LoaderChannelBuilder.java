@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 /**
  * Interface defining a builder of output channels bound to loader invocations.<br/>
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
- * and still running (or cached) at the time of the channel creation.
+ * and still be running (or cached) at the time of the channel creation.
  * <p/>
  * Created by davide-maestroni on 1/14/15.
  *
@@ -36,6 +36,7 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
      * Builds and returns an output channel bound to the routine invocation.
      *
      * @return the newly created output channel.
+     * @throws java.lang.IllegalArgumentException if the configured loader ID is equal to AUTO.
      */
     @Nonnull
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
@@ -75,7 +76,7 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
     InvocationConfiguration.Builder<? extends LoaderChannelBuilder> withInvocation();
 
     /**
-     * Note that the clash resolution type will be ignored.
+     * Note that the clash resolution types will be ignored.
      *
      * @return the loader configuration builder.
      */

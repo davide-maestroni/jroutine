@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.android.invocation;
 
-import com.gh.bmd.jrt.invocation.InvocationFactory;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -25,7 +23,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface ContextInvocationFactory<INPUT, OUTPUT> extends InvocationFactory<INPUT, OUTPUT> {
+public interface ContextInvocationFactory<INPUT, OUTPUT> {
 
     /**
      * Creates and return a new context invocation instance.

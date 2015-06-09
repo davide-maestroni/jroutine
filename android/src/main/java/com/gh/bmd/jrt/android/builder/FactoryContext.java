@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a factory providing object instances whose methods are to be called inside
+ * Interface defining a factory providing object instances, whose methods are to be called inside
  * asynchronous invocations.
  * <p/>
  * Created by davide-maestroni on 4/6/2015.
@@ -31,10 +31,9 @@ public interface FactoryContext {
      *
      * @param <TYPE> the wrapped object type.
      * @param type   the type of the returned instance.
-     * @param args   the constructor arguments.
+     * @param args   the custom arguments.
      * @return the object instance.
      */
     @Nullable
-    <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
-            @Nonnull final Object... args);
+    <TYPE> TYPE geInstance(@Nonnull Class<? extends TYPE> type, @Nonnull Object... args);
 }

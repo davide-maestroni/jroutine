@@ -92,11 +92,6 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             throw new NullPointerException("the context invocation factory must not be null");
         }
 
-        if (loaderConfiguration == null) {
-
-            throw new NullPointerException("the loader configuration must not be null");
-        }
-
         mContext = context;
         mFactory = factory;
         mConfiguration = loaderConfiguration;
@@ -253,7 +248,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
     }
 
     /**
-     * Execution implementation purging all loaders with a specific invocation class.
+     * Execution implementation purging all loaders with a specific invocation factory.
      */
     private static class PurgeExecution implements Execution {
 
@@ -284,13 +279,13 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoaders(context, mFactory, mLoaderId);
+                LoaderInvocation.purgeLoaders(context, mLoaderId, mFactory);
             }
         }
     }
 
     /**
-     * Execution implementation purging the loader with a specific invocation class and inputs.
+     * Execution implementation purging the loader with a specific invocation factory and inputs.
      *
      * @param <INPUT> the input data type.
      */
@@ -328,7 +323,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mFactory, mLoaderId, mInputs);
+                LoaderInvocation.purgeLoader(context, mLoaderId, mFactory, mInputs);
             }
         }
     }

@@ -20,16 +20,10 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import javax.annotation.Nonnull;
 
 /**
- * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * Interface defining a builder of routines wrapping an object instance.
  * <p/>
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.
- * <p/>
- * Note that, like the object passed to the service routine input and output channels, the
- * object factory arguments must comply with the {@link android.os.Parcel#writeValue(Object)}
- * method. Be aware though, that issues may arise when employing {@link java.io.Serializable}
- * objects on the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable}
- * objects instead.
  * <p/>
  * Created by davide-maestroni on 3/29/15.
  */

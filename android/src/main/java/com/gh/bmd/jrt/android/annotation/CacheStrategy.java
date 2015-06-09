@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.
  * <p/>
- * Through this annotation, it is possible to set a specific cache strategy for a single method
+ * Through this annotation, it is possible to set a specific cache strategy type for a single method
  * invocations.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That

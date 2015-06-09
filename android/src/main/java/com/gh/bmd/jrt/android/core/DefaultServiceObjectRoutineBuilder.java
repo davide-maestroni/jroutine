@@ -58,7 +58,7 @@ import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
- * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * Class implementing a builder of routines wrapping an object instance.
  * <p/>
  * Created by davide-maestroni on 3/29/15.
  */
@@ -73,9 +73,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
-    private final Object[] mArgs;
-
     private final Context mContext;
+
+    private final Object[] mFactoryArgs;
 
     private final Class<?> mTargetClass;
 
@@ -91,11 +91,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      *
      * @param context     the routine context.
      * @param targetClass the target object class.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final Class<?> targetClass, @Nullable final Object[] args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
 
@@ -109,7 +109,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         mContext = context;
         mTargetClass = targetClass;
-        mArgs = (args != null) ? args : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -255,26 +255,19 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             log = configuration.getLogOr(Logger.getGlobalLog());
         }
 
-        Logger logger = null;
+        final Logger logger =
+                Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
+                                 DefaultServiceObjectRoutineBuilder.class);
         final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
 
         if (inputOrderType != null) {
 
-            logger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
-                                      DefaultServiceObjectRoutineBuilder.class);
             logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
         }
 
         final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
 
         if (outputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = Logger.newLogger(log,
-                                          configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
-                                          DefaultServiceObjectRoutineBuilder.class);
-            }
 
             logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
         }
@@ -297,7 +290,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         warn(serviceConfiguration.getLogClassOr(null), invocationConfiguration);
         final AliasMethodToken<INPUT, OUTPUT> classToken = new AliasMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{targetClass.getName(), mArgs, shareGroup, name};
+        final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name};
         return JRoutine.onService(mContext, classToken, args)
                        .withInvocation()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
@@ -327,7 +320,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{targetClass.getName(), mArgs, shareGroup, name,
+        final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name,
                                            toNames(parameterTypes)};
         return JRoutine.onService(mContext, classToken, args)
                        .withInvocation()
@@ -725,7 +718,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mInvocationConfiguration = builder.mInvocationConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mServiceConfiguration = builder.mServiceConfiguration;
-            mArgs = builder.mArgs;
+            mArgs = builder.mFactoryArgs;
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws

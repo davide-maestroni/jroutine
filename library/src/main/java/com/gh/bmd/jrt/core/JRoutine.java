@@ -17,14 +17,9 @@ import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
-import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.Reflection;
 
 import javax.annotation.Nonnull;
-
-import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 
 /**
  * This utility class represents the entry point to the framework by acting as a factory of routine
@@ -188,24 +183,6 @@ public class JRoutine {
             @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         return new DefaultRoutineBuilder<INPUT, OUTPUT>(factory);
-    }
-
-    /**
-     * Returns a routine builder based on the specified invocation class token.
-     * <p/>
-     * The invocation instance is created through reflection only when needed.
-     *
-     * @param token    the invocation class token.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if no default constructor was found.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> token) {
-
-        return on(factoryOf(token, Reflection.NO_ARGS));
     }
 
     /**

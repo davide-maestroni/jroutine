@@ -29,8 +29,8 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.
  * <p/>
- * Through this annotation, it is possible to set a specific input clash resolution for a single
- * method invocations.
+ * Through this annotation, it is possible to set a specific input clash resolution type for a
+ * single method invocations.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link SecurityManager} is installed, a security exception might
@@ -59,7 +59,7 @@ import java.lang.annotation.Target;
 public @interface InputClashResolution {
 
     /**
-     * The clash resolution type.
+     * The input clash resolution type.
      *
      * @return the resolution type.
      */

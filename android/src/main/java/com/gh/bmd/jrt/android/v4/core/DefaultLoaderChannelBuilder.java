@@ -20,10 +20,12 @@ import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.invocation.MissingInvocationException;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 
@@ -38,7 +40,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of an loader channel builder.
+ * Default implementation of a loader channel builder.
  * <p/>
  * Created by davide-maestroni on 1/14/15.
  */
@@ -47,8 +49,6 @@ class DefaultLoaderChannelBuilder
         InvocationConfiguration.Configurable<LoaderChannelBuilder> {
 
     private final WeakReference<Object> mContext;
-
-    private final int mLoaderId;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -59,32 +59,29 @@ class DefaultLoaderChannelBuilder
      * Constructor.
      *
      * @param activity the context activity.
-     * @param loaderId the loader ID.
      */
-    DefaultLoaderChannelBuilder(@Nonnull final FragmentActivity activity, final int loaderId) {
+    DefaultLoaderChannelBuilder(@Nonnull final FragmentActivity activity) {
 
-        this((Object) activity, loaderId);
+        this((Object) activity);
     }
 
     /**
      * Constructor.
      *
      * @param fragment the context fragment.
-     * @param loaderId the loader ID.
      */
-    DefaultLoaderChannelBuilder(@Nonnull final Fragment fragment, final int loaderId) {
+    DefaultLoaderChannelBuilder(@Nonnull final Fragment fragment) {
 
-        this((Object) fragment, loaderId);
+        this((Object) fragment);
     }
 
     /**
      * Constructor.
      *
-     * @param context  the context instance.
-     * @param loaderId the loader ID.
+     * @param context the context instance.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultLoaderChannelBuilder(@Nonnull final Object context, final int loaderId) {
+    private DefaultLoaderChannelBuilder(@Nonnull final Object context) {
 
         if (context == null) {
 
@@ -92,32 +89,41 @@ class DefaultLoaderChannelBuilder
         }
 
         mContext = new WeakReference<Object>(context);
-        mLoaderId = loaderId;
     }
 
     @Nonnull
     public <OUTPUT> OutputChannel<OUTPUT> buildChannel() {
 
+        final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
+        final int loaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
+
+        if (loaderId == LoaderConfiguration.AUTO) {
+
+            throw new IllegalArgumentException("the loader ID must not be generated");
+        }
+
         final Object context = mContext.get();
-        final ContextInvocationFactory<OUTPUT, OUTPUT> factory =
-                MissingLoaderInvocation.factoryOf(mLoaderId);
 
         if (context == null) {
 
-            return JRoutine.on(factory).callSync();
+            final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
+            final TransportInput<OUTPUT> inputChannel = transportChannel.input();
+            inputChannel.abort(new MissingInvocationException(loaderId));
+            inputChannel.close();
+            return transportChannel.output();
         }
 
-        final LoaderRoutineBuilder<OUTPUT, OUTPUT> builder;
+        final LoaderRoutineBuilder<Void, OUTPUT> builder;
 
         if (context instanceof FragmentActivity) {
 
             final FragmentActivity activity = (FragmentActivity) context;
-            builder = JRoutine.onActivity(activity, factory);
+            builder = JRoutine.onActivity(activity, new MissingLoaderInvocation<OUTPUT>(loaderId));
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment, factory);
+            builder = JRoutine.onFragment(fragment, new MissingLoaderInvocation<OUTPUT>(loaderId));
 
         } else {
 
@@ -126,21 +132,28 @@ class DefaultLoaderChannelBuilder
         }
 
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-        final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
+        final Logger logger = invocationConfiguration.newLogger(this);
         final ClashResolutionType resolutionType =
                 loaderConfiguration.getClashResolutionTypeOr(null);
 
         if (resolutionType != null) {
 
-            final Logger logger = invocationConfiguration.newLogger(this);
             logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
+        }
+
+        final ClashResolutionType inputResolutionType =
+                loaderConfiguration.getInputClashResolutionTypeOr(null);
+
+        if (inputResolutionType != null) {
+
+            logger.wrn("the specified input clash resolution type will be ignored: %s",
+                       inputResolutionType);
         }
 
         return builder.withInvocation()
                       .with(invocationConfiguration)
                       .set()
                       .withLoader()
-                      .withId(mLoaderId)
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.MERGE)
                       .withInputClashResolution(ClashResolutionType.MERGE)
@@ -156,8 +169,8 @@ class DefaultLoaderChannelBuilder
 
             final List<Object> inputList = Collections.singletonList(input);
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderId, inputList), 0,
-                        TimeUnit.MILLISECONDS);
+                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -170,8 +183,8 @@ class DefaultLoaderChannelBuilder
             final List<Object> inputList =
                     (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderId, inputList), 0,
-                        TimeUnit.MILLISECONDS);
+                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -198,8 +211,8 @@ class DefaultLoaderChannelBuilder
             }
 
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderId, inputList), 0,
-                        TimeUnit.MILLISECONDS);
+                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -210,7 +223,8 @@ class DefaultLoaderChannelBuilder
         if (context.get() != null) {
 
             Runners.mainRunner()
-                   .run(new PurgeExecution(context, mLoaderId), 0, TimeUnit.MILLISECONDS);
+                   .run(new PurgeExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                           LoaderConfiguration.AUTO)), 0, TimeUnit.MILLISECONDS);
         }
     }
 

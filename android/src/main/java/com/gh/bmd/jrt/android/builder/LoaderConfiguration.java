@@ -209,7 +209,7 @@ public final class LoaderConfiguration {
     }
 
     /**
-     * Returns the looper used for dispatching results from the loader (null by default).
+     * Returns the looper used for dispatching the results from the loader (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
@@ -475,7 +475,7 @@ public final class LoaderConfiguration {
         }
 
         /**
-         * Sets the looper on which the results from the service are dispatched. A null value means
+         * Sets the looper on which the results from the loader are dispatched. A null value means
          * that results will be dispatched on the main thread (as by default).
          *
          * @param looper the looper instance.

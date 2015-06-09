@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import javax.annotation.Nonnull;
 
 /**
- * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * Interface defining a builder of routines wrapping an object instance.
  * <p/>
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.
@@ -102,7 +102,7 @@ public interface LoaderObjectRoutineBuilder
             @Nonnull Class<?>... parameterTypes);
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Priority},
@@ -124,7 +124,7 @@ public interface LoaderObjectRoutineBuilder
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Priority},

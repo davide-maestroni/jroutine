@@ -65,6 +65,17 @@ public class Runners {
     }
 
     /**
+     * Returns a runner employing an optimum number of threads.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner poolRunner() {
+
+        return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
+    }
+
+    /**
      * Returns a runner employing the specified number of threads.
      *
      * @param poolSize the thread pool size.
@@ -74,17 +85,6 @@ public class Runners {
     public static Runner poolRunner(final int poolSize) {
 
         return scheduledRunner(Executors.newScheduledThreadPool(poolSize));
-    }
-
-    /**
-     * Returns a runner employing an optimum number of threads.
-     *
-     * @return the runner instance.
-     */
-    @Nonnull
-    public static Runner poolRunner() {
-
-        return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
     }
 
     /**

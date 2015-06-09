@@ -578,7 +578,7 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(factoryOf(DelayedInvocation.class, millis(10)))
+                JRoutine.on(factoryOf(ClassToken.tokenOf(DelayedInvocation.class), millis(10)))
                         .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)

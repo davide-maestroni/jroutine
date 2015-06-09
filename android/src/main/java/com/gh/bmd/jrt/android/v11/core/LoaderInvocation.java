@@ -195,17 +195,16 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
     }
 
     /**
-     * Destroys all loaders with the specified invocation type and inputs.
+     * Destroys all the loaders with the specified invocation factory and inputs.
      *
      * @param context  the context.
-     * @param factory  the invocation factory.
      * @param loaderId the loader ID.
+     * @param factory  the invocation factory.
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final Object context,
-            @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId,
-            @Nonnull final List<?> inputs) {
+    static void purgeLoader(@Nonnull final Object context, final int loaderId,
+            @Nonnull final ContextInvocationFactory<?, ?> factory, @Nonnull final List<?> inputs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -341,14 +340,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
     }
 
     /**
-     * Destroys all loaders with the specified invocation type.
+     * Destroys all the loaders with the specified invocation factory.
      *
      * @param context  the context.
-     * @param factory  the invocation factory.
      * @param loaderId the loader ID.
+     * @param factory  the invocation factory.
      */
-    static void purgeLoaders(@Nonnull final Object context,
-            @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
+    static void purgeLoaders(@Nonnull final Object context, final int loaderId,
+            @Nonnull final ContextInvocationFactory<?, ?> factory) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);

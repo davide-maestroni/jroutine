@@ -32,7 +32,7 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
         ProxyConfigurableBuilder<ProxyRoutineBuilder> {
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
@@ -60,7 +60,7 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},

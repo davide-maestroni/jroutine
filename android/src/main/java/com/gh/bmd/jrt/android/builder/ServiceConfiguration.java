@@ -161,7 +161,7 @@ public final class ServiceConfiguration {
     }
 
     /**
-     * Returns the looper used for dispatching results from the service (null by default).
+     * Returns the looper used for dispatching the results from the service (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.

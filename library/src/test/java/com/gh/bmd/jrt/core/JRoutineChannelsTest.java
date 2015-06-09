@@ -29,6 +29,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
+import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,7 +52,7 @@ public class JRoutineChannelsTest {
         final TransportChannel<String> channel4 = builder.buildChannel();
 
         final Routine<Selectable<String>, String> routine =
-                JRoutine.on(new ClassToken<Amb<String>>() {}).buildRoutine();
+                JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(JRoutineChannels.selectFrom(
                 Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
                               channel4.output())));

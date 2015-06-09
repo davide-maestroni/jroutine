@@ -13,10 +13,8 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.MissingInvocationException;
-import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
+import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
 import com.gh.bmd.jrt.channel.ResultChannel;
 
 import javax.annotation.Nonnull;
@@ -26,16 +24,9 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 1/14/15.
  *
- * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvocation<INPUT, OUTPUT>
-        implements ContextInvocationFactory<INPUT, OUTPUT> {
-
-    /**
-     * The invocation type.
-     */
-    static final String TYPE = MissingLoaderInvocation.class.getName();
+final class MissingLoaderInvocation<OUTPUT> extends ProcedureContextInvocation<OUTPUT> {
 
     private final int mId;
 
@@ -44,35 +35,9 @@ final class MissingLoaderInvocation<INPUT, OUTPUT> extends TemplateContextInvoca
      *
      * @param id the loader ID.
      */
-    private MissingLoaderInvocation(final int id) {
+    MissingLoaderInvocation(final int id) {
 
         mId = id;
-    }
-
-    /**
-     * Returns a factory of missing loader invocations.
-     *
-     * @param id       the loader ID.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the factory.
-     */
-    @SuppressWarnings("unchecked")
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(final int id) {
-
-        return new MissingLoaderInvocation<INPUT, OUTPUT>(id);
-    }
-
-    @Nonnull
-    public String getInvocationType() {
-
-        return TYPE;
-    }
-
-    @Nonnull
-    public ContextInvocation<INPUT, OUTPUT> newInvocation() {
-
-        return this;
     }
 
     @Override

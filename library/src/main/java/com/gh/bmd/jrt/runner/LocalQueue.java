@@ -72,7 +72,7 @@ class LocalQueue {
         sQueue.get().addExecution(execution, delay, timeUnit);
     }
 
-    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
+    private static void resizeArray(@Nonnull final long[] src, @Nonnull final long[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -80,7 +80,7 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private static void resizeArray(@Nonnull final long[] src, @Nonnull final long[] dst,
+    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
             final int first) {
 
         final int remainder = src.length - first;

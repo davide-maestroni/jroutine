@@ -20,19 +20,14 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
 import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
-import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
-import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 
 /**
  * This utility class extends the base one in order to support additional routine builders specific
@@ -147,22 +142,20 @@ import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
 
     /**
-     * Returns a builder of routines bound to the specified activity, wrapping the specified object
-     * instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.<br/>
+     * Returns a builder of an output channel bound to the loader identified by the ID specified in
+     * the loader configuration.<br/>
+     * If no invocation with the specified ID is running at the time of the channel creation, the
+     * output will be aborted with a
+     * {@link com.gh.bmd.jrt.android.invocation.MissingInvocationException}.<br/>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      *
      * @param activity the invocation activity context.
-     * @param target   the wrapped object class.
-     * @param args     the object factory arguments.
-     * @return the routine builder instance.
+     * @return the channel builder instance.
      */
     @Nonnull
-    public static LoaderObjectRoutineBuilder onActivity(@Nonnull final Activity activity,
-            @Nonnull final Class<?> target, @Nullable final Object... args) {
+    public static LoaderChannelBuilder onActivity(@Nonnull final Activity activity) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -172,7 +165,36 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
                             + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        return new DefaultLoaderObjectRoutineBuilder(activity, target, args);
+        return new DefaultLoaderChannelBuilder(activity);
+    }
+
+    /**
+     * Returns a builder of routines bound to the specified activity, wrapping the specified object
+     * instances.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.<br/>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param activity    the invocation activity context.
+     * @param target      the wrapped object class.
+     * @param factoryArgs the object factory arguments.
+     * @return the routine builder instance.
+     */
+    @Nonnull
+    public static LoaderObjectRoutineBuilder onActivity(@Nonnull final Activity activity,
+            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            throw new UnsupportedOperationException(
+                    "this method is supported only for API level >= " +
+                            VERSION_CODES.HONEYCOMB
+                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
+        }
+
+        return new DefaultLoaderObjectRoutineBuilder(activity, target, factoryArgs);
     }
 
     /**
@@ -207,36 +229,8 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
     }
 
     /**
-     * Returns a builder of routines bound to the specified activity.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param activity the invocation activity context.
-     * @param token    the invocation class token.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> onActivity(
-            @Nonnull final Activity activity,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> token) {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        return onActivity(activity, factoryOf(token));
-    }
-
-    /**
-     * Returns a builder of an output channel bound to the loader identified by the specified ID.
-     * <br/>
+     * Returns a builder of an output channel bound to the loader identified by the ID specified in
+     * the loader configuration.<br/>
      * If no invocation with the specified ID is running at the time of the channel creation, the
      * output will be aborted with a
      * {@link com.gh.bmd.jrt.android.invocation.MissingInvocationException}.<br/>
@@ -244,28 +238,13 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      *
-     * @param activity the invocation activity context.
-     * @param id       the loader ID.
+     * @param fragment the invocation fragment context.
      * @return the channel builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified loader ID is equal to AUTO.
      */
     @Nonnull
-    public static LoaderChannelBuilder onActivity(@Nonnull final Activity activity, final int id) {
+    public static LoaderChannelBuilder onFragment(@Nonnull final Fragment fragment) {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        if (id == LoaderConfiguration.AUTO) {
-
-            throw new IllegalArgumentException("the loader ID must not be generated");
-        }
-
-        return new DefaultLoaderChannelBuilder(activity, id);
+        return new DefaultLoaderChannelBuilder(fragment);
     }
 
     /**
@@ -277,16 +256,16 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      *
-     * @param fragment the invocation fragment context.
-     * @param target   the wrapped object class.
-     * @param args     the object factory arguments.
+     * @param fragment    the invocation fragment context.
+     * @param target      the wrapped object class.
+     * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderObjectRoutineBuilder onFragment(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> target, @Nullable final Object... args) {
+            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
-        return new DefaultLoaderObjectRoutineBuilder(fragment, target, args);
+        return new DefaultLoaderObjectRoutineBuilder(fragment, target, factoryArgs);
     }
 
     /**
@@ -310,51 +289,5 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         return new DefaultLoaderRoutineBuilder<INPUT, OUTPUT>(fragment, factory);
-    }
-
-    /**
-     * Returns a builder of routines bound to the specified fragment.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param fragment the invocation fragment context.
-     * @param token    the invocation class token.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> onFragment(
-            @Nonnull final Fragment fragment,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> token) {
-
-        return onFragment(fragment, factoryOf(token));
-    }
-
-    /**
-     * Returns a builder of an output channel bound to the loader identified by the specified ID.
-     * <br/>
-     * If no invocation with the specified ID is running at the time of the channel creation, the
-     * output will be aborted with a
-     * {@link com.gh.bmd.jrt.android.invocation.MissingInvocationException}.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param fragment the invocation fragment context.
-     * @param id       the loader ID.
-     * @return the channel builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified loader ID is equal to AUTO.
-     */
-    @Nonnull
-    public static LoaderChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
-
-        if (id == LoaderConfiguration.AUTO) {
-
-            throw new IllegalArgumentException("the loader ID must not be generated");
-        }
-
-        return new DefaultLoaderChannelBuilder(fragment, id);
     }
 }

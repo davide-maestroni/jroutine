@@ -20,7 +20,11 @@ import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import javax.annotation.Nonnull;
 
 /**
- * Function invocation implementing a context invocation.
+ * This is a special abstract implementation that centralizes the routine invocation inside a
+ * single method, which gets called only when all the inputs are available.
+ * <p/>
+ * The implementing class may additionally override the invocation methods to specifically handle
+ * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
  * <p/>
  * Created by davide-maestroni on 1/8/15.
  *

@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Class implementing a builder of routine objects based on an invocation class token.
+ * Class implementing a builder of routine objects executed in a dedicated service.
  * <p/>
  * Created by davide-maestroni on 1/8/15.
  *
@@ -37,8 +37,6 @@ import javax.annotation.Nullable;
 class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements ServiceRoutineBuilder<INPUT, OUTPUT>,
         ServiceConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>> {
-
-    private final Object[] mArgs;
 
     private final InvocationConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>
             mConfigurable =
@@ -54,6 +52,8 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     private final Context mContext;
 
+    private final Object[] mFactoryArgs;
+
     private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
@@ -61,14 +61,14 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     /**
      * Constructor.
      *
-     * @param context    the routine context.
-     * @param classToken the invocation class token.
-     * @param args       the invocation factory arguments.
+     * @param context     the routine context.
+     * @param classToken  the invocation class token.
+     * @param factoryArgs the invocation factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final Context context,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken,
-            @Nullable final Object[] args) {
+            @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
 
@@ -77,13 +77,13 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
         mContext = context;
         mInvocationClass = classToken.getRawClass();
-        mArgs = args;
+        mFactoryArgs = factoryArgs;
     }
 
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, mArgs,
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, mFactoryArgs,
                                                  getConfiguration(), mServiceConfiguration);
     }
 

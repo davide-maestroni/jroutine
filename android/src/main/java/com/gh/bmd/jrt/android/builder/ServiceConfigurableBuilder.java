@@ -27,10 +27,11 @@ import javax.annotation.Nonnull;
 public interface ServiceConfigurableBuilder<TYPE> {
 
     /**
-     * Gets the service configuration builder related to this builder instance.<br/>
-     * The configuration options not supported by the builder implementation might be ignored.
+     * Gets the service configuration builder related to the routine builder instance.<br/>
+     * The configuration options not supported by the routine builder implementation might be
+     * ignored.
      * <p/>
-     * Note that the builder will be initialized with the current configuration.
+     * Note that the configuration builder will be initialized with the current configuration.
      *
      * @return the service configuration builder.
      */

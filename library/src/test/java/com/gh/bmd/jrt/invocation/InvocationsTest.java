@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import org.junit.Test;
 
@@ -34,10 +35,12 @@ public class InvocationsTest {
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testInvocationFactory() {
 
-        final InvocationFactory<Object, Object> factory =
-                Invocations.factoryOf(TestInvocation.class);
-
-        assertThat(factory.newInvocation()).isExactlyInstanceOf(TestInvocation.class);
+        assertThat(Invocations.factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
+                TestInvocation.class);
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .newInvocation()).isExactlyInstanceOf(TestInvocation.class);
+        assertThat(Invocations.factoryOf(new TestInvocation()).newInvocation()).isExactlyInstanceOf(
+                TestInvocation.class);
     }
 
     @Test
@@ -53,6 +56,41 @@ public class InvocationsTest {
         } catch (final NullPointerException ignored) {
 
         }
+
+        try {
+
+            Invocations.factoryOf((Class<TestInvocation>) null, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullInvocationError() {
+
+        try {
+
+            Invocations.factoryOf((TestInvocation) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Invocations.factoryOf((TestInvocation) null, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -62,6 +100,16 @@ public class InvocationsTest {
         try {
 
             Invocations.factoryOf((ClassToken<TestInvocation>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Invocations.factoryOf((ClassToken<TestInvocation>) null, Reflection.NO_ARGS);
 
             fail();
 

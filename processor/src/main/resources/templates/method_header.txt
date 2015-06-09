@@ -24,7 +24,7 @@
 
         private InvocationFactory${methodCount}(
                 @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped,
-                @javax.annotation.Nonnull final Object mutex) {
+                @javax.annotation.Nullable final Object mutex) {
 
             mWrapped = wrapped;
             mMutex = mutex;

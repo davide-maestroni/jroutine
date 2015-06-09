@@ -23,9 +23,7 @@ import com.gh.bmd.jrt.android.R;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
-import com.gh.bmd.jrt.android.invocation.ContextInvocations;
 import com.gh.bmd.jrt.android.invocation.DelegatingContextInvocation;
 import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
 import com.gh.bmd.jrt.android.invocation.InvocationClashException;
@@ -43,12 +41,14 @@ import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
+import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -60,6 +60,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
@@ -87,7 +88,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withInputClashResolution(ClashResolutionType.ABORT_THIS)
@@ -118,7 +119,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withClashResolution(ClashResolutionType.ABORT_THIS)
@@ -148,7 +149,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final LoaderRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .with(builder().withInputOrder(OrderType.PASS_ORDER)
                                        .withOutputOrder(OrderType.PASS_ORDER)
@@ -162,7 +163,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
         assertThat(channel4.next()).isEqualTo("test");
         assertThat(channel4.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge();
+        JRoutine.onActivity(getActivity()).withLoader().withId(0).set().purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
@@ -174,7 +175,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final LoaderRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .with(builder().withInputOrder(OrderType.PASS_ORDER)
                                        .withOutputOrder(OrderType.PASS_ORDER)
@@ -188,19 +189,23 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
         assertThat(channel5.next()).isEqualTo("test");
         assertThat(channel5.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge("test");
+        JRoutine.onActivity(getActivity()).withLoader().withId(0).set().purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel6.all()).containsExactly("test1", "test2");
         assertThat(channel6.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge("test1", "test2");
+        JRoutine.onActivity(getActivity()).withLoader().withId(0).set().purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel7.all()).containsExactly("test1", "test2");
         assertThat(channel7.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge(Arrays.asList((Object) "test1", "test2"));
+        JRoutine.onActivity(getActivity())
+                .withLoader()
+                .withId(0)
+                .set()
+                .purge(Arrays.asList((Object) "test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
@@ -213,17 +218,14 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 = JRoutine.onActivity(getActivity(),
-                                                                ContextInvocations.contextFactoryOf(
-                                                                        ClassToken.tokenOf(
-                                                                                Abort.class)))
-                                                    .withLoader()
-                                                    .withId(0)
-                                                    .withCacheStrategy(
-                                                            CacheStrategyType.CACHE_IF_SUCCESS)
-                                                    .set()
-                                                    .callAsync(data1)
-                                                    .afterMax(timeout);
+        final OutputChannel<Data> result1 =
+                JRoutine.onActivity(getActivity(), factoryFrom(Invocations.factoryOf(Abort.class)))
+                        .withLoader()
+                        .withId(0)
+                        .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                        .set()
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -238,7 +240,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), factoryOf(Delay.class))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
@@ -250,7 +252,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result2.checkComplete();
 
         final OutputChannel<Data> result3 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), factoryOf(Delay.class))
                         .withLoader()
                         .withId(0)
                         .set()
@@ -271,7 +273,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), factoryOf(Delay.class))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
@@ -284,7 +286,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         AbortException error = null;
         final OutputChannel<Data> result2 =
-                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
+                JRoutine.onActivity(getActivity(), factoryFrom(Invocations.factoryOf(Abort.class)))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
@@ -305,15 +307,13 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         result2.checkComplete();
 
-        final OutputChannel<Data> result3 = JRoutine.onActivity(getActivity(),
-                                                                ContextInvocations.contextFactoryOf(
-                                                                        ClassToken.tokenOf(
-                                                                                Abort.class)))
-                                                    .withLoader()
-                                                    .withId(0)
-                                                    .set()
-                                                    .callAsync(data1)
-                                                    .afterMax(timeout);
+        final OutputChannel<Data> result3 =
+                JRoutine.onActivity(getActivity(), factoryFrom(Invocations.factoryOf(Abort.class)))
+                        .withLoader()
+                        .withId(0)
+                        .set()
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -336,13 +336,13 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        assertThat(JRoutine.on(ContextInvocations.invocationFactoryOf(getActivity(),
-                                                                      new ClassToken<GetContextInvocation<String>>() {}))
+        final ClassToken<GetContextInvocation<String>> classToken =
+                new ClassToken<GetContextInvocation<String>>() {};
+        assertThat(JRoutine.on(factoryFrom(getActivity(), factoryOf(classToken))).callSync().next())
+                .isSameAs(getActivity());
+        assertThat(JRoutine.onActivity(getActivity(), factoryOf(classToken))
                            .callSync()
-                           .next()).isSameAs(getActivity());
-        assertThat(JRoutine.onActivity(getActivity(), ContextInvocations.factoryOf(
-                new ClassToken<GetContextInvocation<String>>() {})).callSync().next()).isSameAs(
-                getActivity().getApplicationContext());
+                           .next()).isSameAs(getActivity().getApplicationContext());
     }
 
     public void testActivityDelegation() {
@@ -357,7 +357,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.onActivity(getActivity(), PassingContextInvocation.factoryOf())
                         .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryWith(routine1, "test_routine");
+                DelegatingContextInvocation.factoryFrom(routine1, "test_routine");
         final Routine<Object, Object> routine2 =
                 JRoutine.onActivity(getActivity(), factory).buildRoutine();
 
@@ -386,8 +386,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .buildRoutine();
+                JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class)).buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
@@ -404,7 +403,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onActivity(getActivity(), LoaderConfiguration.AUTO);
+            JRoutine.onActivity(getActivity()).buildChannel();
 
             fail();
 
@@ -422,7 +421,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class));
+            JRoutine.onActivity(new TestActivity(), factoryOf(ErrorInvocation.class));
 
             fail();
 
@@ -440,7 +439,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withClashResolution(ClashResolutionType.MERGE)
@@ -461,7 +460,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
+        final OutputChannel<String> channel =
+                JRoutine.onActivity(getActivity()).withLoader().withId(0).set().buildChannel();
 
         try {
 
@@ -484,7 +484,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onActivity(null, ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onActivity(null, factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -494,8 +494,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onActivity(getActivity(),
-                                (ClassToken<ContextInvocation<Object, Object>>) null);
+            JRoutine.onActivity(getActivity(), null);
 
             fail();
 
@@ -505,7 +504,27 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onActivity(null, 0);
+            JRoutine.onActivity(null, ToUpperCase.class, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onActivity(getActivity(), null, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onActivity(null);
 
             fail();
 
@@ -523,7 +542,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withInputClashResolution(ClashResolutionType.ABORT_THAT)
@@ -554,7 +573,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withClashResolution(ClashResolutionType.ABORT_THAT)
@@ -586,7 +605,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), factoryOf(Delay.class))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE)
@@ -598,7 +617,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), factoryOf(Delay.class))
                         .withLoader()
                         .withId(0)
                         .set()
@@ -610,7 +629,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         AbortException error = null;
         final OutputChannel<Data> result3 =
-                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
+                JRoutine.onActivity(getActivity(), factoryFrom(Invocations.factoryOf(Abort.class)))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE)
@@ -632,7 +651,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result3.checkComplete();
 
         final OutputChannel<Data> result4 =
-                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
+                JRoutine.onActivity(getActivity(), factoryFrom(Invocations.factoryOf(Abort.class)))
                         .withLoader()
                         .withId(0)
                         .set()
@@ -661,7 +680,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final LoaderRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .with(builder().withInputOrder(OrderType.PASS_ORDER)
                                        .withOutputOrder(OrderType.PASS_ORDER)
@@ -687,7 +706,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final LoaderRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
@@ -726,7 +745,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
+                JRoutine.onActivity(getActivity(), factoryOf(Delay.class)).buildRoutine();
         final OutputChannel<Data> result1 = routine.callAsync(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine.callAsync(data1).afterMax(timeout);
 
@@ -751,7 +770,10 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(countLog)
                          .set();
-        JRoutine.onActivity(getActivity(), 0)
+        JRoutine.onActivity(getActivity())
+                .withLoader()
+                .withId(0)
+                .set()
                 .withInvocation()
                 .with(configuration)
                 .set()
@@ -761,7 +783,14 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        JRoutine.onFragment(fragment, 0).withInvocation().with(configuration).set().buildChannel();
+        JRoutine.onFragment(fragment)
+                .withLoader()
+                .withId(0)
+                .set()
+                .withInvocation()
+                .with(configuration)
+                .set()
+                .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
 
@@ -775,7 +804,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), factoryOf(Delay.class))
                         .withLoader()
                         .withId(0)
                         .withCacheStrategy(CacheStrategyType.CACHE)
@@ -787,7 +816,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
-                JRoutine.onActivity(getActivity(), ContextInvocations.contextFactoryOf(Abort.class))
+                JRoutine.onActivity(getActivity(), factoryFrom(Invocations.factoryOf(Abort.class)))
                         .withLoader()
                         .withId(0)
                         .set()
@@ -855,7 +884,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withClashResolution(ClashResolutionType.ABORT_THIS)
@@ -888,7 +917,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
@@ -901,7 +930,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
         assertThat(channel4.next()).isEqualTo("test");
         assertThat(channel4.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge();
+        JRoutine.onFragment(fragment).withLoader().withId(0).set().purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
@@ -916,7 +945,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
@@ -929,19 +958,23 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
         assertThat(channel5.next()).isEqualTo("test");
         assertThat(channel5.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge("test");
+        JRoutine.onFragment(fragment).withLoader().withId(0).set().purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel6.all()).containsExactly("test1", "test2");
         assertThat(channel6.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge("test1", "test2");
+        JRoutine.onFragment(fragment).withLoader().withId(0).set().purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
         assertThat(channel7.all()).containsExactly("test1", "test2");
         assertThat(channel7.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge(Arrays.asList((Object) "test1", "test2"));
+        JRoutine.onFragment(fragment)
+                .withLoader()
+                .withId(0)
+                .set()
+                .purge(Arrays.asList((Object) "test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
@@ -957,7 +990,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .set()
@@ -966,7 +999,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
-        final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
+        final OutputChannel<String> channel2 =
+                JRoutine.onFragment(fragment).withLoader().withId(0).set().buildChannel();
 
         assertThat(channel1.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
         assertThat(channel2.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
@@ -986,7 +1020,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<Object, Object> routine1 =
                 JRoutine.onFragment(fragment, PassingContextInvocation.factoryOf()).buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryWith(routine1, "test_routine");
+                DelegatingContextInvocation.factoryFrom(routine1, "test_routine");
         final Routine<Object, Object> routine2 =
                 JRoutine.onFragment(fragment, factory).buildRoutine();
 
@@ -1018,7 +1052,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+                JRoutine.onFragment(fragment, factoryOf(ToUpperCase.class)).buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
@@ -1038,7 +1072,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
-            JRoutine.onFragment(fragment, LoaderConfiguration.AUTO);
+            JRoutine.onFragment(fragment).buildChannel();
 
             fail();
 
@@ -1056,7 +1090,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class));
+            JRoutine.onFragment(new TestFragment(), factoryOf(ErrorInvocation.class));
 
             fail();
 
@@ -1077,7 +1111,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withClashResolution(ClashResolutionType.MERGE)
@@ -1101,7 +1135,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final OutputChannel<String> channel = JRoutine.onFragment(fragment, 0).buildChannel();
+        final OutputChannel<String> channel =
+                JRoutine.onFragment(fragment).withLoader().withId(0).set().buildChannel();
 
         try {
 
@@ -1122,9 +1157,13 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+
         try {
 
-            JRoutine.onFragment(null, ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onFragment(null, factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -1134,7 +1173,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.onFragment(null, 0);
+            JRoutine.onFragment(fragment, null);
 
             fail();
 
@@ -1144,10 +1183,27 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
-                                                                      .findFragmentById(
-                                                                              R.id.test_fragment);
-            JRoutine.onFragment(fragment, (ClassToken<ContextInvocation<Object, Object>>) null);
+            JRoutine.onFragment(null, ToUpperCase.class, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFragment(fragment, null, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFragment(null);
 
             fail();
 
@@ -1168,7 +1224,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withInputClashResolution(ClashResolutionType.ABORT_THAT)
@@ -1202,7 +1258,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, factoryOf(ToUpperCase.class))
                         .withLoader()
                         .withId(0)
                         .withClashResolution(ClashResolutionType.ABORT_THAT)
@@ -1235,7 +1291,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
@@ -1263,7 +1319,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeContextInvocation.class))
+                JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .withInvocation()
                         .withInputOrder(OrderType.PASS_ORDER)
                         .withOutputOrder(OrderType.PASS_ORDER)
@@ -1305,7 +1361,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Data, Data> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(Delay.class)).buildRoutine();
+                JRoutine.onFragment(fragment, factoryOf(Delay.class)).buildRoutine();
         final OutputChannel<Data> result1 = routine.callAsync(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine.callAsync(data1).afterMax(timeout);
 
@@ -1340,13 +1396,14 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final ClassToken<StringFunctionInvocation> token2 =
                 ClassToken.tokenOf(StringFunctionInvocation.class);
-        final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(), token2)
-                                                         .withInvocation()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withLog(Logs.androidLog())
-                                                         .withLogLevel(LogLevel.WARNING)
-                                                         .set()
-                                                         .buildRoutine();
+        final Routine<String, String> routine2 =
+                JRoutine.onActivity(getActivity(), factoryOf(token2))
+                        .withInvocation()
+                        .withSyncRunner(Runners.queuedRunner())
+                        .withLog(Logs.androidLog())
+                        .withLogLevel(LogLevel.WARNING)
+                        .set()
+                        .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
         assertThat(
@@ -1430,7 +1487,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(countLog)
                          .set();
-        JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+        JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
                 .withInvocation()
                 .with(configuration)
                 .set()
@@ -1444,7 +1501,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+        JRoutine.onFragment(fragment, factoryOf(ToUpperCase.class))
                 .withInvocation()
                 .with(configuration)
                 .set()

@@ -90,9 +90,9 @@ public class PriorityRunner {
     @Nonnull
     static PriorityRunner getInstance(@Nonnull final Runner wrapped) {
 
-        if (wrapped instanceof PriorityRunner) {
+        if (wrapped instanceof EnqueuingRunner) {
 
-            return (PriorityRunner) wrapped;
+            return ((EnqueuingRunner) wrapped).enclosingRunner();
         }
 
         synchronized (sRunnerMap) {
@@ -268,6 +268,11 @@ public class PriorityRunner {
 
                 mRunner.run(new DelayedExecution(mQueue, priorityExecution), delay, timeUnit);
             }
+        }
+
+        private PriorityRunner enclosingRunner() {
+
+            return PriorityRunner.this;
         }
     }
 }

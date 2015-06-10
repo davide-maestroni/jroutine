@@ -51,6 +51,21 @@ public class RunnerTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullPriorityRunner() {
+
+        try {
+
+            Runners.priorityRunner(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testPoolRunner() throws InterruptedException {
 
         testRunner(Runners.poolRunner(3));
@@ -108,6 +123,14 @@ public class RunnerTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSamePriorityRunner() {
+
+        final PriorityRunner priorityRunner = Runners.priorityRunner(Runners.queuedRunner());
+        assertThat(Runners.priorityRunner(priorityRunner.getRunner(3))).isSameAs(priorityRunner);
     }
 
     @Test

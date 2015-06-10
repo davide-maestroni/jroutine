@@ -21,10 +21,8 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.core.JRoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
@@ -42,8 +40,6 @@ import static com.gh.bmd.jrt.core.JRoutineBuilders.getAnnotatedMethod;
 import static com.gh.bmd.jrt.core.JRoutineBuilders.getTargetMethodInfo;
 import static com.gh.bmd.jrt.core.JRoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.util.Reflection.NO_ARGS;
-import static com.gh.bmd.jrt.util.Reflection.boxingClass;
-import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 
 /**
  * Class implementing a builder of routines wrapping an object instance.
@@ -144,19 +140,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     "the specified class is not an interface: " + itf.getName());
         }
 
-        final InvocationHandler handler;
-
-        if (itf.isAssignableFrom(getTargetClass())) {
-
-            handler = new InterfaceInvocationHandler();
-
-        } else {
-
-            handler = new ProxyInvocationHandler();
-        }
-
-        final Object proxy =
-                Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
+        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+                                                    new ProxyInvocationHandler());
         return itf.cast(proxy);
     }
 
@@ -164,88 +149,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
-    }
-
-    /**
-     * Invocation handler wrapping the target object instance.
-     */
-    private class InterfaceInvocationHandler implements InvocationHandler {
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        private final ProxyConfiguration mProxyConfiguration;
-
-        /**
-         * Constructor.
-         */
-        private InterfaceInvocationHandler() {
-
-            mInvocationConfiguration = getInvocationConfiguration();
-            mProxyConfiguration = getProxyConfiguration();
-        }
-
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
-                Throwable {
-
-            final InvocationConfiguration invocationConfiguration;
-            final Priority priorityAnnotation = method.getAnnotation(Priority.class);
-
-            if (priorityAnnotation != null) {
-
-                final int priority = priorityAnnotation.value();
-                invocationConfiguration =
-                        mInvocationConfiguration.builderFrom().withPriority(priority).set();
-
-            } else {
-
-                invocationConfiguration = mInvocationConfiguration;
-            }
-
-            final OutputChannel<Object> outputChannel =
-                    method(invocationConfiguration, mProxyConfiguration, method).callAsync(args);
-            final Class<?> returnType = method.getReturnType();
-
-            if (!Void.class.equals(boxingClass(returnType))) {
-
-                TimeDuration outputTimeout = null;
-                TimeoutActionType outputAction = null;
-                final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
-
-                if (timeoutAnnotation != null) {
-
-                    outputTimeout = fromUnit(timeoutAnnotation.value(), timeoutAnnotation.unit());
-                }
-
-                final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
-
-                if (actionAnnotation != null) {
-
-                    outputAction = actionAnnotation.value();
-                }
-
-                if (outputTimeout != null) {
-
-                    outputChannel.afterMax(outputTimeout);
-                }
-
-                if (outputAction == TimeoutActionType.DEADLOCK) {
-
-                    outputChannel.eventuallyDeadlock();
-
-                } else if (outputAction == TimeoutActionType.EXIT) {
-
-                    outputChannel.eventuallyExit();
-
-                } else if (outputAction == TimeoutActionType.ABORT) {
-
-                    outputChannel.eventuallyAbort();
-                }
-
-                return outputChannel.next();
-            }
-
-            return null;
-        }
     }
 
     /**
@@ -264,6 +167,32 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             mInvocationConfiguration = getInvocationConfiguration();
             mProxyConfiguration = getProxyConfiguration();
+        }
+
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
+                Throwable {
+
+            final WeakReference<?> targetReference = getTargetReference();
+
+            if (targetReference == null) {
+
+                throw new IllegalStateException("the target reference must not be null");
+            }
+
+            final Object target = targetReference.get();
+
+            if (target == null) {
+
+                throw new IllegalStateException("the target object has been destroyed");
+            }
+
+            final MethodInfo methodInfo = getTargetMethodInfo(getTargetClass(), method);
+            final InputMode inputMode = methodInfo.inputMode;
+            final OutputMode outputMode = methodInfo.outputMode;
+            final Routine<Object, Object> routine =
+                    buildRoutine(method, methodInfo.method, inputMode, outputMode);
+            return invokeRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
+                                 outputMode);
         }
 
         @Nonnull
@@ -313,32 +242,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             }
 
             return getRoutine(builder.set(), shareGroup, targetMethod, inputMode, outputMode);
-        }
-
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
-                Throwable {
-
-            final WeakReference<?> targetReference = getTargetReference();
-
-            if (targetReference == null) {
-
-                throw new IllegalStateException("the target reference must not be null");
-            }
-
-            final Object target = targetReference.get();
-
-            if (target == null) {
-
-                throw new IllegalStateException("the target object has been destroyed");
-            }
-
-            final MethodInfo methodInfo = getTargetMethodInfo(getTargetClass(), method);
-            final InputMode inputMode = methodInfo.inputMode;
-            final OutputMode outputMode = methodInfo.outputMode;
-            final Routine<Object, Object> routine =
-                    buildRoutine(method, methodInfo.method, inputMode, outputMode);
-            return invokeRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
-                                 outputMode);
         }
     }
 }

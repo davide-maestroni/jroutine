@@ -19,10 +19,12 @@ import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Inputs;
 import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.AgingPriority;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
@@ -37,6 +39,8 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.runner.Execution;
+import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.TimeDuration;
@@ -46,6 +50,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
@@ -65,6 +70,32 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 3/27/15.
  */
 public class ObjectRoutineTest {
+
+    @Test
+    public void testAgingPriority() {
+
+        final Pass pass = new Pass();
+        final TestRunner runner = new TestRunner();
+        final PriorityPass priorityPass = JRoutine.on(pass)
+                                                  .withInvocation()
+                                                  .withAsyncRunner(runner)
+                                                  .set()
+                                                  .buildProxy(PriorityPass.class);
+        final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyExit();
+
+        for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
+
+            priorityPass.passHigh("test2");
+            runner.run(1);
+            assertThat(output1.all()).isEmpty();
+        }
+
+        final OutputChannel<String> output2 = priorityPass.passHigh("test2");
+        runner.run(1);
+        assertThat(output1.all()).containsExactly("test1");
+        runner.run(Integer.MAX_VALUE);
+        assertThat(output2.all()).containsExactly("test2");
+    }
 
     @Test
     public void testAliasMethod() throws NoSuchMethodException {
@@ -1599,6 +1630,19 @@ public class ObjectRoutineTest {
         Iterable<Integer> incIterable(@Input(int.class) int... i);
     }
 
+    private interface PriorityPass {
+
+        @Output
+        @Alias("pass")
+        @Priority(AgingPriority.HIGH_PRIORITY)
+        OutputChannel<String> passHigh(String s);
+
+        @Output
+        @Alias("pass")
+        @Priority(AgingPriority.NORMAL_PRIORITY)
+        OutputChannel<String> passNormal(String s);
+    }
+
     private interface SquareItf {
 
         @Timeout(value = 1, unit = TimeUnit.SECONDS)
@@ -1881,6 +1925,14 @@ public class ObjectRoutineTest {
         }
     }
 
+    private static class Pass {
+
+        public String pass(final String s) {
+
+            return s;
+        }
+    }
+
     @SuppressWarnings("unused")
     private static class Square {
 
@@ -1964,6 +2016,36 @@ public class ObjectRoutineTest {
             TimeDuration.millis(500).sleepAtLeast();
 
             return 2;
+        }
+    }
+
+    private static class TestRunner implements Runner {
+
+        private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
+
+        @Override
+        public boolean isRunnerThread() {
+
+            return false;
+        }
+
+        @Override
+        public void run(@Nonnull final Execution execution, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mExecutions.add(execution);
+        }
+
+        private void run(int count) {
+
+            final Iterator<Execution> iterator = mExecutions.iterator();
+
+            while (iterator.hasNext() && (count-- > 0)) {
+
+                final Execution execution = iterator.next();
+                iterator.remove();
+                execution.run();
+            }
         }
     }
 

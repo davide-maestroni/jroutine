@@ -55,4 +55,10 @@ public class ExceptionTest {
 
         assertThat(new OutputDeadlockException("")).hasNoCause();
     }
+
+    @Test
+    public void testRoutineException() {
+
+        assertThat(new RoutineException()).hasNoCause();
+    }
 }

@@ -26,12 +26,14 @@ import com.gh.bmd.jrt.util.ClassToken;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.annotation.Nonnull;
 
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Routine channels unit tests.
@@ -39,6 +41,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 3/18/15.
  */
 public class JRoutineChannelsTest {
+
+    @Test
+    public void testEmpty() {
+
+        try {
+
+            JRoutineChannels.selectFrom(Collections.<OutputChannel<Object>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
 
     @Test
     @SuppressWarnings("unchecked")

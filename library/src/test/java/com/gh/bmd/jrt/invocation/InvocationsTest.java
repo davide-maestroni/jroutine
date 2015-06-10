@@ -70,6 +70,21 @@ public class InvocationsTest {
 
     @Test
     @SuppressWarnings("ConstantConditions")
+    public void testNullDelegatedRoutine() {
+
+        try {
+
+            new DelegatingInvocation<Object, Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
     public void testNullInvocationError() {
 
         try {

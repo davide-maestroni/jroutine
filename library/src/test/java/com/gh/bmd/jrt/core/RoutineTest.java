@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.AgingPriority;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
@@ -49,6 +50,8 @@ import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.runner.Execution;
+import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.TimeDuration;
@@ -235,6 +238,42 @@ public class RoutineTest {
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
 
         assertThat(abortReason.get().getCause()).isEqualTo(exception1);
+    }
+
+    @Test
+    public void testAgingPriority() {
+
+        final TestRunner runner = new TestRunner();
+        final Routine<Object, Object> routine1 = JRoutine.on(PassingInvocation.factoryOf())
+                                                         .withInvocation()
+                                                         .withAsyncRunner(runner)
+                                                         .withPriority(
+                                                                 AgingPriority.NORMAL_PRIORITY)
+                                                         .set()
+                                                         .buildRoutine();
+        final Routine<Object, Object> routine2 = JRoutine.on(PassingInvocation.factoryOf())
+                                                         .withInvocation()
+                                                         .withAsyncRunner(runner)
+                                                         .withPriority(AgingPriority.HIGH_PRIORITY)
+                                                         .set()
+                                                         .buildRoutine();
+        final OutputChannel<Object> output1 = routine1.callAsync("test1").eventuallyExit();
+        final InvocationChannel<Object, Object> input2 = routine2.invokeAsync();
+
+        for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
+
+            input2.pass("test2");
+            runner.run(1);
+            assertThat(output1.all()).isEmpty();
+        }
+
+        final OutputChannel<Object> output2 = input2.pass("test2").result();
+        runner.run(1);
+        assertThat(output1.all()).containsExactly("test1");
+        runner.run(Integer.MAX_VALUE);
+        final List<Object> result2 = output2.all();
+        assertThat(result2).hasSize(AgingPriority.HIGH_PRIORITY);
+        assertThat(result2).containsOnly("test2");
     }
 
     @Test
@@ -3387,6 +3426,36 @@ public class RoutineTest {
 
             mIsOutput = true;
             mOutput = o;
+        }
+    }
+
+    private static class TestRunner implements Runner {
+
+        private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
+
+        @Override
+        public boolean isRunnerThread() {
+
+            return false;
+        }
+
+        @Override
+        public void run(@Nonnull final Execution execution, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mExecutions.add(execution);
+        }
+
+        private void run(int count) {
+
+            final Iterator<Execution> iterator = mExecutions.iterator();
+
+            while (iterator.hasNext() && (count-- > 0)) {
+
+                final Execution execution = iterator.next();
+                iterator.remove();
+                execution.run();
+            }
         }
     }
 }

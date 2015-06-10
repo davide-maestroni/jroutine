@@ -108,15 +108,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mSyncRunner = configuration.getSyncRunnerOr(Runners.queuedRunner());
 
         final int priority = configuration.getPriorityOr(InvocationConfiguration.DEFAULT);
+        final Runner asyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
 
         if (priority != InvocationConfiguration.DEFAULT) {
 
-            final Runner asyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
             mAsyncRunner = Runners.priorityRunner(asyncRunner).getRunner(priority);
 
         } else {
 
-            mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
+            mAsyncRunner = asyncRunner;
         }
 
         mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);

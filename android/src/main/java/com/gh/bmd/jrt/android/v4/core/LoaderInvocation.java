@@ -441,11 +441,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
                     "invalid context type: " + context.getClass().getName());
         }
 
-        final ContextInvocation<INPUT, OUTPUT> invocation =
-                createInvocation(loaderContext, mLoaderId);
+        final ContextInvocation<INPUT, OUTPUT> invocation = createInvocation(mLoaderId);
 
         try {
 
+            invocation.onContext(loaderContext);
             invocation.onInitialize();
             invocation.onAbort(reason);
             invocation.onTerminate();
@@ -600,15 +600,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
 
         final Logger logger = mLogger;
         final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
-                : new RoutineLoader<INPUT, OUTPUT>(loaderContext,
-                                                   createInvocation(loaderContext, loaderId),
+                : new RoutineLoader<INPUT, OUTPUT>(loaderContext, createInvocation(loaderId),
                                                    mFactory, inputs, mOrderType, logger);
         return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
     }
 
     @Nonnull
-    private ContextInvocation<INPUT, OUTPUT> createInvocation(@Nonnull final Context loaderContext,
-            final int loaderId) {
+    private ContextInvocation<INPUT, OUTPUT> createInvocation(final int loaderId) {
 
         final Logger logger = mLogger;
         final ContextInvocationFactory<INPUT, OUTPUT> factory = mFactory;
@@ -618,7 +616,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
 
             logger.dbg("creating a new invocation instance [%d]", loaderId);
             invocation = factory.newInvocation();
-            invocation.onContext(loaderContext.getApplicationContext());
 
         } catch (final RoutineException e) {
 

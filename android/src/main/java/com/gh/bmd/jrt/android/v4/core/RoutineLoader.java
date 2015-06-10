@@ -18,21 +18,15 @@ import android.support.v4.content.AsyncTaskLoader;
 
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
-import com.gh.bmd.jrt.channel.AbortException;
-import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
-import com.gh.bmd.jrt.invocation.InvocationException;
+import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,7 +39,8 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
+class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>>
+        implements InvocationFactory<INPUT, OUTPUT> {
 
     private final List<? extends INPUT> mInputs;
 
@@ -163,81 +158,29 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     public InvocationResult<OUTPUT> loadInBackground() {
 
         final Logger logger = mLogger;
-        final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
-        final LoaderResultChannel<OUTPUT> channel =
-                new LoaderResultChannel<OUTPUT>(mOrderType, logger);
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
-        channel.output().passTo(consumer);
-        Throwable abortException = null;
-        logger.dbg("running invocation");
-
-        try {
-
-            invocation.onInitialize();
-
-            for (final INPUT input : mInputs) {
-
-                invocation.onInput(input, channel);
-                abortException = channel.getAbortException();
-
-                if (abortException != null) {
-
-                    break;
-                }
-            }
-
-            if (abortException == null) {
-
-                invocation.onResult(channel);
-                abortException = channel.getAbortException();
-            }
-
-        } catch (final Throwable t) {
-
-            abortException = t;
-        }
-
-        if (abortException != null) {
-
-            logger.dbg(abortException, "aborting invocation");
-
-            try {
-
-                invocation.onAbort(abortException);
-                invocation.onTerminate();
-
-            } catch (final InvocationException e) {
-
-                abortException = e.getCause();
-
-            } catch (final Throwable t) {
-
-                abortException = t;
-            }
-
-            logger.dbg(abortException, "aborted invocation");
-            channel.abort(abortException);
-            return consumer.createResult();
-
-        } else {
-
-            try {
-
-                invocation.onTerminate();
-
-            } catch (final InvocationInterruptedException e) {
-
-                throw e;
-
-            } catch (final Throwable ignored) {
-
-            }
-        }
-
-        logger.dbg("reading invocation results");
-        channel.close();
+        JRoutine.on(this)
+                .withInvocation()
+                .withSyncRunner(Runners.sequentialRunner())
+                .withOutputOrder(mOrderType)
+                .withOutputMaxSize(Integer.MAX_VALUE)
+                .withOutputTimeout(TimeDuration.ZERO)
+                .withLog(logger.getLog())
+                .withLogLevel(logger.getLogLevel())
+                .set()
+                .callSync(mInputs)
+                .passTo(consumer);
         return consumer.createResult();
+    }
+
+    @Nonnull
+    @Override
+    public Invocation<INPUT, OUTPUT> newInvocation() {
+
+        final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
+        invocation.onContext(getContext());
+        return invocation;
     }
 
     /**
@@ -268,135 +211,5 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     ContextInvocationFactory<INPUT, OUTPUT> getInvocationFactory() {
 
         return mInvocationFactory;
-    }
-
-    /**
-     * Loader result channel.
-     *
-     * @param <OUTPUT> the output data type.
-     */
-    private static class LoaderResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
-
-        private final AtomicReference<Throwable> mAbortException = new AtomicReference<Throwable>();
-
-        private final TransportChannel<OUTPUT> mTransportChannel;
-
-        private final TransportInput<OUTPUT> mTransportInput;
-
-        /**
-         * Constructor.
-         *
-         * @param order  the data order.
-         * @param logger the logger instance.
-         */
-        private LoaderResultChannel(@Nullable final OrderType order, @Nonnull final Logger logger) {
-
-            mTransportChannel = JRoutine.transport()
-                                        .withInvocation()
-                                        .withOutputOrder(order)
-                                        .withOutputMaxSize(Integer.MAX_VALUE)
-                                        .withOutputTimeout(TimeDuration.ZERO)
-                                        .withLog(logger.getLog())
-                                        .withLogLevel(logger.getLogLevel())
-                                        .set()
-                                        .buildChannel();
-            mTransportInput = mTransportChannel.input();
-        }
-
-        public boolean abort() {
-
-            final boolean isAbort = mTransportInput.abort();
-
-            if (isAbort) {
-
-                mAbortException.set(new AbortException(null));
-            }
-
-            return isAbort;
-        }
-
-        public boolean abort(@Nullable final Throwable reason) {
-
-            final boolean isAbort = mTransportInput.abort(reason);
-
-            if (isAbort) {
-
-                mAbortException.set(
-                        (reason instanceof RoutineException) ? reason : new AbortException(reason));
-            }
-
-            return isAbort;
-        }
-
-        public boolean isOpen() {
-
-            return mTransportInput.isOpen();
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
-
-            mTransportInput.after(delay);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
-
-            mTransportInput.after(delay, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> now() {
-
-            mTransportInput.now();
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
-
-            mTransportInput.pass(channel);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
-
-            mTransportInput.pass(outputs);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
-
-            mTransportInput.pass(output);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
-
-            mTransportInput.pass(outputs);
-            return this;
-        }
-
-        private void close() {
-
-            mTransportInput.close();
-        }
-
-        @Nullable
-        private Throwable getAbortException() {
-
-            return mAbortException.get();
-        }
-
-        @Nonnull
-        private OutputChannel<OUTPUT> output() {
-
-            return mTransportChannel.output();
-        }
     }
 }

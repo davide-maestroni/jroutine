@@ -361,7 +361,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the service configuration must not be null");
         }
 
         mServiceConfiguration = configuration;
@@ -375,7 +375,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the proxy configuration must not be null");
         }
 
         mProxyConfiguration = configuration;
@@ -389,7 +389,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mInvocationConfiguration = configuration;

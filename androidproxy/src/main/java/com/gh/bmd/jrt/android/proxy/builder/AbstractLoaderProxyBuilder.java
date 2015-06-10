@@ -123,7 +123,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mLoaderConfiguration = configuration;
@@ -137,7 +137,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mInvocationConfiguration = configuration;
@@ -183,9 +183,9 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
      * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final ProxyConfiguration proxyConfiguration,
-            @Nonnull final LoaderConfiguration loaderConfiguration);
+    protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
+            @Nonnull ProxyConfiguration proxyConfiguration,
+            @Nonnull LoaderConfiguration loaderConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.

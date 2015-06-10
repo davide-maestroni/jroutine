@@ -60,7 +60,7 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mConfiguration = configuration;

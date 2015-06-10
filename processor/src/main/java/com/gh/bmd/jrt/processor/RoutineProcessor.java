@@ -51,6 +51,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
@@ -200,6 +201,14 @@ public class RoutineProcessor extends AbstractProcessor {
 
             for (final Element element : ElementFilter.typesIn(
                     roundEnvironment.getElementsAnnotatedWith(annotationElement))) {
+
+                if (element.getKind() != ElementKind.INTERFACE) {
+
+                    processingEnv.getMessager()
+                                 .printMessage(Kind.ERROR,
+                                               "Annotated element is not an interface: " + element);
+                    throw new RuntimeException("Annotated element is not an interface: " + element);
+                }
 
                 final TypeElement classElement = (TypeElement) element;
                 final List<ExecutableElement> methodElements =

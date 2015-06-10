@@ -101,7 +101,7 @@ public abstract class AbstractProxyBuilder<TYPE>
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mInvocationConfiguration = configuration;
@@ -152,8 +152,8 @@ public abstract class AbstractProxyBuilder<TYPE>
      * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final ProxyConfiguration proxyConfiguration);
+    protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
+            @Nonnull ProxyConfiguration proxyConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.

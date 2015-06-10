@@ -27,7 +27,7 @@ import javax.lang.model.type.TypeMirror;
 
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations,
- * bound to a context lifecycle.
+ * by leveraging Android platform specific classes.
  * <p/>
  * Created by davide-maestroni on 06/05/15.
  */

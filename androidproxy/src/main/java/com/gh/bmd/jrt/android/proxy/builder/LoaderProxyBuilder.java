@@ -40,8 +40,9 @@ public interface LoaderProxyBuilder<TYPE>
      * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
      * {@link com.gh.bmd.jrt.annotation.Timeout} and
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} and
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution},
      * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>

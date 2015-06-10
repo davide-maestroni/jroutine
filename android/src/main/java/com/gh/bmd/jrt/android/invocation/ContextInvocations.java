@@ -67,8 +67,6 @@ public class ContextInvocations {
     public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryFrom(
             @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
-        //TODO: equals/hashCode
-
         return new DecoratingContextInvocationFactory<INPUT, OUTPUT>(factory);
     }
 

@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate interfaces used as templates to generate proxy classes,
+ * This annotation is used to indicate interfaces used as templates to generate proxy classes
  * enabling asynchronous calls to the target instance methods.<br/>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
@@ -27,8 +27,9 @@ import java.lang.annotation.Target;
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
  * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
- * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.Timeout} and
- * {@link com.gh.bmd.jrt.annotation.TimeoutAction} annotations defined for each interface method.
+ * {@link com.gh.bmd.jrt.annotation.Priority}, , {@link com.gh.bmd.jrt.annotation.ShareGroup},
+ * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
+ * annotations defined for each interface method.
  * <p/>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
  * proxy interface must declare the same generic types as the wrapped class or interface.

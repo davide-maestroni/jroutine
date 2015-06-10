@@ -124,7 +124,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the service configuration must not be null");
         }
 
         mServiceConfiguration = configuration;
@@ -138,7 +138,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mInvocationConfiguration = configuration;
@@ -184,9 +184,9 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
      * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final ProxyConfiguration proxyConfiguration,
-            @Nonnull final ServiceConfiguration serviceConfiguration);
+    protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
+            @Nonnull ProxyConfiguration proxyConfiguration,
+            @Nonnull ServiceConfiguration serviceConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.

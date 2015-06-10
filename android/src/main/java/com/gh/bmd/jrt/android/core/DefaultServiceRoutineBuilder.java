@@ -94,7 +94,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the service configuration must not be null");
         }
 
         mServiceConfiguration = configuration;

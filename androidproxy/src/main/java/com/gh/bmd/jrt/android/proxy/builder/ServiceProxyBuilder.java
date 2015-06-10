@@ -39,11 +39,8 @@ public interface ServiceProxyBuilder<TYPE>
      * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
      * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
      * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} and
-     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
+     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
+     * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with

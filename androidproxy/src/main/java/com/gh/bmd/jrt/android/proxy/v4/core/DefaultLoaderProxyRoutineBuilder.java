@@ -44,9 +44,9 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         ProxyConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         LoaderConfiguration.Configurable<LoaderProxyRoutineBuilder> {
 
-    private final Object[] mArgs;
-
     private final WeakReference<?> mContextReference;
+
+    private final Object[] mFactoryArgs;
 
     private final Class<?> mTargetClass;
 
@@ -62,12 +62,12 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      *
      * @param activity    the invocation activity context.
      * @param targetClass the target class.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderProxyRoutineBuilder(@Nonnull final FragmentActivity activity,
-            @Nonnull final Class<?> targetClass, @Nullable final Object... args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
-        this((Object) activity, targetClass, args);
+        this((Object) activity, targetClass, factoryArgs);
     }
 
     /**
@@ -75,12 +75,12 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      *
      * @param fragment    the invocation fragment context.
      * @param targetClass the target class.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderProxyRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass, @Nullable final Object... args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
-        this((Object) fragment, targetClass, args);
+        this((Object) fragment, targetClass, factoryArgs);
     }
 
     /**
@@ -88,11 +88,11 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      *
      * @param context     the invocation context.
      * @param targetClass the target class.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultLoaderProxyRoutineBuilder(@Nonnull final Object context,
-            @Nonnull final Class<?> targetClass, @Nullable final Object... args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
         if (context == null) {
 
@@ -106,7 +106,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         mTargetClass = targetClass;
         mContextReference = new WeakReference<Object>(context);
-        mArgs = (args != null) ? args : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -141,7 +141,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         }
 
         final ObjectLoaderProxyBuilder<TYPE> builder =
-                new ObjectLoaderProxyBuilder<TYPE>(context, mTargetClass, mArgs, itf);
+                new ObjectLoaderProxyBuilder<TYPE>(context, mTargetClass, mFactoryArgs, itf);
         return builder.withInvocation()
                       .with(mInvocationConfiguration)
                       .set()
@@ -182,7 +182,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mInvocationConfiguration = configuration;
@@ -210,7 +210,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the proxy configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mLoaderConfiguration = configuration;

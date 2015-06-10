@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Processor core interfaces and implementations.
+ * Processor core interfaces and implementations, specific to the Android platform.
  * <p/>
  * Created by davide-maestroni on 5/14/15.
  */

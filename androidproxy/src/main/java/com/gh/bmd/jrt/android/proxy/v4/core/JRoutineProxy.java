@@ -37,6 +37,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.gh.bmd.jrt.android.proxy.annotation.V4Proxy
  * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
  * @see com.gh.bmd.jrt.android.annotation.ClashResolution
+ * @see com.gh.bmd.jrt.android.annotation.InputClashResolution
  * @see com.gh.bmd.jrt.android.annotation.LoaderId
  * @see com.gh.bmd.jrt.annotation.Alias
  * @see com.gh.bmd.jrt.annotation.Input
@@ -64,16 +65,16 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
      *
-     * @param activity the invocation activity context.
-     * @param target   the wrapped object class.
-     * @param args     the object factory arguments.
+     * @param activity    the invocation activity context.
+     * @param target      the wrapped object class.
+     * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
-            @Nonnull final Class<?> target, @Nullable final Object... args) {
+            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
-        return new DefaultLoaderProxyRoutineBuilder(activity, target, args);
+        return new DefaultLoaderProxyRoutineBuilder(activity, target, factoryArgs);
     }
 
     /**
@@ -82,15 +83,15 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
      *
-     * @param fragment the invocation fragment context.
-     * @param target   the wrapped object class.
-     * @param args     the object factory arguments.
+     * @param fragment    the invocation fragment context.
+     * @param target      the wrapped object class.
+     * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> target, @Nullable final Object... args) {
+            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
-        return new DefaultLoaderProxyRoutineBuilder(fragment, target, args);
+        return new DefaultLoaderProxyRoutineBuilder(fragment, target, factoryArgs);
     }
 }

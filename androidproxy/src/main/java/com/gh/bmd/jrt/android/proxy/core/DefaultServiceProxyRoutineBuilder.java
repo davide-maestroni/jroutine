@@ -43,9 +43,9 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         ProxyConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
 
-    private final Object[] mArgs;
-
     private final WeakReference<Context> mContextReference;
+
+    private final Object[] mFactoryArgs;
 
     private final Class<?> mTargetClass;
 
@@ -61,11 +61,11 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      *
      * @param context     the invocation context.
      * @param targetClass the target class.
-     * @param args        the object factory arguments.
+     * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceProxyRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final Class<?> targetClass, @Nullable final Object... args) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
         if (context == null) {
 
@@ -79,7 +79,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         mTargetClass = targetClass;
         mContextReference = new WeakReference<Context>(context);
-        mArgs = (args != null) ? args : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -114,7 +114,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         }
 
         final ObjectServiceProxyBuilder<TYPE> builder =
-                new ObjectServiceProxyBuilder<TYPE>(context, mTargetClass, mArgs, itf);
+                new ObjectServiceProxyBuilder<TYPE>(context, mTargetClass, mFactoryArgs, itf);
         return builder.withInvocation()
                       .with(mInvocationConfiguration)
                       .set()
@@ -155,7 +155,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mInvocationConfiguration = configuration;
@@ -183,7 +183,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the proxy configuration must not be null");
+            throw new NullPointerException("the service configuration must not be null");
         }
 
         mServiceConfiguration = configuration;

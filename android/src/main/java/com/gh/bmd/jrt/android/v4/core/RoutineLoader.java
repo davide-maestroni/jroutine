@@ -160,30 +160,17 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         final Logger logger = mLogger;
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
-
-        try {
-
-            JRoutine.on(this)
-                    .withInvocation()
-                    .withSyncRunner(Runners.sequentialRunner())
-                    .withOutputOrder(mOrderType)
-                    .withOutputMaxSize(Integer.MAX_VALUE)
-                    .withOutputTimeout(TimeDuration.ZERO)
-                    .withLog(logger.getLog())
-                    .withLogLevel(logger.getLogLevel())
-                    .set()
-                    .callSync(mInputs)
-                    .passTo(consumer);
-
-        } catch (final InvocationInterruptedException e) {
-
-            throw e;
-
-        } catch (final Throwable t) {
-
-            consumer.onError(t);
-        }
-
+        JRoutine.on(this)
+                .withInvocation()
+                .withSyncRunner(Runners.sequentialRunner())
+                .withOutputOrder(mOrderType)
+                .withOutputMaxSize(Integer.MAX_VALUE)
+                .withOutputTimeout(TimeDuration.ZERO)
+                .withLog(logger.getLog())
+                .withLogLevel(logger.getLogLevel())
+                .set()
+                .callSync(mInputs)
+                .passTo(consumer);
         return consumer.createResult();
     }
 

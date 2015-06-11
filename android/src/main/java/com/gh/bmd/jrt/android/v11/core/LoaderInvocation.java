@@ -42,9 +42,9 @@ import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
-import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Logger;
+import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
@@ -57,6 +57,8 @@ import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
+
 /**
  * Invocation implementation employing loaders to perform background operations.
  * <p/>
@@ -66,7 +68,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @param <OUTPUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> {
+class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
+        implements ContextInvocationFactory<INPUT, OUTPUT> {
 
     private static final WeakIdentityHashMap<Object,
             SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -411,6 +414,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         }
     }
 
+    @Nonnull
+    @Override
+    public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+
+        return createInvocation(mLoaderId);
+    }
+
     @Override
     public void onAbort(@Nullable final Throwable reason) {
 
@@ -444,34 +454,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
                     "invalid context type: " + context.getClass().getName());
         }
 
-        final ContextInvocation<INPUT, OUTPUT> invocation = createInvocation(mLoaderId);
-
-        try {
-
-            invocation.onContext(loaderContext);
-            invocation.onInitialize();
-            invocation.onAbort(reason);
-            invocation.onTerminate();
-
-        } catch (final InvocationInterruptedException e) {
-
-            throw e;
-
-        } catch (final Throwable ignored) {
-
-        }
-
-        try {
-
-            invocation.onDestroy();
-
-        } catch (final InvocationInterruptedException e) {
-
-            throw e;
-
-        } catch (final Throwable ignored) {
-
-        }
+        final Routine<INPUT, OUTPUT> routine =
+                JRoutine.on(factoryFrom(loaderContext, this)).buildRoutine();
+        routine.invokeSync().abort(reason);
+        routine.purge();
     }
 
     @Override

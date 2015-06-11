@@ -135,7 +135,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
                 synchronized (mMutex) {
 
-                    if (mState == ChannelState.EXCEPTION) {
+                    if (mState.ordinal() >= ChannelState.EXCEPTION.ordinal()) {
 
                         mLogger.wrn("avoiding aborting result channel since invocation is aborted");
                         return;
@@ -195,7 +195,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
                 mLogger.dbg(reason, "aborting channel");
                 mAbortException = abortException;
-                mState = ChannelState.EXCEPTION;
+                mState = ChannelState.ABORTED;
             }
         }
 
@@ -433,19 +433,31 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     @Nonnull
     public OutputChannel<OUTPUT> result() {
 
+        boolean isAbort = false;
+        Throwable abortException = null;
         final boolean needsExecution;
 
         synchronized (mMutex) {
 
-            verifyOpen();
-            mLogger.dbg("closing input channel");
-            mState = ChannelState.OUTPUT;
-            needsExecution = !mIsPendingExecution && !mIsConsuming;
+            if (mState == ChannelState.EXCEPTION) {
 
-            if (needsExecution) {
+                needsExecution = false;
+                isAbort = true;
+                abortException = mAbortException;
+                mState = ChannelState.ABORTED;
 
-                ++mPendingExecutionCount;
-                mIsPendingExecution = true;
+            } else {
+
+                verifyOpen();
+                mLogger.dbg("closing input channel");
+                mState = ChannelState.OUTPUT;
+                needsExecution = !mIsPendingExecution && !mIsConsuming;
+
+                if (needsExecution) {
+
+                    ++mPendingExecutionCount;
+                    mIsPendingExecution = true;
+                }
             }
         }
 
@@ -454,7 +466,14 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
         }
 
-        return mResultChanel.getOutput();
+        final OutputChannel<OUTPUT> outputChannel = mResultChanel.getOutput();
+
+        if (isAbort) {
+
+            outputChannel.abort(abortException);
+        }
+
+        return outputChannel;
     }
 
     private void addInputs(final int count) {
@@ -487,11 +506,11 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
     private void verifyOpen() {
 
-        if (mState == ChannelState.EXCEPTION) {
+        if (mState.ordinal() >= ChannelState.EXCEPTION.ordinal()) {
 
-            final Throwable throwable = mAbortException;
-            mLogger.dbg(throwable, "abort exception");
-            throw RoutineExceptionWrapper.wrap(throwable).raise();
+            final Throwable abortException = mAbortException;
+            mLogger.dbg(abortException, "abort exception");
+            throw RoutineExceptionWrapper.wrap(abortException).raise();
         }
 
         if (!isOpen()) {
@@ -508,8 +527,9 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         INPUT,      // input channel is open
         OUTPUT,     // no more inputs
-        RESULT,     // result called
-        EXCEPTION   // abort issued
+        RESULT,     // invocation complete
+        EXCEPTION,  // invocation exception
+        ABORTED     // explicitly aborted
     }
 
     /**
@@ -548,7 +568,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
      */
     private class AbortResultExecution implements Execution {
 
-        private final Throwable mReason;
+        private final Throwable mAbortException;
 
         /**
          * Constructor.
@@ -557,12 +577,12 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
          */
         private AbortResultExecution(@Nullable final Throwable reason) {
 
-            mReason = reason;
+            mAbortException = reason;
         }
 
         public void run() {
 
-            mResultChanel.close(mReason);
+            mResultChanel.close(mAbortException);
         }
     }
 
@@ -592,7 +612,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             synchronized (mMutex) {
 
-                return (mState == ChannelState.EXCEPTION);
+                return (mState.ordinal() >= ChannelState.EXCEPTION.ordinal());
             }
         }
 
@@ -619,20 +639,20 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         public void onAbortComplete() {
 
-            final Throwable exception;
+            final Throwable abortException;
             final ArrayList<OutputChannel<?>> channels;
 
             synchronized (mMutex) {
 
-                exception = mAbortException;
-                mLogger.dbg(exception, "aborting bound channels [%d]", mBoundChannels.size());
+                abortException = mAbortException;
+                mLogger.dbg(abortException, "aborting bound channels [%d]", mBoundChannels.size());
                 channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
                 mBoundChannels.clear();
             }
 
             for (final OutputChannel<?> channel : channels) {
 
-                channel.abort(exception);
+                channel.abort(abortException);
             }
         }
 
@@ -667,7 +687,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             synchronized (mMutex) {
 
-                if (mState != ChannelState.EXCEPTION) {
+                if (mState.ordinal() < ChannelState.EXCEPTION.ordinal()) {
 
                     mState = ChannelState.RESULT;
                 }
@@ -798,11 +818,11 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         private void verifyInput() {
 
-            if (mState == ChannelState.EXCEPTION) {
+            if (mState.ordinal() >= ChannelState.EXCEPTION.ordinal()) {
 
-                final Throwable throwable = mAbortException;
-                mSubLogger.dbg(throwable, "consumer abort exception");
-                throw RoutineExceptionWrapper.wrap(throwable).raise();
+                final Throwable abortException = mAbortException;
+                mSubLogger.dbg(abortException, "consumer abort exception");
+                throw RoutineExceptionWrapper.wrap(abortException).raise();
             }
 
             if (!isInput()) {
@@ -818,33 +838,33 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
      */
     private class DelayedAbortExecution implements Execution {
 
-        private final Throwable mThrowable;
+        private final Throwable mAbortException;
 
         /**
          * Constructor.
          *
-         * @param throwable the reason of the abortion.
+         * @param reason the reason of the abortion.
          */
-        private DelayedAbortExecution(@Nullable final Throwable throwable) {
+        private DelayedAbortExecution(@Nullable final Throwable reason) {
 
-            mThrowable = throwable;
+            mAbortException = reason;
         }
 
         public void run() {
 
-            final Throwable throwable = mThrowable;
+            final Throwable abortException = mAbortException;
 
             synchronized (mMutex) {
 
                 if (isInputComplete() || (mState == ChannelState.RESULT)) {
 
-                    mLogger.dbg(throwable, "avoiding aborting since channel is closed");
+                    mLogger.dbg(abortException, "avoiding aborting since channel is closed");
                     return;
                 }
 
-                mLogger.dbg(throwable, "aborting channel");
-                mAbortException = throwable;
-                mState = ChannelState.EXCEPTION;
+                mLogger.dbg(abortException, "aborting channel");
+                DefaultInvocationChannel.this.mAbortException = abortException;
+                mState = ChannelState.ABORTED;
             }
 
             mRunner.run(mExecution.abort(), 0, TimeUnit.MILLISECONDS);

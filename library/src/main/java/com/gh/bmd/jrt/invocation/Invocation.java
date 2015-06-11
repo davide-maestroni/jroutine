@@ -25,7 +25,8 @@ import javax.annotation.Nullable;
  * <pre>
  *     <code>
  *
- *                   |      -------------------------------
+ *                   |     |
+ *                   |     |-------------------------------
  *                   V     |                               |
  *            ----------------                             |
  *        --->|onInitialize()|-----------                  |
@@ -70,7 +71,8 @@ import javax.annotation.Nullable;
  * needed to prepare the invocation object to be reused. When the method is not called or does not
  * complete successfully, the invocation object is discarded.<br/>
  * The <b><code>onDestroy()</code></b> method is meant to indicate that the invocation object is no
- * longer needed, so any associated resource can be safely released.
+ * longer needed, so any associated resource can be safely released. Note that this method may never
+ * get called if the routine is automatically garbage collected.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
  * {@link com.gh.bmd.jrt.channel.RoutineException}, will be wrapped as the cause of an

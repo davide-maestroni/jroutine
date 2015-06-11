@@ -354,13 +354,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Aborts immediately the execution.
      *
-     * @param throwable the reason of the abortion.
+     * @param reason the reason of the abortion.
      * @see com.gh.bmd.jrt.channel.Channel#abort(Throwable)
      */
-    void abortImmediately(@Nullable final Throwable throwable) {
+    void abortImmediately(@Nullable final Throwable reason) {
 
-        final Throwable abortException = (throwable instanceof RoutineException) ? throwable
-                : new InvocationException(throwable);
+        final Throwable abortException =
+                (reason instanceof RoutineException) ? reason : new InvocationException(reason);
         abort(abortException, true);
     }
 
@@ -460,18 +460,18 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return outputChannel;
     }
 
-    private boolean abort(@Nullable final Throwable throwable, final boolean isImmediate) {
+    private boolean abort(@Nullable final Throwable reason, final boolean isImmediate) {
 
         final TimeDuration delay;
         final Throwable abortException =
-                (isImmediate || (throwable instanceof RoutineException)) ? throwable
-                        : new AbortException(throwable);
+                (isImmediate || (reason instanceof RoutineException)) ? reason
+                        : new AbortException(reason);
 
         synchronized (mMutex) {
 
             if (isResultComplete()) {
 
-                mLogger.dbg(throwable, "avoiding aborting since channel is closed");
+                mLogger.dbg(reason, "avoiding aborting since channel is closed");
                 return false;
             }
 
@@ -479,7 +479,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (delay.isZero()) {
 
-                mLogger.dbg(throwable, "aborting channel");
+                mLogger.dbg(reason, "aborting channel");
                 mOutputQueue.clear();
                 mIsException = true;
                 mAbortException = abortException;
@@ -787,9 +787,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (mIsException) {
 
-            final Throwable throwable = mAbortException;
-            mLogger.dbg(throwable, "abort exception");
-            throw RoutineExceptionWrapper.wrap(throwable).raise();
+            final Throwable abortException = mAbortException;
+            mLogger.dbg(abortException, "abort exception");
+            throw RoutineExceptionWrapper.wrap(abortException).raise();
         }
 
         if (!isResultOpen()) {
@@ -1461,9 +1461,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (mIsException) {
 
-                final Throwable throwable = mAbortException;
-                mSubLogger.dbg(throwable, "consumer abort exception");
-                throw RoutineExceptionWrapper.wrap(throwable).raise();
+                final Throwable abortException = mAbortException;
+                mSubLogger.dbg(abortException, "consumer abort exception");
+                throw RoutineExceptionWrapper.wrap(abortException).raise();
             }
 
             if (isResultComplete()) {
@@ -1479,38 +1479,38 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     private class DelayedAbortExecution implements Execution {
 
-        private final Throwable mThrowable;
+        private final Throwable mAbortException;
 
         /**
          * Constructor.
          *
-         * @param throwable the reason of the abortion.
+         * @param reason the reason of the abortion.
          */
-        private DelayedAbortExecution(@Nullable final Throwable throwable) {
+        private DelayedAbortExecution(@Nullable final Throwable reason) {
 
-            mThrowable = throwable;
+            mAbortException = reason;
         }
 
         public void run() {
 
-            final Throwable throwable = mThrowable;
+            final Throwable abortException = mAbortException;
 
             synchronized (mMutex) {
 
                 if (!isOutputOpen()) {
 
-                    mLogger.dbg(throwable, "avoiding aborting since channel is closed");
+                    mLogger.dbg(abortException, "avoiding aborting since channel is closed");
                     return;
                 }
 
-                mLogger.dbg(throwable, "aborting channel");
+                mLogger.dbg(abortException, "aborting channel");
                 mOutputQueue.clear();
                 mIsException = true;
-                mAbortException = throwable;
+                DefaultResultChannel.this.mAbortException = abortException;
                 mState = ChannelState.EXCEPTION;
             }
 
-            mHandler.onAbort(throwable, 0, TimeUnit.MILLISECONDS);
+            mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
         }
     }
 

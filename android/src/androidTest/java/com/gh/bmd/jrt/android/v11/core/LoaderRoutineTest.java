@@ -369,7 +369,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            channel.result().next();
+            channel.result().eventually().next();
 
         } catch (final AbortException e) {
 
@@ -1032,7 +1032,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            channel.result().next();
+            channel.result().eventually().next();
 
         } catch (final AbortException e) {
 

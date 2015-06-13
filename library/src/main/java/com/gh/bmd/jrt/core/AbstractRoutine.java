@@ -297,9 +297,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %s", type);
         final Runner runner = (type == InvocationType.ASYNC) ? mAsyncRunner : mSyncRunner;
-        return new DefaultInvocationChannel<INPUT, OUTPUT>(mConfiguration,
-                                                           getInvocationManager(type), runner,
-                                                           logger);
+        return new DefaultInvocationChannel2<INPUT, OUTPUT>(mConfiguration,
+                                                            getInvocationManager(type), runner,
+                                                            logger);
     }
 
     /**

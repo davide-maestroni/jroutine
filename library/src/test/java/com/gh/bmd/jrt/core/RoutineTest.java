@@ -1131,10 +1131,10 @@ public class RoutineTest {
 
         try {
 
-            final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(),
-                                                     Runners.sequentialRunner(), logger);
+            final DefaultResultChannel2<Object> channel =
+                    new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                                      new TestAbortHandler(),
+                                                      Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
 
@@ -1146,10 +1146,10 @@ public class RoutineTest {
 
         try {
 
-            final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(),
-                                                     Runners.sequentialRunner(), logger);
+            final DefaultResultChannel2<Object> channel =
+                    new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                                      new TestAbortHandler(),
+                                                      Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(), null, channel,
                                                  logger);
@@ -1173,10 +1173,10 @@ public class RoutineTest {
 
         try {
 
-            final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(),
-                                                     Runners.sequentialRunner(), logger);
+            final DefaultResultChannel2<Object> channel =
+                    new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                                      new TestAbortHandler(),
+                                                      Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(),
                                                  new TestInputIterator(), channel, null);
@@ -1376,6 +1376,121 @@ public class RoutineTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testInvocationChannelError() {
+
+        final Logger logger = Logger.newLogger(new NullLog(), LogLevel.DEBUG, this);
+
+        try {
+
+            new DefaultInvocationChannel2<Object, Object>(
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, null, Runners.sharedRunner(),
+                    logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultInvocationChannel2<Object, Object>(
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
+                    null, logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultInvocationChannel2<Object, Object>(
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
+                    Runners.sharedRunner(), null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultInvocationChannel2<Object, Object>(null, new TestInvocationManager(),
+                                                          Runners.sharedRunner(), logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final DefaultInvocationChannel2<Object, Object> channel =
+                    new DefaultInvocationChannel2<Object, Object>(
+                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            new TestInvocationManager(), Runners.sharedRunner(), logger);
+
+            channel.result();
+            channel.pass("test");
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            final DefaultInvocationChannel2<Object, Object> channel =
+                    new DefaultInvocationChannel2<Object, Object>(
+                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            new TestInvocationManager(), Runners.sharedRunner(), logger);
+
+            channel.after(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final DefaultInvocationChannel2<Object, Object> channel =
+                    new DefaultInvocationChannel2<Object, Object>(
+                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            new TestInvocationManager(), Runners.sharedRunner(), logger);
+
+            channel.after(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final DefaultInvocationChannel2<Object, Object> channel =
+                    new DefaultInvocationChannel2<Object, Object>(
+                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            new TestInvocationManager(), Runners.sharedRunner(), logger);
+
+            channel.after(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testInvocationLifecycle() throws InterruptedException {
 
         final OutputChannel<String> outputChannel =
@@ -1520,121 +1635,6 @@ public class RoutineTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testParameterChannelError() {
-
-        final Logger logger = Logger.newLogger(new NullLog(), LogLevel.DEBUG, this);
-
-        try {
-
-            new DefaultInvocationChannel<Object, Object>(
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, null, Runners.sharedRunner(),
-                    logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new DefaultInvocationChannel<Object, Object>(
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
-                    null, logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new DefaultInvocationChannel<Object, Object>(
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
-                    Runners.sharedRunner(), null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new DefaultInvocationChannel<Object, Object>(null, new TestInvocationManager(),
-                                                         Runners.sharedRunner(), logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final DefaultInvocationChannel<Object, Object> channel =
-                    new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
-                            new TestInvocationManager(), Runners.sharedRunner(), logger);
-
-            channel.result();
-            channel.pass("test");
-
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        }
-
-        try {
-
-            final DefaultInvocationChannel<Object, Object> channel =
-                    new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
-                            new TestInvocationManager(), Runners.sharedRunner(), logger);
-
-            channel.after(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final DefaultInvocationChannel<Object, Object> channel =
-                    new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
-                            new TestInvocationManager(), Runners.sharedRunner(), logger);
-
-            channel.after(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final DefaultInvocationChannel<Object, Object> channel =
-                    new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
-                            new TestInvocationManager(), Runners.sharedRunner(), logger);
-
-            channel.after(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
     public void testPartialOut() {
 
         final TemplateInvocation<String, String> invocation =
@@ -1662,8 +1662,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION, null,
-                                             Runners.sharedRunner(), logger);
+            new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION, null,
+                                              Runners.sharedRunner(), logger);
 
             fail();
 
@@ -1673,8 +1673,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), null, logger);
+            new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                              new TestAbortHandler(), null, logger);
 
             fail();
 
@@ -1684,8 +1684,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), Runners.sharedRunner(), null);
+            new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                              new TestAbortHandler(), Runners.sharedRunner(), null);
 
             fail();
 
@@ -1695,9 +1695,9 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
-                    .after(null);
+            new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                              new TestAbortHandler(), Runners.sharedRunner(),
+                                              logger).after(null);
 
             fail();
 
@@ -1707,9 +1707,9 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
-                    .after(0, null);
+            new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                              new TestAbortHandler(), Runners.sharedRunner(),
+                                              logger).after(0, null);
 
             fail();
 
@@ -1719,10 +1719,10 @@ public class RoutineTest {
 
         try {
 
-            final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(), Runners.sharedRunner(),
-                                                     logger);
+            final DefaultResultChannel2<Object> channel =
+                    new DefaultResultChannel2<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                                      new TestAbortHandler(),
+                                                      Runners.sharedRunner(), logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
 

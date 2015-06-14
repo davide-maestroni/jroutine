@@ -55,8 +55,8 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
 
         final Logger logger = configuration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
-        final DefaultResultChannel<DATA> inputChannel =
-                new DefaultResultChannel<DATA>(configuration, abortHandler,
+        final DefaultResultChannel2<DATA> inputChannel =
+                new DefaultResultChannel2<DATA>(configuration, abortHandler,
                                                configuration.getAsyncRunnerOr(
                                                        Runners.sharedRunner()), logger);
         abortHandler.setChannel(inputChannel);
@@ -146,7 +146,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
      */
     private static class ChannelAbortHandler implements AbortHandler {
 
-        private DefaultResultChannel<?> mChannel;
+        private DefaultResultChannel2<?> mChannel;
 
         public void onAbort(@Nullable final Throwable reason, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
@@ -154,7 +154,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
             mChannel.close(reason);
         }
 
-        private void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
+        private void setChannel(@Nonnull final DefaultResultChannel2<?> channel) {
 
             mChannel = channel;
         }
@@ -167,14 +167,14 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
      */
     private static class DefaultTransportInput<INPUT> implements TransportInput<INPUT> {
 
-        private final DefaultResultChannel<INPUT> mChannel;
+        private final DefaultResultChannel2<INPUT> mChannel;
 
         /**
          * Constructor.
          *
          * @param wrapped the wrapped result channel.
          */
-        private DefaultTransportInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
+        private DefaultTransportInput(@Nonnull final DefaultResultChannel2<INPUT> wrapped) {
 
             mChannel = wrapped;
         }

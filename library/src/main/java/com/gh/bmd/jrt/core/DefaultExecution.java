@@ -41,7 +41,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
     private final Object mMutex = new Object();
 
-    private final DefaultResultChannel<OUTPUT> mResultChannel;
+    private final DefaultResultChannel2<OUTPUT> mResultChannel;
 
     private AbortExecution mAbortExecution;
 
@@ -58,7 +58,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
     @SuppressWarnings("ConstantConditions")
     DefaultExecution(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
             @Nonnull final InputIterator<INPUT> inputs,
-            @Nonnull final DefaultResultChannel<OUTPUT> result, @Nonnull final Logger logger) {
+            @Nonnull final DefaultResultChannel2<OUTPUT> result, @Nonnull final Logger logger) {
 
         if (manager == null) {
 
@@ -106,7 +106,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             final InputIterator<INPUT> inputIterator = mInputIterator;
             final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
-            final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+            final DefaultResultChannel2<OUTPUT> resultChannel = mResultChannel;
             Invocation<INPUT, OUTPUT> invocation = null;
 
             try {
@@ -266,7 +266,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                 }
 
                 final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
-                final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+                final DefaultResultChannel2<OUTPUT> resultChannel = mResultChannel;
                 final Throwable exception = inputIterator.getAbortException();
                 mLogger.dbg(exception, "aborting invocation");
 

@@ -70,7 +70,7 @@ class DefaultInvocationChannel2<INPUT, OUTPUT> implements InvocationChannel<INPU
 
     private final Object mMutex = new Object();
 
-    private final DefaultResultChannel<OUTPUT> mResultChanel;
+    private final DefaultResultChannel2<OUTPUT> mResultChanel;
 
     private final Runner mRunner;
 
@@ -127,7 +127,7 @@ class DefaultInvocationChannel2<INPUT, OUTPUT> implements InvocationChannel<INPU
                 return (mInputCount <= maxInputSize);
             }
         };
-        mResultChanel = new DefaultResultChannel<OUTPUT>(configuration, new AbortHandler() {
+        mResultChanel = new DefaultResultChannel2<OUTPUT>(configuration, new AbortHandler() {
 
             public void onAbort(@Nullable final Throwable reason, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
@@ -1362,6 +1362,7 @@ class DefaultInvocationChannel2<INPUT, OUTPUT> implements InvocationChannel<INPU
         @Override
         public Execution onError(@Nullable final Throwable error, @Nonnull final Logger logger) {
 
+            logger.wrn("avoiding aborting consumer since channel is closed");
             return null;
         }
 

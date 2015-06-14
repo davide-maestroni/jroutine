@@ -167,7 +167,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             }
         }, runner, logger);
         mExecution = new DefaultExecution<INPUT, OUTPUT>(manager, new DefaultInputIterator(),
-                                                         mResultChanel, logger);
+                                                         null, logger);
     }
 
     public boolean abort() {

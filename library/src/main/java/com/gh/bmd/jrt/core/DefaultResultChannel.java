@@ -676,6 +676,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private class AbortedDoneChannelState extends AbortedChannelState {
 
         @Override
+        boolean isPendingOutput() {
+
+            return true;
+        }
+
+        @Override
         boolean isDone() {
 
             return true;

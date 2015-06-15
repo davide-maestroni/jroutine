@@ -393,13 +393,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
      */
     private class AbortedChannelState extends ExceptionChannelState {
 
-        @Nullable
-        @Override
-        Execution onResult() {
-
-            return null;
-        }
-
         @Nonnull
         @Override
         OutputChannel<OUTPUT> getOutputChannel() {
@@ -455,7 +448,9 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             synchronized (mMutex) {
 
                 abortException = mAbortException;
-                channels = mState.onChannelsAbort(abortException);
+                mLogger.dbg(abortException, "aborting bound channels [%d]", mBoundChannels.size());
+                channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
+                mBoundChannels.clear();
             }
 
             for (final OutputChannel<?> channel : channels) {
@@ -752,18 +747,11 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             throw exception();
         }
 
-        @Nullable
-        @Override
-        Execution onResult() {
-
-            mState = new AbortedChannelState();
-            return null;
-        }
-
         @Nonnull
         @Override
         OutputChannel<OUTPUT> getOutputChannel() {
 
+            mState = new AbortedChannelState();
             final OutputChannel<OUTPUT> outputChannel = mResultChanel.getOutput();
             outputChannel.abort(mAbortException);
             return outputChannel;
@@ -810,7 +798,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         Execution delayedAbortInvocation(@Nullable final Throwable reason) {
 
             mSubLogger.dbg(reason, "aborting channel");
-            DefaultInvocationChannel.this.mAbortException = reason;
+            mAbortException = reason;
             mState = new AbortedChannelState();
             return mExecution.abort();
         }
@@ -870,22 +858,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         }
 
         /**
-         * Called when the bound channels are aborted.
-         *
-         * @param abortException the abort exception.
-         * @return the list of channels to abort with the specified exception.
-         */
-        @Nonnull
-        List<OutputChannel<?>> onChannelsAbort(@Nonnull final Throwable abortException) {
-
-            mSubLogger.dbg(abortException, "aborting bound channels [%d]", mBoundChannels.size());
-            final ArrayList<OutputChannel<?>> channels =
-                    new ArrayList<OutputChannel<?>>(mBoundChannels);
-            mBoundChannels.clear();
-            return channels;
-        }
-
-        /**
          * Called when the feeding consumer completes.
          *
          * @param queue the input queue.
@@ -896,18 +868,18 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             mSubLogger.dbg("closing consumer");
             queue.close();
-            final boolean needsExecution = !mIsPendingExecution && !mIsConsuming;
 
-            if (needsExecution) {
+            if (!mIsPendingExecution && !mIsConsuming) {
 
                 mIsPendingExecution = true;
+                return mExecution;
 
             } else {
 
                 --mPendingExecutionCount;
             }
 
-            return (needsExecution) ? mExecution : null;
+            return null;
         }
 
         /**
@@ -937,50 +909,32 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         Execution onConsumerOutput(final INPUT input, @Nonnull final TimeDuration delay,
                 @Nonnull final NestedQueue<INPUT> queue) {
 
-            final NestedQueue<INPUT> inputQueue;
-            boolean needsExecution = false;
+            final Execution execution;
 
             if (delay.isZero()) {
 
-                inputQueue = queue;
                 queue.add(input);
 
-            } else {
-
-                inputQueue = queue.addNested();
-            }
-
-            mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
-            addInputs(1);
-
-            if (delay.isZero()) {
-
-                needsExecution = !mIsPendingExecution;
-
-                if (needsExecution) {
+                if (!mIsPendingExecution) {
 
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
+                    execution = mExecution;
+
+                } else {
+
+                    execution = null;
                 }
 
             } else {
 
                 ++mPendingExecutionCount;
+                execution = new DelayedInputExecution(queue.addNested(), input);
             }
 
-            if (delay.isZero()) {
-
-                if (needsExecution) {
-
-                    return mExecution;
-                }
-
-            } else {
-
-                return new DelayedInputExecution(inputQueue, input);
-            }
-
-            return null;
+            mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
+            addInputs(1);
+            return execution;
         }
 
         /**
@@ -1008,15 +962,15 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             mSubLogger.dbg("closing input channel");
             mState = new OutputChannelState();
-            final boolean needsExecution = !mIsPendingExecution && !mIsConsuming;
 
-            if (needsExecution) {
+            if (!mIsPendingExecution && !mIsConsuming) {
 
                 ++mPendingExecutionCount;
                 mIsPendingExecution = true;
+                return mExecution;
             }
 
-            return (needsExecution) ? mExecution : null;
+            return null;
         }
 
         /**
@@ -1055,14 +1009,13 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                 return null;
             }
 
-            ArrayList<INPUT> list = null;
-            final NestedQueue<INPUT> inputQueue;
+            final Execution execution;
             final TimeDuration delay = mInputDelay;
             int count = 0;
 
             if (delay.isZero()) {
 
-                inputQueue = mInputQueue;
+                final NestedQueue<INPUT> inputQueue = mInputQueue;
 
                 for (final INPUT input : inputs) {
 
@@ -1070,10 +1023,20 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                     ++count;
                 }
 
+                if (!mIsPendingExecution) {
+
+                    ++mPendingExecutionCount;
+                    mIsPendingExecution = true;
+                    execution = mExecution;
+
+                } else {
+
+                    execution = null;
+                }
+
             } else {
 
-                inputQueue = mInputQueue.addNested();
-                list = new ArrayList<INPUT>();
+                final ArrayList<INPUT> list = new ArrayList<INPUT>();
 
                 for (final INPUT input : inputs) {
 
@@ -1081,40 +1044,13 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                 }
 
                 count = list.size();
+                ++mPendingExecutionCount;
+                execution = new DelayedListInputExecution(mInputQueue.addNested(), list);
             }
 
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, count, inputs, delay);
-            addInputs(count);
-            boolean needsExecution = false;
-
-            if (delay.isZero()) {
-
-                needsExecution = !mIsPendingExecution;
-
-                if (needsExecution) {
-
-                    ++mPendingExecutionCount;
-                    mIsPendingExecution = true;
-                }
-
-            } else {
-
-                ++mPendingExecutionCount;
-            }
-
-            if (delay.isZero()) {
-
-                if (needsExecution) {
-
-                    return mExecution;
-                }
-
-            } else {
-
-                return new DelayedListInputExecution(inputQueue, list);
-            }
-
-            return null;
+            addInputs(count); //TODO: what if exception???
+            return execution;
         }
 
         /**
@@ -1126,51 +1062,33 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Nullable
         Execution pass(@Nullable final INPUT input) {
 
-            final NestedQueue<INPUT> inputQueue;
+            final Execution execution;
             final TimeDuration delay = mInputDelay;
 
             if (delay.isZero()) {
 
-                inputQueue = mInputQueue;
-                inputQueue.add(input);
+                mInputQueue.add(input);
 
-            } else {
-
-                inputQueue = mInputQueue.addNested();
-            }
-
-            mSubLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
-            addInputs(1);
-            boolean needsExecution = false;
-
-            if (delay.isZero()) {
-
-                needsExecution = !mIsPendingExecution;
-
-                if (needsExecution) {
+                if (!mIsPendingExecution) {
 
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
+                    execution = mExecution;
+
+                } else {
+
+                    execution = null;
                 }
 
             } else {
 
                 ++mPendingExecutionCount;
+                execution = new DelayedInputExecution(mInputQueue.addNested(), input);
             }
 
-            if (delay.isZero()) {
-
-                if (needsExecution) {
-
-                    return mExecution;
-                }
-
-            } else {
-
-                return new DelayedInputExecution(inputQueue, input);
-            }
-
-            return null;
+            mSubLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
+            addInputs(1);
+            return execution;
         }
 
         /**
@@ -1365,6 +1283,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Override
         public boolean onConsumeComplete() {
 
+            mIsConsuming = false;
             return false;
         }
 

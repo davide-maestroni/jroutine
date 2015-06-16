@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.AbortException;
+import com.gh.bmd.jrt.channel.DeadlockException;
 import com.gh.bmd.jrt.channel.InputDeadlockException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -316,20 +317,20 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         return result;
     }
 
-    private void addInputs(final int count) {
-
-        mInputCount += count;
+    private void waitInputs(final int count) {
 
         try {
 
             if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
 
+                mInputCount -= count;
                 throw new InputDeadlockException(
                         "deadlock while waiting for room in the input channel");
             }
 
         } catch (final InterruptedException e) {
 
+            mInputCount -= count;
             throw new InvocationInterruptedException(e);
         }
     }
@@ -844,6 +845,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Nonnull
         OutputChannel<OUTPUT> getOutputChannel() {
 
+            mState = new OutputChannelState();
             return mResultChanel.getOutput();
         }
 
@@ -909,7 +911,26 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         Execution onConsumerOutput(final INPUT input, @Nonnull final TimeDuration delay,
                 @Nonnull final NestedQueue<INPUT> queue) {
 
-            final Execution execution;
+            mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
+            ++mInputCount;
+
+            if (!mHasInputs.isTrue()) {
+
+                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
+                        && mRunner.isRunnerThread()) {
+
+                    --mInputCount;
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitInputs(1);
+
+                if (mState != this) {
+
+                    --mInputCount;
+                    return mState.onConsumerOutput(input, delay, queue);
+                }
+            }
 
             if (delay.isZero()) {
 
@@ -919,22 +940,14 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
-                    execution = mExecution;
-
-                } else {
-
-                    execution = null;
+                    return mExecution;
                 }
 
-            } else {
-
-                ++mPendingExecutionCount;
-                execution = new DelayedInputExecution(queue.addNested(), input);
+                return null;
             }
 
-            mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
-            addInputs(1);
-            return execution;
+            ++mPendingExecutionCount;
+            return new DelayedInputExecution(queue.addNested(), input);
         }
 
         /**
@@ -961,7 +974,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         Execution onResult() {
 
             mSubLogger.dbg("closing input channel");
-            mState = new OutputChannelState();
 
             if (!mIsPendingExecution && !mIsConsuming) {
 
@@ -1009,48 +1021,52 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                 return null;
             }
 
-            final Execution execution;
+            final ArrayList<INPUT> list = new ArrayList<INPUT>();
+
+            for (final INPUT input : inputs) {
+
+                list.add(input);
+            }
+
+            final int size = list.size();
             final TimeDuration delay = mInputDelay;
-            int count = 0;
+            mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
+            mInputCount += size;
+
+            if (!mHasInputs.isTrue()) {
+
+                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
+                        && mRunner.isRunnerThread()) {
+
+                    mInputCount -= size;
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitInputs(size);
+
+                if (mState != this) {
+
+                    mInputCount -= size;
+                    return mState.pass(inputs);
+                }
+            }
 
             if (delay.isZero()) {
 
-                final NestedQueue<INPUT> inputQueue = mInputQueue;
-
-                for (final INPUT input : inputs) {
-
-                    inputQueue.add(input);
-                    ++count;
-                }
+                mInputQueue.addAll(list);
 
                 if (!mIsPendingExecution) {
 
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
-                    execution = mExecution;
-
-                } else {
-
-                    execution = null;
+                    return mExecution;
                 }
 
-            } else {
-
-                final ArrayList<INPUT> list = new ArrayList<INPUT>();
-
-                for (final INPUT input : inputs) {
-
-                    list.add(input);
-                }
-
-                count = list.size();
-                ++mPendingExecutionCount;
-                execution = new DelayedListInputExecution(mInputQueue.addNested(), list);
+                return null;
             }
 
-            mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, count, inputs, delay);
-            addInputs(count); //TODO: what if exception???
-            return execution;
+            ++mPendingExecutionCount;
+            return new DelayedListInputExecution(mInputQueue.addNested(), list);
         }
 
         /**
@@ -1062,8 +1078,27 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Nullable
         Execution pass(@Nullable final INPUT input) {
 
-            final Execution execution;
             final TimeDuration delay = mInputDelay;
+            mSubLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
+            ++mInputCount;
+
+            if (!mHasInputs.isTrue()) {
+
+                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
+                        && mRunner.isRunnerThread()) {
+
+                    --mInputCount;
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitInputs(1);
+
+                if (mState != this) {
+
+                    --mInputCount;
+                    return mState.pass(input);
+                }
+            }
 
             if (delay.isZero()) {
 
@@ -1073,22 +1108,14 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
-                    execution = mExecution;
-
-                } else {
-
-                    execution = null;
+                    return mExecution;
                 }
 
-            } else {
-
-                ++mPendingExecutionCount;
-                execution = new DelayedInputExecution(mInputQueue.addNested(), input);
+                return null;
             }
 
-            mSubLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
-            addInputs(1);
-            return execution;
+            ++mPendingExecutionCount;
+            return new DelayedInputExecution(mInputQueue.addNested(), input);
         }
 
         /**
@@ -1135,7 +1162,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             final int maxInput = mMaxInput;
             final int prevInputCount = mInputCount;
 
-            if ((--mInputCount < maxInput) && (prevInputCount >= maxInput)) {
+            if ((--mInputCount <= maxInput) && (prevInputCount > maxInput)) {
 
                 mMutex.notify();
             }

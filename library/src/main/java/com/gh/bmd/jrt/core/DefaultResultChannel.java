@@ -334,7 +334,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mAbortException = abortException;
             }
 
-            mState = new AbortedChannelState();
+            mState = new AbortChannelState();
             mMutex.notifyAll();
         }
 
@@ -388,24 +388,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return outputChannel;
     }
 
-    private void addOutputs(final int count) {
-
-        mOutputCount += count;
-
-        try {
-
-            if (!mOutputTimeout.waitTrue(mMutex, mHasOutputs)) {
-
-                throw new OutputDeadlockException(
-                        "deadlock while waiting for room in the output channel");
-            }
-
-        } catch (final InterruptedException e) {
-
-            throw new InvocationInterruptedException(e);
-        }
-    }
-
     private void closeConsumer(@Nonnull final OutputChannelState state,
             @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
@@ -415,7 +397,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             final OutputChannelState currentState = mState;
 
-            if (!currentState.isPendingOutput()) {
+            if (currentState.isReadyToComplete()) {
 
                 mState = currentState.toDoneState();
                 mMutex.notifyAll();
@@ -434,19 +416,19 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             final OutputChannelState state;
             final ArrayList<Object> outputs;
             final OutputConsumer<? super OUTPUT> consumer;
-            final boolean isPending;
+            final boolean isFinal;
 
             synchronized (mMutex) {
 
                 state = mState;
-                isPending = state.isPendingOutput();
+                isFinal = state.isReadyToComplete();
                 consumer = mOutputConsumer;
 
                 if (consumer == null) {
 
                     logger.dbg("avoiding flushing output since channel is not bound");
 
-                    if (!isPending) {
+                    if (isFinal) {
 
                         mState = state.toDoneState();
                     }
@@ -492,7 +474,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         }
                     }
 
-                    if (forceClose || !isPending) {
+                    if (forceClose || isFinal) {
 
                         closeConsumer(state, consumer);
                     }
@@ -511,7 +493,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         finalState = mState;
                         logger.wrn(t, "consumer exception (%s)", consumer);
 
-                        if (forceClose || !finalState.isPendingOutput()) {
+                        if (forceClose || finalState.isReadyToComplete()) {
 
                             isClose = true;
 
@@ -545,7 +527,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         final int maxOutput = mMaxOutput;
         final int prevOutputCount = mOutputCount;
 
-        if ((--mOutputCount < maxOutput) && (prevOutputCount >= maxOutput)) {
+        if ((--mOutputCount <= maxOutput) && (prevOutputCount > maxOutput)) {
 
             mMutex.notifyAll();
         }
@@ -625,6 +607,24 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
+    private void waitOutputs(final int count) {
+
+        try {
+
+            if (!mOutputTimeout.waitTrue(mMutex, mHasOutputs)) {
+
+                mOutputCount -= count;
+                throw new OutputDeadlockException(
+                        "deadlock while waiting for room in the output channel");
+            }
+
+        } catch (final InterruptedException e) {
+
+            mOutputCount -= count;
+            throw new InvocationInterruptedException(e);
+        }
+    }
+
     /**
      * Interface defining an abort handler.
      */
@@ -643,7 +643,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * The invocation has been aborted and the exception put into the output queue.
      */
-    private class AbortedChannelState extends ExceptionChannelState {
+    private class AbortChannelState extends ExceptionChannelState {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
@@ -659,9 +659,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        boolean isPendingOutput() {
+        boolean isReadyToComplete() {
 
-            return false;
+            return true;
         }
 
         @Override
@@ -673,12 +673,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * The invocation has completed with an abortion exception.
      */
-    private class AbortedDoneChannelState extends AbortedChannelState {
+    private class AbortedChannelState extends AbortChannelState {
 
         @Override
-        boolean isPendingOutput() {
+        boolean isReadyToComplete() {
 
-            return true;
+            return false;
         }
 
         @Override
@@ -1428,6 +1428,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
+        boolean isReadyToComplete() {
+
+            return false;
+        }
+
+        @Override
         boolean isOutputChannelOpen() {
 
             return !mOutputQueue.isEmpty();
@@ -1468,12 +1474,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             throw abortException();
         }
 
-        @Override
-        boolean isPendingOutput() {
-
-            return true;
-        }
-
         @Nullable
         @Override
         Execution onConsumerOutput(final OUTPUT output, @Nonnull final TimeDuration delay,
@@ -1496,6 +1496,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
+        }
+
+        @Override
+        boolean isReadyToComplete() {
+
+            return false;
         }
 
         @Nullable
@@ -1530,7 +1536,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         OutputChannelState toDoneState() {
 
-            return new AbortedDoneChannelState();
+            return new AbortedChannelState();
         }
     }
 
@@ -1590,12 +1596,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        boolean isPendingOutput() {
-
-            return false;
-        }
-
-        @Override
         boolean onConsumerError(@Nullable final Throwable error) {
 
             mSubLogger.dbg("avoiding aborting output since result channel is closed");
@@ -1608,6 +1608,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 @Nonnull final NestedQueue<Object> queue) {
 
             throw exception();
+        }
+
+        @Override
+        boolean isReadyToComplete() {
+
+            return true;
         }
     }
 
@@ -1810,13 +1816,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         /**
-         * Called to know if some output is still pending.
+         * Called to know if this state is ready to complete.
          *
-         * @return whether some output is pending.
+         * @return whether the state is ready to complete.
          */
-        boolean isPendingOutput() {
+        boolean isReadyToComplete() {
 
-            return true;
+            return false;
         }
 
         /**
@@ -1872,23 +1878,34 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         Execution onConsumerOutput(final OUTPUT output, @Nonnull final TimeDuration delay,
                 @Nonnull final NestedQueue<Object> queue) {
 
-            final Execution execution;
+            mSubLogger.dbg("consumer output [#%d+1]: %s [%s]", mOutputCount, output, delay);
+            ++mOutputCount;
+
+            if (!mHasOutputs.isTrue()) {
+
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+
+                    --mOutputCount;
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitOutputs(1);
+
+                if (mState != this) {
+
+                    --mOutputCount;
+                    return mState.onConsumerOutput(output, delay, queue);
+                }
+            }
 
             if (delay.isZero()) {
 
                 queue.add(output);
-                execution = null;
-
-            } else {
-
-                final NestedQueue<Object> outputQueue = queue.addNested();
-                ++mPendingOutputCount;
-                execution = new DelayedOutputExecution(outputQueue, output);
+                return null;
             }
 
-            mSubLogger.dbg("consumer output [#%d+1]: %s [%s]", mOutputCount, output, delay);
-            addOutputs(1);
-            return execution;
+            ++mPendingOutputCount;
+            return new DelayedOutputExecution(queue.addNested(), output);
         }
 
         /**
@@ -1927,41 +1944,44 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return null;
             }
 
-            final Execution execution;
+            final ArrayList<OUTPUT> list = new ArrayList<OUTPUT>();
+
+            for (final OUTPUT output : outputs) {
+
+                list.add(output);
+            }
+
+            final int size = list.size();
             final TimeDuration delay = mResultDelay;
-            int count = 0;
+            mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mOutputCount, size, outputs,
+                           delay);
+            mOutputCount += size;
+
+            if (!mHasOutputs.isTrue()) {
+
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+
+                    mOutputCount -= size;
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitOutputs(size);
+
+                if (mState != this) {
+
+                    mOutputCount -= size;
+                    return mState.pass(outputs);
+                }
+            }
 
             if (delay.isZero()) {
 
-                final NestedQueue<Object> outputQueue = mOutputQueue;
-
-                for (final OUTPUT output : outputs) {
-
-                    outputQueue.add(output);
-                    ++count;
-                }
-
-                execution = null;
-
-            } else {
-
-                final NestedQueue<Object> outputQueue = mOutputQueue.addNested();
-                final ArrayList<OUTPUT> list = new ArrayList<OUTPUT>();
-
-                for (final OUTPUT output : outputs) {
-
-                    list.add(output);
-                }
-
-                count = list.size();
-                ++mPendingOutputCount;
-                execution = new DelayedListOutputExecution(outputQueue, list);
+                mOutputQueue.addAll(list);
+                return null;
             }
 
-            mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mOutputCount, count, outputs,
-                           delay);
-            addOutputs(count);
-            return execution;
+            ++mPendingOutputCount;
+            return new DelayedListOutputExecution(mOutputQueue.addNested(), list);
         }
 
         /**
@@ -1973,24 +1993,35 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Nullable
         Execution pass(@Nullable final OUTPUT output) {
 
-            final Execution execution;
             final TimeDuration delay = mResultDelay;
+            mSubLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
+            ++mOutputCount;
+
+            if (!mHasOutputs.isTrue()) {
+
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+
+                    --mOutputCount;
+                    throw new DeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitOutputs(1);
+
+                if (mState != this) {
+
+                    --mOutputCount;
+                    return mState.pass(output);
+                }
+            }
 
             if (delay.isZero()) {
 
                 mOutputQueue.add(output);
-                execution = null;
-
-            } else {
-
-                final NestedQueue<Object> outputQueue = mOutputQueue.addNested();
-                ++mPendingOutputCount;
-                execution = new DelayedOutputExecution(outputQueue, output);
+                return null;
             }
 
-            mSubLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
-            addOutputs(1);
-            return execution;
+            ++mPendingOutputCount;
+            return new DelayedOutputExecution(mOutputQueue.addNested(), output);
         }
 
         /**
@@ -2008,7 +2039,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return null;
             }
 
-            return pass(Arrays.asList(outputs));
+            return pass(Arrays.asList(outputs)); //TODO: optimize??
         }
 
         /**

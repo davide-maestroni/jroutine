@@ -18,6 +18,8 @@ import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.io.File;
@@ -42,6 +44,8 @@ public class Downloader {
     private final HashSet<URI> mDownloadedSet = new HashSet<URI>();
 
     private final Routine<URI, Chunk> mReadConnection;
+
+    private final Runner mWriteRunner = Runners.poolRunner(1);
 
     /**
      * Constructor.
@@ -148,8 +152,11 @@ public class Downloader {
             // routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
-                    JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile))
-                            .withInvocation()
+                    JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).withInvocation()
+                            // since we want to limit the number of allocated chunks, we have to
+                            // make the file writing happen in a dedicated runner, so that waiting
+                            // for available space becomes allowed
+                            .withAsyncRunner(mWriteRunner)
                             .withInputMaxSize(8)
                             .withInputTimeout(seconds(30))
                             .set()

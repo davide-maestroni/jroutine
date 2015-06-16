@@ -1137,6 +1137,7 @@ public class ProxyRoutineTest {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class Pass {
 
         public String pass(final String s) {

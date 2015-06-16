@@ -2039,7 +2039,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return null;
             }
 
-            return pass(Arrays.asList(outputs)); //TODO: optimize??
+            return pass(Arrays.asList(outputs));
         }
 
         /**

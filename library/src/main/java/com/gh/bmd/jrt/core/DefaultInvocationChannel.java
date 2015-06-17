@@ -1029,6 +1029,13 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             }
 
             final int size = list.size();
+
+            if (size > mMaxInput) {
+
+                throw new DeadlockException(
+                        "inputs exceed maximum channel size [" + size + "/" + mMaxInput + "]");
+            }
+
             final TimeDuration delay = mInputDelay;
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
             mInputCount += size;

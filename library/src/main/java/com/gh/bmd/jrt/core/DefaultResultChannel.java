@@ -1952,6 +1952,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             final int size = list.size();
+
+            if (size > mMaxOutput) {
+
+                throw new DeadlockException(
+                        "outputs exceed maximum channel size [" + size + "/" + mMaxOutput + "]");
+            }
+
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mOutputCount, size, outputs,
                            delay);

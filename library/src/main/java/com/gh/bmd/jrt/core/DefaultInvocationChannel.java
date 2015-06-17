@@ -96,7 +96,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
      * @param manager       the invocation manager.
      * @param runner        the runner instance.
      * @param logger        the logger instance.
-     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     DefaultInvocationChannel(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final InvocationManager<INPUT, OUTPUT> manager, @Nonnull final Runner runner,
@@ -106,21 +105,9 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         mRunner = runner;
         mMaxInput = configuration.getInputMaxSizeOr(Integer.MAX_VALUE);
         mInputTimeout = configuration.getInputTimeoutOr(ZERO);
-
-        if (mInputTimeout == null) {
-
-            throw new NullPointerException("the input timeout must not be null");
-        }
-
-        final int maxInputSize = mMaxInput;
-
-        if (maxInputSize < 1) {
-
-            throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
-        }
-
         mInputQueue = (configuration.getInputOrderTypeOr(OrderType.NONE) == OrderType.NONE)
                 ? new SimpleNestedQueue<INPUT>() : new OrderedNestedQueue<INPUT>();
+        final int maxInputSize = mMaxInput;
         mHasInputs = new Check() {
 
             public boolean isTrue() {

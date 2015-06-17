@@ -1304,7 +1304,6 @@ public class RoutineTest {
             final FilterInvocation<Object, Object> anonymousFactory =
                     new FilterInvocation<Object, Object>() {
 
-                        @Override
                         public void onInput(final Object o,
                                 @Nonnull final ResultChannel<Object> result) {
 
@@ -1356,7 +1355,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testInputTimeout() {
+    public void testInputDeadlock() {
 
         try {
 
@@ -1366,6 +1365,29 @@ public class RoutineTest {
                     .withInputTimeout(TimeDuration.ZERO)
                     .set()
                     .callAsync("test1", "test2")
+                    .all();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testInputTimeout() {
+
+        try {
+
+            JRoutine.on(new SlowFilterInvocation<String>(millis(100)))
+                    .withInvocation()
+                    .withInputMaxSize(1)
+                    .withInputTimeout(TimeDuration.ZERO)
+                    .set()
+                    .invokeAsync()
+                    .pass("test1")
+                    .pass("test2")
+                    .result()
                     .all();
 
             fail();
@@ -1605,7 +1627,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testOutputTimeout() {
+    public void testOutputDeadlock() {
 
         final Routine<String, String> routine =
                 JRoutine.on(factoryOf(new FunctionInvocation<String, String>() {
@@ -1626,6 +1648,31 @@ public class RoutineTest {
         try {
 
             routine.callAsync("test1", "test2").eventually().all();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testOutputTimeout() {
+
+        final Routine<String, String> routine =
+                JRoutine.on(new SlowFilterInvocation<String>(millis(100)))
+                        .withInvocation()
+                        .withOutputMaxSize(1)
+                        .withOutputTimeout(TimeDuration.ZERO)
+                        .set()
+                        .buildRoutine();
+
+        try {
+
+            final OutputChannel<String> outputChannel =
+                    routine.invokeAsync().pass("test1").pass("test2").result().eventually();
+            outputChannel.checkComplete();
+            outputChannel.all();
 
             fail();
 
@@ -3181,7 +3228,6 @@ public class RoutineTest {
 
     private static class SleepInvocation extends ProcedureInvocation<Void> {
 
-        @Override
         public void onResult(@Nonnull final ResultChannel<Void> result) {
 
             try {
@@ -3192,6 +3238,30 @@ public class RoutineTest {
 
                 throw new InvocationInterruptedException(e);
             }
+        }
+    }
+
+    private static class SlowFilterInvocation<DATA> extends FilterInvocation<DATA, DATA> {
+
+        private final TimeDuration mDelay;
+
+        private SlowFilterInvocation(@Nonnull final TimeDuration delay) {
+
+            mDelay = delay;
+        }
+
+        public void onInput(final DATA data, @Nonnull final ResultChannel<DATA> result) {
+
+            try {
+
+                mDelay.sleepAtLeast();
+
+            } catch (final InterruptedException e) {
+
+                throw new InvocationInterruptedException(e);
+            }
+
+            result.pass(data);
         }
     }
 
@@ -3433,13 +3503,11 @@ public class RoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        @Override
         public boolean isRunnerThread() {
 
             return false;
         }
 
-        @Override
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 

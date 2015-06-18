@@ -15,14 +15,6 @@ package com.gh.bmd.jrt.android.runner;
 
 import android.os.Looper;
 
-import com.gh.bmd.jrt.runner.Execution;
-import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.runner.Runners;
-
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-
 /**
  * Implementation of a runner employing the main UI thread looper.<br/>
  * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will be
@@ -32,41 +24,11 @@ import javax.annotation.Nonnull;
  */
 public class MainRunner extends LooperRunner {
 
-    private static final SameThreadRunner sSameThreadRunner = new SameThreadRunner();
-
     /**
      * Constructor.
      */
     public MainRunner() {
 
-        super(Looper.getMainLooper(), sSameThreadRunner);
-    }
-
-    /**
-     * Runner handling execution started from the main thread.
-     */
-    private static class SameThreadRunner implements Runner {
-
-        private final Runner mMain = new LooperRunner(Looper.getMainLooper(), null);
-
-        private final Runner mQueued = Runners.queuedRunner();
-
-        public boolean isRunnerThread() {
-
-            return mMain.isRunnerThread();
-        }
-
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
-
-            if (delay == 0) {
-
-                mQueued.run(execution, delay, timeUnit);
-
-            } else {
-
-                mMain.run(execution, delay, timeUnit);
-            }
-        }
+        super(Looper.getMainLooper());
     }
 }

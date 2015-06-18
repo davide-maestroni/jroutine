@@ -89,11 +89,11 @@ public class LoaderObjectRoutineFragmentTest
                                                                           R.id.test_fragment);
         final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
-                                                        .withInvocation()
+                                                        .invocations()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
-                                                        .withMaxInvocations(1)
-                                                        .withCoreInvocations(1)
+                                                        .withMaxInstances(1)
+                                                        .withCoreInstances(1)
                                                         .withAvailInstanceTimeout(1, timeUnit)
                                                         .withReadTimeoutAction(
                                                                 TimeoutActionType.EXIT)
@@ -134,7 +134,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final SumItf sumAsync = JRoutine.onFragment(fragment, Sum.class)
-                                        .withInvocation()
+                                        .invocations()
                                         .withReadTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
@@ -171,7 +171,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final CountItf countAsync = JRoutine.onFragment(fragment, Count.class)
-                                            .withInvocation()
+                                            .invocations()
                                             .withReadTimeout(timeout)
                                             .set()
                                             .buildProxy(CountItf.class);
@@ -249,20 +249,20 @@ public class LoaderObjectRoutineFragmentTest
                                                                .withLog(countLog)
                                                                .set();
         JRoutine.onFragment(fragment, TestClass.class)
-                .withInvocation()
+                .invocations()
                 .with(configuration)
                 .set()
-                .withProxy()
+                .proxies()
                 .withShareGroup("test")
                 .set()
                 .aliasMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         JRoutine.onFragment(fragment, Square.class)
-                .withInvocation()
+                .invocations()
                 .with(configuration)
                 .set()
-                .withProxy()
+                .proxies()
                 .withShareGroup("test")
                 .set()
                 .buildProxy(SquareItf.class)
@@ -487,7 +487,7 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestClass.class)
-                    .withInvocation()
+                    .invocations()
                     .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
@@ -502,7 +502,7 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestClass.class)
-                    .withInvocation()
+                    .invocations()
                     .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
@@ -517,7 +517,7 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestClass.class)
-                    .withInvocation()
+                    .invocations()
                     .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
@@ -614,14 +614,14 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine2 = JRoutine.onFragment(fragment, TestClass.class)
-                                                         .withInvocation()
+                                                         .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
-                                                         .withMaxInvocations(1)
+                                                         .withMaxInstances(1)
                                                          .withAvailInstanceTimeout(
                                                                  TimeDuration.ZERO)
                                                          .set()
-                                                         .withProxy()
+                                                         .proxies()
                                                          .withShareGroup("test")
                                                          .set()
                                                          .method(TestClass.class.getMethod(
@@ -642,7 +642,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 = JRoutine.onFragment(fragment, TestClass.class)
-                                                         .withInvocation()
+                                                         .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .set()
@@ -763,7 +763,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Itf itf = JRoutine.onFragment(fragment, Impl.class)
-                                .withInvocation()
+                                .invocations()
                                 .withReadTimeout(INFINITY)
                                 .set()
                                 .buildProxy(Itf.class);
@@ -1065,16 +1065,16 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
-                                                     .withInvocation()
+                                                     .invocations()
                                                      .withReadTimeout(seconds(10))
                                                      .set();
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.withProxy().withShareGroup("1").set().method("getOne").callAsync();
+                builder.proxies().withShareGroup("1").set().method("getOne").callAsync();
         OutputChannel<Object> getTwo =
-                builder.withProxy().withShareGroup("2").set().method("getTwo").callAsync();
+                builder.proxies().withShareGroup("2").set().method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1101,10 +1101,10 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withInvocation()
+                           .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withLoader()
+                           .loaders()
                            .withId(0)
                            .set()
                            .aliasMethod("test")
@@ -1114,10 +1114,10 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .withInvocation()
+                    .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withLoader()
+                    .loaders()
                     .withId(1)
                     .set()
                     .aliasMethod("test")
@@ -1131,10 +1131,10 @@ public class LoaderObjectRoutineFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withInvocation()
+                           .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withLoader()
+                           .loaders()
                            .withId(2)
                            .set()
                            .method("getInt")
@@ -1144,10 +1144,10 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .withInvocation()
+                    .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withLoader()
+                    .loaders()
                     .withId(3)
                     .set()
                     .method("getInt")
@@ -1161,10 +1161,10 @@ public class LoaderObjectRoutineFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withInvocation()
+                           .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withLoader()
+                           .loaders()
                            .withId(4)
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
@@ -1174,10 +1174,10 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .withInvocation()
+                    .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withLoader()
+                    .loaders()
                     .withId(5)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
@@ -1191,10 +1191,10 @@ public class LoaderObjectRoutineFragmentTest
         }
 
         assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
-                           .withInvocation()
+                           .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
-                           .withLoader()
+                           .loaders()
                            .withId(6)
                            .set()
                            .buildProxy(TestTimeoutItf.class)
@@ -1203,10 +1203,10 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             JRoutine.onFragment(fragment, TestTimeout.class)
-                    .withInvocation()
+                    .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
-                    .withLoader()
+                    .loaders()
                     .withId(7)
                     .set()
                     .buildProxy(TestTimeoutItf.class)

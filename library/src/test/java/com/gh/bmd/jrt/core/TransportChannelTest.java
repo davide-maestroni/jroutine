@@ -236,7 +236,7 @@ public class TransportChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final TransportChannel<String> transportChannel1 = JRoutine.transport()
-                                                                   .withInvocation()
+                                                                   .invocations()
                                                                    .withOutputOrder(
                                                                            OrderType.PASS_ORDER)
                                                                    .set()
@@ -283,10 +283,10 @@ public class TransportChannelTest {
 
         final CountLog countLog = new CountLog();
         JRoutine.transport()
-                .withInvocation()
+                .invocations()
                 .withSyncRunner(Runners.sequentialRunner())
-                .withMaxInvocations(3)
-                .withCoreInvocations(3)
+                .withMaxInstances(3)
+                .withCoreInstances(3)
                 .withAvailInstanceTimeout(seconds(1))
                 .withInputOrder(OrderType.NONE)
                 .withInputMaxSize(3)
@@ -447,7 +447,7 @@ public class TransportChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final TransportChannel<Object> channel = JRoutine.transport()
-                                                         .withInvocation()
+                                                         .invocations()
                                                          .withOutputOrder(OrderType.PASS_ORDER)
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withOutputMaxSize(1)
@@ -468,7 +468,7 @@ public class TransportChannelTest {
         assertThat(transportChannel1.output().afterMax(timeout).all()).containsOnly(23, -77L);
 
         final TransportChannel<Object> transportChannel2 = JRoutine.transport()
-                                                                   .withInvocation()
+                                                                   .invocations()
                                                                    .withOutputOrder(
                                                                            OrderType.PASS_ORDER)
                                                                    .set()
@@ -526,7 +526,7 @@ public class TransportChannelTest {
     public void testReadTimeout() {
 
         final TransportChannel<Object> channel1 = JRoutine.transport()
-                                                          .withInvocation()
+                                                          .invocations()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.EXIT)
@@ -540,7 +540,7 @@ public class TransportChannelTest {
     public void testReadTimeout2() {
 
         final TransportChannel<Object> channel2 = JRoutine.transport()
-                                                          .withInvocation()
+                                                          .invocations()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.ABORT)
@@ -562,7 +562,7 @@ public class TransportChannelTest {
     public void testReadTimeout3() {
 
         final TransportChannel<Object> channel3 = JRoutine.transport()
-                                                          .withInvocation()
+                                                          .invocations()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.DEADLOCK)

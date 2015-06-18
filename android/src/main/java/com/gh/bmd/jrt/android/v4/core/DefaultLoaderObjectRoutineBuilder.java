@@ -303,14 +303,21 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
-        return getBuilder(mContext, factory).withInvocation()
+        return getBuilder(mContext, factory).invocations()
                                             .with(invocationConfiguration)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
-                                            .withLoader()
+                                            .loaders()
                                             .with(loaderConfiguration)
                                             .set()
                                             .buildRoutine();
+    }
+
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
+            @Nonnull final Class<?>... parameterTypes) {
+
+        return method(findMethod(mTargetClass, name, parameterTypes));
     }
 
     @Nonnull
@@ -327,21 +334,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(configuration, method);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, method);
-        return getBuilder(mContext, factory).withInvocation()
+        return getBuilder(mContext, factory).invocations()
                                             .with(invocationConfiguration)
                                             .withInputOrder(OrderType.PASS_ORDER)
                                             .set()
-                                            .withLoader()
+                                            .loaders()
                                             .with(loaderConfiguration)
                                             .set()
                                             .buildRoutine();
-    }
-
-    @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
-            @Nonnull final Class<?>... parameterTypes) {
-
-        return method(findMethod(mTargetClass, name, parameterTypes));
     }
 
     @Nonnull
@@ -367,31 +367,24 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withInvocation() {
+    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public LoaderObjectRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> loaders() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
-        return this;
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
@@ -423,10 +416,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withLoader() {
+    @SuppressWarnings("ConstantConditions")
+    public LoaderObjectRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
+        if (configuration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     /**
@@ -513,7 +513,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mFactoryArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxy()
+                                   .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .aliasMethod(mBindingName);
@@ -636,7 +636,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
                 final Object target = getInstance(context, mTargetClass, mFactoryArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxy()
+                                   .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .method(mMethod);
@@ -882,12 +882,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     configurationWithAnnotations(mInvocationConfiguration, method);
             final LoaderConfiguration loaderConfiguration =
                     configurationWithAnnotations(mLoaderConfiguration, method);
-            final Routine<Object, Object> routine = routineBuilder.withInvocation()
+            final Routine<Object, Object> routine = routineBuilder.invocations()
                                                                   .with(invocationConfiguration)
                                                                   .withInputOrder(inputOrderType)
                                                                   .withOutputOrder(outputOrderType)
                                                                   .set()
-                                                                  .withLoader()
+                                                                  .loaders()
                                                                   .with(loaderConfiguration)
                                                                   .set()
                                                                   .buildRoutine();

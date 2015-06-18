@@ -39,6 +39,19 @@ class LooperRunner implements Runner {
     private final Thread mThread;
 
     /**
+     * Constructor.<br/>
+     * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
+     * will be performed synchronously, while the ones with a positive delay will be posted on the
+     * same thread.
+     *
+     * @param looper the looper to employ.
+     */
+    LooperRunner(@Nonnull final Looper looper) {
+
+        this(looper, new SameThreadRunner(looper));
+    }
+
+    /**
      * Constructor.
      *
      * @param looper           the looper to employ.
@@ -74,6 +87,39 @@ class LooperRunner implements Runner {
         } else {
 
             mHandler.post(execution);
+        }
+    }
+
+    /**
+     * Runner handling execution started from the main thread.
+     */
+    private static class SameThreadRunner implements Runner {
+
+        private final LooperRunner mLooperRunner;
+
+        private final Runner mQueuedRunner = Runners.queuedRunner();
+
+        private SameThreadRunner(@Nonnull final Looper looper) {
+
+            mLooperRunner = new LooperRunner(looper, null);
+        }
+
+        public boolean isRunnerThread() {
+
+            return mLooperRunner.isRunnerThread();
+        }
+
+        public void run(@Nonnull final Execution execution, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            if (delay == 0) {
+
+                mQueuedRunner.run(execution, delay, timeUnit);
+
+            } else {
+
+                mLooperRunner.internalRun(execution, delay, timeUnit);
+            }
         }
     }
 

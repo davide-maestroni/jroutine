@@ -96,17 +96,17 @@ public interface ServiceProxyRoutineBuilder
      * @return the invocation configuration builder.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withInvocation();
+    InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxy();
+    ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxies();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService();
+    ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> service();
 }

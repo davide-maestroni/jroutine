@@ -16,19 +16,18 @@ package com.gh.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no room in the input channel buffer became available before the
- * specific timeout elapsed.
+ * Exception indicating a forbidden wait in a runner thread.
  * <p/>
- * Created by davide-maestroni on 11/25/14.
+ * Created by davide on 18/06/15.
  */
-public class InputDeadlockException extends ChannelDeadlockException {
+public class RunnerDeadlockException extends DeadlockException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public InputDeadlockException(@Nullable final String message) {
+    public RunnerDeadlockException(@Nullable final String message) {
 
         super(message);
     }

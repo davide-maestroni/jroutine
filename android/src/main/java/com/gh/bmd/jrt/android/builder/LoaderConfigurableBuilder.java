@@ -36,5 +36,5 @@ public interface LoaderConfigurableBuilder<TYPE> {
      * @return the loader configuration builder.
      */
     @Nonnull
-    Builder<? extends TYPE> withLoader();
+    Builder<? extends TYPE> loaders();
 }

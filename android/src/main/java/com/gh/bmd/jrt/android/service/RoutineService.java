@@ -280,10 +280,10 @@ public class RoutineService extends Service {
         }
 
         bundle.putParcelableArray(KEY_FACTORY_ARGS, argValues);
-        bundle.putInt(KEY_CORE_INVOCATIONS, invocationConfiguration.getCoreInvocationsOr(
-                InvocationConfiguration.DEFAULT));
+        bundle.putInt(KEY_CORE_INVOCATIONS,
+                      invocationConfiguration.getCoreInstancesOr(InvocationConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
-                      invocationConfiguration.getMaxInvocationsOr(InvocationConfiguration.DEFAULT));
+                      invocationConfiguration.getMaxInstancesOr(InvocationConfiguration.DEFAULT));
         final TimeDuration availTimeout = invocationConfiguration.getAvailInstanceTimeoutOr(null);
 
         if (availTimeout != null) {
@@ -491,8 +491,8 @@ public class RoutineService extends Service {
                     }
                 }
 
-                builder.withCoreInvocations(coreInvocations)
-                       .withMaxInvocations(maxInvocations)
+                builder.withCoreInstances(coreInvocations)
+                       .withMaxInstances(maxInvocations)
                        .withAvailInstanceTimeout(availTimeout)
                        .withInputOrder(inputOrderType)
                        .withOutputOrder(outputOrderType)

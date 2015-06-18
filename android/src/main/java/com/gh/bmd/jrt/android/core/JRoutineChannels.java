@@ -11,7 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.core;
+package com.gh.bmd.jrt.android.core;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -20,6 +23,8 @@ import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
+import com.gh.bmd.jrt.core.JRoutine;
+import com.gh.bmd.jrt.core.JRoutineChannels.Selectable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,12 +35,10 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for handling routine channels.
  * <p/>
- * Created by davide-maestroni on 3/15/15.
+ * Created by davide-maestroni on 6/18/15.
  */
 public class JRoutineChannels {
 
@@ -56,7 +59,7 @@ public class JRoutineChannels {
      */
     @Nonnull
     public static <INPUT> InputChannel<INPUT> asInput(final int index,
-            @Nullable final InputChannel<? extends Selectable<? super INPUT>> channel) {
+            @Nullable final InputChannel<? extends ParcelableSelectable<? super INPUT>> channel) {
 
         final TransportChannel<INPUT> transport = JRoutine.transport().buildChannel();
 
@@ -80,7 +83,7 @@ public class JRoutineChannels {
      */
     @Nonnull
     public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputs(
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUTPUT>> channel,
+            @Nonnull final OutputChannel<? extends ParcelableSelectable<? extends OUTPUT>> channel,
             @Nonnull final int... indexes) {
 
         final ArrayList<Integer> list = new ArrayList<Integer>(indexes.length);
@@ -105,7 +108,7 @@ public class JRoutineChannels {
      */
     @Nonnull
     public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputs(
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUTPUT>> channel,
+            @Nonnull final OutputChannel<? extends ParcelableSelectable<? extends OUTPUT>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
@@ -137,7 +140,7 @@ public class JRoutineChannels {
      * @return the selectable output channel.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> asSelectable(final int index,
+    public static <OUTPUT> OutputChannel<ParcelableSelectable<OUTPUT>> asSelectable(final int index,
             @Nullable final OutputChannel<? extends OUTPUT> channel) {
 
         final SelectableOutputConsumer<OUTPUT> consumer =
@@ -159,10 +162,10 @@ public class JRoutineChannels {
      * @param channels the channels to merge.
      * @param <OUTPUT> the output data type.
      * @return the selectable output channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @throws IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> selectFrom(
+    public static <OUTPUT> OutputChannel<ParcelableSelectable<OUTPUT>> selectFrom(
             @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
 
         if (channels.isEmpty()) {
@@ -170,8 +173,9 @@ public class JRoutineChannels {
             throw new IllegalArgumentException("the list of channels cannot be empty");
         }
 
-        final TransportChannel<Selectable<OUTPUT>> transport = JRoutine.transport().buildChannel();
-        final TransportInput<Selectable<OUTPUT>> input = transport.input();
+        final TransportChannel<ParcelableSelectable<OUTPUT>> transport =
+                JRoutine.transport().buildChannel();
+        final TransportInput<ParcelableSelectable<OUTPUT>> input = transport.input();
         int i = 0;
 
         for (final OutputChannel<? extends OUTPUT> channel : channels) {
@@ -188,19 +192,24 @@ public class JRoutineChannels {
      *
      * @param <DATA> the data type.
      */
-    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD",
-            justification = "this is an immutable data class")
-    public static class Selectable<DATA> {
+    public static class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parcelable {
 
         /**
-         * The data object.
+         * Creator instance needed by the parcelable protocol.
          */
-        public final DATA data;
+        public static final Creator<ParcelableSelectable> CREATOR =
+                new Creator<ParcelableSelectable>() {
 
-        /**
-         * The origin channel index.
-         */
-        public final int index;
+                    public ParcelableSelectable createFromParcel(final Parcel source) {
+
+                        return new ParcelableSelectable(source);
+                    }
+
+                    public ParcelableSelectable[] newArray(final int size) {
+
+                        return new ParcelableSelectable[size];
+                    }
+                };
 
         /**
          * Constructor.
@@ -208,10 +217,32 @@ public class JRoutineChannels {
          * @param data  the data object.
          * @param index the channel index.
          */
-        public Selectable(final DATA data, final int index) {
+        public ParcelableSelectable(final DATA data, final int index) {
 
-            this.data = data;
-            this.index = index;
+            super(data, index);
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param source the source parcel.
+         */
+        @SuppressWarnings("unchecked")
+        protected ParcelableSelectable(final Parcel source) {
+
+            super((DATA) source.readValue(ParcelableSelectable.class.getClassLoader()),
+                  source.readInt());
+        }
+
+        public int describeContents() {
+
+            return 0;
+        }
+
+        public void writeToParcel(final Parcel dest, final int flags) {
+
+            dest.writeValue(data);
+            dest.writeInt(index);
         }
     }
 
@@ -222,7 +253,7 @@ public class JRoutineChannels {
      */
     private static class InputOutputConsumer<INPUT> extends TemplateOutputConsumer<INPUT> {
 
-        private final InputChannel<Selectable<? super INPUT>> mChannel;
+        private final InputChannel<ParcelableSelectable<? super INPUT>> mChannel;
 
         private final int mIndex;
 
@@ -234,10 +265,11 @@ public class JRoutineChannels {
          */
         @SuppressWarnings("unchecked")
         private InputOutputConsumer(final int index,
-                @Nonnull final InputChannel<? extends Selectable<? super INPUT>> channel) {
+                @Nonnull final InputChannel<? extends ParcelableSelectable<? super INPUT>>
+                        channel) {
 
             mIndex = index;
-            mChannel = (InputChannel<Selectable<? super INPUT>>) channel;
+            mChannel = (InputChannel<ParcelableSelectable<? super INPUT>>) channel;
         }
 
         public void onError(@Nullable final Throwable error) {
@@ -247,7 +279,7 @@ public class JRoutineChannels {
 
         public void onOutput(final INPUT input) {
 
-            mChannel.pass(new Selectable<INPUT>(input, mIndex));
+            mChannel.pass(new ParcelableSelectable<INPUT>(input, mIndex));
         }
     }
 
@@ -260,9 +292,9 @@ public class JRoutineChannels {
 
         private final int mIndex;
 
-        private final TransportInput<Selectable<OUTPUT>> mInputChannel;
+        private final TransportInput<ParcelableSelectable<OUTPUT>> mInputChannel;
 
-        private final TransportOutput<Selectable<OUTPUT>> mOutputChannel;
+        private final TransportOutput<ParcelableSelectable<OUTPUT>> mOutputChannel;
 
         /**
          * Constructor.
@@ -272,7 +304,7 @@ public class JRoutineChannels {
         private SelectableOutputConsumer(final int index) {
 
             mIndex = index;
-            final TransportChannel<Selectable<OUTPUT>> transportChannel =
+            final TransportChannel<ParcelableSelectable<OUTPUT>> transportChannel =
                     JRoutine.transport().buildChannel();
             mInputChannel = transportChannel.input();
             mOutputChannel = transportChannel.output();
@@ -283,7 +315,7 @@ public class JRoutineChannels {
             mInputChannel.close();
         }
 
-        private OutputChannel<Selectable<OUTPUT>> getOutput() {
+        private OutputChannel<ParcelableSelectable<OUTPUT>> getOutput() {
 
             return mOutputChannel;
         }
@@ -295,7 +327,7 @@ public class JRoutineChannels {
 
         public void onOutput(final OUTPUT output) {
 
-            mInputChannel.pass(new Selectable<OUTPUT>(output, mIndex));
+            mInputChannel.pass(new ParcelableSelectable<OUTPUT>(output, mIndex));
         }
     }
 
@@ -305,7 +337,7 @@ public class JRoutineChannels {
      * @param <OUTPUT> the output data type.
      */
     private static class SplitOutputConsumer<OUTPUT>
-            implements OutputConsumer<Selectable<? extends OUTPUT>> {
+            implements OutputConsumer<ParcelableSelectable<? extends OUTPUT>> {
 
         private final HashMap<Integer, TransportInput<OUTPUT>> mChannelMap;
 
@@ -336,7 +368,7 @@ public class JRoutineChannels {
             }
         }
 
-        public void onOutput(final Selectable<? extends OUTPUT> selectable) {
+        public void onOutput(final ParcelableSelectable<? extends OUTPUT> selectable) {
 
             final TransportInput<OUTPUT> inputChannel = mChannelMap.get(selectable.index);
 

@@ -45,7 +45,7 @@
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(mTargetClass, mFactoryArgs, ${shareGroup}))
-                                           .withInvocation()
+                                           .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
                                            .withInputMaxSize(Integer.MAX_VALUE)
@@ -53,7 +53,7 @@
                                            .withOutputMaxSize(Integer.MAX_VALUE)
                                            .withOutputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
                                            .set()
-                                           .withLoader()
+                                           .loaders()
                                            .with(loaderConfiguration)
                                            ${invocationBuilderOptions}
                                            .set()

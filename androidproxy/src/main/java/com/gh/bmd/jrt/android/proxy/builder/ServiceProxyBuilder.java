@@ -59,17 +59,17 @@ public interface ServiceProxyBuilder<TYPE>
      * @return the invocation configuration builder.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withInvocation();
+    InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> invocations();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withProxy();
+    ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> proxies();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withService();
+    ServiceConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> service();
 }

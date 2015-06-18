@@ -55,10 +55,10 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         // the read connection invocation is stateless so we can just use a single instance of it
-        mReadConnection = JRoutine.on(new ReadConnection()).withInvocation()
+        mReadConnection = JRoutine.on(new ReadConnection()).invocations()
                 // by setting the maximum number of parallel invocations we effectively limit the
                 // number of parallel downloads...
-                .withMaxInvocations(maxParallelDownloads)
+                .withMaxInstances(maxParallelDownloads)
                         // ...though we need to set a timeout in case the downloads outnumber it
                 .withAvailInstanceTimeout(seconds(30)).set().buildRoutine();
     }
@@ -152,7 +152,7 @@ public class Downloader {
             // routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
-                    JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).withInvocation()
+                    JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).invocations()
                             // since we want to limit the number of allocated chunks, we have to
                             // make the file writing happen in a dedicated runner, so that waiting
                             // for available space becomes allowed

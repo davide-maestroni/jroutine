@@ -34,17 +34,17 @@ public interface ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withInvocation();
+    InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy();
+    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxies();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withService();
+    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> service();
 }

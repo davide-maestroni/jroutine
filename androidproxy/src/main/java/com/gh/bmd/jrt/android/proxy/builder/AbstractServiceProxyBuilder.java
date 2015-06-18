@@ -97,21 +97,21 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withProxy() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public ServiceConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> withService() {
+    public ServiceConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);

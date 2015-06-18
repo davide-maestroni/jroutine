@@ -142,34 +142,34 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         final ObjectLoaderProxyBuilder<TYPE> builder =
                 new ObjectLoaderProxyBuilder<TYPE>(context, mTargetClass, mFactoryArgs, itf);
-        return builder.withInvocation()
+        return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
-                      .withProxy()
+                      .proxies()
                       .with(mProxyConfiguration)
                       .set()
-                      .withLoader()
+                      .loaders()
                       .with(mLoaderConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withInvocation() {
+    public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withLoader() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);

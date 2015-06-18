@@ -96,21 +96,21 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withInvocation() {
+    public InvocationConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withLoader() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);

@@ -153,10 +153,10 @@ class DefaultLoaderChannelBuilder
                        inputResolutionType);
         }
 
-        return builder.withInvocation()
+        return builder.invocations()
                       .with(invocationConfiguration)
                       .set()
-                      .withLoader()
+                      .loaders()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.MERGE)
                       .withInputClashResolution(ClashResolutionType.MERGE)
@@ -164,31 +164,18 @@ class DefaultLoaderChannelBuilder
                       .callAsync();
     }
 
-    public void purge(@Nullable final Object input) {
+    @Nonnull
+    public InvocationConfiguration.Builder<? extends LoaderChannelBuilder> invocations() {
 
-        final WeakReference<Object> context = mContext;
-
-        if (context.get() != null) {
-
-            final List<Object> inputList = Collections.singletonList(input);
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
-        }
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
-    public void purge(@Nullable final Object... inputs) {
+    @Nonnull
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaders() {
 
-        final WeakReference<Object> context = mContext;
-
-        if (context.get() != null) {
-
-            final List<Object> inputList =
-                    (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
-        }
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     public void purge(@Nullable final Iterable<?> inputs) {
@@ -231,18 +218,31 @@ class DefaultLoaderChannelBuilder
         }
     }
 
-    @Nonnull
-    public InvocationConfiguration.Builder<? extends LoaderChannelBuilder> withInvocation() {
+    public void purge(@Nullable final Object input) {
 
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<LoaderChannelBuilder>(this, config);
+        final WeakReference<Object> context = mContext;
+
+        if (context.get() != null) {
+
+            final List<Object> inputList = Collections.singletonList(input);
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+        }
     }
 
-    @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader() {
+    public void purge(@Nullable final Object... inputs) {
 
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
+        final WeakReference<Object> context = mContext;
+
+        if (context.get() != null) {
+
+            final List<Object> inputList =
+                    (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Nonnull

@@ -22,7 +22,7 @@
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
         return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, mTargetClass, mFactoryArgs, ${shareGroup})
-                                           .withInvocation()
+                                           .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
                                            .withInputMaxSize(Integer.MAX_VALUE)
@@ -30,7 +30,7 @@
                                            .withOutputMaxSize(Integer.MAX_VALUE)
                                            .withOutputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
                                            .set()
-                                           .withService()
+                                           .service()
                                            .with(serviceConfiguration)
                                            .set()
                                            .buildRoutine();

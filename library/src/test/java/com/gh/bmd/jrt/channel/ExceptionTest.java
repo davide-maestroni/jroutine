@@ -33,6 +33,12 @@ public class ExceptionTest {
     }
 
     @Test
+    public void testChannelDeadlockException() {
+
+        assertThat(new ChannelDeadlockException("")).hasNoCause();
+    }
+
+    @Test
     public void testDeadlockException() {
 
         assertThat(new DeadlockException("")).hasNoCause();
@@ -60,5 +66,11 @@ public class ExceptionTest {
     public void testRoutineException() {
 
         assertThat(new RoutineException()).hasNoCause();
+    }
+
+    @Test
+    public void testRunnerDeadlockException() {
+
+        assertThat(new RunnerDeadlockException("")).hasNoCause();
     }
 }

@@ -161,7 +161,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
         JRoutine.on(this)
-                .withInvocation()
+                .invocations()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withOutputOrder(mOrderType)
                 .withOutputMaxSize(Integer.MAX_VALUE)

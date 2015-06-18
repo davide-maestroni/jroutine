@@ -115,34 +115,34 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         final ObjectServiceProxyBuilder<TYPE> builder =
                 new ObjectServiceProxyBuilder<TYPE>(context, mTargetClass, mFactoryArgs, itf);
-        return builder.withInvocation()
+        return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
-                      .withProxy()
+                      .proxies()
                       .with(mProxyConfiguration)
                       .set()
-                      .withService()
+                      .service()
                       .with(mServiceConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService() {
+    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);

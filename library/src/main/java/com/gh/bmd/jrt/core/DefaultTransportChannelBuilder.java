@@ -45,7 +45,7 @@ class DefaultTransportChannelBuilder
     }
 
     @Nonnull
-    public Builder<TransportChannelBuilder> withInvocation() {
+    public Builder<TransportChannelBuilder> invocations() {
 
         return new Builder<TransportChannelBuilder>(this, mConfiguration);
     }

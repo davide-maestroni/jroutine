@@ -42,18 +42,20 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified input.
+     * Note that only the options related to logs will be employed.
      *
-     * @param input the input.
+     * @return the invocation configuration builder.
      */
-    void purge(@Nullable Object input);
+    @Nonnull
+    InvocationConfiguration.Builder<? extends LoaderChannelBuilder> invocations();
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     * Note that the clash resolution types will be ignored.
      *
-     * @param inputs the inputs.
+     * @return the loader configuration builder.
      */
-    void purge(@Nullable Object... inputs);
+    @Nonnull
+    LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaders();
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified inputs.
@@ -68,18 +70,16 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
     void purge();
 
     /**
-     * Note that only the options related to logs will be employed.
+     * Makes the builder destroy the cached invocation instances with the specified input.
      *
-     * @return the invocation configuration builder.
+     * @param input the input.
      */
-    @Nonnull
-    InvocationConfiguration.Builder<? extends LoaderChannelBuilder> withInvocation();
+    void purge(@Nullable Object input);
 
     /**
-     * Note that the clash resolution types will be ignored.
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
-     * @return the loader configuration builder.
+     * @param inputs the inputs.
      */
-    @Nonnull
-    LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader();
+    void purge(@Nullable Object... inputs);
 }

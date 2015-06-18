@@ -36,6 +36,12 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
+    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> invocations() {
+
+        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
+    }
+
+    @Nonnull
     public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
 
         return buildRoutine().invokeAsync();
@@ -65,12 +71,6 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
 
         mConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withInvocation() {
-
-        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
     }
 
     /**

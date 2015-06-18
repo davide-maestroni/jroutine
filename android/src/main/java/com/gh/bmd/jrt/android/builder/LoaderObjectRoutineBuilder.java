@@ -59,28 +59,6 @@ public interface LoaderObjectRoutineBuilder
     /**
      * Returns a routine used to call the specified method.
      * <p/>
-     * The method is invoked ignoring a name specified in an
-     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout}, {@link com.gh.bmd.jrt.annotation.TimeoutAction},
-     * as well as {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
-     * <br/>
-     * Note that such annotations will override any configuration set through the builder.
-     *
-     * @param method   the method instance.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine.
-     */
-    @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
-
-    /**
-     * Returns a routine used to call the specified method.
-     * <p/>
      * The method is searched via reflection ignoring a name specified in an
      * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
      * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
@@ -100,6 +78,28 @@ public interface LoaderObjectRoutineBuilder
     @Nonnull
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
             @Nonnull Class<?>... parameterTypes);
+
+    /**
+     * Returns a routine used to call the specified method.
+     * <p/>
+     * The method is invoked ignoring a name specified in an
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout}, {@link com.gh.bmd.jrt.annotation.TimeoutAction},
+     * as well as {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} method annotations will be honored.
+     * <br/>
+     * Note that such annotations will override any configuration set through the builder.
+     *
+     * @param method   the method instance.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine.
+     */
+    @Nonnull
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -149,11 +149,11 @@ public interface LoaderObjectRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withInvocation();
+    InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxy();
+    ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxies();
 }

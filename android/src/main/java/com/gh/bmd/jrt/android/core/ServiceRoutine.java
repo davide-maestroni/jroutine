@@ -110,7 +110,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
         mRoutine = JRoutine.on(factoryFrom(mContext, factoryOf(invocationClass, factoryArgs)))
-                           .withInvocation()
+                           .invocations()
                            .with(invocationConfiguration)
                            .withInputMaxSize(Integer.MAX_VALUE)
                            .withInputTimeout(TimeDuration.ZERO)
@@ -269,7 +269,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final LogLevel logLevel = logger.getLogLevel();
             final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
             final TransportChannel<INPUT> paramChannel = JRoutine.transport()
-                                                                 .withInvocation()
+                                                                 .invocations()
                                                                  .withOutputOrder(inputOrderType)
                                                                  .withOutputMaxSize(
                                                                          Integer.MAX_VALUE)
@@ -286,7 +286,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
             final TransportChannel<OUTPUT> resultChannel = JRoutine.transport()
-                                                                   .withInvocation()
+                                                                   .invocations()
                                                                    .withOutputOrder(outputOrderType)
                                                                    .withOutputMaxSize(
                                                                            Integer.MAX_VALUE)

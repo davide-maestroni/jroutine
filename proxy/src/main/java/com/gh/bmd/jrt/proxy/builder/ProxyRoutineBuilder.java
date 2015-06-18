@@ -93,5 +93,5 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends ProxyRoutineBuilder> withInvocation();
+    Builder<? extends ProxyRoutineBuilder> invocations();
 }

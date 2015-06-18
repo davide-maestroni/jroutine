@@ -88,24 +88,17 @@ public abstract class AbstractProxyBuilder<TYPE>
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ProxyBuilder<TYPE>> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ProxyBuilder<TYPE>> invocations() {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyBuilder<TYPE>>(this, configuration);
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ProxyBuilder<TYPE> setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> proxies() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
-        return this;
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, configuration);
     }
 
     @Nonnull
@@ -122,10 +115,17 @@ public abstract class AbstractProxyBuilder<TYPE>
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> withProxy() {
+    @SuppressWarnings("ConstantConditions")
+    public ProxyBuilder<TYPE> setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, configuration);
+        if (configuration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     /**

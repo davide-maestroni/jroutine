@@ -141,15 +141,15 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withCoreInvocations(27)
+                         .withCoreInstances(27)
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
-        assertThat(configuration).isNotEqualTo(builder().withCoreInvocations(3).set());
-        assertThat(configuration.builderFrom().withCoreInvocations(27).set()).isNotEqualTo(
-                builder().withCoreInvocations(27).set());
+        assertThat(configuration).isNotEqualTo(builder().withCoreInstances(3).set());
+        assertThat(configuration.builderFrom().withCoreInstances(27).set()).isNotEqualTo(
+                builder().withCoreInstances(27).set());
     }
 
     @Test
@@ -158,7 +158,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            builder().withCoreInvocations(-1);
+            builder().withCoreInstances(-1);
 
             fail();
 
@@ -298,9 +298,9 @@ public class InvocationConfigurationTest {
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
-        assertThat(configuration).isNotEqualTo(builder().withMaxInvocations(4).set());
-        assertThat(configuration.builderFrom().withMaxInvocations(41).set()).isNotEqualTo(
-                builder().withMaxInvocations(41).set());
+        assertThat(configuration).isNotEqualTo(builder().withMaxInstances(4).set());
+        assertThat(configuration.builderFrom().withMaxInstances(41).set()).isNotEqualTo(
+                builder().withMaxInstances(41).set());
     }
 
     @Test
@@ -309,7 +309,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            builder().withMaxInvocations(0);
+            builder().withMaxInstances(0);
 
             fail();
 
@@ -416,7 +416,7 @@ public class InvocationConfigurationTest {
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withPriority(17)
-                         .withCoreInvocations(27)
+                         .withCoreInstances(27)
                          .withInputOrder(OrderType.PASS_ORDER)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())

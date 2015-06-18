@@ -55,22 +55,12 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
 
     /**
-     * Returns a routine used to call the specified method.
-     * <p/>
-     * The method is invoked ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
-     * method annotations will be honored.<br/>
-     * Note that such annotations will override any configuration set through the builder.
+     * Note that all the options related to the output and input channels will be ignored.
      *
-     * @param method   the method instance.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
+    Builder<? extends ClassRoutineBuilder> invocations();
 
     /**
      * Returns a routine used to call the specified method.
@@ -92,10 +82,20 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
             @Nonnull Class<?>... parameterTypes);
 
     /**
-     * Note that all the options related to the output and input channels will be ignored.
+     * Returns a routine used to call the specified method.
+     * <p/>
+     * The method is invoked ignoring a name specified in a
+     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
+     * method annotations will be honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
      *
-     * @return the invocation configuration builder.
+     * @param method   the method instance.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine.
      */
     @Nonnull
-    Builder<? extends ClassRoutineBuilder> withInvocation();
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
 }

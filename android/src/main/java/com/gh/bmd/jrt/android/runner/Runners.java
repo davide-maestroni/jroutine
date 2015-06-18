@@ -73,7 +73,9 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
 
     /**
      * Returns a runner employing the specified looper.<br/>
-     * Note that, waiting for results in the very same thread may result in a deadlock exception.
+     * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
+     * will be performed synchronously, while the ones with a positive delay will be posted on the
+     * same thread.
      *
      * @param looper the looper instance.
      * @return the runner instance.
@@ -81,7 +83,7 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
     @Nonnull
     public static Runner looperRunner(@Nonnull final Looper looper) {
 
-        return looperRunner(looper, null);
+        return new LooperRunner(looper);
     }
 
     /**

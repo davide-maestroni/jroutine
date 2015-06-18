@@ -139,6 +139,30 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
                                                        mLoaderConfiguration);
     }
 
+    @Nonnull
+    @Override
+    public InvocationConfiguration.Builder<? extends
+            LoaderRoutineBuilder<INPUT, OUTPUT>> invocations() {
+
+        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(
+                mRoutineConfigurable, getConfiguration());
+    }
+
+    @Nonnull
+    public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
+
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> loaders() {
+
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(this, config);
+    }
+
     @Override
     public void purge() {
 
@@ -172,30 +196,6 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
         mLoaderConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
-
-        super.setConfiguration(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationConfiguration.Builder<? extends
-            LoaderRoutineBuilder<INPUT, OUTPUT>> withInvocation() {
-
-        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(
-                mRoutineConfigurable, getConfiguration());
-    }
-
-    @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> withLoader() {
-
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(this, config);
     }
 
     /**

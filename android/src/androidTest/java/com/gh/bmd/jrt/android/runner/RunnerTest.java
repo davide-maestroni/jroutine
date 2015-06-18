@@ -169,7 +169,7 @@ public class RunnerTest extends AndroidTestCase {
                     }
                 };
         final OutputChannel<Object> channel = JRoutine.on(factoryOf(invocation, this))
-                                                      .withInvocation()
+                                                      .invocations()
                                                       .withAsyncRunner(Runners.handlerRunner(
                                                               new HandlerThread("test")))
                                                       .set()

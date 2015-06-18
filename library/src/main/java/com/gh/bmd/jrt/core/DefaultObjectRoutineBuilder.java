@@ -98,7 +98,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @Nonnull
     @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = getInvocationConfiguration();
         return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
@@ -107,11 +107,11 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    @SuppressWarnings("unchecked")
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxies() {
 
-        super.setConfiguration(configuration);
-        return this;
+        final ProxyConfiguration config = getProxyConfiguration();
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable, config);
     }
 
     @Nonnull
@@ -124,11 +124,11 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
-    @SuppressWarnings("unchecked")
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy() {
+    public ObjectRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        final ProxyConfiguration config = getProxyConfiguration();
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable, config);
+        super.setConfiguration(configuration);
+        return this;
     }
 
     @Nonnull

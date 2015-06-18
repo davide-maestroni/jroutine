@@ -91,7 +91,7 @@ public final class InvocationConfiguration {
 
     private final TimeDuration mAvailableTimeout;
 
-    private final int mCoreInvocations;
+    private final int mCoreInstances;
 
     private final int mInputMaxSize;
 
@@ -103,7 +103,7 @@ public final class InvocationConfiguration {
 
     private final LogLevel mLogLevel;
 
-    private final int mMaxInvocations;
+    private final int mMaxInstances;
 
     private final int mOutputMaxSize;
 
@@ -125,8 +125,8 @@ public final class InvocationConfiguration {
      * @param syncRunner       the runner used for synchronous invocations.
      * @param asyncRunner      the runner used for asynchronous invocations.
      * @param priority         the invocation priority.
-     * @param maxInvocations   the maximum number of parallel running invocations. Must be positive.
-     * @param coreInvocations  the maximum number of retained invocation instances. Must be 0 or a
+     * @param maxInstances     the maximum number of parallel running invocations. Must be positive.
+     * @param coreInstances    the maximum number of retained invocation instances. Must be 0 or a
      *                         positive number.
      * @param availableTimeout the maximum timeout while waiting for an invocation instance to be
      *                         available.
@@ -145,8 +145,8 @@ public final class InvocationConfiguration {
      * @param logLevel         the log level.
      */
     private InvocationConfiguration(@Nullable final Runner syncRunner,
-            @Nullable final Runner asyncRunner, final int priority, final int maxInvocations,
-            final int coreInvocations, @Nullable final TimeDuration availableTimeout,
+            @Nullable final Runner asyncRunner, final int priority, final int maxInstances,
+            final int coreInstances, @Nullable final TimeDuration availableTimeout,
             @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType inputOrderType, final int inputMaxSize,
             @Nullable final TimeDuration inputTimeout, @Nullable final OrderType outputOrderType,
@@ -156,8 +156,8 @@ public final class InvocationConfiguration {
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
         mPriority = priority;
-        mMaxInvocations = maxInvocations;
-        mCoreInvocations = coreInvocations;
+        mMaxInstances = maxInstances;
+        mCoreInstances = coreInstances;
         mAvailableTimeout = availableTimeout;
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
@@ -238,10 +238,10 @@ public final class InvocationConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
      */
-    public int getCoreInvocationsOr(final int valueIfNotSet) {
+    public int getCoreInstancesOr(final int valueIfNotSet) {
 
-        final int coreInvocations = mCoreInvocations;
-        return (coreInvocations != DEFAULT) ? coreInvocations : valueIfNotSet;
+        final int coreInstances = mCoreInstances;
+        return (coreInstances != DEFAULT) ? coreInstances : valueIfNotSet;
     }
 
     /**
@@ -306,15 +306,15 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the maximum number of parallel running invocations (DEFAULT by default).
+     * Returns the maximum number of parallel running invocation instances (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
      */
-    public int getMaxInvocationsOr(final int valueIfNotSet) {
+    public int getMaxInstancesOr(final int valueIfNotSet) {
 
-        final int maxInvocations = mMaxInvocations;
-        return (maxInvocations != DEFAULT) ? maxInvocations : valueIfNotSet;
+        final int maxInstances = mMaxInstances;
+        return (maxInstances != DEFAULT) ? maxInstances : valueIfNotSet;
     }
 
     /**
@@ -411,13 +411,13 @@ public final class InvocationConfiguration {
         // auto-generated code
         int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
         result = 31 * result + (mAvailableTimeout != null ? mAvailableTimeout.hashCode() : 0);
-        result = 31 * result + mCoreInvocations;
+        result = 31 * result + mCoreInstances;
         result = 31 * result + mInputMaxSize;
         result = 31 * result + (mInputOrderType != null ? mInputOrderType.hashCode() : 0);
         result = 31 * result + (mInputTimeout != null ? mInputTimeout.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
-        result = 31 * result + mMaxInvocations;
+        result = 31 * result + mMaxInstances;
         result = 31 * result + mOutputMaxSize;
         result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
@@ -445,7 +445,7 @@ public final class InvocationConfiguration {
 
         final InvocationConfiguration that = (InvocationConfiguration) o;
 
-        if (mCoreInvocations != that.mCoreInvocations) {
+        if (mCoreInstances != that.mCoreInstances) {
 
             return false;
         }
@@ -455,7 +455,7 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mMaxInvocations != that.mMaxInvocations) {
+        if (mMaxInstances != that.mMaxInstances) {
 
             return false;
         }
@@ -535,13 +535,13 @@ public final class InvocationConfiguration {
         return "InvocationConfiguration{" +
                 "mAsyncRunner=" + mAsyncRunner +
                 ", mAvailableTimeout=" + mAvailableTimeout +
-                ", mCoreInvocations=" + mCoreInvocations +
+                ", mCoreInstances=" + mCoreInstances +
                 ", mInputMaxSize=" + mInputMaxSize +
                 ", mInputOrderType=" + mInputOrderType +
                 ", mInputTimeout=" + mInputTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
-                ", mMaxInvocations=" + mMaxInvocations +
+                ", mMaxInstances=" + mMaxInstances +
                 ", mOutputMaxSize=" + mOutputMaxSize +
                 ", mOutputOrderType=" + mOutputOrderType +
                 ", mOutputTimeout=" + mOutputTimeout +
@@ -704,7 +704,7 @@ public final class InvocationConfiguration {
 
         private TimeDuration mAvailableTimeout;
 
-        private int mCoreInvocations;
+        private int mCoreInstances;
 
         private int mInputMaxSize;
 
@@ -716,7 +716,7 @@ public final class InvocationConfiguration {
 
         private LogLevel mLogLevel;
 
-        private int mMaxInvocations;
+        private int mMaxInstances;
 
         private int mOutputMaxSize;
 
@@ -747,8 +747,8 @@ public final class InvocationConfiguration {
 
             mConfigurable = configurable;
             mPriority = DEFAULT;
-            mMaxInvocations = DEFAULT;
-            mCoreInvocations = DEFAULT;
+            mMaxInstances = DEFAULT;
+            mCoreInstances = DEFAULT;
             mInputMaxSize = DEFAULT;
             mOutputMaxSize = DEFAULT;
         }
@@ -854,21 +854,21 @@ public final class InvocationConfiguration {
          * invocations. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
          * framework to choose a default one.
          *
-         * @param coreInvocations the max number of instances.
+         * @param coreInstances the core number of instances.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is negative.
          */
         @Nonnull
-        public Builder<TYPE> withCoreInvocations(final int coreInvocations) {
+        public Builder<TYPE> withCoreInstances(final int coreInstances) {
 
-            if ((coreInvocations != DEFAULT) && (coreInvocations < 0)) {
+            if ((coreInstances != DEFAULT) && (coreInstances < 0)) {
 
                 throw new IllegalArgumentException(
                         "the maximum number of retained instances cannot be negative: "
-                                + coreInvocations);
+                                + coreInstances);
             }
 
-            mCoreInvocations = coreInvocations;
+            mCoreInstances = coreInstances;
             return this;
         }
 
@@ -970,21 +970,21 @@ public final class InvocationConfiguration {
          * {@link InvocationConfiguration#DEFAULT} value means that it is up to the framework to
          * choose a default one.
          *
-         * @param maxInvocations the max number of instances.
+         * @param maxInstances the max number of instances.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
         @Nonnull
-        public Builder<TYPE> withMaxInvocations(final int maxInvocations) {
+        public Builder<TYPE> withMaxInstances(final int maxInstances) {
 
-            if ((maxInvocations != DEFAULT) && (maxInvocations < 1)) {
+            if ((maxInstances != DEFAULT) && (maxInstances < 1)) {
 
                 throw new IllegalArgumentException(
                         "the maximum number of concurrently running instances cannot be less than"
-                                + " 1: " + maxInvocations);
+                                + " 1: " + maxInstances);
             }
 
-            mMaxInvocations = maxInvocations;
+            mMaxInstances = maxInstances;
             return this;
         }
 
@@ -1148,18 +1148,18 @@ public final class InvocationConfiguration {
                 withPriority(priority);
             }
 
-            final int maxInvocations = configuration.mMaxInvocations;
+            final int maxInvocations = configuration.mMaxInstances;
 
             if (maxInvocations != DEFAULT) {
 
-                withMaxInvocations(maxInvocations);
+                withMaxInstances(maxInvocations);
             }
 
-            final int coreInvocations = configuration.mCoreInvocations;
+            final int coreInvocations = configuration.mCoreInstances;
 
             if (coreInvocations != DEFAULT) {
 
-                withCoreInvocations(coreInvocations);
+                withCoreInstances(coreInvocations);
             }
 
             final TimeDuration availTimeout = configuration.mAvailableTimeout;
@@ -1250,11 +1250,11 @@ public final class InvocationConfiguration {
         @Nonnull
         private InvocationConfiguration buildConfiguration() {
 
-            return new InvocationConfiguration(mSyncRunner, mAsyncRunner, mPriority,
-                                               mMaxInvocations, mCoreInvocations, mAvailableTimeout,
-                                               mReadTimeout, mTimeoutActionType, mInputOrderType,
-                                               mInputMaxSize, mInputTimeout, mOutputOrderType,
-                                               mOutputMaxSize, mOutputTimeout, mLog, mLogLevel);
+            return new InvocationConfiguration(mSyncRunner, mAsyncRunner, mPriority, mMaxInstances,
+                                               mCoreInstances, mAvailableTimeout, mReadTimeout,
+                                               mTimeoutActionType, mInputOrderType, mInputMaxSize,
+                                               mInputTimeout, mOutputOrderType, mOutputMaxSize,
+                                               mOutputTimeout, mLog, mLogLevel);
         }
 
         private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {
@@ -1262,8 +1262,8 @@ public final class InvocationConfiguration {
             mSyncRunner = configuration.mSyncRunner;
             mAsyncRunner = configuration.mAsyncRunner;
             mPriority = configuration.mPriority;
-            mMaxInvocations = configuration.mMaxInvocations;
-            mCoreInvocations = configuration.mCoreInvocations;
+            mMaxInstances = configuration.mMaxInstances;
+            mCoreInstances = configuration.mCoreInstances;
             mAvailableTimeout = configuration.mAvailableTimeout;
             mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;

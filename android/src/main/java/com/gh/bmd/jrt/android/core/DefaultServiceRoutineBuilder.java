@@ -88,17 +88,14 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
-            @Nonnull final ServiceConfiguration configuration) {
+    @Override
+    public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
+    invocations() {
 
-        if (configuration == null) {
 
-            throw new NullPointerException("the service configuration must not be null");
-        }
-
-        mServiceConfiguration = configuration;
-        return this;
+        final InvocationConfiguration config = getConfiguration();
+        return new InvocationConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(
+                mConfigurable, config);
     }
 
     @Nonnull
@@ -111,20 +108,23 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
-    public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withInvocation() {
-
-        final InvocationConfiguration config = getConfiguration();
-        return new InvocationConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(
-                mConfigurable, config);
-    }
-
-    @Nonnull
-    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withService() {
+    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this, config);
+    }
+
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final ServiceConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the service configuration must not be null");
+        }
+
+        mServiceConfiguration = configuration;
+        return this;
     }
 }

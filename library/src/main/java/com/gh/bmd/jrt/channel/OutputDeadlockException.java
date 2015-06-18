@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 11/25/14.
  */
-public class OutputDeadlockException extends DeadlockException {
+public class OutputDeadlockException extends ChannelDeadlockException {
 
     /**
      * Constructor.

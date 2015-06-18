@@ -91,34 +91,27 @@ class DefaultProxyRoutineBuilder
         }
 
         final ObjectProxyBuilder<TYPE> builder = new ObjectProxyBuilder<TYPE>(target, itf);
-        return builder.withInvocation()
+        return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
-                      .withProxy()
+                      .proxies()
                       .with(mProxyConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocations() {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ProxyRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> proxies() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
-        return this;
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
@@ -135,10 +128,17 @@ class DefaultProxyRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxy() {
+    @SuppressWarnings("ConstantConditions")
+    public ProxyRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
+        if (configuration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     /**

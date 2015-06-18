@@ -123,24 +123,17 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> invocations() {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> proxies() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
-        return this;
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
@@ -157,10 +150,17 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy() {
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
+        if (configuration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     /**

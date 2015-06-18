@@ -55,10 +55,10 @@ public class LoaderRoutineRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
-                .withInvocation()
+                .invocations()
                 .withOutputOrder(OrderType.PASS_ORDER)
                 .set()
-                .withLoader()
+                .loaders()
                 .withId(0)
                 .set()
                 .callAsync("test1", "test2");
@@ -78,7 +78,7 @@ public class LoaderRoutineRotationTest
         getInstrumentation().waitForIdleSync();
 
         final OutputChannel<String> channel =
-                JRoutine.onActivity(getActivity()).withLoader().withId(0).set().buildChannel();
+                JRoutine.onActivity(getActivity()).loaders().withId(0).set().buildChannel();
 
         assertThat(channel.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
     }

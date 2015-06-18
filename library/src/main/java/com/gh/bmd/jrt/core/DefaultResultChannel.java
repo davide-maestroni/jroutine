@@ -17,7 +17,6 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
-import com.gh.bmd.jrt.channel.DeadlockException;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
@@ -25,6 +24,7 @@ import com.gh.bmd.jrt.channel.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.channel.RunnerDeadlockException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
@@ -560,7 +560,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (mRunner.isRunnerThread()) {
 
-            throw new DeadlockException("cannot wait on the same runner thread");
+            throw new RunnerDeadlockException("cannot wait on the same runner thread");
         }
 
         if (mOutputNotEmpty == null) {
@@ -763,7 +763,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     if (isRunnerThread) {
 
-                        throw new DeadlockException("cannot wait on the same runner thread");
+                        throw new RunnerDeadlockException("cannot wait on the same runner thread");
                     }
 
                     if (mOutputHasNext == null) {
@@ -977,7 +977,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                             if (isRunnerThread) {
 
-                                throw new DeadlockException(
+                                throw new RunnerDeadlockException(
                                         "cannot wait on the same runner thread");
                             }
 
@@ -1027,7 +1027,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (!readTimeout.isZero() && isRunnerThread) {
 
-                    throw new DeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }
 
                 final boolean isDone;
@@ -1886,7 +1886,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
 
                     --mOutputCount;
-                    throw new DeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }
 
                 waitOutputs(1);
@@ -1955,7 +1955,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (size > mMaxOutput) {
 
-                throw new DeadlockException(
+                throw new OutputDeadlockException(
                         "outputs exceed maximum channel size [" + size + "/" + mMaxOutput + "]");
             }
 
@@ -1969,7 +1969,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
 
                     mOutputCount -= size;
-                    throw new DeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }
 
                 waitOutputs(size);
@@ -2009,7 +2009,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
 
                     --mOutputCount;
-                    throw new DeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }
 
                 waitOutputs(1);

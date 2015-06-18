@@ -54,5 +54,5 @@ public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYP
      * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends ProxyBuilder<TYPE>> withInvocation();
+    Builder<? extends ProxyBuilder<TYPE>> invocations();
 }

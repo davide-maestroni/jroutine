@@ -40,5 +40,5 @@ public interface TransportChannelBuilder extends ConfigurableBuilder<TransportCh
      * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends TransportChannelBuilder> withInvocation();
+    Builder<? extends TransportChannelBuilder> invocations();
 }

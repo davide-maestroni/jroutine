@@ -16,12 +16,12 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.AbortException;
-import com.gh.bmd.jrt.channel.DeadlockException;
 import com.gh.bmd.jrt.channel.InputDeadlockException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.channel.RunnerDeadlockException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -907,7 +907,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                         && mRunner.isRunnerThread()) {
 
                     --mInputCount;
-                    throw new DeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }
 
                 waitInputs(1);
@@ -1019,7 +1019,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (size > mMaxInput) {
 
-                throw new DeadlockException(
+                throw new InputDeadlockException(
                         "inputs exceed maximum channel size [" + size + "/" + mMaxInput + "]");
             }
 
@@ -1033,7 +1033,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                         && mRunner.isRunnerThread()) {
 
                     mInputCount -= size;
-                    throw new DeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }
 
                 waitInputs(size);
@@ -1082,7 +1082,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                         && mRunner.isRunnerThread()) {
 
                     --mInputCount;
-                    throw new DeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }
 
                 waitInputs(1);

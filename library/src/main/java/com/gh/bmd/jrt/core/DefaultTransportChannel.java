@@ -82,8 +82,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
             logger.wrn("the specified synchronous runner will be ignored: %s", syncRunner);
         }
 
-        final int maxInvocations =
-                configuration.getMaxInvocationsOr(InvocationConfiguration.DEFAULT);
+        final int maxInvocations = configuration.getMaxInstancesOr(InvocationConfiguration.DEFAULT);
 
         if (maxInvocations != InvocationConfiguration.DEFAULT) {
 
@@ -92,7 +91,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         final int coreInvocations =
-                configuration.getCoreInvocationsOr(InvocationConfiguration.DEFAULT);
+                configuration.getCoreInstancesOr(InvocationConfiguration.DEFAULT);
 
         if (coreInvocations != InvocationConfiguration.DEFAULT) {
 

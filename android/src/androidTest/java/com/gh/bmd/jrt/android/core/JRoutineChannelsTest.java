@@ -55,7 +55,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutineChannels.selectFrom(Collections.<OutputChannel<Object>>emptyList());
+            JRoutineChannels.asSelectable(Collections.<OutputChannel<Object>>emptyList());
 
             fail();
 
@@ -76,7 +76,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
 
         final Routine<ParcelableSelectable<String>, String> routine =
                 JRoutine.onService(getActivity(), new ClassToken<Amb<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(JRoutineChannels.selectFrom(
+        final OutputChannel<String> outputChannel = routine.callAsync(JRoutineChannels.asSelectable(
                 Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
                               channel4.output())));
 
@@ -104,7 +104,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
-        final OutputChannel<ParcelableSelectable<Object>> channel = JRoutineChannels.selectFrom(
+        final OutputChannel<ParcelableSelectable<Object>> channel = JRoutineChannels.asSelectable(
                 Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Sort.class))
@@ -114,7 +114,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
                         .set()
                         .callAsync(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
-                JRoutineChannels.asOutputs(output, Sort.INTEGER, Sort.STRING);
+                JRoutineChannels.asOutputChannels(output, Sort.INTEGER, Sort.STRING);
 
         for (int i = 0; i < 4; i++) {
 
@@ -173,12 +173,13 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
             switch (selectable.index) {
 
                 case INTEGER:
-                    JRoutineChannels.<Integer>asInput(INTEGER, result)
+                    JRoutineChannels.<Integer>asInputChannel(INTEGER, result)
                                     .pass((Integer) selectable.data);
                     break;
 
                 case STRING:
-                    JRoutineChannels.<String>asInput(STRING, result).pass((String) selectable.data);
+                    JRoutineChannels.<String>asInputChannel(STRING, result)
+                                    .pass((String) selectable.data);
                     break;
             }
         }

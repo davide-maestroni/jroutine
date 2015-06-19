@@ -50,7 +50,7 @@ public class JRoutineChannelsTest {
 
         try {
 
-            JRoutineChannels.selectFrom(Collections.<OutputChannel<Object>>emptyList());
+            JRoutineChannels.asSelectable(Collections.<OutputChannel<Object>>emptyList());
 
             fail();
 
@@ -72,7 +72,7 @@ public class JRoutineChannelsTest {
 
         final Routine<Selectable<String>, String> routine =
                 JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(JRoutineChannels.selectFrom(
+        final OutputChannel<String> outputChannel = routine.callAsync(JRoutineChannels.asSelectable(
                 Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
                               channel4.output())));
 
@@ -101,18 +101,16 @@ public class JRoutineChannelsTest {
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
-        final OutputChannel<Selectable<Object>> channel = JRoutineChannels.selectFrom(
+        final OutputChannel<Selectable<Object>> channel = JRoutineChannels.asSelectable(
                 Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
         final OutputChannel<Selectable<Object>> output = JRoutine.on(new Sort())
                                                                  .invocations()
                                                                  .withInputOrder(
                                                                          OrderType.PASS_ORDER)
-                                                                 .withOutputOrder(
-                                                                         OrderType.PASS_ORDER)
                                                                  .set()
                                                                  .callAsync(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
-                JRoutineChannels.asOutputs(output, Sort.INTEGER, Sort.STRING);
+                JRoutineChannels.asOutputChannels(output, Sort.INTEGER, Sort.STRING);
 
         for (int i = 0; i < 4; i++) {
 
@@ -169,12 +167,13 @@ public class JRoutineChannelsTest {
             switch (selectable.index) {
 
                 case INTEGER:
-                    JRoutineChannels.<Integer>asInput(INTEGER, result)
-                                    .pass((Integer) selectable.data);
+                    JRoutineChannels.<Integer>asInputChannel(INTEGER, result)
+                                    .pass(selectable.<Integer>data());
                     break;
 
                 case STRING:
-                    JRoutineChannels.<String>asInput(STRING, result).pass((String) selectable.data);
+                    JRoutineChannels.<String>asInputChannel(STRING, result)
+                                    .pass(selectable.<String>data());
                     break;
             }
         }

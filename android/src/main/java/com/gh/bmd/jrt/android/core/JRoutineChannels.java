@@ -58,7 +58,7 @@ public class JRoutineChannels {
      * @return the input channel.
      */
     @Nonnull
-    public static <INPUT> InputChannel<INPUT> asInput(final int index,
+    public static <INPUT> InputChannel<INPUT> asInputChannel(final int index,
             @Nullable final InputChannel<? extends ParcelableSelectable<? super INPUT>> channel) {
 
         final TransportChannel<INPUT> transport = JRoutine.transport().buildChannel();
@@ -72,31 +72,6 @@ public class JRoutineChannels {
     }
 
     /**
-     * Returns a map of output channels returning the outputs filtered by the specified indexes.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
-     *
-     * @param channel  the selectable output channel.
-     * @param indexes  the list of indexes.
-     * @param <OUTPUT> the output data type.
-     * @return the channel map.
-     */
-    @Nonnull
-    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputs(
-            @Nonnull final OutputChannel<? extends ParcelableSelectable<? extends OUTPUT>> channel,
-            @Nonnull final int... indexes) {
-
-        final ArrayList<Integer> list = new ArrayList<Integer>(indexes.length);
-
-        for (final int index : indexes) {
-
-            list.add(index);
-        }
-
-        return asOutputs(channel, list);
-    }
-
-    /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
      * <p/>
      * Note that the channel will be bound as a result of the call.
@@ -107,7 +82,7 @@ public class JRoutineChannels {
      * @return the channel map.
      */
     @Nonnull
-    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputs(
+    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputChannels(
             @Nonnull final OutputChannel<? extends ParcelableSelectable<? extends OUTPUT>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
@@ -126,6 +101,31 @@ public class JRoutineChannels {
 
         channel.passTo(new SplitOutputConsumer<OUTPUT>(inputMap));
         return outputMap;
+    }
+
+    /**
+     * Returns a map of output channels returning the outputs filtered by the specified indexes.
+     * <p/>
+     * Note that the channel will be bound as a result of the call.
+     *
+     * @param channel  the selectable output channel.
+     * @param indexes  the list of indexes.
+     * @param <OUTPUT> the output data type.
+     * @return the channel map.
+     */
+    @Nonnull
+    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputChannels(
+            @Nonnull final OutputChannel<? extends ParcelableSelectable<? extends OUTPUT>> channel,
+            @Nonnull final int... indexes) {
+
+        final ArrayList<Integer> list = new ArrayList<Integer>(indexes.length);
+
+        for (final int index : indexes) {
+
+            list.add(index);
+        }
+
+        return asOutputChannels(channel, list);
     }
 
     /**
@@ -165,7 +165,7 @@ public class JRoutineChannels {
      * @throws IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<ParcelableSelectable<OUTPUT>> selectFrom(
+    public static <OUTPUT> OutputChannel<ParcelableSelectable<OUTPUT>> asSelectable(
             @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
 
         if (channels.isEmpty()) {

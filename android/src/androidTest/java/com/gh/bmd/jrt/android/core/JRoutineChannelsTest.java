@@ -55,7 +55,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutineChannels.asSelectable(Collections.<OutputChannel<Object>>emptyList());
+            JRoutineChannels.merge(Collections.<OutputChannel<Object>>emptyList());
 
             fail();
 
@@ -76,9 +76,10 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
 
         final Routine<ParcelableSelectable<String>, String> routine =
                 JRoutine.onService(getActivity(), new ClassToken<Amb<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(JRoutineChannels.asSelectable(
-                Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
-                              channel4.output())));
+        final OutputChannel<String> outputChannel = routine.callAsync(
+                JRoutineChannels.mergeParcelable(
+                        Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
+                                      channel4.output())));
 
         for (int i = 0; i < 4; i++) {
 
@@ -104,8 +105,9 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
-        final OutputChannel<ParcelableSelectable<Object>> channel = JRoutineChannels.asSelectable(
-                Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
+        final OutputChannel<? extends ParcelableSelectable<Object>> channel =
+                JRoutineChannels.mergeParcelable(
+                        Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Sort.class))
                         .invocations()
@@ -114,7 +116,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
                         .set()
                         .callAsync(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
-                JRoutineChannels.asOutputChannels(output, Sort.INTEGER, Sort.STRING);
+                JRoutineChannels.map(output, Sort.INTEGER, Sort.STRING);
 
         for (int i = 0; i < 4; i++) {
 
@@ -173,12 +175,12 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
             switch (selectable.index) {
 
                 case INTEGER:
-                    JRoutineChannels.<Integer>asInputChannel(INTEGER, result)
+                    JRoutineChannels.<Object, Integer>selectParcelable(result, INTEGER)
                                     .pass((Integer) selectable.data);
                     break;
 
                 case STRING:
-                    JRoutineChannels.<String>asInputChannel(STRING, result)
+                    JRoutineChannels.<Object, String>selectParcelable(result, STRING)
                                     .pass((String) selectable.data);
                     break;
             }

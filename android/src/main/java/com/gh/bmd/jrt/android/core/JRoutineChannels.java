@@ -19,18 +19,15 @@ import android.os.Parcelable;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
 import com.gh.bmd.jrt.core.JRoutine;
-import com.gh.bmd.jrt.core.JRoutineChannels.Selectable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,7 +37,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 6/18/15.
  */
-public class JRoutineChannels {
+public class JRoutineChannels extends com.gh.bmd.jrt.core.JRoutineChannels {
 
     /**
      * Avoid direct instantiation.
@@ -50,108 +47,155 @@ public class JRoutineChannels {
     }
 
     /**
-     * Returns a new channel transforming the input data into selectable ones.
+     * Returns a map of input channels accepting the input data identified by the specified indexes.
      *
-     * @param index   the channel index.
      * @param channel the selectable channel.
+     * @param indexes the collection of indexes.
+     * @param <DATA>  the channel data type.
      * @param <INPUT> the input data type.
-     * @return the input channel.
+     * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <INPUT> InputChannel<INPUT> asInputChannel(final int index,
-            @Nullable final InputChannel<? extends ParcelableSelectable<? super INPUT>> channel) {
-
-        final TransportChannel<INPUT> transport = JRoutine.transport().buildChannel();
-
-        if (channel != null) {
-
-            transport.output().passTo(new InputOutputConsumer<INPUT>(index, channel));
-        }
-
-        return transport.input();
-    }
-
-    /**
-     * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
-     *
-     * @param channel  the selectable output channel.
-     * @param indexes  the list of indexes.
-     * @param <OUTPUT> the output data type.
-     * @return the channel map.
-     */
-    @Nonnull
-    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputChannels(
-            @Nonnull final OutputChannel<? extends ParcelableSelectable<? extends OUTPUT>> channel,
+    public static <DATA, INPUT extends DATA> Map<Integer, InputChannel<INPUT>> mapParcelable(
+            @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
-        final HashMap<Integer, TransportInput<OUTPUT>> inputMap =
-                new HashMap<Integer, TransportInput<OUTPUT>>(size);
-        final HashMap<Integer, OutputChannel<OUTPUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUTPUT>>(size);
+        final HashMap<Integer, InputChannel<INPUT>> channelMap =
+                new HashMap<Integer, InputChannel<INPUT>>(size);
 
         for (final Integer index : indexes) {
 
-            final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
-            inputMap.put(index, transportChannel.input());
-            outputMap.put(index, transportChannel.output());
+            channelMap.put(index, JRoutineChannels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
-        channel.passTo(new SplitOutputConsumer<OUTPUT>(inputMap));
-        return outputMap;
+        return channelMap;
     }
 
     /**
-     * Returns a map of output channels returning the outputs filtered by the specified indexes.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
+     * Returns a map of input channels accepting the input data identified by the specified indexes.
      *
-     * @param channel  the selectable output channel.
-     * @param indexes  the list of indexes.
-     * @param <OUTPUT> the output data type.
-     * @return the channel map.
+     * @param channel the selectable channel.
+     * @param indexes the array of indexes.
+     * @param <DATA>  the channel data type.
+     * @param <INPUT> the input data type.
+     * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> asOutputChannels(
-            @Nonnull final OutputChannel<? extends ParcelableSelectable<? extends OUTPUT>> channel,
+    public static <DATA, INPUT extends DATA> Map<Integer, InputChannel<INPUT>> mapParcelable(
+            @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final int... indexes) {
 
-        final ArrayList<Integer> list = new ArrayList<Integer>(indexes.length);
+        final int size = indexes.length;
+        final HashMap<Integer, InputChannel<INPUT>> channelMap =
+                new HashMap<Integer, InputChannel<INPUT>>(size);
 
         for (final int index : indexes) {
 
-            list.add(index);
+            channelMap.put(index, JRoutineChannels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
-        return asOutputChannels(channel, list);
+        return channelMap;
     }
 
     /**
-     * Returns a new channel making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
+     * Returns a map of input channels accepting the input data identified by the specified indexes.
      *
-     * @param index    the channel index.
-     * @param channel  the channel to make selectable.
-     * @param <OUTPUT> the output data type.
-     * @return the selectable output channel.
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <DATA>     the channel data type.
+     * @param <INPUT>    the input data type.
+     * @return the map of indexes and output channels.
+     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<ParcelableSelectable<OUTPUT>> asSelectable(final int index,
-            @Nullable final OutputChannel<? extends OUTPUT> channel) {
+    public static <DATA, INPUT extends DATA> Map<Integer, InputChannel<INPUT>> mapParcelable(
+            final int startIndex, final int rangeSize,
+            @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
 
-        final SelectableOutputConsumer<OUTPUT> consumer =
-                new SelectableOutputConsumer<OUTPUT>(index);
+        if (rangeSize <= 0) {
 
-        if (channel != null) {
-
-            channel.passTo(consumer);
+            throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        return consumer.getOutput();
+        final HashMap<Integer, InputChannel<INPUT>> channelMap =
+                new HashMap<Integer, InputChannel<INPUT>>(rangeSize);
+
+        for (int index = startIndex; index < rangeSize; index++) {
+
+            channelMap.put(index, JRoutineChannels.<DATA, INPUT>selectParcelable(channel, index));
+        }
+
+        return channelMap;
+    }
+
+    /**
+     * Merges the specified channels into a selectable one.
+     * <p/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param startIndex the selectable start index.
+     * @param channels   the list of channels.
+     * @param <OUTPUT>   the output data type.
+     * @return the selectable output channel.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     */
+    @Nonnull
+    public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> mergeParcelable(
+            final int startIndex,
+            @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
+
+        if (channels.isEmpty()) {
+
+            throw new IllegalArgumentException("the list of channels must not be empty");
+        }
+
+        final TransportChannel<ParcelableSelectable<OUTPUT>> transport =
+                JRoutine.transport().buildChannel();
+        final TransportInput<ParcelableSelectable<OUTPUT>> input = transport.input();
+        int i = startIndex;
+
+        for (final OutputChannel<? extends OUTPUT> channel : channels) {
+
+            input.pass(toSelectable(channel, i++));
+        }
+
+        input.close();
+        return transport.output();
+    }
+
+    /**
+     * Merges the specified channels into a selectable one.
+     * <p/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param startIndex the selectable start index.
+     * @param channels   the array of channels.
+     * @return the selectable output channel.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     */
+    @Nonnull
+    public static OutputChannel<? extends ParcelableSelectable<Object>> mergeParcelable(
+            final int startIndex, @Nonnull final OutputChannel<?>... channels) {
+
+        if (channels.length == 0) {
+
+            throw new IllegalArgumentException("the array of channels must not be empty");
+        }
+
+        final TransportChannel<ParcelableSelectable<Object>> transport =
+                JRoutine.transport().buildChannel();
+        final TransportInput<ParcelableSelectable<Object>> input = transport.input();
+        int i = startIndex;
+
+        for (final OutputChannel<?> channel : channels) {
+
+            input.pass(toSelectable(channel, i++));
+        }
+
+        input.close();
+        return transport.output();
     }
 
     /**
@@ -162,28 +206,111 @@ public class JRoutineChannels {
      * @param channels the channels to merge.
      * @param <OUTPUT> the output data type.
      * @return the selectable output channel.
-     * @throws IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<ParcelableSelectable<OUTPUT>> asSelectable(
+    public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> mergeParcelable(
             @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
 
-        if (channels.isEmpty()) {
+        return mergeParcelable(0, channels);
+    }
 
-            throw new IllegalArgumentException("the list of channels cannot be empty");
+    /**
+     * Merges the specified channels into a selectable one.
+     * <p/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channelMap the map of indexes and output channels.
+     * @param <OUTPUT>   the output data type.
+     * @return the selectable output channel.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     */
+    @Nonnull
+    public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> mergeParcelable(
+            @Nonnull final Map<Integer, ? extends OutputChannel<? extends OUTPUT>> channelMap) {
+
+        if (channelMap.isEmpty()) {
+
+            throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
         final TransportChannel<ParcelableSelectable<OUTPUT>> transport =
                 JRoutine.transport().buildChannel();
         final TransportInput<ParcelableSelectable<OUTPUT>> input = transport.input();
-        int i = 0;
 
-        for (final OutputChannel<? extends OUTPUT> channel : channels) {
+        for (final Entry<Integer, ? extends OutputChannel<? extends OUTPUT>> entry : channelMap
+                .entrySet()) {
 
-            input.pass(asSelectable(i++, channel));
+            input.pass(toSelectable(entry.getValue(), entry.getKey()));
         }
 
         input.close();
+        return transport.output();
+    }
+
+    /**
+     * Merges the specified channels into a selectable one.
+     * <p/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channels the channels to merge.
+     * @return the selectable output channel.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     */
+    @Nonnull
+    public static OutputChannel<? extends ParcelableSelectable<Object>> mergeParcelable(
+            @Nonnull final OutputChannel<?>... channels) {
+
+        return mergeParcelable(0, channels);
+    }
+
+    /**
+     * Returns a new channel transforming the input data into selectable ones.
+     *
+     * @param channel the selectable channel.
+     * @param index   the channel index.
+     * @param <DATA>  the channel data type.
+     * @param <INPUT> the input data type.
+     * @return the input channel.
+     */
+    @Nonnull
+    public static <DATA, INPUT extends DATA> InputChannel<INPUT> selectParcelable(
+            @Nullable final InputChannel<? super ParcelableSelectable<DATA>> channel,
+            final int index) {
+
+        final TransportChannel<INPUT> transport = JRoutine.transport().buildChannel();
+
+        if (channel != null) {
+
+            transport.output().passTo(new SelectableInputConsumer<DATA, INPUT>(channel, index));
+        }
+
+        return transport.input();
+    }
+
+    /**
+     * Returns a new channel making the specified one selectable.<br/>
+     * Each output will be passed along unchanged.
+     * <p/>
+     * Note that the channel will be bound as a result of the call.
+     *
+     * @param channel  the channel to make selectable.
+     * @param index    the channel index.
+     * @param <OUTPUT> the output data type.
+     * @return the selectable output channel.
+     */
+    @Nonnull
+    public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> toSelectable(
+            @Nullable final OutputChannel<? extends OUTPUT> channel, final int index) {
+
+        final TransportChannel<ParcelableSelectable<OUTPUT>> transport =
+                JRoutine.transport().buildChannel();
+
+        if (channel != null) {
+
+            channel.passTo(new SelectableOutputConsumer<OUTPUT>(transport.input(), index));
+        }
+
         return transport.output();
     }
 
@@ -247,44 +374,49 @@ public class JRoutineChannels {
     }
 
     /**
-     * Output consumer feeding a selectable input channel.
+     * Output consumer transforming input data into selectable ones.
      *
+     * @param <DATA>  the channel data type.
      * @param <INPUT> the input data type.
      */
-    private static class InputOutputConsumer<INPUT> extends TemplateOutputConsumer<INPUT> {
-
-        private final InputChannel<ParcelableSelectable<? super INPUT>> mChannel;
+    private static class SelectableInputConsumer<DATA, INPUT extends DATA>
+            implements OutputConsumer<INPUT> {
 
         private final int mIndex;
+
+        private final InputChannel<? super ParcelableSelectable<DATA>> mInputChannel;
 
         /**
          * Constructor.
          *
-         * @param index   the channel index.
-         * @param channel the selectable input channel.
+         * @param inputChannel the selectable channel.
+         * @param index        the selectable index.
          */
-        @SuppressWarnings("unchecked")
-        private InputOutputConsumer(final int index,
-                @Nonnull final InputChannel<? extends ParcelableSelectable<? super INPUT>>
-                        channel) {
+        private SelectableInputConsumer(
+                @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> inputChannel,
+                final int index) {
 
+            mInputChannel = inputChannel;
             mIndex = index;
-            mChannel = (InputChannel<ParcelableSelectable<? super INPUT>>) channel;
+        }
+
+        public void onComplete() {
+
         }
 
         public void onError(@Nullable final Throwable error) {
 
-            mChannel.abort(error);
+            mInputChannel.abort(error);
         }
 
         public void onOutput(final INPUT input) {
 
-            mChannel.pass(new ParcelableSelectable<INPUT>(input, mIndex));
+            mInputChannel.pass(new ParcelableSelectable<DATA>(input, mIndex));
         }
     }
 
     /**
-     * Output consumer making an output channel selectable.
+     * Output consumer transforming output data into selectable ones.
      *
      * @param <OUTPUT> the output data type.
      */
@@ -294,30 +426,23 @@ public class JRoutineChannels {
 
         private final TransportInput<ParcelableSelectable<OUTPUT>> mInputChannel;
 
-        private final TransportOutput<ParcelableSelectable<OUTPUT>> mOutputChannel;
-
         /**
          * Constructor.
          *
-         * @param index the channel index.
+         * @param inputChannel the transport input channel.
+         * @param index        the selectable index.
          */
-        private SelectableOutputConsumer(final int index) {
+        private SelectableOutputConsumer(
+                @Nonnull final TransportInput<ParcelableSelectable<OUTPUT>> inputChannel,
+                final int index) {
 
+            mInputChannel = inputChannel;
             mIndex = index;
-            final TransportChannel<ParcelableSelectable<OUTPUT>> transportChannel =
-                    JRoutine.transport().buildChannel();
-            mInputChannel = transportChannel.input();
-            mOutputChannel = transportChannel.output();
         }
 
         public void onComplete() {
 
             mInputChannel.close();
-        }
-
-        private OutputChannel<ParcelableSelectable<OUTPUT>> getOutput() {
-
-            return mOutputChannel;
         }
 
         public void onError(@Nullable final Throwable error) {
@@ -328,54 +453,6 @@ public class JRoutineChannels {
         public void onOutput(final OUTPUT output) {
 
             mInputChannel.pass(new ParcelableSelectable<OUTPUT>(output, mIndex));
-        }
-    }
-
-    /**
-     * Output consumer sorting the output data among a map of output channels.
-     *
-     * @param <OUTPUT> the output data type.
-     */
-    private static class SplitOutputConsumer<OUTPUT>
-            implements OutputConsumer<ParcelableSelectable<? extends OUTPUT>> {
-
-        private final HashMap<Integer, TransportInput<OUTPUT>> mChannelMap;
-
-        /**
-         * Constructor.
-         *
-         * @param channelMap the map of indexes and transport input channels.
-         */
-        private SplitOutputConsumer(
-                @Nonnull final HashMap<Integer, TransportInput<OUTPUT>> channelMap) {
-
-            mChannelMap = channelMap;
-        }
-
-        public void onComplete() {
-
-            for (final TransportInput<OUTPUT> inputChannel : mChannelMap.values()) {
-
-                inputChannel.close();
-            }
-        }
-
-        public void onError(@Nullable final Throwable error) {
-
-            for (final TransportInput<OUTPUT> inputChannel : mChannelMap.values()) {
-
-                inputChannel.abort(error);
-            }
-        }
-
-        public void onOutput(final ParcelableSelectable<? extends OUTPUT> selectable) {
-
-            final TransportInput<OUTPUT> inputChannel = mChannelMap.get(selectable.index);
-
-            if (inputChannel != null) {
-
-                inputChannel.pass(selectable.data);
-            }
         }
     }
 }

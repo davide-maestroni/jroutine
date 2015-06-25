@@ -54,6 +54,24 @@ public interface InvocationChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * {@inheritDoc}
      */
     @Nonnull
+    InvocationChannel<INPUT, OUTPUT> orderByCall();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    InvocationChannel<INPUT, OUTPUT> orderByChance();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    InvocationChannel<INPUT, OUTPUT> orderByDelay();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
     InvocationChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
     /**

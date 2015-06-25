@@ -203,10 +203,10 @@ public class ObjectRoutineTest {
 
         final TestClass test = new TestClass();
         final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CHANCE)
                                                                .withInputMaxSize(3)
                                                                .withInputTimeout(seconds(1))
-                                                               .withOutputOrder(OrderType.NONE)
+                                                               .withOutputOrder(OrderType.BY_CHANCE)
                                                                .withOutputMaxSize(3)
                                                                .withOutputTimeout(seconds(1))
                                                                .withLogLevel(LogLevel.DEBUG)
@@ -2023,13 +2023,11 @@ public class ObjectRoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        @Override
         public boolean isRunnerThread() {
 
             return false;
         }
 
-        @Override
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 

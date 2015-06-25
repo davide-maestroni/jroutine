@@ -27,12 +27,12 @@ import static org.junit.Assert.fail;
  * <p/>
  * Created by davide-maestroni on 10/2/14.
  */
-public class OrderedNestedQueueTest {
+public class NestedQueueTest {
 
     @Test
     public void testAdd() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         queue.add(13);
         final NestedQueue<Integer> nested0 = queue.addNested();
@@ -73,7 +73,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testAddCloseError() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         queue.close();
 
@@ -111,7 +111,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testAddNestedError() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         NestedQueue<Integer> nested = queue.addNested();
         nested.addAll(Arrays.asList(1, 2, 3, 4));
@@ -207,7 +207,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testClear() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         queue.add(13);
         queue.addNested();
@@ -230,7 +230,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testMove() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         queue.add(13);
         final NestedQueue<Integer> nested0 = queue.addNested();
@@ -270,7 +270,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testMove2() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         queue.add(13);
         final NestedQueue<Integer> nested0 = queue.addNested();
@@ -297,7 +297,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testRemoveAllError() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         for (int i = 0; i < 7; i++) {
 
@@ -324,7 +324,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testRemoveClearError() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         for (int i = 0; i < 7; i++) {
 
@@ -347,7 +347,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testRemoveEmptyError() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         try {
 
@@ -363,7 +363,7 @@ public class OrderedNestedQueueTest {
     @Test
     public void testRemoveNestedError() {
 
-        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+        final NestedQueue<Integer> queue = new NestedQueue<Integer>();
 
         queue.addNested();
 

@@ -205,6 +205,27 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         }
 
         @Nonnull
+        public TransportInput<INPUT> orderByCall() {
+
+            mChannel.orderByCall();
+            return this;
+        }
+
+        @Nonnull
+        public TransportInput<INPUT> orderByChance() {
+
+            mChannel.orderByChance();
+            return this;
+        }
+
+        @Nonnull
+        public TransportInput<INPUT> orderByDelay() {
+
+            mChannel.orderByDelay();
+            return this;
+        }
+
+        @Nonnull
         public TransportInput<INPUT> pass(@Nullable final OutputChannel<? extends INPUT> channel) {
 
             mChannel.pass(channel);

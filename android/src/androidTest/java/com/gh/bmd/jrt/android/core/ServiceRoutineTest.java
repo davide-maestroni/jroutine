@@ -171,7 +171,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final Routine<String, String> routine = JRoutine.onService(getActivity(), token)
                                                         .invocations()
                                                         .withSyncRunner(Runners.queuedRunner())
-                                                        .withInputOrder(OrderType.NONE)
+                                                        .withInputOrder(OrderType.BY_CHANCE)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .set()
                                                         .service()
@@ -189,7 +189,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
                         .invocations()
                         .withSyncRunner(Runners.queuedRunner())
-                        .withInputOrder(OrderType.NONE)
+                        .withInputOrder(OrderType.BY_CHANCE)
                         .withLogLevel(LogLevel.DEBUG)
                         .set()
                         .service()
@@ -214,7 +214,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
-                                                         .withOutputOrder(OrderType.NONE)
+                                                         .withOutputOrder(OrderType.BY_CHANCE)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .set()
                                                          .service()
@@ -239,8 +239,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 ClassToken.tokenOf(StringFunctionInvocation.class);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
                                                          .invocations()
-                                                         .withInputOrder(OrderType.PASS_ORDER)
-                                                         .withOutputOrder(OrderType.PASS_ORDER)
+                                                         .withInputOrder(OrderType.BY_CALL)
+                                                         .withOutputOrder(OrderType.BY_CALL)
                                                          .set()
                                                          .buildRoutine();
         assertThat(

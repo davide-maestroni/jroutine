@@ -294,7 +294,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return JRoutine.onService(mContext, classToken, args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
-                       .withInputOrder(OrderType.PASS_ORDER)
+                       .withInputOrder(OrderType.BY_CALL)
                        .set()
                        .service()
                        .with(serviceConfiguration)
@@ -319,7 +319,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return JRoutine.onService(mContext, classToken, args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
-                       .withInputOrder(OrderType.PASS_ORDER)
+                       .withInputOrder(OrderType.BY_CALL)
                        .set()
                        .service()
                        .with(serviceConfiguration)
@@ -735,9 +735,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                  targetClass.getName(), targetMethod.getName(),
                                  toNames(targetParameterTypes), inputMode, outputMode};
             final OrderType inputOrder =
-                    (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER;
+                    (inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE : OrderType.BY_CALL;
             final OrderType outputOrder =
-                    (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
+                    (outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL : OrderType.BY_CHANCE;
             final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, PROXY_TOKEN, factoryArgs)
                             .invocations()

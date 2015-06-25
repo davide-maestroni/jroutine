@@ -64,7 +64,7 @@ public class JRoutineChannelsTest {
     public void testMerge() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.PASS_ORDER).set();
+                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<String> channel2 = builder.buildChannel();
         final TransportChannel<String> channel3 = builder.buildChannel();
@@ -97,7 +97,7 @@ public class JRoutineChannelsTest {
     public void testSplit() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.PASS_ORDER).set();
+                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
@@ -106,7 +106,7 @@ public class JRoutineChannelsTest {
         final OutputChannel<Selectable<Object>> output = JRoutine.on(new Sort())
                                                                  .invocations()
                                                                  .withInputOrder(
-                                                                         OrderType.PASS_ORDER)
+                                                                         OrderType.BY_CALL)
                                                                  .set()
                                                                  .callAsync(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =

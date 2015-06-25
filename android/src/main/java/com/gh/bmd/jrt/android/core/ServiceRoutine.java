@@ -343,6 +343,27 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
+        public InvocationChannel<INPUT, OUTPUT> orderByCall() {
+
+            mTransportParamInput.orderByCall();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<INPUT, OUTPUT> orderByChance() {
+
+            mTransportParamInput.orderByChance();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<INPUT, OUTPUT> orderByDelay() {
+
+            mTransportParamInput.orderByDelay();
+            return this;
+        }
+
+        @Nonnull
         public InvocationChannel<INPUT, OUTPUT> pass(
                 @Nullable final OutputChannel<? extends INPUT> channel) {
 

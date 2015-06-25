@@ -619,8 +619,8 @@ public class RoutineTest {
         final InvocationChannel<String, String> channel1 =
                 JRoutine.on(factoryOf(ClassToken.tokenOf(DelayedInvocation.class), millis(10)))
                         .invocations()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withOutputOrder(OrderType.PASS_ORDER)
+                        .withInputOrder(OrderType.BY_CALL)
+                        .withOutputOrder(OrderType.BY_CALL)
                         .set()
                         .invokeAsync();
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -651,9 +651,8 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.PASS_ORDER)
-                                                               .withOutputOrder(
-                                                                       OrderType.PASS_ORDER)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withOutputOrder(OrderType.BY_CALL)
                                                                .set();
         final InvocationChannel<String, String> channel3 =
                 JRoutine.on(factoryOf(DelayedListInvocation.class, millis(10), 2))
@@ -1379,13 +1378,16 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new SlowFilterInvocation<String>(millis(100)))
+            JRoutine.on(PassingInvocation.factoryOf())
                     .invocations()
+                    .withInputOrder(OrderType.BY_CALL)
                     .withInputMaxSize(1)
                     .withInputTimeout(TimeDuration.ZERO)
                     .set()
                     .invokeAsync()
+                    .after(millis(100))
                     .pass("test1")
+                    .now()
                     .pass("test2")
                     .result()
                     .all();
@@ -1968,7 +1970,7 @@ public class RoutineTest {
                            .withInputTimeout(1, TimeUnit.SECONDS)
                            .withOutputMaxSize(2)
                            .withOutputTimeout(1, TimeUnit.SECONDS)
-                           .withOutputOrder(OrderType.PASS_ORDER)
+                           .withOutputOrder(OrderType.BY_CALL)
                            .set()
                            .callSync("test1", "test2")
                            .all()).containsExactly("test1", "test2");
@@ -1984,7 +1986,7 @@ public class RoutineTest {
                            .withInputTimeout(TimeDuration.ZERO)
                            .withOutputMaxSize(2)
                            .withOutputTimeout(TimeDuration.ZERO)
-                           .withOutputOrder(OrderType.PASS_ORDER)
+                           .withOutputOrder(OrderType.BY_CALL)
                            .set()
                            .callSync("test1", "test2")
                            .all()).containsExactly("test1", "test2");

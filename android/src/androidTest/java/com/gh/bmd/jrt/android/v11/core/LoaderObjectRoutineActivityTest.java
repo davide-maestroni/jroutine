@@ -221,10 +221,10 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.NONE)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CHANCE)
                                                                .withInputMaxSize(3)
                                                                .withInputTimeout(seconds(10))
-                                                               .withOutputOrder(OrderType.NONE)
+                                                               .withOutputOrder(OrderType.BY_CHANCE)
                                                                .withOutputMaxSize(3)
                                                                .withOutputTimeout(seconds(10))
                                                                .withLogLevel(LogLevel.DEBUG)

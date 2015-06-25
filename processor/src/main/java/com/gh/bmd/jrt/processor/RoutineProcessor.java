@@ -491,13 +491,13 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.append(".withInputOrder(")
                       .append(OrderType.class.getCanonicalName())
                       .append(".")
-                      .append(((inputMode == InputMode.ELEMENT) ? OrderType.NONE
-                              : OrderType.PASS_ORDER))
+                      .append(((inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE
+                              : OrderType.BY_CALL))
                       .append(").withOutputOrder(")
                       .append(OrderType.class.getCanonicalName())
                       .append(".")
-                      .append(((outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER
-                              : OrderType.NONE))
+                      .append(((outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL
+                              : OrderType.BY_CHANCE))
                       .append(")")
                       .toString();
     }

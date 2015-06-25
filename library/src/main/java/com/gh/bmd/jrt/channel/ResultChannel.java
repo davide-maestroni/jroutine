@@ -52,6 +52,24 @@ public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
      * {@inheritDoc}
      */
     @Nonnull
+    ResultChannel<OUTPUT> orderByCall();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ResultChannel<OUTPUT> orderByChance();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ResultChannel<OUTPUT> orderByDelay();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
     ResultChannel<OUTPUT> pass(@Nullable OutputChannel<? extends OUTPUT> channel);
 
     /**

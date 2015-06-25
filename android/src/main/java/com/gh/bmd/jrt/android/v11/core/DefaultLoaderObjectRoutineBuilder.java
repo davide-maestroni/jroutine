@@ -305,7 +305,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
         return getBuilder(mContext, factory).invocations()
                                             .with(invocationConfiguration)
-                                            .withInputOrder(OrderType.PASS_ORDER)
+                                            .withInputOrder(OrderType.BY_CALL)
                                             .set()
                                             .loaders()
                                             .with(loaderConfiguration)
@@ -336,7 +336,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mLoaderConfiguration, method);
         return getBuilder(mContext, factory).invocations()
                                             .with(invocationConfiguration)
-                                            .withInputOrder(OrderType.PASS_ORDER)
+                                            .withInputOrder(OrderType.BY_CALL)
                                             .set()
                                             .loaders()
                                             .with(loaderConfiguration)
@@ -870,9 +870,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final OutputMode outputMode = methodInfo.outputMode;
             final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
             final OrderType inputOrderType =
-                    (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER;
+                    (inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE : OrderType.BY_CALL;
             final OrderType outputOrderType =
-                    (outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER : OrderType.NONE;
+                    (outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL : OrderType.BY_CHANCE;
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(targetMethod, mTargetClass, mFactoryArgs, shareGroup,
                                                inputMode, outputMode);

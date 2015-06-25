@@ -570,16 +570,21 @@ public final class InvocationConfiguration {
     public enum OrderType {
 
         /**
-         * Pass order.<br/>
+         * Order by chance.<br/>
+         * There is no guarantee about the data order.
+         */
+        BY_CHANCE,
+        /**
+         * Order by call.<br/>
          * Data are returned in the same order as they are passed to the channel, independently from
          * the specific delay.
          */
-        PASS_ORDER,
+        BY_CALL,
         /**
-         * No order.<br/>
-         * There is no guarantee about the data order.
+         * Order by delay.<br/>
+         * TODO
          */
-        NONE
+        BY_DELAY
     }
 
     /**

@@ -43,7 +43,7 @@ public class InvocationConfigurationTest {
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withPriority(11)
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -62,7 +62,7 @@ public class InvocationConfigurationTest {
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withPriority(11)
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -83,7 +83,7 @@ public class InvocationConfigurationTest {
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withPriority(11)
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -125,7 +125,7 @@ public class InvocationConfigurationTest {
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withPriority(11)
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -142,7 +142,7 @@ public class InvocationConfigurationTest {
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withCoreInstances(27)
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -172,16 +172,16 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
-        assertThat(configuration).isNotEqualTo(builder().withInputOrder(OrderType.NONE).set());
+        assertThat(configuration).isNotEqualTo(builder().withInputOrder(OrderType.BY_CHANCE).set());
         assertThat(configuration.builderFrom()
-                                .withInputOrder(OrderType.PASS_ORDER)
+                                .withInputOrder(OrderType.BY_CALL)
                                 .set()).isNotEqualTo(
-                builder().withInputOrder(OrderType.PASS_ORDER).set());
+                builder().withInputOrder(OrderType.BY_CALL).set());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -219,7 +219,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -263,7 +263,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -278,7 +278,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -293,7 +293,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -323,16 +323,16 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
-        assertThat(configuration).isNotEqualTo(builder().withOutputOrder(OrderType.NONE).set());
+        assertThat(configuration).isNotEqualTo(builder().withOutputOrder(OrderType.BY_CHANCE).set());
         assertThat(configuration.builderFrom()
-                                .withOutputOrder(OrderType.PASS_ORDER)
+                                .withOutputOrder(OrderType.BY_CALL)
                                 .set()).isNotEqualTo(
-                builder().withOutputOrder(OrderType.PASS_ORDER).set());
+                builder().withOutputOrder(OrderType.BY_CALL).set());
     }
 
     @Test
@@ -340,7 +340,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -370,7 +370,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -417,7 +417,7 @@ public class InvocationConfigurationTest {
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
                          .withPriority(17)
                          .withCoreInstances(27)
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -432,7 +432,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
@@ -451,7 +451,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration =
                 builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.PASS_ORDER)
+                         .withInputOrder(OrderType.BY_CALL)
                          .withAsyncRunner(Runners.queuedRunner())
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)

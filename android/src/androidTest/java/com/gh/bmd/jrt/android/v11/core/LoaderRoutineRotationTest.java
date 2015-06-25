@@ -56,7 +56,7 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class))
                 .invocations()
-                .withOutputOrder(OrderType.PASS_ORDER)
+                .withOutputOrder(OrderType.BY_CALL)
                 .set()
                 .loaders()
                 .withId(0)

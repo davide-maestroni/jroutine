@@ -247,10 +247,10 @@ public class ProxyRoutineTest {
         final TestClass test = new TestClass();
         JRoutineProxy.on(test)
                      .invocations()
-                     .withInputOrder(OrderType.NONE)
+                     .withInputOrder(OrderType.BY_CHANCE)
                      .withInputMaxSize(3)
                      .withInputTimeout(seconds(1))
-                     .withOutputOrder(OrderType.NONE)
+                     .withOutputOrder(OrderType.BY_CHANCE)
                      .withOutputMaxSize(3)
                      .withOutputTimeout(seconds(1))
                      .withLogLevel(LogLevel.DEBUG)

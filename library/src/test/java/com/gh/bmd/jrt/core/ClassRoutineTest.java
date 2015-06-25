@@ -111,10 +111,10 @@ public class ClassRoutineTest {
         final CountLog countLog = new CountLog();
         JRoutine.on(TestStatic.class)
                 .invocations()
-                .withInputOrder(OrderType.NONE)
+                .withInputOrder(OrderType.BY_CHANCE)
                 .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))
-                .withOutputOrder(OrderType.NONE)
+                .withOutputOrder(OrderType.BY_CHANCE)
                 .withOutputMaxSize(3)
                 .withOutputTimeout(seconds(1))
                 .withLogLevel(LogLevel.DEBUG)

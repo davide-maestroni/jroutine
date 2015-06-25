@@ -108,6 +108,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private TimeDuration mResultDelay = ZERO;
 
+    private OrderType mResultOrder;
+
     private OutputChannelState mState;
 
     /**
@@ -136,12 +138,19 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = handler;
         mRunner = runner;
+        mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_CHANCE);
         mReadTimeout = configuration.getReadTimeoutOr(ZERO);
         mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.DEADLOCK);
         mMaxOutput = configuration.getOutputMaxSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
-        mOutputQueue = (configuration.getOutputOrderTypeOr(OrderType.NONE) == OrderType.NONE)
-                ? new SimpleNestedQueue<Object>() : new OrderedNestedQueue<Object>();
+        mOutputQueue = new NestedQueue<Object>() {
+
+            @Override
+            public void close() {
+
+                // prevents closing
+            }
+        };
         final int maxOutputSize = mMaxOutput;
         mHasOutputs = new Check() {
 
@@ -197,6 +206,39 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     public ResultChannel<OUTPUT> now() {
 
         return after(ZERO);
+    }
+
+    @Nonnull
+    public ResultChannel<OUTPUT> orderByCall() {
+
+        synchronized (mMutex) {
+
+            mState.orderBy(OrderType.BY_CALL);
+        }
+
+        return this;
+    }
+
+    @Nonnull
+    public ResultChannel<OUTPUT> orderByChance() {
+
+        synchronized (mMutex) {
+
+            mState.orderBy(OrderType.BY_CHANCE);
+        }
+
+        return this;
+    }
+
+    @Nonnull
+    public ResultChannel<OUTPUT> orderByDelay() {
+
+        synchronized (mMutex) {
+
+            mState.orderBy(OrderType.BY_DELAY);
+        }
+
+        return this;
     }
 
     @Nonnull
@@ -1224,19 +1266,21 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final TimeDuration mDelay;
 
+        private final OrderType mOrderType;
+
         private final NestedQueue<Object> mQueue;
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
         /**
          * Constructor.
-         *
-         * @param delay the output delay.
          */
-        private DefaultOutputConsumer(@Nonnull final TimeDuration delay) {
+        private DefaultOutputConsumer() {
 
-            mDelay = delay;
-            mQueue = mOutputQueue.addNested();
+            final TimeDuration delay = (mDelay = mResultDelay);
+            final OrderType order = (mOrderType = mResultOrder);
+            mQueue = ((order == OrderType.BY_CALL) || ((order == OrderType.BY_DELAY)
+                    && delay.isZero())) ? mOutputQueue.addNested() : mOutputQueue;
         }
 
         public void onComplete() {
@@ -1278,7 +1322,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                execution = mState.onConsumerOutput(output, delay, mQueue);
+                execution = mState.onConsumerOutput(mQueue, output, delay, mOrderType);
             }
 
             if (delay.isZero()) {
@@ -1476,8 +1520,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Nullable
         @Override
-        Execution onConsumerOutput(final OUTPUT output, @Nonnull final TimeDuration delay,
-                @Nonnull final NestedQueue<Object> queue) {
+        Execution onConsumerOutput(@Nonnull final NestedQueue<Object> queue, final OUTPUT output,
+                @Nonnull final TimeDuration delay, final OrderType orderType) {
 
             throw abortException();
         }
@@ -1488,6 +1532,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             final Throwable abortException = mAbortException;
             mSubLogger.dbg(abortException, "abort exception");
             return RoutineExceptionWrapper.wrap(abortException).raise();
+        }
+
+        @Override
+        void orderBy(@Nonnull final OrderType orderType) {
+
+            throw abortException();
         }
 
         @Nullable
@@ -1604,8 +1654,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Nullable
         @Override
-        Execution onConsumerOutput(final OUTPUT output, @Nonnull final TimeDuration delay,
-                @Nonnull final NestedQueue<Object> queue) {
+        Execution onConsumerOutput(@Nonnull final NestedQueue<Object> queue, final OUTPUT output,
+                @Nonnull final TimeDuration delay, final OrderType orderType) {
 
             throw exception();
         }
@@ -1869,14 +1919,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         /**
          * Called when the feeding consumer receives an output.
          *
-         * @param output the output.
-         * @param delay  the output delay.
-         * @param queue  the output queue.
+         * @param queue     the output queue.
+         * @param output    the output.
+         * @param delay     the output delay.
+         * @param orderType the result order type.
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onConsumerOutput(final OUTPUT output, @Nonnull final TimeDuration delay,
-                @Nonnull final NestedQueue<Object> queue) {
+        Execution onConsumerOutput(@Nonnull final NestedQueue<Object> queue, final OUTPUT output,
+                @Nonnull final TimeDuration delay, final OrderType orderType) {
 
             mSubLogger.dbg("consumer output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
@@ -1894,7 +1945,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (mState != this) {
 
                     --mOutputCount;
-                    return mState.onConsumerOutput(output, delay, queue);
+                    return mState.onConsumerOutput(queue, output, delay, orderType);
                 }
             }
 
@@ -1905,7 +1956,18 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             ++mPendingOutputCount;
-            return new DelayedOutputExecution(queue.addNested(), output);
+            return new DelayedOutputExecution(
+                    (orderType != OrderType.BY_CHANCE) ? queue.addNested() : queue, output);
+        }
+
+        /**
+         * Called to set the result delivery order.
+         *
+         * @param orderType the result order type.
+         */
+        void orderBy(@Nonnull final OrderType orderType) {
+
+            mResultOrder = orderType;
         }
 
         /**
@@ -1926,7 +1988,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mBoundChannels.add(channel);
             ++mPendingOutputCount;
             mSubLogger.dbg("passing channel: %s", channel);
-            return new DefaultOutputConsumer(mResultDelay);
+            return new DefaultOutputConsumer();
         }
 
         /**
@@ -1988,7 +2050,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             ++mPendingOutputCount;
-            return new DelayedListOutputExecution(mOutputQueue.addNested(), list);
+            return new DelayedListOutputExecution(
+                    (mResultOrder != OrderType.BY_CHANCE) ? mOutputQueue.addNested() : mOutputQueue,
+                    list);
         }
 
         /**
@@ -2028,7 +2092,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             ++mPendingOutputCount;
-            return new DelayedOutputExecution(mOutputQueue.addNested(), output);
+            return new DelayedOutputExecution(
+                    (mResultOrder != OrderType.BY_CHANCE) ? mOutputQueue.addNested() : mOutputQueue,
+                    output);
         }
 
         /**
@@ -2118,6 +2184,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             queue.addAll(outputs);
             queue.close();
             return true;
+        }
+
+        @Override
+        void orderBy(@Nonnull final OrderType orderType) {
+
+            throw exception();
         }
 
         @Override

@@ -81,6 +81,8 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
     private TimeDuration mInputDelay = ZERO;
 
+    private OrderType mInputOrder;
+
     private boolean mIsConsuming;
 
     private boolean mIsPendingExecution;
@@ -103,10 +105,17 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
+        mInputOrder = configuration.getInputOrderTypeOr(OrderType.BY_CHANCE);
         mMaxInput = configuration.getInputMaxSizeOr(Integer.MAX_VALUE);
         mInputTimeout = configuration.getInputTimeoutOr(ZERO);
-        mInputQueue = (configuration.getInputOrderTypeOr(OrderType.NONE) == OrderType.NONE)
-                ? new SimpleNestedQueue<INPUT>() : new OrderedNestedQueue<INPUT>();
+        mInputQueue = new NestedQueue<INPUT>() {
+
+            @Override
+            public void close() {
+
+                // prevents closing
+            }
+        };
         final int maxInputSize = mMaxInput;
         mHasInputs = new Check() {
 
@@ -172,18 +181,11 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
     public InvocationChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
         synchronized (mMutex) {
 
-            if (delay == null) {
-
-                mLogger.err("invalid null delay");
-                throw new NullPointerException("the input delay must not be null");
-            }
-
-            mInputDelay = delay;
+            mState.after(delay);
         }
 
         return this;
@@ -200,6 +202,39 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     public InvocationChannel<INPUT, OUTPUT> now() {
 
         return after(ZERO);
+    }
+
+    @Nonnull
+    public InvocationChannel<INPUT, OUTPUT> orderByCall() {
+
+        synchronized (mMutex) {
+
+            mState.orderBy(OrderType.BY_CALL);
+        }
+
+        return this;
+    }
+
+    @Nonnull
+    public InvocationChannel<INPUT, OUTPUT> orderByChance() {
+
+        synchronized (mMutex) {
+
+            mState.orderBy(OrderType.BY_CHANCE);
+        }
+
+        return this;
+    }
+
+    @Nonnull
+    public InvocationChannel<INPUT, OUTPUT> orderByDelay() {
+
+        synchronized (mMutex) {
+
+            mState.orderBy(OrderType.BY_DELAY);
+        }
+
+        return this;
     }
 
     @Nonnull
@@ -480,17 +515,19 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         private final TimeDuration mDelay;
 
+        private final OrderType mOrderType;
+
         private final NestedQueue<INPUT> mQueue;
 
         /**
          * Constructor.
-         *
-         * @param delay the output delay.
          */
-        private DefaultOutputConsumer(@Nonnull final TimeDuration delay) {
+        private DefaultOutputConsumer() {
 
-            mDelay = delay;
-            mQueue = mInputQueue.addNested();
+            final TimeDuration delay = (mDelay = mInputDelay);
+            final OrderType order = (mOrderType = mInputOrder);
+            mQueue = ((order == OrderType.BY_CALL) || ((order == OrderType.BY_DELAY)
+                    && delay.isZero())) ? mInputQueue.addNested() : mInputQueue;
         }
 
         public void onComplete() {
@@ -531,7 +568,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             synchronized (mMutex) {
 
-                execution = mState.onConsumerOutput(output, delay, mQueue);
+                execution = mState.onConsumerOutput(output, mQueue, delay, mOrderType);
             }
 
             if (execution != null) {
@@ -657,6 +694,20 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
+        @Override
+        void after(@Nonnull final TimeDuration delay) {
+
+            throw exception();
+        }
+
+        @Nullable
+        @Override
+        Execution onConsumerOutput(final INPUT input, @Nonnull final NestedQueue<INPUT> queue,
+                @Nonnull final TimeDuration delay, @Nonnull final OrderType orderType) {
+
+            throw consumerException();
+        }
+
         @Nullable
         @Override
         Execution onHandlerAbort(@Nullable final Throwable reason) {
@@ -668,14 +719,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Nullable
         @Override
         Execution onConsumerComplete(@Nonnull final NestedQueue<INPUT> queue) {
-
-            throw consumerException();
-        }
-
-        @Nullable
-        @Override
-        Execution onConsumerOutput(final INPUT input, @Nonnull final TimeDuration delay,
-                @Nonnull final NestedQueue<INPUT> queue) {
 
             throw consumerException();
         }
@@ -694,6 +737,12 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             final Throwable abortException = mAbortException;
             mSubLogger.dbg(abortException, "abort exception");
             throw RoutineExceptionWrapper.wrap(abortException).raise();
+        }
+
+        @Override
+        void orderBy(@Nonnull final OrderType orderType) {
+
+            throw exception();
         }
 
         @Override
@@ -774,6 +823,23 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             }
 
             return new DelayedAbortExecution(abortException);
+        }
+
+        /**
+         * Called to set the specified input delay.
+         *
+         * @param delay the delay.
+         */
+        @SuppressWarnings("ConstantConditions")
+        void after(@Nonnull final TimeDuration delay) {
+
+            if (delay == null) {
+
+                mLogger.err("invalid null delay");
+                throw new NullPointerException("the input delay must not be null");
+            }
+
+            mInputDelay = delay;
         }
 
         /**
@@ -889,14 +955,15 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         /**
          * Called when the feeding consumer receives an output.
          *
-         * @param input the input.
-         * @param delay the input delay.
-         * @param queue the input queue.
+         * @param input     the input.
+         * @param queue     the input queue.
+         * @param delay     the input delay.
+         * @param orderType the input order type.
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onConsumerOutput(final INPUT input, @Nonnull final TimeDuration delay,
-                @Nonnull final NestedQueue<INPUT> queue) {
+        Execution onConsumerOutput(final INPUT input, @Nonnull final NestedQueue<INPUT> queue,
+                @Nonnull final TimeDuration delay, @Nonnull final OrderType orderType) {
 
             mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
@@ -915,7 +982,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                 if (mState != this) {
 
                     --mInputCount;
-                    return mState.onConsumerOutput(input, delay, queue);
+                    return mState.onConsumerOutput(input, queue, delay, orderType);
                 }
             }
 
@@ -934,7 +1001,8 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             }
 
             ++mPendingExecutionCount;
-            return new DelayedInputExecution(queue.addNested(), input);
+            return new DelayedInputExecution(
+                    (orderType != OrderType.BY_CHANCE) ? queue.addNested() : queue, input);
         }
 
         /**
@@ -973,6 +1041,16 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         }
 
         /**
+         * Called to set the input delivery order.
+         *
+         * @param orderType the input order type.
+         */
+        void orderBy(@Nonnull final OrderType orderType) {
+
+            mInputOrder = orderType;
+        }
+
+        /**
          * Called when an output channel is passed to the invocation.
          *
          * @param channel the channel instance.
@@ -990,7 +1068,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mBoundChannels.add(channel);
             ++mPendingExecutionCount;
             mSubLogger.dbg("passing channel: %s", channel);
-            return new DefaultOutputConsumer(mInputDelay);
+            return new DefaultOutputConsumer();
         }
 
         /**
@@ -1060,7 +1138,9 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             }
 
             ++mPendingExecutionCount;
-            return new DelayedListInputExecution(mInputQueue.addNested(), list);
+            return new DelayedListInputExecution(
+                    (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
+                    list);
         }
 
         /**
@@ -1109,7 +1189,9 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             }
 
             ++mPendingExecutionCount;
-            return new DelayedInputExecution(mInputQueue.addNested(), input);
+            return new DelayedInputExecution(
+                    (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
+                    input);
         }
 
         /**
@@ -1203,6 +1285,12 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             return null;
         }
 
+        @Override
+        void after(@Nonnull final TimeDuration delay) {
+
+            throw exception();
+        }
+
         @Nullable
         @Override
         Execution delayedAbortInvocation(@Nullable final Throwable reason) {
@@ -1222,6 +1310,13 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mSubLogger.err("invalid call on closed channel");
             return new IllegalStateException("the input channel is closed");
         }
+
+        @Override
+        void orderBy(@Nonnull final OrderType orderType) {
+
+            throw exception();
+        }
+
 
         @Override
         boolean isChannelOpen() {
@@ -1286,19 +1381,27 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
+        @Nonnull
+        private IllegalStateException exception() {
+
+            mSubLogger.dbg("consumer invalid call on closed channel");
+            return new IllegalStateException("the input channel is closed");
+        }
+
+        @Nullable
+        @Override
+        Execution onConsumerOutput(final INPUT input, @Nonnull final NestedQueue<INPUT> queue,
+                @Nonnull final TimeDuration delay, @Nonnull final OrderType orderType) {
+
+            throw exception();
+        }
+
         @Nullable
         @Override
         Execution delayedAbortInvocation(@Nullable final Throwable reason) {
 
             mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
-        }
-
-        @Nonnull
-        private IllegalStateException exception() {
-
-            mSubLogger.dbg("consumer invalid call on closed channel");
-            return new IllegalStateException("the input channel is closed");
         }
 
         @Override
@@ -1361,12 +1464,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             return null;
         }
 
-        @Nullable
-        @Override
-        Execution onConsumerOutput(final INPUT input, @Nonnull final TimeDuration delay,
-                @Nonnull final NestedQueue<INPUT> queue) {
 
-            throw exception();
-        }
     }
 }

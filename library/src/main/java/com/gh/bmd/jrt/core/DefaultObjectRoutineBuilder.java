@@ -206,11 +206,11 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     configuration.builderFrom();
             warn(configuration);
             builder.withInputOrder(
-                    (inputMode == InputMode.ELEMENT) ? OrderType.NONE : OrderType.PASS_ORDER)
+                    (inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE : OrderType.BY_CALL)
                    .withInputMaxSize(Integer.MAX_VALUE)
                    .withInputTimeout(TimeDuration.ZERO)
-                   .withOutputOrder((outputMode == OutputMode.ELEMENT) ? OrderType.PASS_ORDER
-                                            : OrderType.NONE)
+                   .withOutputOrder((outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL
+                                            : OrderType.BY_CHANCE)
                    .withOutputMaxSize(Integer.MAX_VALUE)
                    .withOutputTimeout(TimeDuration.ZERO);
             final Priority priorityAnnotation = method.getAnnotation(Priority.class);

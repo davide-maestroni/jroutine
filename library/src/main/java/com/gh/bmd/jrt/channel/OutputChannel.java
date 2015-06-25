@@ -41,9 +41,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param timeout the maximum timeout.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException         if this channel is already bound to a
-     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
@@ -57,10 +54,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @param timeout  the maximum timeout value.
      * @param timeUnit the timeout time unit.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalArgumentException      if the specified timeout is negative.
-     * @throws java.lang.IllegalStateException         if this channel is already bound to a
-     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
@@ -124,9 +118,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @return this channel.
-     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException         if this channel is already bound to a
-     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> eventually();
@@ -185,9 +176,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @return this channel.
-     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException         if this channel is already bound to a
-     *                                                 consumer.
      */
     @Nonnull
     OutputChannel<OUTPUT> immediately();

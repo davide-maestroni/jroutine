@@ -289,7 +289,7 @@ class DefaultClassRoutineBuilder
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 invocationConfiguration.builderFrom();
         warn(invocationConfiguration);
-        builder.withInputOrder(OrderType.PASS_ORDER)
+        builder.withInputOrder(OrderType.BY_CALL)
                .withInputMaxSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
                .withOutputMaxSize(Integer.MAX_VALUE)

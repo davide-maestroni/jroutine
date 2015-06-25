@@ -135,8 +135,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .with(builder().withInputOrder(OrderType.PASS_ORDER)
-                                       .withOutputOrder(OrderType.PASS_ORDER)
+                        .with(builder().withInputOrder(OrderType.BY_CALL)
+                                       .withOutputOrder(OrderType.BY_CALL)
                                        .set())
                         .set()
                         .loaders()
@@ -156,8 +156,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .with(builder().withInputOrder(OrderType.PASS_ORDER)
-                                       .withOutputOrder(OrderType.PASS_ORDER)
+                        .with(builder().withInputOrder(OrderType.BY_CALL)
+                                       .withOutputOrder(OrderType.BY_CALL)
                                        .set())
                         .set()
                         .loaders()
@@ -591,8 +591,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .with(builder().withInputOrder(OrderType.PASS_ORDER)
-                                       .withOutputOrder(OrderType.PASS_ORDER)
+                        .with(builder().withInputOrder(OrderType.BY_CALL)
+                                       .withOutputOrder(OrderType.BY_CALL)
                                        .set())
                         .set()
                         .loaders()
@@ -612,8 +612,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withOutputOrder(OrderType.PASS_ORDER)
+                        .withInputOrder(OrderType.BY_CALL)
+                        .withOutputOrder(OrderType.BY_CALL)
                         .set()
                         .loaders()
                         .withId(0)
@@ -793,8 +793,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withOutputOrder(OrderType.PASS_ORDER)
+                        .withInputOrder(OrderType.BY_CALL)
+                        .withOutputOrder(OrderType.BY_CALL)
                         .set()
                         .loaders()
                         .withId(0)
@@ -816,8 +816,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withOutputOrder(OrderType.PASS_ORDER)
+                        .withInputOrder(OrderType.BY_CALL)
+                        .withOutputOrder(OrderType.BY_CALL)
                         .set()
                         .loaders()
                         .withId(0)
@@ -859,7 +859,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                         .withId(0)
                         .set()
                         .invocations()
-                        .withOutputOrder(OrderType.PASS_ORDER)
+                        .withOutputOrder(OrderType.BY_CALL)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
@@ -1107,8 +1107,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withOutputOrder(OrderType.PASS_ORDER)
+                        .withInputOrder(OrderType.BY_CALL)
+                        .withOutputOrder(OrderType.BY_CALL)
                         .set()
                         .loaders()
                         .withId(0)
@@ -1130,8 +1130,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, factoryOf(PurgeContextInvocation.class))
                         .invocations()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withOutputOrder(OrderType.PASS_ORDER)
+                        .withInputOrder(OrderType.BY_CALL)
+                        .withOutputOrder(OrderType.BY_CALL)
                         .set()
                         .loaders()
                         .withId(0)

@@ -70,6 +70,36 @@ public interface InputChannel<INPUT> extends Channel {
     InputChannel<INPUT> now();
 
     /**
+     * TODO
+     *
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
+     */
+    @Nonnull
+    InputChannel<INPUT> orderByCall();
+
+    /**
+     * TODO
+     *
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
+     */
+    @Nonnull
+    InputChannel<INPUT> orderByChance();
+
+    /**
+     * TODO
+     *
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
+     */
+    @Nonnull
+    InputChannel<INPUT> orderByDelay();
+
+    /**
      * Passes the specified channel to this one.
      * <p/>
      * Note that the output channel will be bound as a result of the call, thus effectively

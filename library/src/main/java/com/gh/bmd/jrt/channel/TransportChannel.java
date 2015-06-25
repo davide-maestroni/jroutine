@@ -80,6 +80,24 @@ public interface TransportChannel<DATA> {
          * {@inheritDoc}
          */
         @Nonnull
+        TransportInput<INPUT> orderByCall();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        TransportInput<INPUT> orderByChance();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        TransportInput<INPUT> orderByDelay();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
         TransportInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
         /**

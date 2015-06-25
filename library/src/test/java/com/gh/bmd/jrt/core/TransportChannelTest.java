@@ -238,7 +238,7 @@ public class TransportChannelTest {
         final TransportChannel<String> transportChannel1 = JRoutine.transport()
                                                                    .invocations()
                                                                    .withOutputOrder(
-                                                                           OrderType.PASS_ORDER)
+                                                                           OrderType.BY_CALL)
                                                                    .set()
                                                                    .buildChannel();
 
@@ -288,7 +288,7 @@ public class TransportChannelTest {
                 .withMaxInstances(3)
                 .withCoreInstances(3)
                 .withAvailInstanceTimeout(seconds(1))
-                .withInputOrder(OrderType.NONE)
+                .withInputOrder(OrderType.BY_CHANCE)
                 .withInputMaxSize(3)
                 .withInputTimeout(seconds(1))
                 .withLogLevel(LogLevel.DEBUG)
@@ -448,7 +448,7 @@ public class TransportChannelTest {
         final TimeDuration timeout = seconds(1);
         final TransportChannel<Object> channel = JRoutine.transport()
                                                          .invocations()
-                                                         .withOutputOrder(OrderType.PASS_ORDER)
+                                                         .withOutputOrder(OrderType.BY_CALL)
                                                          .withAsyncRunner(Runners.sharedRunner())
                                                          .withOutputMaxSize(1)
                                                          .withOutputTimeout(1,
@@ -470,7 +470,7 @@ public class TransportChannelTest {
         final TransportChannel<Object> transportChannel2 = JRoutine.transport()
                                                                    .invocations()
                                                                    .withOutputOrder(
-                                                                           OrderType.PASS_ORDER)
+                                                                           OrderType.BY_CALL)
                                                                    .set()
                                                                    .buildChannel();
         final TransportInput<Object> input2 = transportChannel2.input();

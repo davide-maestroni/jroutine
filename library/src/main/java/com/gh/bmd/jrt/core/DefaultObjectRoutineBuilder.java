@@ -22,7 +22,7 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.core.JRoutineBuilders.MethodInfo;
+import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 
@@ -34,9 +34,9 @@ import java.lang.reflect.Proxy;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.core.JRoutineBuilders.getAnnotatedMethod;
-import static com.gh.bmd.jrt.core.JRoutineBuilders.getTargetMethodInfo;
-import static com.gh.bmd.jrt.core.JRoutineBuilders.invokeRoutine;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedMethod;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getTargetMethodInfo;
+import static com.gh.bmd.jrt.core.RoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.util.Reflection.NO_ARGS;
 
 /**

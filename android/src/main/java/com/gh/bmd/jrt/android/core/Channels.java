@@ -37,12 +37,12 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 6/18/15.
  */
-public class JRoutineChannels extends com.gh.bmd.jrt.core.JRoutineChannels {
+public class Channels extends com.gh.bmd.jrt.core.Channels {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutineChannels() {
+    protected Channels() {
 
     }
 
@@ -66,7 +66,8 @@ public class JRoutineChannels extends com.gh.bmd.jrt.core.JRoutineChannels {
 
         for (final Integer index : indexes) {
 
-            channelMap.put(index, JRoutineChannels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.put(index, com.gh.bmd.jrt.android.core.Channels.<DATA, INPUT>selectParcelable(
+                    channel, index));
         }
 
         return channelMap;
@@ -92,7 +93,8 @@ public class JRoutineChannels extends com.gh.bmd.jrt.core.JRoutineChannels {
 
         for (final int index : indexes) {
 
-            channelMap.put(index, JRoutineChannels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.put(index, com.gh.bmd.jrt.android.core.Channels.<DATA, INPUT>selectParcelable(
+                    channel, index));
         }
 
         return channelMap;
@@ -124,7 +126,8 @@ public class JRoutineChannels extends com.gh.bmd.jrt.core.JRoutineChannels {
 
         for (int index = startIndex; index < rangeSize; index++) {
 
-            channelMap.put(index, JRoutineChannels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.put(index, com.gh.bmd.jrt.android.core.Channels.<DATA, INPUT>selectParcelable(
+                    channel, index));
         }
 
         return channelMap;

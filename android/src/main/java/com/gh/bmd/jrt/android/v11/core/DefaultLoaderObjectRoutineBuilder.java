@@ -39,7 +39,7 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.core.JRoutineBuilders.MethodInfo;
+import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
@@ -56,11 +56,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.core.JRoutineBuilders.callFromInvocation;
-import static com.gh.bmd.jrt.core.JRoutineBuilders.getAnnotatedMethod;
-import static com.gh.bmd.jrt.core.JRoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.core.JRoutineBuilders.getTargetMethodInfo;
-import static com.gh.bmd.jrt.core.JRoutineBuilders.invokeRoutine;
+import static com.gh.bmd.jrt.core.RoutineBuilders.callFromInvocation;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedMethod;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getTargetMethodInfo;
+import static com.gh.bmd.jrt.core.RoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
 

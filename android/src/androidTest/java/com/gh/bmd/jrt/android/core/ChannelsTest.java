@@ -17,7 +17,7 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.gh.bmd.jrt.android.core.JRoutineChannels.ParcelableSelectable;
+import com.gh.bmd.jrt.android.core.Channels.ParcelableSelectable;
 import com.gh.bmd.jrt.android.invocation.FilterContextInvocation;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
@@ -44,9 +44,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 6/18/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public JRoutineChannelsTest() {
+    public ChannelsTest() {
 
         super(TestActivity.class);
     }
@@ -55,7 +55,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutineChannels.merge(Collections.<OutputChannel<Object>>emptyList());
+            Channels.merge(Collections.<OutputChannel<Object>>emptyList());
 
             fail();
 
@@ -77,7 +77,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<ParcelableSelectable<String>, String> routine =
                 JRoutine.onService(getActivity(), new ClassToken<Amb<String>>() {}).buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(
-                JRoutineChannels.mergeParcelable(
+                Channels.mergeParcelable(
                         Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
                                       channel4.output())));
 
@@ -106,7 +106,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends ParcelableSelectable<Object>> channel =
-                JRoutineChannels.mergeParcelable(
+                Channels.mergeParcelable(
                         Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Sort.class))
@@ -116,7 +116,7 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
                         .set()
                         .callAsync(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
-                JRoutineChannels.map(output, Sort.INTEGER, Sort.STRING);
+                Channels.map(output, Sort.INTEGER, Sort.STRING);
 
         for (int i = 0; i < 4; i++) {
 
@@ -175,12 +175,12 @@ public class JRoutineChannelsTest extends ActivityInstrumentationTestCase2<TestA
             switch (selectable.index) {
 
                 case INTEGER:
-                    JRoutineChannels.<Object, Integer>selectParcelable(result, INTEGER)
+                    Channels.<Object, Integer>selectParcelable(result, INTEGER)
                                     .pass((Integer) selectable.data);
                     break;
 
                 case STRING:
-                    JRoutineChannels.<Object, String>selectParcelable(result, STRING)
+                    Channels.<Object, String>selectParcelable(result, STRING)
                                     .pass((String) selectable.data);
                     break;
             }

@@ -38,12 +38,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide-maestroni on 3/15/15.
  */
-public class JRoutineChannels {
+public class Channels {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutineChannels() {
+    protected Channels() {
 
     }
 
@@ -56,8 +56,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static InputChannel<Selectable<Object>> combine(
-            @Nonnull final InputChannel<?>... channels) {
+    public static InputChannel<Selectable<?>> combine(@Nonnull final InputChannel<?>... channels) {
 
         return combine(0, channels);
     }
@@ -71,8 +70,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    @SuppressWarnings("unchecked")
-    public static InputChannel<Selectable<Object>> combine(final int startIndex,
+    public static InputChannel<Selectable<?>> combine(final int startIndex,
             @Nonnull final InputChannel<?>... channels) {
 
         final int length = channels.length;
@@ -84,7 +82,7 @@ public class JRoutineChannels {
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
         Collections.addAll(channelList, channels);
-        final TransportChannel<Selectable<Object>> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<Selectable<?>> transport = JRoutine.transport().buildChannel();
         transport.output().passTo(new SortingInputConsumer(startIndex, channelList));
         return transport.input();
     }
@@ -98,7 +96,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static InputChannel<Selectable<Object>> combine(final int startIndex,
+    public static InputChannel<Selectable<?>> combine(final int startIndex,
             @Nonnull final List<? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
@@ -107,7 +105,7 @@ public class JRoutineChannels {
         }
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
-        final TransportChannel<Selectable<Object>> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<Selectable<?>> transport = JRoutine.transport().buildChannel();
         transport.output().passTo(new SortingInputConsumer(startIndex, channelList));
         return transport.input();
     }
@@ -121,7 +119,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static InputChannel<Selectable<Object>> combine(
+    public static InputChannel<Selectable<?>> combine(
             @Nonnull final List<? extends InputChannel<?>> channels) {
 
         return combine(0, channels);
@@ -135,7 +133,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @Nonnull
-    public static InputChannel<Selectable<Object>> combine(
+    public static InputChannel<Selectable<?>> combine(
             @Nonnull final Map<Integer, ? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
@@ -145,7 +143,7 @@ public class JRoutineChannels {
 
         final HashMap<Integer, InputChannel<?>> channelMap =
                 new HashMap<Integer, InputChannel<?>>(channels);
-        final TransportChannel<Selectable<Object>> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<Selectable<?>> transport = JRoutine.transport().buildChannel();
         transport.output().passTo(new SortingInputMapConsumer(channelMap));
         return transport.input();
     }
@@ -159,22 +157,9 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    @SuppressWarnings("unchecked")
-    public static InputChannel<List<Object>> distribute(
-            @Nonnull final InputChannel<?>... channels) {
+    public static InputChannel<List<?>> distribute(@Nonnull final InputChannel<?>... channels) {
 
-        final int length = channels.length;
-
-        if (length == 0) {
-
-            throw new IllegalArgumentException("the array of channels must not be empty");
-        }
-
-        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
-        Collections.addAll(channelList, channels);
-        final TransportChannel<List<Object>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer(false, channelList));
-        return transport.input();
+        return distribute(false, channels);
     }
 
     /**
@@ -189,15 +174,7 @@ public class JRoutineChannels {
     public static InputChannel<List<?>> distribute(
             @Nonnull final List<? extends InputChannel<?>> channels) {
 
-        if (channels.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of channels must not be empty");
-        }
-
-        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
-        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer(false, channelList));
-        return transport.input();
+        return distribute(false, channels);
     }
 
     /**
@@ -211,22 +188,10 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    @SuppressWarnings("unchecked")
-    public static InputChannel<List<Object>> distributeAndFlush(
+    public static InputChannel<List<?>> distributeAndFlush(
             @Nonnull final InputChannel<?>... channels) {
 
-        final int length = channels.length;
-
-        if (length == 0) {
-
-            throw new IllegalArgumentException("the array of channels must not be empty");
-        }
-
-        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
-        Collections.addAll(channelList, channels);
-        final TransportChannel<List<Object>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer(true, channelList));
-        return transport.input();
+        return distribute(true, channels);
     }
 
     /**
@@ -243,15 +208,7 @@ public class JRoutineChannels {
     public static InputChannel<List<?>> distributeAndFlush(
             @Nonnull final List<? extends InputChannel<?>> channels) {
 
-        if (channels.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of channels must not be empty");
-        }
-
-        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
-        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer(true, channelList));
-        return transport.input();
+        return distribute(true, channels);
     }
 
     /**
@@ -265,7 +222,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<List<Object>> join(@Nonnull final OutputChannel<?>... channels) {
+    public static OutputChannel<List<?>> join(@Nonnull final OutputChannel<?>... channels) {
 
         return join(false, channels);
     }
@@ -302,8 +259,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<List<Object>> joinAndFlush(
-            @Nonnull final OutputChannel<?>... channels) {
+    public static OutputChannel<List<?>> joinAndFlush(@Nonnull final OutputChannel<?>... channels) {
 
         return join(true, channels);
     }
@@ -349,7 +305,7 @@ public class JRoutineChannels {
 
         for (final Integer index : indexes) {
 
-            channelMap.put(index, JRoutineChannels.<DATA, INPUT>select(channel, index));
+            channelMap.put(index, Channels.<DATA, INPUT>select(channel, index));
         }
 
         return channelMap;
@@ -375,7 +331,7 @@ public class JRoutineChannels {
 
         for (final int index : indexes) {
 
-            channelMap.put(index, JRoutineChannels.<DATA, INPUT>select(channel, index));
+            channelMap.put(index, Channels.<DATA, INPUT>select(channel, index));
         }
 
         return channelMap;
@@ -407,7 +363,7 @@ public class JRoutineChannels {
 
         for (int index = startIndex; index < rangeSize; index++) {
 
-            channelMap.put(index, JRoutineChannels.<DATA, INPUT>select(channel, index));
+            channelMap.put(index, Channels.<DATA, INPUT>select(channel, index));
         }
 
         return channelMap;
@@ -527,7 +483,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<? extends Selectable<Object>> merge(final int startIndex,
+    public static OutputChannel<? extends Selectable<?>> merge(final int startIndex,
             @Nonnull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
@@ -591,7 +547,7 @@ public class JRoutineChannels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<? extends Selectable<Object>> merge(
+    public static OutputChannel<? extends Selectable<?>> merge(
             @Nonnull final OutputChannel<?>... channels) {
 
         return merge(0, channels);
@@ -743,8 +699,23 @@ public class JRoutineChannels {
     }
 
     @Nonnull
-    private static OutputChannel<List<Object>> join(final boolean isFlush,
-            @Nonnull final OutputChannel<?>... channels) {
+    private static InputChannel<List<?>> distribute(final boolean isFlush,
+            @Nonnull final List<? extends InputChannel<?>> channels) {
+
+        if (channels.isEmpty()) {
+
+            throw new IllegalArgumentException("the list of channels must not be empty");
+        }
+
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
+        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
+        transport.output().passTo(new DistributeInputConsumer(isFlush, channelList));
+        return transport.input();
+    }
+
+    @Nonnull
+    private static InputChannel<List<?>> distribute(final boolean isFlush,
+            @Nonnull final InputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -753,11 +724,11 @@ public class JRoutineChannels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final TransportChannel<List<Object>> transport = JRoutine.transport().buildChannel();
-        final JoinOutputConsumer<Object> consumer =
-                new JoinOutputConsumer<Object>(transport.input(), length, isFlush);
-        merge(channels).passTo(consumer);
-        return transport.output();
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
+        Collections.addAll(channelList, channels);
+        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
+        transport.output().passTo(new DistributeInputConsumer(isFlush, channelList));
+        return transport.input();
     }
 
     @Nonnull
@@ -774,6 +745,25 @@ public class JRoutineChannels {
         final TransportChannel<List<OUTPUT>> transport = JRoutine.transport().buildChannel();
         final JoinOutputConsumer<OUTPUT> consumer =
                 new JoinOutputConsumer<OUTPUT>(transport.input(), size, isFlush);
+        merge(channels).passTo(consumer);
+        return transport.output();
+    }
+
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    private static OutputChannel<List<?>> join(final boolean isFlush,
+            @Nonnull final OutputChannel<?>... channels) {
+
+        final int length = channels.length;
+
+        if (length == 0) {
+
+            throw new IllegalArgumentException("the array of channels must not be empty");
+        }
+
+        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
+        final JoinOutputConsumer consumer =
+                new JoinOutputConsumer(transport.input(), length, isFlush);
         merge(channels).passTo(consumer);
         return transport.output();
     }
@@ -1179,7 +1169,7 @@ public class JRoutineChannels {
     /**
      * Output consumer sorting selectable inputs among a list of input channels.
      */
-    private static class SortingInputConsumer extends TemplateOutputConsumer<Selectable<Object>> {
+    private static class SortingInputConsumer extends TemplateOutputConsumer<Selectable<?>> {
 
         private final ArrayList<InputChannel<?>> mChannelList;
 
@@ -1208,7 +1198,7 @@ public class JRoutineChannels {
         }
 
         @Override
-        public void onOutput(final Selectable<Object> selectable) {
+        public void onOutput(final Selectable<?> selectable) {
 
             final InputChannel<?> inputChannel = mChannelList.get(selectable.index - mStartIndex);
 
@@ -1222,8 +1212,7 @@ public class JRoutineChannels {
     /**
      * Output consumer sorting selectable inputs among a map of input channels.
      */
-    private static class SortingInputMapConsumer
-            extends TemplateOutputConsumer<Selectable<Object>> {
+    private static class SortingInputMapConsumer extends TemplateOutputConsumer<Selectable<?>> {
 
         private final HashMap<Integer, InputChannel<?>> mChannelMap;
 
@@ -1248,7 +1237,7 @@ public class JRoutineChannels {
         }
 
         @Override
-        public void onOutput(final Selectable<Object> selectable) {
+        public void onOutput(final Selectable<?> selectable) {
 
             final InputChannel<?> inputChannel = mChannelMap.get(selectable.index);
 

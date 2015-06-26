@@ -36,13 +36,11 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.JRoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
@@ -294,7 +292,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
-        warn(configuration);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
                 new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod, targetClass,
@@ -305,7 +302,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
         return getBuilder(mContext, factory).invocations()
                                             .with(invocationConfiguration)
-                                            .withInputOrder(OrderType.BY_CALL)
                                             .set()
                                             .loaders()
                                             .with(loaderConfiguration)
@@ -325,7 +321,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
-        warn(configuration);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
         final MethodInvocationFactory<INPUT, OUTPUT> factory =
                 new MethodInvocationFactory<INPUT, OUTPUT>(method, mTargetClass, mFactoryArgs,
@@ -336,7 +331,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mLoaderConfiguration, method);
         return getBuilder(mContext, factory).invocations()
                                             .with(invocationConfiguration)
-                                            .withInputOrder(OrderType.BY_CALL)
                                             .set()
                                             .loaders()
                                             .with(loaderConfiguration)
@@ -353,8 +347,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     "the specified class is not an interface: " + itf.getName());
         }
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        warn(configuration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this));
         return itf.cast(proxy);
@@ -430,29 +422,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the invocation configuration.
-     */
-    private void warn(@Nonnull final InvocationConfiguration configuration) {
-
-        final Logger logger = configuration.newLogger(this);
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
-    }
-
-    /**
      * Alias method invocation.
      *
      * @param <INPUT>  the input data type.
@@ -461,7 +430,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static class AliasMethodInvocation<INPUT, OUTPUT>
             extends FunctionContextInvocation<INPUT, OUTPUT> {
 
-        private final String mBindingName;
+        private final String mAliasName;
 
         private final Object[] mFactoryArgs;
 
@@ -489,7 +458,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mTargetClass = targetClass;
             mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
-            mBindingName = name;
+            mAliasName = name;
         }
 
         @Override
@@ -516,7 +485,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                    .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
-                                   .aliasMethod(mBindingName);
+                                   .aliasMethod(mAliasName);
                 mTarget = target;
 
             } catch (final RoutineException e) {
@@ -869,10 +838,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
-            final OrderType inputOrderType =
-                    (inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE : OrderType.BY_CALL;
-            final OrderType outputOrderType =
-                    (outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL : OrderType.BY_CHANCE;
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(targetMethod, mTargetClass, mFactoryArgs, shareGroup,
                                                inputMode, outputMode);
@@ -884,8 +849,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     configurationWithAnnotations(mLoaderConfiguration, method);
             final Routine<Object, Object> routine = routineBuilder.invocations()
                                                                   .with(invocationConfiguration)
-                                                                  .withInputOrder(inputOrderType)
-                                                                  .withOutputOrder(outputOrderType)
                                                                   .set()
                                                                   .loaders()
                                                                   .with(loaderConfiguration)

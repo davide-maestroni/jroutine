@@ -16,12 +16,13 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
+import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +75,18 @@ public class JRoutineChannels {
     public static InputChannel<Selectable<Object>> combine(final int startIndex,
             @Nonnull final InputChannel<?>... channels) {
 
-        return combine(startIndex, (List<? extends InputChannel<? super
-                Object>>) Arrays.asList(channels));
+        final int length = channels.length;
+
+        if (length == 0) {
+
+            throw new IllegalArgumentException("the array of channels must not be empty");
+        }
+
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
+        Collections.addAll(channelList, channels);
+        final TransportChannel<Selectable<Object>> transport = JRoutine.transport().buildChannel();
+        transport.output().passTo(new SortingInputConsumer(startIndex, channelList));
+        return transport.input();
     }
 
     /**
@@ -83,23 +94,21 @@ public class JRoutineChannels {
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of input channels.
-     * @param <INPUT>    the input data type.
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <INPUT> InputChannel<Selectable<INPUT>> combine(final int startIndex,
-            @Nonnull final List<? extends InputChannel<? super INPUT>> channels) {
+    public static InputChannel<Selectable<Object>> combine(final int startIndex,
+            @Nonnull final List<? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
 
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final ArrayList<InputChannel<? super INPUT>> channelList =
-                new ArrayList<InputChannel<? super INPUT>>(channels);
-        final TransportChannel<Selectable<INPUT>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new SortingInputConsumer<INPUT>(startIndex, channelList));
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
+        final TransportChannel<Selectable<Object>> transport = JRoutine.transport().buildChannel();
+        transport.output().passTo(new SortingInputConsumer(startIndex, channelList));
         return transport.input();
     }
 
@@ -108,13 +117,12 @@ public class JRoutineChannels {
      * same as the list ones.
      *
      * @param channels the list of input channels.
-     * @param <INPUT>  the input data type.
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <INPUT> InputChannel<Selectable<INPUT>> combine(
-            @Nonnull final List<? extends InputChannel<? super INPUT>> channels) {
+    public static InputChannel<Selectable<Object>> combine(
+            @Nonnull final List<? extends InputChannel<?>> channels) {
 
         return combine(0, channels);
     }
@@ -123,23 +131,22 @@ public class JRoutineChannels {
      * Combines the specified channels into a selectable one.
      *
      * @param channels the map of indexes and input channels.
-     * @param <INPUT>  the input data type.
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @Nonnull
-    public static <INPUT> InputChannel<Selectable<INPUT>> combine(
-            @Nonnull final Map<Integer, ? extends InputChannel<? super INPUT>> channels) {
+    public static InputChannel<Selectable<Object>> combine(
+            @Nonnull final Map<Integer, ? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
 
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final HashMap<Integer, InputChannel<? super INPUT>> channelMap =
-                new HashMap<Integer, InputChannel<? super INPUT>>(channels);
-        final TransportChannel<Selectable<INPUT>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new SortingInputMapConsumer<INPUT>(channelMap));
+        final HashMap<Integer, InputChannel<?>> channelMap =
+                new HashMap<Integer, InputChannel<?>>(channels);
+        final TransportChannel<Selectable<Object>> transport = JRoutine.transport().buildChannel();
+        transport.output().passTo(new SortingInputMapConsumer(channelMap));
         return transport.input();
     }
 
@@ -156,16 +163,17 @@ public class JRoutineChannels {
     public static InputChannel<List<Object>> distribute(
             @Nonnull final InputChannel<?>... channels) {
 
-        final ArrayList<InputChannel<Object>> channelList =
-                new ArrayList<InputChannel<Object>>(channels.length);
+        final int length = channels.length;
 
-        for (final InputChannel<?> channel : channels) {
+        if (length == 0) {
 
-            channelList.add((InputChannel<Object>) channel);
+            throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
+        Collections.addAll(channelList, channels);
         final TransportChannel<List<Object>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer<Object, Object>(channelList, false));
+        transport.output().passTo(new DistributeInputConsumer(false, channelList));
         return transport.input();
     }
 
@@ -174,24 +182,21 @@ public class JRoutineChannels {
      * of data exceeds the number of channels, the invocation will be aborted.
      *
      * @param channels the list of channels.
-     * @param <DATA>   the channels data type.
-     * @param <INPUT>  the input data type.
      * @return the input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> InputChannel<List<INPUT>> distribute(
-            @Nonnull final List<? extends InputChannel<DATA>> channels) {
+    public static InputChannel<List<?>> distribute(
+            @Nonnull final List<? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
 
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final TransportChannel<List<INPUT>> transport = JRoutine.transport().buildChannel();
-        transport.output()
-                 .passTo(new DistributeInputConsumer<DATA, INPUT>(
-                         new ArrayList<InputChannel<DATA>>(channels), false));
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
+        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
+        transport.output().passTo(new DistributeInputConsumer(false, channelList));
         return transport.input();
     }
 
@@ -210,16 +215,17 @@ public class JRoutineChannels {
     public static InputChannel<List<Object>> distributeAndFlush(
             @Nonnull final InputChannel<?>... channels) {
 
-        final ArrayList<InputChannel<Object>> channelList =
-                new ArrayList<InputChannel<Object>>(channels.length);
+        final int length = channels.length;
 
-        for (final InputChannel<?> channel : channels) {
+        if (length == 0) {
 
-            channelList.add((InputChannel<Object>) channel);
+            throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
+        Collections.addAll(channelList, channels);
         final TransportChannel<List<Object>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer<Object, Object>(channelList, true));
+        transport.output().passTo(new DistributeInputConsumer(true, channelList));
         return transport.input();
     }
 
@@ -230,24 +236,21 @@ public class JRoutineChannels {
      * be aborted.
      *
      * @param channels the list of channels.
-     * @param <DATA>   the channels data type.
-     * @param <INPUT>  the input data type.
      * @return the input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> InputChannel<List<INPUT>> distributeAndFlush(
-            @Nonnull final List<? extends InputChannel<DATA>> channels) {
+    public static InputChannel<List<?>> distributeAndFlush(
+            @Nonnull final List<? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
 
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final TransportChannel<List<INPUT>> transport = JRoutine.transport().buildChannel();
-        transport.output()
-                 .passTo(new DistributeInputConsumer<DATA, INPUT>(
-                         new ArrayList<InputChannel<DATA>>(channels), true));
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
+        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
+        transport.output().passTo(new DistributeInputConsumer(true, channelList));
         return transport.input();
     }
 
@@ -821,46 +824,40 @@ public class JRoutineChannels {
 
     /**
      * Output consumer distributing list of inputs among a list of input channels.
-     *
-     * @param <DATA>  the channels data type.
-     * @param <INPUT> the input data type.
      */
-    private static class DistributeInputConsumer<DATA, INPUT extends DATA>
-            implements OutputConsumer<List<INPUT>> {
+    private static class DistributeInputConsumer extends TemplateOutputConsumer<List<?>> {
 
-        private final ArrayList<InputChannel<DATA>> mChannels;
+        private final ArrayList<InputChannel<?>> mChannels;
 
         private final boolean mIsFlush;
 
         /**
          * Constructor.
          *
-         * @param channels the list of channels.
          * @param isFlush  whether the inputs have to be flushed.
+         * @param channels the list of channels.
          */
-        private DistributeInputConsumer(@Nonnull final ArrayList<InputChannel<DATA>> channels,
-                final boolean isFlush) {
+        private DistributeInputConsumer(final boolean isFlush,
+                @Nonnull final ArrayList<InputChannel<?>> channels) {
 
             mChannels = channels;
             mIsFlush = isFlush;
         }
 
-        public void onComplete() {
-
-        }
-
+        @Override
         public void onError(@Nullable final Throwable error) {
 
-            for (final InputChannel<DATA> channel : mChannels) {
+            for (final InputChannel<?> channel : mChannels) {
 
                 channel.abort(error);
             }
         }
 
-        public void onOutput(final List<INPUT> inputs) {
+        @Override
+        public void onOutput(final List<?> inputs) {
 
             final int inputSize = inputs.size();
-            final ArrayList<InputChannel<DATA>> channels = mChannels;
+            final ArrayList<InputChannel<?>> channels = mChannels;
             final int size = channels.size();
 
             if (inputSize > size) {
@@ -872,7 +869,7 @@ public class JRoutineChannels {
 
             for (int i = 0; i < size; i++) {
 
-                final InputChannel<DATA> channel = channels.get(i);
+                final InputChannel<?> channel = channels.get(i);
 
                 if (i < inputSize) {
 
@@ -880,7 +877,7 @@ public class JRoutineChannels {
 
                 } else if (isFlush) {
 
-                    channel.pass((DATA) null);
+                    channel.pass((Object) null);
                 }
             }
         }
@@ -891,7 +888,8 @@ public class JRoutineChannels {
      *
      * @param <INPUT> the input data type.
      */
-    private static class FilterInputConsumer<INPUT> implements OutputConsumer<Selectable<INPUT>> {
+    private static class FilterInputConsumer<INPUT>
+            extends TemplateOutputConsumer<Selectable<INPUT>> {
 
         private final int mIndex;
 
@@ -910,15 +908,13 @@ public class JRoutineChannels {
             mIndex = index;
         }
 
-        public void onComplete() {
-
-        }
-
+        @Override
         public void onError(@Nullable final Throwable error) {
 
             mInputChannel.abort(error);
         }
 
+        @Override
         public void onOutput(final Selectable<INPUT> selectable) {
 
             if (selectable.index == mIndex) {
@@ -1107,7 +1103,7 @@ public class JRoutineChannels {
      * @param <INPUT> the input data type.
      */
     private static class SelectableInputConsumer<DATA, INPUT extends DATA>
-            implements OutputConsumer<INPUT> {
+            extends TemplateOutputConsumer<INPUT> {
 
         private final int mIndex;
 
@@ -1127,15 +1123,13 @@ public class JRoutineChannels {
             mIndex = index;
         }
 
-        public void onComplete() {
-
-        }
-
+        @Override
         public void onError(@Nullable final Throwable error) {
 
             mInputChannel.abort(error);
         }
 
+        @Override
         public void onOutput(final INPUT input) {
 
             mInputChannel.pass(new Selectable<DATA>(input, mIndex));
@@ -1184,13 +1178,10 @@ public class JRoutineChannels {
 
     /**
      * Output consumer sorting selectable inputs among a list of input channels.
-     *
-     * @param <INPUT> the input data type.
      */
-    private static class SortingInputConsumer<INPUT>
-            implements OutputConsumer<Selectable<? extends INPUT>> {
+    private static class SortingInputConsumer extends TemplateOutputConsumer<Selectable<Object>> {
 
-        private final List<InputChannel<? super INPUT>> mChannelList;
+        private final ArrayList<InputChannel<?>> mChannelList;
 
         private final int mStartIndex;
 
@@ -1201,28 +1192,25 @@ public class JRoutineChannels {
          * @param channels   the list of channels.
          */
         private SortingInputConsumer(final int startIndex,
-                @Nonnull final ArrayList<InputChannel<? super INPUT>> channels) {
+                @Nonnull final ArrayList<InputChannel<?>> channels) {
 
             mStartIndex = startIndex;
             mChannelList = channels;
         }
 
-        public void onComplete() {
-
-        }
-
+        @Override
         public void onError(@Nullable final Throwable error) {
 
-            for (final InputChannel<? super INPUT> inputChannel : mChannelList) {
+            for (final InputChannel<?> inputChannel : mChannelList) {
 
                 inputChannel.abort(error);
             }
         }
 
-        public void onOutput(final Selectable<? extends INPUT> selectable) {
+        @Override
+        public void onOutput(final Selectable<Object> selectable) {
 
-            final InputChannel<? super INPUT> inputChannel =
-                    mChannelList.get(selectable.index - mStartIndex);
+            final InputChannel<?> inputChannel = mChannelList.get(selectable.index - mStartIndex);
 
             if (inputChannel != null) {
 
@@ -1233,13 +1221,11 @@ public class JRoutineChannels {
 
     /**
      * Output consumer sorting selectable inputs among a map of input channels.
-     *
-     * @param <INPUT> the input data type.
      */
-    private static class SortingInputMapConsumer<INPUT>
-            implements OutputConsumer<Selectable<? extends INPUT>> {
+    private static class SortingInputMapConsumer
+            extends TemplateOutputConsumer<Selectable<Object>> {
 
-        private final HashMap<Integer, InputChannel<? super INPUT>> mChannelMap;
+        private final HashMap<Integer, InputChannel<?>> mChannelMap;
 
         /**
          * Constructor.
@@ -1247,26 +1233,24 @@ public class JRoutineChannels {
          * @param channelMap the map of indexes and input channels.
          */
         private SortingInputMapConsumer(
-                @Nonnull final HashMap<Integer, InputChannel<? super INPUT>> channelMap) {
+                @Nonnull final HashMap<Integer, InputChannel<?>> channelMap) {
 
             mChannelMap = channelMap;
         }
 
-        public void onComplete() {
-
-        }
-
+        @Override
         public void onError(@Nullable final Throwable error) {
 
-            for (final InputChannel<? super INPUT> inputChannel : mChannelMap.values()) {
+            for (final InputChannel<?> inputChannel : mChannelMap.values()) {
 
                 inputChannel.abort(error);
             }
         }
 
-        public void onOutput(final Selectable<? extends INPUT> selectable) {
+        @Override
+        public void onOutput(final Selectable<Object> selectable) {
 
-            final InputChannel<? super INPUT> inputChannel = mChannelMap.get(selectable.index);
+            final InputChannel<?> inputChannel = mChannelMap.get(selectable.index);
 
             if (inputChannel != null) {
 

@@ -178,9 +178,8 @@ public class InvocationConfigurationTest {
                          .withOutputMaxSize(100)
                          .set();
         assertThat(configuration).isNotEqualTo(builder().withInputOrder(OrderType.BY_CHANCE).set());
-        assertThat(configuration.builderFrom()
-                                .withInputOrder(OrderType.BY_CALL)
-                                .set()).isNotEqualTo(
+        assertThat(
+                configuration.builderFrom().withInputOrder(OrderType.BY_CALL).set()).isNotEqualTo(
                 builder().withInputOrder(OrderType.BY_CALL).set());
     }
 
@@ -328,10 +327,10 @@ public class InvocationConfigurationTest {
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
-        assertThat(configuration).isNotEqualTo(builder().withOutputOrder(OrderType.BY_CHANCE).set());
-        assertThat(configuration.builderFrom()
-                                .withOutputOrder(OrderType.BY_CALL)
-                                .set()).isNotEqualTo(
+        assertThat(configuration).isNotEqualTo(
+                builder().withOutputOrder(OrderType.BY_CHANCE).set());
+        assertThat(
+                configuration.builderFrom().withOutputOrder(OrderType.BY_CALL).set()).isNotEqualTo(
                 builder().withOutputOrder(OrderType.BY_CALL).set());
     }
 

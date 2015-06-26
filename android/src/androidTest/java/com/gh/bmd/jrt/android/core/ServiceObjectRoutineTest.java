@@ -28,7 +28,6 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
@@ -55,7 +54,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -185,40 +183,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    public void testConfigurationWarnings() {
-
-        final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CHANCE)
-                                                               .withInputMaxSize(3)
-                                                               .withInputTimeout(seconds(10))
-                                                               .withOutputOrder(OrderType.BY_CHANCE)
-                                                               .withOutputMaxSize(3)
-                                                               .withOutputTimeout(seconds(10))
-                                                               .withLogLevel(LogLevel.DEBUG)
-                                                               .withLog(countLog)
-                                                               .set();
-        JRoutine.onService(getActivity(), TestClass.class)
-                .invocations()
-                .with(configuration)
-                .set()
-                .proxies()
-                .withShareGroup("test")
-                .set()
-                .aliasMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
-
-        JRoutine.onService(getActivity(), Square.class)
-                .invocations()
-                .with(configuration)
-                .set()
-                .proxies()
-                .withShareGroup("test")
-                .set()
-                .buildProxy(SquareItf.class)
-                .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
     }
 
     public void testDuplicateAnnotationError() {

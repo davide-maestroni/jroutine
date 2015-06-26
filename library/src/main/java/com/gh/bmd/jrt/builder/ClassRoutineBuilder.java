@@ -44,6 +44,9 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout} and
      * {@link com.gh.bmd.jrt.annotation.TimeoutAction} method annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * Note that it is up to the caller to ensure that the input data are passed to the routine in
+     * the correct order.
      *
      * @param name     the name specified in the annotation.
      * @param <INPUT>  the input data type.
@@ -71,6 +74,9 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
      * method annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * Note that it is up to the caller to ensure that the input data are passed to the routine in
+     * the correct order.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -90,6 +96,9 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
      * method annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * Note that it is up to the caller to ensure that the input data are passed to the routine in
+     * the correct order.
      *
      * @param method   the method instance.
      * @param <INPUT>  the input data type.

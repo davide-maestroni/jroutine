@@ -116,7 +116,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * Constructor.
      *
      * @param configuration the invocation configuration.
-     * @param handler       the abortOutput handler.
+     * @param handler       the abort handler.
      * @param runner        the runner instance.
      * @param logger        the logger instance.
      */

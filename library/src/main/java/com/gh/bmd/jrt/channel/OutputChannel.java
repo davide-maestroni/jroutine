@@ -54,7 +54,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @param timeout  the maximum timeout value.
      * @param timeUnit the timeout time unit.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException      if the specified timeout is negative.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
      */
     @Nonnull
     OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);

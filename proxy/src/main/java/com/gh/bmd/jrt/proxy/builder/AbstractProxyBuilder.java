@@ -14,11 +14,8 @@
 package com.gh.bmd.jrt.proxy.builder;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.reflect.Type;
@@ -71,8 +68,6 @@ public abstract class AbstractProxyBuilder<TYPE>
 
                 return token.cast(instance);
             }
-
-            warn(invocationConfiguration);
 
             try {
 
@@ -154,57 +149,6 @@ public abstract class AbstractProxyBuilder<TYPE>
     @Nonnull
     protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
             @Nonnull ProxyConfiguration proxyConfiguration);
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the invocation configuration.
-     */
-    private void warn(@Nonnull final InvocationConfiguration configuration) {
-
-        final Logger logger = configuration.newLogger(this);
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (outputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
-    }
 
     /**
      * Class used as key to identify a specific proxy instance.

@@ -17,7 +17,6 @@ import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.invocation.InvocationException;
@@ -103,25 +102,6 @@ public class ClassRoutineTest {
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    @Test
-    public void testConfigurationWarnings() {
-
-        final CountLog countLog = new CountLog();
-        JRoutine.on(TestStatic.class)
-                .invocations()
-                .withInputOrder(OrderType.BY_CHANCE)
-                .withInputMaxSize(3)
-                .withInputTimeout(seconds(1))
-                .withOutputOrder(OrderType.BY_CHANCE)
-                .withOutputMaxSize(3)
-                .withOutputTimeout(seconds(1))
-                .withLogLevel(LogLevel.DEBUG)
-                .withLog(countLog)
-                .set()
-                .aliasMethod(TestStatic.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
     }
 
     @Test

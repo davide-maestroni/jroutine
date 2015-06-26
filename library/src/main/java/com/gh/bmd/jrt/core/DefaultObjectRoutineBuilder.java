@@ -20,13 +20,11 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.core.JRoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
@@ -204,15 +202,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             final InvocationConfiguration configuration = mInvocationConfiguration;
             final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                     configuration.builderFrom();
-            warn(configuration);
-            builder.withInputOrder(
-                    (inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE : OrderType.BY_CALL)
-                   .withInputMaxSize(Integer.MAX_VALUE)
-                   .withInputTimeout(TimeDuration.ZERO)
-                   .withOutputOrder((outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL
-                                            : OrderType.BY_CHANCE)
-                   .withOutputMaxSize(Integer.MAX_VALUE)
-                   .withOutputTimeout(TimeDuration.ZERO);
             final Priority priorityAnnotation = method.getAnnotation(Priority.class);
 
             if (priorityAnnotation != null) {

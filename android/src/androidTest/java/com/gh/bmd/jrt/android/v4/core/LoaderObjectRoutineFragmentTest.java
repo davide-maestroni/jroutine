@@ -208,15 +208,17 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CHANCE)
-                                                               .withInputMaxSize(3)
-                                                               .withInputTimeout(seconds(10))
-                                                               .withOutputOrder(OrderType.BY_CHANCE)
-                                                               .withOutputMaxSize(3)
-                                                               .withOutputTimeout(seconds(10))
-                                                               .withLogLevel(LogLevel.DEBUG)
-                                                               .withLog(countLog)
-                                                               .set();
+        final InvocationConfiguration configuration =
+                builder().withAsyncRunner(Runners.poolRunner())
+                         .withInputOrder(OrderType.BY_CHANCE)
+                         .withInputMaxSize(3)
+                         .withInputTimeout(seconds(10))
+                         .withOutputOrder(OrderType.BY_CHANCE)
+                         .withOutputMaxSize(3)
+                         .withOutputTimeout(seconds(10))
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(countLog)
+                         .set();
         JRoutine.onFragment(fragment, TestClass.class)
                 .invocations()
                 .with(configuration)
@@ -225,7 +227,7 @@ public class LoaderObjectRoutineFragmentTest
                 .withShareGroup("test")
                 .set()
                 .aliasMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         JRoutine.onFragment(fragment, Square.class)
                 .invocations()
@@ -236,7 +238,7 @@ public class LoaderObjectRoutineFragmentTest
                 .set()
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
+        assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
 
     public void testDuplicateAnnotationError() {

@@ -140,6 +140,7 @@ public class JRoutineBuilders {
 
                         if (methodResult != null) {
 
+                            result.orderByCall();
                             final int length = Array.getLength(methodResult);
 
                             for (int i = 0; i < length; ++i) {
@@ -759,7 +760,8 @@ public class JRoutineBuilders {
 
         } else if (inputMode == InputMode.VALUE) {
 
-            final InvocationChannel<Object, Object> invocationChannel = routine.invokeAsync();
+            final InvocationChannel<Object, Object> invocationChannel =
+                    routine.invokeAsync().orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
 
@@ -781,7 +783,10 @@ public class JRoutineBuilders {
 
         } else if (inputMode == InputMode.COLLECTION) {
 
-            outputChannel = routine.invokeAsync().pass((OutputChannel<Object>) args[0]).result();
+            outputChannel = routine.invokeAsync()
+                                   .orderByCall()
+                                   .pass((OutputChannel<Object>) args[0])
+                                   .result();
 
         } else {
 

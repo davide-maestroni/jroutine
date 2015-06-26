@@ -15,12 +15,16 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
+import com.gh.bmd.jrt.channel.AbortException;
+import com.gh.bmd.jrt.channel.InputChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
 import com.gh.bmd.jrt.core.JRoutineChannels.Selectable;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
+import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
@@ -29,6 +33,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -46,17 +51,253 @@ import static org.junit.Assert.fail;
 public class JRoutineChannelsTest {
 
     @Test
-    public void testEmptyError() {
+    public void testCombine() {
+
+        final InvocationChannel<String, String> channel1 =
+                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        final InvocationChannel<Integer, Integer> channel2 =
+                JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        JRoutineChannels.combine(channel1, channel2)
+                        .pass(new Selectable<Object>("test1", 0))
+                        .pass(new Selectable<Object>(1, 1));
+        JRoutineChannels.combine(3, channel1, channel2)
+                        .pass(new Selectable<Object>("test2", 3))
+                        .pass(new Selectable<Object>(2, 4));
+        JRoutineChannels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                        .pass(new Selectable<Object>("test3", 0))
+                        .pass(new Selectable<Object>(3, 1));
+        JRoutineChannels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                        .pass(new Selectable<Object>("test4", -5))
+                        .pass(new Selectable<Object>(4, -4));
+        final HashMap<Integer, InvocationChannel<?, ?>> map =
+                new HashMap<Integer, InvocationChannel<?, ?>>(2);
+        map.put(31, channel1);
+        map.put(17, channel2);
+        JRoutineChannels.combine(map)
+                        .pass(new Selectable<Object>("test5", 31))
+                        .pass(new Selectable<Object>(5, 17));
+        assertThat(channel1.result().eventually().all()).containsExactly("test1", "test2", "test3",
+                                                                         "test4", "test5");
+        assertThat(channel2.result().eventually().all()).containsExactly(1, 2, 3, 4, 5);
+    }
+
+    @Test
+    public void testCombineAbort() {
+
+        InvocationChannel<String, String> channel1;
+        InvocationChannel<Integer, Integer> channel2;
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        JRoutineChannels.combine(channel1, channel2).abort();
 
         try {
 
-            JRoutineChannels.merge(Collections.<OutputChannel<Object>>emptyList());
+            channel1.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channel2.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        JRoutineChannels.combine(3, channel1, channel2).abort();
+
+        try {
+
+            channel1.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channel2.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        JRoutineChannels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                        .abort();
+
+        try {
+
+            channel1.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channel2.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        JRoutineChannels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                        .abort();
+
+        try {
+
+            channel1.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channel2.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        final HashMap<Integer, InvocationChannel<?, ?>> map =
+                new HashMap<Integer, InvocationChannel<?, ?>>(2);
+        map.put(31, channel1);
+        map.put(17, channel2);
+        JRoutineChannels.combine(map).abort();
+
+        try {
+
+            channel1.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channel2.result().eventually().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testCombineError() {
+
+        try {
+
+            JRoutineChannels.combine();
 
             fail();
 
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        try {
+
+            JRoutineChannels.combine(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutineChannels.combine(Collections.<InputChannel<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutineChannels.combine(0, Collections.<InputChannel<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutineChannels.combine(Collections.<Integer, InputChannel<?>>emptyMap());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMap() {
+
+        final TransportChannelBuilder builder =
+                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+        final TransportChannel<String> channel1 = builder.buildChannel();
+        final TransportChannel<Integer> channel2 = builder.buildChannel();
+
+        final OutputChannel<? extends Selectable<Object>> channel = JRoutineChannels.merge(
+                Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
+        final OutputChannel<Selectable<Object>> output = JRoutine.on(new Sort())
+                                                                 .invocations()
+                                                                 .withInputOrder(OrderType.BY_CALL)
+                                                                 .set()
+                                                                 .callAsync(channel);
+        final Map<Integer, OutputChannel<Object>> channelMap =
+                JRoutineChannels.map(output, Sort.INTEGER, Sort.STRING);
+
+        for (int i = 0; i < 4; i++) {
+
+            final String input = Integer.toString(i);
+            channel1.input().after(millis(20)).pass(input);
+            channel2.input().after(millis(20)).pass(i);
+        }
+
+        channel1.input().close();
+        channel2.input().close();
+
+        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsExactly("0", "1", "2",
+                                                                                   "3");
+        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsExactly(0, 1, 2, 3);
     }
 
     @Test
@@ -94,37 +335,17 @@ public class JRoutineChannelsTest {
     }
 
     @Test
-    public void testSplit() {
+    public void testMergeError() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
-        final TransportChannel<String> channel1 = builder.buildChannel();
-        final TransportChannel<Integer> channel2 = builder.buildChannel();
+        try {
 
-        final OutputChannel<? extends Selectable<Object>> channel = JRoutineChannels.merge(
-                Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
-        final OutputChannel<Selectable<Object>> output = JRoutine.on(new Sort())
-                                                                 .invocations()
-                                                                 .withInputOrder(
-                                                                         OrderType.BY_CALL)
-                                                                 .set()
-                                                                 .callAsync(channel);
-        final Map<Integer, OutputChannel<Object>> channelMap =
-                JRoutineChannels.map(output, Sort.INTEGER, Sort.STRING);
+            JRoutineChannels.merge(Collections.<OutputChannel<Object>>emptyList());
 
-        for (int i = 0; i < 4; i++) {
+            fail();
 
-            final String input = Integer.toString(i);
-            channel1.input().after(millis(20)).pass(input);
-            channel2.input().after(millis(20)).pass(i);
+        } catch (final IllegalArgumentException ignored) {
+
         }
-
-        channel1.input().close();
-        channel2.input().close();
-
-        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsExactly("0", "1", "2",
-                                                                                   "3");
-        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsExactly(0, 1, 2, 3);
     }
 
     private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {

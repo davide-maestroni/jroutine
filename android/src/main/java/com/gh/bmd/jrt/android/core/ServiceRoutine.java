@@ -112,54 +112,11 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mRoutine = JRoutine.on(factoryFrom(mContext, factoryOf(invocationClass, factoryArgs)))
                            .invocations()
                            .with(invocationConfiguration)
-                           .withInputMaxSize(Integer.MAX_VALUE)
-                           .withInputTimeout(TimeDuration.ZERO)
-                           .withOutputMaxSize(Integer.MAX_VALUE)
-                           .withOutputTimeout(TimeDuration.ZERO)
                            .set()
                            .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
                    invocationClass.getName(), invocationConfiguration, serviceConfiguration);
-        warn(logger, invocationConfiguration);
-    }
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param logger        the logger instance.
-     * @param configuration the invocation configuration.
-     */
-    private static void warn(@Nonnull final Logger logger,
-            @Nonnull final InvocationConfiguration configuration) {
-
-        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (outputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
     }
 
     @Nonnull
@@ -268,30 +225,33 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
             final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
+            final int inputMaxSize =
+                    invocationConfiguration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
+            final TimeDuration inputTimeout = invocationConfiguration.getInputTimeoutOr(null);
             final TransportChannel<INPUT> paramChannel = JRoutine.transport()
                                                                  .invocations()
                                                                  .withOutputOrder(inputOrderType)
-                                                                 .withOutputMaxSize(
-                                                                         Integer.MAX_VALUE)
-                                                                 .withOutputTimeout(
-                                                                         TimeDuration.ZERO)
+                                                                 .withOutputMaxSize(inputMaxSize)
+                                                                 .withOutputTimeout(inputTimeout)
                                                                  .withLog(log)
                                                                  .withLogLevel(logLevel)
                                                                  .set()
                                                                  .buildChannel();
             mTransportParamInput = paramChannel.input();
             mTransportParamOutput = paramChannel.output();
-            final OrderType outputOrderType = invocationConfiguration.getOutputOrderTypeOr(null);
+            final OrderType outputOrderType =
+                    invocationConfiguration.getOutputOrderTypeOr(OrderType.BY_CALL);
+            final int outputMaxSize =
+                    invocationConfiguration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
+            final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
             final TimeDuration readTimeout = invocationConfiguration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
             final TransportChannel<OUTPUT> resultChannel = JRoutine.transport()
                                                                    .invocations()
                                                                    .withOutputOrder(outputOrderType)
-                                                                   .withOutputMaxSize(
-                                                                           Integer.MAX_VALUE)
-                                                                   .withOutputTimeout(
-                                                                           TimeDuration.ZERO)
+                                                                   .withOutputMaxSize(outputMaxSize)
+                                                                   .withOutputTimeout(outputTimeout)
                                                                    .withReadTimeout(readTimeout)
                                                                    .withReadTimeoutAction(
                                                                            timeoutActionType)

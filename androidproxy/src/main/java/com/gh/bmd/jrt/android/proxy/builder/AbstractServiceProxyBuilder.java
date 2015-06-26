@@ -15,12 +15,9 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.reflect.Type;
@@ -195,54 +192,12 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
      */
     private void warn(@Nonnull final InvocationConfiguration configuration) {
 
-        final Logger logger = configuration.newLogger(this);
         final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
 
         if (asyncRunner != null) {
 
-            logger.wrn("the specified runner will be ignored: %s", asyncRunner);
-        }
-
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (outputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
+            configuration.newLogger(this)
+                         .wrn("the specified runner will be ignored: %s", asyncRunner);
         }
     }
 

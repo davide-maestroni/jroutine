@@ -24,7 +24,6 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.AgingPriority;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
@@ -238,27 +237,6 @@ public class ProxyRoutineTest {
                                 .set()
                                 .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
                 testProxy);
-    }
-
-    @Test
-    public void testProxyBuilderWarnings() {
-
-        final CountLog countLog = new CountLog();
-        final TestClass test = new TestClass();
-        JRoutineProxy.on(test)
-                     .invocations()
-                     .withInputOrder(OrderType.BY_CHANCE)
-                     .withInputMaxSize(3)
-                     .withInputTimeout(seconds(1))
-                     .withOutputOrder(OrderType.BY_CHANCE)
-                     .withOutputMaxSize(3)
-                     .withOutputTimeout(seconds(1))
-                     .withLogLevel(LogLevel.DEBUG)
-                     .withLog(countLog)
-                     .set()
-                     .buildProxy(TestProxy.class)
-                     .getOne();
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
     }
 
     @Test

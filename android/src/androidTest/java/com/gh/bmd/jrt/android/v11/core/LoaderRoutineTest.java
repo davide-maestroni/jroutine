@@ -778,7 +778,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .with(configuration)
                 .set()
                 .buildChannel();
-        assertThat(countLog.getWrnCount()).isEqualTo(5);
+        assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
@@ -791,7 +791,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .with(configuration)
                 .set()
                 .buildChannel();
-        assertThat(countLog.getWrnCount()).isEqualTo(10);
+        assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
 
     public void testClash() {
@@ -1496,7 +1496,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .withInputClashResolution(ClashResolutionType.MERGE)
                 .set()
                 .buildRoutine();
-        assertThat(countLog.getWrnCount()).isEqualTo(5);
+        assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
@@ -1510,7 +1510,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .withInputClashResolution(ClashResolutionType.MERGE)
                 .set()
                 .buildRoutine();
-        assertThat(countLog.getWrnCount()).isEqualTo(10);
+        assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
 
     @SuppressWarnings("ConstantConditions")

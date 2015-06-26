@@ -221,15 +221,17 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CHANCE)
-                                                               .withInputMaxSize(3)
-                                                               .withInputTimeout(seconds(10))
-                                                               .withOutputOrder(OrderType.BY_CHANCE)
-                                                               .withOutputMaxSize(3)
-                                                               .withOutputTimeout(seconds(10))
-                                                               .withLogLevel(LogLevel.DEBUG)
-                                                               .withLog(countLog)
-                                                               .set();
+        final InvocationConfiguration configuration =
+                builder().withAsyncRunner(Runners.poolRunner())
+                         .withInputOrder(OrderType.BY_CHANCE)
+                         .withInputMaxSize(3)
+                         .withInputTimeout(seconds(10))
+                         .withOutputOrder(OrderType.BY_CHANCE)
+                         .withOutputMaxSize(3)
+                         .withOutputTimeout(seconds(10))
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(countLog)
+                         .set();
         JRoutine.onActivity(getActivity(), TestClass.class)
                 .invocations()
                 .with(configuration)
@@ -238,7 +240,7 @@ public class LoaderObjectRoutineActivityTest
                 .withShareGroup("test")
                 .set()
                 .aliasMethod(TestClass.GET);
-        assertThat(countLog.getWrnCount()).isEqualTo(6);
+        assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         JRoutine.onActivity(getActivity(), Square.class)
                 .invocations()
@@ -249,7 +251,7 @@ public class LoaderObjectRoutineActivityTest
                 .set()
                 .buildProxy(SquareItf.class)
                 .compute(3);
-        assertThat(countLog.getWrnCount()).isEqualTo(12);
+        assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
 
     public void testDuplicateAnnotationError() {

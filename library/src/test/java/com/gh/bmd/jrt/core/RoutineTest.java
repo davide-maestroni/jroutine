@@ -60,6 +60,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -1385,6 +1386,9 @@ public class RoutineTest {
                     .withInputTimeout(TimeDuration.ZERO)
                     .set()
                     .invokeAsync()
+                    .orderByChance()
+                    .orderByDelay()
+                    .orderByCall()
                     .after(millis(100))
                     .pass("test1")
                     .now()
@@ -2940,6 +2944,7 @@ public class RoutineTest {
 
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
+            result.orderByCall().orderByDelay().orderByChance();
             assertThat(result.isOpen()).isTrue();
             assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
             assertThat(result.abort()).isFalse();
@@ -2947,7 +2952,57 @@ public class RoutineTest {
 
             try {
 
+                result.orderByCall();
+
+                fail();
+
+            } catch (final InvocationException ignored) {
+
+            }
+
+            try {
+
+                result.orderByDelay();
+
+                fail();
+
+            } catch (final InvocationException ignored) {
+
+            }
+
+            try {
+
+                result.orderByChance();
+
+                fail();
+
+            } catch (final InvocationException ignored) {
+
+            }
+
+            try {
+
                 result.pass(s);
+
+                fail();
+
+            } catch (final InvocationException ignored) {
+
+            }
+
+            try {
+
+                result.pass(new String[]{s});
+
+                fail();
+
+            } catch (final InvocationException ignored) {
+
+            }
+
+            try {
+
+                result.pass(Collections.singletonList(s));
 
                 fail();
 

@@ -21,15 +21,12 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.ref.WeakReference;
@@ -110,9 +107,10 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> invocations() {
 
-        return method(mInvocationConfiguration, mProxyConfiguration, method);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
@@ -123,10 +121,9 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> invocations() {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
+        return method(mInvocationConfiguration, mProxyConfiguration, method);
     }
 
     @Nonnull
@@ -288,12 +285,6 @@ class DefaultClassRoutineBuilder
         String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 invocationConfiguration.builderFrom();
-        warn(invocationConfiguration);
-        builder.withInputOrder(OrderType.BY_CALL)
-               .withInputMaxSize(Integer.MAX_VALUE)
-               .withInputTimeout(TimeDuration.ZERO)
-               .withOutputMaxSize(Integer.MAX_VALUE)
-               .withOutputTimeout(TimeDuration.ZERO);
         final Priority priorityAnnotation = targetMethod.getAnnotation(Priority.class);
 
         if (priorityAnnotation != null) {
@@ -323,57 +314,6 @@ class DefaultClassRoutineBuilder
         }
 
         return getRoutine(builder.set(), methodShareGroup, targetMethod, null, null);
-    }
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the invocation configuration.
-     */
-    protected void warn(@Nonnull final InvocationConfiguration configuration) {
-
-        final Logger logger = configuration.newLogger(this);
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (outputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
     }
 
     /**

@@ -26,19 +26,15 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.JRoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
-import com.gh.bmd.jrt.log.Log;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -225,54 +221,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return names;
     }
 
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param logClass      the log class.
-     * @param configuration the invocation configuration.
-     */
-    private static void warn(@Nullable final Class<? extends Log> logClass,
-            @Nonnull final InvocationConfiguration configuration) {
-
-        Log log = null;
-
-        if (logClass != null) {
-
-            final Constructor<? extends Log> constructor = findConstructor(logClass);
-
-            try {
-
-                log = constructor.newInstance();
-
-            } catch (final Throwable t) {
-
-                throw new IllegalArgumentException(t);
-            }
-        }
-
-        if (log == null) {
-
-            log = configuration.getLogOr(Logger.getGlobalLog());
-        }
-
-        final Logger logger =
-                Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
-                                 DefaultServiceObjectRoutineBuilder.class);
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
-    }
-
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
@@ -287,14 +235,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        warn(serviceConfiguration.getLogClassOr(null), invocationConfiguration);
         final AliasMethodToken<INPUT, OUTPUT> classToken = new AliasMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name};
         return JRoutine.onService(mContext, classToken, args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
-                       .withInputOrder(OrderType.BY_CALL)
                        .set()
                        .service()
                        .with(serviceConfiguration)
@@ -310,7 +256,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Method targetMethod = findMethod(targetClass, name, parameterTypes);
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        warn(serviceConfiguration.getLogClassOr(null), invocationConfiguration);
         final MethodSignatureToken<INPUT, OUTPUT> classToken =
                 new MethodSignatureToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
@@ -319,7 +264,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return JRoutine.onService(mContext, classToken, args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
-                       .withInputOrder(OrderType.BY_CALL)
                        .set()
                        .service()
                        .with(serviceConfiguration)
@@ -342,7 +286,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     "the specified class is not an interface: " + itf.getName());
         }
 
-        warn(mServiceConfiguration.getLogClassOr(null), mInvocationConfiguration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this));
         return itf.cast(proxy);
@@ -426,9 +369,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private static class AliasMethodInvocation<INPUT, OUTPUT>
             extends FunctionContextInvocation<INPUT, OUTPUT> {
 
-        private final Object[] mArgs;
+        private final String mAliasName;
 
-        private final String mBindingName;
+        private final Object[] mArgs;
 
         private final String mShareGroup;
 
@@ -444,7 +387,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param targetClassName the target object class name.
          * @param args            the factory constructor arguments.
          * @param shareGroup      the share group name.
-         * @param name            the binding name.
+         * @param name            the alias name.
          */
         @SuppressWarnings("unchecked")
         public AliasMethodInvocation(@Nonnull final String targetClassName,
@@ -454,7 +397,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mTargetClass = Class.forName(targetClassName);
             mArgs = args;
             mShareGroup = shareGroup;
-            mBindingName = name;
+            mAliasName = name;
         }
 
         @Override
@@ -481,7 +424,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                    .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
-                                   .aliasMethod(mBindingName);
+                                   .aliasMethod(mAliasName);
                 mTarget = target;
 
             } catch (final RoutineException e) {
@@ -734,16 +677,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     new Object[]{mArgs, groupWithShareAnnotation(mProxyConfiguration, method),
                                  targetClass.getName(), targetMethod.getName(),
                                  toNames(targetParameterTypes), inputMode, outputMode};
-            final OrderType inputOrder =
-                    (inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE : OrderType.BY_CALL;
-            final OrderType outputOrder =
-                    (outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL : OrderType.BY_CHANCE;
             final Routine<Object, Object> routine =
                     JRoutine.onService(mContext, PROXY_TOKEN, factoryArgs)
                             .invocations()
                             .with(configurationWithAnnotations(mInvocationConfiguration, method))
-                            .withInputOrder(inputOrder)
-                            .withOutputOrder(outputOrder)
                             .set()
                             .service()
                             .with(mServiceConfiguration)

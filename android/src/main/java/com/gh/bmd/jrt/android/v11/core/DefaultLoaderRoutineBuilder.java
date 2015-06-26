@@ -25,10 +25,8 @@ import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.util.Reflection;
-import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
 
@@ -127,14 +125,17 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
     public LoaderRoutine<INPUT, OUTPUT> buildRoutine() {
 
         final InvocationConfiguration configuration = getConfiguration();
-        warn(configuration);
+        final Runner mainRunner = Runners.mainRunner();
+        final Runner asyncRunner = configuration.getAsyncRunnerOr(mainRunner);
+
+        if (asyncRunner != mainRunner) {
+
+            configuration.newLogger(this)
+                         .wrn("the specified async runner will be ignored: %s", asyncRunner);
+        }
+
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                configuration.builderFrom()
-                             .withAsyncRunner(Runners.mainRunner())
-                             .withInputMaxSize(Integer.MAX_VALUE)
-                             .withInputTimeout(TimeDuration.INFINITY)
-                             .withOutputMaxSize(Integer.MAX_VALUE)
-                             .withOutputTimeout(TimeDuration.INFINITY);
+                configuration.builderFrom().withAsyncRunner(mainRunner);
         return new DefaultLoaderRoutine<INPUT, OUTPUT>(mContext, mFactory, builder.set(),
                                                        mLoaderConfiguration);
     }
@@ -196,49 +197,5 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
         mLoaderConfiguration = configuration;
         return this;
-    }
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the invocation configuration.
-     */
-    private void warn(@Nonnull final InvocationConfiguration configuration) {
-
-        final Logger logger = configuration.newLogger(this);
-        final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
-
-        if (asyncRunner != null) {
-
-            logger.wrn("the specified async runner will be ignored: %s", asyncRunner);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (outputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
     }
 }

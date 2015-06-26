@@ -50,7 +50,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
-import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -371,25 +370,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         assertThat(
                 routine.callParallel("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
-    }
-
-    public void testServiceRoutineBuilderWarnings() {
-
-        final CountLog countLog = new CountLog();
-        JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                .invocations()
-                .withInputMaxSize(3)
-                .withInputTimeout(seconds(1))
-                .withOutputMaxSize(3)
-                .withOutputTimeout(seconds(1))
-                .withLogLevel(LogLevel.DEBUG)
-                .withLog(countLog)
-                .set()
-                .service()
-                .withServiceClass(TestService.class)
-                .set()
-                .buildRoutine();
-        assertThat(countLog.getWrnCount()).isEqualTo(4);
     }
 
     private static class Abort extends TemplateContextInvocation<Data, Data> {

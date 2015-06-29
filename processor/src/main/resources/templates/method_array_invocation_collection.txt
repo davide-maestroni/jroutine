@@ -51,6 +51,8 @@
 
                 try {
 
+                    result.orderByCall();
+
                     for (final ${resultClassName} element : wrapped.${targetMethodName}(array)) {
 
                         result.pass(element);

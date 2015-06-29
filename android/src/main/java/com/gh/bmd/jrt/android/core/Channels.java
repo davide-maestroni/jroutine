@@ -66,8 +66,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
 
         for (final Integer index : indexes) {
 
-            channelMap.put(index, com.gh.bmd.jrt.android.core.Channels.<DATA, INPUT>selectParcelable(
-                    channel, index));
+            channelMap.put(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -93,8 +92,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
 
         for (final int index : indexes) {
 
-            channelMap.put(index, com.gh.bmd.jrt.android.core.Channels.<DATA, INPUT>selectParcelable(
-                    channel, index));
+            channelMap.put(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -126,8 +124,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
 
         for (int index = startIndex; index < rangeSize; index++) {
 
-            channelMap.put(index, com.gh.bmd.jrt.android.core.Channels.<DATA, INPUT>selectParcelable(
-                    channel, index));
+            channelMap.put(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
         return channelMap;

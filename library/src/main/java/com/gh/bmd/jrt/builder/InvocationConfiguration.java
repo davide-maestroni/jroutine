@@ -902,7 +902,9 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the order in which input data are collected from the input channel. A null value
-         * means that it is up to the framework to choose a default one.
+         * means that it is up to the framework to choose a default one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the channel
+         * order can be dynamically changed through the dedicated methods.
          *
          * @param orderType the order type.
          * @return this builder.
@@ -1018,7 +1020,9 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the order in which output data are collected from the result channel. A null value
-         * means that it is up to the framework to choose a default order one.
+         * means that it is up to the framework to choose a default order one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the channel
+         * order can be dynamically changed through the dedicated methods.
          *
          * @param orderType the order type.
          * @return this builder.
@@ -1075,7 +1079,9 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the timeout for an invocation instance to produce a readable result.
+         * Sets the timeout for an invocation instance to produce a readable result.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout can be dynamically changed through the dedicated methods.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
@@ -1090,7 +1096,9 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to produce a readable result. A null value
-         * means that it is up to the framework to choose a default one.
+         * means that it is up to the framework to choose a default one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout can be dynamically changed through the dedicated methods.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -1105,7 +1113,9 @@ public final class InvocationConfiguration {
         /**
          * Sets the action to be taken if the timeout elapses before a result can be read from the
          * output channel. A null value means that it is up to the framework to choose a default
-         * one.
+         * one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout action can be dynamically changed through the dedicated methods.
          *
          * @param actionType the action type.
          * @return this builder.

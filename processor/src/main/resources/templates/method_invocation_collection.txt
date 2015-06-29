@@ -50,6 +50,8 @@
 
                 try {
 
+                    result.orderByCall();
+
                     for (final ${resultClassName} element : wrapped.${targetMethodName}(${paramValues})) {
 
                         result.pass(element);

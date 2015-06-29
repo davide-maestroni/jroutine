@@ -23,7 +23,6 @@ import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -284,6 +283,22 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
+     * Builds the string used to replace "${inputOptions}" in the template.
+     *
+     * @param methodElement the method element.
+     * @param inputMode     the input mode.
+     * @return the string.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String buildInputOptions(final ExecutableElement methodElement,
+            final InputMode inputMode) {
+
+        return ((inputMode == InputMode.VALUE) || (inputMode == InputMode.COLLECTION))
+                ? ".orderByCall()" : "";
+    }
+
+    /**
      * Builds the string used to replace "${inputParams}" in the template.
      *
      * @param methodElement the method element.
@@ -472,34 +487,14 @@ public class RoutineProcessor extends AbstractProcessor {
      * Builds the string used to replace "${routineBuilderOptions}" in the template.
      *
      * @param methodElement the method element.
-     * @param inputMode     the input transfer mode.
-     * @param outputMode    the output transfer mode.
      * @return the string.
      */
     @Nonnull
-    protected String buildRoutineOptions(@Nonnull final ExecutableElement methodElement,
-            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+    protected String buildRoutineOptions(@Nonnull final ExecutableElement methodElement) {
 
-        final StringBuilder builder = new StringBuilder();
         final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
-
-        if (priorityAnnotation != null) {
-
-            builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
-        }
-
-        return builder.append(".withInputOrder(")
-                      .append(OrderType.class.getCanonicalName())
-                      .append(".")
-                      .append(((inputMode == InputMode.ELEMENT) ? OrderType.BY_CHANCE
-                              : OrderType.BY_CALL))
-                      .append(").withOutputOrder(")
-                      .append(OrderType.class.getCanonicalName())
-                      .append(".")
-                      .append(((outputMode == OutputMode.ELEMENT) ? OrderType.BY_CALL
-                              : OrderType.BY_CHANCE))
-                      .append(")")
-                      .toString();
+        return (priorityAnnotation != null) ? ".withPriority(" + priorityAnnotation.value() + ")"
+                : "";
     }
 
     /**
@@ -1962,8 +1957,7 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
         methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
-                                            buildRoutineOptions(methodElement, inputMode,
-                                                                outputMode));
+                                            buildRoutineOptions(methodElement));
 
         final ShareGroup shareGroupAnnotation = methodElement.getAnnotation(ShareGroup.class);
 
@@ -1986,6 +1980,7 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${methodName}", methodElement.getSimpleName());
         method = method.replace("${params}", buildParams(methodElement));
         method = method.replace("${paramTypes}", buildParamTypes(methodElement));
+        method = method.replace("${inputOptions}", buildInputOptions(methodElement, inputMode));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
         method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
         method = method.replace("${invokeMethod}",

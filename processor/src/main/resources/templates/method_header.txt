@@ -46,10 +46,6 @@
                                            .invocations()
                                            .with(configuration)
                                            ${routineBuilderOptions}
-                                           .withInputMaxSize(Integer.MAX_VALUE)
-                                           .withInputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
-                                           .withOutputMaxSize(Integer.MAX_VALUE)
-                                           .withOutputTimeout(com.gh.bmd.jrt.util.TimeDuration.ZERO)
                                            .set()
                                            .buildRoutine();
     }

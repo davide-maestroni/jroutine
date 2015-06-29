@@ -825,6 +825,7 @@ public class RoutineBuilders {
             return outputChannel.all().iterator().next();
         }
 
+        outputChannel.checkComplete();
         return null;
     }
 

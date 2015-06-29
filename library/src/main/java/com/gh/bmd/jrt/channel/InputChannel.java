@@ -70,31 +70,47 @@ public interface InputChannel<INPUT> extends Channel {
     InputChannel<INPUT> now();
 
     /**
-     * TODO
+     * Tells the channel to sort the passed input data based on the order of the calls to the pass
+     * methods.
+     * <p/>
+     * By default no particular order is applied.
      *
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException         if this channel is already closed.
+     * @see {@link #orderByChance()}
+     * @see {@link #orderByDelay()}
      */
     @Nonnull
     InputChannel<INPUT> orderByCall();
 
     /**
-     * TODO
+     * Tells the channel to avoid sorting the passed input in any particular order.
+     * <p/>
+     * This is the default behavior.
      *
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException         if this channel is already closed.
+     * @see {@link #orderByCall()}
+     * @see {@link #orderByDelay()}
      */
     @Nonnull
     InputChannel<INPUT> orderByChance();
 
     /**
-     * TODO
+     * Tells the channel to sort the passed input data based on the specific delay.<br/>
+     * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
+     * are passed to the channel, while the others will be delivered as soon as the set runner
+     * handles the related execution.
+     * <p/>
+     * By default no particular order is applied.
      *
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException         if this channel is already closed.
+     * @see {@link #orderByCall()}
+     * @see {@link #orderByChance()}
      */
     @Nonnull
     InputChannel<INPUT> orderByDelay();

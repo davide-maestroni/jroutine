@@ -810,6 +810,35 @@ public class Channels {
 
             return (TYPE) data;
         }
+
+        @Override
+        public int hashCode() {
+
+            // auto-generated code
+            int result = data != null ? data.hashCode() : 0;
+            result = 31 * result + index;
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            // auto-generated code
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof Selectable)) {
+
+                return false;
+            }
+
+            final Selectable<?> that = (Selectable<?>) o;
+
+            return index == that.index && !(data != null ? !data.equals(that.data)
+                    : that.data != null);
+        }
     }
 
     /**
@@ -1049,12 +1078,13 @@ public class Channels {
 
             final int index = selectable.index;
             final SimpleQueue<OUTPUT>[] queues = mQueues;
+            queues[index].add(selectable.data);
             final int length = queues.length;
             boolean isFull = true;
 
-            for (int i = 0; i < length; i++) {
+            for (final SimpleQueue<OUTPUT> queue : queues) {
 
-                if ((i != index) && queues[i].isEmpty()) {
+                if (queue.isEmpty()) {
 
                     isFull = false;
                     break;
@@ -1065,23 +1095,12 @@ public class Channels {
 
                 final ArrayList<OUTPUT> outputs = new ArrayList<OUTPUT>(length);
 
-                for (int i = 0; i < length; i++) {
+                for (final SimpleQueue<OUTPUT> queue : queues) {
 
-                    if (i != index) {
-
-                        outputs.add(queues[i].removeFirst());
-
-                    } else {
-
-                        outputs.add(selectable.data);
-                    }
+                    outputs.add(queue.removeFirst());
                 }
 
                 mInputChannel.pass(outputs);
-
-            } else {
-
-                queues[index].add(selectable.data);
             }
         }
     }
@@ -1173,6 +1192,8 @@ public class Channels {
 
         private final ArrayList<InputChannel<?>> mChannelList;
 
+        private final int mSize;
+
         private final int mStartIndex;
 
         /**
@@ -1186,6 +1207,7 @@ public class Channels {
 
             mStartIndex = startIndex;
             mChannelList = channels;
+            mSize = channels.size();
         }
 
         @Override
@@ -1200,7 +1222,14 @@ public class Channels {
         @Override
         public void onOutput(final Selectable<?> selectable) {
 
-            final InputChannel<?> inputChannel = mChannelList.get(selectable.index - mStartIndex);
+            final int index = selectable.index - mStartIndex;
+
+            if ((index < 0) || (index >= mSize)) {
+
+                return;
+            }
+
+            final InputChannel<?> inputChannel = mChannelList.get(index);
 
             if (inputChannel != null) {
 

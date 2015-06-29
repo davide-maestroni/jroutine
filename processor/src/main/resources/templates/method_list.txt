@@ -18,5 +18,5 @@
     public ${resultType} ${methodName}(${paramTypes}) {
 
         final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        return $$routine.${invokeMethod}()${inputParams}.result()${outputOptions}.all();
+        return $$routine.${invokeMethod}()${inputOptions}${inputParams}.result()${outputOptions}.all();
     }

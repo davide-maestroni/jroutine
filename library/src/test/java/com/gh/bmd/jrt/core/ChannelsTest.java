@@ -487,6 +487,164 @@ public class ChannelsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testInputMap() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        Map<Integer, InputChannel<Object>> channelMap;
+        InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
+        channel = routine.invokeAsync();
+        channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
+        channelMap.get(Sort.INTEGER).pass(-11);
+        channelMap.get(Sort.STRING).pass("test21");
+        assertThat(channel.result().eventually().all()).containsOnly(
+                new Selectable<Object>("test21", Sort.STRING),
+                new Selectable<Object>(-11, Sort.INTEGER));
+        channel = routine.invokeAsync();
+        channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
+        channelMap.get(Sort.INTEGER).pass(-11);
+        channelMap.get(Sort.STRING).pass("test21");
+        assertThat(channel.result().eventually().all()).containsOnly(
+                new Selectable<Object>("test21", Sort.STRING),
+                new Selectable<Object>(-11, Sort.INTEGER));
+        channel = routine.invokeAsync();
+        channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
+        channelMap.get(Sort.INTEGER).pass(-11);
+        channelMap.get(Sort.STRING).pass("test21");
+        assertThat(channel.result().eventually().all()).containsOnly(
+                new Selectable<Object>("test21", Sort.STRING),
+                new Selectable<Object>(-11, Sort.INTEGER));
+    }
+
+    @Test
+    public void testInputMapAbort() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        Map<Integer, InputChannel<Object>> channelMap;
+        InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
+        channel = routine.invokeAsync();
+        channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
+        channelMap.get(Sort.INTEGER).pass(-11);
+        channelMap.get(Sort.STRING).abort();
+
+        try {
+
+            channel.result().eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = routine.invokeAsync();
+        channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
+        channelMap.get(Sort.INTEGER).abort();
+        channelMap.get(Sort.STRING).pass("test21");
+
+        try {
+
+            channel.result().eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = routine.invokeAsync();
+        channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
+        channelMap.get(Sort.INTEGER).abort();
+        channelMap.get(Sort.STRING).abort();
+
+        try {
+
+            channel.result().eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testInputMapError() {
+
+        try {
+
+            Channels.map(0, 0, JRoutine.on(new Sort()).invokeAsync());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInputSelect() {
+
+        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        Channels.select(channel.input(), 33).pass("test1", "test2", "test3");
+        channel.input().close();
+        assertThat(channel.output().all()).containsExactly(new Selectable<String>("test1", 33),
+                                                           new Selectable<String>("test2", 33),
+                                                           new Selectable<String>("test3", 33));
+    }
+
+    @Test
+    public void testInputSelectAbort() {
+
+        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        Channels.select(channel.input(), 33).pass("test1", "test2", "test3").abort();
+        channel.input().close();
+
+        try {
+
+            channel.output().eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInputToSelectable() {
+
+        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        Channels.toSelectable(channel.input(), 33)
+                .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
+                      new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
+        channel.input().close();
+        assertThat(channel.output().eventually().all()).containsExactly("test1", "test3");
+    }
+
+    @Test
+    public void testInputToSelectableAbort() {
+
+        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        Channels.toSelectable(channel.input(), 33).abort();
+        channel.input().close();
+
+        try {
+
+            channel.output().eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
     public void testJoin() {
 
         final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
@@ -742,6 +900,56 @@ public class ChannelsTest {
 
         final TransportChannelBuilder builder =
                 JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+        TransportChannel<String> channel1;
+        TransportChannel<Integer> channel2;
+        OutputChannel<? extends Selectable<?>> outputChannel;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(-7, channel1.output(), channel2.output());
+        channel1.input().pass("test1").close();
+        channel2.input().pass(13).close();
+        assertThat(outputChannel.eventually().all()).containsOnly(
+                new Selectable<String>("test1", -7), new Selectable<Integer>(13, -6));
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(11, Arrays.asList(channel1.output(), channel2.output()));
+        channel2.input().pass(13).close();
+        channel1.input().pass("test1").close();
+        assertThat(outputChannel.eventually().all()).containsOnly(
+                new Selectable<String>("test1", 11), new Selectable<Integer>(13, 12));
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(channel1.output(), channel2.output());
+        channel1.input().pass("test2").close();
+        channel2.input().pass(-17).close();
+        assertThat(outputChannel.eventually().all()).containsOnly(
+                new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(Arrays.asList(channel1.output(), channel2.output()));
+        channel1.input().pass("test2").close();
+        channel2.input().pass(-17).close();
+        assertThat(outputChannel.eventually().all()).containsOnly(
+                new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        final HashMap<Integer, OutputChannel<?>> channelMap =
+                new HashMap<Integer, OutputChannel<?>>(2);
+        channelMap.put(7, channel1.output());
+        channelMap.put(-3, channel2.output());
+        outputChannel = Channels.merge(channelMap);
+        channel1.input().pass("test3").close();
+        channel2.input().pass(111).close();
+        assertThat(outputChannel.eventually().all()).containsOnly(
+                new Selectable<String>("test3", 7), new Selectable<Integer>(111, -3));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testMerge4() {
+
+        final TransportChannelBuilder builder =
+                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<String> channel2 = builder.buildChannel();
         final TransportChannel<String> channel3 = builder.buildChannel();
@@ -771,7 +979,121 @@ public class ChannelsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testMergeAbort() {
+
+        final TransportChannelBuilder builder =
+                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+        TransportChannel<String> channel1;
+        TransportChannel<Integer> channel2;
+        OutputChannel<? extends Selectable<?>> outputChannel;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(-7, channel1.output(), channel2.output());
+        channel1.input().pass("test1").close();
+        channel2.input().abort();
+
+        try {
+
+            outputChannel.eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(11, Arrays.asList(channel1.output(), channel2.output()));
+        channel2.input().abort();
+        channel1.input().pass("test1").close();
+
+        try {
+
+            outputChannel.eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(channel1.output(), channel2.output());
+        channel1.input().abort();
+        channel2.input().pass(-17).close();
+
+        try {
+
+            outputChannel.eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        outputChannel = Channels.merge(Arrays.asList(channel1.output(), channel2.output()));
+        channel1.input().pass("test2").close();
+        channel2.input().abort();
+
+        try {
+
+            outputChannel.eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        final HashMap<Integer, OutputChannel<?>> channelMap =
+                new HashMap<Integer, OutputChannel<?>>(2);
+        channelMap.put(7, channel1.output());
+        channelMap.put(-3, channel2.output());
+        outputChannel = Channels.merge(channelMap);
+        channel1.input().abort();
+        channel2.input().pass(111).close();
+
+        try {
+
+            outputChannel.eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
     public void testMergeError() {
+
+        try {
+
+            Channels.merge(0, Collections.<OutputChannel<Object>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
 
         try {
 
@@ -780,6 +1102,208 @@ public class ChannelsTest {
             fail();
 
         } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge(Collections.<Integer, OutputChannel<Object>>emptyMap());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testOutputMap() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        Map<Integer, OutputChannel<Object>> channelMap;
+        OutputChannel<Selectable<Object>> channel;
+        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
+                                    new Selectable<Object>(-11, Sort.INTEGER));
+        channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
+        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
+        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
+        channel = routine.callAsync(new Selectable<Object>(-11, Sort.INTEGER),
+                                    new Selectable<Object>("test21", Sort.STRING));
+        channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
+        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
+        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
+        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
+                                    new Selectable<Object>(-11, Sort.INTEGER));
+        channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
+        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
+        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testOutputMapAbort() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        Map<Integer, OutputChannel<Object>> channelMap;
+        OutputChannel<Selectable<Object>> channel;
+        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
+                                    new Selectable<Object>(-11, Sort.INTEGER));
+        channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
+        channel.abort();
+
+        try {
+
+            channelMap.get(Sort.STRING).eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channelMap.get(Sort.INTEGER).eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = routine.callAsync(new Selectable<Object>(-11, Sort.INTEGER),
+                                    new Selectable<Object>("test21", Sort.STRING));
+        channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
+        channel.abort();
+
+        try {
+
+            channelMap.get(Sort.STRING).eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channelMap.get(Sort.INTEGER).eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
+                                    new Selectable<Object>(-11, Sort.INTEGER));
+        channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
+        channel.abort();
+
+        try {
+
+            channelMap.get(Sort.STRING).eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channelMap.get(Sort.INTEGER).eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testOutputMapError() {
+
+        try {
+
+            Channels.map(0, 0, JRoutine.on(new Sort()).callAsync());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testOutputSelect() {
+
+        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        final OutputChannel<String> outputChannel = Channels.select(channel.output(), 33);
+        channel.input()
+               .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
+                     new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
+        channel.input().close();
+        assertThat(outputChannel.all()).containsExactly("test1", "test3");
+    }
+
+    @Test
+    public void testOutputSelectAbort() {
+
+        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        final OutputChannel<String> outputChannel = Channels.select(channel.output(), 33);
+        channel.input().abort();
+
+        try {
+
+            outputChannel.eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testOutputToSelectable() {
+
+        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        channel.input().pass("test1", "test2", "test3").close();
+        assertThat(Channels.toSelectable(channel.output(), 33).eventually().all()).containsExactly(
+                new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
+                new Selectable<String>("test3", 33));
+    }
+
+    @Test
+    public void testOutputToSelectableAbort() {
+
+        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        channel.input().pass("test1", "test2", "test3").abort();
+
+        try {
+
+            Channels.toSelectable(channel.output(), 33).eventually().all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
 
         }
     }

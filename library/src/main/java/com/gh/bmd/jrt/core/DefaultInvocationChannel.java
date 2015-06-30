@@ -33,7 +33,7 @@ import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.TimeDuration.Check;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -811,8 +811,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Nullable
         Execution abortInvocation(@Nullable final Throwable reason) {
 
-            final Throwable abortException =
-                    (reason instanceof RoutineException) ? reason : new AbortException(reason);
+            final Throwable abortException = AbortException.wrapIfNeeded(reason);
 
             if (mInputDelay.isZero()) {
 
@@ -1209,7 +1208,57 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                 return null;
             }
 
-            return pass(Arrays.asList(inputs));
+            final int size = inputs.length;
+
+            if (size > mMaxInput) {
+
+                throw new InputDeadlockException(
+                        "inputs exceed maximum channel size [" + size + "/" + mMaxInput + "]");
+            }
+
+            final TimeDuration delay = mInputDelay;
+            mSubLogger.dbg("passing array [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
+            mInputCount += size;
+
+            if (!mHasInputs.isTrue()) {
+
+                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
+                        && mRunner.isRunnerThread()) {
+
+                    mInputCount -= size;
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitInputs(size);
+
+                if (mState != this) {
+
+                    mInputCount -= size;
+                    return mState.pass(inputs);
+                }
+            }
+
+            final ArrayList<INPUT> list = new ArrayList<INPUT>(size);
+            Collections.addAll(list, inputs);
+
+            if (delay.isZero()) {
+
+                mInputQueue.addAll(list);
+
+                if (!mIsPendingExecution) {
+
+                    ++mPendingExecutionCount;
+                    mIsPendingExecution = true;
+                    return mExecution;
+                }
+
+                return null;
+            }
+
+            ++mPendingExecutionCount;
+            return new DelayedListInputExecution(
+                    (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
+                    list);
         }
 
         @Nullable

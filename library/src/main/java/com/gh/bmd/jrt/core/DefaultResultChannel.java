@@ -35,8 +35,8 @@ import com.gh.bmd.jrt.util.TimeDuration.Check;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -339,8 +339,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     void abortImmediately(@Nullable final Throwable reason) {
 
-        Throwable abortException =
-                (reason instanceof RoutineException) ? reason : new InvocationException(reason);
+        Throwable abortException = InvocationException.wrapIfNeeded(reason);
 
         synchronized (mMutex) {
 
@@ -361,8 +360,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     void close(@Nullable final Throwable throwable) {
 
         final ArrayList<OutputChannel<?>> channels;
-        final Throwable abortException = (throwable instanceof RoutineException) ? throwable
-                : new InvocationException(throwable);
+        final Throwable abortException = InvocationException.wrapIfNeeded(throwable);
 
         synchronized (mMutex) {
 
@@ -1701,8 +1699,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         Throwable abortInvocation(@Nullable final Throwable reason,
                 @Nonnull final TimeDuration delay) {
 
-            final Throwable abortException =
-                    (reason instanceof RoutineException) ? reason : new AbortException(reason);
+            final Throwable abortException = AbortException.wrapIfNeeded(reason);
 
             if (delay.isZero()) {
 
@@ -1724,8 +1721,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Nullable
         Throwable abortOutputChannel(@Nullable final Throwable reason) {
 
-            final Throwable abortException =
-                    (reason instanceof RoutineException) ? reason : new AbortException(reason);
+            final Throwable abortException = AbortException.wrapIfNeeded(reason);
             mSubLogger.dbg(reason, "aborting output");
             mOutputQueue.clear();
             mAbortException = abortException;
@@ -2112,7 +2108,48 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return null;
             }
 
-            return pass(Arrays.asList(outputs));
+            final int size = outputs.length;
+
+            if (size > mMaxOutput) {
+
+                throw new OutputDeadlockException(
+                        "outputs exceed maximum channel size [" + size + "/" + mMaxOutput + "]");
+            }
+
+            final TimeDuration delay = mResultDelay;
+            mSubLogger.dbg("passing array [#%d+%d]: %s [%s]", mOutputCount, size, outputs, delay);
+            mOutputCount += size;
+
+            if (!mHasOutputs.isTrue()) {
+
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+
+                    mOutputCount -= size;
+                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
+                }
+
+                waitOutputs(size);
+
+                if (mState != this) {
+
+                    mOutputCount -= size;
+                    return mState.pass(outputs);
+                }
+            }
+
+            final ArrayList<OUTPUT> list = new ArrayList<OUTPUT>(size);
+            Collections.addAll(list, outputs);
+
+            if (delay.isZero()) {
+
+                mOutputQueue.addAll(list);
+                return null;
+            }
+
+            ++mPendingOutputCount;
+            return new DelayedListOutputExecution(
+                    (mResultOrder != OrderType.BY_CHANCE) ? mOutputQueue.addNested() : mOutputQueue,
+                    list);
         }
 
         /**

@@ -32,6 +32,7 @@ import com.gh.bmd.jrt.util.ClassToken;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -487,9 +488,11 @@ public class ChannelsTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testInputMap() {
 
+        final ArrayList<Selectable<Object>> outputs = new ArrayList<Selectable<Object>>();
+        outputs.add(new Selectable<Object>("test21", Sort.STRING));
+        outputs.add(new Selectable<Object>(-11, Sort.INTEGER));
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
         Map<Integer, InputChannel<Object>> channelMap;
@@ -498,23 +501,17 @@ public class ChannelsTest {
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
         channelMap.get(Sort.INTEGER).pass(-11);
         channelMap.get(Sort.STRING).pass("test21");
-        assertThat(channel.result().eventually().all()).containsOnly(
-                new Selectable<Object>("test21", Sort.STRING),
-                new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
         channel = routine.invokeAsync();
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
         channelMap.get(Sort.INTEGER).pass(-11);
         channelMap.get(Sort.STRING).pass("test21");
-        assertThat(channel.result().eventually().all()).containsOnly(
-                new Selectable<Object>("test21", Sort.STRING),
-                new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
         channel = routine.invokeAsync();
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
         channelMap.get(Sort.INTEGER).pass(-11);
         channelMap.get(Sort.STRING).pass("test21");
-        assertThat(channel.result().eventually().all()).containsOnly(
-                new Selectable<Object>("test21", Sort.STRING),
-                new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
     }
 
     @Test
@@ -1159,8 +1156,11 @@ public class ChannelsTest {
                 JRoutine.on(new Sort()).buildRoutine();
         Map<Integer, OutputChannel<Object>> channelMap;
         OutputChannel<Selectable<Object>> channel;
-        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
-                                    new Selectable<Object>(-11, Sort.INTEGER));
+        channel = routine.invokeAsync()
+                         .after(millis(100))
+                         .pass(new Selectable<Object>("test21", Sort.STRING),
+                               new Selectable<Object>(-11, Sort.INTEGER))
+                         .result();
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
         channel.abort();
 
@@ -1184,8 +1184,11 @@ public class ChannelsTest {
 
         }
 
-        channel = routine.callAsync(new Selectable<Object>(-11, Sort.INTEGER),
-                                    new Selectable<Object>("test21", Sort.STRING));
+        channel = routine.invokeAsync()
+                         .after(millis(100))
+                         .pass(new Selectable<Object>(-11, Sort.INTEGER),
+                               new Selectable<Object>("test21", Sort.STRING))
+                         .result();
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
         channel.abort();
 
@@ -1209,8 +1212,11 @@ public class ChannelsTest {
 
         }
 
-        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
-                                    new Selectable<Object>(-11, Sort.INTEGER));
+        channel = routine.invokeAsync()
+                         .after(millis(100))
+                         .pass(new Selectable<Object>("test21", Sort.STRING),
+                               new Selectable<Object>(-11, Sort.INTEGER))
+                         .result();
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
         channel.abort();
 

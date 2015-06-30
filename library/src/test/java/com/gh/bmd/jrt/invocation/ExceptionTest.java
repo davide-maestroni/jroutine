@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.invocation;
 
+import com.gh.bmd.jrt.channel.RoutineException;
+
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +39,11 @@ public class ExceptionTest {
                 new InvocationException(new NullPointerException()).getCause()).isExactlyInstanceOf(
                 NullPointerException.class);
         assertThat(new InvocationException(null)).hasNoCause();
+        assertThat(
+                InvocationException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
+                InvocationException.class);
+        assertThat(InvocationException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
+                RoutineException.class);
     }
 
     @Test

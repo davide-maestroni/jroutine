@@ -549,25 +549,41 @@ public class RoutineService extends Service {
 
                 switch (msg.what) {
 
-                    case MSG_DATA:
-                        service.getInvocation(msg).pass(getValue(msg));
-                        break;
+                    case MSG_DATA: {
 
-                    case MSG_COMPLETE:
+                        service.getInvocation(msg).pass(getValue(msg));
+                    }
+
+                    break;
+
+                    case MSG_COMPLETE: {
+
                         final RoutineInvocation invocation = service.getInvocation(msg);
                         invocation.result(new ServiceOutputConsumer(invocation, msg.replyTo));
-                        break;
+                    }
 
-                    case MSG_ABORT:
-                        service.getInvocation(msg).abort(getAbortError(msg));
-                        break;
+                    break;
 
-                    case MSG_INIT:
+                    case MSG_ABORT: {
+
+                        final RoutineInvocation invocation = service.getInvocation(msg);
+                        invocation.abort(getAbortError(msg));
+                        invocation.result(new ServiceOutputConsumer(invocation, msg.replyTo));
+                    }
+
+                    break;
+
+                    case MSG_INIT: {
+
                         service.initRoutine(msg);
-                        break;
+                    }
 
-                    default:
+                    break;
+
+                    default: {
+
                         super.handleMessage(msg);
+                    }
                 }
 
             } catch (final Throwable t) {

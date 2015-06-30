@@ -492,22 +492,34 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     switch (msg.what) {
 
-                        case RoutineService.MSG_DATA:
-                            mTransportResultInput.pass((OUTPUT) getValue(msg));
-                            break;
+                        case RoutineService.MSG_DATA: {
 
-                        case RoutineService.MSG_COMPLETE:
+                            mTransportResultInput.pass((OUTPUT) getValue(msg));
+                        }
+
+                        break;
+
+                        case RoutineService.MSG_COMPLETE: {
+
                             mTransportResultInput.close();
                             unbindService();
-                            break;
+                        }
 
-                        case RoutineService.MSG_ABORT:
-                            mTransportResultInput.abort(getAbortError(msg));
+                        break;
+
+                        case RoutineService.MSG_ABORT: {
+
+                            mTransportResultInput.abort(
+                                    InvocationException.wrapIfNeeded(getAbortError(msg)));
                             unbindService();
-                            break;
+                        }
 
-                        default:
+                        break;
+
+                        default: {
+
                             super.handleMessage(msg);
+                        }
                     }
 
                 } catch (final Throwable t) {

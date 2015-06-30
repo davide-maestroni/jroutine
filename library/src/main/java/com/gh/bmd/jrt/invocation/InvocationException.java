@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.RoutineException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -32,5 +33,19 @@ public class InvocationException extends RoutineException {
     public InvocationException(@Nullable final Throwable cause) {
 
         super(cause);
+    }
+
+    /**
+     * Wraps the specified throwable only if it is not an instance of
+     * {@link com.gh.bmd.jrt.channel.RoutineException}.
+     *
+     * @param cause the throwable to wrap.
+     * @return the throwable or an invocation exception wrapping it.
+     */
+    @Nonnull
+    public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
+
+        return (cause instanceof RoutineException) ? (RoutineException) cause
+                : new InvocationException(cause);
     }
 }

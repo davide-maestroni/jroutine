@@ -30,6 +30,10 @@ public class ExceptionTest {
         assertThat(new AbortException(new NullPointerException()).getCause()).isExactlyInstanceOf(
                 NullPointerException.class);
         assertThat(new AbortException(null)).hasNoCause();
+        assertThat(AbortException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
+                AbortException.class);
+        assertThat(AbortException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
+                RoutineException.class);
     }
 
     @Test

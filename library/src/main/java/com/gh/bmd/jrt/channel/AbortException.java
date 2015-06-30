@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -30,5 +31,19 @@ public class AbortException extends RoutineException {
     public AbortException(@Nullable final Throwable cause) {
 
         super(cause);
+    }
+
+    /**
+     * Wraps the specified throwable only if it is not an instance of
+     * {@link com.gh.bmd.jrt.channel.RoutineException}.
+     *
+     * @param cause the throwable to wrap.
+     * @return the throwable or an abort exception wrapping it.
+     */
+    @Nonnull
+    public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
+
+        return (cause instanceof RoutineException) ? (RoutineException) cause
+                : new AbortException(cause);
     }
 }

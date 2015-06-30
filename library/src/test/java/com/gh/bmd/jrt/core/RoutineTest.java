@@ -31,7 +31,9 @@ import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RunnerDeadlockException;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
+import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
@@ -1375,6 +1377,50 @@ public class RoutineTest {
     }
 
     @Test
+    public void testInputRunnerDeadlock() {
+
+        try {
+
+            JRoutine.on(new InputRunnerDeadlock()).callAsync("test").eventually().all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(new InputListRunnerDeadlock()).callAsync("test").eventually().all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(new InputArrayRunnerDeadlock()).callAsync("test").eventually().all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(new InputConsumerRunnerDeadlock()).callAsync("test").eventually().all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
+
+        }
+    }
+
+    @Test
     public void testInputTimeout() {
 
         try {
@@ -1923,6 +1969,78 @@ public class RoutineTest {
             fail();
 
         } catch (final ReadDeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testResultRunnerDeadlock() {
+
+        try {
+
+            JRoutine.on(new ResultRunnerDeadlock())
+                    .invocations()
+                    .withOutputMaxSize(1)
+                    .withOutputTimeout(millis(500))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(new ResultListRunnerDeadlock())
+                    .invocations()
+                    .withOutputMaxSize(1)
+                    .withOutputTimeout(millis(500))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(new ResultArrayRunnerDeadlock())
+                    .invocations()
+                    .withOutputMaxSize(1)
+                    .withOutputTimeout(millis(500))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(new ResultConsumerRunnerDeadlock())
+                    .invocations()
+                    .withOutputMaxSize(1)
+                    .withOutputTimeout(millis(500))
+                    .set()
+                    .callAsync("test")
+                    .eventually()
+                    .all();
+
+            fail();
+
+        } catch (final RunnerDeadlockException ignored) {
 
         }
     }
@@ -3255,6 +3373,81 @@ public class RoutineTest {
         }
     }
 
+    private static class InputArrayRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            JRoutine.on(PassingInvocation.<String>factoryOf())
+                    .invocations()
+                    .withInputMaxSize(1)
+                    .withInputTimeout(TimeDuration.INFINITY)
+                    .set()
+                    .invokeAsync()
+                    .after(millis(500))
+                    .pass(s)
+                    .now()
+                    .pass(new String[]{s})
+                    .result()
+                    .all();
+        }
+    }
+
+    private static class InputConsumerRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+            result.pass(JRoutine.on(PassingInvocation.<String>factoryOf())
+                                .invocations()
+                                .withInputMaxSize(1)
+                                .withInputTimeout(TimeDuration.INFINITY)
+                                .set()
+                                .invokeAsync()
+                                .after(millis(500))
+                                .pass(channel.output())
+                                .result());
+            channel.input().pass(s, s).close();
+        }
+    }
+
+    private static class InputListRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            JRoutine.on(PassingInvocation.<String>factoryOf())
+                    .invocations()
+                    .withInputMaxSize(1)
+                    .withInputTimeout(TimeDuration.INFINITY)
+                    .set()
+                    .invokeAsync()
+                    .after(millis(500))
+                    .pass(s)
+                    .now()
+                    .pass(Collections.singletonList(s))
+                    .result()
+                    .all();
+        }
+    }
+
+    private static class InputRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            JRoutine.on(PassingInvocation.<String>factoryOf())
+                    .invocations()
+                    .withInputMaxSize(1)
+                    .withInputTimeout(TimeDuration.INFINITY)
+                    .set()
+                    .invokeAsync()
+                    .after(millis(500))
+                    .pass(s)
+                    .now()
+                    .pass(s)
+                    .result()
+                    .all();
+        }
+    }
+
     private static class NextInvocation extends FilterInvocation<Object, Object> {
 
         public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
@@ -3280,6 +3473,40 @@ public class RoutineTest {
         protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
 
             return null;
+        }
+    }
+
+    private static class ResultArrayRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            result.after(millis(500)).pass(s).after(millis(100)).pass(new String[]{s});
+        }
+    }
+
+    private static class ResultConsumerRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+            result.after(millis(500)).pass(channel.output());
+            channel.input().pass(s, s).close();
+        }
+    }
+
+    private static class ResultListRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            result.after(millis(500)).pass(s).after(millis(100)).pass(Collections.singletonList(s));
+        }
+    }
+
+    private static class ResultRunnerDeadlock extends FilterInvocation<String, String> {
+
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            result.after(millis(500)).pass(s).after(millis(100)).pass(s);
         }
     }
 

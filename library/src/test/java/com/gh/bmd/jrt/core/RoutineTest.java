@@ -1371,7 +1371,23 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final DeadlockException ignored) {
+        } catch (final InputDeadlockException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.<String>factoryOf())
+                    .invocations()
+                    .withInputMaxSize(1)
+                    .withInputTimeout(TimeDuration.ZERO)
+                    .set()
+                    .callAsync(Arrays.asList("test1", "test2"))
+                    .all();
+
+            fail();
+
+        } catch (final InputDeadlockException ignored) {
 
         }
     }
@@ -1447,6 +1463,72 @@ public class RoutineTest {
         } catch (final InputDeadlockException ignored) {
 
         }
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .invocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputMaxSize(1)
+                           .withInputTimeout(millis(1000))
+                           .set()
+                           .invokeAsync()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass("test2")
+                           .result()
+                           .eventually()
+                           .all()).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .invocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputMaxSize(1)
+                           .withInputTimeout(millis(1000))
+                           .set()
+                           .invokeAsync()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass(new String[]{"test2"})
+                           .result()
+                           .eventually()
+                           .all()).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .invocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputMaxSize(1)
+                           .withInputTimeout(millis(1000))
+                           .set()
+                           .invokeAsync()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass(Collections.singletonList("test2"))
+                           .result()
+                           .eventually()
+                           .all()).containsExactly("test1", "test2");
+
+        final TransportChannel<Object> channel = JRoutine.transport().buildChannel();
+        channel.input().pass("test2").close();
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .invocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputMaxSize(1)
+                           .withInputTimeout(millis(1000))
+                           .set()
+                           .invokeAsync()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass(channel.output())
+                           .result()
+                           .eventually()
+                           .all()).containsExactly("test1", "test2");
     }
 
     @Test
@@ -1681,7 +1763,7 @@ public class RoutineTest {
     @Test
     public void testOutputDeadlock() {
 
-        final Routine<String, String> routine =
+        final Routine<String, String> routine1 =
                 JRoutine.on(factoryOf(new FunctionInvocation<String, String>() {
 
                     @Override
@@ -1699,20 +1781,24 @@ public class RoutineTest {
 
         try {
 
-            routine.callAsync("test1", "test2").eventually().all();
+            routine1.callAsync("test1", "test2").eventually().all();
 
             fail();
 
-        } catch (final DeadlockException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
-    }
 
-    @Test
-    public void testOutputTimeout() {
+        final Routine<String, String> routine2 =
+                JRoutine.on(factoryOf(new FunctionInvocation<String, String>() {
 
-        final Routine<String, String> routine =
-                JRoutine.on(new SlowFilterInvocation<String>(millis(100)))
+                    @Override
+                    public void onCall(@Nonnull final List<? extends String> strings,
+                            @Nonnull final ResultChannel<String> result) {
+
+                        result.pass(strings.toArray(new String[strings.size()]));
+                    }
+                }, this))
                         .invocations()
                         .withOutputMaxSize(1)
                         .withOutputTimeout(TimeDuration.ZERO)
@@ -1721,8 +1807,29 @@ public class RoutineTest {
 
         try {
 
+            routine2.callAsync("test1", "test2").eventually().all();
+
+            fail();
+
+        } catch (final OutputDeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testOutputTimeout() throws InterruptedException {
+
+        final Routine<String, String> routine = JRoutine.on(PassingInvocation.<String>factoryOf())
+                                                        .invocations()
+                                                        .withOutputMaxSize(1)
+                                                        .withOutputTimeout(TimeDuration.ZERO)
+                                                        .set()
+                                                        .buildRoutine();
+
+        try {
+
             final OutputChannel<String> outputChannel =
-                    routine.invokeAsync().pass("test1").pass("test2").result().eventually();
+                    routine.callAsync("test1", "test2").eventually();
             outputChannel.checkComplete();
             outputChannel.all();
 
@@ -1731,6 +1838,76 @@ public class RoutineTest {
         } catch (final OutputDeadlockException ignored) {
 
         }
+
+        final TransportChannel<String> channel1 = JRoutine.transport()
+                                                          .invocations()
+                                                          .withOutputMaxSize(1)
+                                                          .withOutputTimeout(millis(1000))
+                                                          .set()
+                                                          .buildChannel();
+        new Thread() {
+
+            @Override
+            public void run() {
+
+                channel1.input().pass("test1").pass("test2").close();
+            }
+        }.start();
+        millis(100).sleepAtLeast();
+        assertThat(channel1.output().eventually().all()).containsOnly("test1", "test2");
+
+        final TransportChannel<String> channel2 = JRoutine.transport()
+                                                          .invocations()
+                                                          .withOutputMaxSize(1)
+                                                          .withOutputTimeout(millis(1000))
+                                                          .set()
+                                                          .buildChannel();
+        new Thread() {
+
+            @Override
+            public void run() {
+
+                channel2.input().pass("test1").pass(new String[]{"test2"}).close();
+            }
+        }.start();
+        millis(100).sleepAtLeast();
+        assertThat(channel2.output().eventually().all()).containsOnly("test1", "test2");
+
+        final TransportChannel<String> channel3 = JRoutine.transport()
+                                                          .invocations()
+                                                          .withOutputMaxSize(1)
+                                                          .withOutputTimeout(millis(1000))
+                                                          .set()
+                                                          .buildChannel();
+        new Thread() {
+
+            @Override
+            public void run() {
+
+                channel3.input().pass("test1").pass(Collections.singletonList("test2")).close();
+            }
+        }.start();
+        millis(100).sleepAtLeast();
+        assertThat(channel3.output().eventually().all()).containsOnly("test1", "test2");
+
+        final TransportChannel<String> channel4 = JRoutine.transport()
+                                                          .invocations()
+                                                          .withOutputMaxSize(1)
+                                                          .withOutputTimeout(millis(1000))
+                                                          .set()
+                                                          .buildChannel();
+        new Thread() {
+
+            @Override
+            public void run() {
+
+                final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+                channel.input().pass("test1", "test2").close();
+                channel4.input().pass(channel.output()).close();
+            }
+        }.start();
+        millis(100).sleepAtLeast();
+        assertThat(channel4.output().eventually().all()).containsOnly("test1", "test2");
     }
 
     @Test
@@ -3522,30 +3699,6 @@ public class RoutineTest {
 
                 throw new InvocationInterruptedException(e);
             }
-        }
-    }
-
-    private static class SlowFilterInvocation<DATA> extends FilterInvocation<DATA, DATA> {
-
-        private final TimeDuration mDelay;
-
-        private SlowFilterInvocation(@Nonnull final TimeDuration delay) {
-
-            mDelay = delay;
-        }
-
-        public void onInput(final DATA data, @Nonnull final ResultChannel<DATA> result) {
-
-            try {
-
-                mDelay.sleepAtLeast();
-
-            } catch (final InterruptedException e) {
-
-                throw new InvocationInterruptedException(e);
-            }
-
-            result.pass(data);
         }
     }
 

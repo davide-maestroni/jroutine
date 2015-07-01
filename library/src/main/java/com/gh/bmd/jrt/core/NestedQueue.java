@@ -28,6 +28,8 @@ import javax.annotation.Nullable;
  */
 class NestedQueue<E> {
 
+    private final static Object EMPTY_ELEMENT = new Object();
+
     private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
 
     private boolean mClosed;
@@ -39,13 +41,14 @@ class NestedQueue<E> {
 
     }
 
-    private static void prune(@Nonnull final NestedQueue<?> queue) {
+    @Nullable
+    private static Object prune(@Nonnull final NestedQueue<?> queue) {
 
         final SimpleQueue<Object> simpleQueue = queue.mQueue;
 
         if (simpleQueue.isEmpty()) {
 
-            return;
+            return EMPTY_ELEMENT;
         }
 
         Object element = simpleQueue.peekFirst();
@@ -54,32 +57,22 @@ class NestedQueue<E> {
 
             final NestedQueue<?> nested = ((NestedQueue<?>) element);
 
-            if (!nested.mClosed) {
+            if (!nested.mClosed || (prune(nested) != EMPTY_ELEMENT)) {
 
-                return;
-            }
-
-            final SimpleQueue<Object> nestedSimpleQueue = nested.mQueue;
-
-            if (!nestedSimpleQueue.isEmpty()) {
-
-                prune(nested);
-
-                if (!nestedSimpleQueue.isEmpty()) {
-
-                    return;
-                }
+                return nested;
             }
 
             simpleQueue.removeFirst();
 
             if (simpleQueue.isEmpty()) {
 
-                return;
+                return EMPTY_ELEMENT;
             }
 
             element = simpleQueue.peekFirst();
         }
+
+        return element;
     }
 
     /**
@@ -150,16 +143,9 @@ class NestedQueue<E> {
      */
     public boolean isEmpty() {
 
-        prune(this);
-        final SimpleQueue<Object> queue = mQueue;
-
-        if (queue.isEmpty()) {
-
-            return true;
-        }
-
-        final Object element = queue.peekFirst();
-        return (element instanceof NestedQueue) && ((NestedQueue<?>) element).isEmpty();
+        final Object element = prune(this);
+        return (element == EMPTY_ELEMENT) || ((element instanceof NestedQueue)
+                && ((NestedQueue<?>) element).isEmpty());
     }
 
     /**
@@ -170,7 +156,11 @@ class NestedQueue<E> {
     @SuppressWarnings("unchecked")
     public void moveTo(@Nonnull final Collection<? super E> collection) {
 
-        prune(this);
+        if (prune(this) == EMPTY_ELEMENT) {
+
+            return;
+        }
+        
         final SimpleQueue<Object> queue = mQueue;
 
         while (!queue.isEmpty()) {
@@ -206,8 +196,7 @@ class NestedQueue<E> {
     @SuppressWarnings("unchecked")
     public E removeFirst() {
 
-        prune(this);
-        final Object element = mQueue.peekFirst();
+        final Object element = prune(this);
 
         if (element instanceof NestedQueue) {
 

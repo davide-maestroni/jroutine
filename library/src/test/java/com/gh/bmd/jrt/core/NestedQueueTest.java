@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Ordered nested queue unit tests.
+ * Nested queue unit tests.
  * <p/>
  * Created by davide-maestroni on 10/2/14.
  */

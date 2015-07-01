@@ -1491,7 +1491,7 @@ public class RoutineTest {
                            .after(millis(100))
                            .pass("test1")
                            .now()
-                           .pass(new String[]{"test2"})
+                           .pass(new Object[]{"test2"})
                            .result()
                            .eventually()
                            .all()).containsExactly("test1", "test2");

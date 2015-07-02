@@ -25,6 +25,10 @@ import javax.annotation.Nonnull;
  * share a pool of them between different instances.<br/>
  * The only requirement is that the specified execution is called each time a run method is invoked.
  * <br/>
+ * Note that, a proper asynchronous runner implementation will never synchronously run an execution,
+ * no matter the delay, unless it employs a single thread. While, a proper synchronous runner, will
+ * always run executions in the very same caller thread.
+ * <br/>
  * Note also that the runner methods can be called from different threads, so, it is up to the
  * implementing class to ensure synchronization when required.
  * <p/>

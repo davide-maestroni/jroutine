@@ -58,14 +58,7 @@ class ScheduledRunner implements Runner {
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        if (delay > 0) {
-
-            mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
-
-        } else {
-
-            mService.execute(new ExecutionWrapper(execution, mThreads));
-        }
+        mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
     }
 
     /**

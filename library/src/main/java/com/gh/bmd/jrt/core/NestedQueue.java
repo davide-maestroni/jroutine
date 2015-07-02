@@ -41,6 +41,14 @@ class NestedQueue<E> {
 
     }
 
+    /**
+     * Returns the first element in the specified queue by first pruning any nested queues (a nested
+     * queue can be safely pruned when closed and empty). In case the queue is empty, the method
+     * will return the special {@link #EMPTY_ELEMENT} object (null is a valid element).
+     *
+     * @param queue the queue to prune.
+     * @return the first element or {@link #EMPTY_ELEMENT}.
+     */
     @Nullable
     private static Object prune(@Nonnull final NestedQueue<?> queue) {
 
@@ -160,7 +168,7 @@ class NestedQueue<E> {
 
             return;
         }
-        
+
         final SimpleQueue<Object> queue = mQueue;
 
         while (!queue.isEmpty()) {

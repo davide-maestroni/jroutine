@@ -96,7 +96,7 @@ public interface InvocationChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * Closes the input channel and returns the output one.
      *
      * @return the routine output channel.
-     * @throws java.lang.IllegalStateException if this channel is already closed.
+     * @throws java.lang.IllegalStateException if this method has been already called.
      */
     @Nonnull
     OutputChannel<OUTPUT> result();

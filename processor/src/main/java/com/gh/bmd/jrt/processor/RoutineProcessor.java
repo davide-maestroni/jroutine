@@ -1506,10 +1506,18 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String getSourceName(@Nonnull final TypeElement annotationElement,
             @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
 
-        return getGeneratedClassPackage(annotationElement, element, targetElement) + "."
-                + getGeneratedClassPrefix(annotationElement, element, targetElement)
-                + getGeneratedClassName(annotationElement, element, targetElement)
-                + getGeneratedClassSuffix(annotationElement, element, targetElement);
+        final StringBuilder builder = new StringBuilder(
+                getGeneratedClassPackage(annotationElement, element, targetElement));
+
+        if (builder.length() > 0) {
+
+            builder.append('.');
+        }
+
+        return builder.append(getGeneratedClassPrefix(annotationElement, element, targetElement))
+                      .append(getGeneratedClassName(annotationElement, element, targetElement))
+                      .append(getGeneratedClassSuffix(annotationElement, element, targetElement))
+                      .toString();
     }
 
     /**
@@ -1657,9 +1665,11 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             String header;
-            header = getHeaderTemplate().replace("${packageName}",
-                                                 getGeneratedClassPackage(annotationElement,
-                                                                          element, targetElement));
+            final String packageName =
+                    getGeneratedClassPackage(annotationElement, element, targetElement);
+            header = getHeaderTemplate().replace("${generatedPackage}",
+                                                 (packageName.length() > 0) ? "package "
+                                                         + packageName + ";" : "");
             header = header.replace("${generatedClassName}",
                                     getGeneratedClassPrefix(annotationElement, element,
                                                             targetElement) +

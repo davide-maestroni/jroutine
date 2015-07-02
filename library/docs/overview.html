@@ -21,15 +21,13 @@
 
                 final Routine&lt;String, Integer&gt; parseRoutine = on(factoryOf(Parse.class)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine = on(factoryOf(Square.class)).buildRoutine();
-                final Routine&lt;Integer, Double&gt; meanRoutine = on(factoryOf(SquareRootMean.class)).buildRoutine();
-
+                final Routine&lt;Integer, Double&gt; meanRoutine =
+                        on(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                    .eventually()
                                    .next();
-
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
@@ -100,22 +98,13 @@
 
                 final Routine&lt;String, Integer&gt; parseRoutine = on(new Parse()).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine = on(new Square()).buildRoutine();
-                final Routine&lt;Integer, Double&gt; meanRoutine = on(new InvocationFactory&lt;Integer, Double&gt;() {
-
-                    &commat;Nonnull
-                    public Invocation&lt;Integer, Double&gt; newInvocation() {
-
-                        return new SquareRootMean();
-                    }
-                }).buildRoutine();
+                final Routine&lt;Integer, Double&gt; meanRoutine = on(new SquareRootMeanFactory()).buildRoutine();
 
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                    .eventually()
                                    .next();
-
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
@@ -169,6 +158,15 @@
                     }
                 }
             }
+
+            private static class SquareRootMeanFactory implements InvocationFactory&lt;Integer, Double&gt; {
+
+                &commat;Nonnull
+                public Invocation&lt;Integer, Double&gt; newInvocation() {
+
+                   return new SquareRootMean();
+                }
+            }
         }
     </code>
 </pre>
@@ -198,12 +196,9 @@
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
-
                 final Double rms = meanRoutine.callAsync(
                         squareRoutine.callParallel(parseRoutine.callParallel(args)).all()).next();
-
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
@@ -259,9 +254,7 @@
                                                     .set()
                                                     .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
-
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
@@ -299,7 +292,7 @@
 
                 &commat;Output
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Input(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(&commat;Input(List.class) OutputChannel&lt;Integer&gt; values);
             }

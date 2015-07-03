@@ -67,8 +67,8 @@ public class PriorityRunner {
 
     private final Runner mRunner;
 
-    private final WeakHashMap<EnqueuingRunner, Void> mRunnerMap =
-            new WeakHashMap<EnqueuingRunner, Void>();
+    private final WeakHashMap<QueuingRunner, Void> mRunnerMap =
+            new WeakHashMap<QueuingRunner, Void>();
 
     /**
      * Constructor.
@@ -90,9 +90,9 @@ public class PriorityRunner {
     @Nonnull
     static PriorityRunner getInstance(@Nonnull final Runner wrapped) {
 
-        if (wrapped instanceof EnqueuingRunner) {
+        if (wrapped instanceof QueuingRunner) {
 
-            return ((EnqueuingRunner) wrapped).enclosingRunner();
+            return ((QueuingRunner) wrapped).enclosingRunner();
         }
 
         synchronized (sRunnerMap) {
@@ -126,9 +126,9 @@ public class PriorityRunner {
 
         synchronized (mRunnerMap) {
 
-            final WeakHashMap<EnqueuingRunner, Void> runnerMap = mRunnerMap;
+            final WeakHashMap<QueuingRunner, Void> runnerMap = mRunnerMap;
 
-            for (final EnqueuingRunner runner : runnerMap.keySet()) {
+            for (final QueuingRunner runner : runnerMap.keySet()) {
 
                 if (runner.mPriority == priority) {
 
@@ -136,7 +136,7 @@ public class PriorityRunner {
                 }
             }
 
-            final EnqueuingRunner runner = new EnqueuingRunner(priority);
+            final QueuingRunner runner = new QueuingRunner(priority);
             runnerMap.put(runner, null);
             return runner;
         }
@@ -234,7 +234,7 @@ public class PriorityRunner {
     /**
      * Enqueuing runner implementation.
      */
-    private class EnqueuingRunner implements Runner {
+    private class QueuingRunner implements Runner {
 
         private final int mPriority;
 
@@ -243,14 +243,14 @@ public class PriorityRunner {
          *
          * @param priority the execution priority.
          */
-        private EnqueuingRunner(final int priority) {
+        private QueuingRunner(final int priority) {
 
             mPriority = priority;
         }
 
-        public boolean isRunnerThread() {
+        public boolean isOwnedThread() {
 
-            return mRunner.isRunnerThread();
+            return mRunner.isOwnedThread();
         }
 
         public void run(@Nonnull final Execution execution, final long delay,

@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide on 31/05/15.
+ * Created by davide-maestroni on 31/05/15.
  */
 @Inherited
 @Target(ElementType.METHOD)

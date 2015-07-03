@@ -745,9 +745,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<TransportInput<OUTPUT>> channels = mNewChannels;
             final TransportChannel<OUTPUT> channel = JRoutine.transport()
-                                                             .invocations()
-                                                             .withOutputMaxSize(Integer.MAX_VALUE)
-                                                             .withOutputTimeout(TimeDuration.ZERO)
+                                                             .channels()
+                                                             .withChannelMaxSize(Integer.MAX_VALUE)
+                                                             .withChannelTimeout(TimeDuration.ZERO)
                                                              .withLog(logger.getLog())
                                                              .withLogLevel(logger.getLogLevel())
                                                              .set()

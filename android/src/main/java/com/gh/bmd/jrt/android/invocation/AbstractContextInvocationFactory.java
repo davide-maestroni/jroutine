@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  * the same data. In fact an array <code>equals()</code> implementation does not override the Object
  * one.
  * <p/>
- * Created by davide on 28/05/15.
+ * Created by davide-maestroni on 28/05/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.

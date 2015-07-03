@@ -1994,7 +1994,7 @@ public class ObjectRoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        public boolean isRunnerThread() {
+        public boolean isOwnedThread() {
 
             return false;
         }

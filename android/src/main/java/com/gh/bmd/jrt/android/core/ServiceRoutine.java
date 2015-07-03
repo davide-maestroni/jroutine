@@ -28,6 +28,7 @@ import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.android.service.ServiceDisconnectedException;
+import com.gh.bmd.jrt.builder.ChannelConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
@@ -226,41 +227,41 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final LogLevel logLevel = logger.getLogLevel();
             final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
             final int inputMaxSize =
-                    invocationConfiguration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
+                    invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration inputTimeout = invocationConfiguration.getInputTimeoutOr(null);
-            final TransportChannel<INPUT> paramChannel = JRoutine.transport()
-                                                                 .invocations()
-                                                                 .withOutputOrder(inputOrderType)
-                                                                 .withOutputMaxSize(inputMaxSize)
-                                                                 .withOutputTimeout(inputTimeout)
-                                                                 .withLog(log)
-                                                                 .withLogLevel(logLevel)
-                                                                 .set()
-                                                                 .buildChannel();
-            mTransportParamInput = paramChannel.input();
-            mTransportParamOutput = paramChannel.output();
+            final TransportChannel<INPUT> inChannel = JRoutine.transport()
+                                                              .channels()
+                                                              .withChannelOrder(inputOrderType)
+                                                              .withChannelMaxSize(inputMaxSize)
+                                                              .withChannelTimeout(inputTimeout)
+                                                              .withLog(log)
+                                                              .withLogLevel(logLevel)
+                                                              .set()
+                                                              .buildChannel();
+            mTransportParamInput = inChannel.input();
+            mTransportParamOutput = inChannel.output();
             final OrderType outputOrderType =
                     invocationConfiguration.getOutputOrderTypeOr(OrderType.BY_CALL);
             final int outputMaxSize =
-                    invocationConfiguration.getOutputMaxSizeOr(InvocationConfiguration.DEFAULT);
+                    invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
             final TimeDuration readTimeout = invocationConfiguration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
-            final TransportChannel<OUTPUT> resultChannel = JRoutine.transport()
-                                                                   .invocations()
-                                                                   .withOutputOrder(outputOrderType)
-                                                                   .withOutputMaxSize(outputMaxSize)
-                                                                   .withOutputTimeout(outputTimeout)
-                                                                   .withReadTimeout(readTimeout)
-                                                                   .withReadTimeoutAction(
-                                                                           timeoutActionType)
-                                                                   .withLog(log)
-                                                                   .withLogLevel(logLevel)
-                                                                   .set()
-                                                                   .buildChannel();
-            mTransportResultInput = resultChannel.input();
-            mTransportResultOutput = resultChannel.output();
+            final TransportChannel<OUTPUT> outChannel = JRoutine.transport()
+                                                                .channels()
+                                                                .withChannelOrder(outputOrderType)
+                                                                .withChannelMaxSize(outputMaxSize)
+                                                                .withChannelTimeout(outputTimeout)
+                                                                .withReadTimeout(readTimeout)
+                                                                .withReadTimeoutAction(
+                                                                        timeoutActionType)
+                                                                .withLog(log)
+                                                                .withLogLevel(logLevel)
+                                                                .set()
+                                                                .buildChannel();
+            mTransportResultInput = outChannel.input();
+            mTransportResultOutput = outChannel.output();
         }
 
         public boolean abort() {

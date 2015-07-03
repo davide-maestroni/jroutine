@@ -1840,9 +1840,9 @@ public class RoutineTest {
         }
 
         final TransportChannel<String> channel1 = JRoutine.transport()
-                                                          .invocations()
-                                                          .withOutputMaxSize(1)
-                                                          .withOutputTimeout(millis(1000))
+                                                          .channels()
+                                                          .withChannelMaxSize(1)
+                                                          .withChannelTimeout(millis(1000))
                                                           .set()
                                                           .buildChannel();
         new Thread() {
@@ -1857,9 +1857,9 @@ public class RoutineTest {
         assertThat(channel1.output().eventually().all()).containsOnly("test1", "test2");
 
         final TransportChannel<String> channel2 = JRoutine.transport()
-                                                          .invocations()
-                                                          .withOutputMaxSize(1)
-                                                          .withOutputTimeout(millis(1000))
+                                                          .channels()
+                                                          .withChannelMaxSize(1)
+                                                          .withChannelTimeout(millis(1000))
                                                           .set()
                                                           .buildChannel();
         new Thread() {
@@ -1874,9 +1874,9 @@ public class RoutineTest {
         assertThat(channel2.output().eventually().all()).containsOnly("test1", "test2");
 
         final TransportChannel<String> channel3 = JRoutine.transport()
-                                                          .invocations()
-                                                          .withOutputMaxSize(1)
-                                                          .withOutputTimeout(millis(1000))
+                                                          .channels()
+                                                          .withChannelMaxSize(1)
+                                                          .withChannelTimeout(millis(1000))
                                                           .set()
                                                           .buildChannel();
         new Thread() {
@@ -1891,9 +1891,8 @@ public class RoutineTest {
         assertThat(channel3.output().eventually().all()).containsOnly("test1", "test2");
 
         final TransportChannel<String> channel4 = JRoutine.transport()
-                                                          .invocations()
-                                                          .withOutputMaxSize(1)
-                                                          .withOutputTimeout(millis(1000))
+                                                          .channels().withChannelMaxSize(1)
+                                                          .withChannelTimeout(millis(1000))
                                                           .set()
                                                           .buildChannel();
         new Thread() {
@@ -3940,7 +3939,7 @@ public class RoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        public boolean isRunnerThread() {
+        public boolean isOwnedThread() {
 
             return false;
         }

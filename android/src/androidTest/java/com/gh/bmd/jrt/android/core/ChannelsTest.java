@@ -693,7 +693,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testJoin() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(CharAt.class)).buildRoutine();
         TransportChannel<String> channel1;
@@ -730,7 +730,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testJoinAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(CharAt.class)).buildRoutine();
         TransportChannel<String> channel1;
@@ -773,7 +773,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testJoinAndFlush() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(CharAt.class)).buildRoutine();
         TransportChannel<String> channel1;
@@ -819,7 +819,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testJoinAndFlushAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(CharAt.class)).buildRoutine();
         TransportChannel<String> channel1;
@@ -909,7 +909,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMap() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
@@ -944,7 +944,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMerge() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1000,7 +1000,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMerge4() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<String> channel2 = builder.buildChannel();
         final TransportChannel<String> channel3 = builder.buildChannel();
@@ -1033,7 +1033,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMergeAbort() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;

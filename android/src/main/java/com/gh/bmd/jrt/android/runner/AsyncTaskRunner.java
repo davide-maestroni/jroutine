@@ -55,7 +55,7 @@ class AsyncTaskRunner extends MainRunner {
     }
 
     @Override
-    public boolean isRunnerThread() {
+    public boolean isOwnedThread() {
 
         return mThreads.containsKey(Thread.currentThread());
     }

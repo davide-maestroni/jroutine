@@ -644,7 +644,7 @@ public class ChannelsTest {
     @Test
     public void testJoin() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
@@ -681,7 +681,7 @@ public class ChannelsTest {
     @Test
     public void testJoinAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
@@ -724,7 +724,7 @@ public class ChannelsTest {
     @Test
     public void testJoinAndFlush() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
@@ -770,7 +770,7 @@ public class ChannelsTest {
     @Test
     public void testJoinAndFlushAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport().invocations().set();
+        final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
@@ -862,7 +862,7 @@ public class ChannelsTest {
     public void testMap() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
@@ -896,7 +896,7 @@ public class ChannelsTest {
     public void testMerge() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
@@ -946,7 +946,7 @@ public class ChannelsTest {
     public void testMerge4() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         final TransportChannel<String> channel1 = builder.buildChannel();
         final TransportChannel<String> channel2 = builder.buildChannel();
         final TransportChannel<String> channel3 = builder.buildChannel();
@@ -980,7 +980,7 @@ public class ChannelsTest {
     public void testMergeAbort() {
 
         final TransportChannelBuilder builder =
-                JRoutine.transport().invocations().withOutputOrder(OrderType.BY_CALL).set();
+                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;

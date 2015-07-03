@@ -64,7 +64,7 @@ class LooperRunner implements Runner {
         mHandler = new Handler(looper);
         mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new Runner() {
 
-            public boolean isRunnerThread() {
+            public boolean isOwnedThread() {
 
                 return false;
             }
@@ -104,9 +104,9 @@ class LooperRunner implements Runner {
             mLooperRunner = new LooperRunner(looper, null);
         }
 
-        public boolean isRunnerThread() {
+        public boolean isOwnedThread() {
 
-            return mLooperRunner.isRunnerThread();
+            return mLooperRunner.isOwnedThread();
         }
 
         public void run(@Nonnull final Execution execution, final long delay,
@@ -123,9 +123,9 @@ class LooperRunner implements Runner {
         }
     }
 
-    public boolean isRunnerThread() {
+    public boolean isOwnedThread() {
 
-        return (Thread.currentThread() == mThread) || mSameThreadRunner.isRunnerThread();
+        return (Thread.currentThread() == mThread) || mSameThreadRunner.isOwnedThread();
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

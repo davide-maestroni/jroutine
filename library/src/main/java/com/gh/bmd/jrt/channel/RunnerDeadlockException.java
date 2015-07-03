@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * Exception indicating a forbidden wait in a runner thread.
  * <p/>
- * Created by davide on 18/06/15.
+ * Created by davide-maestroni on 18/06/15.
  */
 public class RunnerDeadlockException extends DeadlockException {
 

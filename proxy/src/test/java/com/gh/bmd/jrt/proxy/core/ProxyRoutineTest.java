@@ -1235,7 +1235,7 @@ public class ProxyRoutineTest {
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
         @Override
-        public boolean isRunnerThread() {
+        public boolean isOwnedThread() {
 
             return false;
         }

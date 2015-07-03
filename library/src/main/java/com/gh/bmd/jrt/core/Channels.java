@@ -1049,6 +1049,7 @@ public class Channels {
                 if (!isEmpty) {
 
                     inputChannel.pass(outputs);
+                    outputs.clear();
 
                 } else {
 

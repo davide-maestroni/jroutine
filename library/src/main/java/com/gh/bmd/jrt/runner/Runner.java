@@ -42,7 +42,7 @@ public interface Runner {
      *
      * @return whether the calling thread is managed by the runner.
      */
-    boolean isRunnerThread();
+    boolean isOwnedThread();
 
     /**
      * Runs the specified execution (that is, it calls the execution <b><code>run()</code></b>

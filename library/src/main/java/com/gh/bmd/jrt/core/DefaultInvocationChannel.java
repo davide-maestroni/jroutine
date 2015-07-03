@@ -48,7 +48,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 /**
  * Default implementation of a invocation input channel.
  * <p/>
- * Created by davide on 11/06/15.
+ * Created by davide-maestroni on 11/06/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
@@ -970,7 +970,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             if (!mHasInputs.isTrue()) {
 
                 if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isRunnerThread()) {
+                        && mRunner.isOwnedThread()) {
 
                     --mInputCount;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -1107,7 +1107,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             if (!mHasInputs.isTrue()) {
 
                 if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isRunnerThread()) {
+                        && mRunner.isOwnedThread()) {
 
                     mInputCount -= size;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -1158,7 +1158,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             if (!mHasInputs.isTrue()) {
 
                 if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isRunnerThread()) {
+                        && mRunner.isOwnedThread()) {
 
                     --mInputCount;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -1223,7 +1223,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             if (!mHasInputs.isTrue()) {
 
                 if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isRunnerThread()) {
+                        && mRunner.isOwnedThread()) {
 
                     mInputCount -= size;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");

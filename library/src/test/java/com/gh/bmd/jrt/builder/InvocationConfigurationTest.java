@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.builder;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logs;
 import com.gh.bmd.jrt.log.NullLog;
@@ -88,7 +89,6 @@ public class InvocationConfigurationTest {
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
-
         assertThat(builderFrom(configuration).set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set()).isEqualTo(
                 InvocationConfiguration.DEFAULT_CONFIGURATION);
@@ -424,6 +424,25 @@ public class InvocationConfigurationTest {
         assertThat(configuration).isNotEqualTo(builder().withPriority(3).set());
         assertThat(configuration.builderFrom().withPriority(17).set()).isNotEqualTo(
                 builder().withPriority(17).set());
+    }
+
+    @Test
+    public void testReadTimeoutActionEquals() {
+
+        final InvocationConfiguration configuration =
+                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
+                         .withInputOrder(OrderType.BY_CALL)
+                         .withAsyncRunner(Runners.queuedRunner())
+                         .withLog(new NullLog())
+                         .withOutputMaxSize(100)
+                         .set();
+        assertThat(configuration).isNotEqualTo(
+                builder().withReadTimeoutAction(TimeoutActionType.ABORT).set());
+        assertThat(configuration).isNotEqualTo(
+                builder().withReadTimeoutAction(TimeoutActionType.EXIT).set());
+        assertThat(
+                configuration.builderFrom().withReadTimeoutAction(TimeoutActionType.DEADLOCK).set())
+                .isNotEqualTo(builder().withReadTimeoutAction(TimeoutActionType.DEADLOCK).set());
     }
 
     @Test

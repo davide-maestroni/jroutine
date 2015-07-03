@@ -59,7 +59,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * result channel puts data into the output queue and, on the other end, the output channel reads
  * them from the same queue.
  * <p/>
- * Created by davide on 12/06/15.
+ * Created by davide-maestroni on 12/06/15.
  *
  * @param <OUTPUT> the output data type.
  */
@@ -598,7 +598,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return nextOutput(timeout);
         }
 
-        if (mRunner.isRunnerThread()) {
+        if (mRunner.isOwnedThread()) {
 
             throw new RunnerDeadlockException("cannot wait on the same runner thread");
         }
@@ -769,7 +769,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         public boolean hasNext() {
 
-            final boolean isRunnerThread = mRunner.isRunnerThread();
+            final boolean isRunnerThread = mRunner.isOwnedThread();
             boolean isAbort = false;
 
             synchronized (mMutex) {
@@ -952,7 +952,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @SuppressWarnings({"unchecked", "ConstantConditions"})
         public OutputChannel<OUTPUT> allInto(@Nonnull final Collection<? super OUTPUT> results) {
 
-            final boolean isRunnerThread = mRunner.isRunnerThread();
+            final boolean isRunnerThread = mRunner.isOwnedThread();
             boolean isAbort = false;
 
             synchronized (mMutex) {
@@ -1059,7 +1059,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         public boolean checkComplete() {
 
-            final boolean isRunnerThread = mRunner.isRunnerThread();
+            final boolean isRunnerThread = mRunner.isOwnedThread();
 
             synchronized (mMutex) {
 
@@ -1930,7 +1930,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
 
                     --mOutputCount;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -2024,7 +2024,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
 
                     mOutputCount -= size;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -2066,7 +2066,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
 
                     --mOutputCount;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -2122,7 +2122,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isRunnerThread()) {
+                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
 
                     mOutputCount -= size;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");

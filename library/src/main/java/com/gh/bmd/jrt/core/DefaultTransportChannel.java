@@ -13,15 +13,14 @@
  */
 package com.gh.bmd.jrt.core;
 
+import com.gh.bmd.jrt.builder.ChannelConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.util.TimeDuration;
 
@@ -49,83 +48,40 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     /**
      * Constructor.
      *
-     * @param configuration the invocation configuration.
+     * @param configuration the channel configuration.
      */
-    DefaultTransportChannel(@Nonnull final InvocationConfiguration configuration) {
+    DefaultTransportChannel(@Nonnull final ChannelConfiguration configuration) {
 
-        final Logger logger = configuration.newLogger(this);
+        final InvocationConfiguration invocationConfiguration =
+                asInvocationConfiguration(configuration);
+        final Logger logger = invocationConfiguration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<DATA> inputChannel =
-                new DefaultResultChannel<DATA>(configuration, abortHandler,
-                                               configuration.getAsyncRunnerOr(
+                new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler,
+                                               invocationConfiguration.getAsyncRunnerOr(
                                                        Runners.sharedRunner()), logger);
         abortHandler.setChannel(inputChannel);
         mInputChannel = new DefaultTransportInput<DATA>(inputChannel);
         mOutputChannel = new DefaultTransportOutput<DATA>(inputChannel.getOutput());
         logger.dbg("building transport channel with configuration: %s", configuration);
-        warn(logger, configuration);
     }
 
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param logger        the logger instance.
-     * @param configuration the invocation configuration.
-     */
-    private static void warn(@Nonnull final Logger logger,
-            @Nonnull final InvocationConfiguration configuration) {
+    @Nonnull
+    private static InvocationConfiguration asInvocationConfiguration(
+            @Nonnull final ChannelConfiguration configuration) {
 
-        final Runner syncRunner = configuration.getSyncRunnerOr(null);
-
-        if (syncRunner != null) {
-
-            logger.wrn("the specified synchronous runner will be ignored: %s", syncRunner);
-        }
-
-        final int maxInvocations = configuration.getMaxInstancesOr(InvocationConfiguration.DEFAULT);
-
-        if (maxInvocations != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum running invocations will be ignored: %d",
-                       maxInvocations);
-        }
-
-        final int coreInvocations =
-                configuration.getCoreInstancesOr(InvocationConfiguration.DEFAULT);
-
-        if (coreInvocations != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified core invocations will be ignored: %d", coreInvocations);
-        }
-
-        final TimeDuration availableTimeout = configuration.getAvailInstanceTimeoutOr(null);
-
-        if (availableTimeout != null) {
-
-            logger.wrn("the specified available invocation timeout will be ignored: %s",
-                       availableTimeout);
-        }
-
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(InvocationConfiguration.DEFAULT);
-
-        if (inputSize != InvocationConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
+        return InvocationConfiguration.builder()
+                                      .withAsyncRunner(configuration.getAsyncRunnerOr(null))
+                                      .withOutputMaxSize(configuration.getChannelMaxSizeOr(
+                                              InvocationConfiguration.DEFAULT))
+                                      .withOutputOrder(configuration.getChannelOrderTypeOr(null))
+                                      .withOutputTimeout(configuration.getChannelTimeoutOr(null))
+                                      .withReadTimeout(configuration.getReadTimeoutOr(null))
+                                      .withReadTimeoutAction(
+                                              configuration.getReadTimeoutActionOr(null))
+                                      .withLog(configuration.getLogOr(null))
+                                      .withLogLevel(configuration.getLogLevelOr(null))
+                                      .set();
     }
 
     @Nonnull

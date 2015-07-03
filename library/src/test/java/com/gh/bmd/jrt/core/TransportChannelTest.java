@@ -236,8 +236,8 @@ public class TransportChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final TransportChannel<String> transportChannel1 = JRoutine.transport()
-                                                                   .invocations()
-                                                                   .withOutputOrder(
+                                                                   .channels()
+                                                                   .withChannelOrder(
                                                                            OrderType.BY_CALL)
                                                                    .set()
                                                                    .buildChannel();
@@ -276,26 +276,6 @@ public class TransportChannelTest {
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    @Test
-    public void testConfigurationWarnings() {
-
-        final CountLog countLog = new CountLog();
-        JRoutine.transport()
-                .invocations()
-                .withSyncRunner(Runners.sequentialRunner())
-                .withMaxInstances(3)
-                .withCoreInstances(3)
-                .withAvailInstanceTimeout(seconds(1))
-                .withInputOrder(OrderType.BY_CHANCE)
-                .withInputMaxSize(3)
-                .withInputTimeout(seconds(1))
-                .withLogLevel(LogLevel.DEBUG)
-                .withLog(countLog)
-                .set()
-                .buildChannel();
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
     @Test
@@ -447,13 +427,13 @@ public class TransportChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final TransportChannel<Object> channel = JRoutine.transport()
-                                                         .invocations()
-                                                         .withOutputOrder(OrderType.BY_CALL)
+                                                         .channels()
+                                                         .withChannelOrder(OrderType.BY_CALL)
                                                          .withAsyncRunner(Runners.sharedRunner())
-                                                         .withOutputMaxSize(1)
-                                                         .withOutputTimeout(1,
-                                                                            TimeUnit.MILLISECONDS)
-                                                         .withOutputTimeout(seconds(1))
+                                                         .withChannelMaxSize(1)
+                                                         .withChannelTimeout(1,
+                                                                             TimeUnit.MILLISECONDS)
+                                                         .withChannelTimeout(seconds(1))
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(new NullLog())
                                                          .set()
@@ -468,8 +448,8 @@ public class TransportChannelTest {
         assertThat(transportChannel1.output().afterMax(timeout).all()).containsOnly(23, -77L);
 
         final TransportChannel<Object> transportChannel2 = JRoutine.transport()
-                                                                   .invocations()
-                                                                   .withOutputOrder(
+                                                                   .channels()
+                                                                   .withChannelOrder(
                                                                            OrderType.BY_CALL)
                                                                    .set()
                                                                    .buildChannel();
@@ -526,7 +506,7 @@ public class TransportChannelTest {
     public void testReadTimeout() {
 
         final TransportChannel<Object> channel1 = JRoutine.transport()
-                                                          .invocations()
+                                                          .channels()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.EXIT)
@@ -540,7 +520,7 @@ public class TransportChannelTest {
     public void testReadTimeout2() {
 
         final TransportChannel<Object> channel2 = JRoutine.transport()
-                                                          .invocations()
+                                                          .channels()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.ABORT)
@@ -562,7 +542,7 @@ public class TransportChannelTest {
     public void testReadTimeout3() {
 
         final TransportChannel<Object> channel3 = JRoutine.transport()
-                                                          .invocations()
+                                                          .channels()
                                                           .withReadTimeout(millis(10))
                                                           .withReadTimeoutAction(
                                                                   TimeoutActionType.DEADLOCK)

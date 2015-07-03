@@ -44,6 +44,36 @@ public class InvocationsTest {
     }
 
     @Test
+    public void testInvocationFactoryEquals() {
+
+        assertThat(Invocations.factoryOf(TestInvocation.class).hashCode()).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class).hashCode());
+        assertThat(Invocations.factoryOf(TestInvocation.class)).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class));
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .hashCode()).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class).hashCode());
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class));
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .hashCode()).isEqualTo(
+                Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode());
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
+                Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class)));
+        assertThat(Invocations.factoryOf(TestInvocation.class).hashCode()).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this)
+                           .hashCode());
+        assertThat(Invocations.factoryOf(TestInvocation.class)).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this));
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .hashCode()).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this)
+                           .hashCode());
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this));
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testNullClassError() {
 

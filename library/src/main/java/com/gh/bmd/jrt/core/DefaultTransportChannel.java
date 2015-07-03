@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
+
 /**
  * Default implementation of a transport channel.
  * <p/>
@@ -70,18 +72,16 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     private static InvocationConfiguration asInvocationConfiguration(
             @Nonnull final ChannelConfiguration configuration) {
 
-        return InvocationConfiguration.builder()
-                                      .withAsyncRunner(configuration.getAsyncRunnerOr(null))
-                                      .withOutputMaxSize(configuration.getChannelMaxSizeOr(
-                                              InvocationConfiguration.DEFAULT))
-                                      .withOutputOrder(configuration.getChannelOrderTypeOr(null))
-                                      .withOutputTimeout(configuration.getChannelTimeoutOr(null))
-                                      .withReadTimeout(configuration.getReadTimeoutOr(null))
-                                      .withReadTimeoutAction(
-                                              configuration.getReadTimeoutActionOr(null))
-                                      .withLog(configuration.getLogOr(null))
-                                      .withLogLevel(configuration.getLogLevelOr(null))
-                                      .set();
+        return builder().withAsyncRunner(configuration.getAsyncRunnerOr(null))
+                        .withOutputMaxSize(
+                                configuration.getChannelMaxSizeOr(InvocationConfiguration.DEFAULT))
+                        .withOutputOrder(configuration.getChannelOrderTypeOr(null))
+                        .withOutputTimeout(configuration.getChannelTimeoutOr(null))
+                        .withReadTimeout(configuration.getReadTimeoutOr(null))
+                        .withReadTimeoutAction(configuration.getReadTimeoutActionOr(null))
+                        .withLog(configuration.getLogOr(null))
+                        .withLogLevel(configuration.getLogLevelOr(null))
+                        .set();
     }
 
     @Nonnull

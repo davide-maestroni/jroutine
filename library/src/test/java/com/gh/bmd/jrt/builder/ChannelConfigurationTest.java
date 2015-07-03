@@ -62,7 +62,10 @@ public class ChannelConfigurationTest {
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
+        assertThat(builderFrom(configuration).set().hashCode()).isEqualTo(configuration.hashCode());
         assertThat(builderFrom(configuration).set()).isEqualTo(configuration);
+        assertThat(builderFrom(null).set().hashCode()).isEqualTo(
+                ChannelConfiguration.DEFAULT_CONFIGURATION.hashCode());
         assertThat(builderFrom(null).set()).isEqualTo(ChannelConfiguration.DEFAULT_CONFIGURATION);
     }
 

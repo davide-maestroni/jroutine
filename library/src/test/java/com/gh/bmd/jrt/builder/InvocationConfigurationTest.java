@@ -89,7 +89,10 @@ public class InvocationConfigurationTest {
                          .withLog(new NullLog())
                          .withOutputMaxSize(100)
                          .set();
+        assertThat(builderFrom(configuration).set().hashCode()).isEqualTo(configuration.hashCode());
         assertThat(builderFrom(configuration).set()).isEqualTo(configuration);
+        assertThat(builderFrom(null).set().hashCode()).isEqualTo(
+                InvocationConfiguration.DEFAULT_CONFIGURATION.hashCode());
         assertThat(builderFrom(null).set()).isEqualTo(
                 InvocationConfiguration.DEFAULT_CONFIGURATION);
     }

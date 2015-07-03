@@ -113,7 +113,7 @@ public class TransportChannelTest {
         final TransportOutput<String> output = transportChannel.output();
         assertThat(output.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock();
+        output.eventuallyAbort().eventuallyDeadlock();
 
         try {
 
@@ -447,13 +447,9 @@ public class TransportChannelTest {
         input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(transportChannel1.output().afterMax(timeout).all()).containsOnly(23, -77L);
 
-        final TransportChannel<Object> transportChannel2 = JRoutine.transport()
-                                                                   .channels()
-                                                                   .withChannelOrder(
-                                                                           OrderType.BY_CALL)
-                                                                   .set()
-                                                                   .buildChannel();
-        final TransportInput<Object> input2 = transportChannel2.input();
+        final TransportChannel<Object> transportChannel2 = JRoutine.transport().buildChannel();
+        final TransportInput<Object> input2 =
+                transportChannel2.input().orderByDelay().orderByDelay().orderByCall();
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(transportChannel2.output().afterMax(timeout).all()).containsExactly(23, -77L);
@@ -485,6 +481,7 @@ public class TransportChannelTest {
 
         assertThat(outputChannel.immediately().checkComplete()).isFalse();
         transportChannel.input().close();
+        assertThat(transportChannel.input().isOpen()).isFalse();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).checkComplete()).isTrue();
     }
 

@@ -19,14 +19,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate interfaces used as templates to generate proxy classes,
+ * This annotation is used to indicate interfaces used as templates to generate proxy classes
  * enabling asynchronous calls to the target instance methods.<br/>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
- * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
+ * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+ * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+ * {@link com.gh.bmd.jrt.annotation.Priority}, , {@link com.gh.bmd.jrt.annotation.ShareGroup},
+ * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
  * annotations defined for each interface method.
  * <p/>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
@@ -67,11 +69,11 @@ import java.lang.annotation.Target;
  *                 TYPE get(int i);
  *
  *                 &#64;Alias("get")
- *                 &#64;Param(Object.class)
+ *                 &#64;Output
  *                 OutputChannel&lt;TYPE&gt; getAsync(int i);
  *
  *                 &#64;Alias("get")
- *                 &#64;Param(Object.class)
+ *                 &#64;Output
  *                 List&lt;TYPE&gt; getList(int i);
  *             }
  *     </code>
@@ -124,31 +126,35 @@ public @interface Proxy {
     /**
      * The generated class name. By default the name is obtained by the interface simple name,
      * prepending all the outer class names in case it is not a top level class.
+     * <p/>
+     * For instance, an interface named <code>MyItf</code> defined inside a class named
+     * <code>MyClass</code>, will result in the generation of a class named
+     * <code>Proxy_MyClass_MyItf</code>.
      *
      * @return the class name.
      */
-    String generatedClassName() default DEFAULT;
+    String className() default DEFAULT;
 
     /**
      * The generated class package. By default it is the same as the interface.
      *
      * @return the package.
      */
-    String generatedClassPackage() default DEFAULT;
+    String classPackage() default DEFAULT;
 
     /**
      * The generated class name prefix.
      *
      * @return the name prefix.
      */
-    String generatedClassPrefix() default DEFAULT_CLASS_PREFIX;
+    String classPrefix() default DEFAULT_CLASS_PREFIX;
 
     /**
      * The generated class name suffix.
      *
      * @return the name suffix.
      */
-    String generatedClassSuffix() default DEFAULT_CLASS_SUFFIX;
+    String classSuffix() default DEFAULT_CLASS_SUFFIX;
 
     /**
      * The wrapped class.

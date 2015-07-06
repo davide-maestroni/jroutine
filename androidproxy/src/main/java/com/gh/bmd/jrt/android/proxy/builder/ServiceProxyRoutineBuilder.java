@@ -15,10 +15,10 @@ package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfigurableBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 
@@ -35,14 +35,14 @@ public interface ServiceProxyRoutineBuilder
         extends ProxyRoutineBuilder, ServiceConfigurableBuilder<ServiceProxyRoutineBuilder> {
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param},
-     * as well as {@link com.gh.bmd.jrt.android.annotation.LoaderId},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
+     * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
@@ -63,14 +63,14 @@ public interface ServiceProxyRoutineBuilder
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param},
-     * as well as {@link com.gh.bmd.jrt.android.annotation.LoaderId},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution} and
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
+     * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
@@ -93,20 +93,20 @@ public interface ServiceProxyRoutineBuilder
     /**
      * Note that all the options related to the output and input channels will be ignored.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withRoutine();
+    InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxy();
+    ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxies();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService();
+    ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> service();
 }

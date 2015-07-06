@@ -39,17 +39,35 @@ class LooperRunner implements Runner {
     private final Thread mThread;
 
     /**
+     * Constructor.<br/>
+     * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
+     * will be performed synchronously, while the ones with a positive delay will be posted on the
+     * same thread.
+     *
+     * @param looper the looper to employ.
+     */
+    LooperRunner(@Nonnull final Looper looper) {
+
+        this(looper, new SameThreadRunner(looper));
+    }
+
+    /**
      * Constructor.
      *
      * @param looper           the looper to employ.
      * @param sameThreadRunner the runner to be used when this one is called on its own thread.
-     *                         If null, the invocation will be posted on the specified looper.
+     *                         If null, the invocation will be posted on the very same looper.
      */
     LooperRunner(@Nonnull final Looper looper, @Nullable final Runner sameThreadRunner) {
 
         mThread = looper.getThread();
         mHandler = new Handler(looper);
         mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new Runner() {
+
+            public boolean isOwnedThread() {
+
+                return true;
+            }
 
             public void run(@Nonnull final Execution execution, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
@@ -70,6 +88,44 @@ class LooperRunner implements Runner {
 
             mHandler.post(execution);
         }
+    }
+
+    /**
+     * Runner handling execution started from the same looper thread.
+     */
+    private static class SameThreadRunner implements Runner {
+
+        private final LooperRunner mLooperRunner;
+
+        private final Runner mQueuedRunner = Runners.queuedRunner();
+
+        private SameThreadRunner(@Nonnull final Looper looper) {
+
+            mLooperRunner = new LooperRunner(looper, null);
+        }
+
+        public boolean isOwnedThread() {
+
+            return true;
+        }
+
+        public void run(@Nonnull final Execution execution, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            if (delay == 0) {
+
+                mQueuedRunner.run(execution, delay, timeUnit);
+
+            } else {
+
+                mLooperRunner.internalRun(execution, delay, timeUnit);
+            }
+        }
+    }
+
+    public boolean isOwnedThread() {
+
+        return (Thread.currentThread() == mThread) && mSameThreadRunner.isOwnedThread();
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

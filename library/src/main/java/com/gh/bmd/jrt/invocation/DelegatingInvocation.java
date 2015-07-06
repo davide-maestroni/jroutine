@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.routine.Routine;
 
@@ -31,7 +31,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
-    private ParameterChannel<INPUT, OUTPUT> mChannel = null;
+    private InvocationChannel<INPUT, OUTPUT> mChannel = null;
 
     /**
      * Constructor.
@@ -62,19 +62,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryWith(
             @Nonnull final Routine<INPUT, OUTPUT> routine) {
 
-        if (routine == null) {
-
-            throw new NullPointerException("the routine must not be null");
-        }
-
-        return new InvocationFactory<INPUT, OUTPUT>() {
-
-            @Nonnull
-            public Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-                return new DelegatingInvocation<INPUT, OUTPUT>(routine);
-            }
-        };
+        return new DelegatingInvocationFactory<INPUT, OUTPUT>(routine);
     }
 
     public void onAbort(final Throwable reason) {
@@ -87,7 +75,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
         mRoutine.purge();
     }
 
-    public void onInit() {
+    public void onInitialize() {
 
         mChannel = mRoutine.invokeAsync();
     }
@@ -102,8 +90,42 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
         result.pass(mChannel.result());
     }
 
-    public void onReturn() {
+    public void onTerminate() {
 
         mChannel = null;
+    }
+
+    /**
+     * Factory creating delegating invocation instances.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class DelegatingInvocationFactory<INPUT, OUTPUT>
+            implements InvocationFactory<INPUT, OUTPUT> {
+
+        private final Routine<INPUT, OUTPUT> mRoutine;
+
+        /**
+         * Constructor.
+         *
+         * @param routine the delegated routine.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private DelegatingInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+
+            if (routine == null) {
+
+                throw new NullPointerException("the routine must not be null");
+            }
+
+            mRoutine = routine;
+        }
+
+        @Nonnull
+        public Invocation<INPUT, OUTPUT> newInvocation() {
+
+            return new DelegatingInvocation<INPUT, OUTPUT>(mRoutine);
+        }
     }
 }

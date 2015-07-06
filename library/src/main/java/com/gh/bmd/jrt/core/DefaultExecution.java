@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
@@ -105,14 +105,15 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         synchronized (mMutex) {
 
             final InputIterator<INPUT> inputIterator = mInputIterator;
+            final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+            Invocation<INPUT, OUTPUT> invocation = null;
 
             try {
 
                 inputIterator.onConsumeStart();
                 mLogger.dbg("running execution");
                 final boolean isComplete;
-                final Invocation<INPUT, OUTPUT> invocation;
 
                 try {
 
@@ -130,12 +131,11 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 if (isComplete) {
 
-                    final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
                     invocation.onResult(resultChannel);
 
                     try {
 
-                        invocation.onReturn();
+                        invocation.onTerminate();
                         manager.recycle(invocation);
 
                     } catch (final Throwable ignored) {
@@ -151,7 +151,19 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             } catch (final Throwable t) {
 
-                resultChannel.abortImmediately(t);
+                if (invocation != null) {
+
+                    resultChannel.abortImmediately(t);
+
+                } else {
+
+                    if (mInvocation != null) {
+
+                        manager.discard(mInvocation);
+                    }
+
+                    resultChannel.close(t);
+                }
             }
         }
     }
@@ -169,7 +181,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             invocation = (mInvocation = mInvocationManager.create());
             mLogger.dbg("initializing invocation: %s", invocation);
-            invocation.onInit();
+            invocation.onInitialize();
         }
 
         return invocation;
@@ -208,7 +220,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * Gets the next input.
          *
          * @return the input.
-         * @throws java.util.NoSuchElementException if no more input is available.
+         * @throws java.util.NoSuchElementException if no more inputs are available.
          */
         @Nullable
         INPUT nextInput();
@@ -246,9 +258,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
             synchronized (mMutex) {
 
                 final InputIterator<INPUT> inputIterator = mInputIterator;
-                final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
-                final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-                Invocation<INPUT, OUTPUT> invocation = null;
 
                 if (!inputIterator.isAborting()) {
 
@@ -256,22 +265,24 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                     return;
                 }
 
+                final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
+                final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
                 final Throwable exception = inputIterator.getAbortException();
                 mLogger.dbg(exception, "aborting invocation");
 
                 try {
 
-                    invocation = initInvocation();
+                    final Invocation<INPUT, OUTPUT> invocation = initInvocation();
                     invocation.onAbort(exception);
-                    invocation.onReturn();
+                    invocation.onTerminate();
                     manager.recycle(invocation);
                     resultChannel.close(exception);
 
                 } catch (final Throwable t) {
 
-                    if (invocation != null) {
+                    if (mInvocation != null) {
 
-                        manager.discard(invocation);
+                        manager.discard(mInvocation);
                     }
 
                     resultChannel.close(t);

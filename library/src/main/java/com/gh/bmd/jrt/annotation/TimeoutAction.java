@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.annotation;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.
  * <p/>
- * Through this annotation it is possible to indicate the action to be taken when the timeout for a
+ * Through this annotation, it is possible to indicate the action to be taken when the timeout for a
  * readable result to become available elapses.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
@@ -51,7 +51,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 4/8/2015.
  *
- * @see com.gh.bmd.jrt.builder.RoutineConfiguration
+ * @see com.gh.bmd.jrt.builder.InvocationConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

@@ -21,6 +21,7 @@ import android.os.Build.VERSION_CODES;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -38,18 +39,22 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide-maestroni on 06/05/15.
  *
- * @see com.gh.bmd.jrt.android.proxy.annotation.V4Proxy
+ * @see com.gh.bmd.jrt.android.proxy.annotation.V11Proxy
  * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
  * @see com.gh.bmd.jrt.android.annotation.ClashResolution
+ * @see com.gh.bmd.jrt.android.annotation.InputClashResolution
  * @see com.gh.bmd.jrt.android.annotation.LoaderId
  * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Param
+ * @see com.gh.bmd.jrt.annotation.Input
+ * @see com.gh.bmd.jrt.annotation.Inputs
+ * @see com.gh.bmd.jrt.annotation.Output
+ * @see com.gh.bmd.jrt.annotation.Priority
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility class")
+        justification = "utility class extending the functions of another utility class")
 public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutineProxy {
 
     /**
@@ -65,13 +70,14 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
      *
-     * @param activity the invocation activity context.
-     * @param target   the wrapped object class.
+     * @param activity    the invocation activity context.
+     * @param target      the wrapped object class.
+     * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderProxyRoutineBuilder onActivity(@Nonnull final Activity activity,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -82,7 +88,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
                             + "instead");
         }
 
-        return new DefaultLoaderProxyRoutineBuilder(activity, target);
+        return new DefaultLoaderProxyRoutineBuilder(activity, target, factoryArgs);
     }
 
     /**
@@ -91,14 +97,15 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
      *
-     * @param fragment the invocation fragment context.
-     * @param target   the wrapped object class.
+     * @param fragment    the invocation fragment context.
+     * @param target      the wrapped object class.
+     * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
-        return new DefaultLoaderProxyRoutineBuilder(fragment, target);
+        return new DefaultLoaderProxyRoutineBuilder(fragment, target, factoryArgs);
     }
 }

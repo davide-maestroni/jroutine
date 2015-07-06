@@ -13,15 +13,15 @@
  */
 package com.gh.bmd.jrt.runner;
 
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
-import static com.gh.bmd.jrt.time.TimeDuration.nanos;
+import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
+import static com.gh.bmd.jrt.util.TimeDuration.nanos;
 
 /**
  * Class maintaining a queue of executions which is local to the calling thread.
@@ -35,14 +35,7 @@ class LocalQueue {
 
     private static final int INITIAL_CAPACITY = 10;
 
-    private static final ThreadLocal<LocalQueue> sQueue = new ThreadLocal<LocalQueue>() {
-
-        @Override
-        protected LocalQueue initialValue() {
-
-            return new LocalQueue();
-        }
-    };
+    private static final LocalQueueThreadLocal sQueue = new LocalQueueThreadLocal();
 
     private TimeDuration[] mDelays;
 
@@ -79,7 +72,7 @@ class LocalQueue {
         sQueue.get().addExecution(execution, delay, timeUnit);
     }
 
-    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
+    private static void resizeArray(@Nonnull final long[] src, @Nonnull final long[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -87,7 +80,7 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private static void resizeArray(@Nonnull final long[] src, @Nonnull final long[] dst,
+    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -279,6 +272,18 @@ class LocalQueue {
         } finally {
 
             mIsRunning = false;
+        }
+    }
+
+    /**
+     * Thread local initializing the queue instance.
+     */
+    private static class LocalQueueThreadLocal extends ThreadLocal<LocalQueue> {
+
+        @Override
+        protected LocalQueue initialValue() {
+
+            return new LocalQueue();
         }
     }
 }

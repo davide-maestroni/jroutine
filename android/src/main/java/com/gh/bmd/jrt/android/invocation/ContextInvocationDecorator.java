@@ -59,9 +59,9 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
         mInvocation.onDestroy();
     }
 
-    public void onInit() {
+    public void onInitialize() {
 
-        mInvocation.onInit();
+        mInvocation.onInitialize();
     }
 
     public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
@@ -74,9 +74,9 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
         mInvocation.onResult(result);
     }
 
-    public void onReturn() {
+    public void onTerminate() {
 
-        mInvocation.onReturn();
+        mInvocation.onTerminate();
     }
 
     public void onContext(@Nonnull final Context context) {

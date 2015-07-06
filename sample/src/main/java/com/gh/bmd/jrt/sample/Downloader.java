@@ -14,11 +14,13 @@
 package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.core.JRoutine;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.Runners;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +29,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 
 /**
  * The downloader implementation.
@@ -43,6 +45,8 @@ public class Downloader {
 
     private final Routine<URI, Chunk> mReadConnection;
 
+    private final Runner mWriteRunner = Runners.poolRunner(1);
+
     /**
      * Constructor.
      *
@@ -51,12 +55,12 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         // the read connection invocation is stateless so we can just use a single instance of it
-        mReadConnection = JRoutine.on(new ReadConnection()).withRoutine()
+        mReadConnection = JRoutine.on(new ReadConnection()).invocations()
                 // by setting the maximum number of parallel invocations we effectively limit the
                 // number of parallel downloads...
-                .withMaxInvocations(maxParallelDownloads)
+                .withMaxInstances(maxParallelDownloads)
                         // ...though we need to set a timeout in case the downloads outnumber it
-                .withAvailInvocationTimeout(seconds(30)).set().buildRoutine();
+                .withAvailInstanceTimeout(seconds(30)).set().buildRoutine();
     }
 
     /**
@@ -148,9 +152,11 @@ public class Downloader {
             // routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
-                    JRoutine.on(Invocations.factoryOf(WriteFile.class))
-                            .withRoutine()
-                            .withFactoryArgs(dstFile)
+                    JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).invocations()
+                            // since we want to limit the number of allocated chunks, we have to
+                            // make the file writing happen in a dedicated runner, so that waiting
+                            // for available space becomes allowed
+                            .withAsyncRunner(mWriteRunner)
                             .withInputMaxSize(8)
                             .withInputTimeout(seconds(30))
                             .set()
@@ -205,7 +211,7 @@ public class Downloader {
                     downloadMap.remove(uri);
 
                     // read the result
-                    if (channel.readNext()) {
+                    if (channel.next()) {
 
                         // if successful, add the resource to the downloaded set
                         mDownloadedSet.add(uri);

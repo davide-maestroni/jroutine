@@ -17,16 +17,13 @@ import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
-import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.Invocations;
 
 import javax.annotation.Nonnull;
 
 /**
- * This utility class represents the entry point to the framework functionalities by acting as a
- * factory of routine builders.
+ * This utility class represents the entry point to the framework by acting as a factory of routine
+ * builders.
  * <p/>
  * There are mainly two ways to create a routine object:
  * <p/>
@@ -41,15 +38,15 @@ import javax.annotation.Nonnull;
  * in turn asynchronously invoke the target object ones.<br/>
  * Note that a proxy object can be simply defined as an interface implemented by the target, but
  * also as a completely unrelated one mirroring the target methods. In this way it is possible to
- * apply the framework functionalities to objects defined by third party libraries which are not
- * under direct control.<br/>
+ * apply the framework functionality to objects defined by third party libraries which are not under
+ * direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
  * channels, so that data are transferred asynchronously, avoiding the need to block execution while
  * waiting for them to be available.<br/>
  * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
  * through annotation pre-processing and compile-time code generation. In order to activate the
- * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
- * or module in the project dependencies.
+ * processing of annotations, it is simply necessary to include the proxy artifact or module in the
+ * project dependencies.
  * <p/>
  * This class provides also a way to build transport channel instances, which can be used to pass
  * data without the need to start a routine invocation.
@@ -67,7 +64,7 @@ import javax.annotation.Nonnull;
  *                .close();
  *         channel.output()
  *                .eventually()
- *                .readAllInto(results);
+ *                .allInto(results);
  *     </code>
  * </pre>
  * Or simply:
@@ -76,18 +73,18 @@ import javax.annotation.Nonnull;
  *
  *         final OutputChannel&lt;Result&gt; output1 = doSomething1.callAsync();
  *         final OutputChannel&lt;Result&gt; output2 = doSomething2.callAsync();
- *         output1.eventually().readAllInto(results);
- *         output2.eventually().readAllInto(results);
+ *         output1.eventually().allInto(results);
+ *         output2.eventually().allInto(results);
  *     </code>
  * </pre>
- * (Note that, the order of the input or the output of the routine is not guaranteed unless the
- * proper builder methods are called)
+ * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
+ * configured)
  * <p/>
  * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
  * <pre>
  *     <code>
  *
- *         doSomething1.callAsync(doSomething2.callAsync())).eventually().readAllInto(results);
+ *         doSomething1.callAsync(doSomething2.callAsync())).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -98,8 +95,8 @@ import javax.annotation.Nonnull;
  *         public interface AsyncCallback {
  *
  *             public void onResults(
- *                  &#64;Param(Result.class) OutputChannel&lt;Result&gt; result1,
- *                  &#64;Param(Result.class) OutputChannel&lt;Result&gt; result2);
+ *                  &#64;Input(Result.class) OutputChannel&lt;Result&gt; result1,
+ *                  &#64;Input(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
  *         final AsyncCallback callback = JRoutine.on(myCallback)
@@ -129,14 +126,17 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                          .buildRoutine();
- *         routine.callAsync(channel.output()).eventually().readAllInto(results);
+ *         routine.callAsync(channel.output()).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *
  * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Param
+ * @see com.gh.bmd.jrt.annotation.Input
+ * @see com.gh.bmd.jrt.annotation.Inputs
+ * @see com.gh.bmd.jrt.annotation.Output
+ * @see com.gh.bmd.jrt.annotation.Priority
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
@@ -155,8 +155,7 @@ public class JRoutine {
      *
      * @param target the target class.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
+     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     @Nonnull
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
@@ -165,16 +164,19 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified invocation factory.
+     * Returns a routine builder based on the specified invocation factory.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must be static.
      * <p/>
      * The invocation instance is created only when needed, by passing the specified arguments to
-     * the constructor. Note that the arguments objects should be immutable or, at least, never
-     * shared inside and outside the routine in order to avoid concurrency issues.
+     * the factory. Note that the arguments objects should be immutable or, at least, never shared
+     * inside and outside the routine in order to avoid concurrency issues.
      *
      * @param factory  the invocation factory.
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
@@ -184,31 +186,12 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified invocation class token.
-     * <p/>
-     * The invocation instance is created through reflection only when needed.
-     *
-     * @param token    the invocation class token.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> token) {
-
-        return on(Invocations.factoryOf(token));
-    }
-
-    /**
      * Returns a routine builder wrapping a weak reference to the specified target object.<br/>
      * Note that it is responsibility of the caller to retain a strong reference to the target
      * instance to prevent it from being garbage collected.
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
      */
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {

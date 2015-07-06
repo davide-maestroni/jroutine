@@ -23,14 +23,26 @@ import javax.annotation.Nonnull;
  * <p/>
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
  * share a pool of them between different instances.<br/>
- * The only requirements is that the specified execution is called each time a run method is
- * invoked.<br/>
+ * The only requirement is that the specified execution is called each time a run method is invoked.
+ * <br/>
+ * Note that, a proper asynchronous runner implementation will never synchronously run an execution,
+ * no matter the delay, unless it employs a single thread. While, a proper synchronous runner, will
+ * always run executions in the very same caller thread.
+ * <br/>
  * Note also that the runner methods can be called from different threads, so, it is up to the
- * implementing class to ensure synchronization when needed.
+ * implementing class to ensure synchronization when required.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  */
 public interface Runner {
+
+    /**
+     * Checks if the calling thread belongs to the runner ones.<br/>
+     * A synchronous runner will always return <code>false</code>.
+     *
+     * @return whether the calling thread is managed by the runner.
+     */
+    boolean isOwnedThread();
 
     /**
      * Runs the specified execution (that is, it calls the execution <b><code>run()</code></b>

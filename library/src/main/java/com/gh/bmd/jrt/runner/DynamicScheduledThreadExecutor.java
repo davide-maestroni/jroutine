@@ -64,12 +64,6 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
         return super.schedule(new CommandRunnable(mExecutor, command), delay, unit);
     }
 
-    @Override
-    public void execute(final Runnable command) {
-
-        mExecutor.execute(command);
-    }
-
     /**
      * Runnable executing another runnable.
      */

@@ -36,7 +36,7 @@ class SimpleQueue<E> {
 
     private Object[] mQueue = new Object[8];
 
-    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
+    private static void resizeArray(@Nonnull final Object[] src, @Nonnull final Object[] dst,
             final int first) {
 
         final int remainder = src.length - first;

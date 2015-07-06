@@ -17,18 +17,16 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
+import com.gh.bmd.jrt.android.runner.Runners;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationFactory;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,15 +39,14 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
-
-    private final Object[] mArgs;
+class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>>
+        implements InvocationFactory<INPUT, OUTPUT> {
 
     private final List<? extends INPUT> mInputs;
 
     private final ContextInvocation<INPUT, OUTPUT> mInvocation;
 
-    private final String mInvocationType;
+    private final ContextInvocationFactory<INPUT, OUTPUT> mInvocationFactory;
 
     private final Logger mLogger;
 
@@ -62,18 +59,17 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     /**
      * Constructor.
      *
-     * @param context        used to retrieve the application context.
-     * @param invocation     the invocation instance.
-     * @param invocationType the invocation type.
-     * @param args           the invocation factory arguments.
-     * @param inputs         the input data.
-     * @param order          the data order.
-     * @param logger         the logger instance.
+     * @param context           used to retrieve the application context.
+     * @param invocation        the invocation instance.
+     * @param invocationFactory the invocation factory.
+     * @param inputs            the input data.
+     * @param order             the data order.
+     * @param logger            the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
             @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation,
-            @Nonnull final String invocationType, @Nonnull final Object[] args,
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> invocationFactory,
             @Nonnull final List<? extends INPUT> inputs, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
 
@@ -84,14 +80,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             throw new NullPointerException("the invocation instance must not be null");
         }
 
-        if (invocationType == null) {
+        if (invocationFactory == null) {
 
-            throw new NullPointerException("the invocation type must not be null");
-        }
-
-        if (args == null) {
-
-            throw new NullPointerException("the array of arguments must not be null");
+            throw new NullPointerException("the invocation factory must not be null");
         }
 
         if (inputs == null) {
@@ -100,8 +91,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         mInvocation = invocation;
-        mInvocationType = invocationType;
-        mArgs = args;
+        mInvocationFactory = invocationFactory;
         mInputs = inputs;
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
@@ -168,72 +158,29 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     public InvocationResult<OUTPUT> loadInBackground() {
 
         final Logger logger = mLogger;
-        final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
-        final LoaderResultChannel<OUTPUT> channel =
-                new LoaderResultChannel<OUTPUT>(mOrderType, logger);
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
-        channel.output().bind(consumer);
-        Throwable abortException = null;
-        logger.dbg("running invocation");
-
-        try {
-
-            invocation.onInit();
-
-            for (final INPUT input : mInputs) {
-
-                invocation.onInput(input, channel);
-            }
-
-            invocation.onResult(channel);
-            invocation.onReturn();
-
-        } catch (final InvocationException e) {
-
-            abortException = e.getCause();
-
-        } catch (final Throwable t) {
-
-            abortException = t;
-        }
-
-        if (abortException != null) {
-
-            logger.dbg(abortException, "aborting invocation");
-
-            try {
-
-                invocation.onAbort(abortException);
-
-            } catch (final InvocationException e) {
-
-                abortException = e.getCause();
-
-            } catch (final Throwable t) {
-
-                abortException = t;
-            }
-
-            logger.dbg(abortException, "aborted invocation");
-            channel.abort(abortException);
-            return consumer.createResult();
-        }
-
-        logger.dbg("reading invocation results");
-        channel.close();
+        JRoutine.on(this)
+                .invocations()
+                .withSyncRunner(Runners.sequentialRunner())
+                .withOutputOrder(mOrderType)
+                .withOutputMaxSize(Integer.MAX_VALUE)
+                .withOutputTimeout(TimeDuration.ZERO)
+                .withLog(logger.getLog())
+                .withLogLevel(logger.getLogLevel())
+                .set()
+                .callSync(mInputs)
+                .passTo(consumer);
         return consumer.createResult();
     }
 
-    /**
-     * Gets the constructor arguments of this loader invocation.
-     *
-     * @return the array of arguments.
-     */
     @Nonnull
-    Object[] getInvocationArgs() {
+    @Override
+    public Invocation<INPUT, OUTPUT> newInvocation() {
 
-        return mArgs;
+        final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
+        invocation.onContext(getContext());
+        return invocation;
     }
 
     /**
@@ -257,120 +204,12 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Returns the loader invocation type.
+     * Returns the invocation factory.
      *
-     * @return the invocation type.
+     * @return the factory.
      */
-    @Nonnull
-    String getInvocationType() {
+    ContextInvocationFactory<INPUT, OUTPUT> getInvocationFactory() {
 
-        return mInvocationType;
-    }
-
-    /**
-     * Loader result channel.
-     *
-     * @param <OUTPUT> the output data type.
-     */
-    private static class LoaderResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
-
-        private final TransportChannel<OUTPUT> mTransportChannel;
-
-        private final TransportInput<OUTPUT> mTransportInput;
-
-        /**
-         * Constructor.
-         *
-         * @param order  the data order.
-         * @param logger the logger instance.
-         */
-        private LoaderResultChannel(@Nullable final OrderType order, @Nonnull final Logger logger) {
-
-            mTransportChannel = JRoutine.transport()
-                                        .withRoutine()
-                                        .withOutputOrder(order)
-                                        .withOutputMaxSize(Integer.MAX_VALUE)
-                                        .withOutputTimeout(TimeDuration.ZERO)
-                                        .withLog(logger.getLog())
-                                        .withLogLevel(logger.getLogLevel())
-                                        .set()
-                                        .buildChannel();
-            mTransportInput = mTransportChannel.input();
-        }
-
-        public boolean abort() {
-
-            return mTransportInput.abort();
-        }
-
-        public boolean abort(@Nullable final Throwable reason) {
-
-            return mTransportInput.abort(reason);
-        }
-
-        public boolean isOpen() {
-
-            return mTransportInput.isOpen();
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
-
-            mTransportInput.after(delay);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
-
-            mTransportInput.after(delay, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> now() {
-
-            mTransportInput.now();
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
-
-            mTransportInput.pass(channel);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
-
-            mTransportInput.pass(outputs);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
-
-            mTransportInput.pass(output);
-            return this;
-        }
-
-        @Nonnull
-        public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
-
-            mTransportInput.pass(outputs);
-            return this;
-        }
-
-        private void close() {
-
-            mTransportInput.close();
-        }
-
-        @Nonnull
-        private OutputChannel<OUTPUT> output() {
-
-            return mTransportChannel.output();
-        }
+        return mInvocationFactory;
     }
 }

@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +80,24 @@ public interface TransportChannel<DATA> {
          * {@inheritDoc}
          */
         @Nonnull
+        TransportInput<INPUT> orderByCall();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        TransportInput<INPUT> orderByChance();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        TransportInput<INPUT> orderByDelay();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
         TransportInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
         /**
@@ -102,7 +120,7 @@ public interface TransportChannel<DATA> {
 
         /**
          * Closes the channel input.<br/>
-         * If the channel is already close, this method has no effect.
+         * If the channel is already closed, this method has no effect.
          * <p/>
          * Note that this method must be always called when done with the channel.
          */
@@ -132,7 +150,7 @@ public interface TransportChannel<DATA> {
          * {@inheritDoc}
          */
         @Nonnull
-        TransportOutput<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
+        TransportOutput<OUTPUT> allInto(@Nonnull Collection<? super OUTPUT> results);
 
         /**
          * {@inheritDoc}
@@ -168,12 +186,6 @@ public interface TransportChannel<DATA> {
          * {@inheritDoc}
          */
         @Nonnull
-        TransportOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
+        TransportOutput<OUTPUT> passTo(@Nonnull OutputConsumer<? super OUTPUT> consumer);
     }
 }

@@ -14,11 +14,12 @@
 package com.gh.bmd.jrt.android.v4.core;
 
 import com.gh.bmd.jrt.android.runner.Runners;
+import com.gh.bmd.jrt.channel.AbortException;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
-import com.gh.bmd.jrt.common.RoutineException;
+import com.gh.bmd.jrt.invocation.InvocationException;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
@@ -31,7 +32,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Class storing the invocation loader results.
+ * Class consuming the invocation loader results.
  * <p/>
  * Created by davide-maestroni on 12/12/14.
  *
@@ -172,12 +173,21 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
      */
     private class Result implements InvocationResult<OUTPUT> {
 
+        public void abort() {
+
+            synchronized (mMutex) {
+
+                mIsComplete = true;
+                mAbortException = new AbortException(null);
+            }
+        }
+
         @Nullable
         public Throwable getAbortException() {
 
             synchronized (mMutex) {
 
-                return mAbortException;
+                return mAbortException.getCause();
             }
         }
 
@@ -190,7 +200,8 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
         }
 
         public boolean passTo(@Nonnull final Collection<TransportInput<OUTPUT>> newChannels,
-                @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels) {
+                @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels,
+                @Nonnull final Collection<TransportInput<OUTPUT>> abortedChannels) {
 
             synchronized (mMutex) {
 
@@ -208,37 +219,42 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
                 } else {
 
-                    try {
+                    logger.dbg("passing result: %s + %s", cachedResults, lastResults);
 
-                        logger.dbg("passing result: %s + %s", cachedResults, lastResults);
+                    for (final TransportInput<OUTPUT> newChannel : newChannels) {
 
-                        for (final TransportInput<OUTPUT> newChannel : newChannels) {
+                        try {
 
                             newChannel.pass(cachedResults).pass(lastResults);
-                        }
 
-                        for (final TransportInput<OUTPUT> channel : oldChannels) {
+                        } catch (final InvocationInterruptedException e) {
+
+                            throw e;
+
+                        } catch (final Throwable t) {
+
+                            abortedChannels.add(newChannel);
+                        }
+                    }
+
+                    for (final TransportInput<OUTPUT> channel : oldChannels) {
+
+                        try {
 
                             channel.pass(lastResults);
+
+                        } catch (final InvocationInterruptedException e) {
+
+                            throw e;
+
+                        } catch (final Throwable t) {
+
+                            abortedChannels.add(channel);
                         }
-
-                        cachedResults.addAll(lastResults);
-                        lastResults.clear();
-
-                    } catch (final InvocationInterruptedException e) {
-
-                        throw e;
-
-                    } catch (final RoutineException e) {
-
-                        mIsComplete = true;
-                        mAbortException = e;
-
-                    } catch (final Throwable t) {
-
-                        mIsComplete = true;
-                        mAbortException = new InvocationException(t);
                     }
+
+                    cachedResults.addAll(lastResults);
+                    lastResults.clear();
                 }
 
                 logger.dbg("invocation is complete: %s", mIsComplete);

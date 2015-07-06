@@ -18,15 +18,16 @@ import android.content.Context;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
- * Class implementing a builder of routine objects based on an invocation class token.
+ * Class implementing a builder of routine objects executed in a dedicated service.
  * <p/>
  * Created by davide-maestroni on 1/8/15.
  *
@@ -37,19 +38,21 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         implements ServiceRoutineBuilder<INPUT, OUTPUT>,
         ServiceConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>> {
 
-    private final RoutineConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>
+    private final InvocationConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>
             mConfigurable =
-            new RoutineConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>() {
+            new InvocationConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>() {
 
                 @Nonnull
                 public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
-                        @Nonnull final RoutineConfiguration configuration) {
+                        @Nonnull final InvocationConfiguration configuration) {
 
                     return DefaultServiceRoutineBuilder.this.setConfiguration(configuration);
                 }
             };
 
     private final Context mContext;
+
+    private final Object[] mFactoryArgs;
 
     private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
 
@@ -58,12 +61,14 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     /**
      * Constructor.
      *
-     * @param context    the routine context.
-     * @param classToken the invocation class token.
+     * @param context     the routine context.
+     * @param classToken  the invocation class token.
+     * @param factoryArgs the invocation factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken,
+            @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
 
@@ -72,13 +77,41 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
         mContext = context;
         mInvocationClass = classToken.getRawClass();
+        mFactoryArgs = factoryArgs;
     }
 
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, getConfiguration(),
-                                                 mServiceConfiguration);
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, mFactoryArgs,
+                                                 getConfiguration(), mServiceConfiguration);
+    }
+
+    @Nonnull
+    @Override
+    public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
+    invocations() {
+
+
+        final InvocationConfiguration config = getConfiguration();
+        return new InvocationConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(
+                mConfigurable, config);
+    }
+
+    @Nonnull
+    @Override
+    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
+
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> service() {
+
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this, config);
     }
 
     @Nonnull
@@ -88,37 +121,10 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the service configuration must not be null");
         }
 
         mServiceConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    @Override
-    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
-
-        super.setConfiguration(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withRoutine() {
-
-        final RoutineConfiguration config = getConfiguration();
-        return new RoutineConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(mConfigurable,
-                                                                                      config);
-    }
-
-    @Nonnull
-    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    withService() {
-
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this, config);
     }
 }

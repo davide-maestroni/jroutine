@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 
 import java.io.BufferedOutputStream;
@@ -56,7 +56,7 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
     }
 
     @Override
-    public void onInit() {
+    public void onInitialize() {
 
         try {
 

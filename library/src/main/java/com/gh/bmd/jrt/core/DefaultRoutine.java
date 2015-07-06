@@ -13,11 +13,10 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.Reflection;
-import com.gh.bmd.jrt.common.RoutineException;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.log.Logger;
 
@@ -33,18 +32,16 @@ import javax.annotation.Nonnull;
  */
 class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
-    private final Object[] mArgs;
-
     private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      * @param factory       the invocation factory.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultRoutine(@Nonnull final RoutineConfiguration configuration,
+    DefaultRoutine(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         super(configuration);
@@ -54,13 +51,12 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             throw new NullPointerException("the invocation factory must not be null");
         }
 
-        mArgs = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
         mFactory = factory;
     }
 
     @Nonnull
     @Override
-    protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
+    protected Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final InvocationType type) {
 
         final Logger logger = getLogger();
 
@@ -68,7 +64,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
             final InvocationFactory<INPUT, OUTPUT> factory = mFactory;
             logger.dbg("creating a new invocation instance with factory: %s", factory);
-            final Invocation<INPUT, OUTPUT> invocation = factory.newInvocation(mArgs);
+            final Invocation<INPUT, OUTPUT> invocation = factory.newInvocation();
             logger.dbg("created a new instance of class: %s", invocation.getClass());
             return invocation;
 

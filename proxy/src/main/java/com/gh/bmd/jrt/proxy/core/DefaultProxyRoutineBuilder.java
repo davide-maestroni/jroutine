@@ -13,19 +13,19 @@
  */
 package com.gh.bmd.jrt.proxy.core;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a proxy builder.
@@ -33,14 +33,15 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * Created by davide-maestroni on 3/23/15.
  */
 class DefaultProxyRoutineBuilder
-        implements ProxyRoutineBuilder, RoutineConfiguration.Configurable<ProxyRoutineBuilder>,
+        implements ProxyRoutineBuilder, InvocationConfiguration.Configurable<ProxyRoutineBuilder>,
         ProxyConfiguration.Configurable<ProxyRoutineBuilder> {
 
     private final WeakReference<?> mTargetReference;
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
@@ -90,32 +91,27 @@ class DefaultProxyRoutineBuilder
         }
 
         final ObjectProxyBuilder<TYPE> builder = new ObjectProxyBuilder<TYPE>(target, itf);
-        return builder.withRoutine()
-                      .with(mRoutineConfiguration)
+        return builder.invocations()
+                      .with(mInvocationConfiguration)
                       .set()
-                      .withProxy()
+                      .proxies()
                       .with(mProxyConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ProxyRoutineBuilder> withRoutine() {
+    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocations() {
 
-        return new RoutineConfiguration.Builder<ProxyRoutineBuilder>(this, mRoutineConfiguration);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ProxyRoutineBuilder setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> proxies() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mRoutineConfiguration = configuration;
-        return this;
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
@@ -132,9 +128,17 @@ class DefaultProxyRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxy() {
+    @SuppressWarnings("ConstantConditions")
+    public ProxyRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, mProxyConfiguration);
+        if (configuration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     /**
@@ -177,7 +181,7 @@ class DefaultProxyRoutineBuilder
 
         @Nonnull
         @Override
-        protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+        protected TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration) {
 
             try {
@@ -185,7 +189,7 @@ class DefaultProxyRoutineBuilder
                 final Object target = mTarget;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
-                String packageName = annotation.generatedClassPackage();
+                String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {
 
@@ -197,7 +201,7 @@ class DefaultProxyRoutineBuilder
                     packageName += ".";
                 }
 
-                String className = annotation.generatedClassName();
+                String className = annotation.className();
 
                 if (className.equals(Proxy.DEFAULT)) {
 
@@ -206,19 +210,18 @@ class DefaultProxyRoutineBuilder
 
                     while (enclosingClass != null) {
 
-                        className = enclosingClass.getSimpleName() + className;
+                        className = enclosingClass.getSimpleName() + "_" + className;
                         enclosingClass = enclosingClass.getEnclosingClass();
                     }
                 }
 
-                final String fullClassName =
-                        packageName + annotation.generatedClassPrefix() + className
-                                + annotation.generatedClassSuffix();
+                final String fullClassName = packageName + annotation.classPrefix() + className
+                        + annotation.classSuffix();
                 final Constructor<?> constructor =
-                        findConstructor(Class.forName(fullClassName), target, routineConfiguration,
-                                        proxyConfiguration);
-                return interfaceClass.cast(
-                        constructor.newInstance(target, routineConfiguration, proxyConfiguration));
+                        findConstructor(Class.forName(fullClassName), target,
+                                        invocationConfiguration, proxyConfiguration);
+                return interfaceClass.cast(constructor.newInstance(target, invocationConfiguration,
+                                                                   proxyConfiguration));
 
             } catch (final Throwable t) {
 

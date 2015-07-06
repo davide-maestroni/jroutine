@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Configurable;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 
 import javax.annotation.Nonnull;
@@ -33,22 +33,28 @@ import javax.annotation.Nonnull;
 public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
         implements RoutineBuilder<INPUT, OUTPUT>, Configurable<RoutineBuilder<INPUT, OUTPUT>> {
 
-    private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> invocations() {
+
+        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
+    }
+
+    @Nonnull
+    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
 
         return buildRoutine().invokeAsync();
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
 
         return buildRoutine().invokeParallel();
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
 
         return buildRoutine().invokeSync();
     }
@@ -56,30 +62,24 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public RoutineBuilder<INPUT, OUTPUT> setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mConfiguration = configuration;
         return this;
     }
 
-    @Nonnull
-    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> withRoutine() {
-
-        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
-    }
-
     /**
-     * Returns the routine configuration.
+     * Returns the invocation configuration.
      *
      * @return the configuration.
      */
     @Nonnull
-    protected RoutineConfiguration getConfiguration() {
+    protected InvocationConfiguration getConfiguration() {
 
         return mConfiguration;
     }

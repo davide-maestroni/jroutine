@@ -42,6 +42,11 @@ public class RunnerDecorator implements Runner {
         mRunner = wrapped;
     }
 
+    public boolean isOwnedThread() {
+
+        return mRunner.isOwnedThread();
+    }
+
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 

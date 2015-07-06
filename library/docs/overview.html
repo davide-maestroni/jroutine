@@ -21,15 +21,13 @@
 
                 final Routine&lt;String, Integer&gt; parseRoutine = on(factoryOf(Parse.class)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine = on(factoryOf(Square.class)).buildRoutine();
-                final Routine&lt;Integer, Double&gt; meanRoutine = on(factoryOf(SquareRootMean.class)).buildRoutine();
-
+                final Routine&lt;Integer, Double&gt; meanRoutine =
+                        on(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                    .eventually()
-                                   .readNext();
-
+                                   .next();
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
@@ -59,7 +57,7 @@
                 private int mSum;
 
                 &commat;Override
-                public void onInit() {
+                public void onInitialize() {
 
                     mCount = 0;
                     mSum = 0;
@@ -100,26 +98,17 @@
 
                 final Routine&lt;String, Integer&gt; parseRoutine = on(new Parse()).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine = on(new Square()).buildRoutine();
-                final Routine&lt;Integer, Double&gt; meanRoutine = on(new InvocationFactory&lt;Integer, Double&gt;() {
-
-                    &commat;Nonnull
-                    public Invocation&lt;Integer, Double&gt; newInvocation() {
-
-                        return new SquareRootMean();
-                    }
-                }).buildRoutine();
+                final Routine&lt;Integer, Double&gt; meanRoutine = on(new SquareRootMeanFactory()).buildRoutine();
 
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                    .eventually()
-                                   .readNext();
-
+                                   .next();
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
-            private static class Parse extends StatelessInvocation&lt;String, Integer&gt; {
+            private static class Parse extends FilterInvocation&lt;String, Integer&gt; {
 
                 public void onInput(final String s, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
 
@@ -127,7 +116,7 @@
                 }
             }
 
-            private static class Square extends StatelessInvocation&lt;Integer, Integer&gt; {
+            private static class Square extends FilterInvocation&lt;Integer, Integer&gt; {
 
                 public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
 
@@ -143,7 +132,7 @@
                 private int mSum;
 
                 &commat;Override
-                public void onInit() {
+                public void onInitialize() {
 
                     mCount = 0;
                     mSum = 0;
@@ -169,6 +158,15 @@
                     }
                 }
             }
+
+            private static class SquareRootMeanFactory implements InvocationFactory&lt;Integer, Double&gt; {
+
+                &commat;Nonnull
+                public Invocation&lt;Integer, Double&gt; newInvocation() {
+
+                   return new SquareRootMean();
+                }
+            }
         }
     </code>
 </pre>
@@ -189,21 +187,18 @@
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder = on(Main.class).withProxy()
+                final ClassRoutineBuilder builder = on(Main.class).proxies()
                                                                   .withShareGroup(ShareGroup.NONE)
                                                                   .set()
-                                                                  .withRoutine()
+                                                                  .invocations()
                                                                   .withReadTimeout(TimeDuration.INFINITY)
                                                                   .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
-
                 final Double rms = meanRoutine.callAsync(
-                        squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll()).readNext();
-
+                        squareRoutine.callParallel(parseRoutine.callParallel(args)).all()).next();
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
@@ -242,7 +237,7 @@
 <b>Example 4:</b> via proxy.
 <p>
     Using a proxy object is just a convenient way to wrap several methods at once.<br/>
-    Note that the some annotations of the previous example could have been used to bind the methods with the proxy interface.
+    Note that the same annotations of the previous example could have been used to bind the methods with the proxy interface.
 </p>
 <pre>
     <code>
@@ -251,17 +246,15 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = on(instance).withProxy()
+                final AsyncMain proxy = on(instance).proxies()
                                                     .withShareGroup(ShareGroup.NONE)
                                                     .set()
-                                                    .withRoutine()
+                                                    .invocations()
                                                     .withReadTimeout(TimeDuration.INFINITY)
                                                     .set()
                                                     .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
-
                 System.out.println(rms);
-
                 System.exit(0);
             }
 
@@ -294,14 +287,14 @@
 
             private interface AsyncMain {
 
-                &commat;Param(int.class)
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Param(String.class) String[] args);
+                &commat;Output
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Input(String.class) String[] args);
 
-                &commat;Param(int.class)
+                &commat;Output
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel&lt;Integer&gt; value);
 
-                double squareRootMean(&commat;Param(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(&commat;Input(List.class) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>

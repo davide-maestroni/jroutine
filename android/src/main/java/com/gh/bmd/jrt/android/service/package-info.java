@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Android service class implementation.
+ * Android service classes implementation.
  * <p/>
  * Created by davide-maestroni on 1/10/15.
  */

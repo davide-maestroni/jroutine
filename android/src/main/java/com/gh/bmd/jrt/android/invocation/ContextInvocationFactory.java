@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.android.invocation;
 
-import com.gh.bmd.jrt.invocation.InvocationFactory;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -25,23 +23,13 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface ContextInvocationFactory<INPUT, OUTPUT> extends InvocationFactory<INPUT, OUTPUT> {
-
-    /**
-     * Returns the type identifying the created invocations.<br/>
-     * Note that the returned string will be used to detect clashing of invocation instances.
-     *
-     * @return the invocation type.
-     */
-    @Nonnull
-    String getInvocationType();
+public interface ContextInvocationFactory<INPUT, OUTPUT> {
 
     /**
      * Creates and return a new context invocation instance.
      *
-     * @param args the arguments.
      * @return the context invocation instance.
      */
     @Nonnull
-    ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args);
+    ContextInvocation<INPUT, OUTPUT> newInvocation();
 }

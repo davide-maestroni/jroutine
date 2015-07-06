@@ -38,7 +38,7 @@ public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<IN
 
     }
 
-    public void onInit() {
+    public void onInitialize() {
 
     }
 
@@ -50,7 +50,7 @@ public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<IN
 
     }
 
-    public void onReturn() {
+    public void onTerminate() {
 
     }
 }

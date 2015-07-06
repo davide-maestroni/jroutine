@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Configurable;
+import com.gh.bmd.jrt.builder.ChannelConfiguration;
+import com.gh.bmd.jrt.builder.ChannelConfiguration.Builder;
+import com.gh.bmd.jrt.builder.ChannelConfiguration.Configurable;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.channel.TransportChannel;
 
@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 class DefaultTransportChannelBuilder
         implements TransportChannelBuilder, Configurable<TransportChannelBuilder> {
 
-    private RoutineConfiguration mConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Avoid direct instantiation.
@@ -45,7 +45,7 @@ class DefaultTransportChannelBuilder
     }
 
     @Nonnull
-    public Builder<TransportChannelBuilder> withRoutine() {
+    public Builder<? extends TransportChannelBuilder> channels() {
 
         return new Builder<TransportChannelBuilder>(this, mConfiguration);
     }
@@ -53,11 +53,11 @@ class DefaultTransportChannelBuilder
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public TransportChannelBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final ChannelConfiguration configuration) {
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
         mConfiguration = configuration;

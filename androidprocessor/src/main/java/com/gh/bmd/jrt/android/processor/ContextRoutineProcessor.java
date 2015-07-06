@@ -20,16 +20,22 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations,
- * bound to a context lifecycle.
+ * by leveraging Android platform specific classes.
  * <p/>
  * Created by davide-maestroni on 06/05/15.
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
+
+    private TypeMirror mCacheAnnotationType;
+
+    private TypeMirror mClashAnnotationType;
 
     private TypeElement mCurrentAnnotationElement;
 
@@ -38,6 +44,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     private String mHeaderV11;
 
     private String mHeaderV4;
+
+    private TypeMirror mIdAnnotationType;
+
+    private TypeMirror mInputClashAnnotationType;
 
     private String mMethodArrayInvocation;
 
@@ -61,6 +71,19 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private TypeElement mV4ProxyElement;
 
+    @Override
+    public synchronized void init(final ProcessingEnvironment processingEnv) {
+
+        super.init(processingEnv);
+        mIdAnnotationType = getTypeFromName("com.gh.bmd.jrt.android.annotation.LoaderId").asType();
+        mClashAnnotationType =
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.ClashResolution").asType();
+        mInputClashAnnotationType =
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.InputClashResolution").asType();
+        mCacheAnnotationType =
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.CacheStrategy").asType();
+    }
+
     @Nonnull
     @Override
     protected String buildRoutineFieldsInit(final int size) {
@@ -76,11 +99,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             if (annotationElement == serviceProxyElement) {
 
-                builder.append("(routineConfiguration, serviceConfiguration);");
+                builder.append("(invocationConfiguration, serviceConfiguration);");
 
             } else {
 
-                builder.append("(routineConfiguration, loaderConfiguration);");
+                builder.append("(invocationConfiguration, loaderConfiguration);");
             }
 
             builder.append(NEW_LINE);
@@ -272,20 +295,15 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         // We need to avoid explicit dependency on the android module...
         final StringBuilder builder = new StringBuilder();
-        final TypeElement idAnnotationElement =
-                getTypeFromName("com.gh.bmd.jrt.android.annotation.LoaderId");
-        final Integer id =
-                (Integer) getAnnotationValue(methodElement, idAnnotationElement.asType(), "value");
+        final Integer id = (Integer) getAnnotationValue(methodElement, mIdAnnotationType, "value");
 
         if (id != null) {
 
             builder.append(".withId(").append(id).append(")");
         }
 
-        final TypeElement clashAnnotationElement =
-                getTypeFromName("com.gh.bmd.jrt.android.annotation.ClashResolution");
         final Object resolutionType =
-                getAnnotationValue(methodElement, clashAnnotationElement.asType(), "value");
+                getAnnotationValue(methodElement, mClashAnnotationType, "value");
 
         if (resolutionType != null) {
 
@@ -293,10 +311,18 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                                    + ".ClashResolutionType.").append(resolutionType).append(")");
         }
 
-        final TypeElement cacheAnnotationElement =
-                getTypeFromName("com.gh.bmd.jrt.android.annotation.CacheStrategy");
+        final Object inputResolutionType =
+                getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
+
+        if (inputResolutionType != null) {
+
+            builder.append(
+                    ".withInputClashResolution(com.gh.bmd.jrt.android.builder.LoaderConfiguration"
+                            + ".ClashResolutionType.").append(resolutionType).append(")");
+        }
+
         final Object strategyType =
-                getAnnotationValue(methodElement, cacheAnnotationElement.asType(), "value");
+                getAnnotationValue(methodElement, mCacheAnnotationType, "value");
 
         if (strategyType != null) {
 

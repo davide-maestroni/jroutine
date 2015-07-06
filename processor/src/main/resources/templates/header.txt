@@ -14,7 +14,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-package ${packageName};
+${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
@@ -24,7 +24,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@javax.annotation.Nonnull final ${classFullName} wrapped,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
         if (wrapped == null) {
@@ -51,14 +51,14 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             return null;
         }
 
-        return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(mWrapped, shareGroup);
+        return com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(mWrapped, shareGroup);
     }
 
     private static class ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
 
         private final ${classFullName} mTarget;
 
-        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+        private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
         private ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
@@ -73,7 +73,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         @Override
         @javax.annotation.Nonnull
-        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
+        protected com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }
@@ -88,9 +88,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @Override
         @javax.annotation.Nonnull
         protected ${interfaceFullName} newProxy(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-            return new ${generatedClassName}${genericTypes}(mTarget, routineConfiguration, proxyConfiguration);
+            return new ${generatedClassName}${genericTypes}(mTarget, invocationConfiguration, proxyConfiguration);
         }
     }

@@ -13,42 +13,34 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Alias;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.RoutineException;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.invocation.FunctionInvocation;
+import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.Invocations;
-import com.gh.bmd.jrt.invocation.ProcedureInvocation;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.common.Reflection.boxingClass;
+import static com.gh.bmd.jrt.core.RoutineBuilders.callFromInvocation;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedStaticMethod;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex;
+import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
  * Class implementing a builder of routines wrapping a class method.
@@ -56,29 +48,26 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
  * Created by davide-maestroni on 9/21/14.
  */
 class DefaultClassRoutineBuilder
-        implements ClassRoutineBuilder, RoutineConfiguration.Configurable<ClassRoutineBuilder>,
+        implements ClassRoutineBuilder, InvocationConfiguration.Configurable<ClassRoutineBuilder>,
         ProxyConfiguration.Configurable<ClassRoutineBuilder> {
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
 
-    private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
-
     private final Class<?> mTargetClass;
 
     private final WeakReference<?> mTargetReference;
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
      *
      * @param targetClass the target class.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected, or the specified class represents an
-     *                                            interface.
+     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     DefaultClassRoutineBuilder(@Nonnull final Class<?> targetClass) {
 
@@ -90,90 +79,58 @@ class DefaultClassRoutineBuilder
 
         mTargetClass = targetClass;
         mTargetReference = null;
-        fillMethodMap(true);
     }
 
     /**
      * Constructor.
      *
      * @param target the target object.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
      */
     DefaultClassRoutineBuilder(@Nonnull final Object target) {
 
         mTargetClass = target.getClass();
         mTargetReference = new WeakReference<Object>(target);
-        fillMethodMap(false);
     }
 
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        final Method method = mMethodMap.get(name);
+        final Method method = getAnnotatedStaticMethod(mTargetClass, name);
 
         if (method == null) {
 
             throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
+                    "no annotated method with alias '" + name + "' has been found");
         }
 
         return method(method);
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> invocations() {
 
-        return method(mRoutineConfiguration, mProxyConfiguration, method);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
-        final Class<?> targetClass = mTargetClass;
-        Method targetMethod = null;
-
-        try {
-
-            targetMethod = targetClass.getMethod(name, parameterTypes);
-
-        } catch (final NoSuchMethodException ignored) {
-
-        }
-
-        if (targetMethod == null) {
-
-            try {
-
-                targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
-
-            } catch (final NoSuchMethodException e) {
-
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        return method(targetMethod);
+        return method(findMethod(mTargetClass, name, parameterTypes));
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ClassRoutineBuilder> withRoutine() {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return new RoutineConfiguration.Builder<ClassRoutineBuilder>(this, mRoutineConfiguration);
+        return method(mInvocationConfiguration, mProxyConfiguration, method);
     }
 
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder setConfiguration(@Nonnull final RoutineConfiguration configuration) {
+    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> proxies() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mRoutineConfiguration = configuration;
-        return this;
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     @Nonnull
@@ -190,26 +147,32 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ClassRoutineBuilder> withProxy() {
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        return new ProxyConfiguration.Builder<ClassRoutineBuilder>(this, mProxyConfiguration);
+        if (configuration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     /**
-     * Gets the annotated method associated to the specified name.
+     * Returns the internal invocation configuration.
      *
-     * @param name the name specified in the annotation.
-     * @return the method or null.
-     * @see com.gh.bmd.jrt.annotation.Alias
+     * @return the configuration.
      */
-    @Nullable
-    protected Method getAnnotatedMethod(final String name) {
+    @Nonnull
+    protected InvocationConfiguration getInvocationConfiguration() {
 
-        return mMethodMap.get(name);
+        return mInvocationConfiguration;
     }
 
     /**
-     * Returns the internal share configuration.
+     * Returns the internal proxy configuration.
      *
      * @return the configuration.
      */
@@ -222,24 +185,19 @@ class DefaultClassRoutineBuilder
     /**
      * Gets or creates the routine.
      *
-     * @param configuration      the routine configuration.
-     * @param shareGroup         the share group name.
-     * @param method             the method to wrap.
-     * @param isInputCollection  whether we need to collect the input parameters.
-     * @param isOutputCollection whether the output is a collection.
+     * @param configuration the invocation configuration.
+     * @param shareGroup    the share group name.
+     * @param method        the method to wrap.
+     * @param inputMode     the input transfer mode.
+     * @param outputMode    the output transfer mode.
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
-            @Nonnull final Method method, final boolean isInputCollection,
-            final boolean isOutputCollection) {
-
-        if (!method.isAccessible()) {
-
-            AccessController.doPrivileged(new SetAccessibleAction(method));
-        }
+            @Nonnull final InvocationConfiguration configuration, @Nullable final String shareGroup,
+            @Nonnull final Method method, @Nullable final InputMode inputMode,
+            @Nullable final OutputMode outputMode) {
 
         final Object target = (mTargetReference != null) ? mTargetReference.get() : mTargetClass;
 
@@ -262,8 +220,7 @@ class DefaultClassRoutineBuilder
 
             final String methodShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(configuration, method, methodShareGroup, isInputCollection,
-                                    isOutputCollection);
+                    new RoutineInfo(configuration, method, methodShareGroup, inputMode, outputMode);
             Routine<?, ?> routine = routineMap.get(routineInfo);
 
             if (routine == null) {
@@ -279,29 +236,14 @@ class DefaultClassRoutineBuilder
                     mutex = null;
                 }
 
-                final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                        configuration.builderFrom();
-                final InvocationFactory<Object, Object> factory =
-                        Invocations.factoryOf(MethodProcedureInvocation.class);
-                routine = new DefaultRoutine<Object, Object>(
-                        builder.withFactoryArgs(target, method, mutex, isInputCollection,
-                                                isOutputCollection).set(), factory);
+                final MethodInvocationFactory factory =
+                        new MethodInvocationFactory(target, method, mutex, inputMode, outputMode);
+                routine = new DefaultRoutine<Object, Object>(configuration, factory);
                 routineMap.put(routineInfo, routine);
             }
 
             return (Routine<INPUT, OUTPUT>) routine;
         }
-    }
-
-    /**
-     * Returns the internal routine configuration.
-     *
-     * @return the configuration.
-     */
-    @Nonnull
-    protected RoutineConfiguration getRoutineConfiguration() {
-
-        return mRoutineConfiguration;
     }
 
     /**
@@ -329,20 +271,27 @@ class DefaultClassRoutineBuilder
     /**
      * Returns a routine used to call the specified method.
      *
-     * @param routineConfiguration the routine configuration.
-     * @param proxyConfiguration   the share configuration.
-     * @param targetMethod         the target method.
+     * @param invocationConfiguration the invocation configuration.
+     * @param proxyConfiguration      the share configuration.
+     * @param targetMethod            the target method.
      * @return the routine.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
-            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ProxyConfiguration proxyConfiguration,
             @Nonnull final Method targetMethod) {
 
         String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
-        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                routineConfiguration.builderFrom();
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                invocationConfiguration.builderFrom();
+        final Priority priorityAnnotation = targetMethod.getAnnotation(Priority.class);
+
+        if (priorityAnnotation != null) {
+
+            builder.withPriority(priorityAnnotation.value());
+        }
+
         final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {
@@ -350,12 +299,6 @@ class DefaultClassRoutineBuilder
             methodShareGroup = shareGroupAnnotation.value();
         }
 
-        warn(routineConfiguration);
-        builder.withInputOrder(OrderType.PASS_ORDER)
-               .withInputMaxSize(Integer.MAX_VALUE)
-               .withInputTimeout(TimeDuration.ZERO)
-               .withOutputMaxSize(Integer.MAX_VALUE)
-               .withOutputTimeout(TimeDuration.ZERO);
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
@@ -370,285 +313,99 @@ class DefaultClassRoutineBuilder
             builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
-        return getRoutine(builder.set(), methodShareGroup, targetMethod, false, false);
-    }
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the routine configuration.
-     */
-    protected void warn(@Nonnull final RoutineConfiguration configuration) {
-
-        Logger logger = null;
-        final Object[] args = configuration.getFactoryArgsOr(null);
-
-        if (args != null) {
-
-            logger = configuration.newLogger(this);
-            logger.wrn("the specified factory arguments will be ignored: %s",
-                       Arrays.toString(args));
-        }
-
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (inputSize != RoutineConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (outputSize != RoutineConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
-    }
-
-    private void fillMap(@Nonnull final HashMap<String, Method> map,
-            @Nonnull final Method[] methods, final boolean isClass) {
-
-        for (final Method method : methods) {
-
-            final boolean isStatic = Modifier.isStatic(method.getModifiers());
-
-            if (isClass) {
-
-                if (!isStatic) {
-
-                    continue;
-                }
-
-            } else if (isStatic) {
-
-                continue;
-            }
-
-            final Alias annotation = method.getAnnotation(Alias.class);
-
-            if (annotation != null) {
-
-                final String name = annotation.value();
-
-                if (map.containsKey(name)) {
-
-                    throw new IllegalArgumentException(
-                            "the name '" + name + "' has already been used to identify a different"
-                                    + " method");
-                }
-
-                map.put(name, method);
-            }
-        }
-    }
-
-    private void fillMethodMap(final boolean isClass) {
-
-        final Class<?> targetClass = mTargetClass;
-        final HashMap<String, Method> methodMap = mMethodMap;
-        fillMap(methodMap, targetClass.getMethods(), isClass);
-        final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
-        fillMap(declaredMethodMap, targetClass.getDeclaredMethods(), isClass);
-
-        for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
-
-            final String name = methodEntry.getKey();
-
-            if (!methodMap.containsKey(name)) {
-
-                methodMap.put(name, methodEntry.getValue());
-            }
-        }
+        return getRoutine(builder.set(), methodShareGroup, targetMethod, null, null);
     }
 
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodProcedureInvocation extends ProcedureInvocation<Object, Object> {
+    private static class MethodFunctionInvocation extends FunctionInvocation<Object, Object> {
 
-        private final boolean mHasResult;
-
-        private final boolean mIsArrayResult;
-
-        private final boolean mIsInputCollection;
-
-        private final boolean mIsOutputCollection;
+        private final InputMode mInputMode;
 
         private final Method mMethod;
 
         private final Object mMutex;
+
+        private final OutputMode mOutputMode;
 
         private final WeakReference<?> mTargetReference;
 
         /**
          * Constructor.
          *
-         * @param target             the target object.
-         * @param method             the method to wrap.
-         * @param mutex              the mutex used for synchronization.
-         * @param isInputCollection  whether we need to collect the input parameters.
-         * @param isOutputCollection whether the output is a collection.
+         * @param targetReference the reference to target object.
+         * @param method          the method to wrap.
+         * @param mutex           the mutex used for synchronization.
+         * @param inputMode       the input transfer mode.
+         * @param outputMode      the output transfer mode.
          */
-        public MethodProcedureInvocation(@Nullable final Object target,
+        public MethodFunctionInvocation(@Nonnull final WeakReference<?> targetReference,
                 @Nonnull final Method method, @Nullable final Object mutex,
-                final boolean isInputCollection, final boolean isOutputCollection) {
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-            mTargetReference = new WeakReference<Object>(target);
+            mTargetReference = targetReference;
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
-            mIsInputCollection = isInputCollection;
-            mIsOutputCollection = isOutputCollection;
-            final Class<?> returnClass = method.getReturnType();
-            mHasResult = !Void.class.equals(boxingClass(returnClass));
-            mIsArrayResult = returnClass.isArray();
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
         }
 
         @Override
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            synchronized (mMutex) {
+            final Object target = mTargetReference.get();
 
-                final Object target = mTargetReference.get();
+            if (target == null) {
 
-                if (target == null) {
-
-                    throw new IllegalStateException("the target object has been destroyed");
-                }
-
-                final Method method = mMethod;
-
-                try {
-
-                    final Object[] args;
-
-                    if (mIsInputCollection) {
-
-                        final Class<?> paramClass = method.getParameterTypes()[0];
-
-                        if (paramClass.isArray()) {
-
-                            final int size = objects.size();
-                            final Object array =
-                                    Array.newInstance(paramClass.getComponentType(), size);
-
-                            for (int i = 0; i < size; ++i) {
-
-                                Array.set(array, i, objects.get(i));
-                            }
-
-                            args = new Object[]{array};
-
-                        } else {
-
-                            args = new Object[]{objects};
-                        }
-
-                    } else {
-
-                        args = objects.toArray(new Object[objects.size()]);
-                    }
-
-                    final Object methodResult = method.invoke(target, args);
-
-                    if (mHasResult) {
-
-                        if (mIsOutputCollection) {
-
-                            if (mIsArrayResult) {
-
-                                if (methodResult != null) {
-
-                                    final int length = Array.getLength(methodResult);
-
-                                    for (int i = 0; i < length; ++i) {
-
-                                        result.pass(Array.get(methodResult, i));
-                                    }
-                                }
-
-                            } else {
-
-                                result.pass((Iterable<?>) methodResult);
-                            }
-
-                        } else {
-
-                            result.pass(methodResult);
-                        }
-                    }
-
-                } catch (final RoutineException e) {
-
-                    throw e;
-
-                } catch (final InvocationTargetException e) {
-
-                    throw new InvocationException(e.getCause());
-
-                } catch (final Throwable t) {
-
-                    throw new InvocationException(t);
-                }
+                throw new IllegalStateException("the target object has been destroyed");
             }
+
+            callFromInvocation(target, mMutex, objects, result, mMethod, mInputMode, mOutputMode);
+        }
+    }
+
+    /**
+     * Factory creating method invocations.
+     */
+    private static class MethodInvocationFactory implements InvocationFactory<Object, Object> {
+
+        private final InputMode mInputMode;
+
+        private final Method mMethod;
+
+        private final Object mMutex;
+
+        private final OutputMode mOutputMode;
+
+        private final WeakReference<?> mTargetReference;
+
+        /**
+         * Constructor.
+         *
+         * @param target     the target object.
+         * @param method     the method to wrap.
+         * @param mutex      the mutex used for synchronization.
+         * @param inputMode  the input transfer mode.
+         * @param outputMode the output transfer mode.
+         */
+        public MethodInvocationFactory(@Nonnull final Object target, @Nonnull final Method method,
+                @Nullable final Object mutex, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) {
+
+            mTargetReference = new WeakReference<Object>(target);
+            mMethod = method;
+            mMutex = (mutex != null) ? mutex : this;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
+        }
+
+        @Nonnull
+        public Invocation<Object, Object> newInvocation() {
+
+            return new MethodFunctionInvocation(mTargetReference, mMethod, mMutex, mInputMode,
+                                                mOutputMode);
         }
     }
 
@@ -657,34 +414,34 @@ class DefaultClassRoutineBuilder
      */
     private static final class RoutineInfo {
 
-        private final RoutineConfiguration mConfiguration;
+        private final InvocationConfiguration mConfiguration;
 
-        private final boolean mIsInputCollection;
-
-        private final boolean mIsOutputCollection;
+        private final InputMode mInputMode;
 
         private final Method mMethod;
+
+        private final OutputMode mOutputMode;
 
         private final String mShareGroup;
 
         /**
          * Constructor.
          *
-         * @param configuration      the routine configuration.
-         * @param method             the method to wrap.
-         * @param shareGroup         the group name.
-         * @param isInputCollection  whether we need to collect the input parameters.
-         * @param isOutputCollection whether the output is a collection.
+         * @param configuration the invocation configuration.
+         * @param method        the method to wrap.
+         * @param shareGroup    the group name.
+         * @param inputMode     the input transfer mode.
+         * @param outputMode    the output transfer mode.
          */
-        public RoutineInfo(@Nonnull final RoutineConfiguration configuration,
+        public RoutineInfo(@Nonnull final InvocationConfiguration configuration,
                 @Nonnull final Method method, @Nonnull final String shareGroup,
-                final boolean isInputCollection, final boolean isOutputCollection) {
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mMethod = method;
             mShareGroup = shareGroup;
             mConfiguration = configuration;
-            mIsInputCollection = isInputCollection;
-            mIsOutputCollection = isOutputCollection;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
         }
 
         @Override
@@ -692,9 +449,9 @@ class DefaultClassRoutineBuilder
 
             // auto-generated code
             int result = mConfiguration.hashCode();
-            result = 31 * result + (mIsInputCollection ? 1 : 0);
-            result = 31 * result + (mIsOutputCollection ? 1 : 0);
+            result = 31 * result + (mInputMode != null ? mInputMode.hashCode() : 0);
             result = 31 * result + mMethod.hashCode();
+            result = 31 * result + (mOutputMode != null ? mOutputMode.hashCode() : 0);
             result = 31 * result + mShareGroup.hashCode();
             return result;
         }
@@ -714,34 +471,9 @@ class DefaultClassRoutineBuilder
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-            return mIsInputCollection == that.mIsInputCollection
-                    && mIsOutputCollection == that.mIsOutputCollection && mConfiguration.equals(
-                    that.mConfiguration) && mMethod.equals(that.mMethod) && mShareGroup.equals(
-                    that.mShareGroup);
-        }
-    }
-
-    /**
-     * Privileged action used to grant accessibility to a method.
-     */
-    private static class SetAccessibleAction implements PrivilegedAction<Void> {
-
-        private final Method mMethod;
-
-        /**
-         * Constructor.
-         *
-         * @param method the method instance.
-         */
-        private SetAccessibleAction(@Nonnull final Method method) {
-
-            mMethod = method;
-        }
-
-        public Void run() {
-
-            mMethod.setAccessible(true);
-            return null;
+            return mConfiguration.equals(that.mConfiguration) && mInputMode == that.mInputMode
+                    && mMethod.equals(that.mMethod) && mOutputMode == that.mOutputMode
+                    && mShareGroup.equals(that.mShareGroup);
         }
     }
 }

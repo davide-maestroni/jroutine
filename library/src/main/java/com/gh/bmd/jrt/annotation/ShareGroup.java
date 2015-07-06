@@ -27,12 +27,12 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.
  * <p/>
- * Through this annotation, it is possible to exclude single methods from this kind of protection by
- * indicating them as having a different share group. Each group has a name associated, and every
- * method within a specific group is protected so that shared class members can be safely accessed
+ * Through this annotation, it is possible to exclude single methods from this kind of protection,
+ * by indicating them as having a different share group. Each group has a name associated, and every
+ * method, within a specific group, is protected so that shared class members can be safely accessed
  * only from the other methods sharing the same group name. That means that the invocation of
  * methods within the same group cannot happen in parallel. In a dual way, methods belonging to
- * different groups can be invoked in parallel but should not access the same members to avoid
+ * different groups can be invoked in parallel, but should not access the same members to avoid
  * concurrency issues.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That

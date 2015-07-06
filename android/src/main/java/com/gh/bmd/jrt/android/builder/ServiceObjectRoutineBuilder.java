@@ -13,23 +13,17 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 
 import javax.annotation.Nonnull;
 
 /**
- * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * Interface defining a builder of routines wrapping an object instance.
  * <p/>
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.
- * <p/>
- * Note that, like the object passed to the service routine input and output channels, the
- * object factory arguments must comply with the {@link android.os.Parcel#writeValue(Object)}
- * method. Be aware though, that issues may arise when employing {@link java.io.Serializable}
- * objects on the Lollipop OS version, so, it is advisable to use {@link android.os.Parcelable}
- * objects instead.
  * <p/>
  * Created by davide-maestroni on 3/29/15.
  */
@@ -40,17 +34,17 @@ public interface ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxy();
+    InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    RoutineConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withRoutine();
+    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxies();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withService();
+    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> service();
 }

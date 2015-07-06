@@ -30,7 +30,7 @@ public class Chunk {
 
     private final byte[] mData;
 
-    private int mLength;
+    private final int mLength;
 
     /**
      * Constructor.

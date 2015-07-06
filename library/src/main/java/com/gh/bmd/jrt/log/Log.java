@@ -27,9 +27,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Note also that a log instance is typically accessed from different threads, so, it is
  * responsibility of the implementing class to avoid concurrency issues, by synchronizing mutable
- * fields when needed.
+ * fields when required.
  * <p/>
- * To avoid an excessive number of log messages it is sufficient to set an higher log level.
+ * To avoid an excessive number of log messages, it is sufficient to set an higher log level.
  * Though, it is also possible to completely remove the log source code (and related strings) from
  * the released code by using Proguard and adding, for example, the following rule to the
  * configuration file:
@@ -96,7 +96,7 @@ public interface Log {
         WARNING,
         /**
          * The least verbose level.<br/>
-         * Error logs notify unexpected events that are clearly an exception in the normal routine
+         * Error logs notify unexpected events that are clearly an exception in the normal code
          * execution.
          */
         ERROR,

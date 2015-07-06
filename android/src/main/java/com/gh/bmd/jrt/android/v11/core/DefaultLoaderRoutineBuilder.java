@@ -23,20 +23,18 @@ import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Modifier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of an loader routine builder.
+ * Default implementation of a loader routine builder.
  * <p/>
  * Created by davide-maestroni on 12/9/14.
  *
@@ -52,13 +50,13 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
     private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
-    private final RoutineConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>>
+    private final InvocationConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>>
             mRoutineConfigurable =
-            new RoutineConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>>() {
+            new InvocationConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>>() {
 
                 @Nonnull
                 public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
-                        @Nonnull final RoutineConfiguration configuration) {
+                        @Nonnull final InvocationConfiguration configuration) {
 
                     return DefaultLoaderRoutineBuilder.this.setConfiguration(configuration);
                 }
@@ -113,8 +111,7 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
         final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
 
-        if ((factoryClass.getEnclosingClass() != null) && !Modifier.isStatic(
-                factoryClass.getModifiers())) {
+        if (!Reflection.isStaticClass(factoryClass)) {
 
             throw new IllegalArgumentException(
                     "the factory class must be static: " + factoryClass.getName());
@@ -127,17 +124,44 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
     @Nonnull
     public LoaderRoutine<INPUT, OUTPUT> buildRoutine() {
 
-        final RoutineConfiguration configuration = getConfiguration();
-        warn(configuration);
-        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                configuration.builderFrom()
-                             .withAsyncRunner(Runners.mainRunner())
-                             .withInputMaxSize(Integer.MAX_VALUE)
-                             .withInputTimeout(TimeDuration.INFINITY)
-                             .withOutputMaxSize(Integer.MAX_VALUE)
-                             .withOutputTimeout(TimeDuration.INFINITY);
+        final InvocationConfiguration configuration = getConfiguration();
+        final Runner mainRunner = Runners.mainRunner();
+        final Runner asyncRunner = configuration.getAsyncRunnerOr(mainRunner);
+
+        if (asyncRunner != mainRunner) {
+
+            configuration.newLogger(this)
+                         .wrn("the specified async runner will be ignored: %s", asyncRunner);
+        }
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                configuration.builderFrom().withAsyncRunner(mainRunner);
         return new DefaultLoaderRoutine<INPUT, OUTPUT>(mContext, mFactory, builder.set(),
                                                        mLoaderConfiguration);
+    }
+
+    @Nonnull
+    @Override
+    public InvocationConfiguration.Builder<? extends
+            LoaderRoutineBuilder<INPUT, OUTPUT>> invocations() {
+
+        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(
+                mRoutineConfigurable, getConfiguration());
+    }
+
+    @Nonnull
+    public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
+
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> loaders() {
+
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(this, config);
     }
 
     @Override
@@ -168,99 +192,10 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mLoaderConfiguration = configuration;
         return this;
-    }
-
-    @Nonnull
-    public LoaderRoutineBuilder<INPUT, OUTPUT> setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
-
-        super.setConfiguration(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfiguration.Builder<? extends
-            LoaderRoutineBuilder<INPUT, OUTPUT>> withRoutine() {
-
-        return new RoutineConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(
-                mRoutineConfigurable, getConfiguration());
-    }
-
-    @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> withLoader() {
-
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<INPUT, OUTPUT>>(this, config);
-    }
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the routine configuration.
-     */
-    private void warn(@Nonnull final RoutineConfiguration configuration) {
-
-        Logger logger = null;
-        final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
-
-        if (asyncRunner != null) {
-
-            logger = configuration.newLogger(this);
-            logger.wrn("the specified runner will be ignored: %s", asyncRunner);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (inputSize != RoutineConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (outputSize != RoutineConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
     }
 }

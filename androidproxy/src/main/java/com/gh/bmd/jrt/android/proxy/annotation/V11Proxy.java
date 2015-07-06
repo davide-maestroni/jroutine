@@ -21,15 +21,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate interfaces used as templates to generate proxy classes,
+ * This annotation is used to indicate interfaces used as templates to generate proxy classes
  * enabling asynchronous calls to the target instance methods, bound to a context lifecycle.<br/>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
- * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}, as
- * well as v11 builder annotations defined for each interface method.
+ * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+ * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+ * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
+ * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as
+ * well as {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
+ * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
+ * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution} and
+ * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations defined for each interface method.
  * <p/>
  * See {@link com.gh.bmd.jrt.android.proxy.annotation.V4Proxy} for support of API levels less
  * than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
@@ -81,28 +86,28 @@ public @interface V11Proxy {
      *
      * @return the class name.
      */
-    String generatedClassName() default Proxy.DEFAULT;
+    String className() default Proxy.DEFAULT;
 
     /**
      * The generated class package. By default it is the same as the interface.
      *
      * @return the package.
      */
-    String generatedClassPackage() default Proxy.DEFAULT;
+    String classPackage() default Proxy.DEFAULT;
 
     /**
      * The generated class name prefix.
      *
      * @return the name prefix.
      */
-    String generatedClassPrefix() default DEFAULT_CLASS_PREFIX;
+    String classPrefix() default DEFAULT_CLASS_PREFIX;
 
     /**
      * The generated class name suffix.
      *
      * @return the name suffix.
      */
-    String generatedClassSuffix() default DEFAULT_CLASS_SUFFIX;
+    String classSuffix() default DEFAULT_CLASS_SUFFIX;
 
     /**
      * The wrapped class.

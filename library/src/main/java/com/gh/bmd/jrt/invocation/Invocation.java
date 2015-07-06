@@ -19,41 +19,42 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining the behavior of a routine invocation.
+ * Interface defining a routine invocation.
  * <p/>
- * The typical lifecycle of an invocation object is the following:
+ * The typical lifecycle of an invocation object is the one depicted below:
  * <pre>
  *     <code>
  *
- *                  |
- *                  V
- *            --------------
- *        --->|  onInit()  |
- *       |    --------------
- *       |          |     ------
- *       |          |    |      |
- *       |          V    V      |
- *       |    --------------    |
- *       |    | onInput()  |----
- *       |    --------------
- *       |          |               --------------
- *       |          |        ...--->| onAbort()  |
- *       |          V               --------------
- *       |    --------------            |    |
- *       |    | onResult() |            |    |
- *       |    --------------            |    |
- *       |          |     --------------     |
- *       |          |    |                   | (if exception is thrown)
- *       |          V    V                   |
- *       |    --------------                 |
- *        ----| onReturn() |                 |
- *            --------------                 |
- *                  |     -------------------
- *                  |    |
- *                  V    V
- *            --------------
- *            |onDestroy() |
- *            --------------
+ *                   |     |
+ *                   |     |-------------------------------
+ *                   V     |                               |
+ *            ----------------                             |
+ *        --->|onInitialize()|-----------                  |
+ *       |    ----------------           |                 |
+ *       |           |      ------       |                 |
+ *       |           |     |      |      |                 |
+ *       |           V     V      |      |                 |
+ *       |    ----------------    |      |                 |
+ *       |    |  onInput()   |----       |                 |
+ *       |    ----------------           V                 |
+ *       |           |     |         ----------------      |
+ *       |           |     |-------->|  onAbort()   |      |
+ *       |           V     |         ----------------      |
+ *       |    ----------------           |     |           |
+ *       |    |  onResult()  |           |     |           |
+ *       |    ----------------           |     |           |
+ *       |           |      -------------      |           |
+ *       |           |     |              (if exception is thrown)
+ *       |           V     V                   |           |
+ *       |    -----------------                |           |
+ *        ----| onTerminate() |                |           |
+ *            -----------------                |           |
+ *                   |      -------------------------------
+ *                   |     |
+ *                   V     V
+ *            -----------------
+ *            |  onDestroy()  |
+ *            -----------------
  *     </code>
  * </pre>
  * Note that the <b><code>onInput()</code></b> method will be called for each input passed to the
@@ -61,16 +62,21 @@ import javax.annotation.Nullable;
  * called soon after the initialization.
  * <p/>
  * Note also that <b><code>onAbort()</code></b> might be called at any time between
- * <b><code>onInit()</code></b> and <b><code>onReturn()</code></b> in case the execution is
+ * <b><code>onInitialize()</code></b> and <b><code>onTerminate()</code></b> in case the execution is
  * aborted.<br/>
- * The only case in which the <b><code>onReturn()</code></b> method does not get call at all, is
+ * The only case in which the <b><code>onTerminate()</code></b> method does not get call at all, is
  * when an exception escapes the <b><code>onAbort()</code></b> method invocation.
  * <p/>
- * The <b><code>onReturn()</code></b> method is meant to allow the clean up and reset operations
+ * The <b><code>onTerminate()</code></b> method is meant to allow the clean up and reset operations
  * needed to prepare the invocation object to be reused. When the method is not called or does not
  * complete successfully, the invocation object is discarded.<br/>
  * The <b><code>onDestroy()</code></b> method is meant to indicate that the invocation object is no
- * longer needed, so any associated resource can be safely released.
+ * longer needed, so any associated resource can be safely released. Note that this method may never
+ * get called if the routine is automatically garbage collected.
+ * <p/>
+ * Any exception escaping the invocation methods, unless it extends the base
+ * {@link com.gh.bmd.jrt.channel.RoutineException}, will be wrapped as the cause of an
+ * {@link com.gh.bmd.jrt.invocation.InvocationException} instance.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *
@@ -96,7 +102,7 @@ public interface Invocation<INPUT, OUTPUT> {
      * Called when the routine invocation is initialized.<br/>
      * This is always the first method in the invocation lifecycle.
      */
-    void onInit();
+    void onInitialize();
 
     /**
      * Called when an input is passed to the routine.<br/>
@@ -117,7 +123,7 @@ public interface Invocation<INPUT, OUTPUT> {
     void onResult(@Nonnull ResultChannel<OUTPUT> result);
 
     /**
-     * Called when the routine execution has completed.
+     * Called when the invocation execution has completed.
      */
-    void onReturn();
+    void onTerminate();
 }

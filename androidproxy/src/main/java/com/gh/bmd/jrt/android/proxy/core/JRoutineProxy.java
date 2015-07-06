@@ -18,6 +18,7 @@ import android.content.Context;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -34,13 +35,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @see com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy
  * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Param
+ * @see com.gh.bmd.jrt.annotation.Input
+ * @see com.gh.bmd.jrt.annotation.Inputs
+ * @see com.gh.bmd.jrt.annotation.Output
+ * @see com.gh.bmd.jrt.annotation.Priority
  * @see com.gh.bmd.jrt.annotation.ShareGroup
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility class")
+        justification = "utility class extending the functions of another utility class")
 public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
 
     /**
@@ -51,24 +55,25 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
     }
 
     /**
-     * Returns a builder of routines running in a service based on the specified context, wrapping
-     * the specified object instances.<br/>
+     * Returns a builder of routines, wrapping the specified object instance, running in a service
+     * based on the specified context.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
      * <p/>
-     * Note that the built routine results will be dispatched in the looper specified through the
-     * builder, thus, waiting for the outputs on the very same looper thread, immediately after its
-     * invocation, will result in a deadlock.<br/>
-     * By default output results are dispatched in the main looper.
+     * Note that the built routine results will be dispatched in the configured looper, thus,
+     * waiting for the outputs on the very same looper thread, immediately after its invocation,
+     * will result in a deadlock.<br/>
+     * By default, output results are dispatched in the main looper.
      *
-     * @param context the invocation context.
-     * @param target  the wrapped object class.
+     * @param context     the invocation context.
+     * @param target      the wrapped object class.
+     * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
     public static ServiceProxyRoutineBuilder onService(@Nonnull final Context context,
-            @Nonnull final Class<?> target) {
+            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
-        return new DefaultServiceProxyRoutineBuilder(context, target);
+        return new DefaultServiceProxyRoutineBuilder(context, target, factoryArgs);
     }
 }

@@ -14,14 +14,11 @@
 package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
-import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -36,18 +33,19 @@ import javax.annotation.Nonnull;
  * @param <TYPE> the interface type.
  */
 public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBuilder<TYPE>,
-        RoutineConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
+        InvocationConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
         ProxyConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
         LoaderConfiguration.Configurable<LoaderProxyBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
+
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
-
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
     public TYPE buildProxy() {
@@ -64,12 +62,12 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
                 classMap.put(target, classes);
             }
 
-            final RoutineConfiguration routineConfiguration = mRoutineConfiguration;
+            final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo =
-                    new ClassInfo(token, routineConfiguration, proxyConfiguration,
+                    new ClassInfo(token, invocationConfiguration, proxyConfiguration,
                                   loaderConfiguration);
             final Object instance = classes.get(classInfo);
 
@@ -78,12 +76,12 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
                 return token.cast(instance);
             }
 
-            warn(routineConfiguration);
+            warn(invocationConfiguration);
 
             try {
 
                 final TYPE newInstance =
-                        newProxy(routineConfiguration, proxyConfiguration, loaderConfiguration);
+                        newProxy(invocationConfiguration, proxyConfiguration, loaderConfiguration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -95,21 +93,21 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withRoutine() {
+    public InvocationConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> invocations() {
 
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withLoader() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
@@ -122,7 +120,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mLoaderConfiguration = configuration;
@@ -132,14 +130,14 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyBuilder<TYPE> setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 
@@ -176,102 +174,29 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     /**
      * Creates and return a new proxy instance.
      *
-     * @param routineConfiguration the routine configuration.
-     * @param proxyConfiguration   the proxy configuration.
-     * @param loaderConfiguration  the loader configuration.
+     * @param invocationConfiguration the invocation configuration.
+     * @param proxyConfiguration      the proxy configuration.
+     * @param loaderConfiguration     the loader configuration.
      * @return the proxy instance.
      */
     @Nonnull
-    protected abstract TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
-            @Nonnull final ProxyConfiguration proxyConfiguration,
-            @Nonnull final LoaderConfiguration loaderConfiguration);
+    protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
+            @Nonnull ProxyConfiguration proxyConfiguration,
+            @Nonnull LoaderConfiguration loaderConfiguration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
-    private void warn(@Nonnull final RoutineConfiguration configuration) {
+    private void warn(@Nonnull final InvocationConfiguration configuration) {
 
-        Logger logger = null;
         final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
 
         if (asyncRunner != null) {
 
-            logger = configuration.newLogger(this);
-            logger.wrn("the specified runner will be ignored: %s", asyncRunner);
-        }
-
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
-        }
-
-        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (inputSize != RoutineConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (outputSize != RoutineConfiguration.DEFAULT) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
+            configuration.newLogger(this)
+                         .wrn("the specified runner will be ignored: %s", asyncRunner);
         }
     }
 
@@ -280,29 +205,29 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
      */
     private static class ClassInfo {
 
+        private final InvocationConfiguration mInvocationConfiguration;
+
         private final LoaderConfiguration mLoaderConfiguration;
 
         private final ProxyConfiguration mProxyConfiguration;
-
-        private final RoutineConfiguration mRoutineConfiguration;
 
         private final Type mType;
 
         /**
          * Constructor.
          *
-         * @param token                the proxy interface token.
-         * @param routineConfiguration the routine configuration.
-         * @param proxyConfiguration   the proxy configuration.
-         * @param loaderConfiguration  the loader configuration.
+         * @param token                   the proxy interface token.
+         * @param invocationConfiguration the invocation configuration.
+         * @param proxyConfiguration      the proxy configuration.
+         * @param loaderConfiguration     the loader configuration.
          */
         private ClassInfo(@Nonnull final ClassToken<?> token,
-                @Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final LoaderConfiguration loaderConfiguration) {
 
             mType = token.getRawClass();
-            mRoutineConfiguration = routineConfiguration;
+            mInvocationConfiguration = invocationConfiguration;
             mProxyConfiguration = proxyConfiguration;
             mLoaderConfiguration = loaderConfiguration;
         }
@@ -324,7 +249,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
             final ClassInfo classInfo = (ClassInfo) o;
             return mLoaderConfiguration.equals(classInfo.mLoaderConfiguration)
                     && mProxyConfiguration.equals(classInfo.mProxyConfiguration)
-                    && mRoutineConfiguration.equals(classInfo.mRoutineConfiguration)
+                    && mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
                     && mType.equals(classInfo.mType);
         }
 
@@ -334,7 +259,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
             // auto-generated code
             int result = mLoaderConfiguration.hashCode();
             result = 31 * result + mProxyConfiguration.hashCode();
-            result = 31 * result + mRoutineConfiguration.hashCode();
+            result = 31 * result + mInvocationConfiguration.hashCode();
             result = 31 * result + mType.hashCode();
             return result;
         }

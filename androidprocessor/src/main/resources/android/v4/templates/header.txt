@@ -14,11 +14,13 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-package ${packageName};
+${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
     private final java.lang.ref.WeakReference<Object> mContext;
+
+    private final Object[] mFactoryArgs;
 
     private final String mShareGroup;
 
@@ -26,26 +28,29 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     public ${generatedClassName}(@javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity,
             @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nullable final Object[] factoryArgs,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        this((Object) activity, targetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
+        this((Object) activity, targetClass, factoryArgs, invocationConfiguration, proxyConfiguration, loaderConfiguration);
     }
 
     public ${generatedClassName}(@javax.annotation.Nonnull final android.support.v4.app.Fragment fragment,
             @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nullable final Object[] factoryArgs,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        this((Object) fragment, targetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
+        this((Object) fragment, targetClass, factoryArgs, invocationConfiguration, proxyConfiguration, loaderConfiguration);
     }
 
     @SuppressWarnings("ConstantConditions")
     private ${generatedClassName}(@javax.annotation.Nonnull final Object context,
             @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+            @javax.annotation.Nullable final Object[] factoryArgs,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
@@ -61,6 +66,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         mContext = new java.lang.ref.WeakReference<Object>(context);
         mTargetClass = targetClass;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : com.gh.bmd.jrt.util.Reflection.NO_ARGS;
         mShareGroup = proxyConfiguration.getShareGroupOr(com.gh.bmd.jrt.annotation.ShareGroup.ALL);
         ${routineFieldsInit}
     }
@@ -68,17 +74,19 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> onActivity(
             @javax.annotation.Nonnull final android.support.v4.app.FragmentActivity activity,
-            @javax.annotation.Nonnull final Class<?> targetClass) {
+            @javax.annotation.Nonnull final Class<?> targetClass,
+            @javax.annotation.Nullable final Object... factoryArgs) {
 
-        return new LoaderProxyBuilder${genericTypes}(activity, targetClass);
+        return new LoaderProxyBuilder${genericTypes}(activity, targetClass, factoryArgs);
     }
 
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> onFragment(
             @javax.annotation.Nonnull final android.support.v4.app.Fragment fragment,
-            @javax.annotation.Nonnull final Class<?> targetClass) {
+            @javax.annotation.Nonnull final Class<?> targetClass,
+            @javax.annotation.Nullable final Object... factoryArgs) {
 
-        return new LoaderProxyBuilder${genericTypes}(fragment, targetClass);
+        return new LoaderProxyBuilder${genericTypes}(fragment, targetClass, factoryArgs);
     }
 
     @javax.annotation.Nonnull
@@ -124,7 +132,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (target == null) {
 
-            target = com.gh.bmd.jrt.common.Reflection.findConstructor(targetClass, args).newInstance(args);
+            target = com.gh.bmd.jrt.util.Reflection.findConstructor(targetClass, args).newInstance(args);
 
         } else if (!targetClass.isInstance(target)) {
 
@@ -143,26 +151,30 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             return null;
         }
 
-        return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(target, shareGroup);
+        return com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
     }
 
     private static class LoaderProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {
 
         private final Object mContext;
 
+        private final Object[] mFactoryArgs;
+
         private final Class<?> mTargetClass;
 
-        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+        private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
-        private LoaderProxyBuilder(@javax.annotation.Nonnull final Object context, @javax.annotation.Nonnull final Class<?> targetClass) {
+        private LoaderProxyBuilder(@javax.annotation.Nonnull final Object context,
+                @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final Object... factoryArgs) {
 
             mContext = context;
             mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
         }
 
         @Override
         @javax.annotation.Nonnull
-        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
+        protected com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }
@@ -177,10 +189,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @Override
         @javax.annotation.Nonnull
         protected ${interfaceFullName} newProxy(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-            return new ${generatedClassName}${genericTypes}(mContext, mTargetClass, routineConfiguration, proxyConfiguration, loaderConfiguration);
+            return new ${generatedClassName}${genericTypes}(mContext, mTargetClass, mFactoryArgs, invocationConfiguration, proxyConfiguration, loaderConfiguration);
         }
     }

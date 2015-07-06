@@ -19,94 +19,88 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.annotation.CacheStrategy;
 import com.gh.bmd.jrt.android.annotation.ClashResolution;
+import com.gh.bmd.jrt.android.annotation.InputClashResolution;
 import com.gh.bmd.jrt.android.annotation.LoaderId;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
+import com.gh.bmd.jrt.android.invocation.AbstractContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
-import com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation;
-import com.gh.bmd.jrt.annotation.Alias;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.Reflection;
-import com.gh.bmd.jrt.common.RoutineException;
-import com.gh.bmd.jrt.log.Logger;
+import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
-import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
-import static com.gh.bmd.jrt.common.Reflection.boxingClass;
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.core.RoutineBuilders.callFromInvocation;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedMethod;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getTargetMethodInfo;
+import static com.gh.bmd.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
- * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * Class implementing a builder of routines wrapping an object instance.
  * <p/>
  * Created by davide-maestroni on 4/6/2015.
  */
 class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         LoaderConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
-        RoutineConfiguration.Configurable<LoaderObjectRoutineBuilder> {
-
-    private static final AliasMethodInvocationFactory<Object, Object> sAliasMethodFactory =
-            new AliasMethodInvocationFactory<Object, Object>();
-
-    private static final MethodInvocationFactory<Object, Object> sMethodFactory =
-            new MethodInvocationFactory<Object, Object>();
+        InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
-    private static final ProxyInvocationFactory sProxyFactory = new ProxyInvocationFactory();
-
     private final WeakReference<Object> mContext;
 
+    private final Object[] mFactoryArgs;
+
     private final Class<?> mTargetClass;
+
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
-
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
      *
      * @param activity    the context activity.
      * @param targetClass the invocation class token.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderObjectRoutineBuilder(@Nonnull final FragmentActivity activity,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
-        this((Object) activity, targetClass);
+        this((Object) activity, targetClass, factoryArgs);
     }
 
     /**
@@ -114,11 +108,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      *
      * @param fragment    the context fragment.
      * @param targetClass the invocation class token.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderObjectRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
-        this((Object) fragment, targetClass);
+        this((Object) fragment, targetClass, factoryArgs);
     }
 
     /**
@@ -126,38 +121,55 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      *
      * @param context     the routine context.
      * @param targetClass the target object class.
+     * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultLoaderObjectRoutineBuilder(@Nonnull final Object context,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
 
             throw new NullPointerException("the routine context must not be null");
         }
 
+        if (targetClass == null) {
+
+            throw new NullPointerException("the target class must not be null");
+        }
+
         mContext = new WeakReference<Object>(context);
         mTargetClass = targetClass;
-        final HashSet<String> bindingSet = new HashSet<String>();
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
+    }
 
-        for (final Method method : targetClass.getMethods()) {
+    @Nonnull
+    private static InvocationConfiguration configurationWithAnnotations(
+            @Nonnull final InvocationConfiguration configuration, @Nonnull final Method method) {
 
-            final Alias annotation = method.getAnnotation(Alias.class);
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                configuration.builderFrom();
+        final Priority priorityAnnotation = method.getAnnotation(Priority.class);
 
-            if (annotation != null) {
+        if (priorityAnnotation != null) {
 
-                final String name = annotation.value();
-
-                if (bindingSet.contains(name)) {
-
-                    throw new IllegalArgumentException(
-                            "the name '" + name + "' has already been used to identify a different"
-                                    + " method");
-                }
-
-                bindingSet.add(name);
-            }
+            builder.withPriority(priorityAnnotation.value());
         }
+
+        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+        }
+
+        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.withReadTimeoutAction(actionAnnotation.value());
+        }
+
+        return builder.set();
     }
 
     @Nonnull
@@ -181,6 +193,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             builder.withClashResolution(clashAnnotation.value());
         }
 
+        final InputClashResolution inputClashAnnotation =
+                method.getAnnotation(InputClashResolution.class);
+
+        if (inputClashAnnotation != null) {
+
+            builder.withInputClashResolution(inputClashAnnotation.value());
+        }
+
         final CacheStrategy cacheAnnotation = method.getAnnotation(CacheStrategy.class);
 
         if (cacheAnnotation != null) {
@@ -189,63 +209,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         return builder.set();
-    }
-
-    @Nonnull
-    private static RoutineConfiguration configurationWithTimeout(
-            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
-
-        final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                configuration.builderFrom();
-        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
-
-        if (timeoutAnnotation != null) {
-
-            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
-        }
-
-        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
-
-        if (actionAnnotation != null) {
-
-            builder.withReadTimeoutAction(actionAnnotation.value());
-        }
-
-        return builder.set();
-    }
-
-    @Nullable
-    private static Method getAnnotatedMethod(@Nonnull final Class<?> targetClass,
-            @Nonnull final String name) {
-
-        Method targetMethod = null;
-
-        for (final Method method : targetClass.getMethods()) {
-
-            final Alias annotation = method.getAnnotation(Alias.class);
-
-            if ((annotation != null) && name.equals(annotation.value())) {
-
-                targetMethod = method;
-                break;
-            }
-        }
-
-        if (targetMethod == null) {
-
-            for (final Method method : targetClass.getDeclaredMethods()) {
-
-                final Alias annotation = method.getAnnotation(Alias.class);
-
-                if ((annotation != null) && name.equals(annotation.value())) {
-
-                    targetMethod = method;
-                    break;
-                }
-            }
-        }
-
-        return targetMethod;
     }
 
     @Nonnull
@@ -325,52 +288,22 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         if (targetMethod == null) {
 
             throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
+                    "no annotated method with alias '" + name + "' has been found");
         }
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
-        warn(configuration);
-        final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] invocationArgs = new Object[]{targetClass, args, shareGroup, name};
         final AliasMethodInvocationFactory<INPUT, OUTPUT> factory =
-                (AliasMethodInvocationFactory<INPUT, OUTPUT>) sAliasMethodFactory;
-        final RoutineConfiguration routineConfiguration =
-                configurationWithTimeout(configuration, targetMethod);
+                new AliasMethodInvocationFactory<INPUT, OUTPUT>(targetMethod, targetClass,
+                                                                mFactoryArgs, shareGroup, name);
+        final InvocationConfiguration invocationConfiguration =
+                configurationWithAnnotations(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
-        return getBuilder(mContext, factory).withRoutine()
-                                            .with(routineConfiguration)
-                                            .withFactoryArgs(invocationArgs)
-                                            .withInputOrder(OrderType.PASS_ORDER)
+        return getBuilder(mContext, factory).invocations()
+                                            .with(invocationConfiguration)
                                             .set()
-                                            .withLoader()
-                                            .with(loaderConfiguration)
-                                            .set()
-                                            .buildRoutine();
-    }
-
-    @Nonnull
-    @SuppressWarnings("unchecked")
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
-
-        final RoutineConfiguration configuration = mRoutineConfiguration;
-        warn(configuration);
-        final Object[] args = configuration.getFactoryArgsOr(Reflection.NO_ARGS);
-        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
-        final Object[] invocationArgs = new Object[]{mTargetClass, args, shareGroup, method};
-        final MethodInvocationFactory<INPUT, OUTPUT> factory =
-                (MethodInvocationFactory<INPUT, OUTPUT>) sMethodFactory;
-        final RoutineConfiguration routineConfiguration =
-                configurationWithTimeout(configuration, method);
-        final LoaderConfiguration loaderConfiguration =
-                configurationWithAnnotations(mLoaderConfiguration, method);
-        return getBuilder(mContext, factory).withRoutine()
-                                            .with(routineConfiguration)
-                                            .withFactoryArgs(invocationArgs)
-                                            .withInputOrder(OrderType.PASS_ORDER)
-                                            .set()
-                                            .withLoader()
+                                            .loaders()
                                             .with(loaderConfiguration)
                                             .set()
                                             .buildRoutine();
@@ -380,26 +313,29 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
-        Method targetMethod;
-        final Class<?> targetClass = mTargetClass;
+        return method(findMethod(mTargetClass, name, parameterTypes));
+    }
 
-        try {
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-            targetMethod = targetClass.getMethod(name, parameterTypes);
-
-        } catch (final NoSuchMethodException ignored) {
-
-            try {
-
-                targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
-
-            } catch (final NoSuchMethodException e) {
-
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        return method(targetMethod);
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
+        final MethodInvocationFactory<INPUT, OUTPUT> factory =
+                new MethodInvocationFactory<INPUT, OUTPUT>(method, mTargetClass, mFactoryArgs,
+                                                           shareGroup, method);
+        final InvocationConfiguration invocationConfiguration =
+                configurationWithAnnotations(configuration, method);
+        final LoaderConfiguration loaderConfiguration =
+                configurationWithAnnotations(mLoaderConfiguration, method);
+        return getBuilder(mContext, factory).invocations()
+                                            .with(invocationConfiguration)
+                                            .set()
+                                            .loaders()
+                                            .with(loaderConfiguration)
+                                            .set()
+                                            .buildRoutine();
     }
 
     @Nonnull
@@ -411,8 +347,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     "the specified class is not an interface: " + itf.getName());
         }
 
-        final RoutineConfiguration configuration = mRoutineConfiguration;
-        warn(configuration);
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this));
         return itf.cast(proxy);
@@ -425,31 +359,24 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxy() {
+    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocations() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
+    }
+
+    @Nonnull
+    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withRoutine() {
+    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> loaders() {
 
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
-    }
-
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public LoaderObjectRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
-
-        if (configuration == null) {
-
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        mRoutineConfiguration = configuration;
-        return this;
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @Nonnull
@@ -459,7 +386,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mLoaderConfiguration = configuration;
@@ -473,7 +400,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the proxy configuration must not be null");
         }
 
         mProxyConfiguration = configuration;
@@ -481,39 +408,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withLoader() {
+    @SuppressWarnings("ConstantConditions")
+    public LoaderObjectRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
-    }
+        if (configuration == null) {
 
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the routine configuration.
-     */
-    private void warn(@Nonnull final RoutineConfiguration configuration) {
-
-        Logger logger = null;
-        final OrderType inputOrderType = configuration.getInputOrderTypeOr(null);
-
-        if (inputOrderType != null) {
-
-            logger = configuration.newLogger(this);
-            logger.wrn("the specified input order type will be ignored: %s", inputOrderType);
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
-        final OrderType outputOrderType = configuration.getOutputOrderTypeOr(null);
-
-        if (outputOrderType != null) {
-
-            if (logger == null) {
-
-                logger = configuration.newLogger(this);
-            }
-
-            logger.wrn("the specified output order type will be ignored: %s", outputOrderType);
-        }
+        mInvocationConfiguration = configuration;
+        return this;
     }
 
     /**
@@ -523,17 +428,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class AliasMethodInvocation<INPUT, OUTPUT>
-            extends ProcedureContextInvocation<INPUT, OUTPUT> {
+            extends FunctionContextInvocation<INPUT, OUTPUT> {
 
-        private final Object[] mArgs;
+        private final String mAliasName;
 
-        private final String mBindingName;
+        private final Object[] mFactoryArgs;
 
         private final String mShareGroup;
 
         private final Class<?> mTargetClass;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private Routine<INPUT, OUTPUT> mRoutine = null;
 
         private Object mTarget;
 
@@ -541,19 +446,19 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * Constructor.
          *
          * @param targetClass the target object class.
-         * @param args        the factory constructor arguments.
+         * @param factoryArgs the object factor arguments.
          * @param shareGroup  the share group name.
-         * @param name        the binding name.
+         * @param name        the alias name.
          */
         @SuppressWarnings("unchecked")
         public AliasMethodInvocation(@Nonnull final Class<?> targetClass,
-                @Nonnull final Object[] args, @Nullable final String shareGroup,
+                @Nonnull final Object[] factoryArgs, @Nullable final String shareGroup,
                 @Nonnull final String name) {
 
             mTargetClass = targetClass;
-            mArgs = args;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
-            mBindingName = name;
+            mAliasName = name;
         }
 
         @Override
@@ -575,12 +480,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final Object target = getInstance(context, mTargetClass, mArgs);
+                final Object target = getInstance(context, mTargetClass, mFactoryArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxy()
+                                   .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
-                                   .aliasMethod(mBindingName);
+                                   .aliasMethod(mAliasName);
                 mTarget = target;
 
             } catch (final RoutineException e) {
@@ -601,19 +506,41 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class AliasMethodInvocationFactory<INPUT, OUTPUT>
-            implements ContextInvocationFactory<INPUT, OUTPUT> {
+            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
 
-        @Nonnull
-        public String getInvocationType() {
+        private final Object[] mFactoryArgs;
 
-            return AliasMethodInvocation.class.getName();
+        private final String mName;
+
+        private final String mShareGroup;
+
+        private final Class<?> mTargetClass;
+
+        /**
+         * Constructor.
+         *
+         * @param targetMethod the target method.
+         * @param targetClass  the target object class.
+         * @param factoryArgs  the object factor arguments.
+         * @param shareGroup   the share group name.
+         * @param name         the alias name.
+         */
+        private AliasMethodInvocationFactory(@Nonnull final Method targetMethod,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
+                @Nullable final String shareGroup, @Nonnull final String name) {
+
+            super(targetMethod, targetMethod, factoryArgs, shareGroup, name);
+            mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
+            mShareGroup = shareGroup;
+            mName = name;
         }
 
         @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
-            return new AliasMethodInvocation<INPUT, OUTPUT>((Class<?>) args[0], (Object[]) args[1],
-                                                            (String) args[2], (String) args[3]);
+            return new AliasMethodInvocation<INPUT, OUTPUT>(mTargetClass, mFactoryArgs, mShareGroup,
+                                                            mName);
         }
     }
 
@@ -624,9 +551,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class MethodInvocation<INPUT, OUTPUT>
-            extends ProcedureContextInvocation<INPUT, OUTPUT> {
+            extends FunctionContextInvocation<INPUT, OUTPUT> {
 
-        private final Object[] mArgs;
+        private final Object[] mFactoryArgs;
 
         private final Method mMethod;
 
@@ -634,7 +561,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final Class<?> mTargetClass;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private Routine<INPUT, OUTPUT> mRoutine = null;
 
         private Object mTarget;
 
@@ -642,16 +569,17 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * Constructor.
          *
          * @param targetClass the target object class.
-         * @param args        the factory constructor arguments.
+         * @param factoryArgs the object factor arguments.
          * @param shareGroup  the share group name.
          * @param method      the method.
          */
         @SuppressWarnings("unchecked")
-        public MethodInvocation(@Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
-                @Nullable final String shareGroup, @Nonnull final Method method) {
+        public MethodInvocation(@Nonnull final Class<?> targetClass,
+                @Nonnull final Object[] factoryArgs, @Nullable final String shareGroup,
+                @Nonnull final Method method) {
 
             mTargetClass = targetClass;
-            mArgs = args;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
             mMethod = method;
         }
@@ -675,9 +603,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final Object target = getInstance(context, mTargetClass, mArgs);
+                final Object target = getInstance(context, mTargetClass, mFactoryArgs);
                 mRoutine = JRoutine.on(target)
-                                   .withProxy()
+                                   .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .method(mMethod);
@@ -701,32 +629,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUTPUT> the output data type.
      */
     private static class MethodInvocationFactory<INPUT, OUTPUT>
-            implements ContextInvocationFactory<INPUT, OUTPUT> {
+            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
 
-        @Nonnull
-        public String getInvocationType() {
-
-            return MethodInvocation.class.getName();
-        }
-
-        @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-            return new MethodInvocation<INPUT, OUTPUT>((Class<?>) args[0], (Object[]) args[1],
-                                                       (String) args[2], (Method) args[3]);
-        }
-    }
-
-    /**
-     * Proxy method invocation.
-     */
-    private static class ProxyInvocation extends ProcedureContextInvocation<Object, Object> {
-
-        private final Object[] mArgs;
-
-        private final boolean mIsInputCollection;
-
-        private final boolean mIsOutputCollection;
+        private final Object[] mFactoryArgs;
 
         private final Method mMethod;
 
@@ -734,7 +639,50 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final Class<?> mTargetClass;
 
-        private final Class<?>[] mTargetParameterTypes;
+        /**
+         * Constructor.
+         *
+         * @param targetMethod the target method.
+         * @param targetClass  the target object class.
+         * @param factoryArgs  the object factor arguments.
+         * @param shareGroup   the share group name.
+         * @param method       the method.
+         */
+        private MethodInvocationFactory(@Nonnull final Method targetMethod,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
+                @Nullable final String shareGroup, @Nonnull final Method method) {
+
+            super(targetMethod, targetClass, factoryArgs, shareGroup, method);
+            mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
+            mShareGroup = shareGroup;
+            mMethod = method;
+        }
+
+        @Nonnull
+        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+
+            return new MethodInvocation<INPUT, OUTPUT>(mTargetClass, mFactoryArgs, mShareGroup,
+                                                       mMethod);
+        }
+    }
+
+    /**
+     * Proxy method invocation.
+     */
+    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
+
+        private final Object[] mArgs;
+
+        private final InputMode mInputMode;
+
+        private final OutputMode mOutputMode;
+
+        private final String mShareGroup;
+
+        private final Class<?> mTargetClass;
+
+        private final Method mTargetMethod;
 
         private Object mMutex;
 
@@ -743,66 +691,24 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetClass          the target object class.
-         * @param args                 the factory constructor arguments.
-         * @param shareGroup           the share group name.
-         * @param method               the method.
-         * @param targetParameterTypes the target method parameter types.
-         * @param isInputCollection    whether the input is a collection.
-         * @param isOutputCollection   whether the output is a collection.
+         * @param args         the factory constructor arguments.
+         * @param shareGroup   the share group name.
+         * @param targetClass  the target object class.
+         * @param targetMethod the target method.
+         * @param inputMode    the input transfer mode.
+         * @param outputMode   the output transfer mode.
          */
-        public ProxyInvocation(@Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
-                @Nullable final String shareGroup, @Nonnull final Method method,
-                @Nonnull final Class<?>[] targetParameterTypes, final boolean isInputCollection,
-                final boolean isOutputCollection) {
+        public ProxyInvocation(@Nonnull final Object[] args, @Nullable final String shareGroup,
+                @Nonnull final Class<?> targetClass, @Nonnull final Method targetMethod,
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-            mTargetClass = targetClass;
             mArgs = args;
             mShareGroup = shareGroup;
-            mMethod = method;
-            mTargetParameterTypes = targetParameterTypes;
-            mIsInputCollection = isInputCollection;
-            mIsOutputCollection = isOutputCollection;
+            mTargetClass = targetClass;
+            mTargetMethod = targetMethod;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
             mMutex = this;
-        }
-
-        @Nonnull
-        private Method getTargetMethod(@Nonnull final Method method,
-                @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
-
-            String name = null;
-            Method targetMethod = null;
-            final Class<?> targetClass = mTarget.getClass();
-            final Alias annotation = method.getAnnotation(Alias.class);
-
-            if (annotation != null) {
-
-                name = annotation.value();
-                targetMethod = getAnnotatedMethod(targetClass, name);
-            }
-
-            if (targetMethod == null) {
-
-                if (name == null) {
-
-                    name = method.getName();
-                }
-
-                try {
-
-                    targetMethod = targetClass.getMethod(name, targetParameterTypes);
-
-                } catch (final NoSuchMethodException ignored) {
-
-                }
-
-                if (targetMethod == null) {
-
-                    targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
-                }
-            }
-
-            return targetMethod;
         }
 
         @Override
@@ -810,101 +716,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            try {
-
-                final Method method = mMethod;
-                final Class<?>[] targetParameterTypes = mTargetParameterTypes;
-                final Method targetMethod = getTargetMethod(method, targetParameterTypes);
-                final Class<?> returnType = targetMethod.getReturnType();
-                final Param annotation = method.getAnnotation(Param.class);
-                final Class<?> expectedType;
-
-                if (annotation != null) {
-
-                    expectedType = annotation.value();
-
-                } else {
-
-                    expectedType = method.getReturnType();
-                }
-
-                if (!returnType.isAssignableFrom(expectedType)) {
-
-                    throw new IllegalArgumentException(
-                            "the proxy method has incompatible return type: " + method);
-                }
-
-                final Object methodResult;
-
-                synchronized (mMutex) {
-
-                    if (mIsInputCollection) {
-
-                        final Class<?> paramType = targetParameterTypes[0];
-
-                        if (paramType.isArray()) {
-
-                            final int size = objects.size();
-                            final Object array =
-                                    Array.newInstance(paramType.getComponentType(), size);
-
-                            for (int i = 0; i < size; i++) {
-
-                                Array.set(array, i, objects.get(i));
-                            }
-
-                            methodResult = targetMethod.invoke(mTarget, array);
-
-                        } else {
-
-                            methodResult = targetMethod.invoke(mTarget, objects);
-                        }
-
-                    } else {
-
-                        methodResult = targetMethod.invoke(mTarget, objects.toArray());
-                    }
-                }
-
-                if (!Void.class.equals(boxingClass(returnType))) {
-
-                    if (mIsOutputCollection) {
-
-                        if (returnType.isArray()) {
-
-                            if (methodResult != null) {
-
-                                final int l = Array.getLength(methodResult);
-
-                                for (int i = 0; i < l; ++i) {
-
-                                    result.pass(Array.get(methodResult, i));
-                                }
-                            }
-
-                        } else {
-
-                            result.pass((Iterable<?>) methodResult);
-                        }
-
-                    } else {
-
-                        result.pass(methodResult);
-                    }
-                }
-
-            } catch (final RoutineException e) {
-
-                throw e;
-
-            } catch (final InvocationTargetException e) {
-
-                throw new InvocationException(e.getCause());
-
-            } catch (final Throwable t) {
-
-                throw new InvocationException(t);
-            }
+            callFromInvocation(mTarget, mMutex, objects, result, mTargetMethod, mInputMode,
+                               mOutputMode);
         }
 
         @Override
@@ -939,20 +752,49 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * Factory of {@link ProxyInvocation}s.
      */
     private static class ProxyInvocationFactory
-            implements ContextInvocationFactory<Object, Object> {
+            extends AbstractContextInvocationFactory<Object, Object> {
 
-        @Nonnull
-        public String getInvocationType() {
+        private final Object[] mFactoryArgs;
 
-            return ProxyInvocation.class.getName();
+        private final InputMode mInputMode;
+
+        private final OutputMode mOutputMode;
+
+        private final String mShareGroup;
+
+        private final Class<?> mTargetClass;
+
+        private final Method mTargetMethod;
+
+        /**
+         * Constructor.
+         *
+         * @param targetMethod the target method.
+         * @param targetClass  the target object class.
+         * @param factoryArgs  the object factor arguments.
+         * @param shareGroup   the share group name.
+         * @param inputMode    the input transfer mode.
+         * @param outputMode   the output transfer mode.
+         */
+        private ProxyInvocationFactory(@Nonnull final Method targetMethod,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
+                @Nullable final String shareGroup, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) {
+
+            super(targetMethod, targetClass, factoryArgs, shareGroup, inputMode, outputMode);
+            mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
+            mShareGroup = shareGroup;
+            mTargetMethod = targetMethod;
+            mInputMode = inputMode;
+            mOutputMode = outputMode;
         }
 
         @Nonnull
-        public ContextInvocation<Object, Object> newInvocation(@Nonnull final Object... args) {
+        public ContextInvocation<Object, Object> newInvocation() {
 
-            return new ProxyInvocation((Class<?>) args[0], (Object[]) args[1], (String) args[2],
-                                       (Method) args[3], (Class<?>[]) args[4], (Boolean) args[5],
-                                       (Boolean) args[6]);
+            return new ProxyInvocation(mFactoryArgs, mShareGroup, mTargetClass, mTargetMethod,
+                                       mInputMode, mOutputMode);
         }
     }
 
@@ -961,15 +803,15 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocationHandler implements InvocationHandler {
 
-        private final Object[] mArgs;
-
         private final WeakReference<Object> mContext;
+
+        private final Object[] mFactoryArgs;
+
+        private final InvocationConfiguration mInvocationConfiguration;
 
         private final LoaderConfiguration mLoaderConfiguration;
 
         private final ProxyConfiguration mProxyConfiguration;
-
-        private final RoutineConfiguration mRoutineConfiguration;
 
         private final Class<?> mTargetClass;
 
@@ -982,157 +824,38 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             mContext = builder.mContext;
             mTargetClass = builder.mTargetClass;
-            mRoutineConfiguration = builder.mRoutineConfiguration;
+            mInvocationConfiguration = builder.mInvocationConfiguration;
             mProxyConfiguration = builder.mProxyConfiguration;
             mLoaderConfiguration = builder.mLoaderConfiguration;
-            mArgs = mRoutineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
+            mFactoryArgs = builder.mFactoryArgs;
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            boolean isParallel = false;
-            final Class<?>[] parameterTypes = method.getParameterTypes();
-            final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-            final int length = (args != null) ? args.length : 0;
-            final boolean[] isAsync = new boolean[length];
-            final Class<?>[] targetParameterTypes = new Class<?>[length];
-            boolean isInputCollection = false;
-
-            for (int i = 0; i < length; i++) {
-
-                final PassMode paramMode = getParamMode(method, i);
-
-                if (paramMode != null) {
-
-                    isAsync[i] = true;
-                    isParallel = (paramMode == PassMode.PARALLEL);
-                    isInputCollection = (paramMode == PassMode.COLLECTION);
-
-                    for (final Annotation annotation : parameterAnnotations[i]) {
-
-                        if (annotation.annotationType() == Param.class) {
-
-                            targetParameterTypes[i] = ((Param) annotation).value();
-                            break;
-                        }
-                    }
-
-                } else {
-
-                    targetParameterTypes[i] = parameterTypes[i];
-                }
-            }
-
-            PassMode returnMode = null;
-            final Class<?> returnType = method.getReturnType();
-            final Param methodAnnotation = method.getAnnotation(Param.class);
-
-            if (methodAnnotation != null) {
-
-                returnMode = getReturnMode(method);
-            }
-
+            final MethodInfo methodInfo = getTargetMethodInfo(mTargetClass, method);
+            final Method targetMethod = methodInfo.method;
+            final InputMode inputMode = methodInfo.inputMode;
+            final OutputMode outputMode = methodInfo.outputMode;
             final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
-            final boolean isOutputCollection = (returnMode == PassMode.COLLECTION);
-            final Object[] invocationArgs =
-                    new Object[]{mTargetClass, mArgs, shareGroup, method, targetParameterTypes,
-                                 isInputCollection, isOutputCollection};
-            final OrderType inputOrderType = (isParallel) ? OrderType.NONE : OrderType.PASS_ORDER;
-            final OrderType outputOrderType =
-                    (returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER : OrderType.NONE;
+            final ProxyInvocationFactory factory =
+                    new ProxyInvocationFactory(targetMethod, mTargetClass, mFactoryArgs, shareGroup,
+                                               inputMode, outputMode);
             final LoaderRoutineBuilder<Object, Object> routineBuilder =
-                    getBuilder(mContext, sProxyFactory);
-            final RoutineConfiguration routineConfiguration =
-                    configurationWithTimeout(mRoutineConfiguration, method);
+                    getBuilder(mContext, factory);
+            final InvocationConfiguration invocationConfiguration =
+                    configurationWithAnnotations(mInvocationConfiguration, method);
             final LoaderConfiguration loaderConfiguration =
                     configurationWithAnnotations(mLoaderConfiguration, method);
-            final Routine<Object, Object> routine = routineBuilder.withRoutine()
-                                                                  .with(routineConfiguration)
-                                                                  .withFactoryArgs(invocationArgs)
-                                                                  .withInputOrder(inputOrderType)
-                                                                  .withOutputOrder(outputOrderType)
+            final Routine<Object, Object> routine = routineBuilder.invocations()
+                                                                  .with(invocationConfiguration)
                                                                   .set()
-                                                                  .withLoader()
+                                                                  .loaders()
                                                                   .with(loaderConfiguration)
                                                                   .set()
                                                                   .buildRoutine();
-            final ParameterChannel<Object, Object> parameterChannel =
-                    (isParallel) ? routine.invokeParallel() : routine.invokeAsync();
-
-            for (int i = 0; i < length; i++) {
-
-                if (isAsync[i]) {
-
-                    final Class<?> parameterType = parameterTypes[i];
-
-                    if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                        parameterChannel.pass((OutputChannel<?>) args[i]);
-
-                    } else if (args[i] == null) {
-
-                        parameterChannel.pass((Object[]) null);
-
-                    } else if (parameterType.isArray()) {
-
-                        final Object array = args[i];
-                        final int size = Array.getLength(array);
-
-                        for (int j = 0; j < size; j++) {
-
-                            parameterChannel.pass(Array.get(array, j));
-                        }
-
-                    } else if (Iterable.class.isAssignableFrom(parameterType)) {
-
-                        for (final Object object : ((Iterable<?>) args[i])) {
-
-                            parameterChannel.pass(object);
-                        }
-                    }
-
-                } else {
-
-                    parameterChannel.pass(args[i]);
-                }
-            }
-
-            final OutputChannel<Object> outputChannel = parameterChannel.result();
-
-            if (!Void.class.equals(boxingClass(returnType))) {
-
-                if (methodAnnotation != null) {
-
-                    if (OutputChannel.class.isAssignableFrom(returnType)) {
-
-                        return outputChannel;
-                    }
-
-                    if (returnType.isAssignableFrom(List.class)) {
-
-                        return outputChannel.readAll();
-                    }
-
-                    if (returnType.isArray()) {
-
-                        final List<Object> results = outputChannel.readAll();
-                        final int size = results.size();
-                        final Object array = Array.newInstance(returnType.getComponentType(), size);
-
-                        for (int i = 0; i < size; ++i) {
-
-                            Array.set(array, i, results.get(i));
-                        }
-
-                        return array;
-                    }
-                }
-
-                return outputChannel.readNext();
-            }
-
-            return null;
+            return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
+                                 inputMode, outputMode);
         }
     }
 

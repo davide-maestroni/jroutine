@@ -13,13 +13,9 @@
  */
 package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.core.JRoutine;
-import com.gh.bmd.jrt.invocation.Invocations.Function;
-import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import org.junit.Test;
 
@@ -36,42 +32,45 @@ import static org.junit.Assert.fail;
 public class InvocationsTest {
 
     @Test
-    public void testFunction() {
-
-        final Routine<Object, String> routine =
-                JRoutine.on(Invocations.factoryOn(new Function<String>() {
-
-                    public String call(@Nonnull final Object... params) {
-
-                        final StringBuilder builder = new StringBuilder(String.valueOf(params[0]));
-
-                        for (int i = 1; i < params.length; i++) {
-
-                            builder.append(", ").append(params[i]);
-                        }
-
-                        return builder.toString();
-                    }
-                }))
-                        .withRoutine()
-                        .withInputOrder(OrderType.PASS_ORDER)
-                        .withReadTimeout(TimeDuration.seconds(1))
-                        .set()
-                        .buildRoutine();
-        assertThat(routine.callAsync("test1", "test2", "test3", "test4").readNext()).isEqualTo(
-                "test1, test2, test3, test4");
-        assertThat(routine.callParallel("test1", "test2", "test3", "test4").readAll()).containsOnly(
-                "test1", "test2", "test3", "test4");
-    }
-
-    @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testInvocationFactory() {
 
-        final InvocationFactory<Object, Object> factory =
-                Invocations.factoryOf(TestInvocation.class);
+        assertThat(Invocations.factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
+                TestInvocation.class);
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .newInvocation()).isExactlyInstanceOf(TestInvocation.class);
+        assertThat(Invocations.factoryOf(new TestInvocation()).newInvocation()).isExactlyInstanceOf(
+                TestInvocation.class);
+    }
 
-        assertThat(factory.newInvocation()).isExactlyInstanceOf(TestInvocation.class);
+    @Test
+    public void testInvocationFactoryEquals() {
+
+        assertThat(Invocations.factoryOf(TestInvocation.class).hashCode()).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class).hashCode());
+        assertThat(Invocations.factoryOf(TestInvocation.class)).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class));
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .hashCode()).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class).hashCode());
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
+                Invocations.factoryOf(TestInvocation.class));
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .hashCode()).isEqualTo(
+                Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode());
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
+                Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class)));
+        assertThat(Invocations.factoryOf(TestInvocation.class).hashCode()).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this)
+                           .hashCode());
+        assertThat(Invocations.factoryOf(TestInvocation.class)).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this));
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                              .hashCode()).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this)
+                           .hashCode());
+        assertThat(Invocations.factoryOf(ClassToken.tokenOf(TestInvocation.class))).isNotEqualTo(
+                Invocations.factoryOf(new TemplateInvocation<Object, Object>() {}, this));
     }
 
     @Test
@@ -87,15 +86,50 @@ public class InvocationsTest {
         } catch (final NullPointerException ignored) {
 
         }
+
+        try {
+
+            Invocations.factoryOf((Class<TestInvocation>) null, Reflection.NO_ARGS);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testNullFunctionError() {
+    public void testNullDelegatedRoutine() {
 
         try {
 
-            Invocations.factoryOn(null);
+            new DelegatingInvocation<Object, Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullInvocationError() {
+
+        try {
+
+            Invocations.factoryOf((TestInvocation) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Invocations.factoryOf((TestInvocation) null, Reflection.NO_ARGS);
 
             fail();
 
@@ -111,6 +145,16 @@ public class InvocationsTest {
         try {
 
             Invocations.factoryOf((ClassToken<TestInvocation>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Invocations.factoryOf((ClassToken<TestInvocation>) null, Reflection.NO_ARGS);
 
             fail();
 

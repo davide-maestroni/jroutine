@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
@@ -27,13 +27,14 @@ import javax.annotation.Nonnull;
 public interface ConfigurableBuilder<TYPE> {
 
     /**
-     * Gets the routine configuration builder related to this builder instance.<br/>
-     * The configuration options not supported by the builder implementation might be ignored.
+     * Gets the invocation configuration builder related to the routine builder instance.<br/>
+     * The configuration options not supported by the routine builder implementation might be
+     * ignored.
      * <p/>
-     * Note that the builder will be initialized with the current configuration.
+     * Note that the configuration builder will be initialized with the current configuration.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends TYPE> withRoutine();
+    Builder<? extends TYPE> invocations();
 }

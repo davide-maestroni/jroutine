@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.builder.ChannelConfiguration.Builder;
 import com.gh.bmd.jrt.channel.TransportChannel;
 
 import javax.annotation.Nonnull;
@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 3/7/15.
  */
-public interface TransportChannelBuilder extends ConfigurableBuilder<TransportChannelBuilder> {
+public interface TransportChannelBuilder {
 
     /**
      * Builds and returns the transport channel instance.
@@ -34,11 +34,12 @@ public interface TransportChannelBuilder extends ConfigurableBuilder<TransportCh
     <T> TransportChannel<T> buildChannel();
 
     /**
-     * Note that only options related to the output channel, the asynchronous runner and the logs
-     * will be employed.
+     * Gets the channel configuration builder related to the channel builder instance.
+     * <p/>
+     * Note that the configuration builder will be initialized with the current configuration.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends TransportChannelBuilder> withRoutine();
+    Builder<? extends TransportChannelBuilder> channels();
 }

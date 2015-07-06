@@ -13,21 +13,21 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
-import com.gh.bmd.jrt.core.DefaultParameterChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationDeadlockException;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.routine.InvocationDeadlockException;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
-import com.gh.bmd.jrt.time.TimeDuration.Check;
+import com.gh.bmd.jrt.util.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration.Check;
 
 import java.util.LinkedList;
 
@@ -35,13 +35,13 @@ import javax.annotation.Nonnull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
+import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 
 /**
  * Basic abstract implementation of a routine.
  * <p/>
- * This class provides a default implementation of all the routine functionalities. The inheriting
- * class just need to create invocation objects when required.
+ * This class provides a default implementation of all the routine features. The inheriting class
+ * just needs to create invocation objects when required.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *
@@ -63,7 +63,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final TimeDuration mAvailTimeout;
 
-    private final RoutineConfiguration mConfiguration;
+    private final InvocationConfiguration mConfiguration;
 
     private final int mCoreInvocations;
 
@@ -99,17 +99,29 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      */
     @SuppressWarnings("ConstantConditions")
-    protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {
+    protected AbstractRoutine(@Nonnull final InvocationConfiguration configuration) {
 
         mConfiguration = configuration;
         mSyncRunner = configuration.getSyncRunnerOr(Runners.queuedRunner());
-        mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
-        mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);
-        mCoreInvocations = configuration.getCoreInvocationsOr(DEFAULT_CORE_INVOCATIONS);
-        mAvailTimeout = configuration.getAvailInvocationTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
+
+        final int priority = configuration.getPriorityOr(InvocationConfiguration.DEFAULT);
+        final Runner asyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
+
+        if (priority != InvocationConfiguration.DEFAULT) {
+
+            mAsyncRunner = Runners.priorityRunner(asyncRunner).getRunner(priority);
+
+        } else {
+
+            mAsyncRunner = asyncRunner;
+        }
+
+        mMaxInvocations = configuration.getMaxInstancesOr(DEFAULT_MAX_INVOCATIONS);
+        mCoreInvocations = configuration.getCoreInstancesOr(DEFAULT_CORE_INVOCATIONS);
+        mAvailTimeout = configuration.getAvailInstanceTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
         mLogger = configuration.newLogger(this);
         mLogger.dbg("building routine with configuration: %s", configuration);
     }
@@ -117,12 +129,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     /**
      * Constructor.
      *
-     * @param configuration the routine configuration.
+     * @param configuration the invocation configuration.
      * @param syncRunner    the runner used for synchronous invocation.
      * @param asyncRunner   the runner used for asynchronous invocation.
      * @param logger        the logger instance.
      */
-    private AbstractRoutine(@Nonnull final RoutineConfiguration configuration,
+    private AbstractRoutine(@Nonnull final InvocationConfiguration configuration,
             @Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
             @Nonnull final Logger logger) {
 
@@ -136,13 +148,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
 
-        return invoke(true);
+        return invoke(InvocationType.ASYNC);
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
 
         synchronized (mParallelMutex) {
 
@@ -155,7 +167,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     @Nonnull
                     @Override
-                    protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
+                    protected Invocation<INPUT, OUTPUT> newInvocation(
+                            @Nonnull final InvocationType type) {
 
                         return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
                     }
@@ -167,9 +180,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
 
-        return invoke(false);
+        return invoke(InvocationType.SYNC);
     }
 
     @Override
@@ -221,16 +234,17 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     /**
-     * Converts an invocation instance from synchronous to asynchronous or the contrary.
+     * Converts an invocation instance to the specified type.
      *
-     * @param async      whether the converted invocation is asynchronous.
      * @param invocation the invocation to convert.
+     * @param type       the converted invocation type.
      * @return the converted invocation.
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
-    protected Invocation<INPUT, OUTPUT> convertInvocation(final boolean async,
-            @Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+    protected Invocation<INPUT, OUTPUT> convertInvocation(
+            @Nonnull final Invocation<INPUT, OUTPUT> invocation,
+            @Nonnull final InvocationType type) {
 
         return invocation;
     }
@@ -249,20 +263,21 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     /**
      * Creates a new invocation instance.
      *
-     * @param async whether the invocation is asynchronous.
+     * @param type the invocation type.
      * @return the invocation instance.
      */
     @Nonnull
-    protected abstract Invocation<INPUT, OUTPUT> newInvocation(boolean async);
+    protected abstract Invocation<INPUT, OUTPUT> newInvocation(@Nonnull InvocationType type);
 
     @Nonnull
-    private DefaultInvocationManager getInvocationManager(final boolean async) {
+    private DefaultInvocationManager getInvocationManager(@Nonnull final InvocationType type) {
 
-        if (async) {
+        if (type == InvocationType.ASYNC) {
 
             if (mAsyncManager == null) {
 
-                mAsyncManager = new DefaultInvocationManager(true);
+                mAsyncManager =
+                        new DefaultInvocationManager(type, mAsyncInvocations, mSyncInvocations);
             }
 
             return mAsyncManager;
@@ -270,21 +285,30 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         if (mSyncManager == null) {
 
-            mSyncManager = new DefaultInvocationManager(false);
+            mSyncManager = new DefaultInvocationManager(type, mSyncInvocations, mAsyncInvocations);
         }
 
         return mSyncManager;
     }
 
     @Nonnull
-    private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
+    private InvocationChannel<INPUT, OUTPUT> invoke(@Nonnull final InvocationType type) {
 
         final Logger logger = mLogger;
-        logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
-        return new DefaultParameterChannel<INPUT, OUTPUT>(mConfiguration,
-                                                          getInvocationManager(async),
-                                                          (async) ? mAsyncRunner : mSyncRunner,
-                                                          logger);
+        logger.dbg("invoking routine: %s", type);
+        final Runner runner = (type == InvocationType.ASYNC) ? mAsyncRunner : mSyncRunner;
+        return new DefaultInvocationChannel<INPUT, OUTPUT>(mConfiguration,
+                                                           getInvocationManager(type), runner,
+                                                           logger);
+    }
+
+    /**
+     * Invocation type enumeration.
+     */
+    protected enum InvocationType {
+
+        ASYNC,  // asynchronous
+        SYNC    // synchronous
     }
 
     /**
@@ -320,16 +344,26 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      */
     private class DefaultInvocationManager implements InvocationManager<INPUT, OUTPUT> {
 
-        private final boolean mAsync;
+        private final LinkedList<Invocation<INPUT, OUTPUT>> mFallbackInvocations;
+
+        private final InvocationType mInvocationType;
+
+        private final LinkedList<Invocation<INPUT, OUTPUT>> mPrimaryInvocations;
 
         /**
          * Constructor.
          *
-         * @param async whether the invocation is asynchronous.
+         * @param type                the invocation type.
+         * @param primaryInvocations  the primary pool of invocations.
+         * @param fallbackInvocations the fallback pool of invocations.
          */
-        private DefaultInvocationManager(final boolean async) {
+        private DefaultInvocationManager(@Nonnull final InvocationType type,
+                @Nonnull final LinkedList<Invocation<INPUT, OUTPUT>> primaryInvocations,
+                @Nonnull final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations) {
 
-            mAsync = async;
+            mInvocationType = type;
+            mPrimaryInvocations = primaryInvocations;
+            mFallbackInvocations = fallbackInvocations;
         }
 
         @Nonnull
@@ -358,37 +392,35 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                             "deadlock while waiting for an available invocation instance");
                 }
 
-                final boolean async = mAsync;
-                final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
-                        (async) ? mAsyncInvocations : mSyncInvocations;
+                final InvocationType invocationType = mInvocationType;
+                final int coreInvocations = mCoreInvocations;
+                final LinkedList<Invocation<INPUT, OUTPUT>> invocations = mPrimaryInvocations;
                 final Invocation<INPUT, OUTPUT> invocation;
 
                 if (!invocations.isEmpty()) {
 
                     invocation = invocations.removeFirst();
-                    mLogger.dbg("reusing %ssync invocation instance [%d/%d]: %s",
-                                (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
-                                invocation);
+                    mLogger.dbg("reusing %s invocation instance [%d/%d]: %s", invocationType,
+                                invocations.size() + 1, coreInvocations, invocation);
 
                 } else {
 
                     final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations =
-                            (async) ? mSyncInvocations : mAsyncInvocations;
+                            mFallbackInvocations;
 
                     if (!fallbackInvocations.isEmpty()) {
 
                         final Invocation<INPUT, OUTPUT> convertInvocation =
                                 fallbackInvocations.removeFirst();
-                        mLogger.dbg("converting %ssync invocation instance [%d/%d]: %s",
-                                    (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
-                                    convertInvocation);
-                        invocation = convertInvocation(async, convertInvocation);
+                        mLogger.dbg("converting %s invocation instance [%d/%d]: %s", invocationType,
+                                    invocations.size() + 1, coreInvocations, convertInvocation);
+                        invocation = convertInvocation(convertInvocation, invocationType);
 
                     } else {
 
-                        mLogger.dbg("creating %ssync invocation instance [1/%d]",
-                                    (async) ? "a" : "", mCoreInvocations);
-                        invocation = newInvocation(async);
+                        mLogger.dbg("creating %s invocation instance [1/%d]", invocationType,
+                                    coreInvocations);
+                        invocation = newInvocation(invocationType);
                     }
                 }
 
@@ -436,23 +468,22 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             synchronized (mMutex) {
 
                 final Logger logger = mLogger;
-                final boolean async = mAsync;
-                final LinkedList<Invocation<INPUT, OUTPUT>> syncInvocations = mSyncInvocations;
-                final LinkedList<Invocation<INPUT, OUTPUT>> asyncInvocations = mAsyncInvocations;
+                final int coreInvocations = mCoreInvocations;
+                final LinkedList<Invocation<INPUT, OUTPUT>> primaryInvocations =
+                        mPrimaryInvocations;
+                final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations =
+                        mFallbackInvocations;
 
-                if ((syncInvocations.size() + asyncInvocations.size()) < mCoreInvocations) {
+                if ((primaryInvocations.size() + fallbackInvocations.size()) < coreInvocations) {
 
-                    final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
-                            (async) ? asyncInvocations : syncInvocations;
-                    logger.dbg("recycling %ssync invocation instance [%d/%d]: %s",
-                               (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
-                               invocation);
-                    invocations.add(invocation);
+                    logger.dbg("recycling %s invocation instance [%d/%d]: %s", mInvocationType,
+                               primaryInvocations.size() + 1, coreInvocations, invocation);
+                    primaryInvocations.add(invocation);
 
                 } else {
 
-                    logger.wrn("discarding %ssync invocation instance [%d/%d]: %s",
-                               (async) ? "a" : "", mCoreInvocations, mCoreInvocations, invocation);
+                    logger.wrn("discarding %s invocation instance [%d/%d]: %s", mInvocationType,
+                               coreInvocations, coreInvocations, invocation);
 
                     try {
 

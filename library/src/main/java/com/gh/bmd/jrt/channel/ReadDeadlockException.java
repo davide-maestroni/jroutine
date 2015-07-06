@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.common.DeadlockException;
-
 import javax.annotation.Nullable;
 
 /**

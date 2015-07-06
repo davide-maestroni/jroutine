@@ -21,13 +21,18 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining an Android invocation result.
+ * Interface defining a loader invocation result.
  * <p/>
  * Created by davide-maestroni on 1/4/15.
  *
  * @param <OUTPUT> the output data type.
  */
 interface InvocationResult<OUTPUT> {
+
+    /**
+     * Aborts the loader invocation.
+     */
+    void abort();
 
     /**
      * Returns the abort exception.
@@ -47,10 +52,13 @@ interface InvocationResult<OUTPUT> {
     /**
      * Passes the cached results to the specified channels.
      *
-     * @param newChannels new channels freshly created.
-     * @param oldChannels old channels already fed with previous results.
+     * @param newChannels     new channels freshly created.
+     * @param oldChannels     old channels already fed with previous results.
+     * @param abortedChannels list to be filled with the channels, from the other lists, that are
+     *                        aborted while passing the results.
      * @return whether the invocation is complete.
      */
-    boolean passTo(@Nonnull final Collection<TransportInput<OUTPUT>> newChannels,
-            @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels);
+    boolean passTo(@Nonnull Collection<TransportInput<OUTPUT>> newChannels,
+            @Nonnull Collection<TransportInput<OUTPUT>> oldChannels,
+            @Nonnull Collection<TransportInput<OUTPUT>> abortedChannels);
 }

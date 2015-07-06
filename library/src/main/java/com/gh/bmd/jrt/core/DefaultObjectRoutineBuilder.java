@@ -13,41 +13,31 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.annotation.Alias;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
-import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ParameterChannel;
-import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
+import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
 
-import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getParamMode;
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getReturnMode;
-import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
-import static com.gh.bmd.jrt.common.Reflection.boxingClass;
-import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedMethod;
+import static com.gh.bmd.jrt.core.RoutineBuilders.getTargetMethodInfo;
+import static com.gh.bmd.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.gh.bmd.jrt.util.Reflection.NO_ARGS;
 
 /**
  * Class implementing a builder of routines wrapping an object instance.
@@ -56,9 +46,6 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  */
 class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         implements ObjectRoutineBuilder {
-
-    private static final WeakIdentityHashMap<Object, HashMap<Method, Method>> sMethodCache =
-            new WeakIdentityHashMap<Object, HashMap<Method, Method>>();
 
     private final ProxyConfiguration.Configurable<ObjectRoutineBuilder> mProxyConfigurable =
             new ProxyConfiguration.Configurable<ObjectRoutineBuilder>() {
@@ -71,12 +58,12 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 }
             };
 
-    private final RoutineConfiguration.Configurable<ObjectRoutineBuilder> mRoutineConfigurable =
-            new RoutineConfiguration.Configurable<ObjectRoutineBuilder>() {
+    private final InvocationConfiguration.Configurable<ObjectRoutineBuilder> mRoutineConfigurable =
+            new InvocationConfiguration.Configurable<ObjectRoutineBuilder>() {
 
                 @Nonnull
                 public ObjectRoutineBuilder setConfiguration(
-                        @Nonnull final RoutineConfiguration configuration) {
+                        @Nonnull final InvocationConfiguration configuration) {
 
                     return DefaultObjectRoutineBuilder.this.setConfiguration(configuration);
                 }
@@ -86,172 +73,43 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      * Constructor.
      *
      * @param target the target object instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
      */
     DefaultObjectRoutineBuilder(@Nonnull final Object target) {
 
         super(target);
     }
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
-            @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nullable final PassMode paramMode, @Nullable final PassMode returnMode) {
-
-        final Class<?> returnType = method.getReturnType();
-        final OutputChannel<Object> outputChannel;
-
-        if (paramMode == PassMode.PARALLEL) {
-
-            final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
-            final Class<?> parameterType = method.getParameterTypes()[0];
-            final Object arg = args[0];
-
-            if (arg == null) {
-
-                parameterChannel.pass((Iterable<Object>) null);
-
-            } else if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                parameterChannel.pass((OutputChannel<Object>) arg);
-
-            } else if (parameterType.isArray()) {
-
-                final int length = Array.getLength(arg);
-
-                for (int i = 0; i < length; i++) {
-
-                    parameterChannel.pass(Array.get(arg, i));
-                }
-
-            } else {
-
-                final Iterable<?> iterable = (Iterable<?>) arg;
-
-                for (final Object input : iterable) {
-
-                    parameterChannel.pass(input);
-                }
-            }
-
-            outputChannel = parameterChannel.result();
-
-        } else if (paramMode == PassMode.VALUE) {
-
-            final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
-            final Class<?>[] parameterTypes = method.getParameterTypes();
-            final int length = args.length;
-
-            for (int i = 0; i < length; ++i) {
-
-                final Object arg = args[i];
-
-                if (OutputChannel.class.isAssignableFrom(parameterTypes[i])) {
-
-                    parameterChannel.pass((OutputChannel<Object>) arg);
-
-                } else {
-
-                    parameterChannel.pass(arg);
-                }
-            }
-
-            outputChannel = parameterChannel.result();
-
-        } else if (paramMode == PassMode.COLLECTION) {
-
-            final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
-            outputChannel = parameterChannel.pass((OutputChannel<Object>) args[0]).result();
-
-        } else {
-
-            outputChannel = routine.callAsync(args);
-        }
-
-        if (!Void.class.equals(boxingClass(returnType))) {
-
-            if (returnMode != null) {
-
-                if (OutputChannel.class.isAssignableFrom(returnType)) {
-
-                    return outputChannel;
-                }
-
-                if (returnType.isAssignableFrom(List.class)) {
-
-                    return outputChannel.readAll();
-                }
-
-                if (returnType.isArray()) {
-
-                    final List<Object> results = outputChannel.readAll();
-                    final int size = results.size();
-                    final Object array = Array.newInstance(returnType.getComponentType(), size);
-
-                    for (int i = 0; i < size; ++i) {
-
-                        Array.set(array, i, results.get(i));
-                    }
-
-                    return array;
-                }
-            }
-
-            return outputChannel.readNext();
-        }
-
-        return null;
-    }
-
     @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        if (!itf.isInterface()) {
+        final Method method = getAnnotatedMethod(getTargetClass(), name);
+
+        if (method == null) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getName());
+                    "no annotated method with alias '" + name + "' has been found");
         }
 
-        final InvocationHandler handler;
-
-        if (itf.isAssignableFrom(getTargetClass())) {
-
-            handler = new InterfaceInvocationHandler();
-
-        } else {
-
-            handler = new ProxyInvocationHandler();
-        }
-
-        final Object proxy =
-                Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
-        return itf.cast(proxy);
-    }
-
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
-
-        return itf.cast(buildProxy(itf.getRawClass()));
+        return method(method);
     }
 
     @Nonnull
     @Override
     @SuppressWarnings("unchecked")
-    public RoutineConfiguration.Builder<? extends ObjectRoutineBuilder> withRoutine() {
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> invocations() {
 
-        return new RoutineConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
-                                                                      getRoutineConfiguration());
+        final InvocationConfiguration config = getInvocationConfiguration();
+        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(mRoutineConfigurable,
+                                                                         config);
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+    @SuppressWarnings("unchecked")
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxies() {
 
-        super.setConfiguration(configuration);
-        return this;
+        final ProxyConfiguration config = getProxyConfiguration();
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable, config);
     }
 
     @Nonnull
@@ -264,118 +122,31 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
-    @SuppressWarnings("unchecked")
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxy() {
+    public ObjectRoutineBuilder setConfiguration(
+            @Nonnull final InvocationConfiguration configuration) {
 
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(mProxyConfigurable,
-                                                                    getProxyConfiguration());
+        super.setConfiguration(configuration);
+        return this;
     }
 
     @Nonnull
-    private Method getTargetMethod(@Nonnull final Method method,
-            @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
+    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
-        String name = null;
-        Method targetMethod = null;
-        final Class<?> targetClass = getTargetClass();
-        final Alias annotation = method.getAnnotation(Alias.class);
+        if (!itf.isInterface()) {
 
-        if (annotation != null) {
-
-            name = annotation.value();
-            targetMethod = getAnnotatedMethod(name);
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getName());
         }
 
-        if (targetMethod == null) {
-
-            if (name == null) {
-
-                name = method.getName();
-            }
-
-            try {
-
-                targetMethod = targetClass.getMethod(name, targetParameterTypes);
-
-            } catch (final NoSuchMethodException ignored) {
-
-            }
-
-            if (targetMethod == null) {
-
-                targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
-            }
-        }
-
-        return targetMethod;
+        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+                                                    new ProxyInvocationHandler());
+        return itf.cast(proxy);
     }
 
-    /**
-     * Invocation handler wrapping the target object instance.
-     */
-    private class InterfaceInvocationHandler implements InvocationHandler {
+    @Nonnull
+    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
-        private final ProxyConfiguration mProxyConfiguration;
-
-        private final RoutineConfiguration mRoutineConfiguration;
-
-        /**
-         * Constructor.
-         */
-        private InterfaceInvocationHandler() {
-
-            mRoutineConfiguration = getRoutineConfiguration();
-            mProxyConfiguration = getProxyConfiguration();
-        }
-
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
-                Throwable {
-
-            final OutputChannel<Object> outputChannel =
-                    method(mRoutineConfiguration, mProxyConfiguration, method).callAsync(args);
-            final Class<?> returnType = method.getReturnType();
-
-            if (!Void.class.equals(boxingClass(returnType))) {
-
-                TimeDuration outputTimeout = null;
-                TimeoutActionType outputAction = null;
-                final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
-
-                if (timeoutAnnotation != null) {
-
-                    outputTimeout = fromUnit(timeoutAnnotation.value(), timeoutAnnotation.unit());
-                }
-
-                final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
-
-                if (actionAnnotation != null) {
-
-                    outputAction = actionAnnotation.value();
-                }
-
-                if (outputTimeout != null) {
-
-                    outputChannel.afterMax(outputTimeout);
-                }
-
-                if (outputAction == TimeoutActionType.DEADLOCK) {
-
-                    outputChannel.eventuallyDeadlock();
-
-                } else if (outputAction == TimeoutActionType.EXIT) {
-
-                    outputChannel.eventuallyExit();
-
-                } else if (outputAction == TimeoutActionType.ABORT) {
-
-                    outputChannel.eventuallyAbort();
-                }
-
-                return outputChannel.readNext();
-            }
-
-            return null;
-        }
+        return itf.cast(buildProxy(itf.getRawClass()));
     }
 
     /**
@@ -383,61 +154,17 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
      */
     private class ProxyInvocationHandler implements InvocationHandler {
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final InvocationConfiguration mInvocationConfiguration;
 
-        private final RoutineConfiguration mRoutineConfiguration;
+        private final ProxyConfiguration mProxyConfiguration;
 
         /**
          * Constructor.
          */
         private ProxyInvocationHandler() {
 
-            mRoutineConfiguration = getRoutineConfiguration();
+            mInvocationConfiguration = getInvocationConfiguration();
             mProxyConfiguration = getProxyConfiguration();
-        }
-
-        @Nonnull
-        private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
-                @Nonnull final Method targetMethod, @Nullable final PassMode paramMode,
-                @Nullable final PassMode returnMode) {
-
-            String shareGroup = mProxyConfiguration.getShareGroupOr(null);
-            final RoutineConfiguration configuration = mRoutineConfiguration;
-            final RoutineConfiguration.Builder<RoutineConfiguration> builder =
-                    configuration.builderFrom();
-            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
-
-            if (shareGroupAnnotation != null) {
-
-                shareGroup = shareGroupAnnotation.value();
-            }
-
-            warn(configuration);
-            builder.withInputOrder(
-                    (paramMode == PassMode.PARALLEL) ? OrderType.NONE : OrderType.PASS_ORDER)
-                   .withInputMaxSize(Integer.MAX_VALUE)
-                   .withInputTimeout(TimeDuration.ZERO)
-                   .withOutputOrder((returnMode == PassMode.COLLECTION) ? OrderType.PASS_ORDER
-                                            : OrderType.NONE)
-                   .withOutputMaxSize(Integer.MAX_VALUE)
-                   .withOutputTimeout(TimeDuration.ZERO);
-            final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
-
-            if (timeoutAnnotation != null) {
-
-                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
-            }
-
-            final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
-
-            if (actionAnnotation != null) {
-
-                builder.withReadTimeoutAction(actionAnnotation.value());
-            }
-
-            return getRoutine(builder.set(), shareGroup, targetMethod,
-                              (paramMode == PassMode.COLLECTION),
-                              (returnMode == PassMode.COLLECTION));
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -457,100 +184,53 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            PassMode asyncParamMode = null;
-            PassMode asyncReturnMode = null;
-            Class<?> returnClass = null;
-            final Param methodAnnotation = method.getAnnotation(Param.class);
-
-            if (methodAnnotation != null) {
-
-                returnClass = methodAnnotation.value();
-                asyncReturnMode = getReturnMode(method);
-            }
-
-            final Class<?>[] targetParameterTypes = method.getParameterTypes();
-            final Annotation[][] annotations = method.getParameterAnnotations();
-            final int length = annotations.length;
-
-            for (int i = 0; i < length; ++i) {
-
-                final PassMode paramMode = getParamMode(method, i);
-
-                if (paramMode != null) {
-
-                    asyncParamMode = paramMode;
-
-                    for (final Annotation paramAnnotation : annotations[i]) {
-
-                        if (paramAnnotation.annotationType() == Param.class) {
-
-                            final Param passAnnotation = (Param) paramAnnotation;
-                            targetParameterTypes[i] = passAnnotation.value();
-                            break;
-                        }
-                    }
-                }
-            }
-
-            Method targetMethod;
-
-            synchronized (sMethodCache) {
-
-                final Class<?> targetClass = getTargetClass();
-                final WeakIdentityHashMap<Object, HashMap<Method, Method>> methodCache =
-                        sMethodCache;
-                HashMap<Method, Method> methodMap = methodCache.get(targetClass);
-
-                if (methodMap == null) {
-
-                    methodMap = new HashMap<Method, Method>();
-                    methodCache.put(targetClass, methodMap);
-                }
-
-                targetMethod = methodMap.get(method);
-
-                if (targetMethod == null) {
-
-                    try {
-
-                        targetMethod = getTargetMethod(method, targetParameterTypes);
-
-                    } catch (final NoSuchMethodException e) {
-
-                        throw new IllegalArgumentException(e);
-                    }
-
-                    final Class<?> returnType = method.getReturnType();
-                    final Class<?> targetReturnType = targetMethod.getReturnType();
-                    boolean isError = false;
-
-                    if (methodAnnotation == null) {
-
-                        isError = !returnType.isAssignableFrom(targetReturnType);
-
-                    } else {
-
-                        if ((asyncReturnMode == PassMode.PARALLEL) && returnType.isArray()) {
-
-                            isError = !boxingClass(returnType.getComponentType()).isAssignableFrom(
-                                    boxingClass(targetReturnType));
-                        }
-
-                        isError |= !returnClass.isAssignableFrom(targetReturnType);
-                    }
-
-                    if (isError) {
-
-                        throw new IllegalArgumentException(
-                                "the proxy method has incompatible return type: " + method);
-                    }
-                }
-            }
-
+            final MethodInfo methodInfo = getTargetMethodInfo(getTargetClass(), method);
+            final InputMode inputMode = methodInfo.inputMode;
+            final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =
-                    buildRoutine(method, targetMethod, asyncParamMode, asyncReturnMode);
-            return callRoutine(routine, method, (args != null) ? args : NO_ARGS, asyncParamMode,
-                               asyncReturnMode);
+                    buildRoutine(method, methodInfo.method, inputMode, outputMode);
+            return invokeRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
+                                 outputMode);
+        }
+
+        @Nonnull
+        private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
+                @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) {
+
+            String shareGroup = mProxyConfiguration.getShareGroupOr(null);
+            final InvocationConfiguration configuration = mInvocationConfiguration;
+            final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                    configuration.builderFrom();
+            final Priority priorityAnnotation = method.getAnnotation(Priority.class);
+
+            if (priorityAnnotation != null) {
+
+                builder.withPriority(priorityAnnotation.value());
+            }
+
+            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+
+            if (shareGroupAnnotation != null) {
+
+                shareGroup = shareGroupAnnotation.value();
+            }
+
+            final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+            if (timeoutAnnotation != null) {
+
+                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            }
+
+            final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+            if (actionAnnotation != null) {
+
+                builder.withReadTimeoutAction(actionAnnotation.value());
+            }
+
+            return getRoutine(builder.set(), shareGroup, targetMethod, inputMode, outputMode);
         }
     }
 }

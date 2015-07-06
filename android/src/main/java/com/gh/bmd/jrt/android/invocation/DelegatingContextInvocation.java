@@ -21,7 +21,7 @@ import com.gh.bmd.jrt.routine.Routine;
 import javax.annotation.Nonnull;
 
 /**
- * Implementation of a delegating invocation implementing the platform specific Android invocation.
+ * Invocation implementation delegating the execution to another routine.
  * <p/>
  * Created by davide-maestroni on 19/04/15.
  *
@@ -44,44 +44,63 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
     /**
      * Returns a factory of delegating invocations.
      *
-     * @param routine        the routine used to execute this invocation.
-     * @param invocationType the invocation type.
-     * @param <INPUT>        the input data type.
-     * @param <OUTPUT>       the output data type.
+     * @param routine  the routine used to execute this invocation.
+     * @param tag      the tag used to identify the routine.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      * @return the factory.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryWith(
-            @Nonnull final Routine<INPUT, OUTPUT> routine, @Nonnull final String invocationType) {
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryFrom(
+            @Nonnull final Routine<INPUT, OUTPUT> routine, @Nonnull final String tag) {
 
-        if (routine == null) {
-
-            throw new NullPointerException("the routine must not be null");
-        }
-
-        if (invocationType == null) {
-
-            throw new NullPointerException("the invocation type must not be null");
-        }
-
-        return new ContextInvocationFactory<INPUT, OUTPUT>() {
-
-            @Nonnull
-            public String getInvocationType() {
-
-                return invocationType;
-            }
-
-            @Nonnull
-            public ContextInvocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
-
-                return new DelegatingContextInvocation<INPUT, OUTPUT>(routine);
-            }
-        };
+        return new DelegatingContextInvocationFactory<INPUT, OUTPUT>(routine, tag);
     }
 
     public void onContext(@Nonnull final Context context) {
 
+    }
+
+    /**
+     * Factory creating delegating context invocation instances.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class DelegatingContextInvocationFactory<INPUT, OUTPUT>
+            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
+
+        private final Routine<INPUT, OUTPUT> mRoutine;
+
+        /**
+         * Constructor.
+         *
+         * @param routine the delegated routine.
+         * @param tag     the routine tag.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private DelegatingContextInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine,
+                @Nonnull final String tag) {
+
+            super(tag);
+
+            if (routine == null) {
+
+                throw new NullPointerException("the routine must not be null");
+            }
+
+            if (tag == null) {
+
+                throw new NullPointerException("the routine tag must not be null");
+            }
+
+            mRoutine = routine;
+        }
+
+        @Nonnull
+        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+
+            return new DelegatingContextInvocation<INPUT, OUTPUT>(mRoutine);
+        }
     }
 }

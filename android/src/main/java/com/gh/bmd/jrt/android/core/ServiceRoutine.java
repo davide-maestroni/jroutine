@@ -27,34 +27,34 @@ import android.os.RemoteException;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.android.service.ServiceDisconnectedException;
+import com.gh.bmd.jrt.builder.ChannelConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.ParameterChannel;
-import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
-import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.Reflection;
-import com.gh.bmd.jrt.common.RoutineException;
-import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.Reflection;
+import com.gh.bmd.jrt.util.TimeDuration;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.gh.bmd.jrt.android.service.RoutineService.getAbortError;
 import static com.gh.bmd.jrt.android.service.RoutineService.getValue;
 import static com.gh.bmd.jrt.android.service.RoutineService.putAsyncInvocation;
@@ -62,7 +62,6 @@ import static com.gh.bmd.jrt.android.service.RoutineService.putError;
 import static com.gh.bmd.jrt.android.service.RoutineService.putInvocationId;
 import static com.gh.bmd.jrt.android.service.RoutineService.putParallelInvocation;
 import static com.gh.bmd.jrt.android.service.RoutineService.putValue;
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -77,109 +76,68 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
     private final Context mContext;
 
+    private final Object[] mFactoryArgs;
+
     private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
+
+    private final InvocationConfiguration mInvocationConfiguration;
 
     private final Logger mLogger;
 
     private final Routine<INPUT, OUTPUT> mRoutine;
-
-    private final RoutineConfiguration mRoutineConfiguration;
 
     private final ServiceConfiguration mServiceConfiguration;
 
     /**
      * Constructor.
      *
-     * @param context              the routine context.
-     * @param invocationClass      the invocation class.
-     * @param routineConfiguration the routine configuration.
-     * @param serviceConfiguration the service configuration.
+     * @param context                 the routine context.
+     * @param invocationClass         the invocation class.
+     * @param factoryArgs             the invocation factory arguments.
+     * @param invocationConfiguration the invocation configuration.
+     * @param serviceConfiguration    the service configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     ServiceRoutine(@Nonnull final Context context,
             @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
-            @Nonnull final RoutineConfiguration routineConfiguration,
+            @Nullable final Object[] factoryArgs,
+            @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
-        final Object[] invocationArgs = routineConfiguration.getFactoryArgsOr(Reflection.NO_ARGS);
-        findConstructor(invocationClass, invocationArgs);
         mContext = context.getApplicationContext();
         mInvocationClass = invocationClass;
-        mRoutineConfiguration = routineConfiguration;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
+        mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
-        mLogger = routineConfiguration.newLogger(this);
-        mRoutine = JRoutine.on(new ClassToken<SyncInvocation<INPUT, OUTPUT>>() {})
-                           .withRoutine()
-                           .with(routineConfiguration)
-                           .withFactoryArgs(mContext, invocationClass, invocationArgs)
-                           .withInputMaxSize(Integer.MAX_VALUE)
-                           .withInputTimeout(TimeDuration.ZERO)
-                           .withOutputMaxSize(Integer.MAX_VALUE)
-                           .withOutputTimeout(TimeDuration.ZERO)
+        mLogger = invocationConfiguration.newLogger(this);
+        mRoutine = JRoutine.on(factoryFrom(mContext, factoryOf(invocationClass, factoryArgs)))
+                           .invocations()
+                           .with(invocationConfiguration)
                            .set()
                            .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
-                   invocationClass.getName(), routineConfiguration, serviceConfiguration);
-        warn(logger, routineConfiguration);
-    }
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param logger        the logger instance.
-     * @param configuration the routine configuration.
-     */
-    private static void warn(@Nonnull final Logger logger,
-            @Nonnull final RoutineConfiguration configuration) {
-
-        final int inputSize = configuration.getInputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (inputSize != RoutineConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum input size will be ignored: %d", inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            logger.wrn("the specified input timeout will be ignored: %s", inputTimeout);
-        }
-
-        final int outputSize = configuration.getOutputMaxSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (outputSize != RoutineConfiguration.DEFAULT) {
-
-            logger.wrn("the specified maximum output size will be ignored: %d", outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            logger.wrn("the specified output timeout will be ignored: %s", outputTimeout);
-        }
+                   invocationClass.getName(), invocationConfiguration, serviceConfiguration);
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationClass,
-                                                 mRoutineConfiguration, mServiceConfiguration,
+        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationClass, mFactoryArgs,
+                                                 mInvocationConfiguration, mServiceConfiguration,
                                                  mLogger);
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationClass,
-                                                 mRoutineConfiguration, mServiceConfiguration,
+        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationClass, mFactoryArgs,
+                                                 mInvocationConfiguration, mServiceConfiguration,
                                                  mLogger);
     }
 
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
 
         return mRoutine.invokeSync();
     }
@@ -191,26 +149,28 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     /**
-     * Service parameter channel implementation.
+     * Service invocation channel implementation.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class ServiceChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, OUTPUT> {
+    private static class ServiceChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT, OUTPUT> {
 
         private final Context mContext;
+
+        private final Object[] mFactoryArgs;
 
         private final Messenger mInMessenger;
 
         private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
+
+        private final InvocationConfiguration mInvocationConfiguration;
 
         private final boolean mIsParallel;
 
         private final Logger mLogger;
 
         private final Object mMutex = new Object();
-
-        private final RoutineConfiguration mRoutineConfiguration;
 
         private final Class<? extends RoutineService> mServiceClass;
 
@@ -237,16 +197,18 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         /**
          * Constructor.
          *
-         * @param isParallel           whether the invocation is parallel.
-         * @param context              the routine context.
-         * @param invocationClass      the invocation class.
-         * @param routineConfiguration the routine configuration.
-         * @param serviceConfiguration the service configuration.
-         * @param logger               the routine logger.
+         * @param isParallel              whether the invocation is parallel.
+         * @param context                 the routine context.
+         * @param invocationClass         the invocation class.
+         * @param factoryArgs             the invocation factory arguments.
+         * @param invocationConfiguration the invocation configuration.
+         * @param serviceConfiguration    the service configuration.
+         * @param logger                  the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final Context context,
                 @Nonnull Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
-                @Nonnull final RoutineConfiguration routineConfiguration,
+                @Nonnull final Object[] factoryArgs,
+                @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ServiceConfiguration serviceConfiguration,
                 @Nonnull final Logger logger) {
 
@@ -257,45 +219,49 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mInMessenger = new Messenger(new IncomingHandler(
                     serviceConfiguration.getResultLooperOr(Looper.getMainLooper())));
             mInvocationClass = invocationClass;
-            mRoutineConfiguration = routineConfiguration;
+            mFactoryArgs = factoryArgs;
+            mInvocationConfiguration = invocationConfiguration;
             mServiceConfiguration = serviceConfiguration;
             mLogger = logger;
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
-            final OrderType inputOrderType = routineConfiguration.getInputOrderTypeOr(null);
-            final TransportChannel<INPUT> paramChannel = JRoutine.transport()
-                                                                 .withRoutine()
-                                                                 .withOutputOrder(inputOrderType)
-                                                                 .withOutputMaxSize(
-                                                                         Integer.MAX_VALUE)
-                                                                 .withOutputTimeout(
-                                                                         TimeDuration.ZERO)
-                                                                 .withLog(log)
-                                                                 .withLogLevel(logLevel)
-                                                                 .set()
-                                                                 .buildChannel();
-            mTransportParamInput = paramChannel.input();
-            mTransportParamOutput = paramChannel.output();
-            final OrderType outputOrderType = routineConfiguration.getOutputOrderTypeOr(null);
-            final TimeDuration readTimeout = routineConfiguration.getReadTimeoutOr(null);
+            final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
+            final int inputMaxSize =
+                    invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
+            final TimeDuration inputTimeout = invocationConfiguration.getInputTimeoutOr(null);
+            final TransportChannel<INPUT> inChannel = JRoutine.transport()
+                                                              .channels()
+                                                              .withChannelOrder(inputOrderType)
+                                                              .withChannelMaxSize(inputMaxSize)
+                                                              .withChannelTimeout(inputTimeout)
+                                                              .withLog(log)
+                                                              .withLogLevel(logLevel)
+                                                              .set()
+                                                              .buildChannel();
+            mTransportParamInput = inChannel.input();
+            mTransportParamOutput = inChannel.output();
+            final OrderType outputOrderType =
+                    invocationConfiguration.getOutputOrderTypeOr(OrderType.BY_CALL);
+            final int outputMaxSize =
+                    invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
+            final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
+            final TimeDuration readTimeout = invocationConfiguration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
-                    routineConfiguration.getReadTimeoutActionOr(null);
-            final TransportChannel<OUTPUT> resultChannel = JRoutine.transport()
-                                                                   .withRoutine()
-                                                                   .withOutputOrder(outputOrderType)
-                                                                   .withOutputMaxSize(
-                                                                           Integer.MAX_VALUE)
-                                                                   .withOutputTimeout(
-                                                                           TimeDuration.ZERO)
-                                                                   .withReadTimeout(readTimeout)
-                                                                   .withReadTimeoutAction(
-                                                                           timeoutActionType)
-                                                                   .withLog(log)
-                                                                   .withLogLevel(logLevel)
-                                                                   .set()
-                                                                   .buildChannel();
-            mTransportResultInput = resultChannel.input();
-            mTransportResultOutput = resultChannel.output();
+                    invocationConfiguration.getReadTimeoutActionOr(null);
+            final TransportChannel<OUTPUT> outChannel = JRoutine.transport()
+                                                                .channels()
+                                                                .withChannelOrder(outputOrderType)
+                                                                .withChannelMaxSize(outputMaxSize)
+                                                                .withChannelTimeout(outputTimeout)
+                                                                .withReadTimeout(readTimeout)
+                                                                .withReadTimeoutAction(
+                                                                        timeoutActionType)
+                                                                .withLog(log)
+                                                                .withLogLevel(logLevel)
+                                                                .set()
+                                                                .buildChannel();
+            mTransportResultInput = outChannel.input();
+            mTransportResultOutput = outChannel.output();
         }
 
         public boolean abort() {
@@ -316,14 +282,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
+        public InvocationChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mTransportParamInput.after(delay);
             return this;
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> after(final long delay,
+        public InvocationChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
             mTransportParamInput.after(delay, timeUnit);
@@ -331,14 +297,35 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> now() {
+        public InvocationChannel<INPUT, OUTPUT> now() {
 
             mTransportParamInput.now();
             return this;
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(
+        public InvocationChannel<INPUT, OUTPUT> orderByCall() {
+
+            mTransportParamInput.orderByCall();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<INPUT, OUTPUT> orderByChance() {
+
+            mTransportParamInput.orderByChance();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<INPUT, OUTPUT> orderByDelay() {
+
+            mTransportParamInput.orderByDelay();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<INPUT, OUTPUT> pass(
                 @Nullable final OutputChannel<? extends INPUT> channel) {
 
             bindService();
@@ -347,7 +334,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(
+        public InvocationChannel<INPUT, OUTPUT> pass(
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
             bindService();
@@ -356,7 +343,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
+        public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
             mTransportParamInput.pass(input);
@@ -364,7 +351,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
+        public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
             mTransportParamInput.pass(inputs);
@@ -506,22 +493,34 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     switch (msg.what) {
 
-                        case RoutineService.MSG_DATA:
-                            mTransportResultInput.pass((OUTPUT) getValue(msg));
-                            break;
+                        case RoutineService.MSG_DATA: {
 
-                        case RoutineService.MSG_COMPLETE:
+                            mTransportResultInput.pass((OUTPUT) getValue(msg));
+                        }
+
+                        break;
+
+                        case RoutineService.MSG_COMPLETE: {
+
                             mTransportResultInput.close();
                             unbindService();
-                            break;
+                        }
 
-                        case RoutineService.MSG_ABORT:
-                            mTransportResultInput.abort(getAbortError(msg));
+                        break;
+
+                        case RoutineService.MSG_ABORT: {
+
+                            mTransportResultInput.abort(
+                                    InvocationException.wrapIfNeeded(getAbortError(msg)));
                             unbindService();
-                            break;
+                        }
 
-                        default:
+                        break;
+
+                        default: {
+
                             super.handleMessage(msg);
+                        }
                     }
 
                 } catch (final Throwable t) {
@@ -557,19 +556,24 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 final Logger logger = mLogger;
                 logger.dbg("service connected: %s", name);
                 mOutMessenger = new Messenger(service);
+                final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
                 final Message message = Message.obtain(null, RoutineService.MSG_INIT);
 
                 if (mIsParallel) {
 
                     logger.dbg("sending parallel invocation message");
-                    putParallelInvocation(message.getData(), mUUID, mInvocationClass,
-                                          mRoutineConfiguration, mServiceConfiguration);
+                    putParallelInvocation(message.getData(), mUUID, mInvocationClass, mFactoryArgs,
+                                          mInvocationConfiguration,
+                                          serviceConfiguration.getRunnerClassOr(null),
+                                          serviceConfiguration.getLogClassOr(null));
 
                 } else {
 
                     logger.dbg("sending async invocation message");
-                    putAsyncInvocation(message.getData(), mUUID, mInvocationClass,
-                                       mRoutineConfiguration, mServiceConfiguration);
+                    putAsyncInvocation(message.getData(), mUUID, mInvocationClass, mFactoryArgs,
+                                       mInvocationConfiguration,
+                                       serviceConfiguration.getRunnerClassOr(null),
+                                       serviceConfiguration.getLogClassOr(null));
                 }
 
                 message.replyTo = mInMessenger;
@@ -578,7 +582,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
-                    mTransportParamOutput.bind(mConsumer);
+                    mTransportParamOutput.passTo(mConsumer);
 
                 } catch (final RemoteException e) {
 
@@ -591,73 +595,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);
-                mTransportParamOutput.unbind(mConsumer);
+                mTransportParamOutput.abort(new ServiceDisconnectedException(name));
             }
-        }
-    }
-
-    /**
-     * Invocation used to synchronously call the specified one.
-     *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     */
-    private static class SyncInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
-
-        private final ContextInvocation<INPUT, OUTPUT> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param context         the the routine context.
-         * @param invocationClass the invocation class.
-         * @param args            the invocation constructor arguments.
-         * @throws java.lang.IllegalAccessException            if an error occurred during the
-         *                                                     invocation instantiation.
-         * @throws java.lang.reflect.InvocationTargetException if an error occurred during the
-         *                                                     invocation instantiation.
-         * @throws java.lang.InstantiationException            if an error occurred during the
-         *                                                     invocation instantiation.
-         */
-        public SyncInvocation(@Nonnull final Context context,
-                @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
-                @Nonnull final Object[] args) throws IllegalAccessException,
-                InvocationTargetException, InstantiationException {
-
-            final ContextInvocation<INPUT, OUTPUT> invocation =
-                    findConstructor(invocationClass, args).newInstance(args);
-            invocation.onContext(context);
-            mInvocation = invocation;
-        }
-
-        public void onAbort(@Nullable final Throwable reason) {
-
-            mInvocation.onAbort(reason);
-        }
-
-        public void onDestroy() {
-
-            mInvocation.onDestroy();
-        }
-
-        public void onInit() {
-
-            mInvocation.onInit();
-        }
-
-        public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
-
-            mInvocation.onInput(input, result);
-        }
-
-        public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
-
-            mInvocation.onResult(result);
-        }
-
-        public void onReturn() {
-
-            mInvocation.onReturn();
         }
     }
 }

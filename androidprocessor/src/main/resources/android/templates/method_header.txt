@@ -14,25 +14,19 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
+    private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     @javax.annotation.Nonnull
-    private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration routineConfiguration,
+    private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final Object[] args = routineConfiguration.getFactoryArgsOr(com.gh.bmd.jrt.common.Reflection.NO_ARGS);
-        return getBuilder(mContext, new com.gh.bmd.jrt.common.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {})
-                                           .withRoutine()
-                                           .with(routineConfiguration)
+        return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, mTargetClass, mFactoryArgs, ${shareGroup})
+                                           .invocations()
+                                           .with(invocationConfiguration)
                                            ${routineBuilderOptions}
-                                           .withFactoryArgs(mTargetClass, ${shareGroup}, args)
-                                           .withInputMaxSize(Integer.MAX_VALUE)
-                                           .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                                           .withOutputMaxSize(Integer.MAX_VALUE)
-                                           .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .set()
-                                           .withService()
+                                           .service()
                                            .with(serviceConfiguration)
                                            .set()
                                            .buildRoutine();

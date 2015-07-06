@@ -14,16 +14,16 @@
 package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of output channels bound to routine invocations.<br/>
+ * Interface defining a builder of output channels bound to loader invocations.<br/>
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
- * and still running (or cached) at the time of the channel creation.
+ * and still be running (or cached) at the time of the channel creation.
  * <p/>
  * Created by davide-maestroni on 1/14/15.
  *
@@ -36,23 +36,26 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
      * Builds and returns an output channel bound to the routine invocation.
      *
      * @return the newly created output channel.
+     * @throws java.lang.IllegalArgumentException if the configured loader ID is equal to AUTO.
      */
     @Nonnull
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified input.
+     * Note that only the options related to logs will be employed.
      *
-     * @param input the input.
+     * @return the invocation configuration builder.
      */
-    void purge(@Nullable Object input);
+    @Nonnull
+    InvocationConfiguration.Builder<? extends LoaderChannelBuilder> invocations();
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     * Note that the clash resolution types will be ignored.
      *
-     * @param inputs the inputs.
+     * @return the loader configuration builder.
      */
-    void purge(@Nullable Object... inputs);
+    @Nonnull
+    LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaders();
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified inputs.
@@ -67,18 +70,16 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
     void purge();
 
     /**
-     * Note that the clash resolution type will be ignored.
+     * Makes the builder destroy the cached invocation instances with the specified input.
      *
-     * @return the loader configuration builder.
+     * @param input the input.
      */
-    @Nonnull
-    LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader();
+    void purge(@Nullable Object input);
 
     /**
-     * Note that only the options related to logs will be employed.
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
-     * @return the routine configuration builder.
+     * @param inputs the inputs.
      */
-    @Nonnull
-    RoutineConfiguration.Builder<? extends LoaderChannelBuilder> withRoutine();
+    void purge(@Nullable Object... inputs);
 }

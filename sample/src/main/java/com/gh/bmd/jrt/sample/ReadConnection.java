@@ -14,8 +14,8 @@
 package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
+import com.gh.bmd.jrt.invocation.InvocationException;
 
 import java.io.IOException;
 import java.io.InputStream;

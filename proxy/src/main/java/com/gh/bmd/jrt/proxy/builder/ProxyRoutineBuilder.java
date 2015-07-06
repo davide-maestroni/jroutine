@@ -14,9 +14,9 @@
 package com.gh.bmd.jrt.proxy.builder;
 
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
-import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
 
@@ -32,11 +32,13 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
         ProxyConfigurableBuilder<ProxyRoutineBuilder> {
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
@@ -58,11 +60,13 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
 
     /**
-     * Returns a proxy object enabling asynchronous calling of the target instance methods.
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} and {@link com.gh.bmd.jrt.annotation.Param}
+     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
      * annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
@@ -86,8 +90,8 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
     /**
      * Note that all the options related to the output and input channels will be ignored.
      *
-     * @return the routine configuration builder.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends ProxyRoutineBuilder> withRoutine();
+    Builder<? extends ProxyRoutineBuilder> invocations();
 }

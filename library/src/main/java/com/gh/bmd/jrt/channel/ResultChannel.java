@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +47,24 @@ public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
      */
     @Nonnull
     ResultChannel<OUTPUT> now();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ResultChannel<OUTPUT> orderByCall();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ResultChannel<OUTPUT> orderByChance();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    ResultChannel<OUTPUT> orderByDelay();
 
     /**
      * {@inheritDoc}

@@ -16,9 +16,9 @@ package com.gh.bmd.jrt.android.builder;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
-import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.util.Reflection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,16 +33,7 @@ import javax.annotation.Nullable;
  */
 public final class ServiceConfiguration {
 
-    private static final Configurable<ServiceConfiguration> sDefaultConfigurable =
-            new Configurable<ServiceConfiguration>() {
-
-                @Nonnull
-                public ServiceConfiguration setConfiguration(
-                        @Nonnull final ServiceConfiguration configuration) {
-
-                    return configuration;
-                }
-            };
+    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
      * Empty configuration constant.<br/>The configuration has all the values set to their default.
@@ -170,7 +161,7 @@ public final class ServiceConfiguration {
     }
 
     /**
-     * Returns the looper used for dispatching results from the service (null by default).
+     * Returns the looper used for dispatching the results from the service (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
@@ -418,6 +409,19 @@ public final class ServiceConfiguration {
             mServiceClass = configuration.mServiceClass;
             mRunnerClass = configuration.mRunnerClass;
             mLogClass = configuration.mLogClass;
+        }
+    }
+
+    /**
+     * Default configurable implementation.
+     */
+    private static class DefaultConfigurable implements Configurable<ServiceConfiguration> {
+
+        @Nonnull
+        public ServiceConfiguration setConfiguration(
+                @Nonnull final ServiceConfiguration configuration) {
+
+            return configuration;
         }
     }
 }

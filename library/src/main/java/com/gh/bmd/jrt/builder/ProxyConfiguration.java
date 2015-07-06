@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * Class storing the proxy configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration instance.
+ * must be created starting from the specific configuration.
  * <p/>
  * The configuration has a share group associated. Every method within a specific group is protected
  * so that shared class members can be safely accessed only from the other methods sharing the same
@@ -32,19 +32,10 @@ import javax.annotation.Nullable;
  */
 public final class ProxyConfiguration {
 
-    private static final Configurable<ProxyConfiguration> sDefaultConfigurable =
-            new Configurable<ProxyConfiguration>() {
-
-                @Nonnull
-                public ProxyConfiguration setConfiguration(
-                        @Nonnull final ProxyConfiguration configuration) {
-
-                    return configuration;
-                }
-            };
+    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
-     * Empty configuration constant.<br/>The configuration has all the values set to their default.
+     * Empty configuration constant.<br/>The configuration has all the options set to their default.
      */
     public static final ProxyConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
@@ -245,7 +236,7 @@ public final class ProxyConfiguration {
 
         /**
          * Sets the share group name. A null value means that it is up to the framework to choose a
-         * default value.
+         * default one.
          *
          * @param groupName the group name.
          * @return this builder.
@@ -266,6 +257,19 @@ public final class ProxyConfiguration {
         private void setConfiguration(@Nonnull final ProxyConfiguration configuration) {
 
             mGroupName = configuration.mGroupName;
+        }
+    }
+
+    /**
+     * Default configurable implementation.
+     */
+    private static class DefaultConfigurable implements Configurable<ProxyConfiguration> {
+
+        @Nonnull
+        public ProxyConfiguration setConfiguration(
+                @Nonnull final ProxyConfiguration configuration) {
+
+            return configuration;
         }
     }
 }

@@ -14,17 +14,21 @@
 package com.gh.bmd.jrt.proxy.core;
 
 import com.gh.bmd.jrt.annotation.Alias;
-import com.gh.bmd.jrt.annotation.Param;
-import com.gh.bmd.jrt.annotation.Param.PassMode;
+import com.gh.bmd.jrt.annotation.Input;
+import com.gh.bmd.jrt.annotation.Input.InputMode;
+import com.gh.bmd.jrt.annotation.Inputs;
+import com.gh.bmd.jrt.annotation.Output;
+import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.AgingPriority;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.gh.bmd.jrt.channel.AbortException;
+import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.common.AbortException;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
@@ -32,9 +36,11 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.ProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -43,14 +49,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
-import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.gh.bmd.jrt.time.TimeDuration.seconds;
+import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
+import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -62,11 +70,37 @@ import static org.junit.Assert.fail;
 public class ProxyRoutineTest {
 
     @Test
+    public void testAgingPriority() {
+
+        final Pass pass = new Pass();
+        final TestRunner runner = new TestRunner();
+        final PriorityPass priorityPass = JRoutineProxy.on(pass)
+                                                       .invocations()
+                                                       .withAsyncRunner(runner)
+                                                       .set()
+                                                       .buildProxy(PriorityPass.class);
+        final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyExit();
+
+        for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
+
+            priorityPass.passHigh("test2");
+            runner.run(1);
+            assertThat(output1.all()).isEmpty();
+        }
+
+        final OutputChannel<String> output2 = priorityPass.passHigh("test2");
+        runner.run(1);
+        assertThat(output1.all()).containsExactly("test1");
+        runner.run(Integer.MAX_VALUE);
+        assertThat(output2.all()).containsExactly("test2");
+    }
+
+    @Test
     public void testGenericProxyCache() {
 
         final TestList<String> testList = new TestList<String>();
         final ProxyRoutineBuilder builder = JRoutineProxy.on(testList)
-                                                         .withRoutine()
+                                                         .invocations()
                                                          .withAsyncRunner(Runners.queuedRunner())
                                                          .set();
 
@@ -86,7 +120,7 @@ public class ProxyRoutineTest {
 
         testListItf2.add(3);
         assertThat(testListItf2.get(1)).isEqualTo(3);
-        assertThat(testListItf2.getAsync(1).readNext()).isEqualTo(3);
+        assertThat(testListItf2.getAsync(1).next()).isEqualTo(3);
         assertThat(testListItf2.getList(1)).containsExactly(3);
     }
 
@@ -96,13 +130,13 @@ public class ProxyRoutineTest {
         final TestClass test = new TestClass();
         final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
         final TestInterfaceProxy testProxy = JRoutineProxy.on(test)
-                                                          .withRoutine()
+                                                          .invocations()
                                                           .withSyncRunner(
                                                                   Runners.sequentialRunner())
                                                           .set()
                                                           .buildProxy(token);
 
-        assertThat(testProxy.getOne().readNext()).isEqualTo(1);
+        assertThat(testProxy.getOne().next()).isEqualTo(1);
     }
 
     @Test
@@ -139,7 +173,7 @@ public class ProxyRoutineTest {
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
         final TestProxy testProxy = JRoutineProxy.on(test)
-                                                 .withRoutine()
+                                                 .invocations()
                                                  .withSyncRunner(Runners.sequentialRunner())
                                                  .withAsyncRunner(runner)
                                                  .withLogLevel(LogLevel.DEBUG)
@@ -147,10 +181,10 @@ public class ProxyRoutineTest {
                                                  .set()
                                                  .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
-        assertThat(testProxy.getOne().readNext()).isEqualTo(1);
+        assertThat(testProxy.getOne().next()).isEqualTo(1);
         assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
         assertThat(testProxy.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
-                            .readAll()).containsOnly("1", "2", "3");
+                            .all()).containsOnly("1", "2", "3");
         assertThat(testProxy.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
         assertThat(testProxy.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
                 "1", "2", "3");
@@ -171,19 +205,19 @@ public class ProxyRoutineTest {
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
-        final RoutineConfiguration configuration =
+        final InvocationConfiguration configuration =
                 builder().withSyncRunner(Runners.sequentialRunner())
                          .withAsyncRunner(runner)
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
         final ProxyBuilder<TestProxy> builder = com.gh.bmd.jrt.proxy.Proxy_Test.on(test);
-        final TestProxy testProxy = builder.withRoutine().with(configuration).set().buildProxy();
+        final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
-        assertThat(testProxy.getOne().readNext()).isEqualTo(1);
+        assertThat(testProxy.getOne().next()).isEqualTo(1);
         assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
         assertThat(testProxy.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
-                            .readAll()).containsOnly("1", "2", "3");
+                            .all()).containsOnly("1", "2", "3");
         assertThat(testProxy.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
         assertThat(testProxy.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
                 "1", "2", "3");
@@ -198,33 +232,11 @@ public class ProxyRoutineTest {
         assertThat(testProxy.getString(transportChannel.output())).isEqualTo("3");
 
         assertThat(JRoutineProxy.on(test)
-                                .withRoutine()
+                                .invocations()
                                 .with(configuration)
                                 .set()
                                 .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
                 testProxy);
-    }
-
-    @Test
-    public void testProxyBuilderWarnings() {
-
-        final CountLog countLog = new CountLog();
-        final TestClass test = new TestClass();
-        JRoutineProxy.on(test)
-                     .withRoutine()
-                     .withFactoryArgs()
-                     .withInputOrder(OrderType.NONE)
-                     .withInputMaxSize(3)
-                     .withInputTimeout(seconds(1))
-                     .withOutputOrder(OrderType.NONE)
-                     .withOutputMaxSize(3)
-                     .withOutputTimeout(seconds(1))
-                     .withLogLevel(LogLevel.DEBUG)
-                     .withLog(countLog)
-                     .set()
-                     .buildProxy(TestProxy.class)
-                     .getOne();
-        assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
     @Test
@@ -233,20 +245,20 @@ public class ProxyRoutineTest {
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
-        final RoutineConfiguration configuration =
+        final InvocationConfiguration configuration =
                 builder().withSyncRunner(Runners.sequentialRunner())
                          .withAsyncRunner(runner)
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
         final TestProxy testProxy = JRoutineProxy.on(test)
-                                                 .withRoutine()
+                                                 .invocations()
                                                  .with(configuration)
                                                  .set()
                                                  .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
         assertThat(JRoutineProxy.on(test)
-                                .withRoutine()
+                                .invocations()
                                 .with(configuration)
                                 .set()
                                 .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -284,16 +296,16 @@ public class ProxyRoutineTest {
 
         final TestClass2 test = new TestClass2();
         final ProxyRoutineBuilder builder =
-                JRoutineProxy.on(test).withRoutine().withReadTimeout(seconds(2)).set();
+                JRoutineProxy.on(test).invocations().withReadTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Integer> getOne = builder.withProxy()
+        OutputChannel<Integer> getOne = builder.proxies()
                                                .withShareGroup("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
-        OutputChannel<Integer> getTwo = builder.withProxy()
+        OutputChannel<Integer> getTwo = builder.proxies()
                                                .withShareGroup("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
@@ -319,7 +331,7 @@ public class ProxyRoutineTest {
 
         final Impl impl = new Impl();
         final Itf itf = JRoutineProxy.on(impl)
-                                     .withRoutine()
+                                     .invocations()
                                      .withReadTimeout(INFINITY)
                                      .set()
                                      .buildProxy(Itf.class);
@@ -331,14 +343,16 @@ public class ProxyRoutineTest {
         final TransportChannel<Character> channel2 = JRoutine.transport().buildChannel();
         channel2.input().pass('d', 'e', 'f').close();
         assertThat(itf.add2(channel2.output())).isIn((int) 'd', (int) 'e', (int) 'f');
-        assertThat(itf.add3('c').readAll()).containsExactly((int) 'c');
+        assertThat(itf.add3('c').all()).containsExactly((int) 'c');
         final TransportChannel<Character> channel3 = JRoutine.transport().buildChannel();
         channel3.input().pass('a').close();
-        assertThat(itf.add4(channel3.output()).readAll()).containsExactly((int) 'a');
+        assertThat(itf.add4(channel3.output()).all()).containsExactly((int) 'a');
         final TransportChannel<Character> channel4 = JRoutine.transport().buildChannel();
         channel4.input().pass('d', 'e', 'f').close();
-        assertThat(itf.add5(channel4.output()).readAll()).containsOnly((int) 'd', (int) 'e',
-                                                                       (int) 'f');
+        assertThat(itf.add5(channel4.output()).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
+        assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
+        assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
+                                                                               (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
         channel5.input().pass(new char[]{'a', 'z'}).close();
@@ -352,36 +366,34 @@ public class ProxyRoutineTest {
                 .close();
         assertThat(itf.addA03(channel7.output())).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                                        new int[]{'f', 'z'});
-        assertThat(itf.addA04(new char[]{'c', 'z'}).readAll()).containsExactly(new int[]{'c', 'z'});
+        assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel8 = JRoutine.transport().buildChannel();
         channel8.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA05(channel8.output()).readAll()).containsExactly(new int[]{'a', 'z'});
+        assertThat(itf.addA05(channel8.output()).all()).containsExactly(new int[]{'a', 'z'});
         final TransportChannel<Character> channel9 = JRoutine.transport().buildChannel();
         channel9.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA06(channel9.output()).readAll()).containsExactly(
-                new int[]{'d', 'e', 'f'});
+        assertThat(itf.addA06(channel9.output()).all()).containsExactly(new int[]{'d', 'e', 'f'});
         final TransportChannel<char[]> channel10 = JRoutine.transport().buildChannel();
         channel10.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
-        assertThat(itf.addA07(channel10.output()).readAll()).containsOnly(new int[]{'d', 'z'},
-                                                                          new int[]{'e', 'z'},
-                                                                          new int[]{'f', 'z'});
-        assertThat(itf.addA08(new char[]{'c', 'z'}).readAll()).containsExactly((int) 'c',
-                                                                               (int) 'z');
+        assertThat(itf.addA07(channel10.output()).all()).containsOnly(new int[]{'d', 'z'},
+                                                                      new int[]{'e', 'z'},
+                                                                      new int[]{'f', 'z'});
+        assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
         final TransportChannel<char[]> channel11 = JRoutine.transport().buildChannel();
         channel11.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA09(channel11.output()).readAll()).containsExactly((int) 'a', (int) 'z');
+        assertThat(itf.addA09(channel11.output()).all()).containsExactly((int) 'a', (int) 'z');
         final TransportChannel<Character> channel12 = JRoutine.transport().buildChannel();
         channel12.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA10(channel12.output()).readAll()).containsExactly((int) 'd', (int) 'e',
-                                                                             (int) 'f');
+        assertThat(itf.addA10(channel12.output()).all()).containsExactly((int) 'd', (int) 'e',
+                                                                         (int) 'f');
         final TransportChannel<char[]> channel13 = JRoutine.transport().buildChannel();
         channel13.input()
                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                  .close();
-        assertThat(itf.addA11(channel13.output()).readAll()).containsOnly((int) 'd', (int) 'e',
-                                                                          (int) 'f', (int) 'z');
+        assertThat(itf.addA11(channel13.output()).all()).containsOnly((int) 'd', (int) 'e',
+                                                                      (int) 'f', (int) 'z');
         assertThat(itf.addA12(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel14 = JRoutine.transport().buildChannel();
         channel14.input().pass(new char[]{'a', 'z'}).close();
@@ -410,6 +422,15 @@ public class ProxyRoutineTest {
         assertThat(itf.addA19(channel19.output())).containsOnly(new int[]{'d', 'z'},
                                                                 new int[]{'e', 'z'},
                                                                 new int[]{'f', 'z'});
+        assertThat(itf.addA20().pass(new char[]{'c', 'z'}).result().all()).containsOnly(
+                new int[]{'c', 'z'});
+        assertThat(itf.addA21()
+                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .result()
+                      .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                           new int[]{'f', 'z'});
+        assertThat(itf.addA22().pass('d', 'e', 'f').result().all()).containsOnly(
+                new int[]{'d', 'e', 'f'});
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel20 = JRoutine.transport().buildChannel();
@@ -426,38 +447,37 @@ public class ProxyRoutineTest {
         assertThat(itf.addL03(channel22.output())).isIn(Arrays.asList((int) 'd', (int) 'z'),
                                                         Arrays.asList((int) 'e', (int) 'z'),
                                                         Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL04(Arrays.asList('c', 'z')).readAll()).containsExactly(
+        assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel23 = JRoutine.transport().buildChannel();
         channel23.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL05(channel23.output()).readAll()).containsExactly(
+        assertThat(itf.addL05(channel23.output()).all()).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
         final TransportChannel<Character> channel24 = JRoutine.transport().buildChannel();
         channel24.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL06(channel24.output()).readAll()).containsExactly(
+        assertThat(itf.addL06(channel24.output()).all()).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         final TransportChannel<List<Character>> channel25 = JRoutine.transport().buildChannel();
         channel25.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL07(channel25.output()).readAll()).containsOnly(
+        assertThat(itf.addL07(channel25.output()).all()).containsOnly(
                 Arrays.asList((int) 'd', (int) 'z'), Arrays.asList((int) 'e', (int) 'z'),
                 Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL08(Arrays.asList('c', 'z')).readAll()).containsExactly((int) 'c',
-                                                                                  (int) 'z');
+        assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
         final TransportChannel<List<Character>> channel26 = JRoutine.transport().buildChannel();
         channel26.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL09(channel26.output()).readAll()).containsExactly((int) 'a', (int) 'z');
+        assertThat(itf.addL09(channel26.output()).all()).containsExactly((int) 'a', (int) 'z');
         final TransportChannel<Character> channel27 = JRoutine.transport().buildChannel();
         channel27.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL10(channel27.output()).readAll()).containsExactly((int) 'd', (int) 'e',
-                                                                             (int) 'f');
+        assertThat(itf.addL10(channel27.output()).all()).containsExactly((int) 'd', (int) 'e',
+                                                                         (int) 'f');
         final TransportChannel<List<Character>> channel28 = JRoutine.transport().buildChannel();
         channel28.input()
                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL11(channel28.output()).readAll()).containsOnly((int) 'd', (int) 'e',
-                                                                          (int) 'f', (int) 'z');
+        assertThat(itf.addL11(channel28.output()).all()).containsOnly((int) 'd', (int) 'e',
+                                                                      (int) 'f', (int) 'z');
         assertThat(itf.addL12(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel29 = JRoutine.transport().buildChannel();
@@ -494,16 +514,30 @@ public class ProxyRoutineTest {
                                                                 Arrays.asList((int) 'e', (int) 'z'),
                                                                 Arrays.asList((int) 'f',
                                                                               (int) 'z'));
+        assertThat(itf.addL20().pass(Arrays.asList('c', 'z')).result().all()).containsOnly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        assertThat(itf.addL21()
+                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                            Arrays.asList('f', 'z'))
+                      .result()
+                      .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                           Arrays.asList((int) 'e', (int) 'z'),
+                                           Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL22().pass('d', 'e', 'f').result().all()).containsOnly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         assertThat(itf.get0()).isEqualTo(31);
-        assertThat(itf.get1().readAll()).containsExactly(31);
+        assertThat(itf.get1().all()).containsExactly(31);
+        assertThat(itf.get2().result().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
-        assertThat(itf.getA1().readAll()).containsExactly(1, 2, 3);
+        assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA4().result().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL1().readAll()).containsExactly(1, 2, 3);
+        assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL4().result().all()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
         channel35.input().pass(-17).close();
@@ -511,6 +545,7 @@ public class ProxyRoutineTest {
         final TransportChannel<Integer> channel36 = JRoutine.transport().buildChannel();
         channel36.input().pass(-17).close();
         itf.set2(channel36.output());
+        itf.set3().pass(-17).result().checkComplete();
         itf.setA0(new int[]{1, 2, 3});
         final TransportChannel<int[]> channel37 = JRoutine.transport().buildChannel();
         channel37.input().pass(new int[]{1, 2, 3}).close();
@@ -521,6 +556,8 @@ public class ProxyRoutineTest {
         final TransportChannel<int[]> channel39 = JRoutine.transport().buildChannel();
         channel39.input().pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39.output());
+        itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
+        itf.setA5().pass(1, 2, 3).result().checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final TransportChannel<List<Integer>> channel40 = JRoutine.transport().buildChannel();
         channel40.input().pass(Arrays.asList(1, 2, 3)).close();
@@ -531,6 +568,8 @@ public class ProxyRoutineTest {
         final TransportChannel<List<Integer>> channel42 = JRoutine.transport().buildChannel();
         channel42.input().pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42.output());
+        itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
+        itf.setL5().pass(1, 2, 3).result().checkComplete();
     }
 
     @Test
@@ -538,7 +577,7 @@ public class ProxyRoutineTest {
 
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutineProxy.on(testTimeout)
-                                .withRoutine()
+                                .invocations()
                                 .withReadTimeout(seconds(1))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
@@ -547,7 +586,7 @@ public class ProxyRoutineTest {
         try {
 
             JRoutineProxy.on(testTimeout)
-                         .withRoutine()
+                         .invocations()
                          .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
@@ -567,205 +606,238 @@ public class ProxyRoutineTest {
         int add0(char c);
 
         @Alias("a")
-        int add1(@Param(value = char.class, mode = PassMode.VALUE) OutputChannel<Character> c);
+        int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        int add2(@Param(value = char.class, mode = PassMode.PARALLEL) OutputChannel<Character> c);
+        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("a")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add3(char c);
 
         @Alias("a")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add4(
-                @Param(value = char.class, mode = PassMode.VALUE) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add5(
-                @Param(value = char.class, mode = PassMode.PARALLEL) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+
+        @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.VALUE)
+        InvocationChannel<Character, Integer> add6();
+
+        @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        InvocationChannel<Character, Integer> add7();
 
         @Alias("aa")
         int[] addA00(char[] c);
 
         @Alias("aa")
-        int[] addA01(@Param(value = char[].class,
-                mode = PassMode.VALUE) OutputChannel<char[]> c);
+        int[] addA01(@Input(value = char[].class,
+                mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        int[] addA02(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        int[] addA02(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        int[] addA03(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        int[] addA03(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA04(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA05(
-                @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
-        OutputChannel<int[]> addA06(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.VALUE)
+        OutputChannel<int[]> addA06(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.VALUE)
-        OutputChannel<int[]> addA07(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        @Output(OutputMode.VALUE)
+        OutputChannel<int[]> addA07(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA08(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA09(
-                @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addA10(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.ELEMENT)
+        OutputChannel<Integer> addA10(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addA11(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        @Output(OutputMode.ELEMENT)
+        OutputChannel<Integer> addA11(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> addA12(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> addA13(
-                @Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
-        List<int[]> addA14(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.COLLECTION)
+        List<int[]> addA14(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
-        List<int[]> addA15(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        @Output(OutputMode.COLLECTION)
+        List<int[]> addA15(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         int[][] addA16(char[] c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
-        int[][] addA17(@Param(value = char[].class, mode = PassMode.VALUE) OutputChannel<char[]> c);
+        @Output(OutputMode.COLLECTION)
+        int[][] addA17(
+                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
-        int[][] addA18(@Param(value = char[].class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.COLLECTION)
+        int[][] addA18(@Input(value = char[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
-        int[][] addA19(@Param(value = char[].class,
-                mode = PassMode.PARALLEL) OutputChannel<char[]> c);
+        @Output(OutputMode.COLLECTION)
+        int[][] addA19(@Input(value = char[].class,
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.VALUE)
+        InvocationChannel<char[], int[]> addA20();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
+        InvocationChannel<char[], int[]> addA21();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.COLLECTION)
+        InvocationChannel<Character, int[]> addA22();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
 
         @Alias("al")
-        List<Integer> addL01(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        List<Integer> addL01(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        List<Integer> addL02(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        List<Integer> addL02(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        List<Integer> addL03(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        List<Integer> addL03(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL04(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
-        OutputChannel<List<Integer>> addL05(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        @Output(OutputMode.VALUE)
+        OutputChannel<List<Integer>> addL05(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
-        OutputChannel<List<Integer>> addL06(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.VALUE)
+        OutputChannel<List<Integer>> addL06(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.VALUE)
-        OutputChannel<List<Integer>> addL07(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        @Output(OutputMode.VALUE)
+        OutputChannel<List<Integer>> addL07(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL08(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addL09(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        @Output(OutputMode.ELEMENT)
+        OutputChannel<Integer> addL09(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addL10(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.ELEMENT)
+        OutputChannel<Integer> addL10(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
-        OutputChannel<Integer> addL11(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        @Output(OutputMode.ELEMENT)
+        OutputChannel<Integer> addL11(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL12(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
-        List<List<Integer>> addL13(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        @Output(OutputMode.COLLECTION)
+        List<List<Integer>> addL13(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
-        List<List<Integer>> addL14(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.COLLECTION)
+        List<List<Integer>> addL14(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
-        List<List<Integer>> addL15(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        @Output(OutputMode.COLLECTION)
+        List<List<Integer>> addL15(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List[] addL16(List<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
-        List[] addL17(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Character>> c);
+        @Output(OutputMode.COLLECTION)
+        List[] addL17(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
-        List[] addL18(@Param(value = List.class,
-                mode = PassMode.COLLECTION) OutputChannel<Character> c);
+        @Output(OutputMode.COLLECTION)
+        List[] addL18(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
-        List[] addL19(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Character>> c);
+        @Output(OutputMode.COLLECTION)
+        List[] addL19(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        InvocationChannel<List<Character>, List<Integer>> addL20();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.ELEMENT)
+        InvocationChannel<List<Character>, List<Integer>> addL21();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        InvocationChannel<Character, List<Integer>> addL22();
 
         @Alias("g")
         int get0();
@@ -774,11 +846,18 @@ public class ProxyRoutineTest {
         void set0(int i);
 
         @Alias("g")
-        @Param(value = int.class, mode = PassMode.VALUE)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> get1();
 
         @Alias("s")
-        void set1(@Param(value = int.class, mode = PassMode.VALUE) OutputChannel<Integer> i);
+        void set1(@Input(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
+
+        @Alias("g")
+        @Inputs({})
+        InvocationChannel<Void, Integer> get2();
+
+        @Alias("s")
+        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
 
         @Alias("ga")
         int[] getA0();
@@ -787,26 +866,30 @@ public class ProxyRoutineTest {
         void setA0(int[] i);
 
         @Alias("ga")
-        @Param(value = int[].class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> getA1();
 
         @Alias("sa")
-        void setA1(@Param(value = int[].class, mode = PassMode.VALUE) OutputChannel<int[]> i);
+        void setA1(@Input(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> i);
 
         @Alias("ga")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<int[]> getA2();
 
         @Alias("sa")
         void setA2(
-                @Param(value = int[].class, mode = PassMode.COLLECTION) OutputChannel<Integer> i);
+                @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("ga")
-        @Param(value = int[].class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         int[][] getA3();
 
         @Alias("sa")
-        void setA3(@Param(value = int[].class, mode = PassMode.PARALLEL) OutputChannel<int[]> i);
+        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
+
+        @Alias("ga")
+        @Inputs({})
+        InvocationChannel<Void, int[]> getA4();
 
         @Alias("gl")
         List<Integer> getL0();
@@ -815,39 +898,75 @@ public class ProxyRoutineTest {
         void setL0(List<Integer> i);
 
         @Alias("gl")
-        @Param(value = List.class, mode = PassMode.COLLECTION)
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> getL1();
 
         @Alias("sl")
-        void setL1(@Param(value = List.class,
-                mode = PassMode.VALUE) OutputChannel<List<Integer>> i);
+        void setL1(@Input(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List<List<Integer>> getL2();
 
         @Alias("sl")
-        void setL2(@Param(value = List.class, mode = PassMode.COLLECTION) OutputChannel<Integer> i);
+        void setL2(
+                @Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("gl")
-        @Param(value = List.class, mode = PassMode.PARALLEL)
+        @Output(OutputMode.COLLECTION)
         List[] getL3();
 
         @Alias("sl")
-        void setL3(@Param(value = List.class,
-                mode = PassMode.PARALLEL) OutputChannel<List<Integer>> i);
+        void setL3(@Input(value = List.class,
+                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
+
+        @Alias("gl")
+        @Inputs({})
+        InvocationChannel<Void, List<Integer>> getL4();
 
         @Alias("s")
-        void set2(@Param(value = int.class, mode = PassMode.PARALLEL) OutputChannel<Integer> i);
+        @Inputs(value = int.class, mode = InputMode.VALUE)
+        InvocationChannel<Integer, Void> set3();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.VALUE)
+        InvocationChannel<int[], Void> setA4();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.COLLECTION)
+        InvocationChannel<Integer, Void> setA5();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        InvocationChannel<List<Integer>, Void> setL4();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        InvocationChannel<Integer, Void> setL5();
+    }
+
+    @Proxy(Pass.class)
+    public interface PriorityPass {
+
+        @Output
+        @Alias("pass")
+        @Priority(AgingPriority.HIGH_PRIORITY)
+        OutputChannel<String> passHigh(String s);
+
+        @Output
+        @Alias("pass")
+        @Priority(AgingPriority.NORMAL_PRIORITY)
+        OutputChannel<String> passNormal(String s);
     }
 
     @Proxy(TestClass2.class)
     public interface TestClassAsync {
 
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getOne();
 
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getTwo();
     }
 
@@ -861,7 +980,7 @@ public class ProxyRoutineTest {
     public interface TestInterfaceProxy {
 
         @Timeout(300)
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getOne();
     }
 
@@ -873,53 +992,53 @@ public class ProxyRoutineTest {
         TYPE get(int i);
 
         @Alias("get")
-        @Param(Object.class)
+        @Output
         OutputChannel<TYPE> getAsync(int i);
 
         @Alias("get")
-        @Param(Object.class)
+        @Output
         List<TYPE> getList(int i);
     }
 
-    @Proxy(value = TestClass.class, generatedClassName = "Test",
-            generatedClassPackage = "com.gh.bmd.jrt.proxy")
+    @Proxy(value = TestClass.class, className = "Test",
+            classPackage = "com.gh.bmd.jrt.proxy")
     public interface TestProxy {
 
         @Timeout(300)
-        @Param(List.class)
-        Iterable<Iterable> getList(@Param(List.class) List<? extends List<String>> i);
+        @Output
+        Iterable<Iterable> getList(@Input(List.class) List<? extends List<String>> i);
 
         @Timeout(300)
-        @Param(int.class)
+        @Output
         OutputChannel<Integer> getOne();
 
         @Timeout(300)
-        String getString(@Param(int.class) int... i);
+        String getString(@Input(int.class) int... i);
 
         @Timeout(300)
-        @Param(String.class)
-        OutputChannel<String> getString(@Param(int.class) HashSet<Integer> i);
+        @Output
+        OutputChannel<String> getString(@Input(int.class) HashSet<Integer> i);
 
         @Timeout(300)
-        @Param(String.class)
-        List<String> getString(@Param(int.class) List<Integer> i);
+        @Output
+        List<String> getString(@Input(int.class) List<Integer> i);
 
         @Timeout(300)
-        @Param(String.class)
-        Iterable<String> getString(@Param(int.class) Iterable<Integer> i);
+        @Output
+        Iterable<String> getString(@Input(int.class) Iterable<Integer> i);
 
         @Timeout(300)
-        @Param(String.class)
-        String[] getString(@Param(int.class) Collection<Integer> i);
+        @Output
+        String[] getString(@Input(int.class) Collection<Integer> i);
 
         @Timeout(300)
-        String getString(@Param(int.class) OutputChannel<Integer> i);
+        String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
     @Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
-        @Param(int.class)
+        @Output
         @TimeoutAction(TimeoutActionType.ABORT)
         List<Integer> getInt();
     }
@@ -993,6 +1112,15 @@ public class ProxyRoutineTest {
         public void set(int i) {
 
             assertThat(i).isEqualTo(-17);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class Pass {
+
+        public String pass(final String s) {
+
+            return s;
         }
     }
 
@@ -1099,6 +1227,36 @@ public class ProxyRoutineTest {
         public int getWrnCount() {
 
             return mWrnCount;
+        }
+    }
+
+    private static class TestRunner implements Runner {
+
+        private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
+
+        @Override
+        public boolean isOwnedThread() {
+
+            return false;
+        }
+
+        @Override
+        public void run(@Nonnull final Execution execution, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mExecutions.add(execution);
+        }
+
+        private void run(int count) {
+
+            final Iterator<Execution> iterator = mExecutions.iterator();
+
+            while (iterator.hasNext() && (count-- > 0)) {
+
+                final Execution execution = iterator.next();
+                iterator.remove();
+                execution.run();
+            }
         }
     }
 }

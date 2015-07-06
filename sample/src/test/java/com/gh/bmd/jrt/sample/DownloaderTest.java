@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.sample;
 
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,20 +35,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class DownloaderTest {
 
-    private static final String FAIL_URL = "http://this.domain.does.not.exist/test.txt";
+    private static final String FAIL_URL = "https://this.domain.does.not.exist/test.txt";
 
     private static final String HUGE_FILE_URL =
-            "http://dl.google.com/android/studio/install/0.4.6/android-studio-bundle-133"
+            "https://dl.google.com/android/studio/install/0.4.6/android-studio-bundle-133"
                     + ".1028713-linux.tgz";
 
     private static final String SMALL_FILE_URL1 =
-            "http://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png";
+            "https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png";
 
     private static final String SMALL_FILE_URL2 =
-            "http://upload.wikimedia.org/wikipedia/commons/2/24/Yahoo%21_logo.svg";
+            "https://upload.wikimedia.org/wikipedia/commons/2/24/Yahoo%21_logo.svg";
 
     private static final String SMALL_FILE_URL3 =
-            "http://upload.wikimedia.org/wikipedia/commons/b/b1/Bing_logo_%282013%29.svg";
+            "https://upload.wikimedia.org/wikipedia/commons/b/b1/Bing_logo_%282013%29.svg";
 
     private final Downloader mDownloader;
 

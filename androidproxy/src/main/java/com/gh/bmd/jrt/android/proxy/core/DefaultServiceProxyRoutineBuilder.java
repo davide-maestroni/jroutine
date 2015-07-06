@@ -19,17 +19,19 @@ import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
+import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a service proxy builder.
@@ -37,17 +39,20 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * Created by davide-maestroni on 13/05/15.
  */
 class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
-        RoutineConfiguration.Configurable<ServiceProxyRoutineBuilder>,
+        InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ProxyConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
 
     private final WeakReference<Context> mContextReference;
 
+    private final Object[] mFactoryArgs;
+
     private final Class<?> mTargetClass;
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
@@ -56,10 +61,11 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      *
      * @param context     the invocation context.
      * @param targetClass the target class.
+     * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceProxyRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
         if (context == null) {
 
@@ -73,6 +79,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         mTargetClass = targetClass;
         mContextReference = new WeakReference<Context>(context);
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -106,36 +113,36 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             throw new IllegalStateException("the context object has been destroyed");
         }
 
-        final ObjectContextProxyBuilder<TYPE> builder =
-                new ObjectContextProxyBuilder<TYPE>(context, mTargetClass, itf);
-        return builder.withRoutine()
-                      .with(mRoutineConfiguration)
+        final ObjectServiceProxyBuilder<TYPE> builder =
+                new ObjectServiceProxyBuilder<TYPE>(context, mTargetClass, mFactoryArgs, itf);
+        return builder.invocations()
+                      .with(mInvocationConfiguration)
                       .set()
-                      .withProxy()
+                      .proxies()
                       .with(mProxyConfiguration)
                       .set()
-                      .withService()
+                      .service()
                       .with(mServiceConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withRoutine() {
+    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocations() {
 
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService() {
+    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
@@ -144,14 +151,14 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public ServiceProxyRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 
@@ -176,7 +183,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the proxy configuration must not be null");
+            throw new NullPointerException("the service configuration must not be null");
         }
 
         mServiceConfiguration = configuration;
@@ -188,9 +195,11 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectContextProxyBuilder<TYPE> extends AbstractServiceProxyBuilder<TYPE> {
+    private static class ObjectServiceProxyBuilder<TYPE> extends AbstractServiceProxyBuilder<TYPE> {
 
         private final Object mContext;
+
+        private final Object[] mFactoryArgs;
 
         private final ClassToken<TYPE> mInterfaceToken;
 
@@ -201,14 +210,16 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
          *
          * @param context        the invocation context.
          * @param targetClass    the proxy target class.
+         * @param factoryArgs    the object factory arguments.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectContextProxyBuilder(@Nonnull final Object context,
-                @Nonnull final Class<?> targetClass,
+        private ObjectServiceProxyBuilder(@Nonnull final Object context,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mContext = context;
             mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
             mInterfaceToken = interfaceToken;
         }
 
@@ -228,7 +239,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         @Nonnull
         @Override
-        protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+        protected TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final ServiceConfiguration serviceConfiguration) {
 
@@ -236,9 +247,10 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
                 final Object context = mContext;
                 final Class<?> targetClass = mTargetClass;
+                final Object[] factoryArgs = mFactoryArgs;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
-                String packageName = annotation.generatedClassPackage();
+                String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {
 
@@ -250,7 +262,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                     packageName += ".";
                 }
 
-                String className = annotation.generatedClassName();
+                String className = annotation.className();
 
                 if (className.equals(Proxy.DEFAULT)) {
 
@@ -259,21 +271,21 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
                     while (enclosingClass != null) {
 
-                        className = enclosingClass.getSimpleName() + className;
+                        className = enclosingClass.getSimpleName() + "_" + className;
                         enclosingClass = enclosingClass.getEnclosingClass();
                     }
                 }
 
-                final String fullClassName =
-                        packageName + annotation.generatedClassPrefix() + className
-                                + annotation.generatedClassSuffix();
+                final String fullClassName = packageName + annotation.classPrefix() + className
+                        + annotation.classSuffix();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), context, targetClass,
-                                        routineConfiguration, proxyConfiguration,
+                                        factoryArgs, invocationConfiguration, proxyConfiguration,
                                         serviceConfiguration);
                 return interfaceClass.cast(
-                        constructor.newInstance(context, targetClass, routineConfiguration,
-                                                proxyConfiguration, serviceConfiguration));
+                        constructor.newInstance(context, targetClass, factoryArgs,
+                                                invocationConfiguration, proxyConfiguration,
+                                                serviceConfiguration));
 
             } catch (final Throwable t) {
 

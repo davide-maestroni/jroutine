@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.channel;
 
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,28 +33,28 @@ public interface InputChannel<INPUT> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort command will be delayed as well. Note, however, that a delayed abort will
-     * not prevent the invocation from completing, as input data do.
+     * Note that an abortion command will be delayed as well. Note, however, that a delayed abortion
+     * will not prevent the invocation from completing, as input data do.
      *
      * @param delay the delay.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> after(@Nonnull TimeDuration delay);
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort command will be delayed as well. Note, however, that a delayed abort will
-     * not prevent the invocation from completing, as input data do.
+     * Note that an abortion command will be delayed as well. Note, however, that a delayed abortion
+     * will not prevent the invocation from completing, as input data do.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalArgumentException     if the specified delay is negative.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalArgumentException      if the specified delay is negative.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
@@ -63,23 +63,69 @@ public interface InputChannel<INPUT> extends Channel {
      * Tells the channel to not delay the transfer of data.
      *
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> now();
 
     /**
+     * Tells the channel to sort the passed input data based on the order of the calls to the pass
+     * methods.
+     * <p/>
+     * By default no particular order is applied.
+     *
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
+     * @see {@link #orderByChance()}
+     * @see {@link #orderByDelay()}
+     */
+    @Nonnull
+    InputChannel<INPUT> orderByCall();
+
+    /**
+     * Tells the channel to avoid sorting the passed input in any particular order.
+     * <p/>
+     * This is the default behavior.
+     *
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
+     * @see {@link #orderByCall()}
+     * @see {@link #orderByDelay()}
+     */
+    @Nonnull
+    InputChannel<INPUT> orderByChance();
+
+    /**
+     * Tells the channel to sort the passed input data based on the specific delay.<br/>
+     * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
+     * are passed to the channel, while the others will be delivered as soon as the set runner
+     * handles the related execution.
+     * <p/>
+     * By default no particular order is applied.
+     *
+     * @return this channel.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
+     * @see {@link #orderByCall()}
+     * @see {@link #orderByChance()}
+     */
+    @Nonnull
+    InputChannel<INPUT> orderByDelay();
+
+    /**
      * Passes the specified channel to this one.
      * <p/>
-     * Note that this channel will be bound as a result of the call, thus preventing any other
-     * reader getting data from the specified output channel.
+     * Note that the output channel will be bound as a result of the call, thus effectively
+     * preventing any other consumer from getting data from it.
      *
      * @param channel the output channel.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
-     * @see com.gh.bmd.jrt.channel.OutputChannel#bind(OutputConsumer)
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
+     * @see com.gh.bmd.jrt.channel.OutputChannel#passTo(InputChannel)
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
@@ -89,8 +135,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the iterable returning the input data.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
@@ -100,8 +146,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param input the input.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable INPUT input);
@@ -111,8 +157,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the input data.
      * @return this channel.
-     * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException        if this channel is already closed.
+     * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException         if this channel is already closed.
      */
     @Nonnull
     InputChannel<INPUT> pass(@Nullable INPUT... inputs);

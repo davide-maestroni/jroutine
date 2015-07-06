@@ -20,17 +20,19 @@ import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.proxy.annotation.V11Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
+import com.gh.bmd.jrt.util.ClassToken;
+import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a context proxy builder.
@@ -38,30 +40,34 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * Created by davide-maestroni on 06/05/15.
  */
 class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
-        RoutineConfiguration.Configurable<LoaderProxyRoutineBuilder>,
+        InvocationConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         ProxyConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         LoaderConfiguration.Configurable<LoaderProxyRoutineBuilder> {
 
     private final WeakReference<?> mContextReference;
 
+    private final Object[] mFactoryArgs;
+
     private final Class<?> mTargetClass;
+
+    private InvocationConfiguration mInvocationConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
-
-    private RoutineConfiguration mRoutineConfiguration = RoutineConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
      *
      * @param activity    the invocation activity context.
      * @param targetClass the target class.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderProxyRoutineBuilder(@Nonnull final Activity activity,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
-        this((Object) activity, targetClass);
+        this((Object) activity, targetClass, factoryArgs);
     }
 
     /**
@@ -69,11 +75,12 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      *
      * @param fragment    the invocation fragment context.
      * @param targetClass the target class.
+     * @param factoryArgs the object factory arguments.
      */
     DefaultLoaderProxyRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
-        this((Object) fragment, targetClass);
+        this((Object) fragment, targetClass, factoryArgs);
     }
 
     /**
@@ -81,10 +88,11 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      *
      * @param context     the invocation context.
      * @param targetClass the target class.
+     * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultLoaderProxyRoutineBuilder(@Nonnull final Object context,
-            @Nonnull final Class<?> targetClass) {
+            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
         if (context == null) {
 
@@ -98,6 +106,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         mTargetClass = targetClass;
         mContextReference = new WeakReference<Object>(context);
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -132,35 +141,35 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         }
 
         final ObjectLoaderProxyBuilder<TYPE> builder =
-                new ObjectLoaderProxyBuilder<TYPE>(context, mTargetClass, itf);
-        return builder.withRoutine()
-                      .with(mRoutineConfiguration)
+                new ObjectLoaderProxyBuilder<TYPE>(context, mTargetClass, mFactoryArgs, itf);
+        return builder.invocations()
+                      .with(mInvocationConfiguration)
                       .set()
-                      .withProxy()
+                      .proxies()
                       .with(mProxyConfiguration)
                       .set()
-                      .withLoader()
+                      .loaders()
                       .with(mLoaderConfiguration)
                       .set()
                       .buildProxy();
     }
 
     @Nonnull
-    public RoutineConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withRoutine() {
+    public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocations() {
 
-        final RoutineConfiguration config = mRoutineConfiguration;
-        return new RoutineConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withLoader() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withProxy() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
@@ -169,14 +178,14 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyRoutineBuilder setConfiguration(
-            @Nonnull final RoutineConfiguration configuration) {
+            @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
-            throw new NullPointerException("the configuration must not be null");
+            throw new NullPointerException("the invocation configuration must not be null");
         }
 
-        mRoutineConfiguration = configuration;
+        mInvocationConfiguration = configuration;
         return this;
     }
 
@@ -201,7 +210,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         if (configuration == null) {
 
-            throw new NullPointerException("the proxy configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mLoaderConfiguration = configuration;
@@ -217,6 +226,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         private final Object mContext;
 
+        private final Object[] mFactoryArgs;
+
         private final ClassToken<TYPE> mInterfaceToken;
 
         private final Class<?> mTargetClass;
@@ -226,14 +237,16 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
          *
          * @param context        the invocation context.
          * @param targetClass    the proxy target class.
+         * @param factoryArgs    the object factory arguments.
          * @param interfaceToken the proxy interface token.
          */
         private ObjectLoaderProxyBuilder(@Nonnull final Object context,
-                @Nonnull final Class<?> targetClass,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mContext = context;
             mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
             mInterfaceToken = interfaceToken;
         }
 
@@ -253,7 +266,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         @Nonnull
         @Override
-        protected TYPE newProxy(@Nonnull final RoutineConfiguration routineConfiguration,
+        protected TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final LoaderConfiguration loaderConfiguration) {
 
@@ -261,9 +274,10 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
                 final Object context = mContext;
                 final Class<?> targetClass = mTargetClass;
+                final Object[] factoryArgs = mFactoryArgs;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final V11Proxy annotation = interfaceClass.getAnnotation(V11Proxy.class);
-                String packageName = annotation.generatedClassPackage();
+                String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {
 
@@ -275,7 +289,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                     packageName += ".";
                 }
 
-                String className = annotation.generatedClassName();
+                String className = annotation.className();
 
                 if (className.equals(Proxy.DEFAULT)) {
 
@@ -284,21 +298,21 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
                     while (enclosingClass != null) {
 
-                        className = enclosingClass.getSimpleName() + className;
+                        className = enclosingClass.getSimpleName() + "_" + className;
                         enclosingClass = enclosingClass.getEnclosingClass();
                     }
                 }
 
-                final String fullClassName =
-                        packageName + annotation.generatedClassPrefix() + className
-                                + annotation.generatedClassSuffix();
+                final String fullClassName = packageName + annotation.classPrefix() + className
+                        + annotation.classSuffix();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), context, targetClass,
-                                        routineConfiguration, proxyConfiguration,
+                                        factoryArgs, invocationConfiguration, proxyConfiguration,
                                         loaderConfiguration);
                 return interfaceClass.cast(
-                        constructor.newInstance(context, targetClass, routineConfiguration,
-                                                proxyConfiguration, loaderConfiguration));
+                        constructor.newInstance(context, targetClass, factoryArgs,
+                                                invocationConfiguration, proxyConfiguration,
+                                                loaderConfiguration));
 
             } catch (final Throwable t) {
 

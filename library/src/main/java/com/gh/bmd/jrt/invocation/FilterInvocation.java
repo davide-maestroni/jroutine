@@ -32,7 +32,7 @@ public abstract class FilterInvocation<INPUT, OUTPUT>
         implements Invocation<INPUT, OUTPUT>, InvocationFactory<INPUT, OUTPUT> {
 
     @Nonnull
-    public final Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final Object... args) {
+    public final Invocation<INPUT, OUTPUT> newInvocation() {
 
         return this;
     }
@@ -45,7 +45,7 @@ public abstract class FilterInvocation<INPUT, OUTPUT>
 
     }
 
-    public final void onInit() {
+    public final void onInitialize() {
 
     }
 
@@ -53,7 +53,7 @@ public abstract class FilterInvocation<INPUT, OUTPUT>
 
     }
 
-    public final void onReturn() {
+    public final void onTerminate() {
 
     }
 }

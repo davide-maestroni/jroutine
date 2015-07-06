@@ -45,7 +45,7 @@ public class Runners {
      * Returns a runner employing a dynamic pool of threads.<br/>
      * The number of threads may increase when needed from the core to the maximum pool size. The
      * number of threads exceeding the core size are kept alive when idle for the specified time.
-     * If they stay idle for more time they will be destroyed.
+     * If they stay idle for a longer time they will be destroyed.
      *
      * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
      * @param maximumPoolSize the maximum number of threads to allow in the pool.
@@ -65,6 +65,17 @@ public class Runners {
     }
 
     /**
+     * Returns a runner employing an optimum number of threads.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner poolRunner() {
+
+        return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
+    }
+
+    /**
      * Returns a runner employing the specified number of threads.
      *
      * @param poolSize the thread pool size.
@@ -77,17 +88,6 @@ public class Runners {
     }
 
     /**
-     * Returns a runner employing an optimum number of threads.
-     *
-     * @return the runner instance.
-     */
-    @Nonnull
-    public static Runner poolRunner() {
-
-        return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
-    }
-
-    /**
      * Returns a runner providing ordering of executions based on priority.
      *
      * @param wrapped the wrapped runner instance.
@@ -96,7 +96,7 @@ public class Runners {
     @Nonnull
     public static PriorityRunner priorityRunner(@Nonnull final Runner wrapped) {
 
-        return new PriorityRunner(wrapped);
+        return PriorityRunner.getInstance(wrapped);
     }
 
     /**

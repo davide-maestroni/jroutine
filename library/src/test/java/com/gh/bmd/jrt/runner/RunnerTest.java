@@ -13,10 +13,10 @@
  */
 package com.gh.bmd.jrt.runner;
 
-import com.gh.bmd.jrt.runner.PriorityRunner.AgingPriority;
-import com.gh.bmd.jrt.runner.PriorityRunner.NotAgingPriority;
-import com.gh.bmd.jrt.time.Time;
-import com.gh.bmd.jrt.time.TimeDuration;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.AgingPriority;
+import com.gh.bmd.jrt.builder.InvocationConfiguration.NotAgingPriority;
+import com.gh.bmd.jrt.util.Time;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -26,11 +26,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.gh.bmd.jrt.time.Time.current;
-import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
-import static com.gh.bmd.jrt.time.TimeDuration.micros;
-import static com.gh.bmd.jrt.time.TimeDuration.millis;
-import static com.gh.bmd.jrt.time.TimeDuration.nanos;
+import static com.gh.bmd.jrt.util.Time.current;
+import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
+import static com.gh.bmd.jrt.util.TimeDuration.micros;
+import static com.gh.bmd.jrt.util.TimeDuration.millis;
+import static com.gh.bmd.jrt.util.TimeDuration.nanos;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -48,6 +48,21 @@ public class RunnerTest {
         testRunner(Runners.dynamicPoolRunner(3, 4, 5L, TimeUnit.SECONDS));
         testRunner(new RunnerDecorator(Runners.sharedRunner()));
         testRunner(new RunnerDecorator(Runners.dynamicPoolRunner(1, 4, 0L, TimeUnit.SECONDS)));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullPriorityRunner() {
+
+        try {
+
+            Runners.priorityRunner(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -108,6 +123,14 @@ public class RunnerTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSamePriorityRunner() {
+
+        final PriorityRunner priorityRunner = Runners.priorityRunner(Runners.queuedRunner());
+        assertThat(Runners.priorityRunner(priorityRunner.getRunner(3))).isSameAs(priorityRunner);
     }
 
     @Test

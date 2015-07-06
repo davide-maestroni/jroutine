@@ -14,30 +14,38 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
+    private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     private static class InvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
 
-        @javax.annotation.Nonnull
-        public com.gh.bmd.jrt.invocation.Invocation newInvocation(@javax.annotation.Nonnull Object... args) {
+        private final Object mMutex;
 
-            return new Invocation${methodCount}${genericTypes}((java.lang.ref.WeakReference<${classFullName}>) args[0], args[1]);
+        private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
+
+        private InvocationFactory${methodCount}(
+                @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped,
+                @javax.annotation.Nullable final Object mutex) {
+
+            mWrapped = wrapped;
+            mMutex = mutex;
+        }
+
+        @javax.annotation.Nonnull
+        @SuppressWarnings("unchecked")
+        public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
+
+            return new Invocation${methodCount}${genericTypes}(mWrapped, mMutex);
         }
     }
 
     @javax.annotation.Nonnull
-    private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
+    private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration configuration) {
 
-        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}())
-                                           .withRoutine()
+        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(mWrapped, getMutex(${shareGroup})))
+                                           .invocations()
                                            .with(configuration)
                                            ${routineBuilderOptions}
-                                           .withFactoryArgs(mWrapped, getMutex(${shareGroup}))
-                                           .withInputMaxSize(Integer.MAX_VALUE)
-                                           .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                                           .withOutputMaxSize(Integer.MAX_VALUE)
-                                           .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .set()
                                            .buildRoutine();
     }

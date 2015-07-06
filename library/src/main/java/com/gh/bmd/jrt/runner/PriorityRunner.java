@@ -13,7 +13,11 @@
  */
 package com.gh.bmd.jrt.runner;
 
+import com.gh.bmd.jrt.util.WeakIdentityHashMap;
+
+import java.io.Serializable;
 import java.util.Comparator;
+import java.util.WeakHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -29,29 +33,20 @@ import javax.annotation.Nonnull;
  * older executions slowly increases their priority. Such mechanism has been implemented to avoid
  * starvation of low priority executions. Hence, when assigning priority to different runners, it is
  * important to keep in mind that the difference between two priorities corresponds to the maximum
- * age the lower priority execution will have, before getting the precedence over the higher
- * priority one.
+ * age the lower priority execution will have, before getting precedence over the higher priority
+ * one.
  * <p/>
- * Note that the queue is not share between different instances of this class.
+ * Note that the queue is not shared between different instances of this class.
  * <p/>
  * Created by davide-maestroni on 28/04/15.
  */
 public class PriorityRunner {
 
-    private static final Comparator<PriorityExecution> PRIORITY_EXECUTION_COMPARATOR =
-            new Comparator<PriorityExecution>() {
+    private static final PriorityExecutionComparator PRIORITY_EXECUTION_COMPARATOR =
+            new PriorityExecutionComparator();
 
-                public int compare(final PriorityExecution o1, final PriorityExecution o2) {
-
-                    final int thisPriority = o1.mPriority;
-                    final long thisAge = o1.mAge;
-                    final int thatPriority = o2.mPriority;
-                    final long thatAge = o2.mAge;
-
-                    final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
-                    return (compare == 0) ? compareLong(thatAge, thisAge) : compare;
-                }
-            };
+    private static final WeakIdentityHashMap<Runner, PriorityRunner> sRunnerMap =
+            new WeakIdentityHashMap<Runner, PriorityRunner>();
 
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
 
@@ -72,13 +67,16 @@ public class PriorityRunner {
 
     private final Runner mRunner;
 
+    private final WeakHashMap<QueuingRunner, Void> mRunnerMap =
+            new WeakHashMap<QueuingRunner, Void>();
+
     /**
      * Constructor.
      *
      * @param wrapped the wrapped instance.
      */
     @SuppressWarnings("ConstantConditions")
-    PriorityRunner(@Nonnull final Runner wrapped) {
+    private PriorityRunner(@Nonnull final Runner wrapped) {
 
         if (wrapped == null) {
 
@@ -87,6 +85,29 @@ public class PriorityRunner {
 
         mRunner = wrapped;
         mQueue = new PriorityBlockingQueue<PriorityExecution>(10, PRIORITY_EXECUTION_COMPARATOR);
+    }
+
+    @Nonnull
+    static PriorityRunner getInstance(@Nonnull final Runner wrapped) {
+
+        if (wrapped instanceof QueuingRunner) {
+
+            return ((QueuingRunner) wrapped).enclosingRunner();
+        }
+
+        synchronized (sRunnerMap) {
+
+            final WeakIdentityHashMap<Runner, PriorityRunner> runnerMap = sRunnerMap;
+            PriorityRunner runner = runnerMap.get(wrapped);
+
+            if (runner == null) {
+
+                runner = new PriorityRunner(wrapped);
+                runnerMap.put(wrapped, runner);
+            }
+
+            return runner;
+        }
     }
 
     private static int compareLong(long x, long y) {
@@ -103,74 +124,22 @@ public class PriorityRunner {
     @Nonnull
     public Runner getRunner(final int priority) {
 
-        return new EnqueuingRunner(priority);
-    }
+        synchronized (mRunnerMap) {
 
-    /**
-     * Interface exposing constants which can be used as a common set of priorities.<br/>
-     * Note that, since the priority value can be any in an integer range, it is always possible to
-     * customize the values so to create a personalized set.
-     */
-    public interface AgingPriority {
+            final WeakHashMap<QueuingRunner, Void> runnerMap = mRunnerMap;
 
-        /**
-         * High priority.
-         */
-        int HIGH_PRIORITY = 10;
+            for (final QueuingRunner runner : runnerMap.keySet()) {
 
-        /**
-         * Highest priority.
-         */
-        int HIGHEST_PRIORITY = HIGH_PRIORITY << 1;
+                if (runner.mPriority == priority) {
 
-        /**
-         * Low priority.
-         */
-        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
+                    return runner;
+                }
+            }
 
-        /**
-         * Lowest priority.
-         */
-        int LOW_PRIORITY = -HIGH_PRIORITY;
-
-        /**
-         * Normal priority.
-         */
-        int NORMAL_PRIORITY = 0;
-    }
-
-    /**
-     * Interface exposing constants which can be used as a set of priorities ignoring the aging of
-     * executions.<br/>
-     * Note that, since the priority value can be any in an integer range, it is always possible to
-     * customize the values so to create a personalized set.
-     */
-    public interface NotAgingPriority {
-
-        /**
-         * Highest priority.
-         */
-        int HIGHEST_PRIORITY = Integer.MAX_VALUE;
-
-        /**
-         * High priority.
-         */
-        int HIGH_PRIORITY = HIGHEST_PRIORITY >> 1;
-
-        /**
-         * Low priority.
-         */
-        int LOWEST_PRIORITY = -HIGHEST_PRIORITY;
-
-        /**
-         * Lowest priority.
-         */
-        int LOW_PRIORITY = -HIGH_PRIORITY;
-
-        /**
-         * Normal priority.
-         */
-        int NORMAL_PRIORITY = 0;
+            final QueuingRunner runner = new QueuingRunner(priority);
+            runnerMap.put(runner, null);
+            return runner;
+        }
     }
 
     /**
@@ -242,9 +211,30 @@ public class PriorityRunner {
     }
 
     /**
+     * Comparator of priority execution instances.
+     */
+    private static class PriorityExecutionComparator
+            implements Comparator<PriorityExecution>, Serializable {
+
+        // just don't care...
+        private static final long serialVersionUID = -1;
+
+        public int compare(final PriorityExecution o1, final PriorityExecution o2) {
+
+            final int thisPriority = o1.mPriority;
+            final long thisAge = o1.mAge;
+            final int thatPriority = o2.mPriority;
+            final long thatAge = o2.mAge;
+
+            final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
+            return (compare == 0) ? compareLong(thatAge, thisAge) : compare;
+        }
+    }
+
+    /**
      * Enqueuing runner implementation.
      */
-    private class EnqueuingRunner implements Runner {
+    private class QueuingRunner implements Runner {
 
         private final int mPriority;
 
@@ -253,9 +243,14 @@ public class PriorityRunner {
          *
          * @param priority the execution priority.
          */
-        private EnqueuingRunner(final int priority) {
+        private QueuingRunner(final int priority) {
 
             mPriority = priority;
+        }
+
+        public boolean isOwnedThread() {
+
+            return mRunner.isOwnedThread();
         }
 
         public void run(@Nonnull final Execution execution, final long delay,
@@ -273,6 +268,11 @@ public class PriorityRunner {
 
                 mRunner.run(new DelayedExecution(mQueue, priorityExecution), delay, timeUnit);
             }
+        }
+
+        private PriorityRunner enclosingRunner() {
+
+            return PriorityRunner.this;
         }
     }
 }

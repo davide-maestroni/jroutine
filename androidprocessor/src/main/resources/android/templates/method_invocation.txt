@@ -14,9 +14,9 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.ProcedureContextInvocation<Object, ${resultClassName}> {
+    private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
 
-        private final Object[] mArgs;
+        private final Object[] mFactoryArgs;
 
         private final String mShareGroup;
 
@@ -27,11 +27,11 @@
         private ${classFullName} mTarget;
 
         private ContextInvocation${methodCount}(@javax.annotation.Nonnull final Class<?> targetClass,
-                @javax.annotation.Nullable final String shareGroup, @javax.annotation.Nonnull final Object[] args) {
+                @javax.annotation.Nonnull final Object[] factoryArgs, @javax.annotation.Nullable final String shareGroup) {
 
             mTargetClass = targetClass;
+            mFactoryArgs = factoryArgs;
             mShareGroup = shareGroup;
-            mArgs = args;
         }
 
         @Override
@@ -42,18 +42,18 @@
 
             try {
 
-                final ${classFullName} target = (${classFullName}) getInstance(context, mTargetClass, mArgs);
+                final ${classFullName} target = (${classFullName}) getInstance(context, mTargetClass, mFactoryArgs);
                 final Object mutex = getMutex(target, mShareGroup);
                 mMutex = (mutex != null) ? mutex : this;
                 mTarget = target;
 
-            } catch (final com.gh.bmd.jrt.common.RoutineException e) {
+            } catch (final com.gh.bmd.jrt.channel.RoutineException e) {
 
                 throw e;
 
             } catch (final Throwable t) {
 
-                throw new com.gh.bmd.jrt.common.InvocationException(t);
+                throw new com.gh.bmd.jrt.invocation.InvocationException(t);
             }
         }
 
@@ -82,13 +82,13 @@
 
                     result.pass(wrapped.${targetMethodName}(${paramValues}));
 
-                } catch (final com.gh.bmd.jrt.common.RoutineException e) {
+                } catch (final com.gh.bmd.jrt.channel.RoutineException e) {
 
                     throw e;
 
                 } catch (final Throwable t) {
 
-                    throw new com.gh.bmd.jrt.common.InvocationException(t);
+                    throw new com.gh.bmd.jrt.invocation.InvocationException(t);
                 }
             }
         }

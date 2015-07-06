@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.core;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
+import android.support.v4.util.SparseArrayCompat;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.core.Channels.ParcelableSelectable;
@@ -544,7 +545,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         outputs.add(new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Sort.class)).buildRoutine();
-        Map<Integer, InputChannel<Object>> channelMap;
+        SparseArrayCompat<InputChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.mapParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
@@ -567,7 +568,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Sort.class)).buildRoutine();
-        Map<Integer, InputChannel<Object>> channelMap;
+        SparseArrayCompat<InputChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.mapParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));

@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.android.core;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.util.SparseArrayCompat;
 
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -24,7 +25,6 @@ import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.core.JRoutine;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,17 +60,17 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> Map<Integer, InputChannel<INPUT>> mapParcelable(
+    public static <DATA, INPUT extends DATA> SparseArrayCompat<InputChannel<INPUT>> mapParcelable(
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
-        final HashMap<Integer, InputChannel<INPUT>> channelMap =
-                new HashMap<Integer, InputChannel<INPUT>>(size);
+        final SparseArrayCompat<InputChannel<INPUT>> channelMap =
+                new SparseArrayCompat<InputChannel<INPUT>>(size);
 
         for (final Integer index : indexes) {
 
-            channelMap.put(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -86,17 +86,17 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> Map<Integer, InputChannel<INPUT>> mapParcelable(
+    public static <DATA, INPUT extends DATA> SparseArrayCompat<InputChannel<INPUT>> mapParcelable(
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final int... indexes) {
 
         final int size = indexes.length;
-        final HashMap<Integer, InputChannel<INPUT>> channelMap =
-                new HashMap<Integer, InputChannel<INPUT>>(size);
+        final SparseArrayCompat<InputChannel<INPUT>> channelMap =
+                new SparseArrayCompat<InputChannel<INPUT>>(size);
 
         for (final int index : indexes) {
 
-            channelMap.put(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -114,7 +114,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> Map<Integer, InputChannel<INPUT>> mapParcelable(
+    public static <DATA, INPUT extends DATA> SparseArrayCompat<InputChannel<INPUT>> mapParcelable(
             final int startIndex, final int rangeSize,
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
 
@@ -123,12 +123,12 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, InputChannel<INPUT>> channelMap =
-                new HashMap<Integer, InputChannel<INPUT>>(rangeSize);
+        final SparseArrayCompat<InputChannel<INPUT>> channelMap =
+                new SparseArrayCompat<InputChannel<INPUT>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
-            channelMap.put(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
         }
 
         return channelMap;

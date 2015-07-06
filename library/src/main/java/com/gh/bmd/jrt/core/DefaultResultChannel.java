@@ -769,7 +769,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         public boolean hasNext() {
 
-            final boolean isRunnerThread = mRunner.isOwnedThread();
             boolean isAbort = false;
 
             synchronized (mMutex) {
@@ -801,7 +800,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else {
 
-                    if (isRunnerThread) {
+                    if (mRunner.isOwnedThread()) {
 
                         throw new RunnerDeadlockException("cannot wait on the same runner thread");
                     }
@@ -952,7 +951,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @SuppressWarnings({"unchecked", "ConstantConditions"})
         public OutputChannel<OUTPUT> allInto(@Nonnull final Collection<? super OUTPUT> results) {
 
-            final boolean isRunnerThread = mRunner.isOwnedThread();
             boolean isAbort = false;
 
             synchronized (mMutex) {
@@ -1015,7 +1013,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                                 break;
                             }
 
-                            if (isRunnerThread) {
+                            if (mRunner.isOwnedThread()) {
 
                                 throw new RunnerDeadlockException(
                                         "cannot wait on the same runner thread");
@@ -1059,13 +1057,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         public boolean checkComplete() {
 
-            final boolean isRunnerThread = mRunner.isOwnedThread();
-
             synchronized (mMutex) {
 
                 final TimeDuration readTimeout = mReadTimeout;
 
-                if (!readTimeout.isZero() && isRunnerThread) {
+                if (!readTimeout.isZero() && mRunner.isOwnedThread()) {
 
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
                 }

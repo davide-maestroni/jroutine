@@ -969,8 +969,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (!mHasInputs.isTrue()) {
 
-                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isOwnedThread()) {
+                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
 
                     --mInputCount;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -1106,8 +1105,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (!mHasInputs.isTrue()) {
 
-                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isOwnedThread()) {
+                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
 
                     mInputCount -= size;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -1157,8 +1155,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (!mHasInputs.isTrue()) {
 
-                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isOwnedThread()) {
+                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
 
                     --mInputCount;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");
@@ -1222,8 +1219,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (!mHasInputs.isTrue()) {
 
-                if (!mInputTimeout.isZero() && (!mIsPendingExecution || !delay.isZero())
-                        && mRunner.isOwnedThread()) {
+                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
 
                     mInputCount -= size;
                     throw new RunnerDeadlockException("cannot wait on the same runner thread");

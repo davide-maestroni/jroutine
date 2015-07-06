@@ -66,7 +66,7 @@ class LooperRunner implements Runner {
 
             public boolean isOwnedThread() {
 
-                return false;
+                return true;
             }
 
             public void run(@Nonnull final Execution execution, final long delay,
@@ -91,7 +91,7 @@ class LooperRunner implements Runner {
     }
 
     /**
-     * Runner handling execution started from the main thread.
+     * Runner handling execution started from the same looper thread.
      */
     private static class SameThreadRunner implements Runner {
 
@@ -106,7 +106,7 @@ class LooperRunner implements Runner {
 
         public boolean isOwnedThread() {
 
-            return mLooperRunner.isOwnedThread();
+            return true;
         }
 
         public void run(@Nonnull final Execution execution, final long delay,
@@ -125,7 +125,7 @@ class LooperRunner implements Runner {
 
     public boolean isOwnedThread() {
 
-        return (Thread.currentThread() == mThread) || mSameThreadRunner.isOwnedThread();
+        return (Thread.currentThread() == mThread) && mSameThreadRunner.isOwnedThread();
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

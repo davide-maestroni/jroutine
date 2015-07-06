@@ -161,7 +161,7 @@ public class Downloader {
                             .withInputTimeout(seconds(30))
                             .set()
                             .buildRoutine();
-            downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
+            downloadMap.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
         }
     }
 

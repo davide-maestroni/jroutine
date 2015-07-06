@@ -62,7 +62,7 @@ public class LoaderRoutineRotationTest
                 .loaders()
                 .withId(0)
                 .set()
-                .callAsync("test1", "test2");
+                .asyncCall("test1", "test2");
 
         final Semaphore semaphore = new Semaphore(0);
 
@@ -95,8 +95,8 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class)).buildRoutine();
-        routine1.callAsync("test1");
-        routine1.callAsync("test2");
+        routine1.asyncCall("test1");
+        routine1.asyncCall("test2");
 
         final Semaphore semaphore = new Semaphore(0);
 
@@ -114,8 +114,8 @@ public class LoaderRoutineRotationTest
 
         final Routine<String, String> routine2 =
                 JRoutine.onActivity(getActivity(), factoryOf(ToUpperCase.class)).buildRoutine();
-        final OutputChannel<String> result1 = routine2.callAsync("test1").afterMax(timeout);
-        final OutputChannel<String> result2 = routine2.callAsync("test2").afterMax(timeout);
+        final OutputChannel<String> result1 = routine2.asyncCall("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine2.asyncCall("test2").afterMax(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST2");
@@ -133,8 +133,8 @@ public class LoaderRoutineRotationTest
         final Data data1 = new Data();
         final Routine<Data, Data> routine1 =
                 JRoutine.onActivity(getActivity(), factoryOf(Delay.class)).buildRoutine();
-        routine1.callAsync(data1);
-        routine1.callAsync(data1);
+        routine1.asyncCall(data1);
+        routine1.asyncCall(data1);
 
         final Semaphore semaphore = new Semaphore(0);
 
@@ -152,8 +152,8 @@ public class LoaderRoutineRotationTest
 
         final Routine<Data, Data> routine2 =
                 JRoutine.onActivity(getActivity(), factoryOf(Delay.class)).buildRoutine();
-        final OutputChannel<Data> result1 = routine2.callAsync(data1).afterMax(timeout);
-        final OutputChannel<Data> result2 = routine2.callAsync(data1).afterMax(timeout);
+        final OutputChannel<Data> result1 = routine2.asyncCall(data1).afterMax(timeout);
+        final OutputChannel<Data> result2 = routine2.asyncCall(data1).afterMax(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);

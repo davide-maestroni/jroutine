@@ -59,8 +59,8 @@ import javax.annotation.Nonnull;
  *
  *         final TransportChannel&lt;Result&gt; channel = JRoutine.transport().buildChannel();
  *         channel.input()
- *                .pass(doSomething1.callAsync())
- *                .pass(doSomething2.callAsync())
+ *                .pass(doSomething1.asyncCall())
+ *                .pass(doSomething2.asyncCall())
  *                .close();
  *         channel.output()
  *                .eventually()
@@ -71,8 +71,8 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final OutputChannel&lt;Result&gt; output1 = doSomething1.callAsync();
- *         final OutputChannel&lt;Result&gt; output2 = doSomething2.callAsync();
+ *         final OutputChannel&lt;Result&gt; output1 = doSomething1.asyncCall();
+ *         final OutputChannel&lt;Result&gt; output2 = doSomething2.asyncCall();
  *         output1.eventually().allInto(results);
  *         output2.eventually().allInto(results);
  *     </code>
@@ -84,7 +84,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         doSomething1.callAsync(doSomething2.callAsync())).eventually().allInto(results);
+ *         doSomething1.asyncCall(doSomething2.asyncCall())).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -101,7 +101,7 @@ import javax.annotation.Nonnull;
  *
  *         final AsyncCallback callback = JRoutine.on(myCallback)
  *                                                .buildProxy(AsyncCallback.class);
- *         callback.onResults(doSomething1.callAsync(), doSomething2.callAsync());
+ *         callback.onResults(doSomething1.asyncCall(), doSomething2.asyncCall());
  *     </code>
  * </pre>
  * Where the object <code>myCallback</code> implements a method
@@ -126,7 +126,7 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                          .buildRoutine();
- *         routine.callAsync(channel.output()).eventually().allInto(results);
+ *         routine.asyncCall(channel.output()).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>

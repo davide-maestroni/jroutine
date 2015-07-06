@@ -470,7 +470,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.callSync(inputs));
+            result.pass(mRoutine.syncCall(inputs));
         }
 
         @Override
@@ -593,7 +593,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.callSync(inputs));
+            result.pass(mRoutine.syncCall(inputs));
         }
 
         @Override

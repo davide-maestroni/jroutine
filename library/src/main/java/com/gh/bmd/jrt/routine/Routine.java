@@ -83,138 +83,48 @@ import javax.annotation.Nullable;
 public interface Routine<INPUT, OUTPUT> {
 
     /**
-     * Short for <b><code>invokeAsync().result()</code></b>.
+     * Short for <b><code>asyncInvoke().result()</code></b>.
      *
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callAsync();
+    OutputChannel<OUTPUT> asyncCall();
 
     /**
-     * Short for <b><code>invokeAsync().pass(input).result()</code></b>.
+     * Short for <b><code>asyncInvoke().pass(input).result()</code></b>.
      *
      * @param input the input.
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callAsync(@Nullable INPUT input);
+    OutputChannel<OUTPUT> asyncCall(@Nullable INPUT input);
 
     /**
-     * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
+     * Short for <b><code>asyncInvoke().pass(inputs).result()</code></b>.
      *
      * @param inputs the input data.
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callAsync(@Nullable INPUT... inputs);
+    OutputChannel<OUTPUT> asyncCall(@Nullable INPUT... inputs);
 
     /**
-     * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
+     * Short for <b><code>asyncInvoke().pass(inputs).result()</code></b>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callAsync(@Nullable Iterable<? extends INPUT> inputs);
+    OutputChannel<OUTPUT> asyncCall(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
+     * Short for <b><code>asyncInvoke().pass(inputs).result()</code></b>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callAsync(@Nullable OutputChannel<? extends INPUT> inputs);
-
-    /**
-     * Short for <b><code>invokeParallel().result()</code></b>.
-     * <p/>
-     * (This method actually makes little sense, thought it is here for completeness)
-     *
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callParallel();
-
-    /**
-     * Short for <b><code>invokeParallel().pass(input).result()</code></b>.
-     *
-     * @param input the input.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callParallel(@Nullable INPUT input);
-
-    /**
-     * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the input data.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callParallel(@Nullable INPUT... inputs);
-
-    /**
-     * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the iterable returning the input data.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callParallel(@Nullable Iterable<? extends INPUT> inputs);
-
-    /**
-     * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the output channel returning the input data.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callParallel(@Nullable OutputChannel<? extends INPUT> inputs);
-
-    /**
-     * Short for <b><code>invokeSync().result()</code></b>.
-     *
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callSync();
-
-    /**
-     * Short for <b><code>invokeSync().pass(input).result()</code></b>.
-     *
-     * @param input the input.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callSync(@Nullable INPUT input);
-
-    /**
-     * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the input data.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callSync(@Nullable INPUT... inputs);
-
-    /**
-     * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the iterable returning the input data.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callSync(@Nullable Iterable<? extends INPUT> inputs);
-
-    /**
-     * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the output channel returning the input data.
-     * @return the output channel.
-     */
-    @Nonnull
-    OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<? extends INPUT> inputs);
+    OutputChannel<OUTPUT> asyncCall(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in asynchronous mode.
@@ -222,7 +132,53 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation channel.
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> invokeAsync();
+    InvocationChannel<INPUT, OUTPUT> asyncInvoke();
+
+    /**
+     * Short for <b><code>parallelInvoke().result()</code></b>.
+     * <p/>
+     * (This method actually makes little sense, thought it is here for completeness)
+     *
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> parallelCall();
+
+    /**
+     * Short for <b><code>parallelInvoke().pass(input).result()</code></b>.
+     *
+     * @param input the input.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> parallelCall(@Nullable INPUT input);
+
+    /**
+     * Short for <b><code>parallelInvoke().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the input data.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> parallelCall(@Nullable INPUT... inputs);
+
+    /**
+     * Short for <b><code>parallelInvoke().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the iterable returning the input data.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> parallelCall(@Nullable Iterable<? extends INPUT> inputs);
+
+    /**
+     * Short for <b><code>parallelInvoke().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the output channel returning the input data.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> parallelCall(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in parallel mode.
@@ -230,15 +186,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation channel.
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> invokeParallel();
-
-    /**
-     * Invokes the execution of this routine in synchronous mode.
-     *
-     * @return the invocation channel.
-     */
-    @Nonnull
-    InvocationChannel<INPUT, OUTPUT> invokeSync();
+    InvocationChannel<INPUT, OUTPUT> parallelInvoke();
 
     /**
      * Makes the routine destroy all the cached invocation instances.
@@ -249,4 +197,56 @@ public interface Routine<INPUT, OUTPUT> {
      * Normally it is not needed to call this method.
      */
     void purge();
+
+    /**
+     * Short for <b><code>syncInvoke().result()</code></b>.
+     *
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> syncCall();
+
+    /**
+     * Short for <b><code>syncInvoke().pass(input).result()</code></b>.
+     *
+     * @param input the input.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> syncCall(@Nullable INPUT input);
+
+    /**
+     * Short for <b><code>syncInvoke().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the input data.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> syncCall(@Nullable INPUT... inputs);
+
+    /**
+     * Short for <b><code>syncInvoke().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the iterable returning the input data.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> syncCall(@Nullable Iterable<? extends INPUT> inputs);
+
+    /**
+     * Short for <b><code>syncInvoke().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the output channel returning the input data.
+     * @return the output channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> syncCall(@Nullable OutputChannel<? extends INPUT> inputs);
+
+    /**
+     * Invokes the execution of this routine in synchronous mode.
+     *
+     * @return the invocation channel.
+     */
+    @Nonnull
+    InvocationChannel<INPUT, OUTPUT> syncInvoke();
 }

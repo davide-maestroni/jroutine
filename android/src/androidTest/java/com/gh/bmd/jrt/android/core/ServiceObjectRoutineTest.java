@@ -89,14 +89,14 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
 
         assertThat(JRoutine.onService(getActivity(), TestArgs.class, 17)
                            .method("getId")
-                           .callAsync()
+                           .asyncCall()
                            .eventually()
                            .next()).isEqualTo(17);
     }
@@ -207,7 +207,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
+            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -489,7 +489,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMethodBySignature() throws NoSuchMethodException {
@@ -502,7 +502,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMissingAliasMethodError() {
@@ -869,9 +869,9 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").callAsync();
+                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").callAsync();
+                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -879,8 +879,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").callAsync();
-        getTwo = builder.method("getTwo").callAsync();
+        getOne = builder.method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -894,7 +894,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .withReadTimeout(seconds(10))
                            .set()
                            .aliasMethod("test")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -904,7 +904,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .aliasMethod("test")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -918,7 +918,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .withReadTimeout(seconds(10))
                            .set()
                            .method("getInt")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -928,7 +928,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .method("getInt")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -942,7 +942,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .withReadTimeout(seconds(10))
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -952,7 +952,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();

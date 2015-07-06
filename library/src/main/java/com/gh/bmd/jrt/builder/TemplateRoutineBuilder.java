@@ -36,27 +36,27 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
+    public InvocationChannel<INPUT, OUTPUT> asyncInvoke() {
+
+        return buildRoutine().asyncInvoke();
+    }
+
+    @Nonnull
+    public InvocationChannel<INPUT, OUTPUT> parallelInvoke() {
+
+        return buildRoutine().parallelInvoke();
+    }
+
+    @Nonnull
+    public InvocationChannel<INPUT, OUTPUT> syncInvoke() {
+
+        return buildRoutine().syncInvoke();
+    }
+
+    @Nonnull
     public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> invocations() {
 
         return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
-    }
-
-    @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
-
-        return buildRoutine().invokeAsync();
-    }
-
-    @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
-
-        return buildRoutine().invokeParallel();
-    }
-
-    @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
-
-        return buildRoutine().invokeSync();
     }
 
     @Nonnull

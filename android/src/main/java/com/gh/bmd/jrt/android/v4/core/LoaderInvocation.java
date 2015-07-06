@@ -453,7 +453,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
         final Routine<INPUT, OUTPUT> routine =
                 JRoutine.on(factoryFrom(loaderContext, this)).buildRoutine();
-        routine.invokeSync().abort(reason);
+        routine.syncInvoke().abort(reason);
         routine.purge();
     }
 
@@ -768,7 +768,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                                .withLog(logger.getLog())
                                .withLogLevel(logger.getLogLevel())
                                .set()
-                               .callAsync(channel.output());
+                               .asyncCall(channel.output());
             }
 
             return channel.output();

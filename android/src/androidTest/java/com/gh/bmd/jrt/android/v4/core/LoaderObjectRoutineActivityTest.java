@@ -92,14 +92,14 @@ public class LoaderObjectRoutineActivityTest
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
 
         assertThat(JRoutine.onActivity(getActivity(), TestArgs.class, 17)
                            .method("getId")
-                           .callAsync()
+                           .asyncCall()
                            .eventually()
                            .next()).isEqualTo(17);
     }
@@ -245,7 +245,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
+            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -527,7 +527,7 @@ public class LoaderObjectRoutineActivityTest
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
 
     }
 
@@ -541,7 +541,7 @@ public class LoaderObjectRoutineActivityTest
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMissingAliasMethodError() {
@@ -905,9 +905,9 @@ public class LoaderObjectRoutineActivityTest
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").callAsync();
+                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").callAsync();
+                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -915,8 +915,8 @@ public class LoaderObjectRoutineActivityTest
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").callAsync();
-        getTwo = builder.method("getTwo").callAsync();
+        getOne = builder.method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -933,7 +933,7 @@ public class LoaderObjectRoutineActivityTest
                            .withId(0)
                            .set()
                            .aliasMethod("test")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -946,7 +946,7 @@ public class LoaderObjectRoutineActivityTest
                     .withId(1)
                     .set()
                     .aliasMethod("test")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -963,7 +963,7 @@ public class LoaderObjectRoutineActivityTest
                            .withId(2)
                            .set()
                            .method("getInt")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -976,7 +976,7 @@ public class LoaderObjectRoutineActivityTest
                     .withId(3)
                     .set()
                     .method("getInt")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -993,7 +993,7 @@ public class LoaderObjectRoutineActivityTest
                            .withId(4)
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -1006,7 +1006,7 @@ public class LoaderObjectRoutineActivityTest
                     .withId(5)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();

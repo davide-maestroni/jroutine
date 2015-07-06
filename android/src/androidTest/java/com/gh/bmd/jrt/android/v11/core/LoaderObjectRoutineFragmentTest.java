@@ -102,7 +102,7 @@ public class LoaderObjectRoutineFragmentTest
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
@@ -117,7 +117,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                           R.id.test_fragment);
         assertThat(JRoutine.onFragment(fragment, TestArgs.class, 17)
                            .method("getId")
-                           .callAsync()
+                           .asyncCall()
                            .eventually()
                            .next()).isEqualTo(17);
     }
@@ -311,7 +311,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
+            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -629,7 +629,7 @@ public class LoaderObjectRoutineFragmentTest
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMethodBySignature() throws NoSuchMethodException {
@@ -650,7 +650,7 @@ public class LoaderObjectRoutineFragmentTest
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMissingAliasMethodError() {
@@ -1074,9 +1074,9 @@ public class LoaderObjectRoutineFragmentTest
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").callAsync();
+                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").callAsync();
+                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1084,8 +1084,8 @@ public class LoaderObjectRoutineFragmentTest
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").callAsync();
-        getTwo = builder.method("getTwo").callAsync();
+        getOne = builder.method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1110,7 +1110,7 @@ public class LoaderObjectRoutineFragmentTest
                            .withId(0)
                            .set()
                            .aliasMethod("test")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -1123,7 +1123,7 @@ public class LoaderObjectRoutineFragmentTest
                     .withId(1)
                     .set()
                     .aliasMethod("test")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1140,7 +1140,7 @@ public class LoaderObjectRoutineFragmentTest
                            .withId(2)
                            .set()
                            .method("getInt")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -1153,7 +1153,7 @@ public class LoaderObjectRoutineFragmentTest
                     .withId(3)
                     .set()
                     .method("getInt")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1170,7 +1170,7 @@ public class LoaderObjectRoutineFragmentTest
                            .withId(4)
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -1183,7 +1183,7 @@ public class LoaderObjectRoutineFragmentTest
                     .withId(5)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();

@@ -75,7 +75,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *                 final Routine&lt;URI, MyResource&gt; routine =
  *                         JRoutine.onActivity(this, ClassToken.tokenOf(LoadResource.class))
  *                                 .buildRoutine();
- *                 routine.callAsync(RESOURCE_URI)
+ *                 routine.asyncCall(RESOURCE_URI)
  *                        .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
  *
  *                            &#64;Override
@@ -125,7 +125,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             public void onInput(final URI uri,
  *                     &#64;Nonnull final ResultChannel&lt;MyResource&gt; result) {
  *
- *                 result.pass(mRoutine.callAsync(uri));
+ *                 result.pass(mRoutine.asyncCall(uri));
  *             }
  *         }
  *     </code>

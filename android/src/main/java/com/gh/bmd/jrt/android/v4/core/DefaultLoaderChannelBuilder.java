@@ -158,7 +158,7 @@ class DefaultLoaderChannelBuilder
                       .withClashResolution(ClashResolutionType.MERGE)
                       .withInputClashResolution(ClashResolutionType.MERGE)
                       .set()
-                      .callAsync();
+                      .asyncCall();
     }
 
     @Nonnull

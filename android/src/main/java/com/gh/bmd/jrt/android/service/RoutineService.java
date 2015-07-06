@@ -752,7 +752,7 @@ public class RoutineService extends Service {
         public InvocationChannel<Object, Object> invokeAsync() {
 
             ++mInvocationCount;
-            return mRoutine.invokeAsync();
+            return mRoutine.asyncInvoke();
         }
 
         /**
@@ -764,7 +764,7 @@ public class RoutineService extends Service {
         public InvocationChannel<Object, Object> invokeParallel() {
 
             ++mInvocationCount;
-            return mRoutine.invokeParallel();
+            return mRoutine.parallelInvoke();
         }
 
         /**

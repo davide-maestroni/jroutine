@@ -716,8 +716,8 @@ public class RoutineBuilders {
 
         if (method.getAnnotation(Inputs.class) != null) {
 
-            return (inputMode == InputMode.ELEMENT) ? routine.invokeParallel()
-                    : routine.invokeAsync();
+            return (inputMode == InputMode.ELEMENT) ? routine.parallelInvoke()
+                    : routine.asyncInvoke();
         }
 
         final Class<?> returnType = method.getReturnType();
@@ -725,7 +725,7 @@ public class RoutineBuilders {
 
         if (inputMode == InputMode.ELEMENT) {
 
-            final InvocationChannel<Object, Object> invocationChannel = routine.invokeParallel();
+            final InvocationChannel<Object, Object> invocationChannel = routine.parallelInvoke();
             final Class<?> parameterType = method.getParameterTypes()[0];
             final Object arg = args[0];
 
@@ -761,7 +761,7 @@ public class RoutineBuilders {
         } else if (inputMode == InputMode.VALUE) {
 
             final InvocationChannel<Object, Object> invocationChannel =
-                    routine.invokeAsync().orderByCall();
+                    routine.asyncInvoke().orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
 
@@ -783,14 +783,14 @@ public class RoutineBuilders {
 
         } else if (inputMode == InputMode.COLLECTION) {
 
-            outputChannel = routine.invokeAsync()
+            outputChannel = routine.asyncInvoke()
                                    .orderByCall()
                                    .pass((OutputChannel<Object>) args[0])
                                    .result();
 
         } else {
 
-            outputChannel = routine.callAsync(args);
+            outputChannel = routine.asyncCall(args);
         }
 
         if (!Void.class.equals(boxingClass(returnType))) {

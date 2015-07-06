@@ -169,7 +169,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())
                 .set()
-                .callSync(mInputs)
+                .syncCall(mInputs)
                 .passTo(consumer);
         return consumer.createResult();
     }

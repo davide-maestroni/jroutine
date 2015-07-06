@@ -409,7 +409,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.callSync(inputs));
+            result.pass(mRoutine.syncCall(inputs));
         }
 
         @Override
@@ -504,7 +504,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.callSync(inputs));
+            result.pass(mRoutine.syncCall(inputs));
         }
 
         @Override

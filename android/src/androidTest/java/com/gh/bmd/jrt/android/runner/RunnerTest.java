@@ -173,10 +173,10 @@ public class RunnerTest extends AndroidTestCase {
                                                       .withAsyncRunner(Runners.handlerRunner(
                                                               new HandlerThread("test")))
                                                       .set()
-                                                      .callAsync();
+                                                      .asyncCall();
 
         assertThat(JRoutine.on(new LooperInvocationFactory())
-                           .callAsync(channel)
+                           .asyncCall(channel)
                            .afterMax(seconds(30))
                            .next()).isEqualTo(true);
     }

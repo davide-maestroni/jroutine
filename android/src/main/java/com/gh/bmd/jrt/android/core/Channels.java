@@ -32,11 +32,15 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Utility class for handling routine channels.
  * <p/>
  * Created by davide-maestroni on 6/18/15.
  */
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
+        justification = "utility class extending the functions of another utility class")
 public class Channels extends com.gh.bmd.jrt.core.Channels {
 
     /**

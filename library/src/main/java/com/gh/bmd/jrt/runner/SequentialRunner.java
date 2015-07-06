@@ -35,7 +35,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  */
 class SequentialRunner implements Runner {
 
-    public boolean isOwnedThread() {
+    public boolean isManagedThread() {
 
         return false;
     }

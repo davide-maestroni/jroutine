@@ -341,6 +341,19 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
     private void waitInputs(final int count) {
 
+        if (mInputTimeout.isZero()) {
+
+            mInputCount -= count;
+            throw new InputDeadlockException(
+                    "deadlock while waiting for room in the input channel");
+        }
+
+        if (mRunner.isManagedThread()) {
+
+            mInputCount -= count;
+            throw new RunnerDeadlockException("cannot wait on the invocation runner thread");
+        }
+
         try {
 
             if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
@@ -969,12 +982,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (!mHasInputs.isTrue()) {
 
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    --mInputCount;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
-
                 waitInputs(1);
 
                 if (mState != this) {
@@ -1105,12 +1112,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (!mHasInputs.isTrue()) {
 
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    mInputCount -= size;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
-
                 waitInputs(size);
 
                 if (mState != this) {
@@ -1154,12 +1155,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             ++mInputCount;
 
             if (!mHasInputs.isTrue()) {
-
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    --mInputCount;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
 
                 waitInputs(1);
 
@@ -1218,12 +1213,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mInputCount += size;
 
             if (!mHasInputs.isTrue()) {
-
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    mInputCount -= size;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
 
                 waitInputs(size);
 

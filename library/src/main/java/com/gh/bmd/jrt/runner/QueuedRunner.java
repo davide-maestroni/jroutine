@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  */
 class QueuedRunner implements Runner {
 
-    public boolean isOwnedThread() {
+    public boolean isManagedThread() {
 
         return false;
     }

@@ -50,7 +50,7 @@ class ScheduledRunner implements Runner {
         mService = service;
     }
 
-    public boolean isOwnedThread() {
+    public boolean isManagedThread() {
 
         return mThreads.containsKey(Thread.currentThread());
     }

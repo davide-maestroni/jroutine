@@ -18,7 +18,7 @@
     public void ${methodName}(${paramTypes}) {
 
         final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        final com.gh.bmd.jrt.channel.InvocationChannel<Object, ${resultClassName}> $$channel = $$routine.invokeParallel()${inputOptions};
+        final com.gh.bmd.jrt.channel.InvocationChannel<Object, ${resultClassName}> $$channel = $$routine.parallelInvoke()${inputOptions};
 
         for (final Object $$object: ${params}) {
 

@@ -34,7 +34,7 @@
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
-                            .callAsync(new URI(IMAGE_URI))
+                            .asyncCall(new URI(IMAGE_URI))
                             .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                 &commat;Override
@@ -112,7 +112,7 @@
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
-                            .callAsync(new URI(IMAGE_URI))
+                            .asyncCall(new URI(IMAGE_URI))
                             .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                 &commat;Override
@@ -179,7 +179,7 @@
                 &commat;Override
                 public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
 
-                    result.pass(mRoutine.callAsync(uri));
+                    result.pass(mRoutine.asyncCall(uri));
                 }
             }
         }

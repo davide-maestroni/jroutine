@@ -507,7 +507,7 @@ public class RoutineService extends Service {
 
             final boolean isParallel = data.getBoolean(KEY_PARALLEL_INVOCATION);
             final InvocationChannel<Object, Object> channel =
-                    (isParallel) ? routineState.invokeParallel() : routineState.invokeAsync();
+                    (isParallel) ? routineState.parallelInvoke() : routineState.asyncInvoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
             invocationMap.put(invocationId, routineInvocation);
@@ -749,7 +749,7 @@ public class RoutineService extends Service {
          * @return the invocation channel.
          */
         @Nonnull
-        public InvocationChannel<Object, Object> invokeAsync() {
+        public InvocationChannel<Object, Object> asyncInvoke() {
 
             ++mInvocationCount;
             return mRoutine.asyncInvoke();
@@ -761,7 +761,7 @@ public class RoutineService extends Service {
          * @return the invocation channel.
          */
         @Nonnull
-        public InvocationChannel<Object, Object> invokeParallel() {
+        public InvocationChannel<Object, Object> parallelInvoke() {
 
             ++mInvocationCount;
             return mRoutine.parallelInvoke();

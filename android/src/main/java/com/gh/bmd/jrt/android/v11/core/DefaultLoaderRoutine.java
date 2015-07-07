@@ -32,7 +32,7 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.runner.Execution;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -250,7 +250,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
     /**
      * Execution implementation purging all loaders with a specific invocation factory.
      */
-    private static class PurgeExecution implements Execution {
+    private static class PurgeExecution extends TemplateExecution {
 
         private final WeakReference<Object> mContext;
 
@@ -273,6 +273,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             mLoaderId = loaderId;
         }
 
+        @Override
         public void run() {
 
             final Object context = mContext.get();
@@ -289,7 +290,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
      *
      * @param <INPUT> the input data type.
      */
-    private static class PurgeInputsExecution<INPUT> implements Execution {
+    private static class PurgeInputsExecution<INPUT> extends TemplateExecution {
 
         private final WeakReference<Object> mContext;
 
@@ -317,6 +318,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             mInputs = inputs;
         }
 
+        @Override
         public void run() {
 
             final Object context = mContext.get();

@@ -33,15 +33,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide-maestroni on 13/05/15.
  *
- * @see com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy
- * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Input
- * @see com.gh.bmd.jrt.annotation.Inputs
- * @see com.gh.bmd.jrt.annotation.Output
- * @see com.gh.bmd.jrt.annotation.Priority
- * @see com.gh.bmd.jrt.annotation.ShareGroup
- * @see com.gh.bmd.jrt.annotation.Timeout
- * @see com.gh.bmd.jrt.annotation.TimeoutAction
+ * @see com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy ServiceProxy
+ * @see com.gh.bmd.jrt.annotation.Alias Alias
+ * @see com.gh.bmd.jrt.annotation.Input Input
+ * @see com.gh.bmd.jrt.annotation.Inputs Inputs
+ * @see com.gh.bmd.jrt.annotation.Output Output
+ * @see com.gh.bmd.jrt.annotation.Priority Priority
+ * @see com.gh.bmd.jrt.annotation.ShareGroup ShareGroup
+ * @see com.gh.bmd.jrt.annotation.Timeout Timeout
+ * @see com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")
@@ -58,7 +58,8 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
      * Returns a builder of routines, wrapping the specified object instance, running in a service
      * based on the specified context.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
+     * service.
      * <p/>
      * Note that the built routine results will be dispatched in the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,

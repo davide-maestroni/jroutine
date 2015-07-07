@@ -64,7 +64,11 @@ class LooperRunner implements Runner {
         mHandler = new Handler(looper);
         mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new Runner() {
 
-            public boolean isManagedThread() {
+            public void cancel(@Nonnull final Execution execution) {
+
+            }
+
+            public boolean isExecutionThread() {
 
                 return true;
             }
@@ -104,7 +108,13 @@ class LooperRunner implements Runner {
             mLooperRunner = new LooperRunner(looper, null);
         }
 
-        public boolean isManagedThread() {
+        public void cancel(@Nonnull final Execution execution) {
+
+            mQueuedRunner.cancel(execution);
+            mLooperRunner.cancel(execution);
+        }
+
+        public boolean isExecutionThread() {
 
             return true;
         }
@@ -123,9 +133,15 @@ class LooperRunner implements Runner {
         }
     }
 
-    public boolean isManagedThread() {
+    public void cancel(@Nonnull final Execution execution) {
 
-        return (Thread.currentThread() == mThread) && mSameThreadRunner.isManagedThread();
+        mHandler.removeCallbacks(execution);
+        mSameThreadRunner.cancel(execution);
+    }
+
+    public boolean isExecutionThread() {
+
+        return (Thread.currentThread() == mThread) && mSameThreadRunner.isExecutionThread();
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

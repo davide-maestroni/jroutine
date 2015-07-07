@@ -25,9 +25,9 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
-import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
@@ -269,7 +269,7 @@ public class RunnerTest extends AndroidTestCase {
         }
     }
 
-    private static class TestRunExecution implements Execution {
+    private static class TestRunExecution extends TemplateExecution {
 
         private final TimeDuration mDelay;
 
@@ -295,6 +295,7 @@ public class RunnerTest extends AndroidTestCase {
             return mIsPassed;
         }
 
+        @Override
         public void run() {
 
             // it looks like that handlers and the kind are not so accurate after all...

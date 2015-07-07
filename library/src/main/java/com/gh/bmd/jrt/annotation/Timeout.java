@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide-maestroni on 9/21/14.
  *
- * @see com.gh.bmd.jrt.builder.InvocationConfiguration
+ * @see com.gh.bmd.jrt.builder.InvocationConfiguration InvocationConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

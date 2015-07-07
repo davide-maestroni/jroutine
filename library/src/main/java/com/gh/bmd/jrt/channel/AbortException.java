@@ -35,7 +35,7 @@ public class AbortException extends RoutineException {
 
     /**
      * Wraps the specified throwable only if it is not an instance of
-     * {@link com.gh.bmd.jrt.channel.RoutineException}.
+     * {@link com.gh.bmd.jrt.channel.RoutineException RoutineException}.
      *
      * @param cause the throwable to wrap.
      * @return the throwable or an abort exception wrapping it.

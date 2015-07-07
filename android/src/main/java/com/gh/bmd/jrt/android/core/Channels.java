@@ -26,8 +26,6 @@ import com.gh.bmd.jrt.core.JRoutine;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -231,9 +229,12 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      */
     @Nonnull
     public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> mergeParcelable(
-            @Nonnull final Map<Integer, ? extends OutputChannel<? extends OUTPUT>> channelMap) {
+            @Nonnull final SparseArrayCompat<? extends OutputChannel<? extends OUTPUT>>
+                    channelMap) {
 
-        if (channelMap.isEmpty()) {
+        final int size = channelMap.size();
+
+        if (size == 0) {
 
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
@@ -242,10 +243,9 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
                 JRoutine.transport().buildChannel();
         final TransportInput<ParcelableSelectable<OUTPUT>> input = transport.input();
 
-        for (final Entry<Integer, ? extends OutputChannel<? extends OUTPUT>> entry : channelMap
-                .entrySet()) {
+        for (int i = 0; i < size; i++) {
 
-            input.pass(toSelectable(entry.getValue(), entry.getKey()));
+            input.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
         }
 
         input.close();

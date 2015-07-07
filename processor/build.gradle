@@ -21,9 +21,6 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 javaCompatibility = JavaVersion.VERSION_1_6
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-}
 conditionalDependencies {
     compile name: 'library', artifact: { it.parent.name }
 }

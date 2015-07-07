@@ -24,8 +24,8 @@ import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +48,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
     private final ArrayList<OUTPUT> mCachedResults = new ArrayList<OUTPUT>();
 
-    private final Execution mDeliverResult;
+    private final TemplateExecution mDeliverResult;
 
     private final ArrayList<OUTPUT> mLastResults = new ArrayList<OUTPUT>();
 
@@ -75,8 +75,9 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             throw new NullPointerException("the loader must not be null");
         }
 
-        mDeliverResult = new Execution() {
+        mDeliverResult = new TemplateExecution() {
 
+            @Override
             public void run() {
 
                 loader.deliverResult(createResult());

@@ -58,13 +58,14 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, an
- * {@link com.gh.bmd.jrt.invocation.InvocationDeadlockException} will be thrown.
+ * {@link com.gh.bmd.jrt.invocation.InvocationDeadlockException InvocationDeadlockException} will
+ * be thrown.
  * <p/>
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
  * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case, a {@link com.gh.bmd.jrt.channel.DeadlockException} will be
- * thrown.<br/>
+ * timeout elapses. In the latter case, a {@link com.gh.bmd.jrt.channel.DeadlockException
+ * DeadlockException} will be thrown.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
  * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
@@ -596,7 +597,7 @@ public final class InvocationConfiguration {
         /**
          * Deadlock.<br/>
          * If no result is available after the specified timeout, the called method will throw a
-         * {@link com.gh.bmd.jrt.channel.ReadDeadlockException}.
+         * {@link com.gh.bmd.jrt.channel.ReadDeadlockException ReadDeadlockException}.
          */
         DEADLOCK,
         /**
@@ -857,8 +858,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the number of invocation instances, which represents the core pool of reusable
-         * invocations. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default one.
+         * invocations. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
+         * up to the framework to choose a default one.
          *
          * @param coreInstances the core number of instances.
          * @return this builder.
@@ -880,8 +881,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the maximum number of data that the input channel can retain before they are
-         * consumed. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default one.
+         * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
+         * to the framework to choose a default one.
          *
          * @param inputMaxSize the maximum size.
          * @return this builder.
@@ -975,8 +976,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the max number of concurrently running invocation instances. A
-         * {@link InvocationConfiguration#DEFAULT} value means that it is up to the framework to
-         * choose a default one.
+         * {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up to the
+         * framework to choose a default one.
          *
          * @param maxInstances the max number of instances.
          * @return this builder.
@@ -998,8 +999,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the maximum number of data that the result channel can retain before they are
-         * consumed. A {@link InvocationConfiguration#DEFAULT} value means that it is up to the
-         * framework to choose a default one.
+         * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
+         * to the framework to choose a default one.
          *
          * @param outputMaxSize the maximum size.
          * @return this builder.
@@ -1064,12 +1065,12 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the invocation priority. A {@link InvocationConfiguration#DEFAULT} value means that
-         * the invocations will be executed with no specific priority.
+         * Sets the invocation priority. A {@link InvocationConfiguration#DEFAULT DEFAULT} value
+         * means that the invocations will be executed with no specific priority.
          *
          * @param priority the priority.
          * @return this builder.
-         * @see com.gh.bmd.jrt.runner.PriorityRunner
+         * @see com.gh.bmd.jrt.runner.PriorityRunner PriorityRunner
          */
         @Nonnull
         public Builder<TYPE> withPriority(final int priority) {

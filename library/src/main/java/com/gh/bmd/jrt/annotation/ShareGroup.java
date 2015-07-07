@@ -54,7 +54,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 1/26/15.
  *
- * @see com.gh.bmd.jrt.builder.ProxyConfiguration
+ * @see com.gh.bmd.jrt.builder.ProxyConfiguration ProxyConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

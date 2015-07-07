@@ -1235,7 +1235,12 @@ public class ProxyRoutineTest {
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
         @Override
-        public boolean isManagedThread() {
+        public void cancel(@Nonnull final Execution execution) {
+
+        }
+
+        @Override
+        public boolean isExecutionThread() {
 
             return false;
         }

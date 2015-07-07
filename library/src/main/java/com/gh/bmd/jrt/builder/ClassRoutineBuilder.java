@@ -28,21 +28,23 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 3/7/15.
  *
- * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Priority
- * @see com.gh.bmd.jrt.annotation.ShareGroup
- * @see com.gh.bmd.jrt.annotation.Timeout
- * @see com.gh.bmd.jrt.annotation.TimeoutAction
+ * @see com.gh.bmd.jrt.annotation.Alias Alias
+ * @see com.gh.bmd.jrt.annotation.Priority Priority
+ * @see com.gh.bmd.jrt.annotation.ShareGroup ShareGroup
+ * @see com.gh.bmd.jrt.annotation.Timeout Timeout
+ * @see com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction
  */
 public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBuilder>,
         ProxyConfigurableBuilder<ClassRoutineBuilder> {
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
-     * {@link com.gh.bmd.jrt.annotation.Alias} annotation.<br/>
-     * Optional {@link com.gh.bmd.jrt.annotation.Priority},
-     * {@link com.gh.bmd.jrt.annotation.ShareGroup}, {@link com.gh.bmd.jrt.annotation.Timeout} and
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction} method annotations will be honored.<br/>
+     * {@link com.gh.bmd.jrt.annotation.Alias Alias} annotation.<br/>
+     * Optional {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
+     * honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
@@ -69,10 +71,12 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is searched via reflection ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
-     * method annotations will be honored.<br/>
+     * {@link com.gh.bmd.jrt.annotation.Alias Alias} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
+     * honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
@@ -91,10 +95,12 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is invoked ignoring a name specified in a
-     * {@link com.gh.bmd.jrt.annotation.Alias} annotation. Though, optional
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
-     * method annotations will be honored.<br/>
+     * {@link com.gh.bmd.jrt.annotation.Alias Alias} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
+     * honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in

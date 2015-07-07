@@ -29,11 +29,16 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 9/18/14.
  *
- * @see com.gh.bmd.jrt.runner.SequentialRunner
+ * @see com.gh.bmd.jrt.runner.SequentialRunner SequentialRunner
  */
 class QueuedRunner implements Runner {
 
-    public boolean isManagedThread() {
+    public void cancel(@Nonnull final Execution execution) {
+
+        LocalQueue.cancel(execution);
+    }
+
+    public boolean isExecutionThread() {
 
         return false;
     }

@@ -75,8 +75,8 @@ import javax.annotation.Nullable;
  * get called if the routine is automatically garbage collected.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
- * {@link com.gh.bmd.jrt.channel.RoutineException}, will be wrapped as the cause of an
- * {@link com.gh.bmd.jrt.invocation.InvocationException} instance.
+ * {@link com.gh.bmd.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause
+ * of an {@link com.gh.bmd.jrt.invocation.InvocationException InvocationException} instance.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *

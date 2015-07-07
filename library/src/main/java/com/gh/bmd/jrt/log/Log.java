@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 10/3/14.
  *
- * @see com.gh.bmd.jrt.log.Logger
+ * @see com.gh.bmd.jrt.log.Logger Logger
  */
 public interface Log {
 

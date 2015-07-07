@@ -35,16 +35,19 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
-     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
-     * annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Input Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs Inputs},
+     * {@link com.gh.bmd.jrt.annotation.Output Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy}. The generated class name and package will be
-     * chosen according to the specific annotation attributes.<br/>
+     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
+     * will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
@@ -63,16 +66,19 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
-     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
-     * annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Input Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs Inputs},
+     * {@link com.gh.bmd.jrt.annotation.Output Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy}. The generated class name and package will be
-     * chosen according to the specific annotation attributes.<br/>
+     * {@link com.gh.bmd.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
+     * will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even

@@ -17,6 +17,7 @@ import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -98,6 +99,11 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             return mAbortExecution;
         }
+    }
+
+    public boolean isCancelable() {
+
+        return true;
     }
 
     public void run() {
@@ -251,8 +257,9 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
     /**
      * Abort execution implementation.
      */
-    private class AbortExecution implements Execution {
+    private class AbortExecution extends TemplateExecution {
 
+        @Override
         public void run() {
 
             synchronized (mMutex) {

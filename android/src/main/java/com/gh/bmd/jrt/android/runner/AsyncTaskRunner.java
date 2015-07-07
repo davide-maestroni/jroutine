@@ -21,6 +21,7 @@ import android.os.Build.VERSION_CODES;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -37,7 +38,12 @@ import javax.annotation.Nullable;
  */
 class AsyncTaskRunner extends MainRunner {
 
+    private static final Void[] NO_PARAMS = new Void[0];
+
     private final Executor mExecutor;
+
+    private final WeakIdentityHashMap<Execution, ArrayList<ExecutionTask>> mTasks =
+            new WeakIdentityHashMap<Execution, ArrayList<ExecutionTask>>();
 
     private final Map<Thread, Void> mThreads =
             Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
@@ -55,7 +61,25 @@ class AsyncTaskRunner extends MainRunner {
     }
 
     @Override
-    public boolean isManagedThread() {
+    public void cancel(@Nonnull final Execution execution) {
+
+        synchronized (mTasks) {
+
+            final ArrayList<ExecutionTask> executionTasks = mTasks.remove(execution);
+
+            if (executionTasks != null) {
+
+                for (final ExecutionTask task : executionTasks) {
+
+                    super.cancel(task);
+                    task.cancel(false);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean isExecutionThread() {
 
         return mThreads.containsKey(Thread.currentThread());
     }
@@ -65,6 +89,24 @@ class AsyncTaskRunner extends MainRunner {
             @Nonnull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
+
+        if (execution.isCancelable()) {
+
+            synchronized (mTasks) {
+
+                final WeakIdentityHashMap<Execution, ArrayList<ExecutionTask>> tasks = mTasks;
+                ArrayList<ExecutionTask> executionTasks = tasks.get(execution);
+
+                if (executionTasks == null) {
+
+                    executionTasks = new ArrayList<ExecutionTask>();
+                    tasks.put(execution, executionTasks);
+                }
+
+                executionTasks.add(task);
+            }
+        }
+
         // the super method is called to ensure that a task is always started from the main thread
         super.run(task, delay, timeUnit);
     }
@@ -97,6 +139,11 @@ class AsyncTaskRunner extends MainRunner {
             mThreads = threads;
         }
 
+        public boolean isCancelable() {
+
+            return mExecution.isCancelable();
+        }
+
         @TargetApi(VERSION_CODES.HONEYCOMB)
         public void run() {
 
@@ -104,11 +151,11 @@ class AsyncTaskRunner extends MainRunner {
 
             if ((mExecutor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
 
-                executeOnExecutor(mExecutor);
+                executeOnExecutor(mExecutor, NO_PARAMS);
 
             } else {
 
-                execute();
+                execute(NO_PARAMS);
             }
         }
 

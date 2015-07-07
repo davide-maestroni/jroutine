@@ -34,24 +34,24 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * See {@link com.gh.bmd.jrt.android.proxy.v4.core.JRoutineProxy} for support of API levels less
- * than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
+ * See {@link com.gh.bmd.jrt.android.proxy.v4.core.JRoutineProxy JRoutineProxy} for support of
+ * API levels less than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
  * Created by davide-maestroni on 06/05/15.
  *
- * @see com.gh.bmd.jrt.android.proxy.annotation.V11Proxy
- * @see com.gh.bmd.jrt.android.annotation.CacheStrategy
- * @see com.gh.bmd.jrt.android.annotation.ClashResolution
- * @see com.gh.bmd.jrt.android.annotation.InputClashResolution
- * @see com.gh.bmd.jrt.android.annotation.LoaderId
- * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Input
- * @see com.gh.bmd.jrt.annotation.Inputs
- * @see com.gh.bmd.jrt.annotation.Output
- * @see com.gh.bmd.jrt.annotation.Priority
- * @see com.gh.bmd.jrt.annotation.ShareGroup
- * @see com.gh.bmd.jrt.annotation.Timeout
- * @see com.gh.bmd.jrt.annotation.TimeoutAction
+ * @see com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy
+ * @see com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution
+ * @see com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution
+ * @see com.gh.bmd.jrt.android.annotation.LoaderId LoaderId
+ * @see com.gh.bmd.jrt.android.proxy.annotation.V11Proxy V11Proxy
+ * @see com.gh.bmd.jrt.annotation.Alias Alias
+ * @see com.gh.bmd.jrt.annotation.Input Input
+ * @see com.gh.bmd.jrt.annotation.Inputs Inputs
+ * @see com.gh.bmd.jrt.annotation.Output Output
+ * @see com.gh.bmd.jrt.annotation.Priority Priority
+ * @see com.gh.bmd.jrt.annotation.ShareGroup ShareGroup
+ * @see com.gh.bmd.jrt.annotation.Timeout Timeout
+ * @see com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")
@@ -68,7 +68,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * Returns a builder of routines bound to the specified activity, wrapping the specified object
      * instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as application.
      *
      * @param activity    the invocation activity context.
      * @param target      the wrapped object class.
@@ -95,7 +95,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * Returns a builder of routines bound to the specified fragment, wrapping the specified object
      * instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as application.
      *
      * @param fragment    the invocation fragment context.
      * @param target      the wrapped object class.

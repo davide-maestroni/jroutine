@@ -301,7 +301,7 @@ public class RunnerTest {
         }
     }
 
-    private static class TestRunExecution implements Execution {
+    private static class TestRunExecution extends TemplateExecution {
 
         private final TimeDuration mDelay;
 
@@ -327,6 +327,7 @@ public class RunnerTest {
             return mIsPassed;
         }
 
+        @Override
         public void run() {
 
             // the JVM might not have nanosecond precision...

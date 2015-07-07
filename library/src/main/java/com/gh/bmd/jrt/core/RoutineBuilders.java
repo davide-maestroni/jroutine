@@ -213,7 +213,7 @@ public class RoutineBuilders {
      * @param index  the index of the parameter.
      * @return the input mode.
      * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-     * @see com.gh.bmd.jrt.annotation.Input
+     * @see com.gh.bmd.jrt.annotation.Input Input
      */
     @Nullable
     public static InputMode getInputMode(@Nonnull final Method method, final int index) {
@@ -357,7 +357,7 @@ public class RoutineBuilders {
      * @param method the proxy method.
      * @return the input mode.
      * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-     * @see com.gh.bmd.jrt.annotation.Inputs
+     * @see com.gh.bmd.jrt.annotation.Inputs Inputs
      */
     @Nullable
     public static InputMode getInputsMode(@Nonnull final Method method) {
@@ -446,7 +446,7 @@ public class RoutineBuilders {
      * @param targetReturnType the target return type.
      * @return the output mode.
      * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-     * @see com.gh.bmd.jrt.annotation.Output
+     * @see com.gh.bmd.jrt.annotation.Output Output
      */
     @Nullable
     public static OutputMode getOutputMode(@Nonnull final Method method,

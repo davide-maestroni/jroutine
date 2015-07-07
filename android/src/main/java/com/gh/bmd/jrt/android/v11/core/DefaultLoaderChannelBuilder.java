@@ -29,7 +29,7 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.runner.Execution;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -275,7 +275,7 @@ class DefaultLoaderChannelBuilder
     /**
      * Execution implementation purging the loader with a specific ID.
      */
-    private static class PurgeExecution implements Execution {
+    private static class PurgeExecution extends TemplateExecution {
 
         private final WeakReference<Object> mContext;
 
@@ -293,6 +293,7 @@ class DefaultLoaderChannelBuilder
             mLoaderId = loaderId;
         }
 
+        @Override
         public void run() {
 
             final Object context = mContext.get();
@@ -307,7 +308,7 @@ class DefaultLoaderChannelBuilder
     /**
      * Execution implementation purging the loader with a specific ID and inputs.
      */
-    private static class PurgeInputsExecution implements Execution {
+    private static class PurgeInputsExecution extends TemplateExecution {
 
         private final WeakReference<Object> mContext;
 
@@ -330,6 +331,7 @@ class DefaultLoaderChannelBuilder
             mInputs = inputs;
         }
 
+        @Override
         public void run() {
 
             final Object context = mContext.get();

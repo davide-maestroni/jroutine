@@ -87,7 +87,8 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * Returns a builder of routines running in a service based on the specified context, wrapping
      * the specified object instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
+     * service.
      * <p/>
      * Note that the built routine results will be dispatched in the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
@@ -109,7 +110,8 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * Returns a builder of routines running in a service based on the specified context, wrapping
      * the specified object instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as the invocation service.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
+     * service.
      * <p/>
      * Note that the built routine results will be dispatched in the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
@@ -131,7 +133,8 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
     /**
      * Returns a builder of routines running in a service based on the specified context.<br/>
      * In order to customize the invocation creation, the caller must override the method
-     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])}.
+     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])
+     * getInvocationFactory(Class, Object[])} of the routine service.
      * <p/>
      * Note that the built routine results will be dispatched in the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
@@ -155,7 +158,8 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
     /**
      * Returns a builder of routines running in a service based on the specified context.<br/>
      * In order to customize the invocation creation, the caller must override the method
-     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])}.
+     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])
+     * getInvocationFactory(Class, Object[])} of the routine service.
      * <p/>
      * Note that the built routine results will be dispatched in the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,

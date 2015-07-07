@@ -16,7 +16,9 @@ package com.gh.bmd.jrt.runner;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -50,10 +52,18 @@ public class PriorityRunner {
 
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
 
+    private final Map<PriorityExecution, DelayedExecution> mDelayedExecutions =
+            Collections.synchronizedMap(
+                    new WeakIdentityHashMap<PriorityExecution, DelayedExecution>());
+
+    private final Map<Execution, PriorityExecution> mExecutions =
+            Collections.synchronizedMap(new WeakIdentityHashMap<Execution, PriorityExecution>());
+
     private final PriorityBlockingQueue<PriorityExecution> mQueue;
 
-    private final Execution mExecution = new Execution() {
+    private final TemplateExecution mExecution = new TemplateExecution() {
 
+        @Override
         public void run() {
 
             final PriorityExecution execution = mQueue.poll();
@@ -164,6 +174,11 @@ public class PriorityRunner {
             mExecution = execution;
         }
 
+        public boolean isCancelable() {
+
+            return mExecution.isCancelable();
+        }
+
         public void run() {
 
             final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
@@ -202,6 +217,11 @@ public class PriorityRunner {
             mExecution = execution;
             mPriority = priority;
             mAge = age;
+        }
+
+        public boolean isCancelable() {
+
+            return mExecution.isCancelable();
         }
 
         public void run() {
@@ -248,9 +268,19 @@ public class PriorityRunner {
             mPriority = priority;
         }
 
-        public boolean isManagedThread() {
+        public void cancel(@Nonnull final Execution execution) {
 
-            return mRunner.isManagedThread();
+            final PriorityExecution priorityExecution = mExecutions.remove(execution);
+
+            if (!mQueue.remove(priorityExecution)) {
+
+                mRunner.cancel(mDelayedExecutions.remove(priorityExecution));
+            }
+        }
+
+        public boolean isExecutionThread() {
+
+            return mRunner.isExecutionThread();
         }
 
         public void run(@Nonnull final Execution execution, final long delay,
@@ -259,6 +289,11 @@ public class PriorityRunner {
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
 
+            if (execution.isCancelable()) {
+
+                mExecutions.put(execution, priorityExecution);
+            }
+
             if (delay == 0) {
 
                 mQueue.put(priorityExecution);
@@ -266,7 +301,15 @@ public class PriorityRunner {
 
             } else {
 
-                mRunner.run(new DelayedExecution(mQueue, priorityExecution), delay, timeUnit);
+                final DelayedExecution delayedExecution =
+                        new DelayedExecution(mQueue, priorityExecution);
+
+                if (execution.isCancelable()) {
+
+                    mDelayedExecutions.put(priorityExecution, delayedExecution);
+                }
+
+                mRunner.run(delayedExecution, delay, timeUnit);
             }
         }
 

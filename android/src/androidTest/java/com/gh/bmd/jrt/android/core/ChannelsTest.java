@@ -985,8 +985,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 new ParcelableSelectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        final HashMap<Integer, OutputChannel<?>> channelMap =
-                new HashMap<Integer, OutputChannel<?>>(2);
+        final SparseArrayCompat<OutputChannel<?>> channelMap =
+                new SparseArrayCompat<OutputChannel<?>>(2);
         channelMap.put(7, channel1.output());
         channelMap.put(-3, channel2.output());
         outputChannel = Channels.mergeParcelable(channelMap);
@@ -1106,8 +1106,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        final HashMap<Integer, OutputChannel<?>> channelMap =
-                new HashMap<Integer, OutputChannel<?>>(2);
+        final SparseArrayCompat<OutputChannel<?>> channelMap =
+                new SparseArrayCompat<OutputChannel<?>>(2);
         channelMap.put(7, channel1.output());
         channelMap.put(-3, channel2.output());
         outputChannel = Channels.mergeParcelable(channelMap);

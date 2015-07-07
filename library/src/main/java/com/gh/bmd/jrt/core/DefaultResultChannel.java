@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.TimeDuration.Check;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
@@ -335,7 +336,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * Aborts immediately the execution.
      *
      * @param reason the reason of the abortion.
-     * @see com.gh.bmd.jrt.channel.Channel#abort(Throwable)
+     * @see com.gh.bmd.jrt.channel.Channel#abort(Throwable) abort(Throwable)
      */
     void abortImmediately(@Nullable final Throwable reason) {
 
@@ -598,7 +599,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return nextOutput(timeout);
         }
 
-        if (mRunner.isManagedThread()) {
+        if (mRunner.isExecutionThread()) {
 
             throw new RunnerDeadlockException("cannot wait on the invocation runner thread");
         }
@@ -656,7 +657,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     "deadlock while waiting for room in the output channel");
         }
 
-        if (!delay.isZero() && mRunner.isManagedThread()) {
+        if (!delay.isZero() && mRunner.isExecutionThread()) {
 
             mOutputCount -= count;
             throw new RunnerDeadlockException("cannot wait on the invocation runner thread");
@@ -813,7 +814,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else {
 
-                    if (mRunner.isManagedThread()) {
+                    if (mRunner.isExecutionThread()) {
 
                         throw new RunnerDeadlockException(
                                 "cannot wait on the invocation runner thread");
@@ -1027,7 +1028,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                                 break;
                             }
 
-                            if (mRunner.isManagedThread()) {
+                            if (mRunner.isExecutionThread()) {
 
                                 throw new RunnerDeadlockException(
                                         "cannot wait on the invocation runner thread");
@@ -1075,7 +1076,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final TimeDuration readTimeout = mReadTimeout;
 
-                if (!readTimeout.isZero() && mRunner.isManagedThread()) {
+                if (!readTimeout.isZero() && mRunner.isExecutionThread()) {
 
                     throw new RunnerDeadlockException(
                             "cannot wait on the invocation runner thread");
@@ -1348,7 +1349,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Implementation of an execution handling a delayed abortion.
      */
-    private class DelayedAbortExecution implements Execution {
+    private class DelayedAbortExecution extends TemplateExecution {
 
         private final Throwable mAbortException;
 
@@ -1362,6 +1363,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mAbortException = reason;
         }
 
+        @Override
         public void run() {
 
             final Throwable abortException;
@@ -1381,7 +1383,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Implementation of an execution handling a delayed output of a list of data.
      */
-    private class DelayedListOutputExecution implements Execution {
+    private class DelayedListOutputExecution extends TemplateExecution {
 
         private final ArrayList<OUTPUT> mOutputs;
 
@@ -1400,6 +1402,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mQueue = queue;
         }
 
+        @Override
         public void run() {
 
             final boolean needsFlush;
@@ -1419,7 +1422,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Implementation of an execution handling a delayed output.
      */
-    private class DelayedOutputExecution implements Execution {
+    private class DelayedOutputExecution extends TemplateExecution {
 
         private final OUTPUT mOutput;
 
@@ -1438,6 +1441,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mOutput = output;
         }
 
+        @Override
         public void run() {
 
             final boolean needsFlush;

@@ -23,4 +23,10 @@ package com.gh.bmd.jrt.runner;
  */
 public interface Execution extends Runnable {
 
+    /**
+     * Checks if this execution might be canceled in the future.
+     *
+     * @return whether the execution is cancelable.
+     */
+    boolean isCancelable();
 }

@@ -15,9 +15,11 @@ package com.gh.bmd.jrt.runner;
 
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -28,6 +30,9 @@ import javax.annotation.Nonnull;
  * Created by davide-maestroni on 10/14/14.
  */
 class ScheduledRunner implements Runner {
+
+    private final WeakIdentityHashMap<Execution, ArrayList<ScheduledFuture<?>>> mFutures =
+            new WeakIdentityHashMap<Execution, ArrayList<ScheduledFuture<?>>>();
 
     private final ScheduledExecutorService mService;
 
@@ -50,7 +55,23 @@ class ScheduledRunner implements Runner {
         mService = service;
     }
 
-    public boolean isManagedThread() {
+    public void cancel(@Nonnull final Execution execution) {
+
+        synchronized (mFutures) {
+
+            final ArrayList<ScheduledFuture<?>> scheduledFutures = mFutures.remove(execution);
+
+            if (scheduledFutures != null) {
+
+                for (final ScheduledFuture<?> future : scheduledFutures) {
+
+                    future.cancel(false);
+                }
+            }
+        }
+    }
+
+    public boolean isExecutionThread() {
 
         return mThreads.containsKey(Thread.currentThread());
     }
@@ -58,13 +79,32 @@ class ScheduledRunner implements Runner {
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
+        final ScheduledFuture<?> future =
+                mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
+
+        if (execution.isCancelable()) {
+
+            synchronized (mFutures) {
+
+                final WeakIdentityHashMap<Execution, ArrayList<ScheduledFuture<?>>> futures =
+                        mFutures;
+                ArrayList<ScheduledFuture<?>> scheduledFutures = futures.get(execution);
+
+                if (scheduledFutures == null) {
+
+                    scheduledFutures = new ArrayList<ScheduledFuture<?>>();
+                    futures.put(execution, scheduledFutures);
+                }
+
+                scheduledFutures.add(future);
+            }
+        }
     }
 
     /**
      * Class used to keep track of the threads employed by this runner.
      */
-    private static class ExecutionWrapper implements Execution {
+    private static class ExecutionWrapper implements Runnable {
 
         private final Thread mCurrentThread;
 

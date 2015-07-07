@@ -31,11 +31,15 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * <p/>
  * Created by davide-maestroni on 9/9/14.
  *
- * @see com.gh.bmd.jrt.runner.QueuedRunner
+ * @see com.gh.bmd.jrt.runner.QueuedRunner QueuedRunner
  */
 class SequentialRunner implements Runner {
 
-    public boolean isManagedThread() {
+    public void cancel(@Nonnull final Execution execution) {
+
+    }
+
+    public boolean isExecutionThread() {
 
         return false;
     }

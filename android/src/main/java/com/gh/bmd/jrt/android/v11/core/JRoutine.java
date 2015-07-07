@@ -49,7 +49,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * an already running loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
  * resolved, for example when invocations with different implementations share the same ID, the new
- * invocation is aborted with a {@link com.gh.bmd.jrt.android.invocation.InvocationTypeException}.
+ * invocation is aborted with a {@link com.gh.bmd.jrt.android.invocation.InvocationTypeException
+ * InvocationTypeException}.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>
@@ -131,7 +132,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *     </code>
  * </pre>
  * <p/>
- * See {@link com.gh.bmd.jrt.android.v4.core.JRoutine} for support of API levels less than
+ * See {@link com.gh.bmd.jrt.android.v4.core.JRoutine JRoutine} for support of API levels less than
  * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
  * Created by davide-maestroni on 12/8/14.
@@ -146,7 +147,8 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * the loader configuration.<br/>
      * If no invocation with the specified ID is running at the time of the channel creation, the
      * output will be aborted with a
-     * {@link com.gh.bmd.jrt.android.invocation.MissingInvocationException}.<br/>
+     * {@link com.gh.bmd.jrt.android.invocation.MissingInvocationException
+     * MissingInvocationException}.<br/>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -172,7 +174,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * Returns a builder of routines bound to the specified activity, wrapping the specified object
      * instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.<br/>
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as application.<br/>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -233,7 +235,8 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * the loader configuration.<br/>
      * If no invocation with the specified ID is running at the time of the channel creation, the
      * output will be aborted with a
-     * {@link com.gh.bmd.jrt.android.invocation.MissingInvocationException}.<br/>
+     * {@link com.gh.bmd.jrt.android.invocation.MissingInvocationException
+     * MissingInvocationException}.<br/>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -251,7 +254,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * Returns a builder of routines bound to the specified fragment, wrapping the specified object
      * instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext} as application.<br/>
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as application.<br/>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.

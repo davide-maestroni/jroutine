@@ -27,11 +27,13 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
- * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
- * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
- * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
- * annotations defined for each interface method.
+ * {@link com.gh.bmd.jrt.annotation.Alias Alias}, {@link com.gh.bmd.jrt.annotation.Input Input},
+ * {@link com.gh.bmd.jrt.annotation.Inputs Inputs}, {@link com.gh.bmd.jrt.annotation.Output Output},
+ * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+ * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+ * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+ * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} annotations defined for each
+ * interface method.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -58,7 +60,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 13/05/15.
  *
- * @see com.gh.bmd.jrt.proxy.annotation.Proxy
+ * @see com.gh.bmd.jrt.proxy.annotation.Proxy Proxy
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 1/14/15.
  *
- * @see com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder
+ * @see com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder LoaderRoutineBuilder
  */
 public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelBuilder>,
         LoaderConfigurableBuilder<LoaderChannelBuilder> {

@@ -51,7 +51,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 4/8/2015.
  *
- * @see com.gh.bmd.jrt.builder.InvocationConfiguration
+ * @see com.gh.bmd.jrt.builder.InvocationConfiguration InvocationConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

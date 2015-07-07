@@ -78,8 +78,6 @@ public class RoutineService extends Service {
 
     private static final String KEY_FACTORY_ARGS = "factory_args";
 
-    private static final String KEY_INPUT_ORDER = "input_order";
-
     private static final String KEY_INVOCATION_CLASS = "invocation_class";
 
     private static final String KEY_INVOCATION_ID = "invocation_id";
@@ -292,7 +290,6 @@ public class RoutineService extends Service {
             bundle.putSerializable(KEY_AVAILABLE_UNIT, availTimeout.unit);
         }
 
-        bundle.putSerializable(KEY_INPUT_ORDER, invocationConfiguration.getInputOrderTypeOr(null));
         bundle.putSerializable(KEY_OUTPUT_ORDER,
                                invocationConfiguration.getOutputOrderTypeOr(null));
         bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
@@ -447,7 +444,6 @@ public class RoutineService extends Service {
             final TimeUnit timeUnit = (TimeUnit) data.getSerializable(KEY_AVAILABLE_UNIT);
             final TimeDuration availTimeout =
                     (timeUnit != null) ? TimeDuration.fromUnit(timeout, timeUnit) : null;
-            final OrderType inputOrderType = (OrderType) data.getSerializable(KEY_INPUT_ORDER);
             final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
             final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
             final Class<? extends Runner> runnerClass =
@@ -455,8 +451,8 @@ public class RoutineService extends Service {
             final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
             final RoutineInfo routineInfo =
-                    new RoutineInfo(invocationClass, factoryArgs, inputOrderType, outputOrderType,
-                                    runnerClass, logClass, logLevel);
+                    new RoutineInfo(invocationClass, factoryArgs, outputOrderType, runnerClass,
+                                    logClass, logLevel);
             final HashMap<RoutineInfo, RoutineState> routineMap = mRoutineMap;
             RoutineState routineState = routineMap.get(routineInfo);
 
@@ -494,7 +490,6 @@ public class RoutineService extends Service {
                 builder.withCoreInstances(coreInvocations)
                        .withMaxInstances(maxInvocations)
                        .withAvailInstanceTimeout(availTimeout)
-                       .withInputOrder(inputOrderType)
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
                 final ContextInvocationFactory<Object, Object> factory =
@@ -648,8 +643,6 @@ public class RoutineService extends Service {
 
         private final Object[] mFactoryArgs;
 
-        private final OrderType mInputOrder;
-
         private final Class<? extends ContextInvocation<?, ?>> mInvocationClass;
 
         private final Class<? extends Log> mLogClass;
@@ -665,21 +658,18 @@ public class RoutineService extends Service {
          *
          * @param invocationClass the invocation class.
          * @param factoryArgs     the invocation constructor arguments.
-         * @param inputOrder      the input data order.
          * @param outputOrder     the output data order.
          * @param runnerClass     the runner class.
          * @param logClass        the log class.
          * @param logLevel        the log level.
          */
         private RoutineInfo(@Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-                @Nonnull final Object[] factoryArgs, @Nullable final OrderType inputOrder,
-                @Nullable final OrderType outputOrder,
+                @Nonnull final Object[] factoryArgs, @Nullable final OrderType outputOrder,
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nullable final LogLevel logLevel) {
 
             mInvocationClass = invocationClass;
             mFactoryArgs = factoryArgs;
-            mInputOrder = inputOrder;
             mOutputOrder = outputOrder;
             mRunnerClass = runnerClass;
             mLogClass = logClass;
@@ -701,12 +691,11 @@ public class RoutineService extends Service {
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-            return Arrays.equals(mFactoryArgs, that.mFactoryArgs) && mInputOrder == that.mInputOrder
-                    && mInvocationClass.equals(that.mInvocationClass) && !(mLogClass != null
-                    ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null)
-                    && mLogLevel == that.mLogLevel && mOutputOrder == that.mOutputOrder && !(
-                    mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
-                            : that.mRunnerClass != null);
+            return Arrays.equals(mFactoryArgs, that.mFactoryArgs) && mInvocationClass.equals(
+                    that.mInvocationClass) && !(mLogClass != null ? !mLogClass.equals(
+                    that.mLogClass) : that.mLogClass != null) && mLogLevel == that.mLogLevel
+                    && mOutputOrder == that.mOutputOrder && !(mRunnerClass != null
+                    ? !mRunnerClass.equals(that.mRunnerClass) : that.mRunnerClass != null);
         }
 
         @Override
@@ -714,7 +703,6 @@ public class RoutineService extends Service {
 
             // auto-generated code
             int result = Arrays.hashCode(mFactoryArgs);
-            result = 31 * result + (mInputOrder != null ? mInputOrder.hashCode() : 0);
             result = 31 * result + mInvocationClass.hashCode();
             result = 31 * result + (mLogClass != null ? mLogClass.hashCode() : 0);
             result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);

@@ -101,7 +101,7 @@ public @interface Output {
          * The variable is just passed to an output channel.
          * <p/>
          * The annotated method must return a superclass of
-         * {@link com.gh.bmd.jrt.channel.OutputChannel}.
+         * {@link com.gh.bmd.jrt.channel.OutputChannel OutputChannel}.
          */
         VALUE,
         /**
@@ -109,7 +109,7 @@ public @interface Output {
          * The elements of the result array or iterable are passed one by one to the output channel.
          * <p/>
          * The annotated method must return a superclass of
-         * {@link com.gh.bmd.jrt.channel.OutputChannel}.
+         * {@link com.gh.bmd.jrt.channel.OutputChannel OutputChannel}.
          */
         ELEMENT,
         /**

@@ -132,14 +132,14 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *
- * @see com.gh.bmd.jrt.annotation.Alias
- * @see com.gh.bmd.jrt.annotation.Input
- * @see com.gh.bmd.jrt.annotation.Inputs
- * @see com.gh.bmd.jrt.annotation.Output
- * @see com.gh.bmd.jrt.annotation.Priority
- * @see com.gh.bmd.jrt.annotation.ShareGroup
- * @see com.gh.bmd.jrt.annotation.Timeout
- * @see com.gh.bmd.jrt.annotation.TimeoutAction
+ * @see com.gh.bmd.jrt.annotation.Alias Alias
+ * @see com.gh.bmd.jrt.annotation.Input Input
+ * @see com.gh.bmd.jrt.annotation.Inputs Inputs
+ * @see com.gh.bmd.jrt.annotation.Output Output
+ * @see com.gh.bmd.jrt.annotation.Priority Priority
+ * @see com.gh.bmd.jrt.annotation.ShareGroup ShareGroup
+ * @see com.gh.bmd.jrt.annotation.Timeout Timeout
+ * @see com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction
  */
 public class JRoutine {
 

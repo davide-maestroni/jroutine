@@ -42,9 +42,14 @@ public class RunnerDecorator implements Runner {
         mRunner = wrapped;
     }
 
-    public boolean isManagedThread() {
+    public void cancel(@Nonnull final Execution execution) {
 
-        return mRunner.isManagedThread();
+        mRunner.cancel(execution);
+    }
+
+    public boolean isExecutionThread() {
+
+        return mRunner.isExecutionThread();
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

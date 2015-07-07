@@ -1994,7 +1994,11 @@ public class ObjectRoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        public boolean isManagedThread() {
+        public void cancel(@Nonnull final Execution execution) {
+
+        }
+
+        public boolean isExecutionThread() {
 
             return false;
         }

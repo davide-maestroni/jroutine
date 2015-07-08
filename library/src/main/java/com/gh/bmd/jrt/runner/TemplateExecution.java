@@ -26,8 +26,4 @@ public abstract class TemplateExecution implements Execution {
 
         return false;
     }
-
-    public void run() {
-
-    }
 }

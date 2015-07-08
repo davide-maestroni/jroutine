@@ -315,6 +315,9 @@ class LocalQueue {
      */
     private static class EmptyExecution extends TemplateExecution {
 
+        public void run() {
+
+        }
     }
 
     /**

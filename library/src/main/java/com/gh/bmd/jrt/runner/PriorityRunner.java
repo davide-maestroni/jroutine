@@ -63,7 +63,6 @@ public class PriorityRunner {
 
     private final TemplateExecution mExecution = new TemplateExecution() {
 
-        @Override
         public void run() {
 
             final PriorityExecution execution = mQueue.poll();
@@ -272,7 +271,7 @@ public class PriorityRunner {
 
             final PriorityExecution priorityExecution = mExecutions.remove(execution);
 
-            if (!mQueue.remove(priorityExecution)) {
+            if ((priorityExecution != null) && !mQueue.remove(priorityExecution)) {
 
                 mRunner.cancel(mDelayedExecutions.remove(priorityExecution));
             }
@@ -286,10 +285,11 @@ public class PriorityRunner {
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
+            final boolean isCancelable = execution.isCancelable();
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
 
-            if (execution.isCancelable()) {
+            if (isCancelable) {
 
                 mExecutions.put(execution, priorityExecution);
             }
@@ -304,7 +304,7 @@ public class PriorityRunner {
                 final DelayedExecution delayedExecution =
                         new DelayedExecution(mQueue, priorityExecution);
 
-                if (execution.isCancelable()) {
+                if (isCancelable) {
 
                     mDelayedExecutions.put(priorityExecution, delayedExecution);
                 }

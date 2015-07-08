@@ -21,9 +21,9 @@ import android.os.Build.VERSION_CODES;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -42,8 +42,8 @@ class AsyncTaskRunner extends MainRunner {
 
     private final Executor mExecutor;
 
-    private final WeakIdentityHashMap<Execution, ArrayList<ExecutionTask>> mTasks =
-            new WeakIdentityHashMap<Execution, ArrayList<ExecutionTask>>();
+    private final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> mTasks =
+            new WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>>();
 
     private final Map<Thread, Void> mThreads =
             Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
@@ -65,11 +65,11 @@ class AsyncTaskRunner extends MainRunner {
 
         synchronized (mTasks) {
 
-            final ArrayList<ExecutionTask> executionTasks = mTasks.remove(execution);
+            final WeakHashMap<ExecutionTask, Void> executionTasks = mTasks.remove(execution);
 
             if (executionTasks != null) {
 
-                for (final ExecutionTask task : executionTasks) {
+                for (final ExecutionTask task : executionTasks.keySet()) {
 
                     super.cancel(task);
                     task.cancel(false);
@@ -94,16 +94,17 @@ class AsyncTaskRunner extends MainRunner {
 
             synchronized (mTasks) {
 
-                final WeakIdentityHashMap<Execution, ArrayList<ExecutionTask>> tasks = mTasks;
-                ArrayList<ExecutionTask> executionTasks = tasks.get(execution);
+                final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks =
+                        mTasks;
+                WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
 
                 if (executionTasks == null) {
 
-                    executionTasks = new ArrayList<ExecutionTask>();
+                    executionTasks = new WeakHashMap<ExecutionTask, Void>();
                     tasks.put(execution, executionTasks);
                 }
 
-                executionTasks.add(task);
+                executionTasks.put(task, null);
             }
         }
 

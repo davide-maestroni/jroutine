@@ -15,9 +15,9 @@ package com.gh.bmd.jrt.runner;
 
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +31,8 @@ import javax.annotation.Nonnull;
  */
 class ScheduledRunner implements Runner {
 
-    private final WeakIdentityHashMap<Execution, ArrayList<ScheduledFuture<?>>> mFutures =
-            new WeakIdentityHashMap<Execution, ArrayList<ScheduledFuture<?>>>();
+    private final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> mFutures =
+            new WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>();
 
     private final ScheduledExecutorService mService;
 
@@ -59,11 +59,12 @@ class ScheduledRunner implements Runner {
 
         synchronized (mFutures) {
 
-            final ArrayList<ScheduledFuture<?>> scheduledFutures = mFutures.remove(execution);
+            final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures =
+                    mFutures.remove(execution);
 
             if (scheduledFutures != null) {
 
-                for (final ScheduledFuture<?> future : scheduledFutures) {
+                for (final ScheduledFuture<?> future : scheduledFutures.keySet()) {
 
                     future.cancel(false);
                 }
@@ -86,17 +87,17 @@ class ScheduledRunner implements Runner {
 
             synchronized (mFutures) {
 
-                final WeakIdentityHashMap<Execution, ArrayList<ScheduledFuture<?>>> futures =
-                        mFutures;
-                ArrayList<ScheduledFuture<?>> scheduledFutures = futures.get(execution);
+                final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>
+                        futures = mFutures;
+                WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures = futures.get(execution);
 
                 if (scheduledFutures == null) {
 
-                    scheduledFutures = new ArrayList<ScheduledFuture<?>>();
+                    scheduledFutures = new WeakHashMap<ScheduledFuture<?>, Void>();
                     futures.put(execution, scheduledFutures);
                 }
 
-                scheduledFutures.add(future);
+                scheduledFutures.put(future, null);
             }
         }
     }

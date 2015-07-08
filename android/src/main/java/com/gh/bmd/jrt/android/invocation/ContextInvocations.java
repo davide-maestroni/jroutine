@@ -221,7 +221,7 @@ public class ContextInvocations {
                 @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
                 @Nullable final Object[] args) {
 
-            super(invocationClass, (args != null) ? args : Reflection.NO_ARGS);
+            super(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS);
             mFactory = Invocations.factoryOf(
                     (Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass, args);
         }

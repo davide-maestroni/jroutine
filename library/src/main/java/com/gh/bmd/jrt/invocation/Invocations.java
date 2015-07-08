@@ -52,7 +52,7 @@ public class Invocations {
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
             @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass) {
 
-        return new DefaultInvocationFactory<INPUT, OUTPUT>(invocationClass, null);
+        return factoryOf(invocationClass, (Object[]) null);
     }
 
     /**
@@ -189,7 +189,7 @@ public class Invocations {
                 @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
                 @Nullable final Object[] args) {
 
-            final Object[] invocationArgs = (mArgs = (args != null) ? args : NO_ARGS);
+            final Object[] invocationArgs = (mArgs = (args != null) ? args.clone() : NO_ARGS);
             mConstructor = findConstructor(invocationClass, invocationArgs);
         }
 

@@ -34,7 +34,6 @@ import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -208,8 +207,18 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
         if (context.get() != null) {
 
-            final List<INPUT> inputList =
-                    (inputs == null) ? Collections.<INPUT>emptyList() : Arrays.asList(inputs);
+            final List<INPUT> inputList;
+
+            if (inputs == null) {
+
+                inputList = Collections.emptyList();
+
+            } else {
+
+                inputList = new ArrayList<INPUT>(inputs.length);
+                Collections.addAll(inputList, inputs);
+            }
+
             final PurgeInputsExecution<INPUT> execution =
                     new PurgeInputsExecution<INPUT>(context, mFactory, mLoaderId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);

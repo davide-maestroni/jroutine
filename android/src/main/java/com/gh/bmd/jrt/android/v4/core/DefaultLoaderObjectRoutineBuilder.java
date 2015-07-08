@@ -139,7 +139,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         mContext = new WeakReference<Object>(context);
         mTargetClass = targetClass;
-        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
     }
 
     @Nonnull

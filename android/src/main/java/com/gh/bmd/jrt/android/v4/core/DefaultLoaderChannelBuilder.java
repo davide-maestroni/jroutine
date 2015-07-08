@@ -31,7 +31,6 @@ import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -234,8 +233,18 @@ class DefaultLoaderChannelBuilder
 
         if (context.get() != null) {
 
-            final List<Object> inputList =
-                    (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
+            final List<Object> inputList;
+
+            if (inputs == null) {
+
+                inputList = Collections.emptyList();
+
+            } else {
+
+                inputList = new ArrayList<Object>(inputs.length);
+                Collections.addAll(inputList, inputs);
+            }
+
             Runners.mainRunner()
                    .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
                            LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);

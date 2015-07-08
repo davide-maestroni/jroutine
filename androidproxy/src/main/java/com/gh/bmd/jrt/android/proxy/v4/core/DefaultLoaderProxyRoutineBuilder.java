@@ -106,7 +106,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         mTargetClass = targetClass;
         mContextReference = new WeakReference<Object>(context);
-        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
     }
 
     @Nonnull

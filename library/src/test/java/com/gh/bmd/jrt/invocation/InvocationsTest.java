@@ -46,6 +46,17 @@ public class InvocationsTest {
     @Test
     public void testInvocationFactoryEquals() {
 
+        final InvocationFactory<Object, Object> factory =
+                Invocations.factoryOf(TestInvocation.class);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+
+            @Nonnull
+            public Invocation<Object, Object> newInvocation() {
+
+                return new TemplateInvocation<Object, Object>() {};
+            }
+        });
         assertThat(Invocations.factoryOf(TestInvocation.class).hashCode()).isEqualTo(
                 Invocations.factoryOf(TestInvocation.class).hashCode());
         assertThat(Invocations.factoryOf(TestInvocation.class)).isEqualTo(

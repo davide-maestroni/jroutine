@@ -82,7 +82,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        final Method method = getAnnotatedMethod(getTargetClass(), name);
+        final Method method = getAnnotatedMethod(name, getTargetClass());
 
         if (method == null) {
 
@@ -184,7 +184,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            final MethodInfo methodInfo = getTargetMethodInfo(getTargetClass(), method);
+            final MethodInfo methodInfo = getTargetMethodInfo(method, getTargetClass());
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =

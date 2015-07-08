@@ -95,7 +95,7 @@ class DefaultClassRoutineBuilder
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        final Method method = getAnnotatedStaticMethod(mTargetClass, name);
+        final Method method = getAnnotatedStaticMethod(name, mTargetClass);
 
         if (method == null) {
 
@@ -362,7 +362,7 @@ class DefaultClassRoutineBuilder
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            callFromInvocation(target, mMutex, objects, result, mMethod, mInputMode, mOutputMode);
+            callFromInvocation(mMethod, mMutex, target, objects, result, mInputMode, mOutputMode);
         }
     }
 

@@ -283,7 +283,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
         final Class<?> targetClass = mTargetClass;
-        final Method targetMethod = getAnnotatedMethod(targetClass, name);
+        final Method targetMethod = getAnnotatedMethod(name, targetClass);
 
         if (targetMethod == null) {
 
@@ -716,7 +716,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            callFromInvocation(mTarget, mMutex, objects, result, mTargetMethod, mInputMode,
+            callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,
                                mOutputMode);
         }
 
@@ -833,7 +833,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final MethodInfo methodInfo = getTargetMethodInfo(mTargetClass, method);
+            final MethodInfo methodInfo = getTargetMethodInfo(method, mTargetClass);
             final Method targetMethod = methodInfo.method;
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;

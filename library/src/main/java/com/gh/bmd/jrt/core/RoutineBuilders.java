@@ -76,20 +76,20 @@ public class RoutineBuilders {
     /**
      * Calls the specified target method from inside a routine invocation.
      *
-     * @param target       the target instance.
+     * @param targetMethod the target method.
      * @param mutex        the method mutex.
+     * @param target       the target instance.
      * @param objects      the input objects.
      * @param result       the invocation result channel.
-     * @param targetMethod the target method.
      * @param inputMode    the input transfer mode.
      * @param outputMode   the output transfer mode.
      * @throws com.gh.bmd.jrt.channel.RoutineException in case of errors.
      */
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    public static void callFromInvocation(@Nonnull final Object target, @Nonnull final Object mutex,
+    public static void callFromInvocation(@Nonnull final Method targetMethod,
+            @Nonnull final Object mutex, @Nonnull final Object target,
             @Nonnull final List<?> objects, @Nonnull final ResultChannel<Object> result,
-            @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
-            @Nullable final OutputMode outputMode) {
+            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
         makeAccessible(targetMethod);
 
@@ -177,33 +177,33 @@ public class RoutineBuilders {
     /**
      * Gets the member method annotated with the specified alias name.
      *
-     * @param targetClass the target class.
      * @param name        the alias name.
+     * @param targetClass the target class.
      * @return the method.
      * @throws java.lang.IllegalArgumentException if no method with the specified alias name was
      *                                            found.
      */
     @Nullable
-    public static Method getAnnotatedMethod(@Nonnull final Class<?> targetClass,
-            @Nonnull final String name) {
+    public static Method getAnnotatedMethod(@Nonnull final String name,
+            @Nonnull final Class<?> targetClass) {
 
-        return getAnnotatedMethod(targetClass, name, false);
+        return getAnnotatedMethod(name, targetClass, false);
     }
 
     /**
      * Gets the class method annotated with the specified alias name.
      *
-     * @param targetClass the target class.
      * @param name        the alias name.
+     * @param targetClass the target class.
      * @return the method.
      * @throws java.lang.IllegalArgumentException if no method with the specified alias name was
      *                                            found.
      */
     @Nullable
-    public static Method getAnnotatedStaticMethod(@Nonnull final Class<?> targetClass,
-            @Nonnull final String name) {
+    public static Method getAnnotatedStaticMethod(@Nonnull final String name,
+            @Nonnull final Class<?> targetClass) {
 
-        return getAnnotatedMethod(targetClass, name, true);
+        return getAnnotatedMethod(name, targetClass, true);
     }
 
     /**
@@ -352,7 +352,7 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the input transfer mode associated to the specified method.
+     * Gets the inputs transfer mode associated to the specified method.
      *
      * @param method the proxy method.
      * @return the input mode.
@@ -589,14 +589,14 @@ public class RoutineBuilders {
     /**
      * Gets info about the method targeted by the specified proxy one.
      *
-     * @param targetClass the target class.
      * @param proxyMethod the proxy method.
+     * @param targetClass the target class.
      * @return the method info.
      * @throws java.lang.IllegalArgumentException if no target method was found.
      */
     @Nonnull
-    public static MethodInfo getTargetMethodInfo(@Nonnull final Class<?> targetClass,
-            @Nonnull final Method proxyMethod) {
+    public static MethodInfo getTargetMethodInfo(@Nonnull final Method proxyMethod,
+            @Nonnull final Class<?> targetClass) {
 
         MethodInfo methodInfo;
 
@@ -657,7 +657,7 @@ public class RoutineBuilders {
 
                 try {
 
-                    targetMethod = getTargetMethod(targetClass, proxyMethod, targetParameterTypes);
+                    targetMethod = getTargetMethod(proxyMethod, targetClass, targetParameterTypes);
 
                 } catch (final NoSuchMethodException e) {
 
@@ -868,8 +868,8 @@ public class RoutineBuilders {
 
     @Nullable
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    private static Method getAnnotatedMethod(@Nonnull final Class<?> targetClass,
-            @Nonnull final String name, final boolean isStatic) {
+    private static Method getAnnotatedMethod(@Nonnull final String name,
+            @Nonnull final Class<?> targetClass, final boolean isStatic) {
 
         final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasCache =
                 (isStatic) ? sStaticAliasCache : sAliasCache;
@@ -903,9 +903,9 @@ public class RoutineBuilders {
     }
 
     @Nonnull
-    private static Method getTargetMethod(@Nonnull final Class<?> targetClass,
-            @Nonnull final Method method, @Nonnull final Class<?>[] targetParameterTypes) throws
-            NoSuchMethodException {
+    private static Method getTargetMethod(@Nonnull final Method method,
+            @Nonnull final Class<?> targetClass,
+            @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
 
         String name = null;
         Method targetMethod = null;
@@ -914,7 +914,7 @@ public class RoutineBuilders {
         if (annotation != null) {
 
             name = annotation.value();
-            targetMethod = getAnnotatedMethod(targetClass, name, false);
+            targetMethod = getAnnotatedMethod(name, targetClass, false);
         }
 
         if (targetMethod == null) {

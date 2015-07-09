@@ -13,10 +13,8 @@
  */
 package com.gh.bmd.jrt.android.proxy.v4.core;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.v4.core.RoutineContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,38 +58,39 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
     }
 
     /**
-     * Returns a builder of routines bound to the specified activity, wrapping the specified object
+     * Returns a builder of routines bound to the specified context, wrapping the specified object
      * instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as application.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
+     * context.
      *
-     * @param activity    the invocation activity context.
-     * @param target      the wrapped object class.
-     * @param factoryArgs the object factory arguments.
+     * @param context the routine context.
+     * @param target  the wrapped object class.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static LoaderProxyRoutineBuilder onActivity(@Nonnull final FragmentActivity activity,
-            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
+    public static LoaderProxyRoutineBuilder on(@Nonnull final RoutineContext context,
+            @Nonnull final Class<?> target) {
 
-        return new DefaultLoaderProxyRoutineBuilder(activity, target, factoryArgs);
+        return on(context, target, (Object[]) null);
     }
 
     /**
-     * Returns a builder of routines bound to the specified fragment, wrapping the specified object
+     * Returns a builder of routines bound to the specified context, wrapping the specified object
      * instances.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as application.
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
+     * context.
      *
-     * @param fragment    the invocation fragment context.
+     * @param context     the routine context.
      * @param target      the wrapped object class.
      * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static LoaderProxyRoutineBuilder onFragment(@Nonnull final Fragment fragment,
+    public static LoaderProxyRoutineBuilder on(@Nonnull final RoutineContext context,
             @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
-        return new DefaultLoaderProxyRoutineBuilder(fragment, target, factoryArgs);
+        return new DefaultLoaderProxyRoutineBuilder(context, target, factoryArgs);
     }
 }

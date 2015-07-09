@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 
 import com.gh.bmd.jrt.android.annotation.CacheStrategy;
@@ -24,10 +22,8 @@ import com.gh.bmd.jrt.android.annotation.LoaderId;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AbstractContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
-import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
@@ -45,7 +41,6 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -77,7 +72,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
-    private final WeakReference<Object> mContext;
+    private final RoutineContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -93,38 +88,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Constructor.
      *
-     * @param activity    the context activity.
-     * @param targetClass the invocation class token.
-     * @param factoryArgs the object factory arguments.
-     */
-    DefaultLoaderObjectRoutineBuilder(@Nonnull final Activity activity,
-            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
-
-        this((Object) activity, targetClass, factoryArgs);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param fragment    the context fragment.
-     * @param targetClass the invocation class token.
-     * @param factoryArgs the object factory arguments.
-     */
-    DefaultLoaderObjectRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
-
-        this((Object) fragment, targetClass, factoryArgs);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param context     the routine context.
      * @param targetClass the target object class.
      * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultLoaderObjectRoutineBuilder(@Nonnull final Object context,
+    DefaultLoaderObjectRoutineBuilder(@Nonnull final RoutineContext context,
             @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
@@ -137,7 +106,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             throw new NullPointerException("the target class must not be null");
         }
 
-        mContext = new WeakReference<Object>(context);
+        mContext = context;
         mTargetClass = targetClass;
         mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
     }
@@ -212,30 +181,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    private static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> getBuilder(
-            @Nonnull WeakReference<Object> contextReference,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
-
-        final Object context = contextReference.get();
-
-        if (context == null) {
-
-            throw new IllegalStateException("the routine context has been destroyed");
-        }
-
-        if (context instanceof Activity) {
-
-            return JRoutine.onActivity((Activity) context, factory);
-
-        } else if (context instanceof Fragment) {
-
-            return JRoutine.onFragment((Fragment) context, factory);
-        }
-
-        throw new IllegalArgumentException("invalid context type: " + context.getClass().getName());
-    }
-
-    @Nonnull
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     private static Object getInstance(@Nonnull final Context context,
             @Nonnull final Class<?> targetClass, @Nonnull final Object[] args) throws
@@ -300,13 +245,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(configuration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, targetMethod);
-        return getBuilder(mContext, factory).invocations()
-                                            .with(invocationConfiguration)
-                                            .set()
-                                            .loaders()
-                                            .with(loaderConfiguration)
-                                            .set()
-                                            .buildRoutine();
+        return JRoutine.on(mContext, factory)
+                       .invocations()
+                       .with(invocationConfiguration)
+                       .set()
+                       .loaders()
+                       .with(loaderConfiguration)
+                       .set()
+                       .buildRoutine();
     }
 
     @Nonnull
@@ -329,13 +275,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(configuration, method);
         final LoaderConfiguration loaderConfiguration =
                 configurationWithAnnotations(mLoaderConfiguration, method);
-        return getBuilder(mContext, factory).invocations()
-                                            .with(invocationConfiguration)
-                                            .set()
-                                            .loaders()
-                                            .with(loaderConfiguration)
-                                            .set()
-                                            .buildRoutine();
+        return JRoutine.on(mContext, factory)
+                       .invocations()
+                       .with(invocationConfiguration)
+                       .set()
+                       .loaders()
+                       .with(loaderConfiguration)
+                       .set()
+                       .buildRoutine();
     }
 
     @Nonnull
@@ -803,7 +750,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocationHandler implements InvocationHandler {
 
-        private final WeakReference<Object> mContext;
+        private final RoutineContext mContext;
 
         private final Object[] mFactoryArgs;
 
@@ -841,19 +788,18 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(targetMethod, mTargetClass, mFactoryArgs, shareGroup,
                                                inputMode, outputMode);
-            final LoaderRoutineBuilder<Object, Object> routineBuilder =
-                    getBuilder(mContext, factory);
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
             final LoaderConfiguration loaderConfiguration =
                     configurationWithAnnotations(mLoaderConfiguration, method);
-            final Routine<Object, Object> routine = routineBuilder.invocations()
-                                                                  .with(invocationConfiguration)
-                                                                  .set()
-                                                                  .loaders()
-                                                                  .with(loaderConfiguration)
-                                                                  .set()
-                                                                  .buildRoutine();
+            final Routine<Object, Object> routine = JRoutine.on(mContext, factory)
+                                                            .invocations()
+                                                            .with(invocationConfiguration)
+                                                            .set()
+                                                            .loaders()
+                                                            .with(loaderConfiguration)
+                                                            .set()
+                                                            .buildRoutine();
             return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
                                  inputMode, outputMode);
         }

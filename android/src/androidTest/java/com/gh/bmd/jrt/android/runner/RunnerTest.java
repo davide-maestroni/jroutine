@@ -295,13 +295,11 @@ public class RunnerTest extends AndroidTestCase {
             return mIsPassed;
         }
 
-        @Override
         public void run() {
 
             // it looks like that handlers and the kind are not so accurate after all...
             // let's have a 10 millisecond error tolerance
             mIsPassed = (System.currentTimeMillis() - mStartTime + 10 >= mDelay.toMillis());
-
             mSemaphore.release();
         }
     }

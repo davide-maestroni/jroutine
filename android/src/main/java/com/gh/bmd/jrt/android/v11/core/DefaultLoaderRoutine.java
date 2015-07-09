@@ -13,11 +13,7 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
-import android.os.Build.VERSION_CODES;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
@@ -34,7 +30,6 @@ import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.TemplateExecution;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,13 +46,12 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
 class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
         implements LoaderRoutine<INPUT, OUTPUT> {
 
     private final LoaderConfiguration mConfiguration;
 
-    private final WeakReference<Object> mContext;
+    private final RoutineContext mContext;
 
     private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
@@ -68,13 +62,13 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
     /**
      * Constructor.
      *
-     * @param context                 the context reference.
+     * @param context                 the routine context.
      * @param factory                 the invocation factory.
      * @param invocationConfiguration the invocation configuration.
      * @param loaderConfiguration     the loader configuration.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderRoutine(@Nonnull final WeakReference<Object> context,
+    DefaultLoaderRoutine(@Nonnull final RoutineContext context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final LoaderConfiguration loaderConfiguration) {
@@ -83,7 +77,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
         if (context == null) {
 
-            throw new NullPointerException("the context must not be null");
+            throw new NullPointerException("the routine context must not be null");
         }
 
         if (factory == null) {
@@ -103,9 +97,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
     public void purge() {
 
         super.purge();
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
             Runners.mainRunner()
                    .run(new PurgeExecution(context, mFactory, mLoaderId), 0, TimeUnit.MILLISECONDS);
@@ -146,29 +140,11 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
                                                        mOrderType, logger);
         }
 
-        final Object context = mContext.get();
+        final Context appContext = mContext.getApplicationContext();
 
-        if (context == null) {
+        if (appContext == null) {
 
             throw new IllegalStateException("the routine context has been destroyed");
-        }
-
-        final Context appContext;
-
-        if (context instanceof Activity) {
-
-            final Activity activity = (Activity) context;
-            appContext = activity.getApplicationContext();
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            appContext = fragment.getActivity().getApplicationContext();
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
         }
 
         try {
@@ -193,9 +169,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
     public void purge(@Nullable final INPUT input) {
 
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
             final List<INPUT> inputList = Collections.singletonList(input);
             final PurgeInputsExecution<INPUT> execution =
@@ -206,9 +182,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
     public void purge(@Nullable final INPUT... inputs) {
 
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
             final List<INPUT> inputList;
 
@@ -230,9 +206,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
     public void purge(@Nullable final Iterable<? extends INPUT> inputs) {
 
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
             final List<INPUT> inputList;
 
@@ -261,7 +237,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
      */
     private static class PurgeExecution extends TemplateExecution {
 
-        private final WeakReference<Object> mContext;
+        private final RoutineContext mContext;
 
         private final ContextInvocationFactory<?, ?> mFactory;
 
@@ -270,11 +246,11 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
         /**
          * Constructor.
          *
-         * @param context  the context reference.
+         * @param context  the context instance.
          * @param factory  the invocation factory.
          * @param loaderId the loader ID.
          */
-        private PurgeExecution(@Nonnull final WeakReference<Object> context,
+        private PurgeExecution(@Nonnull final RoutineContext context,
                 @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
 
             mContext = context;
@@ -282,15 +258,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             mLoaderId = loaderId;
         }
 
-        @Override
         public void run() {
 
-            final Object context = mContext.get();
-
-            if (context != null) {
-
-                LoaderInvocation.purgeLoaders(context, mLoaderId, mFactory);
-            }
+            LoaderInvocation.purgeLoaders(mContext, mLoaderId, mFactory);
         }
     }
 
@@ -301,7 +271,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
      */
     private static class PurgeInputsExecution<INPUT> extends TemplateExecution {
 
-        private final WeakReference<Object> mContext;
+        private final RoutineContext mContext;
 
         private final ContextInvocationFactory<?, ?> mFactory;
 
@@ -312,12 +282,12 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
         /**
          * Constructor.
          *
-         * @param context  the context reference.
+         * @param context  the context instance.
          * @param factory  the invocation factory.
          * @param loaderId the loader ID.
          * @param inputs   the list of inputs.
          */
-        private PurgeInputsExecution(@Nonnull final WeakReference<Object> context,
+        private PurgeInputsExecution(@Nonnull final RoutineContext context,
                 @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId,
                 @Nonnull final List<INPUT> inputs) {
 
@@ -327,15 +297,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             mInputs = inputs;
         }
 
-        @Override
         public void run() {
 
-            final Object context = mContext.get();
-
-            if (context != null) {
-
-                LoaderInvocation.purgeLoader(context, mLoaderId, mFactory, mInputs);
-            }
+            LoaderInvocation.purgeLoader(mContext, mLoaderId, mFactory, mInputs);
         }
     }
 }

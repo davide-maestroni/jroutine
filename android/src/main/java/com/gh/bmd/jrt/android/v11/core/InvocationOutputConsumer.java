@@ -13,9 +13,6 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import android.annotation.TargetApi;
-import android.os.Build.VERSION_CODES;
-
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.RoutineException;
@@ -41,7 +38,6 @@ import javax.annotation.Nullable;
  *
  * @param <OUTPUT> the output data type.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
 class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
     private static final Runner sMainRunner = Runners.mainRunner();
@@ -77,7 +73,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
         mDeliverResult = new TemplateExecution() {
 
-            @Override
             public void run() {
 
                 loader.deliverResult(createResult());

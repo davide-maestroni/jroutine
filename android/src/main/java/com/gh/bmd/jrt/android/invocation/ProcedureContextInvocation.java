@@ -31,38 +31,31 @@ public abstract class ProcedureContextInvocation<OUTPUT>
         implements ContextInvocation<Void, OUTPUT>, ContextInvocationFactory<Void, OUTPUT> {
 
     @Nonnull
-    @Override
     public final ContextInvocation<Void, OUTPUT> newInvocation() {
 
         return this;
     }
 
-    @Override
     public final void onAbort(@Nullable final Throwable reason) {
 
     }
 
-    @Override
     public final void onDestroy() {
 
     }
 
-    @Override
     public final void onInitialize() {
 
     }
 
-    @Override
     public final void onInput(final Void input, @Nonnull final ResultChannel<OUTPUT> result) {
 
     }
 
-    @Override
     public final void onTerminate() {
 
     }
 
-    @Override
     public final void onContext(@Nonnull final Context context) {
 
     }

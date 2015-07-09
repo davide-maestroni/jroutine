@@ -73,7 +73,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
         mDeliverResult = new TemplateExecution() {
 
-            @Override
             public void run() {
 
                 loader.deliverResult(createResult());

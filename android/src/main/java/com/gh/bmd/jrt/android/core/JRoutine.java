@@ -19,7 +19,6 @@ import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.util.ClassToken;
-import com.gh.bmd.jrt.util.Reflection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -103,7 +102,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
     public static ServiceObjectRoutineBuilder onService(@Nonnull final Context context,
             @Nonnull final Class<?> targetClass) {
 
-        return onService(context, targetClass, Reflection.NO_ARGS);
+        return onService(context, targetClass, (Object[]) null);
     }
 
     /**
@@ -152,7 +151,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
             @Nonnull final Context context,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
-        return onService(context, classToken, Reflection.NO_ARGS);
+        return onService(context, classToken, (Object[]) null);
     }
 
     /**

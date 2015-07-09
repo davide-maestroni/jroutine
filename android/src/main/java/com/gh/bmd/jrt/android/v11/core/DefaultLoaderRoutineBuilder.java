@@ -13,11 +13,6 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Fragment;
-import android.os.Build.VERSION_CODES;
-
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
@@ -27,8 +22,6 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.util.Reflection;
-
-import java.lang.ref.WeakReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,12 +34,11 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
 class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements LoaderRoutineBuilder<INPUT, OUTPUT>,
         LoaderConfiguration.Configurable<LoaderRoutineBuilder<INPUT, OUTPUT>> {
 
-    private final WeakReference<Object> mContext;
+    private final RoutineContext mContext;
 
     private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
@@ -67,41 +59,13 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
     /**
      * Constructor.
      *
-     * @param activity the context activity.
-     * @param factory  the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
-     *                                            static.
-     */
-    DefaultLoaderRoutineBuilder(@Nonnull final Activity activity,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
-
-        this((Object) activity, factory);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param fragment the context fragment.
-     * @param factory  the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
-     *                                            static.
-     */
-    DefaultLoaderRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
-
-        this((Object) fragment, factory);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param context the context instance.
+     * @param context the routine context.
      * @param factory the invocation factory.
      * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
      *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultLoaderRoutineBuilder(@Nonnull final Object context,
+    DefaultLoaderRoutineBuilder(@Nonnull final RoutineContext context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         if (context == null) {
@@ -117,7 +81,7 @@ class DefaultLoaderRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<
                     "the factory class must be static: " + factoryClass.getName());
         }
 
-        mContext = new WeakReference<Object>(context);
+        mContext = context;
         mFactory = factory;
     }
 

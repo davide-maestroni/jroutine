@@ -175,7 +175,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     @Nonnull
-    @Override
     public Invocation<INPUT, OUTPUT> newInvocation() {
 
         final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;

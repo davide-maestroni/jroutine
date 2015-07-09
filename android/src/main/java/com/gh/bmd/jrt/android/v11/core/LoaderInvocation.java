@@ -14,8 +14,6 @@
 package com.gh.bmd.jrt.android.v11.core;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
@@ -81,7 +79,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
     private final ClashResolutionType mClashResolutionType;
 
-    private final WeakReference<Object> mContext;
+    private final RoutineContext mContext;
 
     private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
 
@@ -98,21 +96,21 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     /**
      * Constructor.
      *
-     * @param context       the context reference.
+     * @param context       the context instance.
      * @param factory       the invocation factory.
      * @param configuration the loader configuration.
      * @param order         the input data order.
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    LoaderInvocation(@Nonnull final WeakReference<Object> context,
+    LoaderInvocation(@Nonnull final RoutineContext context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory,
             @Nonnull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
 
         if (context == null) {
 
-            throw new NullPointerException("the context reference must not be null");
+            throw new NullPointerException("the routine context must not be null");
         }
 
         if (factory == null) {
@@ -136,35 +134,27 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     /**
      * Destroys the loader with the specified ID.
      *
-     * @param context  the context.
+     * @param context  the context instance.
      * @param loaderId the loader ID.
      */
-    static void purgeLoader(@Nonnull final Object context, final int loaderId) {
+    static void purgeLoader(@Nonnull final RoutineContext context, final int loaderId) {
 
+        final Object component = context.getComponent();
+        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+                callbackMap = sCallbackMap;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                sCallbackMap.get(context);
+                callbackMap.get(component);
 
         if (callbackArray == null) {
 
             return;
         }
 
-        final LoaderManager loaderManager;
+        final LoaderManager loaderManager = context.getLoaderManager();
 
-        if (context instanceof Activity) {
+        if (loaderManager == null) {
 
-            final Activity activity = (Activity) context;
-            loaderManager = activity.getLoaderManager();
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            loaderManager = fragment.getLoaderManager();
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
+            return;
         }
 
         int i = 0;
@@ -193,46 +183,38 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
         if (callbackArray.size() == 0) {
 
-            sCallbackMap.remove(context);
+            callbackMap.remove(component);
         }
     }
 
     /**
      * Destroys all the loaders with the specified invocation factory and inputs.
      *
-     * @param context  the context.
+     * @param context  the context instance.
      * @param loaderId the loader ID.
      * @param factory  the invocation factory.
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final Object context, final int loaderId,
+    static void purgeLoader(@Nonnull final RoutineContext context, final int loaderId,
             @Nonnull final ContextInvocationFactory<?, ?> factory, @Nonnull final List<?> inputs) {
 
+        final Object component = context.getComponent();
+        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+                callbackMap = sCallbackMap;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                sCallbackMap.get(context);
+                callbackMap.get(component);
 
         if (callbackArray == null) {
 
             return;
         }
 
-        final LoaderManager loaderManager;
+        final LoaderManager loaderManager = context.getLoaderManager();
 
-        if (context instanceof Activity) {
+        if (loaderManager == null) {
 
-            final Activity activity = (Activity) context;
-            loaderManager = activity.getLoaderManager();
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            loaderManager = fragment.getLoaderManager();
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
+            return;
         }
 
         int i = 0;
@@ -269,45 +251,37 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
         if (callbackArray.size() == 0) {
 
-            sCallbackMap.remove(context);
+            callbackMap.remove(component);
         }
     }
 
     /**
      * Destroys the loader with the specified ID and the specified inputs.
      *
-     * @param context  the context.
+     * @param context  the context instance.
      * @param loaderId the loader ID.
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final Object context, final int loaderId,
+    static void purgeLoader(@Nonnull final RoutineContext context, final int loaderId,
             @Nonnull final List<?> inputs) {
 
+        final Object component = context.getComponent();
+        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+                callbackMap = sCallbackMap;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                sCallbackMap.get(context);
+                callbackMap.get(component);
 
         if (callbackArray == null) {
 
             return;
         }
 
-        final LoaderManager loaderManager;
+        final LoaderManager loaderManager = context.getLoaderManager();
 
-        if (context instanceof Activity) {
+        if (loaderManager == null) {
 
-            final Activity activity = (Activity) context;
-            loaderManager = activity.getLoaderManager();
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            loaderManager = fragment.getLoaderManager();
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
+            return;
         }
 
         int i = 0;
@@ -338,44 +312,36 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
         if (callbackArray.size() == 0) {
 
-            sCallbackMap.remove(context);
+            callbackMap.remove(component);
         }
     }
 
     /**
      * Destroys all the loaders with the specified invocation factory.
      *
-     * @param context  the context.
+     * @param context  the context instance.
      * @param loaderId the loader ID.
      * @param factory  the invocation factory.
      */
-    static void purgeLoaders(@Nonnull final Object context, final int loaderId,
+    static void purgeLoaders(@Nonnull final RoutineContext context, final int loaderId,
             @Nonnull final ContextInvocationFactory<?, ?> factory) {
 
+        final Object component = context.getComponent();
+        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+                callbackMap = sCallbackMap;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                sCallbackMap.get(context);
+                callbackMap.get(component);
 
         if (callbackArray == null) {
 
             return;
         }
 
-        final LoaderManager loaderManager;
+        final LoaderManager loaderManager = context.getLoaderManager();
 
-        if (context instanceof Activity) {
+        if (loaderManager == null) {
 
-            final Activity activity = (Activity) context;
-            loaderManager = activity.getLoaderManager();
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            loaderManager = fragment.getLoaderManager();
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
+            return;
         }
 
         int i = 0;
@@ -410,12 +376,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
         if (callbackArray.size() == 0) {
 
-            sCallbackMap.remove(context);
+            callbackMap.remove(component);
         }
     }
 
     @Nonnull
-    @Override
     public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
         return createInvocation(mLoaderId);
@@ -425,37 +390,16 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     public void onAbort(@Nullable final Throwable reason) {
 
         super.onAbort(reason);
-        final Logger logger = mLogger;
-        final Object context = mContext.get();
+        final Context appContext = mContext.getApplicationContext();
 
-        if (context == null) {
+        if (appContext == null) {
 
-            logger.dbg("avoiding aborting invocation since context is null");
+            mLogger.dbg("avoiding aborting invocation since context is null");
             return;
         }
 
-        final Context loaderContext;
-
-        if (context instanceof Activity) {
-
-            final Activity activity = (Activity) context;
-            loaderContext = activity.getApplicationContext();
-            logger.dbg("aborting invocation bound to activity: %s", activity);
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            loaderContext = fragment.getActivity().getApplicationContext();
-            logger.dbg("aborting invocation bound to fragment: %s", fragment);
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
-        }
-
         final Routine<INPUT, OUTPUT> routine =
-                JRoutine.on(factoryFrom(loaderContext, this)).buildRoutine();
+                JRoutine.on(factoryFrom(appContext, this)).buildRoutine();
         routine.syncInvoke().abort(reason);
         routine.purge();
     }
@@ -468,35 +412,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             @Nonnull final ResultChannel<OUTPUT> result) {
 
         final Logger logger = mLogger;
-        final Object context = mContext.get();
+        final RoutineContext context = mContext;
+        final Object component = context.getComponent();
+        final Context appContext = context.getApplicationContext();
+        final LoaderManager loaderManager = context.getLoaderManager();
 
-        if (context == null) {
+        if ((component == null) || (appContext == null) || (loaderManager == null)) {
 
             logger.dbg("avoiding running invocation since context is null");
             return;
-        }
-
-        final Context loaderContext;
-        final LoaderManager loaderManager;
-
-        if (context instanceof Activity) {
-
-            final Activity activity = (Activity) context;
-            loaderContext = activity.getApplicationContext();
-            loaderManager = activity.getLoaderManager();
-            logger.dbg("running invocation bound to activity: %s", activity);
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            loaderContext = fragment.getActivity().getApplicationContext();
-            loaderManager = fragment.getLoaderManager();
-            logger.dbg("running invocation bound to fragment: %s", fragment);
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
         }
 
         int loaderId = mLoaderId;
@@ -512,12 +436,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
         SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(context);
+                callbackMap.get(component);
 
         if (callbackArray == null) {
 
             callbackArray = new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>();
-            callbackMap.put(context, callbackArray);
+            callbackMap.put(component, callbackArray);
         }
 
         final WeakReference<RoutineLoaderCallbacks<?>> callbackReference =
@@ -553,7 +477,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             }
 
             final RoutineLoaderCallbacks<OUTPUT> newCallbacks =
-                    createCallbacks(loaderContext, loaderManager, routineLoader, inputs, loaderId);
+                    createCallbacks(appContext, loaderManager, routineLoader, inputs, loaderId);
 
             if (callbacks != null) {
 

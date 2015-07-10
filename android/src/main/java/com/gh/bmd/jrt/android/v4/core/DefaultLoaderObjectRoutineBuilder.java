@@ -190,7 +190,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         if (context instanceof FactoryContext) {
 
-            // the context here is always the application
+            // the only safe way is to synchronize the factory using the very same instance
             synchronized (context) {
 
                 target = ((FactoryContext) context).geInstance(targetClass, args);

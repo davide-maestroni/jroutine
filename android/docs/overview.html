@@ -30,7 +30,7 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.onActivity(this, ClassToken.tokenOf(LoadBitmap.class))
+                    JRoutine.on(RoutineContext.contextFrom(this), ClassToken.tokenOf(LoadBitmap.class))
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
@@ -108,7 +108,7 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.onActivity(this, ClassToken.tokenOf(LoadBitmapFromService.class))
+                    JRoutine.on(RoutineContext.contextFrom(this), ClassToken.tokenOf(LoadBitmapFromService.class))
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()

@@ -140,9 +140,9 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
                                                        mOrderType, logger);
         }
 
-        final Context appContext = mContext.getApplicationContext();
+        final Context loaderContext = mContext.getLoaderContext();
 
-        if (appContext == null) {
+        if (loaderContext == null) {
 
             throw new IllegalStateException("the routine context has been destroyed");
         }
@@ -152,7 +152,7 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             final ContextInvocationFactory<INPUT, OUTPUT> factory = mFactory;
             logger.dbg("creating a new invocation instance");
             final ContextInvocation<INPUT, OUTPUT> invocation = factory.newInvocation();
-            invocation.onContext(appContext);
+            invocation.onContext(loaderContext.getApplicationContext());
             return invocation;
 
         } catch (final RoutineException e) {

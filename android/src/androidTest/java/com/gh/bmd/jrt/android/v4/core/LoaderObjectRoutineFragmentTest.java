@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.android.v4.core;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -242,6 +243,19 @@ public class LoaderObjectRoutineFragmentTest
                 .buildProxy(SquareItf.class)
                 .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(2);
+    }
+
+    public void testContextWrapper() {
+
+        final TestActivity activity = getActivity();
+        final TestFragment fragment = (TestFragment) activity.getSupportFragmentManager()
+                                                             .findFragmentById(R.id.test_fragment);
+        final StringContext contextWrapper = new StringContext(activity);
+        assertThat(JRoutine.on(contextFrom(fragment, contextWrapper), String.class)
+                           .method("toString")
+                           .asyncCall()
+                           .eventually()
+                           .next()).isEqualTo("test1");
     }
 
     public void testDuplicateAnnotationError() {
@@ -1801,6 +1815,26 @@ public class LoaderObjectRoutineFragmentTest
         public int compute(final int i) {
 
             return i * i;
+        }
+    }
+
+    private static class StringContext extends FactoryContextWrapper {
+
+        /**
+         * Constructor.
+         *
+         * @param base the base context.
+         */
+        public StringContext(final Context base) {
+
+            super(base);
+        }
+
+        @Nullable
+        public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
+                @Nonnull final Object... args) {
+
+            return type.cast("test1");
         }
     }
 

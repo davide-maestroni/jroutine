@@ -390,16 +390,17 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     public void onAbort(@Nullable final Throwable reason) {
 
         super.onAbort(reason);
-        final Context appContext = mContext.getApplicationContext();
+        final Context loaderContext = mContext.getLoaderContext();
 
-        if (appContext == null) {
+        if (loaderContext == null) {
 
             mLogger.dbg("avoiding aborting invocation since context is null");
             return;
         }
 
         final Routine<INPUT, OUTPUT> routine =
-                JRoutine.on(factoryFrom(appContext, this)).buildRoutine();
+                JRoutine.on(factoryFrom(loaderContext.getApplicationContext(), this))
+                        .buildRoutine();
         routine.syncInvoke().abort(reason);
         routine.purge();
     }
@@ -411,18 +412,17 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     public void onCall(@Nonnull final List<? extends INPUT> inputs,
             @Nonnull final ResultChannel<OUTPUT> result) {
 
-        final Logger logger = mLogger;
         final RoutineContext context = mContext;
         final Object component = context.getComponent();
-        final Context appContext = context.getApplicationContext();
+        final Context loaderContext = context.getLoaderContext();
         final LoaderManager loaderManager = context.getLoaderManager();
 
-        if ((component == null) || (appContext == null) || (loaderManager == null)) {
+        if ((component == null) || (loaderContext == null) || (loaderManager == null)) {
 
-            logger.dbg("avoiding running invocation since context is null");
-            return;
+            throw new IllegalArgumentException("the routine context has been destroyed");
         }
 
+        final Logger logger = mLogger;
         int loaderId = mLoaderId;
 
         if (loaderId == LoaderConfiguration.AUTO) {
@@ -477,7 +477,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             }
 
             final RoutineLoaderCallbacks<OUTPUT> newCallbacks =
-                    createCallbacks(appContext, loaderManager, routineLoader, inputs, loaderId);
+                    createCallbacks(loaderContext, loaderManager, routineLoader, inputs, loaderId);
 
             if (callbacks != null) {
 

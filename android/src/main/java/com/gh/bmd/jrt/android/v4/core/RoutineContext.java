@@ -18,6 +18,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 
+import com.gh.bmd.jrt.util.Reflection;
+
 import java.lang.ref.WeakReference;
 
 import javax.annotation.Nonnull;
@@ -44,7 +46,7 @@ public abstract class RoutineContext {
      * Returns a context wrapping the specified activity.
      *
      * @param activity the activity instance.
-     * @return the UI context.
+     * @return the routine context.
      */
     @Nonnull
     public static RoutineContext contextFrom(@Nonnull final FragmentActivity activity) {
@@ -56,7 +58,7 @@ public abstract class RoutineContext {
      * Returns a context wrapping the specified fragment.
      *
      * @param fragment the fragment instance.
-     * @return the UI context.
+     * @return the routine context.
      */
     @Nonnull
     public static RoutineContext contextFrom(@Nonnull final Fragment fragment) {
@@ -66,11 +68,12 @@ public abstract class RoutineContext {
 
     /**
      * Returns a context wrapping the specified activity, with the specified instance as base
-     * context.
+     * context.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must be static.
      *
      * @param activity the activity instance.
      * @param context  the context used to get the application one.
-     * @return the UI context.
+     * @return the routine context.
      */
     @Nonnull
     public static RoutineContext contextFrom(@Nonnull final FragmentActivity activity,
@@ -81,11 +84,12 @@ public abstract class RoutineContext {
 
     /**
      * Returns a context wrapping the specified fragment, with the specified instance as base
-     * context.
+     * context.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must be static.
      *
      * @param fragment the fragment instance.
      * @param context  the context used to get the application one.
-     * @return the UI context.
+     * @return the routine context.
      */
     @Nonnull
     public static RoutineContext contextFrom(@Nonnull final Fragment fragment,
@@ -93,14 +97,6 @@ public abstract class RoutineContext {
 
         return new WrappedFragmentContext(fragment, context);
     }
-
-    /**
-     * Returns the application context.
-     *
-     * @return the context or null.
-     */
-    @Nullable
-    public abstract Context getApplicationContext();
 
     /**
      * Returns the wrapped component.
@@ -111,6 +107,14 @@ public abstract class RoutineContext {
     public abstract Object getComponent();
 
     /**
+     * Returns the loader context.
+     *
+     * @return the context or null.
+     */
+    @Nullable
+    public abstract Context getLoaderContext();
+
+    /**
      * Returns the loader manager of the specific component.
      *
      * @return the loader manager or null.
@@ -119,7 +123,7 @@ public abstract class RoutineContext {
     public abstract LoaderManager getLoaderManager();
 
     /**
-     * UI context wrapping an activity.
+     * Routine context wrapping an activity.
      */
     private static class ActivityContext extends RoutineContext {
 
@@ -143,15 +147,14 @@ public abstract class RoutineContext {
 
         @Nullable
         @Override
-        public Context getApplicationContext() {
+        public Object getComponent() {
 
-            final FragmentActivity activity = mActivity.get();
-            return (activity != null) ? activity.getApplicationContext() : null;
+            return mActivity.get();
         }
 
         @Nullable
         @Override
-        public Object getComponent() {
+        public Context getLoaderContext() {
 
             return mActivity.get();
         }
@@ -166,7 +169,7 @@ public abstract class RoutineContext {
     }
 
     /**
-     * UI context wrapping a fragment.
+     * Routine context wrapping a fragment.
      */
     private static class FragmentContext extends RoutineContext {
 
@@ -190,17 +193,10 @@ public abstract class RoutineContext {
 
         @Nullable
         @Override
-        public Context getApplicationContext() {
+        public Context getLoaderContext() {
 
             final Fragment fragment = mFragment.get();
-
-            if (fragment != null) {
-
-                final FragmentActivity activity = fragment.getActivity();
-                return (activity != null) ? activity.getApplicationContext() : null;
-            }
-
-            return null;
+            return (fragment != null) ? fragment.getActivity() : null;
         }
 
         @Nullable
@@ -220,7 +216,7 @@ public abstract class RoutineContext {
     }
 
     /**
-     * UI context wrapping an activity and its application context.
+     * Routine context wrapping an activity and its application context.
      */
     private static class WrappedActivityContext extends ActivityContext {
 
@@ -238,9 +234,12 @@ public abstract class RoutineContext {
 
             super(activity);
 
-            if (context == null) {
+            final Class<? extends Context> contextClass = context.getClass();
 
-                throw new NullPointerException("the context must not be null");
+            if (!Reflection.isStaticClass(contextClass)) {
+
+                throw new IllegalArgumentException(
+                        "the context class must be static: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);
@@ -248,15 +247,14 @@ public abstract class RoutineContext {
 
         @Nullable
         @Override
-        public Context getApplicationContext() {
+        public Context getLoaderContext() {
 
-            final Context context = mContext.get();
-            return (context != null) ? context.getApplicationContext() : null;
+            return mContext.get();
         }
     }
 
     /**
-     * UI context wrapping a fragment and its application context.
+     * Routine context wrapping a fragment and its application context.
      */
     private static class WrappedFragmentContext extends FragmentContext {
 
@@ -274,9 +272,12 @@ public abstract class RoutineContext {
 
             super(fragment);
 
-            if (context == null) {
+            final Class<? extends Context> contextClass = context.getClass();
 
-                throw new NullPointerException("the context must not be null");
+            if (!Reflection.isStaticClass(contextClass)) {
+
+                throw new IllegalArgumentException(
+                        "the context class must be static: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);
@@ -284,10 +285,9 @@ public abstract class RoutineContext {
 
         @Nullable
         @Override
-        public Context getApplicationContext() {
+        public Context getLoaderContext() {
 
-            final Context context = mContext.get();
-            return (context != null) ? context.getApplicationContext() : null;
+            return mContext.get();
         }
     }
 }

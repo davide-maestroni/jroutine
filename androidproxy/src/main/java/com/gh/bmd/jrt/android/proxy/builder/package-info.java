@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Classes and interfaces related to processor routine builders, specific to the Android platform.
+ * Classes and interfaces related to proxy routine builders, specific to the Android platform.
  * <p/>
  * Created by davide-maestroni on 5/10/15.
  */

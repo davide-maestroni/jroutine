@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Processor core interfaces and implementations bound to an Android context.
+ * Routine proxy core interfaces and implementations bound to an Android context.
  * <p/>
  * Created by davide-maestroni on 5/10/15.
  */

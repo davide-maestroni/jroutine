@@ -18,7 +18,7 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    private final java.lang.ref.WeakReference<android.content.Context> mContext;
+    private final com.gh.bmd.jrt.android.core.ServiceContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -27,7 +27,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     private final Class<?> mTargetClass;
 
     @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@javax.annotation.Nonnull final android.content.Context context,
+    public ${generatedClassName}(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nullable final Object[] factoryArgs,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
@@ -36,7 +36,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (context == null) {
 
-            throw new NullPointerException("the invocation context must not be null");
+            throw new NullPointerException("the service context must not be null");
         }
 
         if (targetClass == null) {
@@ -44,7 +44,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             throw new NullPointerException("the target class must not be null");
         }
 
-        mContext = new java.lang.ref.WeakReference<android.content.Context>(context);
+        mContext = context;
         mTargetClass = targetClass;
         mFactoryArgs = (factoryArgs != null) ? factoryArgs : com.gh.bmd.jrt.util.Reflection.NO_ARGS;
         mShareGroup = proxyConfiguration.getShareGroupOr(com.gh.bmd.jrt.annotation.ShareGroup.ALL);
@@ -52,8 +52,8 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> onService(
-            @javax.annotation.Nonnull final android.content.Context context,
+    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> on(
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nullable final Object... factoryArgs) {
 
@@ -62,18 +62,11 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @javax.annotation.Nonnull
     private static <OUTPUT> com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder<Object, OUTPUT> getBuilder(
-            @javax.annotation.Nonnull final java.lang.ref.WeakReference<android.content.Context> contextReference,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.util.ClassToken<? extends com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, OUTPUT>> classToken,
             @javax.annotation.Nullable final Object... args) {
 
-        final android.content.Context context = contextReference.get();
-
-        if (context == null) {
-
-            throw new IllegalStateException("the routine context has been destroyed");
-        }
-
-        return com.gh.bmd.jrt.android.core.JRoutine.onService(context, classToken, args);
+        return com.gh.bmd.jrt.android.core.JRoutine.on(context, classToken, args);
     }
 
     @javax.annotation.Nonnull
@@ -86,7 +79,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (context instanceof com.gh.bmd.jrt.android.builder.FactoryContext) {
 
-            // the context here is always the application
+            // the only safe way is to synchronize the factory using the very same instance
             synchronized (context) {
 
                 target = ((com.gh.bmd.jrt.android.builder.FactoryContext) context).geInstance(targetClass, args);
@@ -119,7 +112,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private static class ServiceProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {
 
-        private final android.content.Context mContext;
+        private final com.gh.bmd.jrt.android.core.ServiceContext mContext;
 
         private final Object[] mFactoryArgs;
 
@@ -127,8 +120,19 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
-        private ServiceProxyBuilder(@javax.annotation.Nonnull final android.content.Context context,
+        @SuppressWarnings("ConstantConditions")
+        private ServiceProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
                 @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final Object... factoryArgs) {
+
+            if (context == null) {
+
+                throw new NullPointerException("the service context must not be null");
+            }
+
+            if (targetClass == null) {
+
+                throw new NullPointerException("the target class must not be null");
+            }
 
             mContext = context;
             mTargetClass = targetClass;

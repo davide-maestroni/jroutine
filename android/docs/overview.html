@@ -172,7 +172,8 @@
                 public void onContext(&commat;Nonnull final Context context) {
 
                     super.onContext(context);
-                    mRoutine = JRoutine.onService(context, ClassToken.tokenOf(LoadBitmap.class))
+                    mRoutine = JRoutine.on(ServiceContext.serviceFrom(context, RoutineService.class),
+                                           ClassToken.tokenOf(LoadBitmap.class))
                                        .buildRoutine();
                 }
 

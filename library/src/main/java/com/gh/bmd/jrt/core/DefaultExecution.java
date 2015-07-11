@@ -259,7 +259,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      */
     private class AbortExecution extends TemplateExecution {
 
-        @Override
         public void run() {
 
             synchronized (mMutex) {

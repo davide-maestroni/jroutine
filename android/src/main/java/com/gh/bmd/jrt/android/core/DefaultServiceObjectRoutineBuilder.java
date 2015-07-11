@@ -69,7 +69,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
-    private final Context mContext;
+    private final ServiceContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -85,12 +85,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Constructor.
      *
-     * @param context     the routine context.
+     * @param context     the service context.
      * @param targetClass the target object class.
      * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
+    DefaultServiceObjectRoutineBuilder(@Nonnull final ServiceContext context,
             @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
@@ -174,7 +174,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         if (context instanceof FactoryContext) {
 
-            // the context here is always the service
+            // the only safe way is to synchronize the factory using the very same instance
             synchronized (context) {
 
                 target = ((FactoryContext) context).geInstance(targetClass, args);
@@ -238,7 +238,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final AliasMethodToken<INPUT, OUTPUT> classToken = new AliasMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name};
-        return JRoutine.onService(mContext, classToken, args)
+        return JRoutine.on(mContext, classToken, args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
                        .set()
@@ -261,7 +261,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name,
                                            toNames(parameterTypes)};
-        return JRoutine.onService(mContext, classToken, args)
+        return JRoutine.on(mContext, classToken, args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
                        .set()
@@ -639,7 +639,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Object[] mArgs;
 
-        private final Context mContext;
+        private final ServiceContext mContext;
 
         private final InvocationConfiguration mInvocationConfiguration;
 
@@ -678,7 +678,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                  targetClass.getName(), targetMethod.getName(),
                                  toNames(targetParameterTypes), inputMode, outputMode};
             final Routine<Object, Object> routine =
-                    JRoutine.onService(mContext, PROXY_TOKEN, factoryArgs)
+                    JRoutine.on(mContext, PROXY_TOKEN, factoryArgs)
                             .invocations()
                             .with(configurationWithAnnotations(mInvocationConfiguration, method))
                             .set()

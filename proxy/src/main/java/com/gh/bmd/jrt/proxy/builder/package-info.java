@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Classes and interfaces related to processor routine builders.
+ * Classes and interfaces related to proxy routine builders.
  * <p/>
  * Created by davide-maestroni on 3/25/14.
  */

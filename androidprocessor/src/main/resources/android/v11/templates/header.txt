@@ -86,7 +86,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (context instanceof com.gh.bmd.jrt.android.builder.FactoryContext) {
 
-            // the context here is always the application
+            // the only safe way is to synchronize the factory using the very same instance
             synchronized (context) {
 
                 target = ((com.gh.bmd.jrt.android.builder.FactoryContext) context).geInstance(targetClass, args);
@@ -127,8 +127,19 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
+        @SuppressWarnings("ConstantConditions")
         private LoaderProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.RoutineContext context,
                 @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final Object... factoryArgs) {
+
+            if (context == null) {
+
+                throw new NullPointerException("the routine context must not be null");
+            }
+
+            if (targetClass == null) {
+
+                throw new NullPointerException("the target class must not be null");
+            }
 
             mContext = context;
             mTargetClass = targetClass;

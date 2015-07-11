@@ -415,7 +415,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(null, factoryOf(ToUpperCase.class));
+            JRoutine.on((RoutineContext) null, factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -435,7 +435,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(null, ToUpperCase.class);
+            JRoutine.on((RoutineContext) null, ToUpperCase.class);
 
             fail();
 
@@ -445,7 +445,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(null, ToUpperCase.class, Reflection.NO_ARGS);
+            JRoutine.on((RoutineContext) null, ToUpperCase.class, Reflection.NO_ARGS);
 
             fail();
 
@@ -1015,7 +1015,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(null, factoryOf(ToUpperCase.class));
+            JRoutine.on((RoutineContext) null, factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -1035,7 +1035,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(null, ToUpperCase.class);
+            JRoutine.on((RoutineContext) null, ToUpperCase.class);
 
             fail();
 
@@ -1045,7 +1045,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(null, ToUpperCase.class, Reflection.NO_ARGS);
+            JRoutine.on((RoutineContext) null, ToUpperCase.class, Reflection.NO_ARGS);
 
             fail();
 

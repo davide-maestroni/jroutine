@@ -24,7 +24,6 @@ import org.junit.Test;
  */
 public class SystemLogTest {
 
-
     private static final String[] ARGS = new String[]{"test1", "test2", "test3", "test4", "test5"};
 
     private static final String FORMAT0 = "0: %s";

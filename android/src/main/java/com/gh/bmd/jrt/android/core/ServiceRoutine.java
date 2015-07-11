@@ -121,7 +121,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
+    public InvocationChannel<INPUT, OUTPUT> asyncInvoke() {
 
         return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationClass, mFactoryArgs,
                                                  mInvocationConfiguration, mServiceConfiguration,
@@ -129,7 +129,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
+    public InvocationChannel<INPUT, OUTPUT> parallelInvoke() {
 
         return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationClass, mFactoryArgs,
                                                  mInvocationConfiguration, mServiceConfiguration,
@@ -137,9 +137,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
+    public InvocationChannel<INPUT, OUTPUT> syncInvoke() {
 
-        return mRoutine.invokeSync();
+        return mRoutine.syncInvoke();
     }
 
     @Override
@@ -240,8 +240,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                               .buildChannel();
             mTransportParamInput = inChannel.input();
             mTransportParamOutput = inChannel.output();
-            final OrderType outputOrderType =
-                    invocationConfiguration.getOutputOrderTypeOr(OrderType.BY_CALL);
             final int outputMaxSize =
                     invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
@@ -250,7 +248,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                     invocationConfiguration.getReadTimeoutActionOr(null);
             final TransportChannel<OUTPUT> outChannel = JRoutine.transport()
                                                                 .channels()
-                                                                .withChannelOrder(outputOrderType)
                                                                 .withChannelMaxSize(outputMaxSize)
                                                                 .withChannelTimeout(outputTimeout)
                                                                 .withReadTimeout(readTimeout)

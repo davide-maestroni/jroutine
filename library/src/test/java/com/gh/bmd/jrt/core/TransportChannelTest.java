@@ -58,7 +58,7 @@ public class TransportChannelTest {
         final TimeDuration timeout = seconds(1);
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
         final InvocationChannel<String, String> invocationChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke();
         final OutputChannel<String> outputChannel =
                 transportChannel.output().passTo(invocationChannel).result();
 
@@ -226,7 +226,7 @@ public class TransportChannelTest {
 
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(transportChannel.output());
+                        .asyncCall(transportChannel.output());
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
     }
@@ -258,7 +258,7 @@ public class TransportChannelTest {
 
         final OutputChannel<String> outputChannel1 =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(transportChannel1.output());
+                        .asyncCall(transportChannel1.output());
         assertThat(outputChannel1.afterMax(timeout).all()).containsExactly("test1", "test2",
                                                                            "test3");
     }
@@ -473,7 +473,7 @@ public class TransportChannelTest {
 
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(transportChannel.output())
+                        .asyncCall(transportChannel.output())
                         .eventuallyExit();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).all()).containsExactly("test");
 
@@ -495,7 +495,7 @@ public class TransportChannelTest {
 
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .callAsync(transportChannel.output());
+                        .asyncCall(transportChannel.output());
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
     }
 

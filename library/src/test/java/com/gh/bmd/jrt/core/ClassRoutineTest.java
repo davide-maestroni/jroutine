@@ -60,7 +60,7 @@ public class ClassRoutineTest {
                                                         .set()
                                                         .aliasMethod(TestStatic.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ClassRoutineTest {
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
+            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -173,7 +173,7 @@ public class ClassRoutineTest {
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -190,7 +190,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
 
     }
 
@@ -246,7 +246,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine1.callSync().all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
                                                          .invocations()
@@ -257,7 +257,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine2.callSync().all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutine.on(TestStatic.class)
@@ -269,7 +269,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine3.callSync().all()).containsExactly(-77L);
+        assertThat(routine3.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
@@ -282,7 +282,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine4.callSync().all()).containsExactly(-77L);
+        assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutine.on(TestStatic.class)
@@ -294,7 +294,7 @@ public class ClassRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
 
-        assertThat(routine5.callSync().all()).containsExactly(-77L);
+        assertThat(routine5.syncCall().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
@@ -307,9 +307,9 @@ public class ClassRoutineTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").callAsync();
+                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").callAsync();
+                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -317,8 +317,8 @@ public class ClassRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").callAsync();
-        getTwo = builder.method("getTwo").callAsync();
+        getOne = builder.method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();

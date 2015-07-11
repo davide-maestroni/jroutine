@@ -172,13 +172,12 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())
                 .set()
-                .callSync(mInputs)
+                .syncCall(mInputs)
                 .passTo(consumer);
         return consumer.createResult();
     }
 
     @Nonnull
-    @Override
     public Invocation<INPUT, OUTPUT> newInvocation() {
 
         final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;

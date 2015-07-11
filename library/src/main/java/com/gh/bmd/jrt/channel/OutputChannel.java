@@ -126,7 +126,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to abort the invocation execution in case no result is available before
      * the timeout has elapsed.
      * <p/>
-     * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} exception will be thrown.
+     * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException ReadDeadlockException}
+     * exception will be thrown.
      *
      * @return this channel.
      * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
@@ -139,8 +140,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     OutputChannel<OUTPUT> eventuallyAbort();
 
     /**
-     * Tells the channel to throw a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} in case no
-     * result is available before the timeout has elapsed.
+     * Tells the channel to throw a {@link com.gh.bmd.jrt.channel.ReadDeadlockException
+     * ReadDeadlockException} in case no result is available before the timeout has elapsed.
      * <p/>
      * This is the default behavior.
      *
@@ -158,7 +159,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to break execution in case no result is available before the timeout has
      * elapsed.
      * <p/>
-     * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException} exception will be thrown.
+     * By default a {@link com.gh.bmd.jrt.channel.ReadDeadlockException ReadDeadlockException}
+     * exception will be thrown.
      *
      * @return this channel.
      * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
@@ -228,7 +230,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     /**
      * Binds this channel to the specified consumer. After the call, all the output will be passed
      * only to the consumer. Attempting to read through the dedicated methods will cause an
-     * {@link java.lang.IllegalStateException} to be thrown.
+     * {@link java.lang.IllegalStateException} to be thrown.<br/>
+     * Note that the consumer methods will be called on the runner thread.
      *
      * @param consumer the consumer instance.
      * @return this channel.

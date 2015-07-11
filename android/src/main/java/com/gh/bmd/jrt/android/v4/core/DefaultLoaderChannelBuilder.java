@@ -13,9 +13,6 @@
  */
 package com.gh.bmd.jrt.android.v4.core;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-
 import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
@@ -27,11 +24,9 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.runner.Execution;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +43,7 @@ class DefaultLoaderChannelBuilder
         implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
         InvocationConfiguration.Configurable<LoaderChannelBuilder> {
 
-    private final WeakReference<Object> mContext;
+    private final RoutineContext mContext;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -58,37 +53,17 @@ class DefaultLoaderChannelBuilder
     /**
      * Constructor.
      *
-     * @param activity the context activity.
-     */
-    DefaultLoaderChannelBuilder(@Nonnull final FragmentActivity activity) {
-
-        this((Object) activity);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param fragment the context fragment.
-     */
-    DefaultLoaderChannelBuilder(@Nonnull final Fragment fragment) {
-
-        this((Object) fragment);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param context the context instance.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultLoaderChannelBuilder(@Nonnull final Object context) {
+    DefaultLoaderChannelBuilder(@Nonnull final RoutineContext context) {
 
         if (context == null) {
 
             throw new NullPointerException("the channel context must not be null");
         }
 
-        mContext = new WeakReference<Object>(context);
+        mContext = context;
     }
 
     @Nonnull
@@ -102,9 +77,9 @@ class DefaultLoaderChannelBuilder
             throw new IllegalArgumentException("the loader ID must not be generated");
         }
 
-        final Object context = mContext.get();
+        final Object component = mContext.getComponent();
 
-        if (context == null) {
+        if (component == null) {
 
             final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
             final TransportInput<OUTPUT> inputChannel = transportChannel.input();
@@ -113,24 +88,8 @@ class DefaultLoaderChannelBuilder
             return transportChannel.output();
         }
 
-        final LoaderRoutineBuilder<Void, OUTPUT> builder;
-
-        if (context instanceof FragmentActivity) {
-
-            final FragmentActivity activity = (FragmentActivity) context;
-            builder = JRoutine.onActivity(activity, new MissingLoaderInvocation<OUTPUT>(loaderId));
-
-        } else if (context instanceof Fragment) {
-
-            final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment, new MissingLoaderInvocation<OUTPUT>(loaderId));
-
-        } else {
-
-            throw new IllegalArgumentException(
-                    "invalid context type: " + context.getClass().getName());
-        }
-
+        final LoaderRoutineBuilder<Void, OUTPUT> builder =
+                JRoutine.on(mContext, new MissingLoaderInvocation<OUTPUT>(loaderId));
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final Logger logger = invocationConfiguration.newLogger(this);
         final ClashResolutionType resolutionType =
@@ -158,7 +117,7 @@ class DefaultLoaderChannelBuilder
                       .withClashResolution(ClashResolutionType.MERGE)
                       .withInputClashResolution(ClashResolutionType.MERGE)
                       .set()
-                      .callAsync();
+                      .asyncCall();
     }
 
     @Nonnull
@@ -177,9 +136,9 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Iterable<?> inputs) {
 
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
             final List<Object> inputList;
 
@@ -205,9 +164,9 @@ class DefaultLoaderChannelBuilder
 
     public void purge() {
 
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
             Runners.mainRunner()
                    .run(new PurgeExecution(context, mLoaderConfiguration.getLoaderIdOr(
@@ -217,9 +176,9 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Object input) {
 
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
             final List<Object> inputList = Collections.singletonList(input);
             Runners.mainRunner()
@@ -230,12 +189,22 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Object... inputs) {
 
-        final WeakReference<Object> context = mContext;
+        final RoutineContext context = mContext;
 
-        if (context.get() != null) {
+        if (context.getComponent() != null) {
 
-            final List<Object> inputList =
-                    (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
+            final List<Object> inputList;
+
+            if (inputs == null) {
+
+                inputList = Collections.emptyList();
+
+            } else {
+
+                inputList = new ArrayList<Object>(inputs.length);
+                Collections.addAll(inputList, inputs);
+            }
+
             Runners.mainRunner()
                    .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
                            LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
@@ -272,19 +241,19 @@ class DefaultLoaderChannelBuilder
     /**
      * Execution implementation purging the loader with a specific ID.
      */
-    private static class PurgeExecution implements Execution {
+    private static class PurgeExecution extends TemplateExecution {
 
-        private final WeakReference<Object> mContext;
+        private final RoutineContext mContext;
 
         private final int mLoaderId;
 
         /**
          * Constructor.
          *
-         * @param context  the context reference.
+         * @param context  the context instance.
          * @param loaderId the loader ID.
          */
-        private PurgeExecution(@Nonnull final WeakReference<Object> context, final int loaderId) {
+        private PurgeExecution(@Nonnull final RoutineContext context, final int loaderId) {
 
             mContext = context;
             mLoaderId = loaderId;
@@ -292,21 +261,16 @@ class DefaultLoaderChannelBuilder
 
         public void run() {
 
-            final Object context = mContext.get();
-
-            if (context != null) {
-
-                LoaderInvocation.purgeLoader(context, mLoaderId);
-            }
+            LoaderInvocation.purgeLoader(mContext, mLoaderId);
         }
     }
 
     /**
      * Execution implementation purging the loader with a specific ID and inputs.
      */
-    private static class PurgeInputsExecution implements Execution {
+    private static class PurgeInputsExecution extends TemplateExecution {
 
-        private final WeakReference<Object> mContext;
+        private final RoutineContext mContext;
 
         private final List<Object> mInputs;
 
@@ -315,12 +279,12 @@ class DefaultLoaderChannelBuilder
         /**
          * Constructor.
          *
-         * @param context  the context reference.
+         * @param context  the context instance.
          * @param loaderId the loader ID.
          * @param inputs   the list of inputs.
          */
-        private PurgeInputsExecution(@Nonnull final WeakReference<Object> context,
-                final int loaderId, @Nonnull final List<Object> inputs) {
+        private PurgeInputsExecution(@Nonnull final RoutineContext context, final int loaderId,
+                @Nonnull final List<Object> inputs) {
 
             mContext = context;
             mLoaderId = loaderId;
@@ -329,12 +293,7 @@ class DefaultLoaderChannelBuilder
 
         public void run() {
 
-            final Object context = mContext.get();
-
-            if (context != null) {
-
-                LoaderInvocation.purgeLoader(context, mLoaderId, mInputs);
-            }
+            LoaderInvocation.purgeLoader(mContext, mLoaderId, mInputs);
         }
     }
 }

@@ -79,7 +79,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         mTargetClass = targetClass;
         mContextReference = new WeakReference<Context>(context);
-        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
     }
 
     @Nonnull

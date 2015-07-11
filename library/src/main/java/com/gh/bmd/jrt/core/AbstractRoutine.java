@@ -148,13 +148,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeAsync() {
+    public InvocationChannel<INPUT, OUTPUT> asyncInvoke() {
 
         return invoke(InvocationType.ASYNC);
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeParallel() {
+    public InvocationChannel<INPUT, OUTPUT> parallelInvoke() {
 
         synchronized (mParallelMutex) {
 
@@ -176,11 +176,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             }
         }
 
-        return mParallelRoutine.invokeAsync();
+        return mParallelRoutine.asyncInvoke();
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> invokeSync() {
+    public InvocationChannel<INPUT, OUTPUT> syncInvoke() {
 
         return invoke(InvocationType.SYNC);
     }
@@ -335,7 +335,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         @Override
         public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
-            result.pass(mRoutine.callAsync(input));
+            result.pass(mRoutine.asyncCall(input));
         }
     }
 

@@ -55,6 +55,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.v11.core.RoutineContext.contextFrom;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
@@ -83,10 +84,11 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final LoaderProxyRoutineBuilder builder = JRoutineProxy.onFragment(fragment, TestList.class)
-                                                               .invocations()
-                                                               .withReadTimeout(seconds(10))
-                                                               .set();
+        final LoaderProxyRoutineBuilder builder =
+                JRoutineProxy.on(contextFrom(fragment), TestList.class)
+                             .invocations()
+                             .withReadTimeout(seconds(10))
+                             .set();
 
         final TestListItf<String> testListItf1 =
                 builder.buildProxy(new ClassToken<TestListItf<String>>() {});
@@ -119,12 +121,12 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
-        final TestInterfaceProxy testProxy = JRoutineProxy.onFragment(fragment, TestClass.class)
-                                                          .invocations()
-                                                          .withSyncRunner(
-                                                                  Runners.sequentialRunner())
-                                                          .set()
-                                                          .buildProxy(token);
+        final TestInterfaceProxy testProxy =
+                JRoutineProxy.on(contextFrom(fragment), TestClass.class)
+                             .invocations()
+                             .withSyncRunner(Runners.sequentialRunner())
+                             .set()
+                             .buildProxy(token);
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
     }
@@ -143,7 +145,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class).buildProxy((Class<?>) null);
+            JRoutineProxy.on(contextFrom(fragment), TestClass.class).buildProxy((Class<?>) null);
 
             fail();
 
@@ -153,7 +155,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class).buildProxy((ClassToken<?>) null);
+            JRoutineProxy.on(contextFrom(fragment), TestClass.class)
+                         .buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -174,7 +177,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                           R.id.test_fragment);
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
-        final TestProxy testProxy = JRoutineProxy.onFragment(fragment, TestClass.class)
+        final TestProxy testProxy = JRoutineProxy.on(contextFrom(fragment), TestClass.class)
                                                  .invocations()
                                                  .withSyncRunner(Runners.sequentialRunner())
                                                  .withAsyncRunner(runner)
@@ -220,8 +223,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                          .withLog(log)
                          .set();
         final LoaderProxyBuilder<TestProxy> builder =
-                com.gh.bmd.jrt.android.proxy.V11Proxy_TestFragment.onFragment(fragment,
-                                                                              TestClass.class);
+                com.gh.bmd.jrt.android.proxy.V11Proxy_TestFragment.on(contextFrom(fragment),
+                                                                      TestClass.class);
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -241,7 +244,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         transportChannel.input().pass(3).close();
         assertThat(testProxy.getString(transportChannel.output())).isEqualTo("3");
 
-        assertThat(JRoutineProxy.onFragment(fragment, TestClass.class)
+        assertThat(JRoutineProxy.on(contextFrom(fragment), TestClass.class)
                                 .invocations()
                                 .with(configuration)
                                 .set()
@@ -267,13 +270,13 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(log)
                          .set();
-        final TestProxy testProxy = JRoutineProxy.onFragment(fragment, TestClass.class)
+        final TestProxy testProxy = JRoutineProxy.on(contextFrom(fragment), TestClass.class)
                                                  .invocations()
                                                  .with(configuration)
                                                  .set()
                                                  .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
-        assertThat(JRoutineProxy.onFragment(fragment, TestClass.class)
+        assertThat(JRoutineProxy.on(contextFrom(fragment), TestClass.class)
                                 .invocations()
                                 .with(configuration)
                                 .set()
@@ -294,7 +297,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class).buildProxy(TestClass.class);
+            JRoutineProxy.on(contextFrom(fragment), TestClass.class).buildProxy(TestClass.class);
 
             fail();
 
@@ -304,7 +307,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestClass.class)
+            JRoutineProxy.on(contextFrom(fragment), TestClass.class)
                          .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
@@ -325,7 +328,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderProxyRoutineBuilder builder =
-                JRoutineProxy.onFragment(fragment, TestClass2.class)
+                JRoutineProxy.on(contextFrom(fragment), TestClass2.class)
                              .invocations()
                              .withReadTimeout(seconds(10))
                              .set();
@@ -369,7 +372,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Itf itf = JRoutineProxy.onFragment(fragment, Impl.class)
+        final Itf itf = JRoutineProxy.on(contextFrom(fragment), Impl.class)
                                      .invocations()
                                      .withReadTimeout(INFINITY)
                                      .set()
@@ -621,7 +624,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutineProxy.onFragment(fragment, TestTimeout.class)
+        assertThat(JRoutineProxy.on(contextFrom(fragment), TestTimeout.class)
                                 .invocations()
                                 .withReadTimeout(seconds(10))
                                 .set()
@@ -630,7 +633,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         try {
 
-            JRoutineProxy.onFragment(fragment, TestTimeout.class)
+            JRoutineProxy.on(contextFrom(fragment), TestTimeout.class)
                          .invocations()
                          .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                          .set()

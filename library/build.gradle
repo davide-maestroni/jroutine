@@ -23,7 +23,6 @@ archivesBaseName = project.parent.name
 javaCompatibility = JavaVersion.VERSION_1_5
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.code.findbugs:annotations:3.0.0'
 
     testCompile 'junit:junit:4.12'

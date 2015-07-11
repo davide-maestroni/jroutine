@@ -24,7 +24,7 @@
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         on(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
-                        meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
+                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
                                    .eventually()
                                    .next();
                 System.out.println(rms);
@@ -101,7 +101,7 @@
                 final Routine&lt;Integer, Double&gt; meanRoutine = on(new SquareRootMeanFactory()).buildRoutine();
 
                 final Double rms =
-                        meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
+                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
                                    .eventually()
                                    .next();
                 System.out.println(rms);
@@ -196,8 +196,8 @@
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
-                final Double rms = meanRoutine.callAsync(
-                        squareRoutine.callParallel(parseRoutine.callParallel(args)).all()).next();
+                final Double rms = meanRoutine.asyncCall(
+                        squareRoutine.parallelCall(parseRoutine.parallelCall(args)).all()).next();
                 System.out.println(rms);
                 System.exit(0);
             }

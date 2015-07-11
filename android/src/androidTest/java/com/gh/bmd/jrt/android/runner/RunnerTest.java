@@ -25,9 +25,9 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
-import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
@@ -173,10 +173,10 @@ public class RunnerTest extends AndroidTestCase {
                                                       .withAsyncRunner(Runners.handlerRunner(
                                                               new HandlerThread("test")))
                                                       .set()
-                                                      .callAsync();
+                                                      .asyncCall();
 
         assertThat(JRoutine.on(new LooperInvocationFactory())
-                           .callAsync(channel)
+                           .asyncCall(channel)
                            .afterMax(seconds(30))
                            .next()).isEqualTo(true);
     }
@@ -269,7 +269,7 @@ public class RunnerTest extends AndroidTestCase {
         }
     }
 
-    private static class TestRunExecution implements Execution {
+    private static class TestRunExecution extends TemplateExecution {
 
         private final TimeDuration mDelay;
 
@@ -300,7 +300,6 @@ public class RunnerTest extends AndroidTestCase {
             // it looks like that handlers and the kind are not so accurate after all...
             // let's have a 10 millisecond error tolerance
             mIsPassed = (System.currentTimeMillis() - mStartTime + 10 >= mDelay.toMillis());
-
             mSemaphore.release();
         }
     }

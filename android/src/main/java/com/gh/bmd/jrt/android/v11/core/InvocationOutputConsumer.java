@@ -13,9 +13,6 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import android.annotation.TargetApi;
-import android.os.Build.VERSION_CODES;
-
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.RoutineException;
@@ -24,8 +21,8 @@ import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,14 +38,13 @@ import javax.annotation.Nullable;
  *
  * @param <OUTPUT> the output data type.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
 class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
     private static final Runner sMainRunner = Runners.mainRunner();
 
     private final ArrayList<OUTPUT> mCachedResults = new ArrayList<OUTPUT>();
 
-    private final Execution mDeliverResult;
+    private final TemplateExecution mDeliverResult;
 
     private final ArrayList<OUTPUT> mLastResults = new ArrayList<OUTPUT>();
 
@@ -75,7 +71,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             throw new NullPointerException("the loader must not be null");
         }
 
-        mDeliverResult = new Execution() {
+        mDeliverResult = new TemplateExecution() {
 
             public void run() {
 

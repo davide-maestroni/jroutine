@@ -13,20 +13,17 @@
  */
 package com.gh.bmd.jrt.android.proxy.v11.core;
 
-import android.app.Activity;
-import android.app.Fragment;
-
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.proxy.annotation.V11Proxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.gh.bmd.jrt.android.v11.core.RoutineContext;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
@@ -44,7 +41,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         ProxyConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         LoaderConfiguration.Configurable<LoaderProxyRoutineBuilder> {
 
-    private final WeakReference<?> mContextReference;
+    private final RoutineContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -60,43 +57,17 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     /**
      * Constructor.
      *
-     * @param activity    the invocation activity context.
-     * @param targetClass the target class.
-     * @param factoryArgs the object factory arguments.
-     */
-    DefaultLoaderProxyRoutineBuilder(@Nonnull final Activity activity,
-            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
-
-        this((Object) activity, targetClass, factoryArgs);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param fragment    the invocation fragment context.
-     * @param targetClass the target class.
-     * @param factoryArgs the object factory arguments.
-     */
-    DefaultLoaderProxyRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
-
-        this((Object) fragment, targetClass, factoryArgs);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param context     the invocation context.
+     * @param context     the routine context.
      * @param targetClass the target class.
      * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultLoaderProxyRoutineBuilder(@Nonnull final Object context,
+    DefaultLoaderProxyRoutineBuilder(@Nonnull final RoutineContext context,
             @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
         if (context == null) {
 
-            throw new NullPointerException("the invocation context must not be null");
+            throw new NullPointerException("the routine context must not be null");
         }
 
         if (targetClass == null) {
@@ -104,9 +75,9 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
             throw new NullPointerException("the target class must not be null");
         }
 
+        mContext = context;
         mTargetClass = targetClass;
-        mContextReference = new WeakReference<Object>(context);
-        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
+        mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
     }
 
     @Nonnull
@@ -133,9 +104,9 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                             + itfClass.getName());
         }
 
-        final Object context = mContextReference.get();
+        final RoutineContext context = mContext;
 
-        if (context == null) {
+        if (context.getComponent() == null) {
 
             throw new IllegalStateException("the context object has been destroyed");
         }
@@ -224,7 +195,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      */
     private static class ObjectLoaderProxyBuilder<TYPE> extends AbstractLoaderProxyBuilder<TYPE> {
 
-        private final Object mContext;
+        private final RoutineContext mContext;
 
         private final Object[] mFactoryArgs;
 
@@ -235,12 +206,12 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param context        the invocation context.
+         * @param context        the routine context.
          * @param targetClass    the proxy target class.
          * @param factoryArgs    the object factory arguments.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectLoaderProxyBuilder(@Nonnull final Object context,
+        private ObjectLoaderProxyBuilder(@Nonnull final RoutineContext context,
                 @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
@@ -272,7 +243,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
             try {
 
-                final Object context = mContext;
+                final RoutineContext context = mContext;
                 final Class<?> targetClass = mTargetClass;
                 final Object[] factoryArgs = mFactoryArgs;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();

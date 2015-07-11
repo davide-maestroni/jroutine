@@ -23,6 +23,7 @@ import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +38,12 @@ import javax.annotation.Nullable;
  */
 class AsyncTaskRunner extends MainRunner {
 
+    private static final Void[] NO_PARAMS = new Void[0];
+
     private final Executor mExecutor;
+
+    private final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> mTasks =
+            new WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>>();
 
     private final Map<Thread, Void> mThreads =
             Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
@@ -55,7 +61,25 @@ class AsyncTaskRunner extends MainRunner {
     }
 
     @Override
-    public boolean isOwnedThread() {
+    public void cancel(@Nonnull final Execution execution) {
+
+        synchronized (mTasks) {
+
+            final WeakHashMap<ExecutionTask, Void> executionTasks = mTasks.remove(execution);
+
+            if (executionTasks != null) {
+
+                for (final ExecutionTask task : executionTasks.keySet()) {
+
+                    super.cancel(task);
+                    task.cancel(false);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean isExecutionThread() {
 
         return mThreads.containsKey(Thread.currentThread());
     }
@@ -65,6 +89,25 @@ class AsyncTaskRunner extends MainRunner {
             @Nonnull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
+
+        if (execution.isCancelable()) {
+
+            synchronized (mTasks) {
+
+                final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks =
+                        mTasks;
+                WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
+
+                if (executionTasks == null) {
+
+                    executionTasks = new WeakHashMap<ExecutionTask, Void>();
+                    tasks.put(execution, executionTasks);
+                }
+
+                executionTasks.put(task, null);
+            }
+        }
+
         // the super method is called to ensure that a task is always started from the main thread
         super.run(task, delay, timeUnit);
     }
@@ -97,6 +140,11 @@ class AsyncTaskRunner extends MainRunner {
             mThreads = threads;
         }
 
+        public boolean isCancelable() {
+
+            return mExecution.isCancelable();
+        }
+
         @TargetApi(VERSION_CODES.HONEYCOMB)
         public void run() {
 
@@ -104,11 +152,11 @@ class AsyncTaskRunner extends MainRunner {
 
             if ((mExecutor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
 
-                executeOnExecutor(mExecutor);
+                executeOnExecutor(mExecutor, NO_PARAMS);
 
             } else {
 
-                execute();
+                execute(NO_PARAMS);
             }
         }
 

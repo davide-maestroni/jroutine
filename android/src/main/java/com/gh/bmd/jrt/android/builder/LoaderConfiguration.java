@@ -271,7 +271,8 @@ public final class LoaderConfiguration {
         ABORT_THAT,
         /**
          * The clash is resolved by aborting the invocation with an
-         * {@link com.gh.bmd.jrt.android.invocation.InvocationClashException}.
+         * {@link com.gh.bmd.jrt.android.invocation.InvocationClashException
+         * InvocationClashException}.
          */
         ABORT_THIS,
         /**

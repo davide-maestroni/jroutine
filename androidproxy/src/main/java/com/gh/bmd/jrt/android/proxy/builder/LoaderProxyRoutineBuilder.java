@@ -38,23 +38,26 @@ public interface LoaderProxyRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
-     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Input Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs Inputs},
+     * {@link com.gh.bmd.jrt.annotation.Output Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction}, as well as
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy},
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.android.proxy.annotation.V4Proxy} or
-     * {@link com.gh.bmd.jrt.android.proxy.annotation.V11Proxy}. The generated class name and
-     * package will be chosen according to the specific annotation attributes.<br/>
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.V4Proxy V4Proxy} or
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.V11Proxy V11Proxy}. The generated class name
+     * and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.onXXX()</code> method.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *
@@ -71,22 +74,25 @@ public interface LoaderProxyRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
-     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction}, as well as
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy} and
-     * {@link com.gh.bmd.jrt.android.annotation.LoaderId} annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Input Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs Inputs},
+     * {@link com.gh.bmd.jrt.annotation.Output Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction}, as well as
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy} and
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.android.proxy.annotation.V4Proxy} or
-     * {@link com.gh.bmd.jrt.android.proxy.annotation.V11Proxy}. The generated class name and
-     * package will be chosen according to the specific annotation attributes.<br/>
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.V4Proxy V4Proxy} or
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.V11Proxy V11Proxy}. The generated class name
+     * and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.onXXX()</code> method.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *

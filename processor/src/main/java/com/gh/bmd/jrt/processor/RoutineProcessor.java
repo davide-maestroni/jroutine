@@ -1994,8 +1994,8 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${inputParams}", buildInputParams(methodElement));
         method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
         method = method.replace("${invokeMethod}",
-                                (inputMode == InputMode.ELEMENT) ? "invokeParallel"
-                                        : "invokeAsync");
+                                (inputMode == InputMode.ELEMENT) ? "parallelInvoke"
+                                        : "asyncInvoke");
         writer.append(method);
         String methodInvocation;
 

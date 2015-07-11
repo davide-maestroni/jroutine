@@ -32,97 +32,97 @@ import javax.annotation.Nullable;
 public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync() {
+    public OutputChannel<OUTPUT> asyncCall() {
 
-        return invokeAsync().result();
+        return asyncInvoke().result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable final INPUT input) {
+    public OutputChannel<OUTPUT> asyncCall(@Nullable final INPUT input) {
 
-        return invokeAsync().pass(input).result();
+        return asyncInvoke().pass(input).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable final INPUT... inputs) {
+    public OutputChannel<OUTPUT> asyncCall(@Nullable final INPUT... inputs) {
 
-        return invokeAsync().pass(inputs).result();
+        return asyncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> asyncCall(@Nullable final Iterable<? extends INPUT> inputs) {
 
-        return invokeAsync().pass(inputs).result();
+        return asyncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> asyncCall(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
-        return invokeAsync().pass(inputs).result();
+        return asyncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel() {
+    public OutputChannel<OUTPUT> parallelCall() {
 
-        return invokeParallel().result();
+        return parallelInvoke().result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(@Nullable final INPUT input) {
+    public OutputChannel<OUTPUT> parallelCall(@Nullable final INPUT input) {
 
-        return invokeParallel().pass(input).result();
+        return parallelInvoke().pass(input).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(@Nullable final INPUT... inputs) {
+    public OutputChannel<OUTPUT> parallelCall(@Nullable final INPUT... inputs) {
 
-        return invokeParallel().pass(inputs).result();
+        return parallelInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(@Nullable final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> parallelCall(@Nullable final Iterable<? extends INPUT> inputs) {
 
-        return invokeParallel().pass(inputs).result();
+        return parallelInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(
+    public OutputChannel<OUTPUT> parallelCall(
             @Nullable final OutputChannel<? extends INPUT> inputs) {
 
-        return invokeParallel().pass(inputs).result();
-    }
-
-    @Nonnull
-    public OutputChannel<OUTPUT> callSync() {
-
-        return invokeSync().result();
-    }
-
-    @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable final INPUT input) {
-
-        return invokeSync().pass(input).result();
-    }
-
-    @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable final INPUT... inputs) {
-
-        return invokeSync().pass(inputs).result();
-    }
-
-    @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable final Iterable<? extends INPUT> inputs) {
-
-        return invokeSync().pass(inputs).result();
-    }
-
-    @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable final OutputChannel<? extends INPUT> inputs) {
-
-        return invokeSync().pass(inputs).result();
+        return parallelInvoke().pass(inputs).result();
     }
 
     public void purge() {
 
+    }
+
+    @Nonnull
+    public OutputChannel<OUTPUT> syncCall() {
+
+        return syncInvoke().result();
+    }
+
+    @Nonnull
+    public OutputChannel<OUTPUT> syncCall(@Nullable final INPUT input) {
+
+        return syncInvoke().pass(input).result();
+    }
+
+    @Nonnull
+    public OutputChannel<OUTPUT> syncCall(@Nullable final INPUT... inputs) {
+
+        return syncInvoke().pass(inputs).result();
+    }
+
+    @Nonnull
+    public OutputChannel<OUTPUT> syncCall(@Nullable final Iterable<? extends INPUT> inputs) {
+
+        return syncInvoke().pass(inputs).result();
+    }
+
+    @Nonnull
+    public OutputChannel<OUTPUT> syncCall(@Nullable final OutputChannel<? extends INPUT> inputs) {
+
+        return syncInvoke().pass(inputs).result();
     }
 }

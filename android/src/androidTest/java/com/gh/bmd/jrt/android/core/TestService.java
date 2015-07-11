@@ -33,15 +33,14 @@ import static com.gh.bmd.jrt.util.Reflection.findConstructor;
  */
 public class TestService extends RoutineService implements FactoryContext {
 
-    private static final HashMap<InstanceInfo, Object> sInstanceMap =
-            new HashMap<InstanceInfo, Object>();
+    private final HashMap<InstanceInfo, Object> mInstanceMap = new HashMap<InstanceInfo, Object>();
 
     @Nullable
     @SuppressWarnings("unchecked")
     public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
             @Nonnull final Object[] args) {
 
-        final HashMap<InstanceInfo, Object> instanceMap = sInstanceMap;
+        final HashMap<InstanceInfo, Object> instanceMap = mInstanceMap;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
         Object instance = instanceMap.get(instanceInfo);
 

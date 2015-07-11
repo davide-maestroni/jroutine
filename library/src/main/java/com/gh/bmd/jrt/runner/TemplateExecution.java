@@ -11,20 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply plugin: 'java'
-apply from: '../extra.gradle'
+package com.gh.bmd.jrt.runner;
 
-javaCompatibility = JavaVersion.VERSION_1_5
+/**
+ * Empty abstract implementation of an execution.
+ * <p/>
+ * This class is useful to avoid the need of implementing all the methods defined in the interface.
+ * <p/>
+ * Created by davide on 07/07/15.
+ */
+public abstract class TemplateExecution implements Execution {
 
-dependencies {
-    compile project(':library')
+    public boolean isCancelable() {
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
-}
-
-javadoc {
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/library/')
+        return false;
+    }
 }

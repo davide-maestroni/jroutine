@@ -32,17 +32,33 @@ import javax.annotation.Nonnull;
  * Note also that the runner methods can be called from different threads, so, it is up to the
  * implementing class to ensure synchronization when required.
  * <p/>
+ * The implementing class can optionally support the cancellation of executions not yet run (
+ * waiting, for example, in a consuming queue).
+ * <p/>
  * Created by davide-maestroni on 9/7/14.
  */
 public interface Runner {
 
     /**
-     * Checks if the calling thread belongs to the runner ones.<br/>
+     * Cancels the specified execution if not already run.<br/>
+     * Note that the method will have no effect in case the runner does not maintain a queue or the
+     * specified execution has been already processed at the moment of the call.<br/>
+     * Note also that, in case the same execution has been added more than one time to the runner
+     * queue, when the method returns, the queue will not contain the execution instance anymore,
+     * with the consequence that the {@link Execution#run()} method will never be called.
+     *
+     * @param execution the execution.
+     */
+    void cancel(@Nonnull Execution execution);
+
+    /**
+     * Checks if the calling thread belongs to the ones employed by the runner to run executions.
+     * <br/>
      * A synchronous runner will always return <code>false</code>.
      *
      * @return whether the calling thread is managed by the runner.
      */
-    boolean isOwnedThread();
+    boolean isExecutionThread();
 
     /**
      * Runs the specified execution (that is, it calls the execution <b><code>run()</code></b>

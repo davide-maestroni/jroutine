@@ -48,7 +48,7 @@ class LooperRunner implements Runner {
      */
     LooperRunner(@Nonnull final Looper looper) {
 
-        this(looper, new SameThreadRunner(looper));
+        this(looper, new LooperThreadRunner(looper));
     }
 
     /**
@@ -62,19 +62,7 @@ class LooperRunner implements Runner {
 
         mThread = looper.getThread();
         mHandler = new Handler(looper);
-        mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new Runner() {
-
-            public boolean isOwnedThread() {
-
-                return true;
-            }
-
-            public void run(@Nonnull final Execution execution, final long delay,
-                    @Nonnull final TimeUnit timeUnit) {
-
-                internalRun(execution, delay, timeUnit);
-            }
-        };
+        mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new PostRunner(this);
     }
 
     private void internalRun(@Nonnull final Execution execution, final long delay,
@@ -93,18 +81,24 @@ class LooperRunner implements Runner {
     /**
      * Runner handling execution started from the same looper thread.
      */
-    private static class SameThreadRunner implements Runner {
+    private static class LooperThreadRunner implements Runner {
 
         private final LooperRunner mLooperRunner;
 
         private final Runner mQueuedRunner = Runners.queuedRunner();
 
-        private SameThreadRunner(@Nonnull final Looper looper) {
+        private LooperThreadRunner(@Nonnull final Looper looper) {
 
             mLooperRunner = new LooperRunner(looper, null);
         }
 
-        public boolean isOwnedThread() {
+        public void cancel(@Nonnull final Execution execution) {
+
+            mQueuedRunner.cancel(execution);
+            mLooperRunner.cancel(execution);
+        }
+
+        public boolean isExecutionThread() {
 
             return true;
         }
@@ -123,9 +117,48 @@ class LooperRunner implements Runner {
         }
     }
 
-    public boolean isOwnedThread() {
+    /**
+     * Runner posting execution on the runner looper.
+     */
+    private static class PostRunner implements Runner {
 
-        return (Thread.currentThread() == mThread) && mSameThreadRunner.isOwnedThread();
+        private final LooperRunner mLooperRunner;
+
+        /**
+         * Constructor.
+         *
+         * @param runner the looper runner.
+         */
+        private PostRunner(@Nonnull final LooperRunner runner) {
+
+            mLooperRunner = runner;
+        }
+
+        public void cancel(@Nonnull final Execution execution) {
+
+        }
+
+        public boolean isExecutionThread() {
+
+            return true;
+        }
+
+        public void run(@Nonnull final Execution execution, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mLooperRunner.internalRun(execution, delay, timeUnit);
+        }
+    }
+
+    public void cancel(@Nonnull final Execution execution) {
+
+        mHandler.removeCallbacks(execution);
+        mSameThreadRunner.cancel(execution);
+    }
+
+    public boolean isExecutionThread() {
+
+        return (Thread.currentThread() == mThread) && mSameThreadRunner.isExecutionThread();
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

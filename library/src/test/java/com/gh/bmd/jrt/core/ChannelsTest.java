@@ -57,9 +57,9 @@ public class ChannelsTest {
     public void testCombine() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<Integer, Integer> channel2 =
-                JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(channel1, channel2)
                 .pass(new Selectable<String>("test1", 0))
                 .pass(new Selectable<Integer>(1, 1));
@@ -89,8 +89,8 @@ public class ChannelsTest {
 
         InvocationChannel<String, String> channel1;
         InvocationChannel<Integer, Integer> channel2;
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(channel1, channel2).abort();
 
         try {
@@ -113,8 +113,8 @@ public class ChannelsTest {
 
         }
 
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(3, channel1, channel2).abort();
 
         try {
@@ -137,8 +137,8 @@ public class ChannelsTest {
 
         }
 
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
 
         try {
@@ -161,8 +161,8 @@ public class ChannelsTest {
 
         }
 
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
 
         try {
@@ -185,8 +185,8 @@ public class ChannelsTest {
 
         }
 
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         final HashMap<Integer, InvocationChannel<?, ?>> map =
                 new HashMap<Integer, InvocationChannel<?, ?>>(2);
         map.put(31, channel1);
@@ -272,9 +272,9 @@ public class ChannelsTest {
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<String, String> channel2 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(channel1, channel2).pass(Arrays.<Object>asList("test1-1", "test1-2"));
         Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
                 .pass(Arrays.<Object>asList("test2-1", "test2-2"));
@@ -289,8 +289,8 @@ public class ChannelsTest {
 
         InvocationChannel<String, String> channel1;
         InvocationChannel<String, String> channel2;
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(channel1, channel2).abort();
 
         try {
@@ -313,8 +313,8 @@ public class ChannelsTest {
 
         }
 
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2)).abort();
 
         try {
@@ -342,9 +342,9 @@ public class ChannelsTest {
     public void testDistributeAndFlush() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<String, String> channel2 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distributeAndFlush(channel1, channel2)
                 .pass(Arrays.<Object>asList("test1-1", "test1-2"));
         Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2))
@@ -362,8 +362,8 @@ public class ChannelsTest {
 
         InvocationChannel<String, String> channel1;
         InvocationChannel<String, String> channel2;
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distributeAndFlush(channel1, channel2).abort();
 
         try {
@@ -386,8 +386,8 @@ public class ChannelsTest {
 
         }
 
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2)).abort();
 
         try {
@@ -415,7 +415,7 @@ public class ChannelsTest {
     public void testDistributeAndFlushError() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distributeAndFlush(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2"));
 
         try {
@@ -453,7 +453,7 @@ public class ChannelsTest {
     public void testDistributeError() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).invokeAsync().orderByCall();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2"));
 
         try {
@@ -497,17 +497,17 @@ public class ChannelsTest {
                 JRoutine.on(new Sort()).buildRoutine();
         Map<Integer, InputChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
-        channel = routine.invokeAsync();
+        channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
         channelMap.get(Sort.INTEGER).pass(-11);
         channelMap.get(Sort.STRING).pass("test21");
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
-        channel = routine.invokeAsync();
+        channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
         channelMap.get(Sort.INTEGER).pass(-11);
         channelMap.get(Sort.STRING).pass("test21");
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
-        channel = routine.invokeAsync();
+        channel = routine.asyncInvoke();
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
         channelMap.get(Sort.INTEGER).pass(-11);
         channelMap.get(Sort.STRING).pass("test21");
@@ -521,7 +521,7 @@ public class ChannelsTest {
                 JRoutine.on(new Sort()).buildRoutine();
         Map<Integer, InputChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
-        channel = routine.invokeAsync();
+        channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
         channelMap.get(Sort.INTEGER).pass(-11);
         channelMap.get(Sort.STRING).abort();
@@ -536,7 +536,7 @@ public class ChannelsTest {
 
         }
 
-        channel = routine.invokeAsync();
+        channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
         channelMap.get(Sort.INTEGER).abort();
         channelMap.get(Sort.STRING).pass("test21");
@@ -551,7 +551,7 @@ public class ChannelsTest {
 
         }
 
-        channel = routine.invokeAsync();
+        channel = routine.asyncInvoke();
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
         channelMap.get(Sort.INTEGER).abort();
         channelMap.get(Sort.STRING).abort();
@@ -572,7 +572,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.map(0, 0, JRoutine.on(new Sort()).invokeAsync());
+            Channels.map(0, 0, JRoutine.on(new Sort()).asyncInvoke());
 
             fail();
 
@@ -652,14 +652,14 @@ public class ChannelsTest {
         channel2 = builder.buildChannel();
         channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.callAsync(Channels.join(channel1.output(), channel2.output()))
+        assertThat(routine.asyncCall(Channels.join(channel1.output(), channel2.output()))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.callAsync(Channels.join(
+        assertThat(routine.asyncCall(Channels.join(
                 Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
                           .eventually()
                           .all()).containsExactly('s', '2');
@@ -673,7 +673,7 @@ public class ChannelsTest {
                 .pass("test3")
                 .close();
         channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.callAsync(Channels.join(channel1.output(), channel2.output()))
+        assertThat(routine.asyncCall(Channels.join(channel1.output(), channel2.output()))
                           .eventually()
                           .all()).containsExactly('s', '2');
     }
@@ -692,7 +692,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.callAsync(Channels.join(channel1.output(), channel2.output()))
+            routine.asyncCall(Channels.join(channel1.output(), channel2.output()))
                    .eventually()
                    .all();
 
@@ -709,7 +709,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.callAsync(Channels.join(
+            routine.asyncCall(Channels.join(
                     Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
                    .eventually()
                    .all();
@@ -732,14 +732,14 @@ public class ChannelsTest {
         channel2 = builder.buildChannel();
         channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.callAsync(Channels.joinAndFlush(channel1.output(), channel2.output()))
+        assertThat(routine.asyncCall(Channels.joinAndFlush(channel1.output(), channel2.output()))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.callAsync(Channels.joinAndFlush(
+        assertThat(routine.asyncCall(Channels.joinAndFlush(
                 Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
                           .eventually()
                           .all()).containsExactly('s', '2');
@@ -756,7 +756,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.callAsync(Channels.joinAndFlush(channel1.output(), channel2.output()))
+            routine.asyncCall(Channels.joinAndFlush(channel1.output(), channel2.output()))
                    .eventually()
                    .all();
 
@@ -781,7 +781,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.callAsync(Channels.joinAndFlush(channel1.output(), channel2.output()))
+            routine.asyncCall(Channels.joinAndFlush(channel1.output(), channel2.output()))
                    .eventually()
                    .all();
 
@@ -798,7 +798,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.callAsync(Channels.joinAndFlush(
+            routine.asyncCall(Channels.joinAndFlush(
                     Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
                    .eventually()
                    .all();
@@ -872,7 +872,7 @@ public class ChannelsTest {
                                                                  .invocations()
                                                                  .withInputOrder(OrderType.BY_CALL)
                                                                  .set()
-                                                                 .callAsync(channel);
+                                                                 .asyncCall(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
                 Channels.map(output, Sort.INTEGER, Sort.STRING);
 
@@ -954,7 +954,7 @@ public class ChannelsTest {
 
         final Routine<Selectable<String>, String> routine =
                 JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(Channels.merge(
+        final OutputChannel<String> outputChannel = routine.asyncCall(Channels.merge(
                 Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
                               channel4.output())));
 
@@ -1131,17 +1131,17 @@ public class ChannelsTest {
                 JRoutine.on(new Sort()).buildRoutine();
         Map<Integer, OutputChannel<Object>> channelMap;
         OutputChannel<Selectable<Object>> channel;
-        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
+        channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
                                     new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
         assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
-        channel = routine.callAsync(new Selectable<Object>(-11, Sort.INTEGER),
+        channel = routine.asyncCall(new Selectable<Object>(-11, Sort.INTEGER),
                                     new Selectable<Object>("test21", Sort.STRING));
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
         assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
-        channel = routine.callAsync(new Selectable<Object>("test21", Sort.STRING),
+        channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
                                     new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
         assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
@@ -1156,7 +1156,7 @@ public class ChannelsTest {
                 JRoutine.on(new Sort()).buildRoutine();
         Map<Integer, OutputChannel<Object>> channelMap;
         OutputChannel<Selectable<Object>> channel;
-        channel = routine.invokeAsync()
+        channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new Selectable<Object>("test21", Sort.STRING),
                                new Selectable<Object>(-11, Sort.INTEGER))
@@ -1184,7 +1184,7 @@ public class ChannelsTest {
 
         }
 
-        channel = routine.invokeAsync()
+        channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new Selectable<Object>(-11, Sort.INTEGER),
                                new Selectable<Object>("test21", Sort.STRING))
@@ -1212,7 +1212,7 @@ public class ChannelsTest {
 
         }
 
-        channel = routine.invokeAsync()
+        channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new Selectable<Object>("test21", Sort.STRING),
                                new Selectable<Object>(-11, Sort.INTEGER))
@@ -1246,7 +1246,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.map(0, 0, JRoutine.on(new Sort()).callAsync());
+            Channels.map(0, 0, JRoutine.on(new Sort()).asyncCall());
 
             fail();
 

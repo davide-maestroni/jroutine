@@ -26,6 +26,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+
 import static com.gh.bmd.jrt.util.Time.current;
 import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.util.TimeDuration.micros;
@@ -108,6 +110,68 @@ public class RunnerTest {
         testRunner(new QueuedRunner());
         testRunner(Runners.queuedRunner());
         testRunner(new RunnerDecorator(new QueuedRunner()));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testQueuingRunner() {
+
+        final TestExecution execution = new TestExecution();
+        final TestRunner testRunner = new TestRunner();
+        final Runner runner = Runners.priorityRunner(testRunner).getRunner(0);
+        assertThat(runner.isExecutionThread()).isFalse();
+        testRunner.setExecutionThread(Thread.currentThread());
+        assertThat(runner.isExecutionThread()).isTrue();
+        execution.setCancelable(true);
+        runner.run(execution, 0, TimeUnit.MILLISECONDS);
+        assertThat(execution.isRun()).isFalse();
+        testRunner.getLastExecution().run();
+        assertThat(execution.isRun()).isTrue();
+        runner.cancel(execution);
+        assertThat(testRunner.getLastCancelExecution()).isNull();
+        execution.reset();
+        runner.run(execution, 0, TimeUnit.MILLISECONDS);
+        runner.cancel(execution);
+        assertThat(execution.isRun()).isFalse();
+        assertThat(testRunner.getLastCancelExecution()).isNull();
+        runner.run(execution, 0, TimeUnit.MILLISECONDS);
+        testRunner.getLastExecution().run();
+        runner.cancel(execution);
+        assertThat(execution.isRun()).isTrue();
+        assertThat(testRunner.getLastCancelExecution()).isNull();
+        execution.reset();
+        runner.run(execution, 1, TimeUnit.MILLISECONDS);
+        testRunner.getLastExecution().run();
+        runner.cancel(execution);
+        assertThat(execution.isRun()).isTrue();
+        execution.reset();
+        runner.run(execution, 1, TimeUnit.MILLISECONDS);
+        runner.cancel(execution);
+        assertThat(execution.isRun()).isFalse();
+        assertThat(testRunner.getLastCancelExecution()).isNotNull();
+        execution.setCancelable(false);
+        testRunner.cancel(null);
+        runner.run(execution, 1, TimeUnit.MILLISECONDS);
+        runner.cancel(execution);
+        assertThat(execution.isRun()).isFalse();
+        assertThat(testRunner.getLastCancelExecution()).isNull();
+    }
+
+    @Test
+    public void testRunnerDecorator() {
+
+        final TestExecution execution = new TestExecution();
+        final TestRunner testRunner = new TestRunner();
+        final RunnerDecorator runner = new RunnerDecorator(testRunner);
+        assertThat(runner.isExecutionThread()).isFalse();
+        testRunner.setExecutionThread(Thread.currentThread());
+        assertThat(runner.isExecutionThread()).isTrue();
+        runner.run(execution, 0, TimeUnit.MILLISECONDS);
+        assertThat(testRunner.getLastExecution()).isSameAs(execution);
+        runner.run(new TestExecution(), 1, TimeUnit.MILLISECONDS);
+        assertThat(testRunner.getLastExecution()).isNotSameAs(execution);
+        runner.cancel(execution);
+        assertThat(testRunner.getLastCancelExecution()).isSameAs(execution);
     }
 
     @Test
@@ -262,6 +326,38 @@ public class RunnerTest {
         }
     }
 
+    private static class TestExecution implements Execution {
+
+        private boolean mIsCancelable;
+
+        private boolean mIsRun;
+
+        public boolean isCancelable() {
+
+            return mIsCancelable;
+        }
+
+        private void setCancelable(final boolean isCancelable) {
+
+            mIsCancelable = isCancelable;
+        }
+
+        public void run() {
+
+            mIsRun = true;
+        }
+
+        private boolean isRun() {
+
+            return mIsRun;
+        }
+
+        private void reset() {
+
+            mIsRun = false;
+        }
+    }
+
     private static class TestRecursiveExecution extends TestRunExecution {
 
         private final ArrayList<TimeDuration> mDelays;
@@ -301,7 +397,7 @@ public class RunnerTest {
         }
     }
 
-    private static class TestRunExecution implements Execution {
+    private static class TestRunExecution extends TemplateExecution {
 
         private final TimeDuration mDelay;
 
@@ -331,8 +427,47 @@ public class RunnerTest {
 
             // the JVM might not have nanosecond precision...
             mIsPassed = (current().toMillis() - mStartTime.toMillis() >= mDelay.toMillis());
-
             mSemaphore.release();
+        }
+    }
+
+    private static class TestRunner implements Runner {
+
+        private Execution mLastCancelExecution;
+
+        private Execution mLastExecution;
+
+        private Thread mThread;
+
+        public void cancel(@Nonnull final Execution execution) {
+
+            mLastCancelExecution = execution;
+        }
+
+        public boolean isExecutionThread() {
+
+            return (Thread.currentThread() == mThread);
+        }
+
+        private void setExecutionThread(final Thread thread) {
+
+            mThread = thread;
+        }
+
+        public void run(@Nonnull final Execution execution, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mLastExecution = execution;
+        }
+
+        private Execution getLastCancelExecution() {
+
+            return mLastCancelExecution;
+        }
+
+        private Execution getLastExecution() {
+
+            return mLastExecution;
         }
     }
 }

@@ -37,7 +37,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * The number of input data buffered in the channel can be also limited in order to avoid excessive
  * memory consumption. In case the maximum number is reached hen passing an input, the call blocks
  * until enough data are consumed or the specified  timeout elapses. In the latter case, a
- * {@link com.gh.bmd.jrt.channel.DeadlockException} will be thrown.<br/>
+ * {@link com.gh.bmd.jrt.channel.DeadlockException DeadlockException} will be thrown.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
  * delivered in the same order as they are passed to the channels, at the cost of a slightly

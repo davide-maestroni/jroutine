@@ -51,7 +51,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 4/9/2015.
  *
- * @see com.gh.bmd.jrt.android.builder.LoaderConfiguration
+ * @see com.gh.bmd.jrt.android.builder.LoaderConfiguration LoaderConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)

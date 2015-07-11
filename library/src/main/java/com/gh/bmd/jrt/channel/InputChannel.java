@@ -78,8 +78,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException         if this channel is already closed.
-     * @see {@link #orderByChance()}
-     * @see {@link #orderByDelay()}
+     * @see #orderByChance()
+     * @see #orderByDelay()
      */
     @Nonnull
     InputChannel<INPUT> orderByCall();
@@ -92,8 +92,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException         if this channel is already closed.
-     * @see {@link #orderByCall()}
-     * @see {@link #orderByDelay()}
+     * @see #orderByCall()
+     * @see #orderByDelay()
      */
     @Nonnull
     InputChannel<INPUT> orderByChance();
@@ -109,8 +109,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @return this channel.
      * @throws com.gh.bmd.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException         if this channel is already closed.
-     * @see {@link #orderByCall()}
-     * @see {@link #orderByChance()}
+     * @see #orderByCall()
+     * @see #orderByChance()
      */
     @Nonnull
     InputChannel<INPUT> orderByDelay();

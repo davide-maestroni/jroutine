@@ -36,15 +36,18 @@ public interface ServiceProxyBuilder<TYPE>
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
-     * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
-     * {@link com.gh.bmd.jrt.annotation.Priority}, {@link com.gh.bmd.jrt.annotation.ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
-     * annotations.<br/>
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Input Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs Inputs},
+     * {@link com.gh.bmd.jrt.annotation.Output Output},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy}.<br/>
+     * {@link com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

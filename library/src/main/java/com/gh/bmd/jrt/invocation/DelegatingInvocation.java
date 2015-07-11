@@ -77,7 +77,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
 
     public void onInitialize() {
 
-        mChannel = mRoutine.invokeAsync();
+        mChannel = mRoutine.asyncInvoke();
     }
 
     public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {

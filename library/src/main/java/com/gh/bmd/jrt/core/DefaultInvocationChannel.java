@@ -29,6 +29,7 @@ import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.TimeDuration.Check;
 
@@ -341,6 +342,19 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
     private void waitInputs(final int count) {
 
+        if (mInputTimeout.isZero()) {
+
+            mInputCount -= count;
+            throw new InputDeadlockException(
+                    "deadlock while waiting for room in the input channel");
+        }
+
+        if (mRunner.isExecutionThread()) {
+
+            mInputCount -= count;
+            throw new RunnerDeadlockException("cannot wait on the invocation runner thread");
+        }
+
         try {
 
             if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
@@ -391,7 +405,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     /**
      * Implementation of an execution handling the abortion of the result channel.
      */
-    private class AbortResultExecution implements Execution {
+    private class AbortResultExecution extends TemplateExecution {
 
         private final Throwable mAbortException;
 
@@ -405,6 +419,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mAbortException = reason;
         }
 
+        @Override
         public void run() {
 
             mResultChanel.close(mAbortException);
@@ -581,7 +596,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     /**
      * Implementation of an execution handling a delayed abortion.
      */
-    private class DelayedAbortExecution implements Execution {
+    private class DelayedAbortExecution extends TemplateExecution {
 
         private final Throwable mAbortException;
 
@@ -595,6 +610,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mAbortException = reason;
         }
 
+        @Override
         public void run() {
 
             final Execution execution;
@@ -614,7 +630,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     /**
      * Implementation of an execution handling a delayed input.
      */
-    private class DelayedInputExecution implements Execution {
+    private class DelayedInputExecution extends TemplateExecution {
 
         private final INPUT mInput;
 
@@ -633,6 +649,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mInput = input;
         }
 
+        @Override
         public void run() {
 
             final Execution execution;
@@ -652,7 +669,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     /**
      * Implementation of an execution handling a delayed input of a list of data.
      */
-    private class DelayedListInputExecution implements Execution {
+    private class DelayedListInputExecution extends TemplateExecution {
 
         private final ArrayList<INPUT> mInputs;
 
@@ -671,6 +688,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mQueue = queue;
         }
 
+        @Override
         public void run() {
 
             final Execution execution;
@@ -818,6 +836,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
                 mSubLogger.dbg(reason, "aborting channel");
                 mAbortException = abortException;
                 mState = new AbortedChannelState();
+                mRunner.cancel(mExecution);
                 return mExecution.abort();
             }
 
@@ -853,6 +872,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mSubLogger.dbg(reason, "aborting channel");
             mAbortException = reason;
             mState = new AbortedChannelState();
+            mRunner.cancel(mExecution);
             return mExecution.abort();
         }
 
@@ -948,6 +968,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mSubLogger.dbg("aborting consumer");
             mAbortException = error;
             mState = new ExceptionChannelState();
+            mRunner.cancel(mExecution);
             return mExecution.abort();
         }
 
@@ -968,12 +989,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             ++mInputCount;
 
             if (!mHasInputs.isTrue()) {
-
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    --mInputCount;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
 
                 waitInputs(1);
 
@@ -1015,6 +1030,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mSubLogger.dbg("aborting result channel");
             mAbortException = reason;
             mState = new ExceptionChannelState();
+            mRunner.cancel(mExecution);
             return mExecution.abort();
         }
 
@@ -1105,12 +1121,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (!mHasInputs.isTrue()) {
 
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    mInputCount -= size;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
-
                 waitInputs(size);
 
                 if (mState != this) {
@@ -1154,12 +1164,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             ++mInputCount;
 
             if (!mHasInputs.isTrue()) {
-
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    --mInputCount;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
 
                 waitInputs(1);
 
@@ -1218,12 +1222,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mInputCount += size;
 
             if (!mHasInputs.isTrue()) {
-
-                if (!mInputTimeout.isZero() && mRunner.isOwnedThread()) {
-
-                    mInputCount -= size;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
 
                 waitInputs(size);
 

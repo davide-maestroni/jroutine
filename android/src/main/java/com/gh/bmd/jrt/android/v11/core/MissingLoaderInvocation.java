@@ -40,7 +40,6 @@ final class MissingLoaderInvocation<OUTPUT> extends ProcedureContextInvocation<O
         mId = id;
     }
 
-    @Override
     public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
         result.abort(new MissingInvocationException(mId));

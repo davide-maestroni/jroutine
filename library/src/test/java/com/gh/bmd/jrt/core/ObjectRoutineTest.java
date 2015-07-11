@@ -115,7 +115,7 @@ public class ObjectRoutineTest {
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -220,7 +220,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
+            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -582,7 +582,7 @@ public class ObjectRoutineTest {
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -597,7 +597,7 @@ public class ObjectRoutineTest {
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -978,7 +978,7 @@ public class ObjectRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
 
-        assertThat(routine1.callSync().all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(test)
                                                          .invocations()
@@ -989,7 +989,7 @@ public class ObjectRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
 
-        assertThat(routine2.callSync().all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutine.on(test)
@@ -1001,7 +1001,7 @@ public class ObjectRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
 
-        assertThat(routine3.callSync().all()).containsExactly(-77L);
+        assertThat(routine3.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
@@ -1014,7 +1014,7 @@ public class ObjectRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
 
-        assertThat(routine4.callSync().all()).containsExactly(-77L);
+        assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutine.on(test)
@@ -1026,7 +1026,7 @@ public class ObjectRoutineTest {
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
 
-        assertThat(routine5.callSync().all()).containsExactly(-77L);
+        assertThat(routine5.syncCall().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
@@ -1040,9 +1040,9 @@ public class ObjectRoutineTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").callAsync();
+                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").callAsync();
+                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1050,8 +1050,8 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").callAsync();
-        getTwo = builder.method("getTwo").callAsync();
+        getOne = builder.method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1067,7 +1067,7 @@ public class ObjectRoutineTest {
                            .withReadTimeout(seconds(1))
                            .set()
                            .aliasMethod("test")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -1077,7 +1077,7 @@ public class ObjectRoutineTest {
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .aliasMethod("test")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1091,7 +1091,7 @@ public class ObjectRoutineTest {
                            .withReadTimeout(seconds(1))
                            .set()
                            .method("getInt")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -1101,7 +1101,7 @@ public class ObjectRoutineTest {
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .method("getInt")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1115,7 +1115,7 @@ public class ObjectRoutineTest {
                            .withReadTimeout(seconds(1))
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
@@ -1125,7 +1125,7 @@ public class ObjectRoutineTest {
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1994,7 +1994,11 @@ public class ObjectRoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        public boolean isOwnedThread() {
+        public void cancel(@Nonnull final Execution execution) {
+
+        }
+
+        public boolean isExecutionThread() {
 
             return false;
         }

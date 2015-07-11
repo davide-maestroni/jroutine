@@ -225,7 +225,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
         final Class<?> targetClass = mTargetClass;
-        final Method targetMethod = getAnnotatedMethod(targetClass, name);
+        final Method targetMethod = getAnnotatedMethod(name, targetClass);
 
         if (targetMethod == null) {
 
@@ -409,7 +409,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.callSync(inputs));
+            result.pass(mRoutine.syncCall(inputs));
         }
 
         @Override
@@ -504,7 +504,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.callSync(inputs));
+            result.pass(mRoutine.syncCall(inputs));
         }
 
         @Override
@@ -600,7 +600,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            callFromInvocation(mTarget, mMutex, objects, result, mTargetMethod, mInputMode,
+            callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,
                                mOutputMode);
         }
 
@@ -668,7 +668,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 Throwable {
 
             final Class<?> targetClass = mTargetClass;
-            final MethodInfo methodInfo = getTargetMethodInfo(targetClass, method);
+            final MethodInfo methodInfo = getTargetMethodInfo(method, targetClass);
             final Method targetMethod = methodInfo.method;
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;

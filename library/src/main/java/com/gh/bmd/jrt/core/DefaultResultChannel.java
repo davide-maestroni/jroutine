@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 import com.gh.bmd.jrt.util.TimeDuration;
 import com.gh.bmd.jrt.util.TimeDuration.Check;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
@@ -335,7 +336,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * Aborts immediately the execution.
      *
      * @param reason the reason of the abortion.
-     * @see com.gh.bmd.jrt.channel.Channel#abort(Throwable)
+     * @see com.gh.bmd.jrt.channel.Channel#abort(Throwable) abort(Throwable)
      */
     void abortImmediately(@Nullable final Throwable reason) {
 
@@ -598,9 +599,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return nextOutput(timeout);
         }
 
-        if (mRunner.isOwnedThread()) {
+        if (mRunner.isExecutionThread()) {
 
-            throw new RunnerDeadlockException("cannot wait on the same runner thread");
+            throw new RunnerDeadlockException("cannot wait on the invocation runner thread");
         }
 
         if (mOutputNotEmpty == null) {
@@ -647,7 +648,20 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
-    private void waitOutputs(final int count) {
+    private void waitOutputs(final int count, @Nonnull final TimeDuration delay) {
+
+        if (mOutputTimeout.isZero()) {
+
+            mOutputCount -= count;
+            throw new OutputDeadlockException(
+                    "deadlock while waiting for room in the output channel");
+        }
+
+        if (!delay.isZero() && mRunner.isExecutionThread()) {
+
+            mOutputCount -= count;
+            throw new RunnerDeadlockException("cannot wait on the invocation runner thread");
+        }
 
         try {
 
@@ -800,9 +814,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else {
 
-                    if (mRunner.isOwnedThread()) {
+                    if (mRunner.isExecutionThread()) {
 
-                        throw new RunnerDeadlockException("cannot wait on the same runner thread");
+                        throw new RunnerDeadlockException(
+                                "cannot wait on the invocation runner thread");
                     }
 
                     if (mOutputHasNext == null) {
@@ -1013,10 +1028,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                                 break;
                             }
 
-                            if (mRunner.isOwnedThread()) {
+                            if (mRunner.isExecutionThread()) {
 
                                 throw new RunnerDeadlockException(
-                                        "cannot wait on the same runner thread");
+                                        "cannot wait on the invocation runner thread");
                             }
 
                         } while (readTimeout.waitSinceMillis(mMutex, startTime));
@@ -1061,9 +1076,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final TimeDuration readTimeout = mReadTimeout;
 
-                if (!readTimeout.isZero() && mRunner.isOwnedThread()) {
+                if (!readTimeout.isZero() && mRunner.isExecutionThread()) {
 
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
+                    throw new RunnerDeadlockException(
+                            "cannot wait on the invocation runner thread");
                 }
 
                 final boolean isDone;
@@ -1333,7 +1349,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Implementation of an execution handling a delayed abortion.
      */
-    private class DelayedAbortExecution implements Execution {
+    private class DelayedAbortExecution extends TemplateExecution {
 
         private final Throwable mAbortException;
 
@@ -1347,6 +1363,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mAbortException = reason;
         }
 
+        @Override
         public void run() {
 
             final Throwable abortException;
@@ -1366,7 +1383,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Implementation of an execution handling a delayed output of a list of data.
      */
-    private class DelayedListOutputExecution implements Execution {
+    private class DelayedListOutputExecution extends TemplateExecution {
 
         private final ArrayList<OUTPUT> mOutputs;
 
@@ -1385,6 +1402,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mQueue = queue;
         }
 
+        @Override
         public void run() {
 
             final boolean needsFlush;
@@ -1404,7 +1422,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Implementation of an execution handling a delayed output.
      */
-    private class DelayedOutputExecution implements Execution {
+    private class DelayedOutputExecution extends TemplateExecution {
 
         private final OUTPUT mOutput;
 
@@ -1423,6 +1441,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mOutput = output;
         }
 
+        @Override
         public void run() {
 
             final boolean needsFlush;
@@ -1926,13 +1945,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
-
-                    --mOutputCount;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
-
-                waitOutputs(1);
+                waitOutputs(1, delay);
 
                 if (mState != this) {
 
@@ -2020,13 +2033,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
-
-                    mOutputCount -= size;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
-
-                waitOutputs(size);
+                waitOutputs(size, delay);
 
                 if (mState != this) {
 
@@ -2062,13 +2069,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
-
-                    --mOutputCount;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
-
-                waitOutputs(1);
+                waitOutputs(1, delay);
 
                 if (mState != this) {
 
@@ -2118,13 +2119,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mHasOutputs.isTrue()) {
 
-                if (!mOutputTimeout.isZero() && !delay.isZero() && mRunner.isOwnedThread()) {
-
-                    mOutputCount -= size;
-                    throw new RunnerDeadlockException("cannot wait on the same runner thread");
-                }
-
-                waitOutputs(size);
+                waitOutputs(size, delay);
 
                 if (mState != this) {
 

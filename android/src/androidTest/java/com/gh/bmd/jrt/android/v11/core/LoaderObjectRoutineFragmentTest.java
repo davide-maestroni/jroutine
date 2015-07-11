@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.android.v11.core;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
@@ -57,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.v11.core.RoutineContext.contextFrom;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
@@ -88,7 +90,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final TimeUnit timeUnit = TimeUnit.SECONDS;
-        final Routine<Object, Object> routine = JRoutine.onFragment(fragment, TestClass.class)
+        final Routine<Object, Object> routine = JRoutine.on(contextFrom(fragment), TestClass.class)
                                                         .invocations()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
@@ -102,7 +104,7 @@ public class LoaderObjectRoutineFragmentTest
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
 
-        assertThat(routine.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
@@ -115,9 +117,9 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutine.onFragment(fragment, TestArgs.class, 17)
+        assertThat(JRoutine.on(contextFrom(fragment), TestArgs.class, 17)
                            .method("getId")
-                           .callAsync()
+                           .asyncCall()
                            .eventually()
                            .next()).isEqualTo(17);
     }
@@ -133,7 +135,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final SumItf sumAsync = JRoutine.onFragment(fragment, Sum.class)
+        final SumItf sumAsync = JRoutine.on(contextFrom(fragment), Sum.class)
                                         .invocations()
                                         .withReadTimeout(timeout)
                                         .set()
@@ -170,7 +172,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final CountItf countAsync = JRoutine.onFragment(fragment, Count.class)
+        final CountItf countAsync = JRoutine.on(contextFrom(fragment), Count.class)
                                             .invocations()
                                             .withReadTimeout(timeout)
                                             .set()
@@ -196,7 +198,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class, null).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(contextFrom(fragment), TestClass.class,
+                                                  null).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -207,8 +210,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class, null).setConfiguration(
-                    (ProxyConfiguration) null);
+            new DefaultLoaderObjectRoutineBuilder(contextFrom(fragment), TestClass.class,
+                                                  null).setConfiguration((ProxyConfiguration) null);
 
             fail();
 
@@ -218,7 +221,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            new DefaultLoaderObjectRoutineBuilder(fragment, TestClass.class, null).setConfiguration(
+            new DefaultLoaderObjectRoutineBuilder(contextFrom(fragment), TestClass.class,
+                                                  null).setConfiguration(
                     (LoaderConfiguration) null);
 
             fail();
@@ -250,7 +254,7 @@ public class LoaderObjectRoutineFragmentTest
                          .withLogLevel(LogLevel.DEBUG)
                          .withLog(countLog)
                          .set();
-        JRoutine.onFragment(fragment, TestClass.class)
+        JRoutine.on(contextFrom(fragment), TestClass.class)
                 .invocations()
                 .with(configuration)
                 .set()
@@ -260,7 +264,7 @@ public class LoaderObjectRoutineFragmentTest
                 .aliasMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
-        JRoutine.onFragment(fragment, Square.class)
+        JRoutine.on(contextFrom(fragment), Square.class)
                 .invocations()
                 .with(configuration)
                 .set()
@@ -270,6 +274,24 @@ public class LoaderObjectRoutineFragmentTest
                 .buildProxy(SquareItf.class)
                 .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(2);
+    }
+
+    public void testContextWrapper() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestActivity activity = getActivity();
+        final TestFragment fragment =
+                (TestFragment) activity.getFragmentManager().findFragmentById(R.id.test_fragment);
+        final StringContext contextWrapper = new StringContext(activity);
+        assertThat(JRoutine.on(contextFrom(fragment, contextWrapper), String.class)
+                           .method("toString")
+                           .asyncCall()
+                           .eventually()
+                           .next()).isEqualTo("test1");
     }
 
     public void testDuplicateAnnotationError() {
@@ -285,7 +307,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, DuplicateAnnotation.class)
+            JRoutine.on(contextFrom(fragment), DuplicateAnnotation.class)
                     .aliasMethod(DuplicateAnnotation.GET);
 
             fail();
@@ -307,11 +329,11 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine3 =
-                JRoutine.onFragment(fragment, TestClass.class).aliasMethod(TestClass.THROW);
+                JRoutine.on(contextFrom(fragment), TestClass.class).aliasMethod(TestClass.THROW);
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).all();
+            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -335,7 +357,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).buildProxy(TestClass.class);
+            JRoutine.on(contextFrom(fragment), TestClass.class).buildProxy(TestClass.class);
 
             fail();
 
@@ -345,7 +367,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class)
+            JRoutine.on(contextFrom(fragment), TestClass.class)
                     .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
@@ -368,7 +390,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(1, new int[0]);
 
@@ -380,7 +402,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new String[0]);
 
@@ -392,7 +414,9 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class).buildProxy(SumError.class).compute(new int[0]);
+            JRoutine.on(contextFrom(fragment), Sum.class)
+                    .buildProxy(SumError.class)
+                    .compute(new int[0]);
 
             fail();
 
@@ -402,7 +426,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(Collections.<Integer>emptyList());
 
@@ -416,7 +440,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(channel.output());
 
@@ -428,7 +452,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(1, channel.output());
 
@@ -440,7 +464,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new Object());
 
@@ -452,7 +476,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute(new Object[0]);
 
@@ -464,7 +488,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Sum.class)
+            JRoutine.on(contextFrom(fragment), Sum.class)
                     .buildProxy(SumError.class)
                     .compute("test", new int[0]);
 
@@ -488,7 +512,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class)
+            JRoutine.on(contextFrom(fragment), TestClass.class)
                     .invocations()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -503,7 +527,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class)
+            JRoutine.on(contextFrom(fragment), TestClass.class)
                     .invocations()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -518,7 +542,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class)
+            JRoutine.on(contextFrom(fragment), TestClass.class)
                     .invocations()
                     .withReadTimeout(INFINITY)
                     .set()
@@ -545,7 +569,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count(3);
+            JRoutine.on(contextFrom(fragment), Count.class).buildProxy(CountError.class).count(3);
 
             fail();
 
@@ -555,7 +579,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count1(3);
+            JRoutine.on(contextFrom(fragment), Count.class).buildProxy(CountError.class).count1(3);
 
             fail();
 
@@ -565,7 +589,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).count2(3);
+            JRoutine.on(contextFrom(fragment), Count.class).buildProxy(CountError.class).count2(3);
 
             fail();
 
@@ -575,7 +599,9 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList(3);
+            JRoutine.on(contextFrom(fragment), Count.class)
+                    .buildProxy(CountError.class)
+                    .countList(3);
 
             fail();
 
@@ -585,7 +611,9 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList1(3);
+            JRoutine.on(contextFrom(fragment), Count.class)
+                    .buildProxy(CountError.class)
+                    .countList1(3);
 
             fail();
 
@@ -595,7 +623,9 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, Count.class).buildProxy(CountError.class).countList2(3);
+            JRoutine.on(contextFrom(fragment), Count.class)
+                    .buildProxy(CountError.class)
+                    .countList2(3);
 
             fail();
 
@@ -615,7 +645,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine2 = JRoutine.onFragment(fragment, TestClass.class)
+        final Routine<Object, Object> routine2 = JRoutine.on(contextFrom(fragment), TestClass.class)
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
@@ -629,7 +659,7 @@ public class LoaderObjectRoutineFragmentTest
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMethodBySignature() throws NoSuchMethodException {
@@ -643,14 +673,14 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine1 = JRoutine.onFragment(fragment, TestClass.class)
+        final Routine<Object, Object> routine1 = JRoutine.on(contextFrom(fragment), TestClass.class)
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .set()
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
     public void testMissingAliasMethodError() {
@@ -666,7 +696,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).aliasMethod("test");
+            JRoutine.on(contextFrom(fragment), TestClass.class).aliasMethod("test");
 
             fail();
 
@@ -688,7 +718,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).method("test");
+            JRoutine.on(contextFrom(fragment), TestClass.class).method("test");
 
             fail();
 
@@ -711,7 +741,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, (Class<?>) null);
+            JRoutine.on(contextFrom(fragment), (Class<?>) null);
 
             fail();
 
@@ -734,7 +764,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).buildProxy((Class<?>) null);
+            JRoutine.on(contextFrom(fragment), TestClass.class).buildProxy((Class<?>) null);
 
             fail();
 
@@ -744,7 +774,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestClass.class).buildProxy((ClassToken<?>) null);
+            JRoutine.on(contextFrom(fragment), TestClass.class).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -764,7 +794,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Itf itf = JRoutine.onFragment(fragment, Impl.class)
+        final Itf itf = JRoutine.on(contextFrom(fragment), Impl.class)
                                 .invocations()
                                 .withReadTimeout(INFINITY)
                                 .set()
@@ -1019,7 +1049,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final SquareItf squareAsync =
-                JRoutine.onFragment(fragment, Square.class).buildProxy(SquareItf.class);
+                JRoutine.on(contextFrom(fragment), Square.class).buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.compute1(3)).containsExactly(9);
@@ -1050,7 +1080,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                                                   4,
                                                                                                   9);
 
-        final IncItf incItf = JRoutine.onFragment(fragment, Inc.class)
+        final IncItf incItf = JRoutine.on(contextFrom(fragment), Inc.class)
                                       .buildProxy(ClassToken.tokenOf(IncItf.class));
         assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
         assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
@@ -1066,7 +1096,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final ObjectRoutineBuilder builder = JRoutine.onFragment(fragment, TestClass2.class)
+        final ObjectRoutineBuilder builder = JRoutine.on(contextFrom(fragment), TestClass2.class)
                                                      .invocations()
                                                      .withReadTimeout(seconds(10))
                                                      .set();
@@ -1074,9 +1104,9 @@ public class LoaderObjectRoutineFragmentTest
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").callAsync();
+                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").callAsync();
+                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1084,8 +1114,8 @@ public class LoaderObjectRoutineFragmentTest
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").callAsync();
-        getTwo = builder.method("getTwo").callAsync();
+        getOne = builder.method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1102,7 +1132,7 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+        assertThat(JRoutine.on(contextFrom(fragment), TestTimeout.class)
                            .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -1110,12 +1140,12 @@ public class LoaderObjectRoutineFragmentTest
                            .withId(0)
                            .set()
                            .aliasMethod("test")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.onFragment(fragment, TestTimeout.class)
+            JRoutine.on(contextFrom(fragment), TestTimeout.class)
                     .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -1123,7 +1153,7 @@ public class LoaderObjectRoutineFragmentTest
                     .withId(1)
                     .set()
                     .aliasMethod("test")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1132,7 +1162,7 @@ public class LoaderObjectRoutineFragmentTest
 
         }
 
-        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+        assertThat(JRoutine.on(contextFrom(fragment), TestTimeout.class)
                            .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -1140,12 +1170,12 @@ public class LoaderObjectRoutineFragmentTest
                            .withId(2)
                            .set()
                            .method("getInt")
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.onFragment(fragment, TestTimeout.class)
+            JRoutine.on(contextFrom(fragment), TestTimeout.class)
                     .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -1153,7 +1183,7 @@ public class LoaderObjectRoutineFragmentTest
                     .withId(3)
                     .set()
                     .method("getInt")
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1162,7 +1192,7 @@ public class LoaderObjectRoutineFragmentTest
 
         }
 
-        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+        assertThat(JRoutine.on(contextFrom(fragment), TestTimeout.class)
                            .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -1170,12 +1200,12 @@ public class LoaderObjectRoutineFragmentTest
                            .withId(4)
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
-                           .callAsync()
+                           .asyncCall()
                            .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.onFragment(fragment, TestTimeout.class)
+            JRoutine.on(contextFrom(fragment), TestTimeout.class)
                     .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -1183,7 +1213,7 @@ public class LoaderObjectRoutineFragmentTest
                     .withId(5)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
-                    .callAsync()
+                    .asyncCall()
                     .next();
 
             fail();
@@ -1192,7 +1222,7 @@ public class LoaderObjectRoutineFragmentTest
 
         }
 
-        assertThat(JRoutine.onFragment(fragment, TestTimeout.class)
+        assertThat(JRoutine.on(contextFrom(fragment), TestTimeout.class)
                            .invocations()
                            .withReadTimeout(seconds(10))
                            .set()
@@ -1204,7 +1234,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutine.onFragment(fragment, TestTimeout.class)
+            JRoutine.on(contextFrom(fragment), TestTimeout.class)
                     .invocations()
                     .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
                     .set()
@@ -1901,6 +1931,26 @@ public class LoaderObjectRoutineFragmentTest
         public int compute(final int i) {
 
             return i * i;
+        }
+    }
+
+    private static class StringContext extends FactoryContextWrapper {
+
+        /**
+         * Constructor.
+         *
+         * @param base the base context.
+         */
+        public StringContext(final Context base) {
+
+            super(base);
+        }
+
+        @Nullable
+        public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
+                @Nonnull final Object... args) {
+
+            return type.cast("test1");
         }
     }
 

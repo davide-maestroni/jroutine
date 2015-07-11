@@ -57,7 +57,7 @@ public abstract class AbstractContextInvocationFactory<INPUT, OUTPUT>
      */
     protected AbstractContextInvocationFactory(@Nullable final Object... args) {
 
-        mArgs = (args != null) ? args : Reflection.NO_ARGS;
+        mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
     }
 
     @Override

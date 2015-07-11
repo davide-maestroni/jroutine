@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
+import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 import static com.gh.bmd.jrt.util.TimeDuration.nanos;
 
@@ -32,6 +33,8 @@ import static com.gh.bmd.jrt.util.TimeDuration.nanos;
  * Created by davide-maestroni on 9/18/14.
  */
 class LocalQueue {
+
+    private static final EmptyExecution EMPTY_EXECUTION = new EmptyExecution();
 
     private static final int INITIAL_CAPACITY = 10;
 
@@ -57,6 +60,16 @@ class LocalQueue {
         mExecutionTimeNs = new long[INITIAL_CAPACITY];
         mExecutions = new Execution[INITIAL_CAPACITY];
         mDelays = new TimeDuration[INITIAL_CAPACITY];
+    }
+
+    /**
+     * Cancels the specified execution if not already run.
+     *
+     * @param execution the execution.
+     */
+    public static void cancel(@Nonnull final Execution execution) {
+
+        sQueue.get().removeExecution(execution);
     }
 
     /**
@@ -159,6 +172,28 @@ class LocalQueue {
         final int shift = newSize - size;
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;
+    }
+
+    private void removeExecution(final Execution execution) {
+
+        final Execution[] executions = mExecutions;
+        final int length = executions.length;
+        final int last = mLast;
+        int i = mFirst;
+
+        while (i != last) {
+
+            if (executions[i] == execution) {
+
+                executions[i] = EMPTY_EXECUTION;
+                mDelays[i] = ZERO;
+            }
+
+            if (++i >= length) {
+
+                i = 0;
+            }
+        }
     }
 
     private void run() {
@@ -272,6 +307,16 @@ class LocalQueue {
         } finally {
 
             mIsRunning = false;
+        }
+    }
+
+    /**
+     * Empty execution implementation.
+     */
+    private static class EmptyExecution extends TemplateExecution {
+
+        public void run() {
+
         }
     }
 

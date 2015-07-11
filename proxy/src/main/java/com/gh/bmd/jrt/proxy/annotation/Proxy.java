@@ -25,11 +25,13 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.gh.bmd.jrt.annotation.Alias}, {@link com.gh.bmd.jrt.annotation.Input},
- * {@link com.gh.bmd.jrt.annotation.Inputs}, {@link com.gh.bmd.jrt.annotation.Output},
- * {@link com.gh.bmd.jrt.annotation.Priority}, , {@link com.gh.bmd.jrt.annotation.ShareGroup},
- * {@link com.gh.bmd.jrt.annotation.Timeout} and {@link com.gh.bmd.jrt.annotation.TimeoutAction}
- * annotations defined for each interface method.
+ * {@link com.gh.bmd.jrt.annotation.Alias Alias}, {@link com.gh.bmd.jrt.annotation.Input Input},
+ * {@link com.gh.bmd.jrt.annotation.Inputs Inputs}, {@link com.gh.bmd.jrt.annotation.Output Output},
+ * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+ * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+ * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+ * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} annotations defined for each
+ * interface method.
  * <p/>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
  * proxy interface must declare the same generic types as the wrapped class or interface.

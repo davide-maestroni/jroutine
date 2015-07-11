@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Processor annotation definitions, specific to the Android platform.
+ * Proxy annotation definitions, specific to the Android platform.
  * <p/>
  * Created by davide-maestroni on 5/14/15.
  */

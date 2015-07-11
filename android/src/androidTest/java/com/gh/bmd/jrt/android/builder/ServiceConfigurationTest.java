@@ -17,11 +17,9 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration.Builder;
-import com.gh.bmd.jrt.android.core.TestService;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
 import com.gh.bmd.jrt.android.runner.Runners;
-import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.log.SystemLog;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
@@ -41,7 +39,6 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         final ServiceConfiguration configuration =
                 builder().withResultLooper(Looper.getMainLooper())
-                         .withServiceClass(TestService.class)
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .set();
@@ -78,7 +75,6 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         final ServiceConfiguration configuration =
                 builder().withResultLooper(Looper.getMainLooper())
-                         .withServiceClass(TestService.class)
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .set();
@@ -115,7 +111,6 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         final ServiceConfiguration configuration =
                 builder().withResultLooper(Looper.getMainLooper())
-                         .withServiceClass(TestService.class)
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .set();
@@ -128,7 +123,6 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         final ServiceConfiguration configuration =
                 builder().withResultLooper(Looper.getMainLooper())
-                         .withServiceClass(TestService.class)
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .set();
@@ -141,27 +135,12 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         final ServiceConfiguration configuration =
                 builder().withResultLooper(Looper.getMainLooper())
-                         .withServiceClass(TestService.class)
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .set();
         assertThat(configuration).isNotEqualTo(builder().withRunnerClass(TestRunner.class).set());
         assertThat(builder().withRunnerClass(TestRunner.class).set()).isNotEqualTo(
                 builder().withRunnerClass(MainRunner.class).set());
-    }
-
-    public void testServiceClassEquals() {
-
-        final ServiceConfiguration configuration =
-                builder().withResultLooper(Looper.getMainLooper())
-                         .withServiceClass(TestService.class)
-                         .withRunnerClass(MainRunner.class)
-                         .withLogClass(AndroidLog.class)
-                         .set();
-        assertThat(configuration).isNotEqualTo(
-                builder().withServiceClass(RoutineService.class).set());
-        assertThat(builder().withServiceClass(RoutineService.class).set()).isNotEqualTo(
-                builder().withServiceClass(TestService.class).set());
     }
 
     public static class TestRunner extends RunnerDecorator {

@@ -13,9 +13,8 @@
  */
 package com.gh.bmd.jrt.android.proxy.core;
 
-import android.content.Context;
-
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
+import com.gh.bmd.jrt.android.core.ServiceContext;
 import com.gh.bmd.jrt.android.proxy.annotation.ServiceProxy;
 import com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
@@ -25,7 +24,6 @@ import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
@@ -43,7 +41,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         ProxyConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
 
-    private final WeakReference<Context> mContextReference;
+    private final ServiceContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -59,12 +57,12 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     /**
      * Constructor.
      *
-     * @param context     the invocation context.
+     * @param context     the service context.
      * @param targetClass the target class.
      * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceProxyRoutineBuilder(@Nonnull final Context context,
+    DefaultServiceProxyRoutineBuilder(@Nonnull final ServiceContext context,
             @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
         if (context == null) {
@@ -78,7 +76,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         }
 
         mTargetClass = targetClass;
-        mContextReference = new WeakReference<Context>(context);
+        mContext = context;
         mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
     }
 
@@ -106,15 +104,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                             + ": " + itfClass.getName());
         }
 
-        final Object context = mContextReference.get();
-
-        if (context == null) {
-
-            throw new IllegalStateException("the context object has been destroyed");
-        }
-
         final ObjectServiceProxyBuilder<TYPE> builder =
-                new ObjectServiceProxyBuilder<TYPE>(context, mTargetClass, mFactoryArgs, itf);
+                new ObjectServiceProxyBuilder<TYPE>(mContext, mTargetClass, mFactoryArgs, itf);
         return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
@@ -197,7 +188,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      */
     private static class ObjectServiceProxyBuilder<TYPE> extends AbstractServiceProxyBuilder<TYPE> {
 
-        private final Object mContext;
+        private final ServiceContext mContext;
 
         private final Object[] mFactoryArgs;
 
@@ -208,12 +199,12 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param context        the invocation context.
+         * @param context        the service context.
          * @param targetClass    the proxy target class.
          * @param factoryArgs    the object factory arguments.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectServiceProxyBuilder(@Nonnull final Object context,
+        private ObjectServiceProxyBuilder(@Nonnull final ServiceContext context,
                 @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
@@ -245,7 +236,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
             try {
 
-                final Object context = mContext;
+                final ServiceContext context = mContext;
                 final Class<?> targetClass = mTargetClass;
                 final Object[] factoryArgs = mFactoryArgs;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();

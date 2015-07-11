@@ -1363,7 +1363,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mAbortException = reason;
         }
 
-        @Override
         public void run() {
 
             final Throwable abortException;
@@ -1402,7 +1401,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mQueue = queue;
         }
 
-        @Override
         public void run() {
 
             final boolean needsFlush;
@@ -1441,7 +1439,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mOutput = output;
         }
 
-        @Override
         public void run() {
 
             final boolean needsFlush;

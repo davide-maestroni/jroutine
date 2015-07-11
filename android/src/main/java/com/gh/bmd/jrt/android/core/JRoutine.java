@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.android.core;
 
-import android.content.Context;
-
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
@@ -55,7 +53,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             setContentView(R.layout.my_activity_layout);
  *
  *             final Routine&lt;URI, MyResource&gt; routine =
- *                     JRoutine.onService(this, ClassToken.tokenOf(LoadResourceUri.class))
+ *                     JRoutine.on(serviceFrom(this), tokenOf(LoadResourceUri.class))
  *                             .buildRoutine();
  *             routine.asyncCall(RESOURCE_URI)
  *                    .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -94,15 +92,15 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the routine context.
+     * @param context     the service context.
      * @param targetClass the wrapped object class.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ServiceObjectRoutineBuilder onService(@Nonnull final Context context,
+    public static ServiceObjectRoutineBuilder on(@Nonnull final ServiceContext context,
             @Nonnull final Class<?> targetClass) {
 
-        return onService(context, targetClass, (Object[]) null);
+        return on(context, targetClass, (Object[]) null);
     }
 
     /**
@@ -117,13 +115,13 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the routine context.
+     * @param context     the service context.
      * @param targetClass the wrapped object class.
      * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ServiceObjectRoutineBuilder onService(@Nonnull final Context context,
+    public static ServiceObjectRoutineBuilder on(@Nonnull final ServiceContext context,
             @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
 
         return new DefaultServiceObjectRoutineBuilder(context, targetClass, factoryArgs);
@@ -140,18 +138,18 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context    the routine context.
+     * @param context    the service context.
      * @param classToken the invocation class token.
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> onService(
-            @Nonnull final Context context,
+    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final ServiceContext context,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
 
-        return onService(context, classToken, (Object[]) null);
+        return on(context, classToken, (Object[]) null);
     }
 
     /**
@@ -165,7 +163,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the routine context.
+     * @param context     the service context.
      * @param classToken  the invocation class token.
      * @param factoryArgs the invocation factory arguments.
      * @param <INPUT>     the input data type.
@@ -173,8 +171,8 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> onService(
-            @Nonnull final Context context,
+    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final ServiceContext context,
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken,
             @Nullable final Object... factoryArgs) {
 

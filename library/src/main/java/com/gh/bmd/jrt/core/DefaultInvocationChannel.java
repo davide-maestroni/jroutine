@@ -419,7 +419,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mAbortException = reason;
         }
 
-        @Override
         public void run() {
 
             mResultChanel.close(mAbortException);
@@ -610,7 +609,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mAbortException = reason;
         }
 
-        @Override
         public void run() {
 
             final Execution execution;
@@ -649,7 +647,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mInput = input;
         }
 
-        @Override
         public void run() {
 
             final Execution execution;
@@ -688,7 +685,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mQueue = queue;
         }
 
-        @Override
         public void run() {
 
             final Execution execution;
@@ -1360,7 +1356,6 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             throw exception();
         }
 
-
         @Override
         boolean isChannelOpen() {
 
@@ -1506,7 +1501,5 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             mSubLogger.wrn("avoiding aborting consumer since channel is closed");
             return null;
         }
-
-
     }
 }

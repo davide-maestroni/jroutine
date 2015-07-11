@@ -31,33 +31,27 @@ public abstract class ProcedureInvocation<OUTPUT>
         implements Invocation<Void, OUTPUT>, InvocationFactory<Void, OUTPUT> {
 
     @Nonnull
-    @Override
     public final Invocation<Void, OUTPUT> newInvocation() {
 
         return this;
     }
 
-    @Override
     public final void onAbort(@Nullable final Throwable reason) {
 
     }
 
-    @Override
     public final void onDestroy() {
 
     }
 
-    @Override
     public final void onInitialize() {
 
     }
 
-    @Override
     public final void onInput(final Void input, @Nonnull final ResultChannel<OUTPUT> result) {
 
     }
 
-    @Override
     public final void onTerminate() {
 
     }

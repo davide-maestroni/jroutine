@@ -13,8 +13,7 @@
  */
 package com.gh.bmd.jrt.android.proxy.core;
 
-import android.content.Context;
-
+import com.gh.bmd.jrt.android.core.ServiceContext;
 import com.gh.bmd.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
@@ -66,13 +65,13 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
      * will result in a deadlock.<br/>
      * By default, output results are dispatched in the main looper.
      *
-     * @param context     the invocation context.
+     * @param context     the service context.
      * @param target      the wrapped object class.
      * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ServiceProxyRoutineBuilder onService(@Nonnull final Context context,
+    public static ServiceProxyRoutineBuilder on(@Nonnull final ServiceContext context,
             @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
         return new DefaultServiceProxyRoutineBuilder(context, target, factoryArgs);

@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.android.builder;
 
 import android.os.Looper;
 
-import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.util.Reflection;
@@ -46,23 +45,18 @@ public final class ServiceConfiguration {
 
     private final Class<? extends Runner> mRunnerClass;
 
-    private final Class<? extends RoutineService> mServiceClass;
-
     /**
      * Constructor.
      *
-     * @param looper       the looper instance.
-     * @param serviceClass the service class.
-     * @param runnerClass  the runner class.
-     * @param logClass     the log class.
+     * @param looper      the looper instance.
+     * @param runnerClass the runner class.
+     * @param logClass    the log class.
      */
     private ServiceConfiguration(@Nullable final Looper looper,
-            @Nullable final Class<? extends RoutineService> serviceClass,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
         mLooper = looper;
-        mServiceClass = serviceClass;
         mRunnerClass = runnerClass;
         mLogClass = logClass;
     }
@@ -121,8 +115,7 @@ public final class ServiceConfiguration {
         return !(mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null)
                 && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) && !(
                 mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
-                        : that.mRunnerClass != null) && !(mServiceClass != null
-                ? !mServiceClass.equals(that.mServiceClass) : that.mServiceClass != null);
+                        : that.mRunnerClass != null);
 
     }
 
@@ -133,7 +126,6 @@ public final class ServiceConfiguration {
         int result = mLogClass != null ? mLogClass.hashCode() : 0;
         result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
         result = 31 * result + (mRunnerClass != null ? mRunnerClass.hashCode() : 0);
-        result = 31 * result + (mServiceClass != null ? mServiceClass.hashCode() : 0);
         return result;
     }
 
@@ -144,7 +136,6 @@ public final class ServiceConfiguration {
                 "mLogClass=" + mLogClass +
                 ", mLooper=" + mLooper +
                 ", mRunnerClass=" + mRunnerClass +
-                ", mServiceClass=" + mServiceClass +
                 '}';
     }
 
@@ -186,19 +177,6 @@ public final class ServiceConfiguration {
     }
 
     /**
-     * Returns the service class (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the service class instance.
-     */
-    public Class<? extends RoutineService> getServiceClassOr(
-            @Nullable final Class<? extends RoutineService> valueIfNotSet) {
-
-        final Class<? extends RoutineService> serviceClass = mServiceClass;
-        return (serviceClass != null) ? serviceClass : valueIfNotSet;
-    }
-
-    /**
      * Interface defining a configurable object.
      *
      * @param <TYPE> the configurable object type.
@@ -229,8 +207,6 @@ public final class ServiceConfiguration {
         private Looper mLooper;
 
         private Class<? extends Runner> mRunnerClass;
-
-        private Class<? extends RoutineService> mServiceClass;
 
         /**
          * Constructor.
@@ -300,13 +276,6 @@ public final class ServiceConfiguration {
             if (looper != null) {
 
                 withResultLooper(looper);
-            }
-
-            final Class<? extends RoutineService> serviceClass = configuration.mServiceClass;
-
-            if (serviceClass != null) {
-
-                withServiceClass(serviceClass);
             }
 
             final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
@@ -382,31 +351,15 @@ public final class ServiceConfiguration {
             return this;
         }
 
-        /**
-         * Sets the class of the service executing the built routine. A null value means that it is
-         * up to the framework to choose the default service class.
-         *
-         * @param serviceClass the service class.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> withServiceClass(
-                @Nullable final Class<? extends RoutineService> serviceClass) {
-
-            mServiceClass = serviceClass;
-            return this;
-        }
-
         @Nonnull
         private ServiceConfiguration buildConfiguration() {
 
-            return new ServiceConfiguration(mLooper, mServiceClass, mRunnerClass, mLogClass);
+            return new ServiceConfiguration(mLooper, mRunnerClass, mLogClass);
         }
 
         private void setConfiguration(@Nonnull final ServiceConfiguration configuration) {
 
             mLooper = configuration.mLooper;
-            mServiceClass = configuration.mServiceClass;
             mRunnerClass = configuration.mRunnerClass;
             mLogClass = configuration.mLogClass;
         }

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Processor core interfaces and implementations.
+ * Routine proxy core interfaces and implementations.
  * <p/>
  * Created by davide-maestroni on 3/24/14.
  */

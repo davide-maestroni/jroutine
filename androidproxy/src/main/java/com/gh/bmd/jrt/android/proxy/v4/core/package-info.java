@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Processor core interfaces and implementations bound to an Android context, with support for
+ * Routine proxy core interfaces and implementations bound to an Android context, with support for
  * Android compatibility library.
  * <p/>
  * Created by davide-maestroni on 5/10/15.

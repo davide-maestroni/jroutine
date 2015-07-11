@@ -74,7 +74,7 @@ import static java.util.UUID.randomUUID;
  */
 class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
-    private final Context mContext;
+    private final ServiceContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -91,26 +91,27 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     /**
      * Constructor.
      *
-     * @param context                 the routine context.
+     * @param context                 the service context.
      * @param invocationClass         the invocation class.
      * @param factoryArgs             the invocation factory arguments.
      * @param invocationConfiguration the invocation configuration.
      * @param serviceConfiguration    the service configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
-    ServiceRoutine(@Nonnull final Context context,
+    ServiceRoutine(@Nonnull final ServiceContext context,
             @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
             @Nullable final Object[] factoryArgs,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
-        mContext = context.getApplicationContext();
+        mContext = context;
         mInvocationClass = invocationClass;
         mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
-        mRoutine = JRoutine.on(factoryFrom(mContext, factoryOf(invocationClass, factoryArgs)))
+        mRoutine = JRoutine.on(
+                factoryFrom(context.getRoutineContext(), factoryOf(invocationClass, factoryArgs)))
                            .invocations()
                            .with(invocationConfiguration)
                            .set()
@@ -156,7 +157,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      */
     private static class ServiceChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT, OUTPUT> {
 
-        private final Context mContext;
+        private final ServiceContext mContext;
 
         private final Object[] mFactoryArgs;
 
@@ -171,8 +172,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         private final Logger mLogger;
 
         private final Object mMutex = new Object();
-
-        private final Class<? extends RoutineService> mServiceClass;
 
         private final ServiceConfiguration mServiceConfiguration;
 
@@ -205,7 +204,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          * @param serviceConfiguration    the service configuration.
          * @param logger                  the routine logger.
          */
-        private ServiceChannel(boolean isParallel, @Nonnull final Context context,
+        private ServiceChannel(boolean isParallel, @Nonnull final ServiceContext context,
                 @Nonnull Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
                 @Nonnull final Object[] factoryArgs,
                 @Nonnull final InvocationConfiguration invocationConfiguration,
@@ -215,7 +214,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mUUID = randomUUID().toString();
             mIsParallel = isParallel;
             mContext = context;
-            mServiceClass = serviceConfiguration.getServiceClassOr(RoutineService.class);
             mInMessenger = new Messenger(new IncomingHandler(
                     serviceConfiguration.getResultLooperOr(Looper.getMainLooper())));
             mInvocationClass = invocationClass;
@@ -372,16 +370,18 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                     return;
                 }
 
-                final Context context = mContext;
+                final ServiceContext context = mContext;
+                final Intent intent = context.getServiceIntent();
                 mConnection = new RoutineServiceConnection();
-                mIsBound = context.bindService(new Intent(context, mServiceClass), mConnection,
-                                               Context.BIND_AUTO_CREATE);
+                mIsBound = context.getRoutineContext()
+                                  .bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
                 if (!mIsBound) {
 
-                    throw new RoutineException(
-                            "failed to bind to service: " + mServiceClass.getName()
-                                    + ", remember to add it to the Android manifest file!");
+                    throw new RoutineException("failed to bind to service: " + intent
+                                                       + ", remember to add the service "
+                                                       + "declaration to the Android manifest "
+                                                       + "file!");
                 }
             }
         }
@@ -402,7 +402,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     public void run() {
 
-                        mContext.unbindService(mConnection);
+                        mContext.getRoutineContext().unbindService(mConnection);
                     }
                 });
             }

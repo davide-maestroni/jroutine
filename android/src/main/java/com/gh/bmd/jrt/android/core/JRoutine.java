@@ -92,7 +92,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the routine context.
+     * @param context     the service context.
      * @param targetClass the wrapped object class.
      * @return the routine builder instance.
      */
@@ -115,7 +115,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the routine context.
+     * @param context     the service context.
      * @param targetClass the wrapped object class.
      * @param factoryArgs the object factory arguments.
      * @return the routine builder instance.
@@ -138,7 +138,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context    the routine context.
+     * @param context    the service context.
      * @param classToken the invocation class token.
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
@@ -163,7 +163,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the routine context.
+     * @param context     the service context.
      * @param classToken  the invocation class token.
      * @param factoryArgs the invocation factory arguments.
      * @param <INPUT>     the input data type.

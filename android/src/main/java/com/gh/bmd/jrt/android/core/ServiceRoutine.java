@@ -104,14 +104,21 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
+        final Context serviceContext = context.getServiceContext();
+
+        if (serviceContext == null) {
+
+            throw new IllegalStateException("the service context has been destroyed");
+        }
+
         mContext = context;
         mInvocationClass = invocationClass;
         mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
-        mRoutine = JRoutine.on(
-                factoryFrom(context.getRoutineContext(), factoryOf(invocationClass, factoryArgs)))
+        mRoutine = JRoutine.on(factoryFrom(serviceContext.getApplicationContext(),
+                                           factoryOf(invocationClass, factoryArgs)))
                            .invocations()
                            .with(invocationConfiguration)
                            .set()
@@ -371,10 +378,17 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
 
                 final ServiceContext context = mContext;
+                final Context serviceContext = context.getServiceContext();
+
+                if (serviceContext == null) {
+
+                    throw new IllegalStateException("the service context has been destroyed");
+                }
+
                 final Intent intent = context.getServiceIntent();
                 mConnection = new RoutineServiceConnection();
-                mIsBound = context.getRoutineContext()
-                                  .bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                mIsBound =
+                        serviceContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
                 if (!mIsBound) {
 
@@ -402,7 +416,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     public void run() {
 
-                        mContext.getRoutineContext().unbindService(mConnection);
+                        final Context serviceContext = mContext.getServiceContext();
+
+                        if (serviceContext != null) {
+
+                            serviceContext.unbindService(mConnection);
+                        }
                     }
                 });
             }

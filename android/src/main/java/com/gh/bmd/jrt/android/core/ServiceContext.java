@@ -18,7 +18,10 @@ import android.content.Intent;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
 
+import java.lang.ref.WeakReference;
+
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Class representing an Android service context.
@@ -79,12 +82,12 @@ public abstract class ServiceContext {
     }
 
     /**
-     * Returns the routine context.
+     * Returns the service context.
      *
      * @return the context.
      */
-    @Nonnull
-    public abstract Context getRoutineContext();
+    @Nullable
+    public abstract Context getServiceContext();
 
     /**
      * Returns the service intent.
@@ -99,7 +102,7 @@ public abstract class ServiceContext {
      */
     private static class IntentServiceContext extends ServiceContext {
 
-        private final Context mContext;
+        private final WeakReference<Context> mContext;
 
         private final Intent mIntent;
 
@@ -113,20 +116,25 @@ public abstract class ServiceContext {
         private IntentServiceContext(@Nonnull final Context context,
                 @Nonnull final Intent service) {
 
+            if (context == null) {
+
+                throw new NullPointerException("the service context must not be null");
+            }
+
             if (service == null) {
 
                 throw new NullPointerException("the service intent must not be null");
             }
 
-            mContext = context.getApplicationContext();
+            mContext = new WeakReference<Context>(context);
             mIntent = service;
         }
 
-        @Nonnull
+        @Nullable
         @Override
-        public Context getRoutineContext() {
+        public Context getServiceContext() {
 
-            return mContext;
+            return mContext.get();
         }
 
         @Nonnull

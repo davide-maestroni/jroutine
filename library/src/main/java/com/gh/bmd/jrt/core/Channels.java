@@ -873,6 +873,7 @@ public class Channels {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onOutput(final List<?> inputs) {
 
             final int inputSize = inputs.size();
@@ -888,7 +889,7 @@ public class Channels {
 
             for (int i = 0; i < size; i++) {
 
-                final InputChannel<?> channel = channels.get(i);
+                final InputChannel<Object> channel = (InputChannel<Object>) channels.get(i);
 
                 if (i < inputSize) {
 
@@ -1221,6 +1222,7 @@ public class Channels {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onOutput(final Selectable<?> selectable) {
 
             final int index = selectable.index - mStartIndex;
@@ -1230,7 +1232,8 @@ public class Channels {
                 return;
             }
 
-            final InputChannel<?> inputChannel = mChannelList.get(index);
+            final InputChannel<Object> inputChannel =
+                    (InputChannel<Object>) mChannelList.get(index);
 
             if (inputChannel != null) {
 
@@ -1267,9 +1270,11 @@ public class Channels {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onOutput(final Selectable<?> selectable) {
 
-            final InputChannel<?> inputChannel = mChannelMap.get(selectable.index);
+            final InputChannel<Object> inputChannel =
+                    (InputChannel<Object>) mChannelMap.get(selectable.index);
 
             if (inputChannel != null) {
 

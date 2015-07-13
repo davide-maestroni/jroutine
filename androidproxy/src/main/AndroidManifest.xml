@@ -1,5 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gh.bmd.jrt.android.proxy">
-
-    <application android:label="@string/lib_name"/>
-</manifest>
+<manifest package="com.gh.bmd.jrt.android.proxy"/>

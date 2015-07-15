@@ -20,8 +20,6 @@ import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
@@ -60,9 +58,9 @@ public class TransportChannelTest {
         final InvocationChannel<String, String> invocationChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke();
         final OutputChannel<String> outputChannel =
-                transportChannel.output().passTo(invocationChannel).result();
+                transportChannel.passTo(invocationChannel).result();
 
-        transportChannel.input().abort(new IllegalStateException());
+        transportChannel.abort(new IllegalStateException());
 
         try {
 
@@ -80,20 +78,19 @@ public class TransportChannelTest {
     public void testAbortDelay() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.days(1)).pass("test").close();
+        transportChannel.after(TimeDuration.days(1)).pass("test");
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
         final ArrayList<String> results = new ArrayList<String>();
-        output.afterMax(10, TimeUnit.MILLISECONDS).allInto(results);
+        transportChannel.afterMax(10, TimeUnit.MILLISECONDS).allInto(results);
         assertThat(results).isEmpty();
-        assertThat(output.immediately().eventuallyExit().checkComplete()).isFalse();
-        assertThat(output.abort()).isTrue();
+        assertThat(transportChannel.immediately().eventuallyExit().checkComplete()).isFalse();
+        assertThat(transportChannel.now().abort()).isTrue();
 
         try {
 
-            output.next();
+            transportChannel.next();
 
             fail();
 
@@ -101,23 +98,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.isOpen()).isFalse();
+        assertThat(transportChannel.isOpen()).isFalse();
     }
 
     @Test
     public void testAllIntoTimeout() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyAbort().eventuallyDeadlock();
+        transportChannel.eventuallyAbort().eventuallyDeadlock();
 
         try {
 
-            output.allInto(new ArrayList<String>());
+            transportChannel.allInto(new ArrayList<String>());
 
             fail();
 
@@ -125,23 +121,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testAllIntoTimeout2() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
-            output.allInto(new ArrayList<String>());
+            transportChannel.allInto(new ArrayList<String>());
 
             fail();
 
@@ -149,23 +144,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testAllTimeout() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock();
+        transportChannel.eventuallyDeadlock();
 
         try {
 
-            output.all();
+            transportChannel.all();
 
             fail();
 
@@ -173,23 +167,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testAllTimeout2() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
-            output.all();
+            transportChannel.all();
 
             fail();
 
@@ -197,7 +190,7 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
@@ -219,14 +212,13 @@ public class TransportChannelTest {
 
                 } finally {
 
-                    transportChannel.input().pass("test").close();
+                    transportChannel.pass("test").close();
                 }
             }
         }.start();
 
         final OutputChannel<String> outputChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .asyncCall(transportChannel.output());
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(transportChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
     }
@@ -247,8 +239,7 @@ public class TransportChannelTest {
             @Override
             public void run() {
 
-                transportChannel1.input()
-                                 .after(1, TimeUnit.MILLISECONDS)
+                transportChannel1.after(1, TimeUnit.MILLISECONDS)
                                  .after(TimeDuration.millis(200))
                                  .pass("test1", "test2")
                                  .pass(Collections.singleton("test3"))
@@ -257,8 +248,7 @@ public class TransportChannelTest {
         }.start();
 
         final OutputChannel<String> outputChannel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .asyncCall(transportChannel1.output());
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(transportChannel1);
         assertThat(outputChannel1.afterMax(timeout).all()).containsExactly("test1", "test2",
                                                                            "test3");
     }
@@ -282,16 +272,15 @@ public class TransportChannelTest {
     public void testHasNextIteratorTimeout() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock();
+        transportChannel.eventuallyDeadlock();
 
         try {
 
-            output.iterator().hasNext();
+            transportChannel.iterator().hasNext();
 
             fail();
 
@@ -299,23 +288,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testHasNextIteratorTimeout2() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
-            output.iterator().hasNext();
+            transportChannel.iterator().hasNext();
 
             fail();
 
@@ -323,23 +311,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testNextIteratorTimeout() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock();
+        transportChannel.eventuallyDeadlock();
 
         try {
 
-            output.iterator().next();
+            transportChannel.iterator().next();
 
             fail();
 
@@ -347,23 +334,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testNextIteratorTimeout2() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
-            output.iterator().next();
+            transportChannel.iterator().next();
 
             fail();
 
@@ -371,23 +357,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testNextTimeout() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock();
+        transportChannel.eventuallyDeadlock();
 
         try {
 
-            output.next();
+            transportChannel.next();
 
             fail();
 
@@ -395,23 +380,22 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
     public void testNextTimeout2() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        transportChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TransportOutput<String> output = transportChannel.output();
-        assertThat(output.immediately().eventuallyExit().all()).isEmpty();
+        assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
-            output.next();
+            transportChannel.next();
 
             fail();
 
@@ -419,7 +403,7 @@ public class TransportChannelTest {
 
         }
 
-        assertThat(output.checkComplete()).isFalse();
+        assertThat(transportChannel.checkComplete()).isFalse();
     }
 
     @Test
@@ -438,21 +422,17 @@ public class TransportChannelTest {
                                                          .withLog(new NullLog())
                                                          .set()
                                                          .buildChannel();
-        channel.input().pass(-77L);
-        assertThat(channel.output().afterMax(timeout).next()).isEqualTo(-77L);
+        channel.pass(-77L);
+        assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
 
         final TransportChannel<Object> transportChannel1 = JRoutine.transport().buildChannel();
-        final TransportInput<Object> input1 = transportChannel1.input();
-
-        input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(transportChannel1.output().afterMax(timeout).all()).containsOnly(23, -77L);
+        transportChannel1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(transportChannel1.afterMax(timeout).all()).containsOnly(23, -77L);
 
         final TransportChannel<Object> transportChannel2 = JRoutine.transport().buildChannel();
-        final TransportInput<Object> input2 =
-                transportChannel2.input().orderByDelay().orderByDelay().orderByCall();
-
-        input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(transportChannel2.output().afterMax(timeout).all()).containsExactly(23, -77L);
+        transportChannel2.orderByDelay().orderByDelay().orderByCall();
+        transportChannel2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(transportChannel2.afterMax(timeout).all()).containsExactly(23, -77L);
     }
 
     @Test
@@ -465,7 +445,7 @@ public class TransportChannelTest {
             @Override
             public void run() {
 
-                transportChannel.input().pass("test");
+                transportChannel.pass("test");
             }
         }.start();
 
@@ -473,15 +453,15 @@ public class TransportChannelTest {
 
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .asyncCall(transportChannel.output())
+                        .asyncCall(transportChannel)
                         .eventuallyExit();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).all()).containsExactly("test");
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         assertThat(outputChannel.immediately().checkComplete()).isFalse();
-        transportChannel.input().close();
-        assertThat(transportChannel.input().isOpen()).isFalse();
+        transportChannel.close();
+        assertThat(transportChannel.isOpen()).isFalse();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).checkComplete()).isTrue();
     }
 
@@ -494,8 +474,7 @@ public class TransportChannelTest {
         new WeakThread(transportChannel).start();
 
         final OutputChannel<String> outputChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .asyncCall(transportChannel.output());
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(transportChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
     }
 
@@ -510,7 +489,7 @@ public class TransportChannelTest {
                                                           .set()
                                                           .buildChannel();
 
-        assertThat(channel1.output().all()).isEmpty();
+        assertThat(channel1.all()).isEmpty();
     }
 
     @Test
@@ -526,7 +505,7 @@ public class TransportChannelTest {
 
         try {
 
-            channel2.output().all();
+            channel2.all();
 
             fail();
 
@@ -548,7 +527,7 @@ public class TransportChannelTest {
 
         try {
 
-            channel3.output().all();
+            channel3.all();
 
             fail();
 
@@ -624,7 +603,7 @@ public class TransportChannelTest {
 
                 if (transportChannel != null) {
 
-                    transportChannel.input().pass("test");
+                    transportChannel.pass("test");
                 }
             }
         }

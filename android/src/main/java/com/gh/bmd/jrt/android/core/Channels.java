@@ -21,7 +21,6 @@ import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.core.JRoutine;
 
 import java.util.Collection;
@@ -153,18 +152,17 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final TransportChannel<ParcelableSelectable<OUTPUT>> transport =
+        final TransportChannel<ParcelableSelectable<OUTPUT>> transportChannel =
                 JRoutine.transport().buildChannel();
-        final TransportInput<ParcelableSelectable<OUTPUT>> input = transport.input();
         int i = startIndex;
 
         for (final OutputChannel<? extends OUTPUT> channel : channels) {
 
-            input.pass(toSelectable(channel, i++));
+            transportChannel.pass(toSelectable(channel, i++));
         }
 
-        input.close();
-        return transport.output();
+        transportChannel.close();
+        return transportChannel;
     }
 
     /**
@@ -186,18 +184,17 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final TransportChannel<ParcelableSelectable<Object>> transport =
+        final TransportChannel<ParcelableSelectable<Object>> transportChannel =
                 JRoutine.transport().buildChannel();
-        final TransportInput<ParcelableSelectable<Object>> input = transport.input();
         int i = startIndex;
 
         for (final OutputChannel<?> channel : channels) {
 
-            input.pass(toSelectable(channel, i++));
+            transportChannel.pass(toSelectable(channel, i++));
         }
 
-        input.close();
-        return transport.output();
+        transportChannel.close();
+        return transportChannel;
     }
 
     /**
@@ -239,17 +236,16 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final TransportChannel<ParcelableSelectable<OUTPUT>> transport =
+        final TransportChannel<ParcelableSelectable<OUTPUT>> transportChannel =
                 JRoutine.transport().buildChannel();
-        final TransportInput<ParcelableSelectable<OUTPUT>> input = transport.input();
 
         for (int i = 0; i < size; i++) {
 
-            input.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
+            transportChannel.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
         }
 
-        input.close();
-        return transport.output();
+        transportChannel.close();
+        return transportChannel;
     }
 
     /**
@@ -282,14 +278,14 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             @Nullable final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
 
-        final TransportChannel<INPUT> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<INPUT> transportChannel = JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            transport.output().passTo(new SelectableInputConsumer<DATA, INPUT>(channel, index));
+            transportChannel.passTo(new SelectableInputConsumer<DATA, INPUT>(channel, index));
         }
 
-        return transport.input();
+        return transportChannel;
     }
 
     /**
@@ -307,15 +303,15 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
     public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> toSelectable(
             @Nullable final OutputChannel<? extends OUTPUT> channel, final int index) {
 
-        final TransportChannel<ParcelableSelectable<OUTPUT>> transport =
+        final TransportChannel<ParcelableSelectable<OUTPUT>> transportChannel =
                 JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            channel.passTo(new SelectableOutputConsumer<OUTPUT>(transport.input(), index));
+            channel.passTo(new SelectableOutputConsumer<OUTPUT>(transportChannel, index));
         }
 
-        return transport.output();
+        return transportChannel;
     }
 
     /**
@@ -428,7 +424,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
 
         private final int mIndex;
 
-        private final TransportInput<ParcelableSelectable<OUTPUT>> mInputChannel;
+        private final TransportChannel<ParcelableSelectable<OUTPUT>> mInputChannel;
 
         /**
          * Constructor.
@@ -437,7 +433,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
          * @param index        the selectable index.
          */
         private SelectableOutputConsumer(
-                @Nonnull final TransportInput<ParcelableSelectable<OUTPUT>> inputChannel,
+                @Nonnull final TransportChannel<ParcelableSelectable<OUTPUT>> inputChannel,
                 final int index) {
 
             mInputChannel = inputChannel;

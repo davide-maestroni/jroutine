@@ -22,7 +22,6 @@ import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.TemplateExecution;
 
@@ -82,10 +81,9 @@ class DefaultLoaderChannelBuilder
         if (component == null) {
 
             final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
-            final TransportInput<OUTPUT> inputChannel = transportChannel.input();
-            inputChannel.abort(new MissingInvocationException(loaderId));
-            inputChannel.close();
-            return transportChannel.output();
+            transportChannel.abort(new MissingInvocationException(loaderId));
+            transportChannel.close();
+            return transportChannel;
         }
 
         final LoaderRoutineBuilder<Void, OUTPUT> builder =

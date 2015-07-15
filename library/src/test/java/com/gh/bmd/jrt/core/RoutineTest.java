@@ -1513,7 +1513,7 @@ public class RoutineTest {
                            .all()).containsExactly("test1", "test2");
 
         final TransportChannel<Object> channel = JRoutine.transport().buildChannel();
-        channel.input().pass("test2").close();
+        channel.pass("test2").close();
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .invocations()
                            .withInputOrder(OrderType.BY_CALL)
@@ -1525,7 +1525,7 @@ public class RoutineTest {
                            .after(millis(100))
                            .pass("test1")
                            .now()
-                           .pass(channel.output())
+                           .pass(channel)
                            .result()
                            .eventually()
                            .all()).containsExactly("test1", "test2");
@@ -1850,11 +1850,11 @@ public class RoutineTest {
             @Override
             public void run() {
 
-                channel1.input().pass("test1").pass("test2").close();
+                channel1.pass("test1").pass("test2").close();
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel1.output().eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel1.eventually().all()).containsOnly("test1", "test2");
 
         final TransportChannel<String> channel2 = JRoutine.transport()
                                                           .channels()
@@ -1867,11 +1867,11 @@ public class RoutineTest {
             @Override
             public void run() {
 
-                channel2.input().pass("test1").pass(new String[]{"test2"}).close();
+                channel2.pass("test1").pass(new String[]{"test2"}).close();
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel2.output().eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel2.eventually().all()).containsOnly("test1", "test2");
 
         final TransportChannel<String> channel3 = JRoutine.transport()
                                                           .channels()
@@ -1884,11 +1884,11 @@ public class RoutineTest {
             @Override
             public void run() {
 
-                channel3.input().pass("test1").pass(Collections.singletonList("test2")).close();
+                channel3.pass("test1").pass(Collections.singletonList("test2")).close();
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel3.output().eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel3.eventually().all()).containsOnly("test1", "test2");
 
         final TransportChannel<String> channel4 = JRoutine.transport()
                                                           .channels()
@@ -1902,12 +1902,12 @@ public class RoutineTest {
             public void run() {
 
                 final TransportChannel<String> channel = JRoutine.transport().buildChannel();
-                channel.input().pass("test1", "test2").close();
-                channel4.input().pass(channel.output()).close();
+                channel.pass("test1", "test2").close();
+                channel4.pass(channel).close();
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel4.output().eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel4.eventually().all()).containsOnly("test1", "test2");
     }
 
     @Test
@@ -3581,9 +3581,9 @@ public class RoutineTest {
                                 .set()
                                 .asyncInvoke()
                                 .after(millis(500))
-                                .pass(channel.output())
+                                .pass(channel)
                                 .result());
-            channel.input().pass(s, s).close();
+            channel.pass(s, s).close();
         }
     }
 
@@ -3666,8 +3666,8 @@ public class RoutineTest {
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
             final TransportChannel<String> channel = JRoutine.transport().buildChannel();
-            result.after(millis(500)).pass(channel.output());
-            channel.input().pass(s, s).close();
+            result.after(millis(500)).pass(channel);
+            channel.pass(s, s).close();
         }
     }
 

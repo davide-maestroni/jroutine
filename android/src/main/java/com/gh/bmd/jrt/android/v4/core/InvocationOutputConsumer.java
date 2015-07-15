@@ -17,7 +17,7 @@ import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
+import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
@@ -199,9 +199,9 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             }
         }
 
-        public boolean passTo(@Nonnull final Collection<TransportInput<OUTPUT>> newChannels,
-                @Nonnull final Collection<TransportInput<OUTPUT>> oldChannels,
-                @Nonnull final Collection<TransportInput<OUTPUT>> abortedChannels) {
+        public boolean passTo(@Nonnull final Collection<TransportChannel<OUTPUT>> newChannels,
+                @Nonnull final Collection<TransportChannel<OUTPUT>> oldChannels,
+                @Nonnull final Collection<TransportChannel<OUTPUT>> abortedChannels) {
 
             synchronized (mMutex) {
 
@@ -221,7 +221,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
                     logger.dbg("passing result: %s + %s", cachedResults, lastResults);
 
-                    for (final TransportInput<OUTPUT> newChannel : newChannels) {
+                    for (final TransportChannel<OUTPUT> newChannel : newChannels) {
 
                         try {
 
@@ -237,7 +237,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                         }
                     }
 
-                    for (final TransportInput<OUTPUT> channel : oldChannels) {
+                    for (final TransportChannel<OUTPUT> channel : oldChannels) {
 
                         try {
 

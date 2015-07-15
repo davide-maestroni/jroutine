@@ -677,15 +677,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     new Object[]{mArgs, groupWithShareAnnotation(mProxyConfiguration, method),
                                  targetClass.getName(), targetMethod.getName(),
                                  toNames(targetParameterTypes), inputMode, outputMode};
-            final Routine<Object, Object> routine =
-                    JRoutine.on(mContext, PROXY_TOKEN, factoryArgs)
-                            .invocations()
-                            .with(configurationWithAnnotations(mInvocationConfiguration, method))
-                            .set()
-                            .service()
-                            .with(mServiceConfiguration)
-                            .set()
-                            .buildRoutine();
+            final Routine<Object, Object> routine = JRoutine.on(mContext, PROXY_TOKEN, factoryArgs)
+                                                            .invocations()
+                                                            .with(configurationWithAnnotations(
+                                                                    mInvocationConfiguration,
+                                                                    method))
+                                                            .set()
+                                                            .service()
+                                                            .with(mServiceConfiguration)
+                                                            .set()
+                                                            .buildRoutine();
             return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
                                  inputMode, outputMode);
         }

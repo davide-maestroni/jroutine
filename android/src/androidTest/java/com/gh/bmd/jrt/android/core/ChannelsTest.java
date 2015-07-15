@@ -29,7 +29,6 @@ import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportOutput;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
@@ -638,24 +637,23 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannel<ParcelableSelectable<String>> channel =
                 JRoutine.transport().buildChannel();
-        Channels.selectParcelable(channel.input(), 33).pass("test1", "test2", "test3");
-        channel.input().close();
-        assertThat(channel.output().all()).containsExactly(
-                new ParcelableSelectable<String>("test1", 33),
-                new ParcelableSelectable<String>("test2", 33),
-                new ParcelableSelectable<String>("test3", 33));
+        Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3");
+        channel.close();
+        assertThat(channel.all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
+                                                  new ParcelableSelectable<String>("test2", 33),
+                                                  new ParcelableSelectable<String>("test3", 33));
     }
 
     public void testInputSelectAbort() {
 
         final TransportChannel<ParcelableSelectable<String>> channel =
                 JRoutine.transport().buildChannel();
-        Channels.selectParcelable(channel.input(), 33).pass("test1", "test2", "test3").abort();
-        channel.input().close();
+        Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3").abort();
+        channel.close();
 
         try {
 
-            channel.output().eventually().all();
+            channel.eventually().all();
 
             fail();
 
@@ -668,24 +666,24 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testInputToSelectable() {
 
         final TransportChannel<String> channel = JRoutine.transport().buildChannel();
-        Channels.toSelectable(channel.input(), 33)
+        Channels.toSelectable(channel.asInput(), 33)
                 .pass(new ParcelableSelectable<String>("test1", 33),
                       new ParcelableSelectable<String>("test2", -33),
                       new ParcelableSelectable<String>("test3", 33),
                       new ParcelableSelectable<String>("test4", 333));
-        channel.input().close();
-        assertThat(channel.output().eventually().all()).containsExactly("test1", "test3");
+        channel.close();
+        assertThat(channel.eventually().all()).containsExactly("test1", "test3");
     }
 
     public void testInputToSelectableAbort() {
 
         final TransportChannel<String> channel = JRoutine.transport().buildChannel();
-        Channels.toSelectable(channel.input(), 33).abort();
-        channel.input().close();
+        Channels.toSelectable(channel.asInput(), 33).abort();
+        channel.close();
 
         try {
 
-            channel.output().eventually().all();
+            channel.eventually().all();
 
             fail();
 
@@ -703,30 +701,29 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.join(channel1.output(), channel2.output()))
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(Channels.join(channel1, channel2))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.join(
-                Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(
+                Channels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input()
-                .orderByCall()
+        channel1.orderByCall()
                 .after(millis(100))
                 .pass("testtest")
                 .pass("test2")
                 .pass("test3")
                 .close();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.join(channel1.output(), channel2.output()))
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(Channels.join(channel1, channel2))
                           .eventually()
                           .all()).containsExactly('s', '2');
     }
@@ -740,14 +737,12 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.input().orderByCall().abort();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().abort();
 
         try {
 
-            routine.asyncCall(Channels.join(channel1.output(), channel2.output()))
-                   .eventually()
-                   .all();
+            routine.asyncCall(Channels.join(channel1, channel2)).eventually().all();
 
             fail();
 
@@ -757,13 +752,12 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().abort();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.orderByCall().abort();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 
-            routine.asyncCall(Channels.join(
-                    Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
+            routine.asyncCall(Channels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
                    .eventually()
                    .all();
 
@@ -783,35 +777,32 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.joinAndFlush(channel1.output(), channel2.output()))
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(Channels.joinAndFlush(channel1, channel2))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.joinAndFlush(
-                Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(
+                Channels.joinAndFlush(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input()
-                .orderByCall()
+        channel1.orderByCall()
                 .after(millis(100))
                 .pass("testtest")
                 .pass("test2")
                 .pass("test3")
                 .close();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 
-            routine.asyncCall(Channels.joinAndFlush(channel1.output(), channel2.output()))
-                   .eventually()
-                   .all();
+            routine.asyncCall(Channels.joinAndFlush(channel1, channel2)).eventually().all();
 
             fail();
 
@@ -829,14 +820,12 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.input().orderByCall().abort();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().abort();
 
         try {
 
-            routine.asyncCall(Channels.joinAndFlush(channel1.output(), channel2.output()))
-                   .eventually()
-                   .all();
+            routine.asyncCall(Channels.joinAndFlush(channel1, channel2)).eventually().all();
 
             fail();
 
@@ -846,13 +835,13 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.input().orderByCall().abort();
-        channel2.input().orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.orderByCall().abort();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 
-            routine.asyncCall(Channels.joinAndFlush(
-                    Arrays.<OutputChannel<?>>asList(channel1.output(), channel2.output())))
+            routine.asyncCall(
+                    Channels.joinAndFlush(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
                    .eventually()
                    .all();
 
@@ -917,8 +906,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final TransportChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends ParcelableSelectable<Object>> channel =
-                Channels.mergeParcelable(
-                        Arrays.<TransportOutput<?>>asList(channel1.output(), channel2.output()));
+                Channels.mergeParcelable(Arrays.<TransportChannel<?>>asList(channel1, channel2));
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class))
                         .invocations()
@@ -931,12 +919,12 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         for (int i = 0; i < 4; i++) {
 
             final String input = Integer.toString(i);
-            channel1.input().after(millis(20)).pass(input);
-            channel2.input().after(millis(20)).pass(i);
+            channel1.after(millis(20)).pass(input);
+            channel2.after(millis(20)).pass(i);
         }
 
-        channel1.input().close();
-        channel2.input().close();
+        channel1.close();
+        channel2.close();
 
         assertThat(channelMap.get(Sort.STRING).eventually().all()).containsExactly("0", "1", "2",
                                                                                    "3");
@@ -953,35 +941,33 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(-7, channel1.output(), channel2.output());
-        channel1.input().pass("test1").close();
-        channel2.input().pass(13).close();
+        outputChannel = Channels.mergeParcelable(-7, channel1, channel2);
+        channel1.pass("test1").close();
+        channel2.pass(13).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new ParcelableSelectable<String>("test1", -7),
                 new ParcelableSelectable<Integer>(13, -6));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel =
-                Channels.mergeParcelable(11, Arrays.asList(channel1.output(), channel2.output()));
-        channel2.input().pass(13).close();
-        channel1.input().pass("test1").close();
+        outputChannel = Channels.mergeParcelable(11, Arrays.asList(channel1, channel2));
+        channel2.pass(13).close();
+        channel1.pass("test1").close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new ParcelableSelectable<String>("test1", 11),
                 new ParcelableSelectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(channel1.output(), channel2.output());
-        channel1.input().pass("test2").close();
-        channel2.input().pass(-17).close();
+        outputChannel = Channels.mergeParcelable(channel1, channel2);
+        channel1.pass("test2").close();
+        channel2.pass(-17).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new ParcelableSelectable<String>("test2", 0),
                 new ParcelableSelectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel =
-                Channels.mergeParcelable(Arrays.asList(channel1.output(), channel2.output()));
-        channel1.input().pass("test2").close();
-        channel2.input().pass(-17).close();
+        outputChannel = Channels.mergeParcelable(Arrays.asList(channel1, channel2));
+        channel1.pass("test2").close();
+        channel2.pass(-17).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new ParcelableSelectable<String>("test2", 0),
                 new ParcelableSelectable<Integer>(-17, 1));
@@ -989,11 +975,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channel2 = builder.buildChannel();
         final SparseArrayCompat<OutputChannel<?>> channelMap =
                 new SparseArrayCompat<OutputChannel<?>>(2);
-        channelMap.put(7, channel1.output());
-        channelMap.put(-3, channel2.output());
+        channelMap.put(7, channel1);
+        channelMap.put(-3, channel2);
         outputChannel = Channels.mergeParcelable(channelMap);
-        channel1.input().pass("test3").close();
-        channel2.input().pass(111).close();
+        channel1.pass("test3").close();
+        channel2.pass(111).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new ParcelableSelectable<String>("test3", 7),
                 new ParcelableSelectable<Integer>(111, -3));
@@ -1011,23 +997,22 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<String>, String> routine =
                 JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.asyncCall(Channels.mergeParcelable(
-                Arrays.asList(channel1.output(), channel2.output(), channel3.output(),
-                              channel4.output())));
+        final OutputChannel<String> outputChannel = routine.asyncCall(
+                Channels.mergeParcelable(Arrays.asList(channel1, channel2, channel3, channel4)));
 
         for (int i = 0; i < 4; i++) {
 
             final String input = Integer.toString(i);
-            channel1.input().after(millis(20)).pass(input);
-            channel2.input().after(millis(20)).pass(input);
-            channel3.input().after(millis(20)).pass(input);
-            channel4.input().after(millis(20)).pass(input);
+            channel1.after(millis(20)).pass(input);
+            channel2.after(millis(20)).pass(input);
+            channel3.after(millis(20)).pass(input);
+            channel4.after(millis(20)).pass(input);
         }
 
-        channel1.input().close();
-        channel2.input().close();
-        channel3.input().close();
-        channel4.input().close();
+        channel1.close();
+        channel2.close();
+        channel3.close();
+        channel4.close();
 
         assertThat(outputChannel.eventually().all()).containsExactly("0", "1", "2", "3");
     }
@@ -1042,9 +1027,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(-7, channel1.output(), channel2.output());
-        channel1.input().pass("test1").close();
-        channel2.input().abort();
+        outputChannel = Channels.mergeParcelable(-7, channel1, channel2);
+        channel1.pass("test1").close();
+        channel2.abort();
 
         try {
 
@@ -1058,10 +1043,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel =
-                Channels.mergeParcelable(11, Arrays.asList(channel1.output(), channel2.output()));
-        channel2.input().abort();
-        channel1.input().pass("test1").close();
+        outputChannel = Channels.mergeParcelable(11, Arrays.asList(channel1, channel2));
+        channel2.abort();
+        channel1.pass("test1").close();
 
         try {
 
@@ -1075,9 +1059,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(channel1.output(), channel2.output());
-        channel1.input().abort();
-        channel2.input().pass(-17).close();
+        outputChannel = Channels.mergeParcelable(channel1, channel2);
+        channel1.abort();
+        channel2.pass(-17).close();
 
         try {
 
@@ -1091,10 +1075,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel =
-                Channels.mergeParcelable(Arrays.asList(channel1.output(), channel2.output()));
-        channel1.input().pass("test2").close();
-        channel2.input().abort();
+        outputChannel = Channels.mergeParcelable(Arrays.asList(channel1, channel2));
+        channel1.pass("test2").close();
+        channel2.abort();
 
         try {
 
@@ -1110,11 +1093,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channel2 = builder.buildChannel();
         final SparseArrayCompat<OutputChannel<?>> channelMap =
                 new SparseArrayCompat<OutputChannel<?>>(2);
-        channelMap.put(7, channel1.output());
-        channelMap.put(-3, channel2.output());
+        channelMap.put(7, channel1);
+        channelMap.put(-3, channel2);
         outputChannel = Channels.mergeParcelable(channelMap);
-        channel1.input().abort();
-        channel2.input().pass(111).close();
+        channel1.abort();
+        channel2.pass(111).close();
 
         try {
 
@@ -1315,13 +1298,12 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannel<ParcelableSelectable<String>> channel =
                 JRoutine.transport().buildChannel();
-        final OutputChannel<String> outputChannel = Channels.select(channel.output(), 33);
-        channel.input()
-               .pass(new ParcelableSelectable<String>("test1", 33),
+        final OutputChannel<String> outputChannel = Channels.select(channel, 33);
+        channel.pass(new ParcelableSelectable<String>("test1", 33),
                      new ParcelableSelectable<String>("test2", -33),
                      new ParcelableSelectable<String>("test3", 33),
                      new ParcelableSelectable<String>("test4", 333));
-        channel.input().close();
+        channel.close();
         assertThat(outputChannel.all()).containsExactly("test1", "test3");
     }
 
@@ -1329,8 +1311,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannel<ParcelableSelectable<String>> channel =
                 JRoutine.transport().buildChannel();
-        final OutputChannel<String> outputChannel = Channels.select(channel.output(), 33);
-        channel.input().abort();
+        final OutputChannel<String> outputChannel = Channels.select(channel, 33);
+        channel.abort();
 
         try {
 
@@ -1347,8 +1329,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testOutputToSelectable() {
 
         final TransportChannel<String> channel = JRoutine.transport().buildChannel();
-        channel.input().pass("test1", "test2", "test3").close();
-        assertThat(Channels.toSelectable(channel.output(), 33).eventually().all()).containsExactly(
+        channel.pass("test1", "test2", "test3").close();
+        assertThat(
+                Channels.toSelectable(channel.asOutput(), 33).eventually().all()).containsExactly(
                 new ParcelableSelectable<String>("test1", 33),
                 new ParcelableSelectable<String>("test2", 33),
                 new ParcelableSelectable<String>("test3", 33));
@@ -1357,11 +1340,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testOutputToSelectableAbort() {
 
         final TransportChannel<String> channel = JRoutine.transport().buildChannel();
-        channel.input().pass("test1", "test2", "test3").abort();
+        channel.pass("test1", "test2", "test3").abort();
 
         try {
 
-            Channels.toSelectable(channel.output(), 33).eventually().all();
+            Channels.toSelectable(channel.asOutput(), 33).eventually().all();
 
             fail();
 

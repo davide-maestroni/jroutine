@@ -179,8 +179,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         assertThat(testProxy.getList(Collections.singletonList(list))).containsExactly(list);
 
         final TransportChannel<Integer> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().pass(3).close();
-        assertThat(testProxy.getString(transportChannel.output())).isEqualTo("3");
+        transportChannel.pass(3).close();
+        assertThat(testProxy.getString(transportChannel)).isEqualTo("3");
     }
 
     public void testProxyBuilder() {
@@ -215,8 +215,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         assertThat(testProxy.getList(Collections.singletonList(list))).containsExactly(list);
 
         final TransportChannel<Integer> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.input().pass(3).close();
-        assertThat(testProxy.getString(transportChannel.output())).isEqualTo("3");
+        transportChannel.pass(3).close();
+        assertThat(testProxy.getString(transportChannel)).isEqualTo("3");
 
         assertThat(JRoutineProxy.on(contextFrom(fragment), TestClass.class)
                                 .invocations()
@@ -334,90 +334,77 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
         final TransportChannel<Character> channel1 = JRoutine.transport().buildChannel();
-        channel1.input().pass('a').close();
-        assertThat(itf.add1(channel1.output())).isEqualTo((int) 'a');
+        channel1.pass('a').close();
+        assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
         final TransportChannel<Character> channel2 = JRoutine.transport().buildChannel();
-        channel2.input().pass('d', 'e', 'f').close();
-        assertThat(itf.add2(channel2.output())).isIn((int) 'd', (int) 'e', (int) 'f');
+        channel2.pass('d', 'e', 'f').close();
+        assertThat(itf.add2(channel2)).isIn((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add3('c').all()).containsExactly((int) 'c');
         final TransportChannel<Character> channel3 = JRoutine.transport().buildChannel();
-        channel3.input().pass('a').close();
-        assertThat(itf.add4(channel3.output()).all()).containsExactly((int) 'a');
+        channel3.pass('a').close();
+        assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
         final TransportChannel<Character> channel4 = JRoutine.transport().buildChannel();
-        channel4.input().pass('d', 'e', 'f').close();
-        assertThat(itf.add5(channel4.output()).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
+        channel4.pass('d', 'e', 'f').close();
+        assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
-        channel5.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA01(channel5.output())).isEqualTo(new int[]{'a', 'z'});
+        channel5.pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
         final TransportChannel<Character> channel6 = JRoutine.transport().buildChannel();
-        channel6.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA02(channel6.output())).isEqualTo(new int[]{'d', 'e', 'f'});
+        channel6.pass('d', 'e', 'f').close();
+        assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
         final TransportChannel<char[]> channel7 = JRoutine.transport().buildChannel();
-        channel7.input()
-                .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                .close();
-        assertThat(itf.addA03(channel7.output())).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-                                                       new int[]{'f', 'z'});
+        channel7.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
+        assertThat(itf.addA03(channel7)).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                              new int[]{'f', 'z'});
         assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel8 = JRoutine.transport().buildChannel();
-        channel8.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA05(channel8.output()).all()).containsExactly(new int[]{'a', 'z'});
+        channel8.pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
         final TransportChannel<Character> channel9 = JRoutine.transport().buildChannel();
-        channel9.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA06(channel9.output()).all()).containsExactly(new int[]{'d', 'e', 'f'});
+        channel9.pass('d', 'e', 'f').close();
+        assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
         final TransportChannel<char[]> channel10 = JRoutine.transport().buildChannel();
-        channel10.input()
-                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                 .close();
-        assertThat(itf.addA07(channel10.output()).all()).containsOnly(new int[]{'d', 'z'},
-                                                                      new int[]{'e', 'z'},
-                                                                      new int[]{'f', 'z'});
+        channel10.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
+        assertThat(itf.addA07(channel10).all()).containsOnly(new int[]{'d', 'z'},
+                                                             new int[]{'e', 'z'},
+                                                             new int[]{'f', 'z'});
         assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
         final TransportChannel<char[]> channel11 = JRoutine.transport().buildChannel();
-        channel11.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA09(channel11.output()).all()).containsExactly((int) 'a', (int) 'z');
+        channel11.pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
         final TransportChannel<Character> channel12 = JRoutine.transport().buildChannel();
-        channel12.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA10(channel12.output()).all()).containsExactly((int) 'd', (int) 'e',
-                                                                         (int) 'f');
+        channel12.pass('d', 'e', 'f').close();
+        assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
         final TransportChannel<char[]> channel13 = JRoutine.transport().buildChannel();
-        channel13.input()
-                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                 .close();
-        assertThat(itf.addA11(channel13.output()).all()).containsOnly((int) 'd', (int) 'e',
-                                                                      (int) 'f', (int) 'z');
+        channel13.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
+        assertThat(itf.addA11(channel13).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
+                                                             (int) 'z');
         assertThat(itf.addA12(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel14 = JRoutine.transport().buildChannel();
-        channel14.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA13(channel14.output())).containsExactly(new int[]{'a', 'z'});
+        channel14.pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA13(channel14)).containsExactly(new int[]{'a', 'z'});
         final TransportChannel<Character> channel15 = JRoutine.transport().buildChannel();
-        channel15.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA14(channel15.output())).containsExactly(new int[]{'d', 'e', 'f'});
+        channel15.pass('d', 'e', 'f').close();
+        assertThat(itf.addA14(channel15)).containsExactly(new int[]{'d', 'e', 'f'});
         final TransportChannel<char[]> channel16 = JRoutine.transport().buildChannel();
-        channel16.input()
-                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                 .close();
-        assertThat(itf.addA15(channel16.output())).containsOnly(new int[]{'d', 'z'},
-                                                                new int[]{'e', 'z'},
-                                                                new int[]{'f', 'z'});
+        channel16.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
+        assertThat(itf.addA15(channel16)).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                                       new int[]{'f', 'z'});
         assertThat(itf.addA16(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel17 = JRoutine.transport().buildChannel();
-        channel17.input().pass(new char[]{'a', 'z'}).close();
-        assertThat(itf.addA17(channel17.output())).containsExactly(new int[]{'a', 'z'});
+        channel17.pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA17(channel17)).containsExactly(new int[]{'a', 'z'});
         final TransportChannel<Character> channel18 = JRoutine.transport().buildChannel();
-        channel18.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addA18(channel18.output())).containsExactly(new int[]{'d', 'e', 'f'});
+        channel18.pass('d', 'e', 'f').close();
+        assertThat(itf.addA18(channel18)).containsExactly(new int[]{'d', 'e', 'f'});
         final TransportChannel<char[]> channel19 = JRoutine.transport().buildChannel();
-        channel19.input()
-                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                 .close();
-        assertThat(itf.addA19(channel19.output())).containsOnly(new int[]{'d', 'z'},
-                                                                new int[]{'e', 'z'},
-                                                                new int[]{'f', 'z'});
+        channel19.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
+        assertThat(itf.addA19(channel19)).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                                       new int[]{'f', 'z'});
         assertThat(itf.addA20().pass(new char[]{'c', 'z'}).result().all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA21()
@@ -430,86 +417,75 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel20 = JRoutine.transport().buildChannel();
-        channel20.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL01(channel20.output())).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
+        channel20.pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
         final TransportChannel<Character> channel21 = JRoutine.transport().buildChannel();
-        channel21.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL02(channel21.output())).isEqualTo(
-                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
+        channel21.pass('d', 'e', 'f').close();
+        assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         final TransportChannel<List<Character>> channel22 = JRoutine.transport().buildChannel();
-        channel22.input()
-                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+        channel22.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL03(channel22.output())).isIn(Arrays.asList((int) 'd', (int) 'z'),
-                                                        Arrays.asList((int) 'e', (int) 'z'),
-                                                        Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL03(channel22)).isIn(Arrays.asList((int) 'd', (int) 'z'),
+                                               Arrays.asList((int) 'e', (int) 'z'),
+                                               Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel23 = JRoutine.transport().buildChannel();
-        channel23.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL05(channel23.output()).all()).containsExactly(
+        channel23.pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL05(channel23).all()).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
         final TransportChannel<Character> channel24 = JRoutine.transport().buildChannel();
-        channel24.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL06(channel24.output()).all()).containsExactly(
+        channel24.pass('d', 'e', 'f').close();
+        assertThat(itf.addL06(channel24).all()).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         final TransportChannel<List<Character>> channel25 = JRoutine.transport().buildChannel();
-        channel25.input()
-                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+        channel25.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL07(channel25.output()).all()).containsOnly(
-                Arrays.asList((int) 'd', (int) 'z'), Arrays.asList((int) 'e', (int) 'z'),
-                Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL07(channel25).all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                                             Arrays.asList((int) 'e', (int) 'z'),
+                                                             Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
         final TransportChannel<List<Character>> channel26 = JRoutine.transport().buildChannel();
-        channel26.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL09(channel26.output()).all()).containsExactly((int) 'a', (int) 'z');
+        channel26.pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
         final TransportChannel<Character> channel27 = JRoutine.transport().buildChannel();
-        channel27.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL10(channel27.output()).all()).containsExactly((int) 'd', (int) 'e',
-                                                                         (int) 'f');
+        channel27.pass('d', 'e', 'f').close();
+        assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
         final TransportChannel<List<Character>> channel28 = JRoutine.transport().buildChannel();
-        channel28.input()
-                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+        channel28.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL11(channel28.output()).all()).containsOnly((int) 'd', (int) 'e',
-                                                                      (int) 'f', (int) 'z');
+        assertThat(itf.addL11(channel28).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
+                                                             (int) 'z');
         assertThat(itf.addL12(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel29 = JRoutine.transport().buildChannel();
-        channel29.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL13(channel29.output())).containsExactly(
-                Arrays.asList((int) 'a', (int) 'z'));
+        channel29.pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL13(channel29)).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
         final TransportChannel<Character> channel30 = JRoutine.transport().buildChannel();
-        channel30.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL14(channel30.output())).containsExactly(
+        channel30.pass('d', 'e', 'f').close();
+        assertThat(itf.addL14(channel30)).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         final TransportChannel<List<Character>> channel31 = JRoutine.transport().buildChannel();
-        channel31.input()
-                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+        channel31.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL15(channel31.output())).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                                                Arrays.asList((int) 'e', (int) 'z'),
-                                                                Arrays.asList((int) 'f',
-                                                                              (int) 'z'));
+        assertThat(itf.addL15(channel31)).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                                       Arrays.asList((int) 'e', (int) 'z'),
+                                                       Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL16(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final TransportChannel<List<Character>> channel32 = JRoutine.transport().buildChannel();
-        channel32.input().pass(Arrays.asList('a', 'z')).close();
-        assertThat(itf.addL17(channel32.output())).containsExactly(
-                Arrays.asList((int) 'a', (int) 'z'));
+        channel32.pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL17(channel32)).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
         final TransportChannel<Character> channel33 = JRoutine.transport().buildChannel();
-        channel33.input().pass('d', 'e', 'f').close();
-        assertThat(itf.addL18(channel33.output())).containsExactly(
+        channel33.pass('d', 'e', 'f').close();
+        assertThat(itf.addL18(channel33)).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
         final TransportChannel<List<Character>> channel34 = JRoutine.transport().buildChannel();
-        channel34.input()
-                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+        channel34.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
-        assertThat(itf.addL19(channel34.output())).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                                                Arrays.asList((int) 'e', (int) 'z'),
-                                                                Arrays.asList((int) 'f',
-                                                                              (int) 'z'));
+        assertThat(itf.addL19(channel34)).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                                       Arrays.asList((int) 'e', (int) 'z'),
+                                                       Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL20().pass(Arrays.asList('c', 'z')).result().all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL21()
@@ -536,34 +512,34 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         assertThat(itf.getL4().result().all()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
-        channel35.input().pass(-17).close();
-        itf.set1(channel35.output());
+        channel35.pass(-17).close();
+        itf.set1(channel35);
         final TransportChannel<Integer> channel36 = JRoutine.transport().buildChannel();
-        channel36.input().pass(-17).close();
-        itf.set2(channel36.output());
+        channel36.pass(-17).close();
+        itf.set2(channel36);
         itf.set3().pass(-17).result().checkComplete();
         itf.setA0(new int[]{1, 2, 3});
         final TransportChannel<int[]> channel37 = JRoutine.transport().buildChannel();
-        channel37.input().pass(new int[]{1, 2, 3}).close();
-        itf.setA1(channel37.output());
+        channel37.pass(new int[]{1, 2, 3}).close();
+        itf.setA1(channel37);
         final TransportChannel<Integer> channel38 = JRoutine.transport().buildChannel();
-        channel38.input().pass(1, 2, 3).close();
-        itf.setA2(channel38.output());
+        channel38.pass(1, 2, 3).close();
+        itf.setA2(channel38);
         final TransportChannel<int[]> channel39 = JRoutine.transport().buildChannel();
-        channel39.input().pass(new int[]{1, 2, 3}).close();
-        itf.setA3(channel39.output());
+        channel39.pass(new int[]{1, 2, 3}).close();
+        itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
         itf.setA5().pass(1, 2, 3).result().checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final TransportChannel<List<Integer>> channel40 = JRoutine.transport().buildChannel();
-        channel40.input().pass(Arrays.asList(1, 2, 3)).close();
-        itf.setL1(channel40.output());
+        channel40.pass(Arrays.asList(1, 2, 3)).close();
+        itf.setL1(channel40);
         final TransportChannel<Integer> channel41 = JRoutine.transport().buildChannel();
-        channel41.input().pass(1, 2, 3).close();
-        itf.setL2(channel41.output());
+        channel41.pass(1, 2, 3).close();
+        itf.setL2(channel41);
         final TransportChannel<List<Integer>> channel42 = JRoutine.transport().buildChannel();
-        channel42.input().pass(Arrays.asList(1, 2, 3)).close();
-        itf.setL3(channel42.output());
+        channel42.pass(Arrays.asList(1, 2, 3)).close();
+        itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
         itf.setL5().pass(1, 2, 3).result().checkComplete();
     }

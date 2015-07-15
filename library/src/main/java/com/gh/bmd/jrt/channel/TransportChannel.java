@@ -33,159 +33,146 @@ import javax.annotation.Nullable;
  *
  * @param <DATA> the data type.
  */
-public interface TransportChannel<DATA> {
+public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA> {
+
+    // TODO: abort as input
+    // TODO: isOpen can read even is closed...
 
     /**
-     * Returns the input end of this channel.
-     *
-     * @return the input channel.
+     * {@inheritDoc}
      */
     @Nonnull
-    TransportInput<DATA> input();
+    TransportChannel<DATA> after(@Nonnull TimeDuration delay);
 
     /**
-     * Returns the output end of this channel.
-     *
-     * @return the output channel.
+     * {@inheritDoc}
      */
     @Nonnull
-    TransportOutput<DATA> output();
+    TransportChannel<DATA> after(long delay, @Nonnull TimeUnit timeUnit);
 
     /**
-     * Interface defining a transport channel input.
-     *
-     * @param <INPUT> the input data type.
+     * {@inheritDoc}
      */
-    interface TransportInput<INPUT> extends InputChannel<INPUT> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> after(@Nonnull TimeDuration delay);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> now();
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> orderByCall();
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> orderByChance();
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> orderByDelay();
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> pass(@Nullable INPUT input);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportInput<INPUT> pass(@Nullable INPUT... inputs);
-
-        /**
-         * Closes the channel input.<br/>
-         * If the channel is already closed, this method has no effect.
-         * <p/>
-         * Note that this method must be always called when done with the channel.
-         */
-        void close();
-    }
+    @Nonnull
+    TransportChannel<DATA> now();
 
     /**
-     * Interface defining a transport channel output.
-     *
-     * @param <OUTPUT> the output data type.
+     * {@inheritDoc}
      */
-    interface TransportOutput<OUTPUT> extends OutputChannel<OUTPUT> {
+    @Nonnull
+    TransportChannel<DATA> orderByCall();
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> orderByChance();
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> orderByDelay();
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> allInto(@Nonnull Collection<? super OUTPUT> results);
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> pass(@Nullable OutputChannel<? extends DATA> channel);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> eventually();
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> pass(@Nullable Iterable<? extends DATA> inputs);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> eventuallyAbort();
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> pass(@Nullable DATA input);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> eventuallyDeadlock();
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> pass(@Nullable DATA... inputs);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> eventuallyExit();
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> afterMax(@Nonnull TimeDuration timeout);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> immediately();
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Nonnull
-        TransportOutput<OUTPUT> passTo(@Nonnull OutputConsumer<? super OUTPUT> consumer);
-    }
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> allInto(@Nonnull Collection<? super DATA> results);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> eventually();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> eventuallyAbort();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> eventuallyDeadlock();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> eventuallyExit();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> immediately();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nonnull
+    TransportChannel<DATA> passTo(@Nonnull OutputConsumer<? super DATA> consumer);
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    @Nonnull
+    InputChannel<DATA> asInput();
+
+    /**
+     * TODO
+     *
+     * @return
+     */
+    @Nonnull
+    OutputChannel<DATA> asOutput();
+
+    /**
+     * Closes the channel input.<br/>
+     * If the channel is already closed, this method has no effect.
+     * <p/>
+     * Note that this method must be always called when done with the channel.
+     */
+    void close();
 }

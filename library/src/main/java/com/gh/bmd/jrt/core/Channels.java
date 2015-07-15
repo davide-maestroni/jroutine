@@ -18,7 +18,6 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,9 +81,10 @@ public class Channels {
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
         Collections.addAll(channelList, channels);
-        final TransportChannel<Selectable<?>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new SortingInputConsumer(startIndex, channelList));
-        return transport.input();
+        final TransportChannel<Selectable<?>> transportChannel =
+                JRoutine.transport().buildChannel();
+        transportChannel.passTo(new SortingInputConsumer(startIndex, channelList));
+        return transportChannel;
     }
 
     /**
@@ -105,9 +105,10 @@ public class Channels {
         }
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
-        final TransportChannel<Selectable<?>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new SortingInputConsumer(startIndex, channelList));
-        return transport.input();
+        final TransportChannel<Selectable<?>> transportChannel =
+                JRoutine.transport().buildChannel();
+        transportChannel.passTo(new SortingInputConsumer(startIndex, channelList));
+        return transportChannel;
     }
 
     /**
@@ -143,9 +144,10 @@ public class Channels {
 
         final HashMap<Integer, InputChannel<?>> channelMap =
                 new HashMap<Integer, InputChannel<?>>(channels);
-        final TransportChannel<Selectable<?>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new SortingInputMapConsumer(channelMap));
-        return transport.input();
+        final TransportChannel<Selectable<?>> transportChannel =
+                JRoutine.transport().buildChannel();
+        transportChannel.passTo(new SortingInputMapConsumer(channelMap));
+        return transportChannel;
     }
 
     /**
@@ -391,8 +393,8 @@ public class Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, TransportInput<OUTPUT>> inputMap =
-                new HashMap<Integer, TransportInput<OUTPUT>>(rangeSize);
+        final HashMap<Integer, TransportChannel<OUTPUT>> inputMap =
+                new HashMap<Integer, TransportChannel<OUTPUT>>(rangeSize);
         final HashMap<Integer, OutputChannel<OUTPUT>> outputMap =
                 new HashMap<Integer, OutputChannel<OUTPUT>>(rangeSize);
 
@@ -400,8 +402,8 @@ public class Channels {
 
             final Integer integer = index;
             final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
-            inputMap.put(integer, transportChannel.input());
-            outputMap.put(integer, transportChannel.output());
+            inputMap.put(integer, transportChannel);
+            outputMap.put(integer, transportChannel);
         }
 
         channel.passTo(new SortingOutputConsumer<OUTPUT>(inputMap));
@@ -424,16 +426,16 @@ public class Channels {
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
-        final HashMap<Integer, TransportInput<OUTPUT>> inputMap =
-                new HashMap<Integer, TransportInput<OUTPUT>>(size);
+        final HashMap<Integer, TransportChannel<OUTPUT>> inputMap =
+                new HashMap<Integer, TransportChannel<OUTPUT>>(size);
         final HashMap<Integer, OutputChannel<OUTPUT>> outputMap =
                 new HashMap<Integer, OutputChannel<OUTPUT>>(size);
 
         for (final Integer index : indexes) {
 
             final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
-            inputMap.put(index, transportChannel.input());
-            outputMap.put(index, transportChannel.output());
+            inputMap.put(index, transportChannel);
+            outputMap.put(index, transportChannel);
         }
 
         channel.passTo(new SortingOutputConsumer<OUTPUT>(inputMap));
@@ -456,16 +458,16 @@ public class Channels {
             @Nonnull final int... indexes) {
 
         final int size = indexes.length;
-        final HashMap<Integer, TransportInput<OUTPUT>> inputMap =
-                new HashMap<Integer, TransportInput<OUTPUT>>(size);
+        final HashMap<Integer, TransportChannel<OUTPUT>> inputMap =
+                new HashMap<Integer, TransportChannel<OUTPUT>>(size);
         final HashMap<Integer, OutputChannel<OUTPUT>> outputMap =
                 new HashMap<Integer, OutputChannel<OUTPUT>>(size);
 
         for (final Integer index : indexes) {
 
             final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
-            inputMap.put(index, transportChannel.input());
-            outputMap.put(index, transportChannel.output());
+            inputMap.put(index, transportChannel);
+            outputMap.put(index, transportChannel);
         }
 
         channel.passTo(new SortingOutputConsumer<OUTPUT>(inputMap));
@@ -491,17 +493,17 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final TransportChannel<Selectable<Object>> transport = JRoutine.transport().buildChannel();
-        final TransportInput<Selectable<Object>> input = transport.input();
+        final TransportChannel<Selectable<Object>> transportChannel =
+                JRoutine.transport().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<?> channel : channels) {
 
-            input.pass(toSelectable(channel, i++));
+            transportChannel.pass(toSelectable(channel, i++));
         }
 
-        input.close();
-        return transport.output();
+        transportChannel.close();
+        return transportChannel;
     }
 
     /**
@@ -524,17 +526,17 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final TransportChannel<Selectable<OUTPUT>> transport = JRoutine.transport().buildChannel();
-        final TransportInput<Selectable<OUTPUT>> input = transport.input();
+        final TransportChannel<Selectable<OUTPUT>> transportChannel =
+                JRoutine.transport().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<? extends OUTPUT> channel : channels) {
 
-            input.pass(toSelectable(channel, i++));
+            transportChannel.pass(toSelectable(channel, i++));
         }
 
-        input.close();
-        return transport.output();
+        transportChannel.close();
+        return transportChannel;
     }
 
     /**
@@ -589,17 +591,17 @@ public class Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final TransportChannel<Selectable<OUTPUT>> transport = JRoutine.transport().buildChannel();
-        final TransportInput<Selectable<OUTPUT>> input = transport.input();
+        final TransportChannel<Selectable<OUTPUT>> transportChannel =
+                JRoutine.transport().buildChannel();
 
         for (final Entry<Integer, ? extends OutputChannel<? extends OUTPUT>> entry : channelMap
                 .entrySet()) {
 
-            input.pass(toSelectable(entry.getValue(), entry.getKey()));
+            transportChannel.pass(toSelectable(entry.getValue(), entry.getKey()));
         }
 
-        input.close();
-        return transport.output();
+        transportChannel.close();
+        return transportChannel;
     }
 
     /**
@@ -615,14 +617,14 @@ public class Channels {
     public static <DATA, INPUT extends DATA> InputChannel<INPUT> select(
             @Nullable final InputChannel<? super Selectable<DATA>> channel, final int index) {
 
-        final TransportChannel<INPUT> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<INPUT> transportChannel = JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            transport.output().passTo(new SelectableInputConsumer<DATA, INPUT>(channel, index));
+            transportChannel.passTo(new SelectableInputConsumer<DATA, INPUT>(channel, index));
         }
 
-        return transport.input();
+        return transportChannel;
     }
 
     /**
@@ -640,14 +642,14 @@ public class Channels {
             @Nullable final OutputChannel<? extends Selectable<? extends OUTPUT>> channel,
             final int index) {
 
-        final TransportChannel<OUTPUT> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            channel.passTo(new FilterOutputConsumer<OUTPUT>(transport.input(), index));
+            channel.passTo(new FilterOutputConsumer<OUTPUT>(transportChannel, index));
         }
 
-        return transport.output();
+        return transportChannel;
     }
 
     /**
@@ -663,14 +665,15 @@ public class Channels {
     public static <INPUT> InputChannel<Selectable<INPUT>> toSelectable(
             @Nullable final InputChannel<? super INPUT> channel, final int index) {
 
-        final TransportChannel<Selectable<INPUT>> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<Selectable<INPUT>> transportChannel =
+                JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            transport.output().passTo(new FilterInputConsumer<INPUT>(channel, index));
+            transportChannel.passTo(new FilterInputConsumer<INPUT>(channel, index));
         }
 
-        return transport.input();
+        return transportChannel;
     }
 
     /**
@@ -688,14 +691,15 @@ public class Channels {
     public static <OUTPUT> OutputChannel<? extends Selectable<OUTPUT>> toSelectable(
             @Nullable final OutputChannel<? extends OUTPUT> channel, final int index) {
 
-        final TransportChannel<Selectable<OUTPUT>> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<Selectable<OUTPUT>> transportChannel =
+                JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            channel.passTo(new SelectableOutputConsumer<OUTPUT>(transport.input(), index));
+            channel.passTo(new SelectableOutputConsumer<OUTPUT>(transportChannel, index));
         }
 
-        return transport.output();
+        return transportChannel;
     }
 
     @Nonnull
@@ -708,9 +712,9 @@ public class Channels {
         }
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
-        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer(isFlush, channelList));
-        return transport.input();
+        final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
+        return transportChannel;
     }
 
     @Nonnull
@@ -726,9 +730,9 @@ public class Channels {
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
         Collections.addAll(channelList, channels);
-        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
-        transport.output().passTo(new DistributeInputConsumer(isFlush, channelList));
-        return transport.input();
+        final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
+        transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
+        return transportChannel;
     }
 
     @Nonnull
@@ -742,11 +746,11 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final TransportChannel<List<OUTPUT>> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<List<OUTPUT>> transportChannel = JRoutine.transport().buildChannel();
         final JoinOutputConsumer<OUTPUT> consumer =
-                new JoinOutputConsumer<OUTPUT>(transport.input(), size, isFlush);
+                new JoinOutputConsumer<OUTPUT>(transportChannel, size, isFlush);
         merge(channels).passTo(consumer);
-        return transport.output();
+        return transportChannel;
     }
 
     @Nonnull
@@ -761,11 +765,11 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final TransportChannel<List<?>> transport = JRoutine.transport().buildChannel();
+        final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
         final JoinOutputConsumer consumer =
-                new JoinOutputConsumer(transport.input(), length, isFlush);
+                new JoinOutputConsumer(transportChannel, length, isFlush);
         merge(channels).passTo(consumer);
-        return transport.output();
+        return transportChannel;
     }
 
     /**
@@ -954,15 +958,15 @@ public class Channels {
 
         private final int mIndex;
 
-        private final TransportInput<OUTPUT> mInputChannel;
+        private final TransportChannel<OUTPUT> mInputChannel;
 
         /**
          * Constructor.
          *
-         * @param inputChannel the transport input channel.
+         * @param inputChannel the transport channel.
          * @param index        the index to filter.
          */
-        private FilterOutputConsumer(@Nonnull final TransportInput<OUTPUT> inputChannel,
+        private FilterOutputConsumer(@Nonnull final TransportChannel<OUTPUT> inputChannel,
                 final int index) {
 
             mInputChannel = inputChannel;
@@ -995,7 +999,7 @@ public class Channels {
      */
     private static class JoinOutputConsumer<OUTPUT> implements OutputConsumer<Selectable<OUTPUT>> {
 
-        protected final TransportInput<List<OUTPUT>> mInputChannel;
+        protected final TransportChannel<List<OUTPUT>> mInputChannel;
 
         protected final SimpleQueue<OUTPUT>[] mQueues;
 
@@ -1004,12 +1008,12 @@ public class Channels {
         /**
          * Constructor.
          *
-         * @param inputChannel the transport input channel.
+         * @param inputChannel the transport channel.
          * @param size         the number of channels to join.
          * @param isFlush      whether the inputs have to be flushed.
          */
         @SuppressWarnings("unchecked")
-        private JoinOutputConsumer(@Nonnull final TransportInput<List<OUTPUT>> inputChannel,
+        private JoinOutputConsumer(@Nonnull final TransportChannel<List<OUTPUT>> inputChannel,
                 final int size, final boolean isFlush) {
 
             final SimpleQueue<OUTPUT>[] queues = (mQueues = new SimpleQueue[size]);
@@ -1024,7 +1028,7 @@ public class Channels {
 
         protected void flush() {
 
-            final TransportInput<List<OUTPUT>> inputChannel = mInputChannel;
+            final TransportChannel<List<OUTPUT>> inputChannel = mInputChannel;
             final SimpleQueue<OUTPUT>[] queues = mQueues;
             final int length = queues.length;
             final ArrayList<OUTPUT> outputs = new ArrayList<OUTPUT>(length);
@@ -1156,16 +1160,16 @@ public class Channels {
 
         private final int mIndex;
 
-        private final TransportInput<Selectable<OUTPUT>> mInputChannel;
+        private final TransportChannel<Selectable<OUTPUT>> mInputChannel;
 
         /**
          * Constructor.
          *
-         * @param inputChannel the transport input channel.
+         * @param inputChannel the transport channel.
          * @param index        the selectable index.
          */
         private SelectableOutputConsumer(
-                @Nonnull final TransportInput<Selectable<OUTPUT>> inputChannel, final int index) {
+                @Nonnull final TransportChannel<Selectable<OUTPUT>> inputChannel, final int index) {
 
             mInputChannel = inputChannel;
             mIndex = index;
@@ -1291,42 +1295,42 @@ public class Channels {
     private static class SortingOutputConsumer<OUTPUT>
             implements OutputConsumer<Selectable<? extends OUTPUT>> {
 
-        private final HashMap<Integer, TransportInput<OUTPUT>> mChannelMap;
+        private final HashMap<Integer, TransportChannel<OUTPUT>> mChannelMap;
 
         /**
          * Constructor.
          *
-         * @param channelMap the map of indexes and transport input channels.
+         * @param channelMap the map of indexes and transport channels.
          */
         private SortingOutputConsumer(
-                @Nonnull final HashMap<Integer, TransportInput<OUTPUT>> channelMap) {
+                @Nonnull final HashMap<Integer, TransportChannel<OUTPUT>> channelMap) {
 
             mChannelMap = channelMap;
         }
 
         public void onComplete() {
 
-            for (final TransportInput<OUTPUT> inputChannel : mChannelMap.values()) {
+            for (final TransportChannel<OUTPUT> channel : mChannelMap.values()) {
 
-                inputChannel.close();
+                channel.close();
             }
         }
 
         public void onError(@Nullable final Throwable error) {
 
-            for (final TransportInput<OUTPUT> inputChannel : mChannelMap.values()) {
+            for (final TransportChannel<OUTPUT> channel : mChannelMap.values()) {
 
-                inputChannel.abort(error);
+                channel.abort(error);
             }
         }
 
         public void onOutput(final Selectable<? extends OUTPUT> selectable) {
 
-            final TransportInput<OUTPUT> inputChannel = mChannelMap.get(selectable.index);
+            final TransportChannel<OUTPUT> channel = mChannelMap.get(selectable.index);
 
-            if (inputChannel != null) {
+            if (channel != null) {
 
-                inputChannel.pass(selectable.data);
+                channel.pass(selectable.data);
             }
         }
     }

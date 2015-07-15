@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
+import com.gh.bmd.jrt.channel.TransportChannel;
 
 import java.util.Collection;
 
@@ -58,7 +58,7 @@ interface InvocationResult<OUTPUT> {
      *                        aborted while passing the results.
      * @return whether the invocation is complete.
      */
-    boolean passTo(@Nonnull Collection<TransportInput<OUTPUT>> newChannels,
-            @Nonnull Collection<TransportInput<OUTPUT>> oldChannels,
-            @Nonnull Collection<TransportInput<OUTPUT>> abortedChannels);
+    boolean passTo(@Nonnull Collection<TransportChannel<OUTPUT>> newChannels,
+            @Nonnull Collection<TransportChannel<OUTPUT>> oldChannels,
+            @Nonnull Collection<TransportChannel<OUTPUT>> abortedChannels);
 }

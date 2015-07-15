@@ -30,12 +30,10 @@ import com.gh.bmd.jrt.android.invocation.InvocationClashException;
 import com.gh.bmd.jrt.android.invocation.InvocationTypeException;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
-import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.channel.TransportChannel.TransportInput;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
@@ -620,11 +618,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
-        private final ArrayList<TransportInput<OUTPUT>> mAbortedChannels =
-                new ArrayList<TransportInput<OUTPUT>>();
+        private final ArrayList<TransportChannel<OUTPUT>> mAbortedChannels =
+                new ArrayList<TransportChannel<OUTPUT>>();
 
-        private final ArrayList<TransportInput<OUTPUT>> mChannels =
-                new ArrayList<TransportInput<OUTPUT>>();
+        private final ArrayList<TransportChannel<OUTPUT>> mChannels =
+                new ArrayList<TransportChannel<OUTPUT>>();
 
         private final RoutineLoader<?, OUTPUT> mLoader;
 
@@ -632,8 +630,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
         private final Logger mLogger;
 
-        private final ArrayList<TransportInput<OUTPUT>> mNewChannels =
-                new ArrayList<TransportInput<OUTPUT>>();
+        private final ArrayList<TransportChannel<OUTPUT>> mNewChannels =
+                new ArrayList<TransportChannel<OUTPUT>>();
 
         private CacheStrategyType mCacheStrategyType;
 
@@ -667,7 +665,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final ArrayList<TransportInput<OUTPUT>> channels = mNewChannels;
+            final ArrayList<TransportChannel<OUTPUT>> channels = mNewChannels;
             final TransportChannel<OUTPUT> channel = JRoutine.transport()
                                                              .channels()
                                                              .withChannelMaxSize(Integer.MAX_VALUE)
@@ -676,7 +674,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                                                              .withLogLevel(logger.getLogLevel())
                                                              .set()
                                                              .buildChannel();
-            channels.add(channel.input());
+            channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                                                        internalLoader.getInvocationCount()));
 
@@ -692,10 +690,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                                .withLog(logger.getLog())
                                .withLogLevel(logger.getLogLevel())
                                .set()
-                               .asyncCall(channel.output());
+                               .asyncCall(channel);
             }
 
-            return channel.output();
+            return channel;
         }
 
         public Loader<InvocationResult<OUTPUT>> onCreateLoader(final int id, final Bundle args) {
@@ -709,15 +707,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
             final Logger logger = mLogger;
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final ArrayList<TransportInput<OUTPUT>> channels = mChannels;
-            final ArrayList<TransportInput<OUTPUT>> newChannels = mNewChannels;
-            final ArrayList<TransportInput<OUTPUT>> abortedChannels = mAbortedChannels;
+            final ArrayList<TransportChannel<OUTPUT>> channels = mChannels;
+            final ArrayList<TransportChannel<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<TransportChannel<OUTPUT>> abortedChannels = mAbortedChannels;
             logger.dbg("dispatching invocation result: %s", data);
 
             if (data.passTo(newChannels, channels, abortedChannels)) {
 
-                final ArrayList<TransportInput<OUTPUT>> channelsToClose =
-                        new ArrayList<TransportInput<OUTPUT>>(channels);
+                final ArrayList<TransportChannel<OUTPUT>> channelsToClose =
+                        new ArrayList<TransportChannel<OUTPUT>>(channels);
                 channelsToClose.addAll(newChannels);
                 mResultCount += channels.size() + newChannels.size();
                 channels.clear();
@@ -744,14 +742,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
                     final Throwable exception = data.getAbortException();
 
-                    for (final TransportInput<OUTPUT> channel : channelsToClose) {
+                    for (final TransportChannel<OUTPUT> channel : channelsToClose) {
 
                         channel.abort(exception);
                     }
 
                 } else {
 
-                    for (final TransportInput<OUTPUT> channel : channelsToClose) {
+                    for (final TransportChannel<OUTPUT> channel : channelsToClose) {
 
                         channel.close();
                     }
@@ -781,17 +779,17 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
             mLogger.dbg("aborting result channels");
             mResultCount = 0;
-            final ArrayList<TransportInput<OUTPUT>> channels = mChannels;
-            final ArrayList<TransportInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<TransportChannel<OUTPUT>> channels = mChannels;
+            final ArrayList<TransportChannel<OUTPUT>> newChannels = mNewChannels;
 
-            for (final InputChannel<OUTPUT> channel : channels) {
+            for (final TransportChannel<OUTPUT> channel : channels) {
 
                 channel.abort(reason);
             }
 
             channels.clear();
 
-            for (final InputChannel<OUTPUT> newChannel : newChannels) {
+            for (final TransportChannel<OUTPUT> newChannel : newChannels) {
 
                 newChannel.abort(reason);
             }

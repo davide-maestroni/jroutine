@@ -43,9 +43,9 @@ import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
  */
 class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
 
-    private final DefaultTransportInput<DATA> mInputChannel;
+    private final DefaultResultChannel<DATA> mInputChannel;
 
-    private final DefaultTransportOutput<DATA> mOutputChannel;
+    private final OutputChannel<DATA> mOutputChannel;
 
     /**
      * Constructor.
@@ -63,8 +63,8 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
                                                invocationConfiguration.getAsyncRunnerOr(
                                                        Runners.sharedRunner()), logger);
         abortHandler.setChannel(inputChannel);
-        mInputChannel = new DefaultTransportInput<DATA>(inputChannel);
-        mOutputChannel = new DefaultTransportOutput<DATA>(inputChannel.getOutput());
+        mInputChannel = inputChannel;
+        mOutputChannel = inputChannel.getOutput();
         logger.dbg("building transport channel with configuration: %s", configuration);
     }
 
@@ -84,16 +84,201 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
                         .set();
     }
 
-    @Nonnull
-    public TransportInput<DATA> input() {
+    public boolean abort() {
 
-        return mInputChannel;
+        return mInputChannel.abort() || mOutputChannel.abort();
+    }
+
+    public boolean abort(@Nullable final Throwable reason) {
+
+        return mInputChannel.abort(reason) || mOutputChannel.abort(reason);
+    }
+
+    public boolean isOpen() {
+
+        return mInputChannel.isOpen();
     }
 
     @Nonnull
-    public TransportOutput<DATA> output() {
+    public TransportChannel<DATA> after(@Nonnull final TimeDuration delay) {
 
-        return mOutputChannel;
+        mInputChannel.after(delay);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+
+        mInputChannel.after(delay, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> now() {
+
+        mInputChannel.now();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> orderByCall() {
+
+        mInputChannel.orderByCall();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> orderByChance() {
+
+        mInputChannel.orderByChance();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> orderByDelay() {
+
+        mInputChannel.orderByDelay();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> pass(@Nullable final OutputChannel<? extends DATA> channel) {
+
+        mInputChannel.pass(channel);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> pass(@Nullable final Iterable<? extends DATA> inputs) {
+
+        mInputChannel.pass(inputs);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> pass(@Nullable final DATA input) {
+
+        mInputChannel.pass(input);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> pass(@Nullable final DATA... inputs) {
+
+        mInputChannel.pass(inputs);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> afterMax(@Nonnull final TimeDuration timeout) {
+
+        mOutputChannel.afterMax(timeout);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
+
+        mOutputChannel.afterMax(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> allInto(@Nonnull final Collection<? super DATA> results) {
+
+        mOutputChannel.allInto(results);
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> eventually() {
+
+        mOutputChannel.eventually();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> eventuallyAbort() {
+
+        mOutputChannel.eventuallyAbort();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> eventuallyDeadlock() {
+
+        mOutputChannel.eventuallyDeadlock();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> eventuallyExit() {
+
+        mOutputChannel.eventuallyExit();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> immediately() {
+
+        mOutputChannel.immediately();
+        return this;
+    }
+
+    @Nonnull
+    public TransportChannel<DATA> passTo(@Nonnull final OutputConsumer<? super DATA> consumer) {
+
+        mOutputChannel.passTo(consumer);
+        return this;
+    }
+
+    @Nonnull
+    public InputChannel<DATA> asInput() {
+
+        return this;
+    }
+
+    @Nonnull
+    public OutputChannel<DATA> asOutput() {
+
+        return this;
+    }
+
+    public void close() {
+
+        mInputChannel.close();
+    }
+
+    @Nonnull
+    public List<DATA> all() {
+
+        return mOutputChannel.all();
+    }
+
+    public boolean checkComplete() {
+
+        return mOutputChannel.checkComplete();
+    }
+
+    public boolean isBound() {
+
+        return mOutputChannel.isBound();
+    }
+
+    public DATA next() {
+
+        return mOutputChannel.next();
+    }
+
+    @Nonnull
+    public <INPUT extends InputChannel<? super DATA>> INPUT passTo(@Nonnull final INPUT channel) {
+
+        return mOutputChannel.passTo(channel);
+    }
+
+    public Iterator<DATA> iterator() {
+
+        return mOutputChannel.iterator();
     }
 
     /**
@@ -112,250 +297,6 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         private void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
 
             mChannel = channel;
-        }
-    }
-
-    /**
-     * Default implementation of a transport channel input.
-     *
-     * @param <INPUT> the input data type.
-     */
-    private static class DefaultTransportInput<INPUT> implements TransportInput<INPUT> {
-
-        private final DefaultResultChannel<INPUT> mChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped result channel.
-         */
-        private DefaultTransportInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
-
-            mChannel = wrapped;
-        }
-
-        public boolean abort() {
-
-            return mChannel.abort();
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> after(@Nonnull final TimeDuration delay) {
-
-            mChannel.after(delay);
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
-
-            mChannel.after(delay, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> now() {
-
-            mChannel.now();
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> orderByCall() {
-
-            mChannel.orderByCall();
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> orderByChance() {
-
-            mChannel.orderByChance();
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> orderByDelay() {
-
-            mChannel.orderByDelay();
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> pass(@Nullable final OutputChannel<? extends INPUT> channel) {
-
-            mChannel.pass(channel);
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
-
-            mChannel.pass(inputs);
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> pass(@Nullable final INPUT input) {
-
-            mChannel.pass(input);
-            return this;
-        }
-
-        @Nonnull
-        public TransportInput<INPUT> pass(@Nullable final INPUT... inputs) {
-
-            mChannel.pass(inputs);
-            return this;
-        }
-
-        public void close() {
-
-            mChannel.close();
-        }
-
-        public boolean abort(@Nullable final Throwable reason) {
-
-            return mChannel.abort(reason);
-        }
-
-        public boolean isOpen() {
-
-            return mChannel.isOpen();
-        }
-    }
-
-    /**
-     * Default implementation of a transport channel output.
-     *
-     * @param <OUTPUT> the output data type.
-     */
-    private static class DefaultTransportOutput<OUTPUT> implements TransportOutput<OUTPUT> {
-
-        private final OutputChannel<OUTPUT> mChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped output channel.
-         */
-        private DefaultTransportOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
-
-            mChannel = wrapped;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
-
-            mChannel.afterMax(timeout);
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> afterMax(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
-
-            mChannel.afterMax(timeout, timeUnit);
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> allInto(@Nonnull final Collection<? super OUTPUT> result) {
-
-            mChannel.allInto(result);
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> eventually() {
-
-            mChannel.eventually();
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> eventuallyAbort() {
-
-            mChannel.eventuallyAbort();
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> eventuallyDeadlock() {
-
-            mChannel.eventuallyDeadlock();
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> eventuallyExit() {
-
-            mChannel.eventuallyExit();
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> immediately() {
-
-            mChannel.immediately();
-            return this;
-        }
-
-        @Nonnull
-        public TransportOutput<OUTPUT> passTo(
-                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
-
-            mChannel.passTo(consumer);
-            return this;
-        }
-
-        @Nonnull
-        public List<OUTPUT> all() {
-
-            return mChannel.all();
-        }
-
-        public boolean checkComplete() {
-
-            return mChannel.checkComplete();
-        }
-
-        public boolean isBound() {
-
-            return mChannel.isBound();
-        }
-
-        public OUTPUT next() {
-
-            return mChannel.next();
-        }
-
-        @Nonnull
-        public <INPUT extends InputChannel<? super OUTPUT>> INPUT passTo(
-                @Nonnull final INPUT channel) {
-
-            channel.pass(this);
-            return channel;
-        }
-
-        public Iterator<OUTPUT> iterator() {
-
-            return mChannel.iterator();
-        }
-
-        public boolean abort() {
-
-            return mChannel.abort();
-        }
-
-        public boolean abort(@Nullable final Throwable reason) {
-
-            return mChannel.abort(reason);
-        }
-
-        public boolean isOpen() {
-
-            return mChannel.isOpen();
         }
     }
 }

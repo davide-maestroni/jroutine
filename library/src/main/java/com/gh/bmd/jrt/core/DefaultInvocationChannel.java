@@ -16,12 +16,12 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.AbortException;
-import com.gh.bmd.jrt.channel.InputDeadlockException;
+import com.gh.bmd.jrt.channel.DeadlockException;
+import com.gh.bmd.jrt.channel.InputTimeoutException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.channel.RunnerDeadlockException;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -345,14 +345,13 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         if (mInputTimeout.isZero()) {
 
             mInputCount -= count;
-            throw new InputDeadlockException(
-                    "deadlock while waiting for room in the input channel");
+            throw new InputTimeoutException("timeout while waiting for room in the input channel");
         }
 
         if (mRunner.isExecutionThread()) {
 
             mInputCount -= count;
-            throw new RunnerDeadlockException("cannot wait on the invocation runner thread");
+            throw new DeadlockException("cannot wait on the invocation runner thread");
         }
 
         try {
@@ -360,8 +359,8 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
 
                 mInputCount -= count;
-                throw new InputDeadlockException(
-                        "deadlock while waiting for room in the input channel");
+                throw new InputTimeoutException(
+                        "timeout while waiting for room in the input channel");
             }
 
         } catch (final InterruptedException e) {
@@ -1107,7 +1106,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (size > mMaxInput) {
 
-                throw new InputDeadlockException(
+                throw new InputTimeoutException(
                         "inputs exceed maximum channel size [" + size + "/" + mMaxInput + "]");
             }
 
@@ -1209,7 +1208,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
             if (size > mMaxInput) {
 
-                throw new InputDeadlockException(
+                throw new InputTimeoutException(
                         "inputs exceed maximum channel size [" + size + "/" + mMaxInput + "]");
             }
 

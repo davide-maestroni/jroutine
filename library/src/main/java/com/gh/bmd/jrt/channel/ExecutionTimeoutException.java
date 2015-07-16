@@ -16,18 +16,18 @@ package com.gh.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no result became available before the read timeout elapsed.
+ * Exception indicating that no result became available before the specific timeout elapsed.
  * <p/>
  * Created by davide-maestroni on 11/25/14.
  */
-public class ReadDeadlockException extends DeadlockException {
+public class ExecutionTimeoutException extends TimeoutException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public ReadDeadlockException(@Nullable final String message) {
+    public ExecutionTimeoutException(@Nullable final String message) {
 
         super(message);
     }

@@ -242,15 +242,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final int outputMaxSize =
                     invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
-            final TimeDuration readTimeout = invocationConfiguration.getReadTimeoutOr(null);
+            final TimeDuration executionTimeout =
+                    invocationConfiguration.getExecutionTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
-                    invocationConfiguration.getReadTimeoutActionOr(null);
+                    invocationConfiguration.getExecutionTimeoutActionOr(null);
             mTransportOutput = JRoutine.transport()
                                        .channels()
                                        .withChannelMaxSize(outputMaxSize)
                                        .withChannelTimeout(outputTimeout)
-                                       .withReadTimeout(readTimeout)
-                                       .withReadTimeoutAction(timeoutActionType)
+                                       .withPassTimeout(executionTimeout)
+                                       .withPassTimeoutAction(timeoutActionType)
                                        .withLog(log)
                                        .withLogLevel(logLevel)
                                        .set()

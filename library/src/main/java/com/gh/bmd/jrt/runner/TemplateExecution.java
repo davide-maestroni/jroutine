@@ -18,7 +18,7 @@ package com.gh.bmd.jrt.runner;
  * <p/>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
- * Created by davide on 07/07/15.
+ * Created by davide-maestroni on 07/07/15.
  */
 public abstract class TemplateExecution implements Execution {
 

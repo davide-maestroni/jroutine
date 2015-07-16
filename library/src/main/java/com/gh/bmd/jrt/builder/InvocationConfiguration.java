@@ -58,14 +58,14 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, an
- * {@link com.gh.bmd.jrt.invocation.InvocationDeadlockException InvocationDeadlockException} will
+ * {@link com.gh.bmd.jrt.invocation.InvocationTimeoutException InvocationTimeoutException} will
  * be thrown.
  * <p/>
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
  * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case, a {@link com.gh.bmd.jrt.channel.DeadlockException
- * DeadlockException} will be thrown.<br/>
+ * timeout elapses. In the latter case, a {@link com.gh.bmd.jrt.channel.TimeoutException
+ * TimeoutException} will be thrown.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
  * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
@@ -94,6 +94,8 @@ public final class InvocationConfiguration {
 
     private final int mCoreInstances;
 
+    private final TimeDuration mExecutionTimeout;
+
     private final int mInputMaxSize;
 
     private final OrderType mInputOrderType;
@@ -114,8 +116,6 @@ public final class InvocationConfiguration {
 
     private final int mPriority;
 
-    private final TimeDuration mReadTimeout;
-
     private final Runner mSyncRunner;
 
     private final TimeoutActionType mTimeoutActionType;
@@ -131,7 +131,7 @@ public final class InvocationConfiguration {
      *                         positive number.
      * @param availableTimeout the maximum timeout while waiting for an invocation instance to be
      *                         available.
-     * @param readTimeout      the timeout for an invocation instance to produce a result.
+     * @param executionTimeout the timeout for an invocation instance to produce a result.
      * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         result is available.
      * @param inputOrderType   the order in which input data are collected from the input channel.
@@ -148,11 +148,12 @@ public final class InvocationConfiguration {
     private InvocationConfiguration(@Nullable final Runner syncRunner,
             @Nullable final Runner asyncRunner, final int priority, final int maxInstances,
             final int coreInstances, @Nullable final TimeDuration availableTimeout,
-            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
-            @Nullable final OrderType inputOrderType, final int inputMaxSize,
-            @Nullable final TimeDuration inputTimeout, @Nullable final OrderType outputOrderType,
-            final int outputMaxSize, @Nullable final TimeDuration outputTimeout,
-            @Nullable final Log log, @Nullable final LogLevel logLevel) {
+            @Nullable final TimeDuration executionTimeout,
+            @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
+            final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
+            @Nullable final OrderType outputOrderType, final int outputMaxSize,
+            @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
+            @Nullable final LogLevel logLevel) {
 
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
@@ -160,7 +161,7 @@ public final class InvocationConfiguration {
         mMaxInstances = maxInstances;
         mCoreInstances = coreInstances;
         mAvailableTimeout = availableTimeout;
-        mReadTimeout = readTimeout;
+        mExecutionTimeout = executionTimeout;
         mTimeoutActionType = actionType;
         mInputOrderType = inputOrderType;
         mInputMaxSize = inputMaxSize;
@@ -243,6 +244,33 @@ public final class InvocationConfiguration {
 
         final int coreInstances = mCoreInstances;
         return (coreInstances != DEFAULT) ? coreInstances : valueIfNotSet;
+    }
+
+    /**
+     * Returns the action to be taken if the timeout elapses before a readable result is available
+     * (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the action type.
+     */
+    public TimeoutActionType getExecutionTimeoutActionOr(
+            @Nullable final TimeoutActionType valueIfNotSet) {
+
+        final TimeoutActionType timeoutActionType = mTimeoutActionType;
+        return (timeoutActionType != null) ? timeoutActionType : valueIfNotSet;
+    }
+
+    /**
+     * Returns the timeout for an invocation instance to produce a readable result (null by
+     * default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the timeout.
+     */
+    public TimeDuration getExecutionTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+
+        final TimeDuration executionTimeout = mExecutionTimeout;
+        return (executionTimeout != null) ? executionTimeout : valueIfNotSet;
     }
 
     /**
@@ -368,33 +396,6 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the action to be taken if the timeout elapses before a readable result is available
-     * (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the action type.
-     */
-    public TimeoutActionType getReadTimeoutActionOr(
-            @Nullable final TimeoutActionType valueIfNotSet) {
-
-        final TimeoutActionType timeoutActionType = mTimeoutActionType;
-        return (timeoutActionType != null) ? timeoutActionType : valueIfNotSet;
-    }
-
-    /**
-     * Returns the timeout for an invocation instance to produce a readable result (null by
-     * default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the timeout.
-     */
-    public TimeDuration getReadTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
-
-        final TimeDuration readTimeout = mReadTimeout;
-        return (readTimeout != null) ? readTimeout : valueIfNotSet;
-    }
-
-    /**
      * Returns the runner used for synchronous invocations (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -413,6 +414,7 @@ public final class InvocationConfiguration {
         int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
         result = 31 * result + (mAvailableTimeout != null ? mAvailableTimeout.hashCode() : 0);
         result = 31 * result + mCoreInstances;
+        result = 31 * result + (mExecutionTimeout != null ? mExecutionTimeout.hashCode() : 0);
         result = 31 * result + mInputMaxSize;
         result = 31 * result + (mInputOrderType != null ? mInputOrderType.hashCode() : 0);
         result = 31 * result + (mInputTimeout != null ? mInputTimeout.hashCode() : 0);
@@ -423,7 +425,6 @@ public final class InvocationConfiguration {
         result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + mPriority;
-        result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
@@ -483,6 +484,12 @@ public final class InvocationConfiguration {
             return false;
         }
 
+        if (mExecutionTimeout != null ? !mExecutionTimeout.equals(that.mExecutionTimeout)
+                : that.mExecutionTimeout != null) {
+
+            return false;
+        }
+
         if (mInputOrderType != that.mInputOrderType) {
 
             return false;
@@ -515,19 +522,13 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
-                : that.mReadTimeout != null) {
-
-            return false;
-        }
-
         if (mSyncRunner != null ? !mSyncRunner.equals(that.mSyncRunner)
                 : that.mSyncRunner != null) {
 
             return false;
         }
 
-        return (mTimeoutActionType == that.mTimeoutActionType);
+        return mTimeoutActionType == that.mTimeoutActionType;
     }
 
     @Override
@@ -537,6 +538,7 @@ public final class InvocationConfiguration {
                 "mAsyncRunner=" + mAsyncRunner +
                 ", mAvailableTimeout=" + mAvailableTimeout +
                 ", mCoreInstances=" + mCoreInstances +
+                ", mExecutionTimeout=" + mExecutionTimeout +
                 ", mInputMaxSize=" + mInputMaxSize +
                 ", mInputOrderType=" + mInputOrderType +
                 ", mInputTimeout=" + mInputTimeout +
@@ -547,7 +549,6 @@ public final class InvocationConfiguration {
                 ", mOutputOrderType=" + mOutputOrderType +
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mPriority=" + mPriority +
-                ", mReadTimeout=" + mReadTimeout +
                 ", mSyncRunner=" + mSyncRunner +
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
@@ -595,11 +596,11 @@ public final class InvocationConfiguration {
     public enum TimeoutActionType {
 
         /**
-         * Deadlock.<br/>
-         * If no result is available after the specified timeout, the called method will throw a
-         * {@link com.gh.bmd.jrt.channel.ReadDeadlockException ReadDeadlockException}.
+         * Throw.<br/>
+         * If no result is available after the specified timeout, the called method will throw an
+         * {@link com.gh.bmd.jrt.channel.ExecutionTimeoutException ExecutionTimeoutException}.
          */
-        DEADLOCK,
+        THROW,
         /**
          * Break execution.<br/>
          * If no result is available after the specified timeout, the called method will stop its
@@ -713,6 +714,8 @@ public final class InvocationConfiguration {
 
         private int mCoreInstances;
 
+        private TimeDuration mExecutionTimeout;
+
         private int mInputMaxSize;
 
         private OrderType mInputOrderType;
@@ -732,8 +735,6 @@ public final class InvocationConfiguration {
         private TimeDuration mOutputTimeout;
 
         private int mPriority;
-
-        private TimeDuration mReadTimeout;
 
         private Runner mSyncRunner;
 
@@ -876,6 +877,57 @@ public final class InvocationConfiguration {
             }
 
             mCoreInstances = coreInstances;
+            return this;
+        }
+
+        /**
+         * Sets the timeout for an invocation instance to produce a readable result.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout can be dynamically changed through the dedicated methods.
+         *
+         * @param timeout  the timeout.
+         * @param timeUnit the timeout time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+         */
+        @Nonnull
+        public Builder<TYPE> withExecutionTimeout(final long timeout,
+                @Nonnull final TimeUnit timeUnit) {
+
+            return withExecutionTimeout(fromUnit(timeout, timeUnit));
+        }
+
+        /**
+         * Sets the timeout for an invocation instance to produce a readable result. A null value
+         * means that it is up to the framework to choose a default one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout can be dynamically changed through the dedicated methods.
+         *
+         * @param timeout the timeout.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withExecutionTimeout(@Nullable final TimeDuration timeout) {
+
+            mExecutionTimeout = timeout;
+            return this;
+        }
+
+        /**
+         * Sets the action to be taken if the timeout elapses before a result can be read from the
+         * output channel. A null value means that it is up to the framework to choose a default
+         * one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout action can be dynamically changed through the dedicated methods.
+         *
+         * @param actionType the action type.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder<TYPE> withExecutionTimeoutAction(
+                @Nullable final TimeoutActionType actionType) {
+
+            mTimeoutActionType = actionType;
             return this;
         }
 
@@ -1080,55 +1132,6 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the timeout for an invocation instance to produce a readable result.<br/>
-         * Note that this is just the initial configuration of the invocation, since the output
-         * timeout can be dynamically changed through the dedicated methods.
-         *
-         * @param timeout  the timeout.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         */
-        @Nonnull
-        public Builder<TYPE> withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-            return withReadTimeout(fromUnit(timeout, timeUnit));
-        }
-
-        /**
-         * Sets the timeout for an invocation instance to produce a readable result. A null value
-         * means that it is up to the framework to choose a default one.<br/>
-         * Note that this is just the initial configuration of the invocation, since the output
-         * timeout can be dynamically changed through the dedicated methods.
-         *
-         * @param timeout the timeout.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
-
-            mReadTimeout = timeout;
-            return this;
-        }
-
-        /**
-         * Sets the action to be taken if the timeout elapses before a result can be read from the
-         * output channel. A null value means that it is up to the framework to choose a default
-         * one.<br/>
-         * Note that this is just the initial configuration of the invocation, since the output
-         * timeout action can be dynamically changed through the dedicated methods.
-         *
-         * @param actionType the action type.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> withReadTimeoutAction(@Nullable final TimeoutActionType actionType) {
-
-            mTimeoutActionType = actionType;
-            return this;
-        }
-
-        /**
          * Sets the synchronous runner instance. A null value means that it is up to the framework
          * to choose a default one.
          *
@@ -1186,18 +1189,18 @@ public final class InvocationConfiguration {
                 withAvailInstanceTimeout(availTimeout);
             }
 
-            final TimeDuration readTimeout = configuration.mReadTimeout;
+            final TimeDuration executionTimeout = configuration.mExecutionTimeout;
 
-            if (readTimeout != null) {
+            if (executionTimeout != null) {
 
-                withReadTimeout(readTimeout);
+                withExecutionTimeout(executionTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
 
             if (timeoutActionType != null) {
 
-                withReadTimeoutAction(timeoutActionType);
+                withExecutionTimeoutAction(timeoutActionType);
             }
         }
 
@@ -1268,7 +1271,7 @@ public final class InvocationConfiguration {
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mSyncRunner, mAsyncRunner, mPriority, mMaxInstances,
-                                               mCoreInstances, mAvailableTimeout, mReadTimeout,
+                                               mCoreInstances, mAvailableTimeout, mExecutionTimeout,
                                                mTimeoutActionType, mInputOrderType, mInputMaxSize,
                                                mInputTimeout, mOutputOrderType, mOutputMaxSize,
                                                mOutputTimeout, mLog, mLogLevel);
@@ -1282,7 +1285,7 @@ public final class InvocationConfiguration {
             mMaxInstances = configuration.mMaxInstances;
             mCoreInstances = configuration.mCoreInstances;
             mAvailableTimeout = configuration.mAvailableTimeout;
-            mReadTimeout = configuration.mReadTimeout;
+            mExecutionTimeout = configuration.mExecutionTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mInputOrderType = configuration.mInputOrderType;
             mInputMaxSize = configuration.mInputMaxSize;

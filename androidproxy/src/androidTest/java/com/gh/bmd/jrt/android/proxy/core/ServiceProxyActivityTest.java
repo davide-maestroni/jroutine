@@ -78,7 +78,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ServiceProxyRoutineBuilder builder =
                 JRoutineProxy.on(serviceFrom(getActivity(), TestService.class), TestList.class)
                              .invocations()
-                             .withReadTimeout(seconds(10))
+                             .withExecutionTimeout(seconds(10))
                              .set();
 
         final TestListItf<String> testListItf1 =
@@ -273,7 +273,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ServiceProxyRoutineBuilder builder =
                 JRoutineProxy.on(serviceFrom(getActivity(), TestService.class), TestClass2.class)
                              .invocations()
-                             .withReadTimeout(seconds(10))
+                             .withExecutionTimeout(seconds(10))
                              .set();
 
         long startTime = System.currentTimeMillis();
@@ -309,7 +309,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         final Itf itf = JRoutineProxy.on(serviceFrom(getActivity(), TestService.class), Impl.class)
                                      .invocations()
-                                     .withReadTimeout(INFINITY)
+                                     .withExecutionTimeout(INFINITY)
                                      .set()
                                      .buildProxy(Itf.class);
 
@@ -530,7 +530,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         assertThat(
                 JRoutineProxy.on(serviceFrom(getActivity(), TestService.class), TestTimeout.class)
                              .invocations()
-                             .withReadTimeout(seconds(10))
+                             .withExecutionTimeout(seconds(10))
                              .set()
                              .buildProxy(TestTimeoutItf.class)
                              .getInt()).containsExactly(31);
@@ -539,7 +539,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineProxy.on(serviceFrom(getActivity(), TestService.class), TestTimeout.class)
                          .invocations()
-                         .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                         .withExecutionTimeoutAction(TimeoutActionType.THROW)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();
@@ -561,7 +561,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+        int add2(@Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Output(OutputMode.VALUE)
@@ -575,14 +575,14 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("a")
         @Output(OutputMode.VALUE)
         OutputChannel<Integer> add5(
-                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.VALUE)
         InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        @Inputs(value = char.class, mode = InputMode.PARALLEL)
         InvocationChannel<Character, Integer> add7();
 
         @Alias("aa")
@@ -598,7 +598,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         @Alias("aa")
         int[] addA03(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.VALUE)
@@ -617,7 +617,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("aa")
         @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -636,7 +636,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -655,7 +655,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         List<int[]> addA15(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -674,14 +674,14 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.VALUE)
         InvocationChannel<char[], int[]> addA20();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
+        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
         InvocationChannel<char[], int[]> addA21();
 
         @Alias("aa")
@@ -701,7 +701,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         @Alias("al")
         List<Integer> addL03(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.VALUE)
@@ -720,7 +720,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("al")
         @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.ELEMENT)
@@ -739,7 +739,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("al")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -758,7 +758,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL15(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -777,14 +777,14 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List[] addL19(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.VALUE)
         InvocationChannel<List<Character>, List<Integer>> addL20();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.ELEMENT)
+        @Inputs(value = List.class, mode = InputMode.PARALLEL)
         InvocationChannel<List<Character>, List<Integer>> addL21();
 
         @Alias("al")
@@ -809,7 +809,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         InvocationChannel<Void, Integer> get2();
 
         @Alias("s")
-        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+        void set2(@Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel<Integer> i);
 
         @Alias("ga")
         int[] getA0();
@@ -837,7 +837,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         int[][] getA3();
 
         @Alias("sa")
-        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
+        void setA3(@Input(value = int[].class, mode = InputMode.PARALLEL) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Inputs({})
@@ -871,7 +871,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         @Alias("sl")
         void setL3(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
+                mode = InputMode.PARALLEL) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Inputs({})

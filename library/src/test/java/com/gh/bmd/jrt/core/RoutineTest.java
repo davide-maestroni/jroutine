@@ -23,16 +23,15 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.DeadlockException;
+import com.gh.bmd.jrt.channel.ExecutionTimeoutException;
 import com.gh.bmd.jrt.channel.InputChannel;
-import com.gh.bmd.jrt.channel.InputDeadlockException;
+import com.gh.bmd.jrt.channel.InputTimeoutException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
-import com.gh.bmd.jrt.channel.OutputDeadlockException;
-import com.gh.bmd.jrt.channel.ReadDeadlockException;
+import com.gh.bmd.jrt.channel.OutputTimeoutException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
-import com.gh.bmd.jrt.channel.RunnerDeadlockException;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
@@ -42,10 +41,10 @@ import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
-import com.gh.bmd.jrt.invocation.InvocationDeadlockException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
+import com.gh.bmd.jrt.invocation.InvocationTimeoutException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
@@ -1377,7 +1376,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InputDeadlockException ignored) {
+        } catch (final InputTimeoutException ignored) {
 
         }
 
@@ -1393,7 +1392,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InputDeadlockException ignored) {
+        } catch (final InputTimeoutException ignored) {
 
         }
     }
@@ -1407,7 +1406,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
 
@@ -1417,7 +1416,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
 
@@ -1427,7 +1426,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
 
@@ -1437,7 +1436,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
     }
@@ -1466,7 +1465,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InputDeadlockException ignored) {
+        } catch (final InputTimeoutException ignored) {
 
         }
 
@@ -1683,7 +1682,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationDeadlockException ignored) {
+        } catch (final InvocationTimeoutException ignored) {
 
         }
     }
@@ -1748,7 +1747,7 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(test)
                            .invocations()
-                           .withReadTimeout(timeout)
+                           .withExecutionTimeout(timeout)
                            .set()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
@@ -1760,7 +1759,8 @@ public class RoutineTest {
 
         final TestInterfaceAsync testInterfaceAsync = JRoutine.on(test)
                                                               .invocations()
-                                                              .withReadTimeout(1, TimeUnit.SECONDS)
+                                                              .withExecutionTimeout(1,
+                                                                                    TimeUnit.SECONDS)
                                                               .set()
                                                               .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
@@ -1791,7 +1791,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final OutputDeadlockException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -1817,7 +1817,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final OutputDeadlockException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
     }
@@ -1841,7 +1841,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final OutputDeadlockException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2113,7 +2113,6 @@ public class RoutineTest {
                 routine1.syncCall("test").afterMax(millis(500)).eventuallyExit().iterator();
 
         assertThat(iterator.next()).isEqualTo("test");
-        iterator.remove();
 
         try {
 
@@ -2121,7 +2120,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final UnsupportedOperationException ignored) {
 
         }
 
@@ -2151,7 +2150,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
     }
@@ -2172,7 +2171,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
 
@@ -2189,7 +2188,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
 
@@ -2206,7 +2205,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
 
@@ -2223,7 +2222,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final RunnerDeadlockException ignored) {
+        } catch (final DeadlockException ignored) {
 
         }
     }
@@ -2347,7 +2346,7 @@ public class RoutineTest {
         final Routine<String, String> routine1 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withReadTimeoutAction(TimeoutActionType.ABORT)
+                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
                         .set()
                         .buildRoutine();
 
@@ -2407,8 +2406,8 @@ public class RoutineTest {
         final Routine<String, String> routine2 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withReadTimeoutAction(TimeoutActionType.ABORT)
-                        .withReadTimeout(millis(10))
+                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                        .withExecutionTimeout(millis(10))
                         .set()
                         .buildRoutine();
 
@@ -2468,7 +2467,7 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                        .withExecutionTimeoutAction(TimeoutActionType.THROW)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel3 = routine3.asyncCall("test1");
@@ -2479,7 +2478,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2489,7 +2488,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2500,7 +2499,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2510,7 +2509,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2520,7 +2519,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2534,7 +2533,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2544,7 +2543,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2555,7 +2554,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2565,7 +2564,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2575,7 +2574,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -2584,7 +2583,7 @@ public class RoutineTest {
         final Routine<String, String> routine4 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withReadTimeoutAction(TimeoutActionType.EXIT)
+                        .withExecutionTimeoutAction(TimeoutActionType.EXIT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel4 = routine4.asyncCall("test1");

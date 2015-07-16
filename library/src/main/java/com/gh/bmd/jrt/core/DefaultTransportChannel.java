@@ -78,8 +78,8 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
                                 configuration.getChannelMaxSizeOr(InvocationConfiguration.DEFAULT))
                         .withOutputOrder(configuration.getChannelOrderTypeOr(null))
                         .withOutputTimeout(configuration.getChannelTimeoutOr(null))
-                        .withReadTimeout(configuration.getReadTimeoutOr(null))
-                        .withReadTimeoutAction(configuration.getReadTimeoutActionOr(null))
+                        .withExecutionTimeout(configuration.getPassTimeoutOr(null))
+                        .withExecutionTimeoutAction(configuration.getPassTimeoutActionOr(null))
                         .withLog(configuration.getLogOr(null))
                         .withLogLevel(configuration.getLogLevelOr(null))
                         .set();
@@ -206,16 +206,16 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     }
 
     @Nonnull
-    public TransportChannel<DATA> eventuallyDeadlock() {
+    public TransportChannel<DATA> eventuallyExit() {
 
-        mOutputChannel.eventuallyDeadlock();
+        mOutputChannel.eventuallyExit();
         return this;
     }
 
     @Nonnull
-    public TransportChannel<DATA> eventuallyExit() {
+    public TransportChannel<DATA> eventuallyThrow() {
 
-        mOutputChannel.eventuallyExit();
+        mOutputChannel.eventuallyThrow();
         return this;
     }
 

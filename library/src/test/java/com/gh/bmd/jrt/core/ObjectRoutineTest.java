@@ -108,7 +108,7 @@ public class ObjectRoutineTest {
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
                                                         .withAvailInstanceTimeout(1, timeUnit)
-                                                        .withReadTimeoutAction(
+                                                        .withExecutionTimeoutAction(
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
@@ -125,7 +125,7 @@ public class ObjectRoutineTest {
         final Sum sum = new Sum();
         final SumItf sumAsync = JRoutine.on(sum)
                                         .invocations()
-                                        .withReadTimeout(timeout)
+                                        .withExecutionTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
         final TransportChannel<Integer> channel3 = JRoutine.transport().buildChannel();
@@ -159,7 +159,7 @@ public class ObjectRoutineTest {
         final Count count = new Count();
         final CountItf countAsync = JRoutine.on(count)
                                             .invocations()
-                                            .withReadTimeout(timeout)
+                                            .withExecutionTimeout(timeout)
                                             .set()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
@@ -440,7 +440,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(test)
                     .invocations()
-                    .withReadTimeout(INFINITY)
+                    .withExecutionTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException(null);
@@ -455,7 +455,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(test)
                     .invocations()
-                    .withReadTimeout(INFINITY)
+                    .withExecutionTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
@@ -681,7 +681,7 @@ public class ObjectRoutineTest {
         final Impl impl = new Impl();
         final Itf itf = JRoutine.on(impl)
                                 .invocations()
-                                .withReadTimeout(INFINITY)
+                                .withExecutionTimeout(INFINITY)
                                 .set()
                                 .buildProxy(Itf.class);
 
@@ -1009,7 +1009,7 @@ public class ObjectRoutineTest {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder =
-                JRoutine.on(test2).invocations().withReadTimeout(seconds(2)).set();
+                JRoutine.on(test2).invocations().withExecutionTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 
@@ -1038,7 +1038,7 @@ public class ObjectRoutineTest {
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutine.on(testTimeout)
                            .invocations()
-                           .withReadTimeout(seconds(1))
+                           .withExecutionTimeout(seconds(1))
                            .set()
                            .aliasMethod("test")
                            .asyncCall()
@@ -1048,7 +1048,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(testTimeout)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .aliasMethod("test")
                     .asyncCall()
@@ -1062,7 +1062,7 @@ public class ObjectRoutineTest {
 
         assertThat(JRoutine.on(testTimeout)
                            .invocations()
-                           .withReadTimeout(seconds(1))
+                           .withExecutionTimeout(seconds(1))
                            .set()
                            .method("getInt")
                            .asyncCall()
@@ -1072,7 +1072,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(testTimeout)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .method("getInt")
                     .asyncCall()
@@ -1086,7 +1086,7 @@ public class ObjectRoutineTest {
 
         assertThat(JRoutine.on(testTimeout)
                            .invocations()
-                           .withReadTimeout(seconds(1))
+                           .withExecutionTimeout(seconds(1))
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .asyncCall()
@@ -1096,7 +1096,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(testTimeout)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .asyncCall()
@@ -1110,7 +1110,7 @@ public class ObjectRoutineTest {
 
         assertThat(JRoutine.on(testTimeout)
                            .invocations()
-                           .withReadTimeout(seconds(1))
+                           .withExecutionTimeout(seconds(1))
                            .set()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
@@ -1119,7 +1119,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(testTimeout)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
@@ -1140,7 +1140,7 @@ public class ObjectRoutineTest {
         int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+        int add2(@Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Output(OutputMode.VALUE)
@@ -1154,14 +1154,14 @@ public class ObjectRoutineTest {
         @Alias("a")
         @Output(OutputMode.VALUE)
         OutputChannel<Integer> add5(
-                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.VALUE)
         InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        @Inputs(value = char.class, mode = InputMode.PARALLEL)
         InvocationChannel<Character, Integer> add7();
 
         @Alias("aa")
@@ -1177,7 +1177,7 @@ public class ObjectRoutineTest {
 
         @Alias("aa")
         int[] addA03(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.VALUE)
@@ -1196,7 +1196,7 @@ public class ObjectRoutineTest {
         @Alias("aa")
         @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -1215,7 +1215,7 @@ public class ObjectRoutineTest {
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1234,7 +1234,7 @@ public class ObjectRoutineTest {
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         List<int[]> addA15(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1253,14 +1253,14 @@ public class ObjectRoutineTest {
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.VALUE)
         InvocationChannel<char[], int[]> addA20();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
+        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
         InvocationChannel<char[], int[]> addA21();
 
         @Alias("aa")
@@ -1280,7 +1280,7 @@ public class ObjectRoutineTest {
 
         @Alias("al")
         List<Integer> addL03(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.VALUE)
@@ -1299,7 +1299,7 @@ public class ObjectRoutineTest {
         @Alias("al")
         @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.ELEMENT)
@@ -1318,7 +1318,7 @@ public class ObjectRoutineTest {
         @Alias("al")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1337,7 +1337,7 @@ public class ObjectRoutineTest {
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL15(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1356,14 +1356,14 @@ public class ObjectRoutineTest {
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List[] addL19(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.VALUE)
         InvocationChannel<List<Character>, List<Integer>> addL20();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.ELEMENT)
+        @Inputs(value = List.class, mode = InputMode.PARALLEL)
         InvocationChannel<List<Character>, List<Integer>> addL21();
 
         @Alias("al")
@@ -1388,7 +1388,7 @@ public class ObjectRoutineTest {
         InvocationChannel<Void, Integer> get2();
 
         @Alias("s")
-        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+        void set2(@Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel<Integer> i);
 
         @Alias("ga")
         int[] getA0();
@@ -1416,7 +1416,7 @@ public class ObjectRoutineTest {
         int[][] getA3();
 
         @Alias("sa")
-        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
+        void setA3(@Input(value = int[].class, mode = InputMode.PARALLEL) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Inputs({})
@@ -1450,7 +1450,7 @@ public class ObjectRoutineTest {
 
         @Alias("sl")
         void setL3(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
+                mode = InputMode.PARALLEL) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Inputs({})
@@ -1489,7 +1489,7 @@ public class ObjectRoutineTest {
         InputChannel<Integer> compute2();
 
         @Alias("compute")
-        @Inputs(value = {int.class, int.class}, mode = InputMode.ELEMENT)
+        @Inputs(value = {int.class, int.class}, mode = InputMode.PARALLEL)
         InputChannel<Integer> compute3();
 
         @Alias("compute")
@@ -1625,7 +1625,7 @@ public class ObjectRoutineTest {
         @Alias("compute")
         @Output
         OutputChannel<Integer> computeParallel4(
-                @Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+                @Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel<Integer> i);
     }
 
     private interface SumError {
@@ -1644,11 +1644,11 @@ public class ObjectRoutineTest {
         int compute(int a,
                 @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> b);
 
-        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object ints);
+        int compute(@Input(value = int.class, mode = InputMode.PARALLEL) Object ints);
 
-        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object[] ints);
+        int compute(@Input(value = int.class, mode = InputMode.PARALLEL) Object[] ints);
 
-        int compute(String text, @Input(value = int.class, mode = InputMode.ELEMENT) int[] ints);
+        int compute(String text, @Input(value = int.class, mode = InputMode.PARALLEL) int[] ints);
     }
 
     private interface SumItf {

@@ -16,19 +16,19 @@ package com.gh.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no room in the output channel buffer became available before the
+ * Exception indicating that no room in the input channel buffer became available before the
  * specific timeout elapsed.
  * <p/>
  * Created by davide-maestroni on 11/25/14.
  */
-public class OutputDeadlockException extends ChannelDeadlockException {
+public class InputTimeoutException extends ChannelTimeoutException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public OutputDeadlockException(@Nullable final String message) {
+    public InputTimeoutException(@Nullable final String message) {
 
         super(message);
     }

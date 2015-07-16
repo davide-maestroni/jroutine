@@ -76,7 +76,7 @@ import java.lang.annotation.Target;
 public @interface Inputs {
 
     /**
-     * The input transfer mode.
+     * The inputs transfer mode.
      *
      * @return the mode.
      */

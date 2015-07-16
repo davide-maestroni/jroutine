@@ -88,7 +88,7 @@ public class LoaderObjectRoutineActivityTest
                         .withMaxInstances(1)
                         .withCoreInstances(1)
                         .withAvailInstanceTimeout(1, timeUnit)
-                        .withReadTimeoutAction(TimeoutActionType.EXIT)
+                        .withExecutionTimeoutAction(TimeoutActionType.EXIT)
                         .withLogLevel(LogLevel.DEBUG)
                         .withLog(new NullLog())
                         .set()
@@ -111,7 +111,7 @@ public class LoaderObjectRoutineActivityTest
         final TimeDuration timeout = seconds(10);
         final SumItf sumAsync = JRoutine.on(contextFrom(getActivity()), Sum.class)
                                         .invocations()
-                                        .withReadTimeout(timeout)
+                                        .withExecutionTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
         final TransportChannel<Integer> channel3 = JRoutine.transport().buildChannel();
@@ -140,7 +140,7 @@ public class LoaderObjectRoutineActivityTest
         final TimeDuration timeout = seconds(10);
         final CountItf countAsync = JRoutine.on(contextFrom(getActivity()), Count.class)
                                             .invocations()
-                                            .withReadTimeout(timeout)
+                                            .withExecutionTimeout(timeout)
                                             .set()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
@@ -411,7 +411,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutine.on(contextFrom(getActivity()), TestClass.class)
                     .invocations()
-                    .withReadTimeout(INFINITY)
+                    .withExecutionTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException(null);
@@ -426,7 +426,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutine.on(contextFrom(getActivity()), TestClass.class)
                     .invocations()
-                    .withReadTimeout(INFINITY)
+                    .withExecutionTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
@@ -441,7 +441,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutine.on(contextFrom(getActivity()), TestClass.class)
                     .invocations()
-                    .withReadTimeout(INFINITY)
+                    .withExecutionTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException2(null);
@@ -632,7 +632,7 @@ public class LoaderObjectRoutineActivityTest
 
         final Itf itf = JRoutine.on(contextFrom(getActivity()), Impl.class)
                                 .invocations()
-                                .withReadTimeout(INFINITY)
+                                .withExecutionTimeout(INFINITY)
                                 .set()
                                 .buildProxy(Itf.class);
 
@@ -893,7 +893,7 @@ public class LoaderObjectRoutineActivityTest
         final ObjectRoutineBuilder builder =
                 JRoutine.on(contextFrom(getActivity()), TestClass2.class)
                         .invocations()
-                        .withReadTimeout(seconds(10))
+                        .withExecutionTimeout(seconds(10))
                         .set();
 
         long startTime = System.currentTimeMillis();
@@ -921,7 +921,7 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                            .invocations()
-                           .withReadTimeout(seconds(10))
+                           .withExecutionTimeout(seconds(10))
                            .set()
                            .loaders()
                            .withId(0)
@@ -934,7 +934,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .loaders()
                     .withId(1)
@@ -951,7 +951,7 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                            .invocations()
-                           .withReadTimeout(seconds(10))
+                           .withExecutionTimeout(seconds(10))
                            .set()
                            .loaders()
                            .withId(2)
@@ -964,7 +964,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .loaders()
                     .withId(3)
@@ -981,7 +981,7 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                            .invocations()
-                           .withReadTimeout(seconds(10))
+                           .withExecutionTimeout(seconds(10))
                            .set()
                            .loaders()
                            .withId(4)
@@ -994,7 +994,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .loaders()
                     .withId(5)
@@ -1011,7 +1011,7 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                            .invocations()
-                           .withReadTimeout(seconds(10))
+                           .withExecutionTimeout(seconds(10))
                            .set()
                            .loaders()
                            .withId(6)
@@ -1023,7 +1023,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutine.on(contextFrom(getActivity()), TestTimeout.class)
                     .invocations()
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .loaders()
                     .withId(7)
@@ -1047,7 +1047,7 @@ public class LoaderObjectRoutineActivityTest
         int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+        int add2(@Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Output(OutputMode.VALUE)
@@ -1061,14 +1061,14 @@ public class LoaderObjectRoutineActivityTest
         @Alias("a")
         @Output(OutputMode.VALUE)
         OutputChannel<Integer> add5(
-                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.VALUE)
         InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        @Inputs(value = char.class, mode = InputMode.PARALLEL)
         InvocationChannel<Character, Integer> add7();
 
         @Alias("aa")
@@ -1084,7 +1084,7 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("aa")
         int[] addA03(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.VALUE)
@@ -1103,7 +1103,7 @@ public class LoaderObjectRoutineActivityTest
         @Alias("aa")
         @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -1122,7 +1122,7 @@ public class LoaderObjectRoutineActivityTest
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1141,7 +1141,7 @@ public class LoaderObjectRoutineActivityTest
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         List<int[]> addA15(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1160,14 +1160,14 @@ public class LoaderObjectRoutineActivityTest
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.VALUE)
         InvocationChannel<char[], int[]> addA20();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
+        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
         InvocationChannel<char[], int[]> addA21();
 
         @Alias("aa")
@@ -1187,7 +1187,7 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("al")
         List<Integer> addL03(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.VALUE)
@@ -1206,7 +1206,7 @@ public class LoaderObjectRoutineActivityTest
         @Alias("al")
         @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.ELEMENT)
@@ -1225,7 +1225,7 @@ public class LoaderObjectRoutineActivityTest
         @Alias("al")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1244,7 +1244,7 @@ public class LoaderObjectRoutineActivityTest
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL15(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1263,14 +1263,14 @@ public class LoaderObjectRoutineActivityTest
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List[] addL19(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.VALUE)
         InvocationChannel<List<Character>, List<Integer>> addL20();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.ELEMENT)
+        @Inputs(value = List.class, mode = InputMode.PARALLEL)
         InvocationChannel<List<Character>, List<Integer>> addL21();
 
         @Alias("al")
@@ -1295,7 +1295,7 @@ public class LoaderObjectRoutineActivityTest
         InvocationChannel<Void, Integer> get2();
 
         @Alias("s")
-        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+        void set2(@Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel<Integer> i);
 
         @Alias("ga")
         int[] getA0();
@@ -1323,7 +1323,7 @@ public class LoaderObjectRoutineActivityTest
         int[][] getA3();
 
         @Alias("sa")
-        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
+        void setA3(@Input(value = int[].class, mode = InputMode.PARALLEL) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Inputs({})
@@ -1357,7 +1357,7 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("sl")
         void setL3(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
+                mode = InputMode.PARALLEL) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Inputs({})
@@ -1479,7 +1479,7 @@ public class LoaderObjectRoutineActivityTest
         @Alias("compute")
         @Output
         OutputChannel<Integer> computeParallel4(
-                @Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+                @Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel<Integer> i);
     }
 
     private interface SumError {
@@ -1498,11 +1498,11 @@ public class LoaderObjectRoutineActivityTest
         int compute(int a,
                 @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> b);
 
-        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object ints);
+        int compute(@Input(value = int.class, mode = InputMode.PARALLEL) Object ints);
 
-        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object[] ints);
+        int compute(@Input(value = int.class, mode = InputMode.PARALLEL) Object[] ints);
 
-        int compute(String text, @Input(value = int.class, mode = InputMode.ELEMENT) int[] ints);
+        int compute(String text, @Input(value = int.class, mode = InputMode.PARALLEL) int[] ints);
     }
 
     private interface SumItf {

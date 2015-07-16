@@ -58,12 +58,10 @@ import javax.annotation.Nonnull;
  *     <code>
  *
  *         final TransportChannel&lt;Result&gt; channel = JRoutine.transport().buildChannel();
- *         channel.input()
- *                .pass(doSomething1.asyncCall())
+ *         channel.pass(doSomething1.asyncCall())
  *                .pass(doSomething2.asyncCall())
  *                .close();
- *         channel.output()
- *                .eventually()
+ *         channel.eventually()
  *                .allInto(results);
  *     </code>
  * </pre>
@@ -118,7 +116,7 @@ import javax.annotation.Nonnull;
  *             &#64;Override
  *             public void run() {
  *
- *                 channel.input().pass(new Result()).close();
+ *                 channel.pass(new Result()).close();
  *             }
  *
  *         }.start();
@@ -126,7 +124,7 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                          .buildRoutine();
- *         routine.asyncCall(channel.output()).eventually().allInto(results);
+ *         routine.asyncCall(channel).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>

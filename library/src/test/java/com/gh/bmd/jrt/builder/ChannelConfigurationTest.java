@@ -221,7 +221,7 @@ public class ChannelConfigurationTest {
     }
 
     @Test
-    public void testReadTimeoutActionEquals() {
+    public void testPassTimeoutActionEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withAsyncRunner(Runners.queuedRunner())
@@ -229,28 +229,27 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .set();
         assertThat(configuration).isNotEqualTo(
-                builder().withReadTimeoutAction(TimeoutActionType.ABORT).set());
+                builder().withPassTimeoutAction(TimeoutActionType.ABORT).set());
         assertThat(configuration).isNotEqualTo(
-                builder().withReadTimeoutAction(TimeoutActionType.EXIT).set());
-        assertThat(
-                configuration.builderFrom().withReadTimeoutAction(TimeoutActionType.DEADLOCK).set())
-                .isNotEqualTo(builder().withReadTimeoutAction(TimeoutActionType.DEADLOCK).set());
+                builder().withPassTimeoutAction(TimeoutActionType.EXIT).set());
+        assertThat(configuration.builderFrom().withPassTimeoutAction(TimeoutActionType.THROW).set())
+                .isNotEqualTo(builder().withPassTimeoutAction(TimeoutActionType.THROW).set());
     }
 
     @Test
-    public void testReadTimeoutEquals() {
+    public void testPassTimeoutEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withAsyncRunner(Runners.queuedRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
-        assertThat(configuration).isNotEqualTo(builder().withReadTimeout(TimeDuration.ZERO).set());
+        assertThat(configuration).isNotEqualTo(builder().withPassTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
-                builder().withReadTimeout(1, TimeUnit.MILLISECONDS).set());
+                builder().withPassTimeout(1, TimeUnit.MILLISECONDS).set());
         assertThat(configuration.builderFrom()
-                                .withReadTimeout(TimeDuration.millis(1))
+                                .withPassTimeout(TimeDuration.millis(1))
                                 .set()).isNotEqualTo(
-                builder().withReadTimeout(1, TimeUnit.MILLISECONDS).set());
+                builder().withPassTimeout(1, TimeUnit.MILLISECONDS).set());
     }
 }

@@ -110,18 +110,18 @@ public @interface Input {
          */
         COLLECTION,
         /**
-         * Element mode.<br/>
+         * Parallel mode.<br/>
          * Each input is passed to a different parallel invocation of the wrapped method.
          * <p/>
          * The annotated parameter must be an array or implement an {@link java.lang.Iterable} and
          * must be the only parameter accepted by the method.
          */
-        ELEMENT,
+        PARALLEL,
         /**
          * Automatic mode.<br/>
          * The mode is automatically assigned based to the parameter or return type. Namely: if the
          * parameters match the COLLECTION input mode, that one is chosen; if they match the VALUE
-         * input mode, it is chosen the latter; finally the ELEMENT input mode conditions are
+         * input mode, it is chosen the latter; finally the PARALLEL input mode conditions are
          * checked.
          */
         AUTO

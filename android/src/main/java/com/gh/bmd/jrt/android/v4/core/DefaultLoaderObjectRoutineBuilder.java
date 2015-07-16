@@ -128,14 +128,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         if (timeoutAnnotation != null) {
 
-            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            builder.withExecutionTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
         }
 
         final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
 
         if (actionAnnotation != null) {
 
-            builder.withReadTimeoutAction(actionAnnotation.value());
+            builder.withExecutionTimeoutAction(actionAnnotation.value());
         }
 
         return builder.set();

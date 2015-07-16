@@ -33,8 +33,8 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
+import com.gh.bmd.jrt.channel.ExecutionTimeoutException;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
@@ -183,6 +183,72 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 "1", "2", "3", "4", "5");
     }
 
+    public void testExecutionTimeout() {
+
+        final ClassToken<PassingContextInvocation<String>> classToken =
+                new ClassToken<PassingContextInvocation<String>>() {};
+        assertThat(JRoutine.on(serviceFrom(getActivity()), classToken)
+                           .invocations()
+                           .withExecutionTimeout(millis(10))
+                           .withExecutionTimeoutAction(TimeoutActionType.EXIT)
+                           .set()
+                           .service()
+                           .withResultLooper(Looper.myLooper())
+                           .set()
+                           .asyncCall("test1")
+                           .all()).isEmpty();
+    }
+
+    public void testExecutionTimeout2() {
+
+        final ClassToken<PassingContextInvocation<String>> classToken =
+                new ClassToken<PassingContextInvocation<String>>() {};
+
+        try {
+
+            JRoutine.on(serviceFrom(getActivity()), classToken)
+                    .invocations()
+                    .withExecutionTimeout(millis(10))
+                    .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                    .set()
+                    .service()
+                    .withResultLooper(Looper.myLooper())
+                    .set()
+                    .asyncCall("test2")
+                    .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    public void testExecutionTimeout3() {
+
+        final ClassToken<PassingContextInvocation<String>> classToken =
+                new ClassToken<PassingContextInvocation<String>>() {};
+
+        try {
+
+            JRoutine.on(serviceFrom(getActivity()), classToken)
+                    .invocations()
+                    .withExecutionTimeout(millis(10))
+                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                    .set()
+                    .service()
+                    .withResultLooper(Looper.myLooper())
+                    .set()
+                    .asyncCall("test3")
+                    .all();
+
+            fail();
+
+        } catch (final ExecutionTimeoutException ignored) {
+
+        }
+    }
+
     public void testInvocations() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
@@ -284,72 +350,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                            .asyncCall(p)
                            .afterMax(timeout)
                            .next()).isEqualTo(p);
-    }
-
-    public void testReadTimeout() {
-
-        final ClassToken<PassingContextInvocation<String>> classToken =
-                new ClassToken<PassingContextInvocation<String>>() {};
-        assertThat(JRoutine.on(serviceFrom(getActivity()), classToken)
-                           .invocations()
-                           .withReadTimeout(millis(10))
-                           .withReadTimeoutAction(TimeoutActionType.EXIT)
-                           .set()
-                           .service()
-                           .withResultLooper(Looper.myLooper())
-                           .set()
-                           .asyncCall("test1")
-                           .all()).isEmpty();
-    }
-
-    public void testReadTimeout2() {
-
-        final ClassToken<PassingContextInvocation<String>> classToken =
-                new ClassToken<PassingContextInvocation<String>>() {};
-
-        try {
-
-            JRoutine.on(serviceFrom(getActivity()), classToken)
-                    .invocations()
-                    .withReadTimeout(millis(10))
-                    .withReadTimeoutAction(TimeoutActionType.ABORT)
-                    .set()
-                    .service()
-                    .withResultLooper(Looper.myLooper())
-                    .set()
-                    .asyncCall("test2")
-                    .all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-    }
-
-    public void testReadTimeout3() {
-
-        final ClassToken<PassingContextInvocation<String>> classToken =
-                new ClassToken<PassingContextInvocation<String>>() {};
-
-        try {
-
-            JRoutine.on(serviceFrom(getActivity()), classToken)
-                    .invocations()
-                    .withReadTimeout(millis(10))
-                    .withReadTimeoutAction(TimeoutActionType.DEADLOCK)
-                    .set()
-                    .service()
-                    .withResultLooper(Looper.myLooper())
-                    .set()
-                    .asyncCall("test3")
-                    .all();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
     }
 
     public void testService() {

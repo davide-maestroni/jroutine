@@ -16,18 +16,19 @@ package com.gh.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating a deadlock waiting for data to flow through channels.
+ * Exception indicating that no room in the output channel buffer became available before the
+ * specific timeout elapsed.
  * <p/>
- * Created by davide-maestroni on 18/06/15.
+ * Created by davide-maestroni on 11/25/14.
  */
-public class ChannelDeadlockException extends DeadlockException {
+public class OutputTimeoutException extends ChannelTimeoutException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public ChannelDeadlockException(@Nullable final String message) {
+    public OutputTimeoutException(@Nullable final String message) {
 
         super(message);
     }

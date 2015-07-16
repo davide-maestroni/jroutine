@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
  * No strong reference to the wrapped objects will be retained by this class implementations. So, it
  * is up to the caller to ensure that they are not garbage collected before time.
  * <p/>
- * Created by davide on 08/07/15.
+ * Created by davide-maestroni on 08/07/15.
  */
 public abstract class RoutineContext {
 

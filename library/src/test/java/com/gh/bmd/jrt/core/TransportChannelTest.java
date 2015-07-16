@@ -16,9 +16,9 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
+import com.gh.bmd.jrt.channel.ExecutionTimeoutException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
-import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Log;
@@ -109,7 +109,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyAbort().eventuallyDeadlock();
+        transportChannel.eventuallyAbort().eventuallyThrow();
 
         try {
 
@@ -117,7 +117,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -132,7 +132,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -140,7 +140,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -155,7 +155,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock();
+        transportChannel.eventuallyThrow();
 
         try {
 
@@ -163,7 +163,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -178,7 +178,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -186,7 +186,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -276,7 +276,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock();
+        transportChannel.eventuallyThrow();
 
         try {
 
@@ -284,7 +284,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -299,7 +299,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -307,7 +307,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -322,7 +322,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock();
+        transportChannel.eventuallyThrow();
 
         try {
 
@@ -330,7 +330,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -345,7 +345,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -353,7 +353,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -368,7 +368,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock();
+        transportChannel.eventuallyThrow();
 
         try {
 
@@ -376,7 +376,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -391,7 +391,7 @@ public class TransportChannelTest {
 
         assertThat(transportChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        transportChannel.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
+        transportChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -399,7 +399,7 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
 
@@ -466,25 +466,12 @@ public class TransportChannelTest {
     }
 
     @Test
-    public void testReadFirst() throws InterruptedException {
-
-        final TimeDuration timeout = seconds(1);
-        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
-
-        new WeakThread(transportChannel).start();
-
-        final OutputChannel<String> outputChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(transportChannel);
-        assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
-    }
-
-    @Test
-    public void testReadTimeout() {
+    public void testPassTimeout() {
 
         final TransportChannel<Object> channel1 = JRoutine.transport()
                                                           .channels()
-                                                          .withReadTimeout(millis(10))
-                                                          .withReadTimeoutAction(
+                                                          .withPassTimeout(millis(10))
+                                                          .withPassTimeoutAction(
                                                                   TimeoutActionType.EXIT)
                                                           .set()
                                                           .buildChannel();
@@ -493,12 +480,12 @@ public class TransportChannelTest {
     }
 
     @Test
-    public void testReadTimeout2() {
+    public void testPassTimeout2() {
 
         final TransportChannel<Object> channel2 = JRoutine.transport()
                                                           .channels()
-                                                          .withReadTimeout(millis(10))
-                                                          .withReadTimeoutAction(
+                                                          .withPassTimeout(millis(10))
+                                                          .withPassTimeoutAction(
                                                                   TimeoutActionType.ABORT)
                                                           .set()
                                                           .buildChannel();
@@ -515,13 +502,13 @@ public class TransportChannelTest {
     }
 
     @Test
-    public void testReadTimeout3() {
+    public void testPassTimeout3() {
 
         final TransportChannel<Object> channel3 = JRoutine.transport()
                                                           .channels()
-                                                          .withReadTimeout(millis(10))
-                                                          .withReadTimeoutAction(
-                                                                  TimeoutActionType.DEADLOCK)
+                                                          .withPassTimeout(millis(10))
+                                                          .withPassTimeoutAction(
+                                                                  TimeoutActionType.THROW)
                                                           .set()
                                                           .buildChannel();
 
@@ -531,9 +518,22 @@ public class TransportChannelTest {
 
             fail();
 
-        } catch (final ReadDeadlockException ignored) {
+        } catch (final ExecutionTimeoutException ignored) {
 
         }
+    }
+
+    @Test
+    public void testReadFirst() throws InterruptedException {
+
+        final TimeDuration timeout = seconds(1);
+        final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
+
+        new WeakThread(transportChannel).start();
+
+        final OutputChannel<String> outputChannel =
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(transportChannel);
+        assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
     }
 
     @SuppressWarnings("unused")

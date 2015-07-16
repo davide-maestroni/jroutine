@@ -11,23 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.channel;
+package com.gh.bmd.jrt.invocation;
+
+import com.gh.bmd.jrt.channel.TimeoutException;
 
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating a forbidden wait in a runner thread.
+ * Exception indicating that no invocation instance became available before the specific timeout
+ * elapsed.
  * <p/>
- * Created by davide-maestroni on 18/06/15.
+ * Created by davide-maestroni on 9/20/14.
  */
-public class RunnerDeadlockException extends DeadlockException {
+public class InvocationTimeoutException extends TimeoutException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public RunnerDeadlockException(@Nullable final String message) {
+    public InvocationTimeoutException(@Nullable final String message) {
 
         super(message);
     }

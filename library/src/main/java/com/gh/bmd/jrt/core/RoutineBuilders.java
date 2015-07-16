@@ -262,7 +262,7 @@ public class RoutineBuilders {
                         boxingClass(parameterType.getComponentType()))) {
 
                     throw new IllegalArgumentException(
-                            "[" + method + "] the async input array with mode " + InputMode.ELEMENT
+                            "[" + method + "] the async input array with mode " + InputMode.PARALLEL
                                     + " does not match the bound type: "
                                     + paramClass.getCanonicalName());
                 }
@@ -270,13 +270,13 @@ public class RoutineBuilders {
                 if (length > 1) {
 
                     throw new IllegalArgumentException(
-                            "[" + method + "] an async input with mode " + InputMode.ELEMENT
+                            "[" + method + "] an async input with mode " + InputMode.PARALLEL
                                     + " cannot be applied to a method taking " + length +
                                     " input parameters");
 
                 }
 
-                inputMode = InputMode.ELEMENT;
+                inputMode = InputMode.PARALLEL;
 
             } else {
 
@@ -320,12 +320,12 @@ public class RoutineBuilders {
                                 + " input parameters");
             }
 
-        } else { // InputMode.ELEMENT
+        } else { // InputMode.PARALLEL
 
             if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.ELEMENT
+                        "[" + method + "] an async input with mode " + InputMode.PARALLEL
                                 + " must be an array or implement an "
                                 + Iterable.class.getCanonicalName());
             }
@@ -334,7 +334,7 @@ public class RoutineBuilders {
                     boxingClass(parameterType.getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] the async input array with mode " + InputMode.ELEMENT
+                        "[" + method + "] the async input array with mode " + InputMode.PARALLEL
                                 + " does not match the bound type: "
                                 + paramClass.getCanonicalName());
             }
@@ -342,7 +342,7 @@ public class RoutineBuilders {
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.ELEMENT
+                        "[" + method + "] an async input with mode " + InputMode.PARALLEL
                                 + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
@@ -397,7 +397,7 @@ public class RoutineBuilders {
 
                 } else {
 
-                    inputMode = InputMode.ELEMENT;
+                    inputMode = InputMode.PARALLEL;
                 }
 
             } else {
@@ -425,12 +425,12 @@ public class RoutineBuilders {
                                 + " input parameters");
             }
 
-        } else if (inputMode == InputMode.ELEMENT) {
+        } else if (inputMode == InputMode.PARALLEL) {
 
             if (parameterTypes.length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.ELEMENT +
+                        "[" + method + "] an async input with mode " + InputMode.PARALLEL +
                                 " cannot be applied to a method taking " + parameterTypes.length
                                 + " input parameters");
             }
@@ -707,14 +707,14 @@ public class RoutineBuilders {
 
         if (method.getAnnotation(Inputs.class) != null) {
 
-            return (inputMode == InputMode.ELEMENT) ? routine.parallelInvoke()
+            return (inputMode == InputMode.PARALLEL) ? routine.parallelInvoke()
                     : routine.asyncInvoke();
         }
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
-        if (inputMode == InputMode.ELEMENT) {
+        if (inputMode == InputMode.PARALLEL) {
 
             final InvocationChannel<Object, Object> invocationChannel = routine.parallelInvoke();
             final Class<?> parameterType = method.getParameterTypes()[0];

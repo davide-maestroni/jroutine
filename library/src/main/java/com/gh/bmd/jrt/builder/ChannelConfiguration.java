@@ -37,7 +37,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * The number of input data buffered in the channel can be also limited in order to avoid excessive
  * memory consumption. In case the maximum number is reached hen passing an input, the call blocks
  * until enough data are consumed or the specified  timeout elapses. In the latter case, a
- * {@link com.gh.bmd.jrt.channel.DeadlockException DeadlockException} will be thrown.<br/>
+ * {@link com.gh.bmd.jrt.channel.TimeoutException TimeoutException} will be thrown.<br/>
  * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
  * delivered in the same order as they are passed to the channels, at the cost of a slightly
@@ -71,7 +71,7 @@ public class ChannelConfiguration {
 
     private final LogLevel mLogLevel;
 
-    private final TimeDuration mReadTimeout;
+    private final TimeDuration mPassTimeout;
 
     private final TimeoutActionType mTimeoutActionType;
 
@@ -79,7 +79,7 @@ public class ChannelConfiguration {
      * Constructor.
      *
      * @param asyncRunner      the runner used for asynchronous inputs.
-     * @param readTimeout      the timeout for the channel to produce a result.
+     * @param passTimeout      the timeout for the channel to produce a result.
      * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         result is available.
      * @param channelOrderType the order in which data are collected from the output channel.
@@ -90,13 +90,13 @@ public class ChannelConfiguration {
      * @param logLevel         the log level.
      */
     private ChannelConfiguration(@Nullable final Runner asyncRunner,
-            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
+            @Nullable final TimeDuration passTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType channelOrderType, final int channelMaxSize,
             @Nullable final TimeDuration channelTimeout, @Nullable final Log log,
             @Nullable final LogLevel logLevel) {
 
         mAsyncRunner = asyncRunner;
-        mReadTimeout = readTimeout;
+        mPassTimeout = passTimeout;
         mTimeoutActionType = actionType;
         mChannelOrderType = channelOrderType;
         mChannelMaxSize = channelMaxSize;
@@ -221,7 +221,7 @@ public class ChannelConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutActionType getReadTimeoutActionOr(
+    public TimeoutActionType getPassTimeoutActionOr(
             @Nullable final TimeoutActionType valueIfNotSet) {
 
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
@@ -234,10 +234,10 @@ public class ChannelConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getReadTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getPassTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
 
-        final TimeDuration readTimeout = mReadTimeout;
-        return (readTimeout != null) ? readTimeout : valueIfNotSet;
+        final TimeDuration passTimeout = mPassTimeout;
+        return (passTimeout != null) ? passTimeout : valueIfNotSet;
     }
 
     @Override
@@ -250,7 +250,7 @@ public class ChannelConfiguration {
         result = 31 * result + (mChannelTimeout != null ? mChannelTimeout.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
-        result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
+        result = 31 * result + (mPassTimeout != null ? mPassTimeout.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
     }
@@ -304,8 +304,8 @@ public class ChannelConfiguration {
             return false;
         }
 
-        if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
-                : that.mReadTimeout != null) {
+        if (mPassTimeout != null ? !mPassTimeout.equals(that.mPassTimeout)
+                : that.mPassTimeout != null) {
 
             return false;
         }
@@ -323,7 +323,7 @@ public class ChannelConfiguration {
                 ", mChannelTimeout=" + mChannelTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
-                ", mReadTimeout=" + mReadTimeout +
+                ", mPassTimeout=" + mPassTimeout +
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
     }
@@ -366,7 +366,7 @@ public class ChannelConfiguration {
 
         private LogLevel mLogLevel;
 
-        private TimeDuration mReadTimeout;
+        private TimeDuration mPassTimeout;
 
         private TimeoutActionType mTimeoutActionType;
 
@@ -599,9 +599,9 @@ public class ChannelConfiguration {
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @Nonnull
-        public Builder<TYPE> withReadTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        public Builder<TYPE> withPassTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
-            return withReadTimeout(fromUnit(timeout, timeUnit));
+            return withPassTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -614,9 +614,9 @@ public class ChannelConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withPassTimeout(@Nullable final TimeDuration timeout) {
 
-            mReadTimeout = timeout;
+            mPassTimeout = timeout;
             return this;
         }
 
@@ -631,7 +631,7 @@ public class ChannelConfiguration {
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withReadTimeoutAction(@Nullable final TimeoutActionType actionType) {
+        public Builder<TYPE> withPassTimeoutAction(@Nullable final TimeoutActionType actionType) {
 
             mTimeoutActionType = actionType;
             return this;
@@ -640,7 +640,7 @@ public class ChannelConfiguration {
         @Nonnull
         private ChannelConfiguration buildConfiguration() {
 
-            return new ChannelConfiguration(mAsyncRunner, mReadTimeout, mTimeoutActionType,
+            return new ChannelConfiguration(mAsyncRunner, mPassTimeout, mTimeoutActionType,
                                             mChannelOrderType, mChannelMaxSize, mChannelTimeout,
                                             mLog, mLogLevel);
         }
@@ -648,7 +648,7 @@ public class ChannelConfiguration {
         private void setConfiguration(@Nonnull final ChannelConfiguration configuration) {
 
             mAsyncRunner = configuration.mAsyncRunner;
-            mReadTimeout = configuration.mReadTimeout;
+            mPassTimeout = configuration.mPassTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;
             mChannelMaxSize = configuration.mChannelMaxSize;

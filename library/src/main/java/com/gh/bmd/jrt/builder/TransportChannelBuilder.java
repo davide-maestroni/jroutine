@@ -28,10 +28,11 @@ public interface TransportChannelBuilder {
     /**
      * Builds and returns the transport channel instance.
      *
+     * @param <DATA> the data type.
      * @return the newly created channel.
      */
     @Nonnull
-    <T> TransportChannel<T> buildChannel();
+    <DATA> TransportChannel<DATA> buildChannel();
 
     /**
      * Gets the channel configuration builder related to the channel builder instance.

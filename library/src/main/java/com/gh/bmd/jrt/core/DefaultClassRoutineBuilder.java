@@ -303,14 +303,14 @@ class DefaultClassRoutineBuilder
 
         if (timeoutAnnotation != null) {
 
-            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            builder.withExecutionTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
         }
 
         final TimeoutAction actionAnnotation = targetMethod.getAnnotation(TimeoutAction.class);
 
         if (actionAnnotation != null) {
 
-            builder.withReadTimeoutAction(actionAnnotation.value());
+            builder.withExecutionTimeoutAction(actionAnnotation.value());
         }
 
         return getRoutine(builder.set(), methodShareGroup, targetMethod, null, null);

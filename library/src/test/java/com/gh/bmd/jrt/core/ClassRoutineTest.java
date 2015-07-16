@@ -302,7 +302,7 @@ public class ClassRoutineTest {
     public void testShareGroup() throws NoSuchMethodException {
 
         final ClassRoutineBuilder builder =
-                JRoutine.on(TestStatic2.class).invocations().withReadTimeout(seconds(2)).set();
+                JRoutine.on(TestStatic2.class).invocations().withExecutionTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 

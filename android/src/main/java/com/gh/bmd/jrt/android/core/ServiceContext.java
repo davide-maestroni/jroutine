@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 /**
  * Class representing an Android service context.
  * <p/>
- * Created by davide on 11/07/15.
+ * Created by davide-maestroni on 11/07/15.
  */
 public abstract class ServiceContext {
 

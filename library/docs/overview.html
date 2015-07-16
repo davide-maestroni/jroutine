@@ -191,7 +191,7 @@
                                                                   .withShareGroup(ShareGroup.NONE)
                                                                   .set()
                                                                   .invocations()
-                                                                  .withReadTimeout(TimeDuration.INFINITY)
+                                                                  .withExecutionTimeout(TimeDuration.INFINITY)
                                                                   .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
@@ -250,7 +250,7 @@
                                                     .withShareGroup(ShareGroup.NONE)
                                                     .set()
                                                     .invocations()
-                                                    .withReadTimeout(TimeDuration.INFINITY)
+                                                    .withExecutionTimeout(TimeDuration.INFINITY)
                                                     .set()
                                                     .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));

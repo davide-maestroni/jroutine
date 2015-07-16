@@ -39,31 +39,31 @@ public class ExceptionTest {
     @Test
     public void testChannelDeadlockException() {
 
-        assertThat(new ChannelDeadlockException("")).hasNoCause();
+        assertThat(new ChannelTimeoutException("")).hasNoCause();
     }
 
     @Test
     public void testDeadlockException() {
 
-        assertThat(new DeadlockException("")).hasNoCause();
+        assertThat(new TimeoutException("")).hasNoCause();
     }
 
     @Test
     public void testExceptions() {
 
-        assertThat(new ReadDeadlockException("")).hasNoCause();
+        assertThat(new ExecutionTimeoutException("")).hasNoCause();
     }
 
     @Test
     public void testInputDeadlockException() {
 
-        assertThat(new InputDeadlockException("")).hasNoCause();
+        assertThat(new InputTimeoutException("")).hasNoCause();
     }
 
     @Test
     public void testOutputDeadlockException() {
 
-        assertThat(new OutputDeadlockException("")).hasNoCause();
+        assertThat(new OutputTimeoutException("")).hasNoCause();
     }
 
     @Test
@@ -75,6 +75,6 @@ public class ExceptionTest {
     @Test
     public void testRunnerDeadlockException() {
 
-        assertThat(new RunnerDeadlockException("")).hasNoCause();
+        assertThat(new DeadlockException("")).hasNoCause();
     }
 }

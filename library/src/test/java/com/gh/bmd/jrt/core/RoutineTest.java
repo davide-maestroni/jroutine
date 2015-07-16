@@ -106,7 +106,8 @@ public class RoutineTest {
         assertThat(inputChannel.isOpen()).isFalse();
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test1");
 
-        final InvocationChannel<String, String> inputChannel1 = routine.asyncInvoke().pass("test1");
+        final InvocationChannel<String, String> inputChannel1 =
+                routine.asyncInvoke().after(millis(10)).pass("test1");
         final OutputChannel<String> outputChannel1 = inputChannel1.result();
 
         assertThat(inputChannel1.isOpen()).isFalse();
@@ -118,7 +119,8 @@ public class RoutineTest {
         assertThat(outputChannel1.isOpen()).isFalse();
         assertThat(outputChannel1.afterMax(timeout).hasNext()).isFalse();
 
-        final OutputChannel<String> channel = routine.asyncCall("test2");
+        final OutputChannel<String> channel =
+                routine.asyncInvoke().after(millis(10)).pass("test2").result();
         assertThat(channel.isOpen()).isTrue();
         assertThat(channel.abort(new IllegalArgumentException("test2"))).isTrue();
         assertThat(channel.abort()).isFalse();
@@ -139,7 +141,8 @@ public class RoutineTest {
         assertThat(channel.checkComplete()).isTrue();
         assertThat(channel.isOpen()).isFalse();
 
-        final OutputChannel<String> channel1 = routine.asyncCall("test2");
+        final OutputChannel<String> channel1 =
+                routine.asyncInvoke().after(millis(10)).pass("test2").result();
         assertThat(channel1.isOpen()).isTrue();
         assertThat(channel1.abort()).isTrue();
         assertThat(channel1.abort(new IllegalArgumentException("test2"))).isFalse();

@@ -35,7 +35,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Note that it is up to the caller to properly declare the service in the manifest file. Note also
  * that it is possible to manage the service lifecycle starting it through the
  * {@link android.content.Context#startService(android.content.Intent)} method. Normally the service
- * will stay active only during a routine invocation.<br/>
+ * will stay active only during a routine invocation. In fact, it is responsibility of the caller
+ * to ensure that the started invocations have completed or have been aborted when the relative
+ * context (for example the activity) is destroyed, so to avoid the leak of IPC connections.<br/>
  * The service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels, as well as the factory arguments, must comply with
  * the {@link android.os.Parcel#writeValue(Object)} method. Be aware though, that issues may arise

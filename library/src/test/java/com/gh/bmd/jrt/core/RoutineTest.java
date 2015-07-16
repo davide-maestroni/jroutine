@@ -31,6 +31,7 @@ import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.RunnerDeadlockException;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
@@ -112,14 +113,16 @@ public class RoutineTest {
         assertThat(inputChannel1.abort()).isFalse();
         assertThat(inputChannel1.isOpen()).isFalse();
         assertThat(outputChannel1.isOpen()).isTrue();
+        assertThat(outputChannel1.afterMax(timeout).hasNext()).isTrue();
         assertThat(outputChannel1.afterMax(timeout).next()).isEqualTo("test1");
         assertThat(outputChannel1.isOpen()).isFalse();
+        assertThat(outputChannel1.afterMax(timeout).hasNext()).isFalse();
 
         final OutputChannel<String> channel = routine.asyncCall("test2");
         assertThat(channel.isOpen()).isTrue();
         assertThat(channel.abort(new IllegalArgumentException("test2"))).isTrue();
         assertThat(channel.abort()).isFalse();
-        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.isOpen()).isFalse();
 
         try {
 
@@ -140,7 +143,7 @@ public class RoutineTest {
         assertThat(channel1.isOpen()).isTrue();
         assertThat(channel1.abort()).isTrue();
         assertThat(channel1.abort(new IllegalArgumentException("test2"))).isFalse();
-        assertThat(channel1.isOpen()).isTrue();
+        assertThat(channel1.isOpen()).isFalse();
 
         try {
 
@@ -215,7 +218,7 @@ public class RoutineTest {
                 new TemplateInvocation<String, String>() {
 
                     @Override
-                    public void onAbort(@Nullable final Throwable reason) {
+                    public void onAbort(@Nullable final RoutineException reason) {
 
                         abortReason.set(reason);
                         semaphore.release();
@@ -482,7 +485,7 @@ public class RoutineTest {
                     private InvocationChannel<Integer, Integer> mChannel;
 
                     @Override
-                    public void onAbort(final Throwable reason) {
+                    public void onAbort(@Nullable final RoutineException reason) {
 
                         mChannel.abort(reason);
                     }
@@ -3713,7 +3716,7 @@ public class RoutineTest {
 
     private static class TestAbortHandler implements AbortHandler {
 
-        public void onAbort(@Nullable final Throwable reason, final long delay,
+        public void onAbort(@Nullable final RoutineException reason, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
         }
@@ -3823,7 +3826,7 @@ public class RoutineTest {
     private static class TestInputIterator implements InputIterator<Object> {
 
         @Nullable
-        public Throwable getAbortException() {
+        public RoutineException getAbortException() {
 
             return null;
         }
@@ -3891,7 +3894,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onAbort(@Nullable final Throwable reason) {
+        public void onAbort(@Nullable final RoutineException reason) {
 
             if (!sActive) {
 

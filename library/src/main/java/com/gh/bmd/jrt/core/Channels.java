@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
 
@@ -868,7 +869,7 @@ public class Channels {
         }
 
         @Override
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             for (final InputChannel<?> channel : mChannels) {
 
@@ -933,7 +934,7 @@ public class Channels {
         }
 
         @Override
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInputChannel.abort(error);
         }
@@ -978,7 +979,7 @@ public class Channels {
             mInputChannel.close();
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInputChannel.abort(error);
         }
@@ -1074,7 +1075,7 @@ public class Channels {
             mInputChannel.close();
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInputChannel.abort(error);
         }
@@ -1139,7 +1140,7 @@ public class Channels {
         }
 
         @Override
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInputChannel.abort(error);
         }
@@ -1180,7 +1181,7 @@ public class Channels {
             mInputChannel.close();
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInputChannel.abort(error);
         }
@@ -1217,7 +1218,7 @@ public class Channels {
         }
 
         @Override
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             for (final InputChannel<?> inputChannel : mChannelList) {
 
@@ -1265,7 +1266,7 @@ public class Channels {
         }
 
         @Override
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             for (final InputChannel<?> inputChannel : mChannelMap.values()) {
 
@@ -1316,7 +1317,7 @@ public class Channels {
             }
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             for (final TransportChannel<OUTPUT> channel : mChannelMap.values()) {
 

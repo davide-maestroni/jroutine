@@ -56,7 +56,7 @@ public interface OutputConsumer<OUTPUT> {
      *
      * @param error the reason of the abortion.
      */
-    void onError(@Nullable Throwable error);
+    void onError(@Nullable RoutineException error);
 
     /**
      * Called when an output is passed to the channel.

@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.log.Logger;
@@ -260,14 +261,19 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mOutputChannel.checkComplete();
     }
 
-    public boolean isBound() {
+    public boolean hasNext() {
 
-        return mOutputChannel.isBound();
+        return mOutputChannel.hasNext();
     }
 
     public DATA next() {
 
         return mOutputChannel.next();
+    }
+
+    public boolean isBound() {
+
+        return mOutputChannel.isBound();
     }
 
     @Nonnull
@@ -281,6 +287,11 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mOutputChannel.iterator();
     }
 
+    public void remove() {
+
+        mOutputChannel.remove();
+    }
+
     /**
      * Abort handler used to close the input channel on abort.
      */
@@ -288,7 +299,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
 
         private DefaultResultChannel<?> mChannel;
 
-        public void onAbort(@Nullable final Throwable reason, final long delay,
+        public void onAbort(@Nullable final RoutineException reason, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
             mChannel.close(reason);

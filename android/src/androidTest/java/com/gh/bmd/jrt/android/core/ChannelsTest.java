@@ -474,7 +474,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
             fail();
 
-        } catch (final AbortException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 
@@ -513,7 +513,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
             fail();
 
-        } catch (final AbortException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 

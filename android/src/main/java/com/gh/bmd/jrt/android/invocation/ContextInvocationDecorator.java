@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.android.invocation;
 import android.content.Context;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.invocation.Invocation;
 
 import javax.annotation.Nonnull;
@@ -49,7 +50,7 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
         mInvocation = invocation;
     }
 
-    public void onAbort(@Nullable final Throwable reason) {
+    public void onAbort(@Nullable final RoutineException reason) {
 
         mInvocation.onAbort(reason);
     }

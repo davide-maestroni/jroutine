@@ -411,7 +411,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                         if (serviceContext != null) {
 
-                            serviceContext.unbindService(mConnection);
+                            // unfortunately there is no way to know if the context is still valid
+                            try {
+
+                                serviceContext.unbindService(mConnection);
+
+                            } catch (final Throwable t) {
+
+                                mLogger.wrn(t, "unbinding failed (maybe the connection was "
+                                        + "leaked...)");
+                            }
                         }
                     }
                 }, 0, TimeUnit.MILLISECONDS);
@@ -440,7 +449,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            public void onError(@Nullable final Throwable error) {
+            public void onError(@Nullable final RoutineException error) {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
                 putError(message.getData(), mUUID, error);

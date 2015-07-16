@@ -15,9 +15,11 @@ package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Invocation implementation delegating the execution to another routine.
@@ -65,7 +67,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
         return new DelegatingInvocationFactory<INPUT, OUTPUT>(routine);
     }
 
-    public void onAbort(final Throwable reason) {
+    public void onAbort(@Nullable final RoutineException reason) {
 
         mChannel.abort(reason);
     }

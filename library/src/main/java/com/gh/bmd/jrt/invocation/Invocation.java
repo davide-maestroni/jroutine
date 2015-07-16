@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -91,7 +92,7 @@ public interface Invocation<INPUT, OUTPUT> {
      *
      * @param reason the reason of the abortion.
      */
-    void onAbort(@Nullable Throwable reason);
+    void onAbort(@Nullable RoutineException reason);
 
     /**
      * Called when the routine invocation is no longer needed.

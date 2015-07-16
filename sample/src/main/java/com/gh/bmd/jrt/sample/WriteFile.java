@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 
@@ -49,7 +50,7 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
 
     @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onAbort(@Nullable final Throwable reason) {
+    public void onAbort(@Nullable final RoutineException reason) {
 
         closeStream();
         mFile.delete();

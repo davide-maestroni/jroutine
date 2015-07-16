@@ -52,7 +52,7 @@ public interface Channel {
     boolean abort(@Nullable Throwable reason);
 
     /**
-     * Checks if the channel is open, that is, data can be passed or consumed.
+     * Checks if the channel is open, that is, more data are expected to be passed to it.
      *
      * @return whether the channel is open.
      */

@@ -16,10 +16,12 @@ package com.gh.bmd.jrt.channel;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining an output channel, that is the channel used to read the routine invocation
@@ -31,7 +33,7 @@ import javax.annotation.Nonnull;
  *
  * @param <OUTPUT> the output data type.
  */
-public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
+public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterable<OUTPUT> {
 
     /**
      * Tells the channel to wait at max the specified time duration for the next result to be
@@ -173,23 +175,23 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     OutputChannel<OUTPUT> eventuallyExit();
 
     /**
-     * Tells the channel to not wait for results to be available.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     * Checks if more results are available by waiting at the maximum for the set timeout.
      *
-     * @return this channel.
+     * @return whether at least one result is available.
+     * @throws com.gh.bmd.jrt.channel.ReadDeadlockException if the channel is set to throw an
+     *                                                      exception when the timeout elapses.
+     * @throws com.gh.bmd.jrt.channel.RoutineException      if the execution has been aborted.
+     * @throws java.lang.IllegalStateException              if this channel is already bound to a
+     *                                                      consumer.
+     * @see #afterMax(com.gh.bmd.jrt.util.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
+     * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
      */
-    @Nonnull
-    OutputChannel<OUTPUT> immediately();
-
-    /**
-     * Checks if this channel is bound to a consumer or another channel.
-     *
-     * @return whether the channel is bound.
-     * @see #passTo(InputChannel)
-     * @see #passTo(OutputConsumer)
-     */
-    boolean isBound();
+    boolean hasNext();
 
     /**
      * Consumes the first available result by waiting at the maximum for the set timeout.
@@ -212,7 +214,27 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #eventuallyDeadlock()
      * @see #eventuallyExit()
      */
+    @Nullable
     OUTPUT next();
+
+    /**
+     * Tells the channel to not wait for results to be available.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @return this channel.
+     */
+    @Nonnull
+    OutputChannel<OUTPUT> immediately();
+
+    /**
+     * Checks if this channel is bound to a consumer or another channel.
+     *
+     * @return whether the channel is bound.
+     * @see #passTo(InputChannel)
+     * @see #passTo(OutputConsumer)
+     */
+    boolean isBound();
 
     /**
      * Binds this channel to the specified one. After the call, all the output will be passed

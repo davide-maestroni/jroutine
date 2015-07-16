@@ -107,7 +107,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
     }
 
     @Override
-    public void onError(@Nullable final Throwable error) {
+    public void onError(@Nullable final RoutineException error) {
 
         final boolean deliverResult;
         final InvocationException abortException;

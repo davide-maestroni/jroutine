@@ -423,7 +423,7 @@ public class ChannelsTest {
 
             fail();
 
-        } catch (final AbortException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 
@@ -461,7 +461,7 @@ public class ChannelsTest {
 
             fail();
 
-        } catch (final AbortException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 

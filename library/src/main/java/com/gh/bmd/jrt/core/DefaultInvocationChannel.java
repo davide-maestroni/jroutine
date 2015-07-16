@@ -76,7 +76,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
     private final Runner mRunner;
 
-    private Throwable mAbortException;
+    private RoutineException mAbortException;
 
     private int mInputCount;
 
@@ -127,7 +127,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         };
         mResultChanel = new DefaultResultChannel<OUTPUT>(configuration, new AbortHandler() {
 
-            public void onAbort(@Nullable final Throwable reason, final long delay,
+            public void onAbort(@Nullable final RoutineException reason, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
 
                 final Execution execution;
@@ -444,7 +444,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     private class DefaultInputIterator implements InputIterator<INPUT> {
 
         @Nullable
-        public Throwable getAbortException() {
+        public RoutineException getAbortException() {
 
             synchronized (mMutex) {
 
@@ -559,7 +559,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             }
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             final Execution execution;
 
@@ -597,14 +597,14 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
      */
     private class DelayedAbortExecution extends TemplateExecution {
 
-        private final Throwable mAbortException;
+        private final RoutineException mAbortException;
 
         /**
          * Constructor.
          *
          * @param reason the reason of the abortion.
          */
-        private DelayedAbortExecution(@Nullable final Throwable reason) {
+        private DelayedAbortExecution(@Nullable final RoutineException reason) {
 
             mAbortException = reason;
         }
@@ -724,7 +724,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         @Nullable
         @Override
-        Execution onHandlerAbort(@Nullable final Throwable reason) {
+        Execution onHandlerAbort(@Nullable final RoutineException reason) {
 
             mSubLogger.wrn("avoiding aborting result channel since invocation is aborted");
             return null;
@@ -740,17 +740,17 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Nonnull
         private RoutineException consumerException() {
 
-            final Throwable abortException = mAbortException;
+            final RoutineException abortException = mAbortException;
             mSubLogger.dbg(abortException, "consumer abort exception");
-            return RoutineExceptionWrapper.wrap(abortException).raise();
+            return abortException;
         }
 
         @Nonnull
         private RoutineException exception() {
 
-            final Throwable abortException = mAbortException;
+            final RoutineException abortException = mAbortException;
             mSubLogger.dbg(abortException, "abort exception");
-            throw RoutineExceptionWrapper.wrap(abortException).raise();
+            throw abortException;
         }
 
         @Override
@@ -825,7 +825,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         @Nullable
         Execution abortInvocation(@Nullable final Throwable reason) {
 
-            final Throwable abortException = AbortException.wrapIfNeeded(reason);
+            final RoutineException abortException = AbortException.wrapIfNeeded(reason);
 
             if (mInputDelay.isZero()) {
 
@@ -863,7 +863,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
          * @return the execution to run or null.
          */
         @Nullable
-        Execution delayedAbortInvocation(@Nullable final Throwable reason) {
+        Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg(reason, "aborting channel");
             mAbortException = reason;
@@ -959,7 +959,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onConsumerError(@Nullable final Throwable error) {
+        Execution onConsumerError(@Nullable final RoutineException error) {
 
             mSubLogger.dbg("aborting consumer");
             mAbortException = error;
@@ -1021,7 +1021,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onHandlerAbort(@Nullable final Throwable reason) {
+        Execution onHandlerAbort(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg("aborting result channel");
             mAbortException = reason;
@@ -1252,7 +1252,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         }
 
         @Nullable
-        public Throwable getAbortException() {
+        public RoutineException getAbortException() {
 
             return mAbortException;
         }
@@ -1332,7 +1332,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         @Nullable
         @Override
-        Execution delayedAbortInvocation(@Nullable final Throwable reason) {
+        Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
 
             if ((mPendingExecutionCount <= 0) && !mIsConsuming) {
 
@@ -1436,7 +1436,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         @Nullable
         @Override
-        Execution delayedAbortInvocation(@Nullable final Throwable reason) {
+        Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
@@ -1481,7 +1481,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         @Nullable
         @Override
-        Execution onHandlerAbort(@Nullable final Throwable reason) {
+        Execution onHandlerAbort(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg("avoiding aborting result channel since invocation is complete");
             return new AbortResultExecution(reason);
@@ -1496,7 +1496,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
 
         @Nullable
         @Override
-        Execution onConsumerError(@Nullable final Throwable error) {
+        Execution onConsumerError(@Nullable final RoutineException error) {
 
             mSubLogger.wrn("avoiding aborting consumer since channel is closed");
             return null;

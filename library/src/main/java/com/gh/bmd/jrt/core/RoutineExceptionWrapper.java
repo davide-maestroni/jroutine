@@ -67,24 +67,6 @@ class RoutineExceptionWrapper {
     }
 
     /**
-     * Returns the cause exception.
-     *
-     * @return the cause.
-     */
-    @Nullable
-    Throwable getCause() {
-
-        final Throwable cause = mCause;
-
-        if (cause instanceof InvocationException) {
-
-            return cause.getCause();
-        }
-
-        return cause;
-    }
-
-    /**
      * Returns a routine exception wrapping the cause one.
      *
      * @return the routine exception.

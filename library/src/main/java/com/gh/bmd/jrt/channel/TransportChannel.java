@@ -35,9 +35,6 @@ import javax.annotation.Nullable;
  */
 public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA> {
 
-    // TODO: abort as input
-    // TODO: isOpen can read even is closed...
-
     /**
      * {@inheritDoc}
      */
@@ -153,17 +150,17 @@ public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChanne
     TransportChannel<DATA> passTo(@Nonnull OutputConsumer<? super DATA> consumer);
 
     /**
-     * TODO
+     * Returns this channel as an input one.
      *
-     * @return
+     * @return this channel.
      */
     @Nonnull
     InputChannel<DATA> asInput();
 
     /**
-     * TODO
+     * Returns this channel as an output one.
      *
-     * @return
+     * @return this channel.
      */
     @Nonnull
     OutputChannel<DATA> asOutput();

@@ -816,7 +816,7 @@ public class RoutineService extends Service {
             }
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInvocation.recycle();
             final Message message = Message.obtain(null, RoutineService.MSG_ABORT);

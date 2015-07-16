@@ -20,6 +20,7 @@ import android.support.v4.util.SparseArrayCompat;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.JRoutine;
 
@@ -404,7 +405,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
 
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInputChannel.abort(error);
         }
@@ -445,7 +446,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             mInputChannel.close();
         }
 
-        public void onError(@Nullable final Throwable error) {
+        public void onError(@Nullable final RoutineException error) {
 
             mInputChannel.abort(error);
         }

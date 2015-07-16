@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.core;
 
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Logger;
@@ -206,7 +207,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * @return the reason of the abortion.
          */
         @Nullable
-        Throwable getAbortException();
+        RoutineException getAbortException();
 
         /**
          * Checks if an input is available.
@@ -273,7 +274,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
                 final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-                final Throwable exception = inputIterator.getAbortException();
+                final RoutineException exception = inputIterator.getAbortException();
                 mLogger.dbg(exception, "aborting invocation");
 
                 try {

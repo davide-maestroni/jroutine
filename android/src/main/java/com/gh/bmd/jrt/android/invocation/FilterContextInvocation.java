@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.android.invocation;
 import android.content.Context;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,7 +40,7 @@ public abstract class FilterContextInvocation<INPUT, OUTPUT>
         return this;
     }
 
-    public final void onAbort(@Nullable final Throwable reason) {
+    public final void onAbort(@Nullable final RoutineException reason) {
 
     }
 

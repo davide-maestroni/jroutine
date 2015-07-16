@@ -30,7 +30,7 @@ public abstract class TemplateOutputConsumer<OUTPUT> implements OutputConsumer<O
 
     }
 
-    public void onError(@Nullable final Throwable error) {
+    public void onError(@Nullable final RoutineException error) {
 
     }
 

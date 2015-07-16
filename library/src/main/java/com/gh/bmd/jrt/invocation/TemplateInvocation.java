@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.RoutineException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,7 +31,7 @@ import javax.annotation.Nullable;
  */
 public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
-    public void onAbort(@Nullable final Throwable reason) {
+    public void onAbort(@Nullable final RoutineException reason) {
 
     }
 

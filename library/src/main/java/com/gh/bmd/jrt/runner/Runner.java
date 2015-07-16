@@ -46,23 +46,30 @@ public interface Runner {
      * Note also that, in case the same execution has been added more than one time to the runner
      * queue, when the method returns, the queue will not contain the execution instance anymore,
      * with the consequence that the {@link Execution#run()} method will never be called.
+     * <p/>
+     * The implementation of this method is optional, still, it may greatly increase the performance
+     * by avoiding to start invocations which are already canceled. The specific implementation can
+     * safely ignore all that executions whose method {@link Execution#isCancelable()} returns
+     * false.
      *
      * @param execution the execution.
      */
     void cancel(@Nonnull Execution execution);
 
     /**
-     * Checks if the calling thread belongs to the ones employed by the runner to run executions.
-     * <br/>
-     * A synchronous runner will always return <code>false</code>.
+     * Checks if the calling thread belongs to the ones employed by the object to run executions.
+     * <p/>
+     * The implementation of this method is not strictly mandatory, even if, the classes always
+     * returning false effectively prevent the correct detection of possible deadlocks.<br/>
+     * A synchronous runner implementation will always return false.
      *
      * @return whether the calling thread is managed by the runner.
      */
     boolean isExecutionThread();
 
     /**
-     * Runs the specified execution (that is, it calls the execution <b><code>run()</code></b>
-     * method inside the runner thread).
+     * Runs the specified execution (that is, it calls the {@link Execution#run()} method inside the
+     * runner thread).
      *
      * @param execution the execution.
      * @param delay     the execution delay.

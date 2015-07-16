@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Interface defining an output channel, that is the channel used to read the routine invocation
@@ -214,7 +213,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @see #eventuallyDeadlock()
      * @see #eventuallyExit()
      */
-    @Nullable
     OUTPUT next();
 
     /**

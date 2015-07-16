@@ -46,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
@@ -893,7 +895,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return isNextAvailable(mTimeout, mAction);
         }
 
-        @Nullable
+        @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
+                justification = "readNext() method actually throws it")
         public OUTPUT next() {
 
             final OUTPUT output = readNext(mTimeout, mAction);
@@ -1161,7 +1164,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return isNextAvailable(timeout, timeoutAction);
         }
 
-        @Nullable
+        @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
+                justification = "readNext() method actually throws it")
         public OUTPUT next() {
 
             final TimeDuration timeout;

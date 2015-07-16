@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating a forbidden wait in a runner thread.
+ * Exception indicating a deadlock waiting for data to flow through channels.
  * <p/>
  * Created by davide-maestroni on 18/06/15.
  */

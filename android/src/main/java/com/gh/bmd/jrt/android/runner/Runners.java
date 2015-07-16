@@ -106,6 +106,7 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      * @return the runner instance.
      */
     @Nonnull
+    @SuppressWarnings("ConstantConditions")
     public static Runner myRunner() {
 
         return looperRunner(Looper.myLooper(), queuedRunner());

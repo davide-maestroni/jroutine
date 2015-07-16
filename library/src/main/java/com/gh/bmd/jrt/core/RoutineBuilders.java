@@ -653,17 +653,8 @@ public class RoutineBuilders {
                     }
                 }
 
-                final Method targetMethod;
-
-                try {
-
-                    targetMethod = getTargetMethod(proxyMethod, targetClass, targetParameterTypes);
-
-                } catch (final NoSuchMethodException e) {
-
-                    throw new IllegalArgumentException(e);
-                }
-
+                final Method targetMethod =
+                        getTargetMethod(proxyMethod, targetClass, targetParameterTypes);
                 final Class<?> returnType = proxyMethod.getReturnType();
                 final Class<?> targetReturnType = targetMethod.getReturnType();
                 boolean isError = false;
@@ -904,8 +895,7 @@ public class RoutineBuilders {
 
     @Nonnull
     private static Method getTargetMethod(@Nonnull final Method method,
-            @Nonnull final Class<?> targetClass,
-            @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
+            @Nonnull final Class<?> targetClass, @Nonnull final Class<?>[] targetParameterTypes) {
 
         String name = null;
         Method targetMethod = null;

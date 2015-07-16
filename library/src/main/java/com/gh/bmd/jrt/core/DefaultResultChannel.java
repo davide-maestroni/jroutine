@@ -1308,7 +1308,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                needsFlush = mState.onConsumerComplete(mQueue, mDelay);
+                needsFlush = mState.onConsumerComplete(mQueue);
                 mSubLogger.dbg("closing output [%s]", needsFlush);
             }
 
@@ -1525,8 +1525,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue,
-                @Nonnull final TimeDuration delay) {
+        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
 
             throw abortException();
         }
@@ -1652,8 +1651,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue,
-                @Nonnull final TimeDuration delay) {
+        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
 
             throw exception();
         }
@@ -1891,11 +1889,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * Called when the feeding consumer completes.
          *
          * @param queue the output queue.
-         * @param delay the output delay.
          * @return whether the queue content has changed.
          */
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue,
-                @Nonnull final TimeDuration delay) {
+        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
 
             queue.close();
             --mPendingOutputCount;
@@ -2218,8 +2214,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue,
-                @Nonnull final TimeDuration delay) {
+        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
 
             queue.close();
 

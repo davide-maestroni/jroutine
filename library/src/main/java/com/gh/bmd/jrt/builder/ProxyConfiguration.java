@@ -235,8 +235,8 @@ public final class ProxyConfiguration {
         }
 
         /**
-         * Sets the share group name. A null value means that it is up to the framework to choose a
-         * default one.
+         * Sets the share group name. A null value means that it is up to the specific
+         * implementation to choose a default one.
          *
          * @param groupName the group name.
          * @return this builder.

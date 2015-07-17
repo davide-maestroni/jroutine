@@ -107,13 +107,6 @@ class DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> invocations() {
-
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
-    }
-
-    @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
@@ -124,6 +117,13 @@ class DefaultClassRoutineBuilder
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         return method(mInvocationConfiguration, mProxyConfiguration, method);
+    }
+
+    @Nonnull
+    public InvocationConfiguration.Builder<? extends ClassRoutineBuilder> invocations() {
+
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ClassRoutineBuilder>(this, configuration);
     }
 
     @Nonnull

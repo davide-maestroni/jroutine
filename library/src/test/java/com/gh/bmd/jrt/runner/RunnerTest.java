@@ -332,14 +332,9 @@ public class RunnerTest {
 
         private boolean mIsRun;
 
-        public boolean isCancelable() {
+        public boolean mayBeCanceled() {
 
             return mIsCancelable;
-        }
-
-        private void setCancelable(final boolean isCancelable) {
-
-            mIsCancelable = isCancelable;
         }
 
         public void run() {
@@ -355,6 +350,11 @@ public class RunnerTest {
         private void reset() {
 
             mIsRun = false;
+        }
+
+        private void setCancelable(final boolean isCancelable) {
+
+            mIsCancelable = isCancelable;
         }
     }
 

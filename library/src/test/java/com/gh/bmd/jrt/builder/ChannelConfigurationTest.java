@@ -101,6 +101,13 @@ public class ChannelConfigurationTest {
                                                             .withAsyncRunner(Runners.queuedRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
+                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .withChannelTimeout(
+                                                                    TimeDuration.seconds(1))
+                                                            .withPassTimeout(
+                                                                    TimeDuration.seconds(10))
+                                                            .withPassTimeoutAction(
+                                                                    TimeoutActionType.ABORT)
                                                             .set();
         assertThat(builder().with(configuration).set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);

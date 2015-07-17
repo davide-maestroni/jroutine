@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a basic communication channel with the routine invocation.
+ * Interface defining the basic communication channel with the routine invocation.
  * <p/>
  * Channel instances are used to transfer data to and from the code executed inside the routine
  * invocation.

@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.channel;
 
 /**
- * Common base class for all the exceptions defined in the framework.
+ * Common base exception class.
  * <p/>
  * Created by davide-maestroni on 1/23/15.
  */

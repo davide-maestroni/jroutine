@@ -22,13 +22,14 @@ import com.gh.bmd.jrt.invocation.InvocationFactory;
 import javax.annotation.Nonnull;
 
 /**
- * This utility class represents the entry point to the framework by acting as a factory of routine
+ * This utility class represents the entry point to the library by acting as a factory of routine
  * builders.
  * <p/>
  * There are mainly two ways to create a routine object:
  * <p/>
  * <b>Routine by invocation customization</b><br/>
- * The first approach consists in implementing an invocation object.
+ * The first approach consists in implementing an invocation object. Invocations mimic the scope of
+ * a function call. Objects are instantiated when needed and recycled for successive invocations.
  * <p/>
  * <b>Routine by method invocation</b><br/>
  * The second approach is based on the asynchronous invocation of a method of an existing class or
@@ -38,7 +39,7 @@ import javax.annotation.Nonnull;
  * in turn asynchronously invoke the target object ones.<br/>
  * Note that a proxy object can be simply defined as an interface implemented by the target, but
  * also as a completely unrelated one mirroring the target methods. In this way it is possible to
- * apply the framework functionality to objects defined by third party libraries which are not under
+ * apply the library functionality to objects defined by third party libraries which are not under
  * direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
  * channels, so that data are transferred asynchronously, avoiding the need to block execution while
@@ -61,7 +62,7 @@ import javax.annotation.Nonnull;
  *         channel.pass(doSomething1.asyncCall())
  *                .pass(doSomething2.asyncCall())
  *                .close();
- *         channel.eventually()
+ *                .eventually()
  *                .allInto(results);
  *     </code>
  * </pre>
@@ -82,7 +83,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         doSomething1.asyncCall(doSomething2.asyncCall())).eventually().allInto(results);
+ *         doSomething2.asyncCall(doSomething1.asyncCall())).eventually().allInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -164,10 +165,6 @@ public class JRoutine {
     /**
      * Returns a routine builder based on the specified invocation factory.<br/>
      * In order to prevent undesired leaks, the class of the specified factory must be static.
-     * <p/>
-     * The invocation instance is created only when needed, by passing the specified arguments to
-     * the factory. Note that the arguments objects should be immutable or, at least, never shared
-     * inside and outside the routine in order to avoid concurrency issues.
      *
      * @param factory  the invocation factory.
      * @param <INPUT>  the input data type.

@@ -245,9 +245,11 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return this;
     }
 
-    public void close() {
+    @Nonnull
+    public TransportChannel<DATA> close() {
 
         mInputChannel.close();
+        return this;
     }
 
     @Nonnull

@@ -82,8 +82,7 @@ class DefaultLoaderChannelBuilder
 
             final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
             transportChannel.abort(new MissingInvocationException(loaderId));
-            transportChannel.close();
-            return transportChannel;
+            return transportChannel.close();
         }
 
         final LoaderRoutineBuilder<Void, OUTPUT> builder =

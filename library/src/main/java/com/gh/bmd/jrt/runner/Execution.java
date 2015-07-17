@@ -30,5 +30,5 @@ public interface Execution extends Runnable {
      *
      * @return whether the execution is cancelable.
      */
-    boolean isCancelable();
+    boolean mayBeCanceled();
 }

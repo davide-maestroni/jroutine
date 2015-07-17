@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * the framework as well.
+ * routines as well.
  * <p/>
  * Through this annotation, it is possible to indicate the action to be taken when the timeout for a
  * readable result to become available elapses.

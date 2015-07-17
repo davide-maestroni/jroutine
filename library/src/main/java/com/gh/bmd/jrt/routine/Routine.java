@@ -20,14 +20,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * This interface defines the main component of this framework.
+ * This interface defines the main component of the library architecture.
  * <p/>
  * The interface takes inspiration from the Go routines, where functions are executed
  * asynchronously and communicate with the external world only through channels. Being Java a
  * strictly object oriented programming language, the routine itself must be an object based on
  * logic implemented in other objects.
  * <p/>
- * The framework includes a routine class based on the implementation of an invocation interface.
+ * The library includes a routine class based on the implementation of an invocation interface.
  * Invocation objects are dynamically instantiated when needed, effectively mimicking the temporary
  * scope of a function call.<br/>
  * The paradigm is based on input, result and output channels. A routine can be invoked in
@@ -71,9 +71,9 @@ import javax.annotation.Nullable;
  * meaningful results only for routines which takes a single input parameter and computes the
  * relative output results.
  * <p/>
- * It is worth noting how the framework has been designed only through interfaces, so that,
- * as far as the implementation honors the specific contracts, it is possible to seamlessly combine
- * different routine implementations. Even the ones coming from third party libraries.
+ * It is worth noting how the library has been designed only through interfaces, so that, as far as
+ * the implementation honors the specific contracts, it is possible to seamlessly combine different
+ * routine implementations, even the ones coming from third party libraries.
  * <p/>
  * Created by davide-maestroni on 9/7/14.
  *
@@ -137,7 +137,8 @@ public interface Routine<INPUT, OUTPUT> {
     /**
      * Short for <b><code>parallelInvoke().result()</code></b>.
      * <p/>
-     * (This method actually makes little sense, thought it is here for completeness)
+     * (This method actually makes little sense, and should never need to be called, thought it is
+     * here for completeness)
      *
      * @return the output channel.
      */
@@ -146,6 +147,9 @@ public interface Routine<INPUT, OUTPUT> {
 
     /**
      * Short for <b><code>parallelInvoke().pass(input).result()</code></b>.
+     * <p/>
+     * (This method actually makes little sense, and should never need to be called, thought it is
+     * here for completeness)
      *
      * @param input the input.
      * @return the output channel.

@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.proxy.builder;
 
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
 import com.gh.bmd.jrt.util.ClassToken;
 
@@ -92,12 +91,4 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the invocation configuration builder.
-     */
-    @Nonnull
-    Builder<? extends ProxyRoutineBuilder> invocations();
 }

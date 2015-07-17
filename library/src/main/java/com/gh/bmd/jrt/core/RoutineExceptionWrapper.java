@@ -74,13 +74,6 @@ class RoutineExceptionWrapper {
     @Nonnull
     RoutineException raise() {
 
-        final Throwable cause = mCause;
-
-        if (cause instanceof RoutineException) {
-
-            return ((RoutineException) cause);
-        }
-
-        return new InvocationException(cause);
+        return InvocationException.wrapIfNeeded(mCause);
     }
 }

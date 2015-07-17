@@ -162,8 +162,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             transportChannel.pass(toSelectable(channel, i++));
         }
 
-        transportChannel.close();
-        return transportChannel;
+        return transportChannel.close();
     }
 
     /**
@@ -194,8 +193,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             transportChannel.pass(toSelectable(channel, i++));
         }
 
-        transportChannel.close();
-        return transportChannel;
+        return transportChannel.close();
     }
 
     /**
@@ -245,8 +243,7 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             transportChannel.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
         }
 
-        transportChannel.close();
-        return transportChannel;
+        return transportChannel.close();
     }
 
     /**

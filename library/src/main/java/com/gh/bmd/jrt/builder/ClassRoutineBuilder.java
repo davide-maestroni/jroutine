@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.routine.Routine;
 
 import java.lang.reflect.Method;
@@ -58,14 +57,6 @@ public interface ClassRoutineBuilder extends ConfigurableBuilder<ClassRoutineBui
      */
     @Nonnull
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the invocation configuration builder.
-     */
-    @Nonnull
-    Builder<? extends ClassRoutineBuilder> invocations();
 
     /**
      * Returns a routine used to call the specified method.

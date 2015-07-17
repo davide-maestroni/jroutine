@@ -19,14 +19,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a log object responsible for formatting and writing the framework log
- * messages.
+ * Interface defining a log object responsible for formatting and writing the log messages.
  * <p/>
  * A default global log instance can be set by invoking the proper logger methods. Note, however,
  * that a routine instance cannot dynamically change its log after creation.
  * <p/>
  * Note also that a log instance is typically accessed from different threads, so, it is
- * responsibility of the implementing class to avoid concurrency issues, by synchronizing mutable
+ * responsibility of the implementing class to avoid concurrency issues by synchronizing mutable
  * fields when required.
  * <p/>
  * To avoid an excessive number of log messages, it is sufficient to set an higher log level.
@@ -101,7 +100,7 @@ public interface Log {
          */
         ERROR,
         /**
-         * Silents all the logs.
+         * Silences all the logs.
          */
         SILENT
     }

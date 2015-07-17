@@ -22,7 +22,7 @@ package com.gh.bmd.jrt.runner;
  */
 public abstract class TemplateExecution implements Execution {
 
-    public boolean isCancelable() {
+    public boolean mayBeCanceled() {
 
         return false;
     }

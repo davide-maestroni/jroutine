@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * the framework as well.
+ * routines as well.
  * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a proxy
  * of another class methods. The interface can return the output in an asynchronous way. In such

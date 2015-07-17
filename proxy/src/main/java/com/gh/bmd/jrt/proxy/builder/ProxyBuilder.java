@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.proxy.builder;
 
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.InvocationConfiguration.Builder;
 import com.gh.bmd.jrt.builder.ProxyConfigurableBuilder;
 
 import javax.annotation.Nonnull;
@@ -50,12 +49,4 @@ public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYP
      */
     @Nonnull
     TYPE buildProxy();
-
-    /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the invocation configuration builder.
-     */
-    @Nonnull
-    Builder<? extends ProxyBuilder<TYPE>> invocations();
 }

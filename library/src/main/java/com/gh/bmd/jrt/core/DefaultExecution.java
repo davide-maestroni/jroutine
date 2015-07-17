@@ -102,7 +102,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         }
     }
 
-    public boolean isCancelable() {
+    public boolean mayBeCanceled() {
 
         return true;
     }

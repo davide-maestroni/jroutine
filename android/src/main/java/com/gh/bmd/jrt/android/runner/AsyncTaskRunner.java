@@ -90,7 +90,7 @@ class AsyncTaskRunner extends MainRunner {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
 
-        if (execution.isCancelable()) {
+        if (execution.mayBeCanceled()) {
 
             synchronized (mTasks) {
 
@@ -140,9 +140,9 @@ class AsyncTaskRunner extends MainRunner {
             mThreads = threads;
         }
 
-        public boolean isCancelable() {
+        public boolean mayBeCanceled() {
 
-            return mExecution.isCancelable();
+            return mExecution.mayBeCanceled();
         }
 
         @TargetApi(VERSION_CODES.HONEYCOMB)

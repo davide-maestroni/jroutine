@@ -56,7 +56,8 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new invocation factory creating instances of the specified class.
+     * Builds and returns a new invocation factory creating instances of the specified class by
+     * passing the specified arguments to the class constructor.
      * <p/>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
@@ -97,7 +98,8 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new invocation factory creating instances of the specified class token.
+     * Builds and returns a new invocation factory creating instances of the specified class token
+     * by passing the specified arguments to the class constructor.
      * <p/>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
@@ -122,7 +124,7 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new invocation factory creating instances of the specified object class.
+     * Builds and returns a new invocation factory creating instances of the specified object.
      *
      * @param invocation the invocation instance.
      * @param <INPUT>    the input data type.
@@ -139,7 +141,8 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new invocation factory creating instances of the specified object class.
+     * Builds and returns a new invocation factory creating instances of the specified object by
+     * passing the specified arguments to the class constructor.
      * <p/>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments

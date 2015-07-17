@@ -170,6 +170,9 @@ public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChanne
      * If the channel is already closed, this method has no effect.
      * <p/>
      * Note that this method must be always called when done with the channel.
+     *
+     * @return this channel.
      */
-    void close();
+    @Nonnull
+    TransportChannel<DATA> close();
 }

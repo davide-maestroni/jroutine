@@ -83,7 +83,7 @@ class ScheduledRunner implements Runner {
         final ScheduledFuture<?> future =
                 mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
 
-        if (execution.isCancelable()) {
+        if (execution.mayBeCanceled()) {
 
             synchronized (mFutures) {
 

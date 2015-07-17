@@ -101,8 +101,8 @@ public interface InputChannel<INPUT> extends Channel {
     /**
      * Tells the channel to sort the passed input data based on the specific delay.<br/>
      * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
-     * are passed to the channel, while the others will be delivered as soon as the set runner
-     * handles the related execution.
+     * are passed to the channel, while the others will be delivered as soon as the dedicated runner
+     * handles the specific execution.
      * <p/>
      * By default no particular order is applied.
      *
@@ -116,7 +116,7 @@ public interface InputChannel<INPUT> extends Channel {
     InputChannel<INPUT> orderByDelay();
 
     /**
-     * Passes the specified channel to this one.
+     * Passes the data returned by the specified channel to this one.
      * <p/>
      * Note that the output channel will be bound as a result of the call, thus effectively
      * preventing any other consumer from getting data from it.

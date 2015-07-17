@@ -503,8 +503,7 @@ public class Channels {
             transportChannel.pass(toSelectable(channel, i++));
         }
 
-        transportChannel.close();
-        return transportChannel;
+        return transportChannel.close();
     }
 
     /**
@@ -536,8 +535,7 @@ public class Channels {
             transportChannel.pass(toSelectable(channel, i++));
         }
 
-        transportChannel.close();
-        return transportChannel;
+        return transportChannel.close();
     }
 
     /**
@@ -601,8 +599,7 @@ public class Channels {
             transportChannel.pass(toSelectable(entry.getValue(), entry.getKey()));
         }
 
-        transportChannel.close();
-        return transportChannel;
+        return transportChannel.close();
     }
 
     /**
@@ -714,8 +711,7 @@ public class Channels {
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
         final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
-        return transportChannel;
+        return transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
     }
 
     @Nonnull
@@ -732,8 +728,7 @@ public class Channels {
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
         Collections.addAll(channelList, channels);
         final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
-        transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
-        return transportChannel;
+        return transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
     }
 
     @Nonnull
@@ -840,7 +835,6 @@ public class Channels {
             }
 
             final Selectable<?> that = (Selectable<?>) o;
-
             return index == that.index && !(data != null ? !data.equals(that.data)
                     : that.data != null);
         }

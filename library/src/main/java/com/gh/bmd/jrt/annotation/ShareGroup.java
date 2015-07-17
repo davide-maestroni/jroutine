@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * the framework as well.
+ * routines as well.
  * <p/>
  * Through this annotation, it is possible to exclude single methods from this kind of protection,
  * by indicating them as having a different share group. Each group has a name associated, and every

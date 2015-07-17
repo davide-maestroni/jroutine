@@ -34,14 +34,14 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * must be created starting from the specific configuration.
  * <p/>
  * The configuration has an asynchronous runner associated.<br/>
- * The number of input data buffered in the channel can be also limited in order to avoid excessive
- * memory consumption. In case the maximum number is reached hen passing an input, the call blocks
+ * The number of input data buffered in the channel can be limited in order to avoid excessive
+ * memory consumption. In case the maximum number is reached when passing an input, the call blocks
  * until enough data are consumed or the specified  timeout elapses. In the latter case, a
  * {@link com.gh.bmd.jrt.channel.TimeoutException TimeoutException} will be thrown.<br/>
- * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
+ * By default the timeout is set to 0 so to avoid unexpected deadlocks.<br/>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
  * delivered in the same order as they are passed to the channels, at the cost of a slightly
- * increased memory usage and computation.
+ * increase in memory usage and computation.
  * <p/>
  * Created by davide-maestroni on 03/07/15.
  */
@@ -441,6 +441,20 @@ public class ChannelConfiguration {
                 withAsyncRunner(asyncRunner);
             }
 
+            final TimeDuration passTimeout = configuration.mPassTimeout;
+
+            if (passTimeout != null) {
+
+                withPassTimeout(passTimeout);
+            }
+
+            final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
+
+            if (timeoutActionType != null) {
+
+                withPassTimeoutAction(timeoutActionType);
+            }
+
             final OrderType orderType = configuration.mChannelOrderType;
 
             if (orderType != null) {
@@ -480,8 +494,8 @@ public class ChannelConfiguration {
         }
 
         /**
-         * Sets the asynchronous runner instance. A null value means that it is up to the framework
-         * to choose a default one.
+         * Sets the asynchronous runner instance. A null value means that it is up to the specific
+         * implementation to choose a default one.
          *
          * @param runner the runner instance.
          * @return this builder.
@@ -495,8 +509,8 @@ public class ChannelConfiguration {
 
         /**
          * Sets the maximum number of data that the channel can retain before they are consumed. A
-         * {@link ChannelConfiguration#DEFAULT} value means that it is up to the framework to
-         * choose a default one.
+         * {@link ChannelConfiguration#DEFAULT} value means that it is up to the specific
+         * implementation to choose a default one.
          *
          * @param maxSize the maximum size.
          * @return this builder.
@@ -517,7 +531,7 @@ public class ChannelConfiguration {
 
         /**
          * Sets the order in which data are collected from the channel. A null value means that it
-         * is up to the framework to choose a default order one.<br/>
+         * is up to the specific implementation to choose a default one.<br/>
          * Note that this is just the initial configuration, since the channel order can be
          * dynamically changed through the dedicated methods.
          *
@@ -548,7 +562,7 @@ public class ChannelConfiguration {
 
         /**
          * Sets the timeout for the channel to have room for additional data. A null value means
-         * that it is up to the framework to choose a default one.
+         * that it is up to the specific implementation to choose a default one.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -561,8 +575,8 @@ public class ChannelConfiguration {
         }
 
         /**
-         * Sets the log instance. A null value means that it is up to the framework to choose a
-         * default one.
+         * Sets the log instance. A null value means that it is up to the specific implementation to
+         * choose a default one.
          *
          * @param log the log instance.
          * @return this builder.
@@ -575,8 +589,8 @@ public class ChannelConfiguration {
         }
 
         /**
-         * Sets the log level. A null value means that it is up to the framework to choose a default
-         * one.
+         * Sets the log level. A null value means that it is up to the specific implementation to
+         * choose a default one.
          *
          * @param level the log level.
          * @return this builder.
@@ -606,7 +620,7 @@ public class ChannelConfiguration {
 
         /**
          * Sets the timeout for the channel instance to produce a readable result. A null value
-         * means that it is up to the framework to choose a default one.<br/>
+         * means that it is up to the specific implementation to choose a default one.<br/>
          * Note that this is just the initial configuration, since the output timeout can be
          * dynamically changed through the dedicated methods.
          *
@@ -622,8 +636,8 @@ public class ChannelConfiguration {
 
         /**
          * Sets the action to be taken if the timeout elapses before a result can be read from the
-         * output channel. A null value means that it is up to the framework to choose a default
-         * one.<br/>
+         * output channel. A null value means that it is up to the specific implementation to choose
+         * a default one.<br/>
          * Note that this is just the initial configuration, since the output timeout action can be
          * dynamically changed through the dedicated methods.
          *

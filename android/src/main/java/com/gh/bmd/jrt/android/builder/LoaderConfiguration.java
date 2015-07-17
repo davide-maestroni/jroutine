@@ -418,7 +418,7 @@ public final class LoaderConfiguration {
 
         /**
          * Tells the builder how to cache the invocation result after its completion. A null value
-         * means that it is up to the framework to choose a default strategy.
+         * means that it is up to the specific implementation to choose a default strategy.
          *
          * @param strategyType the cache strategy type.
          * @return this builder.
@@ -433,7 +433,7 @@ public final class LoaderConfiguration {
         /**
          * Tells the builder how to resolve clashes of invocations with different inputs. A clash
          * happens when a loader with the same ID is still running. A null value means that it is up
-         * to the framework to choose a default resolution type.
+         * to the specific implementation to choose a default resolution type.
          *
          * @param resolutionType the type of resolution.
          * @return this builder.
@@ -462,7 +462,7 @@ public final class LoaderConfiguration {
         /**
          * Tells the builder how to resolve clashes of invocations with same inputs. A clash happens
          * when a loader with the same ID is still running. A null value means that it is up to the
-         * framework to choose a default resolution type.
+         * specific implementation to choose a default resolution type.
          *
          * @param resolutionType the type of resolution.
          * @return this builder.

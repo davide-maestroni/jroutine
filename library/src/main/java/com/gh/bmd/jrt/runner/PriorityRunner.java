@@ -173,9 +173,9 @@ public class PriorityRunner {
             mExecution = execution;
         }
 
-        public boolean isCancelable() {
+        public boolean mayBeCanceled() {
 
-            return mExecution.isCancelable();
+            return mExecution.mayBeCanceled();
         }
 
         public void run() {
@@ -218,9 +218,9 @@ public class PriorityRunner {
             mAge = age;
         }
 
-        public boolean isCancelable() {
+        public boolean mayBeCanceled() {
 
-            return mExecution.isCancelable();
+            return mExecution.mayBeCanceled();
         }
 
         public void run() {
@@ -300,11 +300,11 @@ public class PriorityRunner {
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
-            final boolean isCancelable = execution.isCancelable();
+            final boolean mayBeCanceled = execution.mayBeCanceled();
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
 
-            if (isCancelable) {
+            if (mayBeCanceled) {
 
                 synchronized (mExecutions) {
 
@@ -333,7 +333,7 @@ public class PriorityRunner {
                 final DelayedExecution delayedExecution =
                         new DelayedExecution(mQueue, priorityExecution);
 
-                if (isCancelable) {
+                if (mayBeCanceled) {
 
                     mDelayedExecutions.put(priorityExecution, delayedExecution);
                 }

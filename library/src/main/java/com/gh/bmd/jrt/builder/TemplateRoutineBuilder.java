@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * This class is useful to avoid the need of implementing some of the methods defined in the
  * interface.
+ * <p/>
  * Created by davide-maestroni on 3/16/15.
  *
  * @param <INPUT>  the input data type.

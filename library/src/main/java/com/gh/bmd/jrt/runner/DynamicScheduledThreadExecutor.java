@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Scheduled thread pool executor implementing a dynamic allocation of threads.<br/>
- * When the numbers of running threads reaches the maximum pool size, further command are queued
+ * When the numbers of running threads reaches the maximum pool size, further commands are queued
  * for later execution.
  * <p/>
  * Created by davide-maestroni on 1/23/15.

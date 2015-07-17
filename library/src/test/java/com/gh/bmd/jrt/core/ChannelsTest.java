@@ -586,10 +586,9 @@ public class ChannelsTest {
 
         final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
         Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3");
-        channel.close();
-        assertThat(channel.all()).containsExactly(new Selectable<String>("test1", 33),
-                                                  new Selectable<String>("test2", 33),
-                                                  new Selectable<String>("test3", 33));
+        assertThat(channel.close().all()).containsExactly(new Selectable<String>("test1", 33),
+                                                          new Selectable<String>("test2", 33),
+                                                          new Selectable<String>("test3", 33));
     }
 
     @Test
@@ -597,11 +596,10 @@ public class ChannelsTest {
 
         final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
         Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3").abort();
-        channel.close();
 
         try {
 
-            channel.eventually().all();
+            channel.close().eventually().all();
 
             fail();
 
@@ -618,8 +616,7 @@ public class ChannelsTest {
         Channels.toSelectable(channel.asInput(), 33)
                 .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                       new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
-        channel.close();
-        assertThat(channel.eventually().all()).containsExactly("test1", "test3");
+        assertThat(channel.close().eventually().all()).containsExactly("test1", "test3");
     }
 
     @Test
@@ -627,11 +624,10 @@ public class ChannelsTest {
 
         final TransportChannel<String> channel = JRoutine.transport().buildChannel();
         Channels.toSelectable(channel.asInput(), 33).abort();
-        channel.close();
 
         try {
 
-            channel.eventually().all();
+            channel.close().eventually().all();
 
             fail();
 

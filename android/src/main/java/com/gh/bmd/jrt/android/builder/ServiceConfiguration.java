@@ -296,8 +296,8 @@ public final class ServiceConfiguration {
         }
 
         /**
-         * Sets the log class. A null value means that it is up to the framework to choose a default
-         * implementation.
+         * Sets the log class. A null value means that it is up to the specific implementation to
+         * choose a default class.
          *
          * @param logClass the log class.
          * @return this builder.
@@ -331,8 +331,8 @@ public final class ServiceConfiguration {
         }
 
         /**
-         * Sets the runner class. A null value means that it is up to the framework to choose a
-         * default implementation.
+         * Sets the runner class. A null value means that it is up to the specific implementation to
+         * choose a default runner.
          *
          * @param runnerClass the runner class.
          * @return this builder.

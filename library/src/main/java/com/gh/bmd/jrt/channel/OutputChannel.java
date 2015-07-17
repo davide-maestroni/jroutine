@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
 public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterable<OUTPUT> {
 
     /**
-     * Tells the channel to wait at max the specified time duration for the next result to be
+     * Tells the channel to wait at the max the specified time duration for the next result to be
      * available.
      * <p/>
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
@@ -47,7 +47,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
     OutputChannel<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
     /**
-     * Tells the channel to wait at max the specified time duration for the next result to be
+     * Tells the channel to wait at the max the specified time duration for the next result to be
      * available.
      * <p/>
      * By default the timeout is set to 0 to avoid unexpected deadlocks.

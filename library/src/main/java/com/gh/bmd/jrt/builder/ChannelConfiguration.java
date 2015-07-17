@@ -45,7 +45,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * <p/>
  * Created by davide-maestroni on 03/07/15.
  */
-public class ChannelConfiguration {
+public final class ChannelConfiguration {
 
     /**
      * Constant indicating the default value of an integer attribute.

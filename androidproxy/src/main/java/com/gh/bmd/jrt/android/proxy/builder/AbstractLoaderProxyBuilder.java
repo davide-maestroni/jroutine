@@ -76,7 +76,14 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
                 return token.cast(instance);
             }
 
-            warn(invocationConfiguration);
+            final Runner asyncRunner = invocationConfiguration.getAsyncRunnerOr(null);
+
+            if (asyncRunner != null) {
+
+                invocationConfiguration.newLogger(this)
+                                       .wrn("the specified runner will be ignored: %s",
+                                            asyncRunner);
+            }
 
             try {
 
@@ -100,17 +107,17 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> loaders() {
-
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
-    }
-
-    @Nonnull
     public ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
+    }
+
+    @Nonnull
+    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> loaders() {
+
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
@@ -183,22 +190,6 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
             @Nonnull ProxyConfiguration proxyConfiguration,
             @Nonnull LoaderConfiguration loaderConfiguration);
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the invocation configuration.
-     */
-    private void warn(@Nonnull final InvocationConfiguration configuration) {
-
-        final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
-
-        if (asyncRunner != null) {
-
-            configuration.newLogger(this)
-                         .wrn("the specified runner will be ignored: %s", asyncRunner);
-        }
-    }
 
     /**
      * Class used as key to identify a specific proxy instance.

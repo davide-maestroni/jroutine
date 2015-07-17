@@ -218,6 +218,22 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      * <p/>
      * Note that the channels will be bound as a result of the call.
      *
+     * @param channels the channels to merge.
+     * @return the selectable output channel.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     */
+    @Nonnull
+    public static OutputChannel<? extends ParcelableSelectable<Object>> mergeParcelable(
+            @Nonnull final OutputChannel<?>... channels) {
+
+        return mergeParcelable(0, channels);
+    }
+
+    /**
+     * Merges the specified channels into a selectable one.
+     * <p/>
+     * Note that the channels will be bound as a result of the call.
+     *
      * @param channelMap the map of indexes and output channels.
      * @param <OUTPUT>   the output data type.
      * @return the selectable output channel.
@@ -244,22 +260,6 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
         }
 
         return transportChannel.close();
-    }
-
-    /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
-     * Note that the channels will be bound as a result of the call.
-     *
-     * @param channels the channels to merge.
-     * @return the selectable output channel.
-     * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     */
-    @Nonnull
-    public static OutputChannel<? extends ParcelableSelectable<Object>> mergeParcelable(
-            @Nonnull final OutputChannel<?>... channels) {
-
-        return mergeParcelable(0, channels);
     }
 
     /**

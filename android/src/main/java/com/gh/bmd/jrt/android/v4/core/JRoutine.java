@@ -36,8 +36,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * objects and the invocation factory, might be employed to check for clashing of invocation
  * instances or compute the loader ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
- * implementations, a user defined ID or an input independent clash resolution should be used to
- * avoid unexpected results.
+ * implementations, a user defined ID or an input independent clash resolution should be used in
+ * order to avoid unexpected results.
  * <p/>
  * The routine invocations will be identified by an ID number. In case a clash is detected, that is,
  * an already running loader with the same ID exists at the time the new invocation is executed,

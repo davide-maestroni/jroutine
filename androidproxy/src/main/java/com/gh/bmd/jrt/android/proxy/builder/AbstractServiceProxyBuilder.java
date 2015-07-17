@@ -16,7 +16,6 @@ package com.gh.bmd.jrt.android.proxy.builder;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
@@ -76,8 +75,6 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
 
                 return token.cast(instance);
             }
-
-            warn(invocationConfiguration);
 
             try {
 
@@ -184,22 +181,6 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
             @Nonnull ProxyConfiguration proxyConfiguration,
             @Nonnull ServiceConfiguration serviceConfiguration);
-
-    /**
-     * Logs any warning related to ignored options in the specified configuration.
-     *
-     * @param configuration the invocation configuration.
-     */
-    private void warn(@Nonnull final InvocationConfiguration configuration) {
-
-        final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
-
-        if (asyncRunner != null) {
-
-            configuration.newLogger(this)
-                         .wrn("the specified runner will be ignored: %s", asyncRunner);
-        }
-    }
 
     /**
      * Class used as key to identify a specific proxy instance.

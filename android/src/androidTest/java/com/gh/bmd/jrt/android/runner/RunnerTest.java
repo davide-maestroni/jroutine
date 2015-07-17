@@ -154,6 +154,7 @@ public class RunnerTest extends AndroidTestCase {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void testLooperRunner() throws InterruptedException {
 
         testRunner(new LooperRunner(Looper.myLooper(), Runners.queuedRunner()));

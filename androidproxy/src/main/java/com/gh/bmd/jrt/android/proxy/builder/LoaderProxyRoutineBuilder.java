@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfigurableBuilder;
-import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
@@ -106,18 +105,12 @@ public interface LoaderProxyRoutineBuilder
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * Note that all the options related to the output and input channels will be ignored.
+     * Note that the configured asynchronous runner will be ignored.
      *
      * @return the invocation configuration builder.
      */
     @Nonnull
     InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocations();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaders();
 
     /**
      * {@inheritDoc}

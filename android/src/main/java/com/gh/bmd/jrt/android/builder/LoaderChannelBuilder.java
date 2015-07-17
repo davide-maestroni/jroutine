@@ -13,8 +13,8 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.Builder;
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 
 import javax.annotation.Nonnull;
@@ -42,20 +42,12 @@ public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelB
     <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
-     * Note that only the options related to logs will be employed.
-     *
-     * @return the invocation configuration builder.
-     */
-    @Nonnull
-    InvocationConfiguration.Builder<? extends LoaderChannelBuilder> invocations();
-
-    /**
      * Note that the clash resolution types will be ignored.
      *
      * @return the loader configuration builder.
      */
     @Nonnull
-    LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaders();
+    Builder<? extends LoaderChannelBuilder> loaders();
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified inputs.

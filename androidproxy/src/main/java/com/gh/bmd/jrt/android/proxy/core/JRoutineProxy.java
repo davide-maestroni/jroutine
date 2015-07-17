@@ -60,7 +60,30 @@ public class JRoutineProxy extends com.gh.bmd.jrt.proxy.core.JRoutineProxy {
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
      * service.
      * <p/>
-     * Note that the built routine results will be dispatched in the configured looper, thus,
+     * Note that the built routine results will be dispatched into the configured looper, thus,
+     * waiting for the outputs on the very same looper thread, immediately after its invocation,
+     * will result in a deadlock.<br/>
+     * By default, output results are dispatched in the main looper.
+     *
+     * @param context the service context.
+     * @param target  the wrapped object class.
+     * @return the routine builder instance.
+     */
+    @Nonnull
+    public static ServiceProxyRoutineBuilder on(@Nonnull final ServiceContext context,
+            @Nonnull final Class<?> target) {
+
+        return on(context, target, (Object[]) null);
+    }
+
+    /**
+     * Returns a builder of routines, wrapping the specified object instance, running in a service
+     * based on the specified context.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
+     * service.
+     * <p/>
+     * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
      * will result in a deadlock.<br/>
      * By default, output results are dispatched in the main looper.

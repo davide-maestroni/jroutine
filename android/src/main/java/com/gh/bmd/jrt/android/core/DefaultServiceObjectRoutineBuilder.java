@@ -235,10 +235,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        final AliasMethodToken<INPUT, OUTPUT> classToken = new AliasMethodToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name};
-        return JRoutine.on(mContext, classToken, args)
+        return JRoutine.on(mContext, new AliasMethodToken<INPUT, OUTPUT>(), args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
                        .set()
@@ -256,12 +255,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Method targetMethod = findMethod(targetClass, name, parameterTypes);
         final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-        final MethodSignatureToken<INPUT, OUTPUT> classToken =
-                new MethodSignatureToken<INPUT, OUTPUT>();
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name,
                                            toNames(parameterTypes)};
-        return JRoutine.on(mContext, classToken, args)
+        return JRoutine.on(mContext, new MethodSignatureToken<INPUT, OUTPUT>(), args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
                        .set()

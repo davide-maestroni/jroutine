@@ -118,13 +118,6 @@ class DefaultLoaderChannelBuilder
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends LoaderChannelBuilder> invocations() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<LoaderChannelBuilder>(this, config);
-    }
-
-    @Nonnull
     public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
@@ -206,6 +199,13 @@ class DefaultLoaderChannelBuilder
                    .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
                            LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
         }
+    }
+
+    @Nonnull
+    public InvocationConfiguration.Builder<? extends LoaderChannelBuilder> invocations() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @Nonnull

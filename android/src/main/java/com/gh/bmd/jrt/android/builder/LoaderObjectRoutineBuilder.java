@@ -155,7 +155,9 @@ public interface LoaderObjectRoutineBuilder
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * {@inheritDoc}
+     * Note that the configured asynchronous runner will be ignored.
+     *
+     * @return the invocation configuration builder.
      */
     @Nonnull
     InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocations();

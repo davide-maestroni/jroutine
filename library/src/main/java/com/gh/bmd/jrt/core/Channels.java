@@ -220,22 +220,6 @@ public class Channels {
      * <p/>
      * Note that the channels will be bound as a result of the call.
      *
-     * @param channels the array of channels.
-     * @return the output channel.
-     * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     */
-    @Nonnull
-    public static OutputChannel<List<?>> join(@Nonnull final OutputChannel<?>... channels) {
-
-        return join(false, channels);
-    }
-
-    /**
-     * Returns an output channel joining the data coming from the specified list of channels.<br/>
-     * An output will be generated only when at least one result is available for each channel.
-     * <p/>
-     * Note that the channels will be bound as a result of the call.
-     *
      * @param channels the list of channels.
      * @param <OUTPUT> the output data type.
      * @return the output channel.
@@ -251,9 +235,6 @@ public class Channels {
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining output will be returned by
-     * filling the gaps with null instances, so that the generated list of data will always have the
-     * same size of the channel array.
      * <p/>
      * Note that the channels will be bound as a result of the call.
      *
@@ -262,9 +243,9 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<List<?>> joinAndFlush(@Nonnull final OutputChannel<?>... channels) {
+    public static OutputChannel<List<?>> join(@Nonnull final OutputChannel<?>... channels) {
 
-        return join(true, channels);
+        return join(false, channels);
     }
 
     /**
@@ -284,6 +265,25 @@ public class Channels {
     @Nonnull
     public static <OUTPUT> OutputChannel<List<OUTPUT>> joinAndFlush(
             @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
+
+        return join(true, channels);
+    }
+
+    /**
+     * Returns an output channel joining the data coming from the specified list of channels.<br/>
+     * An output will be generated only when at least one result is available for each channel.
+     * Moreover, when all the output channels complete, the remaining output will be returned by
+     * filling the gaps with null instances, so that the generated list of data will always have the
+     * same size of the channel array.
+     * <p/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channels the array of channels.
+     * @return the output channel.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     */
+    @Nonnull
+    public static OutputChannel<List<?>> joinAndFlush(@Nonnull final OutputChannel<?>... channels) {
 
         return join(true, channels);
     }
@@ -481,37 +481,6 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the array of channels.
-     * @return the selectable output channel.
-     * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     */
-    @Nonnull
-    public static OutputChannel<? extends Selectable<?>> merge(final int startIndex,
-            @Nonnull final OutputChannel<?>... channels) {
-
-        if (channels.length == 0) {
-
-            throw new IllegalArgumentException("the array of channels must not be empty");
-        }
-
-        final TransportChannel<Selectable<Object>> transportChannel =
-                JRoutine.transport().buildChannel();
-        int i = startIndex;
-
-        for (final OutputChannel<?> channel : channels) {
-
-            transportChannel.pass(toSelectable(channel, i++));
-        }
-
-        return transportChannel.close();
-    }
-
-    /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
-     * Note that the channels will be bound as a result of the call.
-     *
-     * @param startIndex the selectable start index.
      * @param channels   the list of channels.
      * @param <OUTPUT>   the output data type.
      * @return the selectable output channel.
@@ -543,15 +512,30 @@ public class Channels {
      * <p/>
      * Note that the channels will be bound as a result of the call.
      *
-     * @param channels the channels to merge.
+     * @param startIndex the selectable start index.
+     * @param channels   the array of channels.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<? extends Selectable<?>> merge(
+    public static OutputChannel<? extends Selectable<?>> merge(final int startIndex,
             @Nonnull final OutputChannel<?>... channels) {
 
-        return merge(0, channels);
+        if (channels.length == 0) {
+
+            throw new IllegalArgumentException("the array of channels must not be empty");
+        }
+
+        final TransportChannel<Selectable<Object>> transportChannel =
+                JRoutine.transport().buildChannel();
+        int i = startIndex;
+
+        for (final OutputChannel<?> channel : channels) {
+
+            transportChannel.pass(toSelectable(channel, i++));
+        }
+
+        return transportChannel.close();
     }
 
     /**
@@ -600,6 +584,22 @@ public class Channels {
         }
 
         return transportChannel.close();
+    }
+
+    /**
+     * Merges the specified channels into a selectable one.
+     * <p/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channels the channels to merge.
+     * @return the selectable output channel.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     */
+    @Nonnull
+    public static OutputChannel<? extends Selectable<?>> merge(
+            @Nonnull final OutputChannel<?>... channels) {
+
+        return merge(0, channels);
     }
 
     /**
@@ -702,20 +702,6 @@ public class Channels {
 
     @Nonnull
     private static InputChannel<List<?>> distribute(final boolean isFlush,
-            @Nonnull final List<? extends InputChannel<?>> channels) {
-
-        if (channels.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of channels must not be empty");
-        }
-
-        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
-        final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
-        return transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
-    }
-
-    @Nonnull
-    private static InputChannel<List<?>> distribute(final boolean isFlush,
             @Nonnull final InputChannel<?>... channels) {
 
         final int length = channels.length;
@@ -727,6 +713,20 @@ public class Channels {
 
         final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(length);
         Collections.addAll(channelList, channels);
+        final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
+        return transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
+    }
+
+    @Nonnull
+    private static InputChannel<List<?>> distribute(final boolean isFlush,
+            @Nonnull final List<? extends InputChannel<?>> channels) {
+
+        if (channels.isEmpty()) {
+
+            throw new IllegalArgumentException("the list of channels must not be empty");
+        }
+
+        final ArrayList<InputChannel<?>> channelList = new ArrayList<InputChannel<?>>(channels);
         final TransportChannel<List<?>> transportChannel = JRoutine.transport().buildChannel();
         return transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
     }

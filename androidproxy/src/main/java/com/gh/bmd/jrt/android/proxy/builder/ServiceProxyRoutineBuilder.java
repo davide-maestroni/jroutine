@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.android.proxy.builder;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfigurableBuilder;
-import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
@@ -97,9 +96,7 @@ public interface ServiceProxyRoutineBuilder
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * Note that all the options related to the output and input channels will be ignored.
-     *
-     * @return the invocation configuration builder.
+     * {@inheritDoc}
      */
     @Nonnull
     InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocations();
@@ -109,10 +106,4 @@ public interface ServiceProxyRoutineBuilder
      */
     @Nonnull
     ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxies();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> service();
 }

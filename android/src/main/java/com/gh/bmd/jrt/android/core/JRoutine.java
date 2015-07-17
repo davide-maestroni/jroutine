@@ -27,8 +27,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * This utility class extends the base one in order to support additional routine builders specific
  * to the Android platform.<br/>
  * Routine invocations created through the returned builder will be executed inside a service
- * specified through the routine builder. Be aware, though, that the invocation results will be
- * dispatched in the specified looper, so that, waiting for the outputs on the very same looper
+ * specified by the service context. Be aware, though, that the invocation results will be
+ * dispatched into the configured looper, so that, waiting for the outputs on the very same looper
  * thread, immediately after its invocation, will result in a deadlock.<br/>
  * By default output results are dispatched in the main looper.
  * <p/>
@@ -41,8 +41,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * The service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels, as well as the factory arguments, must comply with
  * the {@link android.os.Parcel#writeValue(Object)} method. Be aware though, that issues may arise
- * when employing {@link java.io.Serializable} objects on the Lollipop OS version, so, it is
- * advisable to use {@link android.os.Parcelable} objects instead.
+ * when employing {@link java.io.Serializable} objects on some OS versions, so, it is advisable to
+ * use {@link android.os.Parcelable} objects instead.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>
@@ -89,7 +89,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
      * service.
      * <p/>
-     * Note that the built routine results will be dispatched in the configured looper, thus,
+     * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
@@ -112,7 +112,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
      * service.
      * <p/>
-     * Note that the built routine results will be dispatched in the configured looper, thus,
+     * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
@@ -135,7 +135,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])
      * getInvocationFactory(Class, Object[])} of the routine service.
      * <p/>
-     * Note that the built routine results will be dispatched in the configured looper, thus,
+     * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
@@ -160,7 +160,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])
      * getInvocationFactory(Class, Object[])} of the routine service.
      * <p/>
-     * Note that the built routine results will be dispatched in the configured looper, thus,
+     * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.

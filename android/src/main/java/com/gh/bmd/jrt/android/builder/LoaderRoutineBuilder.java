@@ -45,8 +45,7 @@ public interface LoaderRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPU
     LoaderRoutine<INPUT, OUTPUT> buildRoutine();
 
     /**
-     * Note that all the options related to the output and input channels size and timeout will be
-     * ignored.
+     * Note that the configured asynchronous runner will be ignored.
      *
      * @return the invocation configuration builder.
      */

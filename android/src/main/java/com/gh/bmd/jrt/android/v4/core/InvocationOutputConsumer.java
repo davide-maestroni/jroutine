@@ -18,7 +18,6 @@ import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
-import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
@@ -110,19 +109,17 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
     public void onError(@Nullable final RoutineException error) {
 
         final boolean deliverResult;
-        final InvocationException abortException;
 
         synchronized (mMutex) {
 
             mIsComplete = true;
-            abortException = new InvocationException(error);
-            mAbortException = abortException;
+            mAbortException = error;
             deliverResult = mLastResults.isEmpty();
         }
 
         if (deliverResult) {
 
-            mLogger.dbg(abortException, "delivering error");
+            mLogger.dbg(error, "delivering error");
             deliverResult();
         }
     }
@@ -183,11 +180,11 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
         }
 
         @Nullable
-        public Throwable getAbortException() {
+        public RoutineException getAbortException() {
 
             synchronized (mMutex) {
 
-                return mAbortException.getCause();
+                return mAbortException;
             }
         }
 
@@ -212,7 +209,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                 if (mAbortException != null) {
 
                     logger.dbg("avoiding passing results since invocation is aborted");
-
                     lastResults.clear();
                     cachedResults.clear();
                     return true;

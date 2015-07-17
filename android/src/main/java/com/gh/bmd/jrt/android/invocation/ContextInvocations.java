@@ -81,6 +81,28 @@ public class ContextInvocations {
      * variables captured in the closure.
      *
      * @param invocationClass the invocation class.
+     * @param <INPUT>         the input data type.
+     * @param <OUTPUT>        the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
+            @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass) {
+
+        return factoryOf(invocationClass, (Object[]) null);
+    }
+
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified
+     * class by passing the specified arguments to the class constructor.
+     * <p/>
+     * Note that inner and anonymous classes can be passed as well. Remember however that Java
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+     * first constructor parameter, and anonymous classes has both the outer instance and all the
+     * variables captured in the closure.
+     *
+     * @param invocationClass the invocation class.
      * @param args            the invocation constructor arguments.
      * @param <INPUT>         the input data type.
      * @param <OUTPUT>        the output data type.
@@ -97,6 +119,28 @@ public class ContextInvocations {
     /**
      * Builds and returns a new context invocation factory creating instances of the specified class
      * token.
+     * <p/>
+     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * and all the variables captured in the closure.
+     *
+     * @param invocationToken the invocation class token.
+     * @param <INPUT>         the input data type.
+     * @param <OUTPUT>        the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
+            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> invocationToken) {
+
+        return factoryOf(invocationToken.getRawClass());
+    }
+
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified class
+     * token by passing the specified arguments to the class constructor.
      * <p/>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct

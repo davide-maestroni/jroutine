@@ -28,8 +28,8 @@ import javax.annotation.Nullable;
 /**
  * Class representing an Android routine context (like activities or fragments).
  * <p/>
- * No strong reference to the wrapped objects will be retained by this class implementations. So, it
- * is up to the caller to ensure that they are not garbage collected before time.
+ * No strong reference to the wrapped objects will be retained by this class implementations. So,
+ * it is up to the caller to ensure that they are not garbage collected before time.
  * <p/>
  * Created by davide-maestroni on 08/07/15.
  */
@@ -40,18 +40,6 @@ public abstract class RoutineContext {
      */
     private RoutineContext() {
 
-    }
-
-    /**
-     * Returns a context wrapping the specified activity.
-     *
-     * @param activity the activity instance.
-     * @return the routine context.
-     */
-    @Nonnull
-    public static RoutineContext contextFrom(@Nonnull final FragmentActivity activity) {
-
-        return new ActivityContext(activity);
     }
 
     /**
@@ -67,25 +55,9 @@ public abstract class RoutineContext {
     }
 
     /**
-     * Returns a context wrapping the specified activity, with the specified instance as base
-     * context.<br/>
-     * In order to prevent undesired leaks, the class of the specified factory must be static.
-     *
-     * @param activity the activity instance.
-     * @param context  the context used to get the application one.
-     * @return the routine context.
-     */
-    @Nonnull
-    public static RoutineContext contextFrom(@Nonnull final FragmentActivity activity,
-            @Nonnull final Context context) {
-
-        return new WrappedActivityContext(activity, context);
-    }
-
-    /**
      * Returns a context wrapping the specified fragment, with the specified instance as base
      * context.<br/>
-     * In order to prevent undesired leaks, the class of the specified factory must be static.
+     * In order to prevent undesired leaks, the class of the specified context must be static.
      *
      * @param fragment the fragment instance.
      * @param context  the context used to get the application one.
@@ -96,6 +68,34 @@ public abstract class RoutineContext {
             @Nonnull final Context context) {
 
         return new WrappedFragmentContext(fragment, context);
+    }
+
+    /**
+     * Returns a context wrapping the specified activity.
+     *
+     * @param activity the activity instance.
+     * @return the routine context.
+     */
+    @Nonnull
+    public static RoutineContext contextFrom(@Nonnull final FragmentActivity activity) {
+
+        return new ActivityContext(activity);
+    }
+
+    /**
+     * Returns a context wrapping the specified activity, with the specified instance as base
+     * context.<br/>
+     * In order to prevent undesired leaks, the class of the specified context must be static.
+     *
+     * @param activity the activity instance.
+     * @param context  the context used to get the application one.
+     * @return the routine context.
+     */
+    @Nonnull
+    public static RoutineContext contextFrom(@Nonnull final FragmentActivity activity,
+            @Nonnull final Context context) {
+
+        return new WrappedActivityContext(activity, context);
     }
 
     /**
@@ -216,7 +216,7 @@ public abstract class RoutineContext {
     }
 
     /**
-     * Routine context wrapping an activity and its application context.
+     * Routine context wrapping an activity and its loader context.
      */
     private static class WrappedActivityContext extends ActivityContext {
 
@@ -254,7 +254,7 @@ public abstract class RoutineContext {
     }
 
     /**
-     * Routine context wrapping a fragment and its application context.
+     * Routine context wrapping a fragment and its loader context.
      */
     private static class WrappedFragmentContext extends FragmentContext {
 

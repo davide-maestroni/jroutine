@@ -133,17 +133,17 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaders() {
-
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
-    }
-
-    @Nonnull
     public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
+    }
+
+    @Nonnull
+    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaders() {
+
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @Nonnull

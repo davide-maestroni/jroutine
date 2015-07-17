@@ -92,7 +92,7 @@ public @interface V11Proxy {
     String className() default Proxy.DEFAULT;
 
     /**
-     * The generated class package. By default it is the same as the interface.
+     * The generated class package. By default it is the same as the interface one.
      *
      * @return the package.
      */

@@ -41,10 +41,4 @@ public interface ServiceObjectRoutineBuilder
      */
     @Nonnull
     ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxies();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> service();
 }

@@ -743,7 +743,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
                 if (data.isError()) {
 
-                    final Throwable exception = data.getAbortException();
+                    final RoutineException exception = data.getAbortException();
 
                     for (final TransportChannel<OUTPUT> channel : channelsToClose) {
 

@@ -164,7 +164,7 @@ public class RoutineService extends Service {
 
         data.setClassLoader(RoutineService.class.getClassLoader());
         final ParcelableValue parcelable = data.getParcelable(KEY_DATA_VALUE);
-        return parcelable.getValue();
+        return (parcelable == null) ? null : parcelable.getValue();
     }
 
     /**

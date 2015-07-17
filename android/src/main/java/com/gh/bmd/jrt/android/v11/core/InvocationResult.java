@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
+import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ interface InvocationResult<OUTPUT> {
      * @return the exception.
      */
     @Nullable
-    Throwable getAbortException();
+    RoutineException getAbortException();
 
     /**
      * Checks if this result represents an error.

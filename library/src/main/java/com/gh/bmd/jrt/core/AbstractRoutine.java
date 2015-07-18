@@ -14,7 +14,6 @@
 package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
-import com.gh.bmd.jrt.channel.DeadlockException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
@@ -372,38 +371,25 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             synchronized (mMutex) {
 
-                final Check isInvocationAvailable = mIsInvocationAvailable;
+                final boolean isTimeout;
 
-                if (!isInvocationAvailable.isTrue()) {
+                try {
 
-                    final TimeDuration availTimeout = mAvailTimeout;
+                    isTimeout = !mAvailTimeout.waitTrue(mMutex, mIsInvocationAvailable);
 
-                    if ((mInvocationType == InvocationType.ASYNC) && !availTimeout.isZero()
-                            && mAsyncRunner.isExecutionThread()) {
+                } catch (final InterruptedException e) {
 
-                        throw new DeadlockException("cannot wait on the invocation runner thread");
-                    }
+                    mLogger.err(e, "waiting for available instances interrupted [#%d]",
+                                mMaxInvocations);
+                    throw new InvocationInterruptedException(e);
+                }
 
-                    final boolean isTimeout;
+                if (isTimeout) {
 
-                    try {
-
-                        isTimeout = !availTimeout.waitTrue(mMutex, isInvocationAvailable);
-
-                    } catch (final InterruptedException e) {
-
-                        mLogger.err(e, "waiting for available instances interrupted [#%d]",
-                                    mMaxInvocations);
-                        throw new InvocationInterruptedException(e);
-                    }
-
-                    if (isTimeout) {
-
-                        mLogger.wrn("routine instance not available after timeout [#%d]: %s",
-                                    mMaxInvocations, availTimeout);
-                        throw new InvocationTimeoutException(
-                                "timeout while waiting for an available invocation instance");
-                    }
+                    mLogger.wrn("routine instance not available after timeout [#%d]: %s",
+                                mMaxInvocations, mAvailTimeout);
+                    throw new InvocationTimeoutException(
+                            "timeout while waiting for an available invocation instance");
                 }
 
                 final InvocationType invocationType = mInvocationType;

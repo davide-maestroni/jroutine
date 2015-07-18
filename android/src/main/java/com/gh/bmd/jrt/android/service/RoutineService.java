@@ -255,7 +255,7 @@ public class RoutineService extends Service {
 
     private static void putError(@Nonnull final Bundle bundle, @Nullable final Throwable error) {
 
-        bundle.putSerializable(RoutineService.KEY_ABORT_EXCEPTION, error);
+        bundle.putSerializable(KEY_ABORT_EXCEPTION, error);
     }
 
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
@@ -624,7 +624,7 @@ public class RoutineService extends Service {
                         return;
                     }
 
-                    final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+                    final Message message = Message.obtain(null, MSG_ABORT);
                     putError(message.getData(), t);
                     outMessenger.send(message);
 
@@ -808,7 +808,7 @@ public class RoutineService extends Service {
 
             try {
 
-                mOutMessenger.send(Message.obtain(null, RoutineService.MSG_COMPLETE));
+                mOutMessenger.send(Message.obtain(null, MSG_COMPLETE));
 
             } catch (final RemoteException e) {
 
@@ -819,7 +819,7 @@ public class RoutineService extends Service {
         public void onError(@Nullable final RoutineException error) {
 
             mInvocation.recycle();
-            final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+            final Message message = Message.obtain(null, MSG_ABORT);
             putError(message.getData(), error);
 
             try {
@@ -834,7 +834,7 @@ public class RoutineService extends Service {
 
         public void onOutput(final Object o) {
 
-            final Message message = Message.obtain(null, RoutineService.MSG_DATA);
+            final Message message = Message.obtain(null, MSG_DATA);
             putValue(message.getData(), o);
 
             try {

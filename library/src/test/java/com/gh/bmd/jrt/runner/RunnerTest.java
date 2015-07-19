@@ -33,6 +33,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.util.TimeDuration.micros;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static com.gh.bmd.jrt.util.TimeDuration.nanos;
+import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -83,7 +84,7 @@ public class RunnerTest {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -216,7 +217,7 @@ public class RunnerTest {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
 
@@ -226,7 +227,7 @@ public class RunnerTest {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -237,6 +238,100 @@ public class RunnerTest {
         testRunner(new SequentialRunner());
         testRunner(Runners.sequentialRunner());
         testRunner(new RunnerDecorator(new SequentialRunner()));
+    }
+
+    @Test
+    public void testThrottlingRunner() throws InterruptedException {
+
+        testRunner(new ThrottlingRunner(Runners.sharedRunner(), 5));
+        testRunner(Runners.throttlingRunner(Runners.poolRunner(), 5));
+        testRunner(new RunnerDecorator(new ThrottlingRunner(Runners.sharedRunner(), 5)));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testThrottlingRunnerCancel() throws InterruptedException {
+
+        final TestExecution execution = new TestExecution();
+        Runner runner = Runners.throttlingRunner(Runners.queuedRunner(), 1);
+        assertThat(runner.isExecutionThread()).isFalse();
+        runner.run(execution, 0, TimeUnit.MILLISECONDS);
+        assertThat(execution.isRun()).isTrue();
+        execution.reset();
+        runner.run(execution, 1, TimeUnit.MILLISECONDS);
+        assertThat(execution.isRun()).isTrue();
+        execution.reset();
+        runner = Runners.throttlingRunner(Runners.sharedRunner(), 1);
+        runner.run(new TestExecution() {
+
+            @Override
+            public void run() {
+
+                try {
+
+                    seconds(1).sleepAtLeast();
+
+                } catch (final InterruptedException ignored) {
+
+                }
+
+                super.run();
+            }
+        }, 0, TimeUnit.MILLISECONDS);
+
+        millis(300).sleepAtLeast();
+        execution.setCancelable(true);
+        runner.run(execution, 0, TimeUnit.MILLISECONDS);
+        millis(300).sleepAtLeast();
+        assertThat(execution.isRun()).isFalse();
+        runner.cancel(execution);
+        millis(500).sleepAtLeast();
+        assertThat(execution.isRun()).isFalse();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testThrottlingRunnerError() {
+
+        try {
+
+            new ThrottlingRunner(null, 5);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Runners.throttlingRunner(null, 5);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ThrottlingRunner(Runners.sharedRunner(), 0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Runners.throttlingRunner(Runners.sharedRunner(), -1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     private void testRunner(final Runner runner) throws InterruptedException {

@@ -80,6 +80,7 @@ public class Runners {
      *
      * @param poolSize the thread pool size.
      * @return the runner instance.
+     * @throws java.lang.IllegalArgumentException if the pool size is less than 1.
      */
     @Nonnull
     public static Runner poolRunner(final int poolSize) {
@@ -152,5 +153,20 @@ public class Runners {
 
             return sSharedRunner;
         }
+    }
+
+    /**
+     * Returns a runner throttling the number of running executions so to keep it under the
+     * specified limit.
+     *
+     * @param wrapped       the wrapped instance.
+     * @param maxExecutions the maximum number of running executions.
+     * @return the runner instance.
+     * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
+     */
+    @Nonnull
+    public static Runner throttlingRunner(@Nonnull final Runner wrapped, final int maxExecutions) {
+
+        return new ThrottlingRunner(wrapped, maxExecutions);
     }
 }

@@ -287,6 +287,29 @@ public class RunnerTest {
         runner.cancel(execution);
         millis(500).sleepAtLeast();
         assertThat(execution.isRun()).isFalse();
+        execution.reset();
+        runner.run(new TestExecution() {
+
+            @Override
+            public void run() {
+
+                try {
+
+                    millis(500).sleepAtLeast();
+
+                } catch (final InterruptedException ignored) {
+
+                }
+
+                super.run();
+            }
+        }, 0, TimeUnit.MILLISECONDS);
+
+        millis(300).sleepAtLeast();
+        runner.run(execution, 0, TimeUnit.MILLISECONDS);
+        assertThat(execution.isRun()).isFalse();
+        millis(500).sleepAtLeast();
+        assertThat(execution.isRun()).isTrue();
     }
 
     @Test

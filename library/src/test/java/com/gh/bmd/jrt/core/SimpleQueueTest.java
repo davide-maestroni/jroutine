@@ -114,9 +114,7 @@ public class SimpleQueueTest {
         }
 
         final ArrayList<Integer> list = new ArrayList<Integer>();
-
-        queue.moveTo(list);
-
+        queue.drainTo(list);
         assertThat(queue.isEmpty()).isTrue();
 
         for (int i = 3; i < 7; i++) {

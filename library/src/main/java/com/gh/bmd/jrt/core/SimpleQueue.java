@@ -91,6 +91,19 @@ class SimpleQueue<E> {
     }
 
     /**
+     * Removes all the elements from this queue and add them to the specified collection.
+     *
+     * @param collection the collection to fill.
+     */
+    public void drainTo(@Nonnull final Collection<? super E> collection) {
+
+        while (!isEmpty()) {
+
+            collection.add(removeFirst());
+        }
+    }
+
+    /**
      * Check if the queue does not contain any element.
      *
      * @return whether the queue is empty.
@@ -98,19 +111,6 @@ class SimpleQueue<E> {
     public boolean isEmpty() {
 
         return mFirst == mLast;
-    }
-
-    /**
-     * Moves all the elements to the specified collection.
-     *
-     * @param collection the collection to fill.
-     */
-    public void moveTo(@Nonnull final Collection<? super E> collection) {
-
-        while (!isEmpty()) {
-
-            collection.add(removeFirst());
-        }
     }
 
     /**

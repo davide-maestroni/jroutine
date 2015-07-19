@@ -145,24 +145,12 @@ class NestedQueue<E> {
     }
 
     /**
-     * Check if the queue does not contain any element.
-     *
-     * @return whether the queue is empty.
-     */
-    public boolean isEmpty() {
-
-        final Object element = prune(this);
-        return (element == EMPTY_ELEMENT) || ((element instanceof NestedQueue)
-                && ((NestedQueue<?>) element).isEmpty());
-    }
-
-    /**
-     * Moves all the elements to the specified collection.
+     * Removes all the elements from this queue and add them to the specified collection.
      *
      * @param collection the collection to fill.
      */
     @SuppressWarnings("unchecked")
-    public void moveTo(@Nonnull final Collection<? super E> collection) {
+    public void drainTo(@Nonnull final Collection<? super E> collection) {
 
         if (prune(this) == EMPTY_ELEMENT) {
 
@@ -178,7 +166,7 @@ class NestedQueue<E> {
             if (element instanceof NestedQueue) {
 
                 final NestedQueue<E> nested = (NestedQueue<E>) element;
-                nested.moveTo(collection);
+                nested.drainTo(collection);
 
                 if (!nested.mClosed || !nested.mQueue.isEmpty()) {
 
@@ -192,6 +180,18 @@ class NestedQueue<E> {
                 collection.add((E) queue.removeFirst());
             }
         }
+    }
+
+    /**
+     * Check if the queue does not contain any element.
+     *
+     * @return whether the queue is empty.
+     */
+    public boolean isEmpty() {
+
+        final Object element = prune(this);
+        return (element == EMPTY_ELEMENT) || ((element instanceof NestedQueue)
+                && ((NestedQueue<?>) element).isEmpty());
     }
 
     /**

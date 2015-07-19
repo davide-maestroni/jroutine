@@ -480,7 +480,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 }
 
                 outputs = new ArrayList<Object>();
-                mOutputQueue.moveTo(outputs);
+                mOutputQueue.drainTo(outputs);
                 mOutputCount = 0;
                 mMutex.notifyAll();
             }

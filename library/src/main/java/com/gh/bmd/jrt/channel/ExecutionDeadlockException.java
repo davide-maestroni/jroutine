@@ -20,14 +20,14 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 19/07/15.
  */
-public class ResultDeadlockException extends DeadlockException {
+public class ExecutionDeadlockException extends DeadlockException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public ResultDeadlockException(@Nullable final String message) {
+    public ExecutionDeadlockException(@Nullable final String message) {
 
         super(message);
     }

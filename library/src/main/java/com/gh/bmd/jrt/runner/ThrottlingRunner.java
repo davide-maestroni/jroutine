@@ -114,40 +114,15 @@ class ThrottlingRunner implements Runner {
 
         synchronized (mMutex) {
 
-            if (mRunningCount >= mMaxRunning) {
+            final LinkedList<PendingExecution> queue = mQueue;
 
-                mQueue.add(new PendingExecution(execution, delay, timeUnit));
+            if ((mRunningCount + queue.size()) >= mMaxRunning) {
+
+                queue.add(new PendingExecution(execution, delay, timeUnit));
 
             } else {
 
-                final WeakReference<ThrottlingExecution> executionReference =
-                        mExecutions.get(execution);
-
-                if (executionReference == null) {
-
-                    throttlingExecution = new ThrottlingExecution(execution);
-
-                    if (execution.mayBeCanceled()) {
-
-                        mExecutions.put(execution, new WeakReference<ThrottlingExecution>(
-                                throttlingExecution));
-                    }
-
-                } else {
-
-                    throttlingExecution = executionReference.get();
-
-                    if (throttlingExecution == null) {
-
-                        throttlingExecution = new ThrottlingExecution(execution);
-
-                        if (execution.mayBeCanceled()) {
-
-                            mExecutions.put(execution, new WeakReference<ThrottlingExecution>(
-                                    throttlingExecution));
-                        }
-                    }
-                }
+                throttlingExecution = getThrottlingExecution(execution);
             }
         }
 
@@ -155,6 +130,41 @@ class ThrottlingRunner implements Runner {
 
             mRunner.run(throttlingExecution, delay, timeUnit);
         }
+    }
+
+    @Nonnull
+    private ThrottlingExecution getThrottlingExecution(@Nonnull final Execution execution) {
+
+        ThrottlingExecution throttlingExecution;
+        final WeakReference<ThrottlingExecution> executionReference = mExecutions.get(execution);
+
+        if (executionReference == null) {
+
+            throttlingExecution = new ThrottlingExecution(execution);
+
+            if (execution.mayBeCanceled()) {
+
+                mExecutions.put(execution,
+                                new WeakReference<ThrottlingExecution>(throttlingExecution));
+            }
+
+        } else {
+
+            throttlingExecution = executionReference.get();
+
+            if (throttlingExecution == null) {
+
+                throttlingExecution = new ThrottlingExecution(execution);
+
+                if (execution.mayBeCanceled()) {
+
+                    mExecutions.put(execution,
+                                    new WeakReference<ThrottlingExecution>(throttlingExecution));
+                }
+            }
+        }
+
+        return throttlingExecution;
     }
 
     /**
@@ -185,7 +195,14 @@ class ThrottlingRunner implements Runner {
 
         public void run() {
 
-            mRunner.run(mExecution, mDelay, mTimeUnit);
+            final ThrottlingExecution throttlingExecution;
+
+            synchronized (mMutex) {
+
+                throttlingExecution = getThrottlingExecution(mExecution);
+            }
+
+            mRunner.run(throttlingExecution, mDelay, mTimeUnit);
         }
     }
 

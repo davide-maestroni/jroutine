@@ -39,9 +39,9 @@ class DefaultTransportChannelBuilder
     }
 
     @Nonnull
-    public <T> TransportChannel<T> buildChannel() {
+    public <DATA> TransportChannel<DATA> buildChannel() {
 
-        return new DefaultTransportChannel<T>(mConfiguration);
+        return new DefaultTransportChannel<DATA>(mConfiguration);
     }
 
     @Nonnull

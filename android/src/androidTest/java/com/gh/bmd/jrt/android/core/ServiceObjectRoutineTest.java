@@ -75,7 +75,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
     public void testAliasMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(10);
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine =
                 JRoutine.on(serviceFrom(getActivity()), TestClass.class)
                         .invocations()
@@ -83,7 +82,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                         .withAsyncRunner(Runners.poolRunner())
                         .withMaxInstances(1)
                         .withCoreInstances(1)
-                        .withAvailInstanceTimeout(1, timeUnit)
                         .withExecutionTimeoutAction(TimeoutActionType.EXIT)
                         .withLogLevel(LogLevel.DEBUG)
                         .withLog(new NullLog())
@@ -489,7 +487,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                         .withSyncRunner(Runners.queuedRunner())
                         .withAsyncRunner(Runners.poolRunner())
                         .withMaxInstances(1)
-                        .withAvailInstanceTimeout(TimeDuration.ZERO)
                         .set()
                         .proxies()
                         .withShareGroup("test")

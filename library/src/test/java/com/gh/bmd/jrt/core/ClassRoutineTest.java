@@ -31,7 +31,6 @@ import org.junit.Test;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -158,14 +157,12 @@ public class ClassRoutineTest {
     public void testMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
                                                          .withCoreInstances(0)
-                                                         .withAvailInstanceTimeout(1, timeUnit)
                                                          .set()
                                                          .proxies()
                                                          .withShareGroup("test")
@@ -185,8 +182,6 @@ public class ClassRoutineTest {
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
-                                                         .withAvailInstanceTimeout(
-                                                                 TimeDuration.ZERO)
                                                          .set()
                                                          .method("getLong");
 

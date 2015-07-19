@@ -36,6 +36,7 @@ import com.gh.bmd.jrt.channel.TemplateOutputConsumer;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.DefaultExecution.InputIterator;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.DelegatingInvocation;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
@@ -44,7 +45,6 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
-import com.gh.bmd.jrt.invocation.InvocationTimeoutException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.invocation.ProcedureInvocation;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
@@ -1682,7 +1682,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final InvocationTimeoutException ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
     }
@@ -2269,7 +2269,6 @@ public class RoutineTest {
                            .withAsyncRunner(Runners.poolRunner())
                            .withCoreInstances(0)
                            .withMaxInstances(1)
-                           .withAvailInstanceTimeout(1, TimeUnit.SECONDS)
                            .withInputMaxSize(2)
                            .withInputTimeout(1, TimeUnit.SECONDS)
                            .withOutputMaxSize(2)
@@ -2285,7 +2284,6 @@ public class RoutineTest {
                            .withAsyncRunner(Runners.poolRunner())
                            .withCoreInstances(0)
                            .withMaxInstances(1)
-                           .withAvailInstanceTimeout(TimeDuration.ZERO)
                            .withInputMaxSize(2)
                            .withInputTimeout(TimeDuration.ZERO)
                            .withOutputMaxSize(2)
@@ -3868,10 +3866,9 @@ public class RoutineTest {
 
     private static class TestInvocationManager implements InvocationManager<Object, Object> {
 
-        @Nonnull
-        public Invocation<Object, Object> create() {
+        public void create(@Nonnull final InvocationObserver<Object, Object> observer) {
 
-            return new TemplateInvocation<Object, Object>() {};
+            observer.onCreate(new TemplateInvocation<Object, Object>() {});
         }
 
         public void discard(@Nonnull final Invocation<Object, Object> invocation) {

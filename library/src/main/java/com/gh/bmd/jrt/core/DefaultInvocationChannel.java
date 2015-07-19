@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.core;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.AbortException;
-import com.gh.bmd.jrt.channel.DeadlockException;
+import com.gh.bmd.jrt.channel.InputDeadlockException;
 import com.gh.bmd.jrt.channel.InputTimeoutException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -351,7 +351,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         if (mRunner.isExecutionThread()) {
 
             mInputCount -= count;
-            throw new DeadlockException("cannot wait on the invocation runner thread");
+            throw new InputDeadlockException("cannot wait on the invocation runner thread");
         }
 
         try {
@@ -379,12 +379,11 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
     interface InvocationManager<INPUT, OUTPUT> {
 
         /**
-         * Creates and returns a new invocation instance.
+         * Creates a new invocation instance.
          *
-         * @return the invocation instance.
+         * @param observer the invocation observer.
          */
-        @Nonnull
-        Invocation<INPUT, OUTPUT> create();
+        void create(@Nonnull InvocationObserver<INPUT, OUTPUT> observer);
 
         /**
          * Discards the specified invocation.
@@ -399,6 +398,29 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
          * @param invocation the invocation instance.
          */
         void recycle(@Nonnull Invocation<INPUT, OUTPUT> invocation);
+    }
+
+    /**
+     * Interface defining an observer of invocation instances.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    interface InvocationObserver<INPUT, OUTPUT> {
+
+        /**
+         * Called when a new invocation instances is available.
+         *
+         * @param invocation the invocation.
+         */
+        void onCreate(@Nonnull Invocation<INPUT, OUTPUT> invocation);
+
+        /**
+         * Called when an error occurs during the invocation instantiation.
+         *
+         * @param error the error.
+         */
+        void onError(@Nonnull Throwable error);
     }
 
     /**

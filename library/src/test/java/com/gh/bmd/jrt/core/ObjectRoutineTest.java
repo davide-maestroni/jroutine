@@ -100,14 +100,12 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine = JRoutine.on(test)
                                                         .invocations()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
-                                                        .withAvailInstanceTimeout(1, timeUnit)
                                                         .withExecutionTimeoutAction(
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -573,8 +571,6 @@ public class ObjectRoutineTest {
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
-                                                         .withAvailInstanceTimeout(
-                                                                 TimeDuration.ZERO)
                                                          .set()
                                                          .proxies()
                                                          .withShareGroup("test")

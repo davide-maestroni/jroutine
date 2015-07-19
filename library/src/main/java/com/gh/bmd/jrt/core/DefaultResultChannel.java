@@ -17,13 +17,14 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.AbortException;
-import com.gh.bmd.jrt.channel.DeadlockException;
 import com.gh.bmd.jrt.channel.ExecutionTimeoutException;
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
+import com.gh.bmd.jrt.channel.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.OutputTimeoutException;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.channel.ResultDeadlockException;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
@@ -592,7 +593,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (mRunner.isExecutionThread()) {
 
-                    throw new DeadlockException("cannot wait on the invocation runner thread");
+                    throw new ResultDeadlockException(
+                            "cannot wait on the invocation runner thread");
                 }
 
                 if (mOutputHasNext == null) {
@@ -714,7 +716,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (mRunner.isExecutionThread()) {
 
-            throw new DeadlockException("cannot wait on the invocation runner thread");
+            throw new ResultDeadlockException("cannot wait on the invocation runner thread");
         }
 
         if (mOutputNotEmpty == null) {
@@ -723,7 +725,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 public boolean isTrue() {
 
-                    return !outputQueue.isEmpty();
+                    return !outputQueue.isEmpty() || mState.isDone();
                 }
             };
         }
@@ -773,7 +775,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         if (!delay.isZero() && mRunner.isExecutionThread()) {
 
             mOutputCount -= count;
-            throw new DeadlockException("cannot wait on the invocation runner thread");
+            throw new OutputDeadlockException("cannot wait on the invocation runner thread");
         }
 
         try {
@@ -1017,7 +1019,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                             if (mRunner.isExecutionThread()) {
 
-                                throw new DeadlockException(
+                                throw new ResultDeadlockException(
                                         "cannot wait on the invocation runner thread");
                             }
 
@@ -1065,7 +1067,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (!executionTimeout.isZero() && mRunner.isExecutionThread()) {
 
-                    throw new DeadlockException("cannot wait on the invocation runner thread");
+                    throw new ResultDeadlockException(
+                            "cannot wait on the invocation runner thread");
                 }
 
                 final boolean isDone;

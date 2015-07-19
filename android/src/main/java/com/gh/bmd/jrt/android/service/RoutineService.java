@@ -39,12 +39,10 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -67,10 +65,6 @@ public class RoutineService extends Service {
     public static final int MSG_INIT = 0;
 
     private static final String KEY_ABORT_EXCEPTION = "abort_exception";
-
-    private static final String KEY_AVAILABLE_TIMEOUT = "avail_time";
-
-    private static final String KEY_AVAILABLE_UNIT = "avail_unit";
 
     private static final String KEY_CORE_INVOCATIONS = "max_retained";
 
@@ -282,14 +276,6 @@ public class RoutineService extends Service {
                       invocationConfiguration.getCoreInstancesOr(InvocationConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
                       invocationConfiguration.getMaxInstancesOr(InvocationConfiguration.DEFAULT));
-        final TimeDuration availTimeout = invocationConfiguration.getAvailInstanceTimeoutOr(null);
-
-        if (availTimeout != null) {
-
-            bundle.putLong(KEY_AVAILABLE_TIMEOUT, availTimeout.time);
-            bundle.putSerializable(KEY_AVAILABLE_UNIT, availTimeout.unit);
-        }
-
         bundle.putSerializable(KEY_OUTPUT_ORDER,
                                invocationConfiguration.getOutputOrderTypeOr(null));
         bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
@@ -440,10 +426,6 @@ public class RoutineService extends Service {
 
             final int coreInvocations = data.getInt(KEY_CORE_INVOCATIONS);
             final int maxInvocations = data.getInt(KEY_MAX_INVOCATIONS);
-            final long timeout = data.getLong(KEY_AVAILABLE_TIMEOUT);
-            final TimeUnit timeUnit = (TimeUnit) data.getSerializable(KEY_AVAILABLE_UNIT);
-            final TimeDuration availTimeout =
-                    (timeUnit != null) ? TimeDuration.fromUnit(timeout, timeUnit) : null;
             final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
             final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
             final Class<? extends Runner> runnerClass =
@@ -489,7 +471,6 @@ public class RoutineService extends Service {
 
                 builder.withCoreInstances(coreInvocations)
                        .withMaxInstances(maxInvocations)
-                       .withAvailInstanceTimeout(availTimeout)
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
                 final ContextInvocationFactory<Object, Object> factory =

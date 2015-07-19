@@ -52,7 +52,6 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.android.core.ServiceContext.serviceFrom;
 import static com.gh.bmd.jrt.util.ClassToken.tokenOf;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -327,9 +326,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                          .invocations()
                                                          .withCoreInstances(0)
                                                          .withMaxInstances(2)
-                                                         .withAvailInstanceTimeout(1, SECONDS)
-                                                         .withAvailInstanceTimeout(
-                                                                 TimeDuration.millis(200))
                                                          .set()
                                                          .buildRoutine();
         assertThat(routine4.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(

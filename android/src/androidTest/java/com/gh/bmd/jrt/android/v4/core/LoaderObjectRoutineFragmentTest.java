@@ -83,14 +83,12 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine = JRoutine.on(contextFrom(fragment), TestClass.class)
                                                         .invocations()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
-                                                        .withAvailInstanceTimeout(1, timeUnit)
                                                         .withExecutionTimeoutAction(
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -579,8 +577,6 @@ public class LoaderObjectRoutineFragmentTest
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
-                                                         .withAvailInstanceTimeout(
-                                                                 TimeDuration.ZERO)
                                                          .set()
                                                          .proxies()
                                                          .withShareGroup("test")

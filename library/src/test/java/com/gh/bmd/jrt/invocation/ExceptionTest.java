@@ -29,7 +29,7 @@ public class ExceptionTest {
     @Test
     public void tesInvocationDeadlockException() {
 
-        assertThat(new InvocationTimeoutException("")).hasNoCause();
+        assertThat(new InvocationDeadlockException("")).hasNoCause();
     }
 
     @Test

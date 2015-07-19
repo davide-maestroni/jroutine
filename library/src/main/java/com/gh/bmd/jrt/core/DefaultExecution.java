@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
@@ -31,7 +32,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultExecution<INPUT, OUTPUT> implements Execution {
+class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<INPUT, OUTPUT> {
 
     private final Object mAbortMutex = new Object();
 
@@ -107,14 +108,13 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         return true;
     }
 
-    public void run() {
+    public void onCreate(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
         synchronized (mMutex) {
 
             final InputIterator<INPUT> inputIterator = mInputIterator;
             final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-            Invocation<INPUT, OUTPUT> invocation = null;
 
             try {
 
@@ -124,7 +124,12 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 try {
 
-                    invocation = initInvocation();
+                    if (mInvocation == null) {
+
+                        mInvocation = invocation;
+                        mLogger.dbg("initializing invocation: %s", invocation);
+                        invocation.onInitialize();
+                    }
 
                     while (inputIterator.hasInput()) {
 
@@ -158,40 +163,28 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             } catch (final Throwable t) {
 
-                if (invocation != null) {
-
-                    resultChannel.abortImmediately(t);
-
-                } else {
-
-                    if (mInvocation != null) {
-
-                        manager.discard(mInvocation);
-                    }
-
-                    resultChannel.close(t);
-                }
+                resultChannel.abortImmediately(t);
             }
         }
     }
 
-    @Nonnull
-    private Invocation<INPUT, OUTPUT> initInvocation() {
+    public void run() {
 
         final Invocation<INPUT, OUTPUT> invocation;
 
-        if (mInvocation != null) {
+        synchronized (mMutex) {
 
             invocation = mInvocation;
+        }
+
+        if (invocation != null) {
+
+            onCreate(invocation);
 
         } else {
 
-            invocation = (mInvocation = mInvocationManager.create());
-            mLogger.dbg("initializing invocation: %s", invocation);
-            invocation.onInitialize();
+            mInvocationManager.create(this);
         }
-
-        return invocation;
     }
 
     /**
@@ -258,9 +251,10 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
     /**
      * Abort execution implementation.
      */
-    private class AbortExecution extends TemplateExecution {
+    private class AbortExecution extends TemplateExecution
+            implements InvocationObserver<INPUT, OUTPUT> {
 
-        public void run() {
+        public void onCreate(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
@@ -279,7 +273,13 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 try {
 
-                    final Invocation<INPUT, OUTPUT> invocation = initInvocation();
+                    if (mInvocation == null) {
+
+                        mInvocation = invocation;
+                        mLogger.dbg("initializing invocation: %s", invocation);
+                        invocation.onInitialize();
+                    }
+
                     invocation.onAbort(exception);
                     invocation.onTerminate();
                     manager.recycle(invocation);
@@ -287,11 +287,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 } catch (final Throwable t) {
 
-                    if (mInvocation != null) {
-
-                        manager.discard(mInvocation);
-                    }
-
+                    manager.discard(invocation);
                     resultChannel.close(t);
 
                 } finally {
@@ -299,6 +295,41 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                     inputIterator.onAbortComplete();
                 }
             }
+        }
+
+        public void onError(@Nonnull final Throwable error) {
+
+            synchronized (mMutex) {
+
+                mResultChannel.close(error);
+            }
+        }
+
+        public void run() {
+
+            final Invocation<INPUT, OUTPUT> invocation;
+
+            synchronized (mMutex) {
+
+                invocation = mInvocation;
+            }
+
+            if (invocation != null) {
+
+                onCreate(invocation);
+
+            } else {
+
+                mInvocationManager.create(this);
+            }
+        }
+    }
+
+    public void onError(@Nonnull final Throwable error) {
+
+        synchronized (mMutex) {
+
+            mResultChannel.close(error);
         }
     }
 }

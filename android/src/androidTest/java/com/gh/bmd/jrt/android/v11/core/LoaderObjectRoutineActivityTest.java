@@ -85,7 +85,6 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final Routine<Object, Object> routine =
                 JRoutine.on(contextFrom(getActivity()), TestClass.class)
                         .invocations()
@@ -93,7 +92,6 @@ public class LoaderObjectRoutineActivityTest
                         .withAsyncRunner(Runners.poolRunner())
                         .withMaxInstances(1)
                         .withCoreInstances(1)
-                        .withAvailInstanceTimeout(1, timeUnit)
                         .withExecutionTimeoutAction(TimeoutActionType.EXIT)
                         .withLogLevel(LogLevel.DEBUG)
                         .withLog(new NullLog())
@@ -608,7 +606,6 @@ public class LoaderObjectRoutineActivityTest
                         .withSyncRunner(Runners.queuedRunner())
                         .withAsyncRunner(Runners.poolRunner())
                         .withMaxInstances(1)
-                        .withAvailInstanceTimeout(TimeDuration.ZERO)
                         .set()
                         .proxies()
                         .withShareGroup("test")

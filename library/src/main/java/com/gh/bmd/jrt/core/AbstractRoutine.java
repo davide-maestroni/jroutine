@@ -17,25 +17,21 @@ import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
+import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationDeadlockException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
-import com.gh.bmd.jrt.invocation.InvocationTimeoutException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
-import com.gh.bmd.jrt.util.TimeDuration;
-import com.gh.bmd.jrt.util.TimeDuration.Check;
 
 import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
+import javax.annotation.Nullable;
 
 /**
  * Basic abstract implementation of a routine.
@@ -50,8 +46,6 @@ import static com.gh.bmd.jrt.util.TimeDuration.ZERO;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
-    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = ZERO;
-
     private static final int DEFAULT_CORE_INVOCATIONS = 10;
 
     private static final int DEFAULT_MAX_INVOCATIONS = Integer.MAX_VALUE;
@@ -60,8 +54,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             new LinkedList<Invocation<INPUT, OUTPUT>>();
 
     private final Runner mAsyncRunner;
-
-    private final TimeDuration mAvailTimeout;
 
     private final InvocationConfiguration mConfiguration;
 
@@ -72,6 +64,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     private final int mMaxInvocations;
 
     private final Object mMutex = new Object();
+
+    private final SimpleQueue<InvocationObserver<INPUT, OUTPUT>> mObservers =
+            new SimpleQueue<InvocationObserver<INPUT, OUTPUT>>();
 
     private final Object mParallelMutex = new Object();
 
@@ -85,14 +80,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     private AbstractRoutine<INPUT, OUTPUT> mParallelRoutine;
 
     private int mRunningCount;
-
-    private final Check mIsInvocationAvailable = new Check() {
-
-        public boolean isTrue() {
-
-            return mRunningCount < mMaxInvocations;
-        }
-    };
 
     private volatile DefaultInvocationManager mSyncManager;
 
@@ -121,7 +108,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         mMaxInvocations = configuration.getMaxInstancesOr(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInstancesOr(DEFAULT_CORE_INVOCATIONS);
-        mAvailTimeout = configuration.getAvailInstanceTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
         mLogger = configuration.newLogger(this);
         mLogger.dbg("building routine with configuration: %s", configuration);
     }
@@ -143,7 +129,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mAsyncRunner = asyncRunner;
         mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
         mCoreInvocations = DEFAULT_CORE_INVOCATIONS;
-        mAvailTimeout = DEFAULT_AVAIL_TIMEOUT;
         mLogger = logger.subContextLogger(this);
     }
 
@@ -366,77 +351,14 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             mFallbackInvocations = fallbackInvocations;
         }
 
-        @Nonnull
-        public Invocation<INPUT, OUTPUT> create() {
+        public void create(@Nonnull final InvocationObserver<INPUT, OUTPUT> observer) {
 
-            synchronized (mMutex) {
-
-                final boolean isTimeout;
-
-                try {
-
-                    isTimeout = !mAvailTimeout.waitTrue(mMutex, mIsInvocationAvailable);
-
-                } catch (final InterruptedException e) {
-
-                    mLogger.err(e, "waiting for available instances interrupted [#%d]",
-                                mMaxInvocations);
-                    throw new InvocationInterruptedException(e);
-                }
-
-                if (isTimeout) {
-
-                    mLogger.wrn("routine instance not available after timeout [#%d]: %s",
-                                mMaxInvocations, mAvailTimeout);
-                    throw new InvocationTimeoutException(
-                            "timeout while waiting for an available invocation instance");
-                }
-
-                final InvocationType invocationType = mInvocationType;
-                final int coreInvocations = mCoreInvocations;
-                final LinkedList<Invocation<INPUT, OUTPUT>> invocations = mPrimaryInvocations;
-                final Invocation<INPUT, OUTPUT> invocation;
-
-                if (!invocations.isEmpty()) {
-
-                    invocation = invocations.removeFirst();
-                    mLogger.dbg("reusing %s invocation instance [%d/%d]: %s", invocationType,
-                                invocations.size() + 1, coreInvocations, invocation);
-
-                } else {
-
-                    final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations =
-                            mFallbackInvocations;
-
-                    if (!fallbackInvocations.isEmpty()) {
-
-                        final Invocation<INPUT, OUTPUT> convertInvocation =
-                                fallbackInvocations.removeFirst();
-                        mLogger.dbg("converting %s invocation instance [%d/%d]: %s", invocationType,
-                                    invocations.size() + 1, coreInvocations, convertInvocation);
-                        invocation = convertInvocation(convertInvocation, invocationType);
-
-                    } else {
-
-                        mLogger.dbg("creating %s invocation instance [1/%d]", invocationType,
-                                    coreInvocations);
-                        invocation = newInvocation(invocationType);
-                    }
-                }
-
-                if (invocation == null) {
-
-                    throw new NullPointerException("null invocation returned");
-                }
-
-                ++mRunningCount;
-                return invocation;
-            }
+            create(observer, false);
         }
 
-        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                justification = "only one invocation is released")
         public void discard(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+
+            final boolean hasDelayed;
 
             synchronized (mMutex) {
 
@@ -456,14 +378,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                     logger.wrn(ignored, "ignoring exception while destroying invocation instance");
                 }
 
+                hasDelayed = !mObservers.isEmpty();
                 --mRunningCount;
-                mMutex.notify();
+            }
+
+            if (hasDelayed) {
+
+                create(null, true);
             }
         }
 
-        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                justification = "only one invocation is released")
         public void recycle(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+
+            final boolean hasDelayed;
 
             synchronized (mMutex) {
 
@@ -500,8 +427,108 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                     }
                 }
 
+                hasDelayed = !mObservers.isEmpty();
                 --mRunningCount;
-                mMutex.notify();
+            }
+
+            if (hasDelayed) {
+
+                create(null, true);
+            }
+        }
+
+        @SuppressWarnings("ConstantConditions")
+        private void create(@Nullable final InvocationObserver<INPUT, OUTPUT> observer,
+                final boolean isDelayed) {
+
+            InvocationObserver<INPUT, OUTPUT> invocationObserver = observer;
+
+            try {
+
+                Throwable error = null;
+                Invocation<INPUT, OUTPUT> invocation = null;
+
+                synchronized (mMutex) {
+
+                    final SimpleQueue<InvocationObserver<INPUT, OUTPUT>> observers = mObservers;
+
+                    if (isDelayed) {
+
+                        invocationObserver = observers.removeFirst();
+                    }
+
+                    if (isDelayed || (mRunningCount < (mMaxInvocations + observers.size()))) {
+
+                        final InvocationType invocationType = mInvocationType;
+                        final int coreInvocations = mCoreInvocations;
+                        final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
+                                mPrimaryInvocations;
+
+                        if (!invocations.isEmpty()) {
+
+                            invocation = invocations.removeFirst();
+                            mLogger.dbg("reusing %s invocation instance [%d/%d]: %s",
+                                        invocationType, invocations.size() + 1, coreInvocations,
+                                        invocation);
+
+                        } else {
+
+                            final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations =
+                                    mFallbackInvocations;
+
+                            if (!fallbackInvocations.isEmpty()) {
+
+                                final Invocation<INPUT, OUTPUT> convertInvocation =
+                                        fallbackInvocations.removeFirst();
+                                mLogger.dbg("converting %s invocation instance [%d/%d]: %s",
+                                            invocationType, invocations.size() + 1, coreInvocations,
+                                            convertInvocation);
+                                invocation = convertInvocation(convertInvocation, invocationType);
+
+                            } else {
+
+                                mLogger.dbg("creating %s invocation instance [1/%d]",
+                                            invocationType, coreInvocations);
+                                invocation = newInvocation(invocationType);
+                            }
+                        }
+
+                        if (invocation != null) {
+
+                            ++mRunningCount;
+                        }
+
+                    } else if (mInvocationType == InvocationType.SYNC) {
+
+                        error = new InvocationDeadlockException(
+                                "cannot wait for invocation instances on a synchronous runner "
+                                        + "thread");
+
+                    } else {
+
+                        observers.add(invocationObserver);
+                        return;
+                    }
+                }
+
+                if (invocation != null) {
+
+                    invocationObserver.onCreate(invocation);
+
+                } else {
+
+                    invocationObserver.onError((error != null) ? error : new NullPointerException(
+                            "null invocation returned"));
+                }
+
+            } catch (final InvocationInterruptedException e) {
+
+                throw e;
+
+            } catch (final Throwable t) {
+
+                mLogger.err(t, "error while creating new invocation instance", mMaxInvocations);
+                invocationObserver.onError(t);
             }
         }
     }

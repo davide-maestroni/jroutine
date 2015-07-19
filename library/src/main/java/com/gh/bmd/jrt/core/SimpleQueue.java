@@ -154,6 +154,18 @@ class SimpleQueue<E> {
         return (E) output;
     }
 
+    /**
+     * Returns the size of the queue (that is, the number of element).
+     *
+     * @return the size.
+     */
+    public int size() {
+
+        final int first = mFirst;
+        final int last = mLast;
+        return (last >= first) ? last - first : mQueue.length + last - first;
+    }
+
     private void doubleCapacity() {
 
         final int size = mQueue.length;

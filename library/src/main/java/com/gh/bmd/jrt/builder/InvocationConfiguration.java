@@ -54,12 +54,8 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * Additionally, a recycling mechanism is provided so that, when an invocation successfully
  * completes, the instance is retained for future executions. Moreover, the maximum running
  * invocation instances at one time can be limited by calling the specific builder method. When the
- * limit is reached and an additional instance is required, the call is blocked until one becomes
- * available or the timeout set through the builder elapses.<br/>
- * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
- * In case the timeout elapses before an invocation instance becomes available, an
- * {@link com.gh.bmd.jrt.invocation.InvocationTimeoutException InvocationTimeoutException} will
- * be thrown.
+ * limit is reached and an additional instance is required, the call is delayed until one becomes
+ * available.
  * <p/>
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
@@ -89,8 +85,6 @@ public final class InvocationConfiguration {
             builder().buildConfiguration();
 
     private final Runner mAsyncRunner;
-
-    private final TimeDuration mAvailableTimeout;
 
     private final int mCoreInstances;
 
@@ -129,8 +123,6 @@ public final class InvocationConfiguration {
      * @param maxInstances     the maximum number of parallel running invocations. Must be positive.
      * @param coreInstances    the maximum number of retained invocation instances. Must be 0 or a
      *                         positive number.
-     * @param availableTimeout the maximum timeout while waiting for an invocation instance to be
-     *                         available.
      * @param executionTimeout the timeout for an invocation instance to produce a result.
      * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         result is available.
@@ -147,8 +139,7 @@ public final class InvocationConfiguration {
      */
     private InvocationConfiguration(@Nullable final Runner syncRunner,
             @Nullable final Runner asyncRunner, final int priority, final int maxInstances,
-            final int coreInstances, @Nullable final TimeDuration availableTimeout,
-            @Nullable final TimeDuration executionTimeout,
+            final int coreInstances, @Nullable final TimeDuration executionTimeout,
             @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
             @Nullable final OrderType outputOrderType, final int outputMaxSize,
@@ -160,7 +151,6 @@ public final class InvocationConfiguration {
         mPriority = priority;
         mMaxInstances = maxInstances;
         mCoreInstances = coreInstances;
-        mAvailableTimeout = availableTimeout;
         mExecutionTimeout = executionTimeout;
         mTimeoutActionType = actionType;
         mInputOrderType = inputOrderType;
@@ -219,19 +209,6 @@ public final class InvocationConfiguration {
 
         final Runner runner = mAsyncRunner;
         return (runner != null) ? runner : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum timeout while waiting for an invocation instance to be available (null
-     * by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the timeout.
-     */
-    public TimeDuration getAvailInstanceTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
-
-        final TimeDuration availableTimeout = mAvailableTimeout;
-        return (availableTimeout != null) ? availableTimeout : valueIfNotSet;
     }
 
     /**
@@ -412,7 +389,6 @@ public final class InvocationConfiguration {
 
         // auto-generated code
         int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
-        result = 31 * result + (mAvailableTimeout != null ? mAvailableTimeout.hashCode() : 0);
         result = 31 * result + mCoreInstances;
         result = 31 * result + (mExecutionTimeout != null ? mExecutionTimeout.hashCode() : 0);
         result = 31 * result + mInputMaxSize;
@@ -478,12 +454,6 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mAvailableTimeout != null ? !mAvailableTimeout.equals(that.mAvailableTimeout)
-                : that.mAvailableTimeout != null) {
-
-            return false;
-        }
-
         if (mExecutionTimeout != null ? !mExecutionTimeout.equals(that.mExecutionTimeout)
                 : that.mExecutionTimeout != null) {
 
@@ -536,7 +506,6 @@ public final class InvocationConfiguration {
 
         return "InvocationConfiguration{" +
                 "mAsyncRunner=" + mAsyncRunner +
-                ", mAvailableTimeout=" + mAvailableTimeout +
                 ", mCoreInstances=" + mCoreInstances +
                 ", mExecutionTimeout=" + mExecutionTimeout +
                 ", mInputMaxSize=" + mInputMaxSize +
@@ -710,8 +679,6 @@ public final class InvocationConfiguration {
 
         private Runner mAsyncRunner;
 
-        private TimeDuration mAvailableTimeout;
-
         private int mCoreInstances;
 
         private TimeDuration mExecutionTimeout;
@@ -825,35 +792,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withAsyncRunner(@Nullable final Runner runner) {
 
             mAsyncRunner = runner;
-            return this;
-        }
-
-        /**
-         * Sets the timeout for an invocation instance to become available.
-         *
-         * @param timeout  the timeout.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         */
-        @Nonnull
-        public Builder<TYPE> withAvailInstanceTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
-
-            return withAvailInstanceTimeout(fromUnit(timeout, timeUnit));
-        }
-
-        /**
-         * Sets the timeout for an invocation instance to become available. A null value means that
-         * it is up to the specific implementation to choose a default one.
-         *
-         * @param timeout the timeout.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> withAvailInstanceTimeout(@Nullable final TimeDuration timeout) {
-
-            mAvailableTimeout = timeout;
             return this;
         }
 
@@ -1182,13 +1120,6 @@ public final class InvocationConfiguration {
                 withCoreInstances(coreInvocations);
             }
 
-            final TimeDuration availTimeout = configuration.mAvailableTimeout;
-
-            if (availTimeout != null) {
-
-                withAvailInstanceTimeout(availTimeout);
-            }
-
             final TimeDuration executionTimeout = configuration.mExecutionTimeout;
 
             if (executionTimeout != null) {
@@ -1271,7 +1202,7 @@ public final class InvocationConfiguration {
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mSyncRunner, mAsyncRunner, mPriority, mMaxInstances,
-                                               mCoreInstances, mAvailableTimeout, mExecutionTimeout,
+                                               mCoreInstances, mExecutionTimeout,
                                                mTimeoutActionType, mInputOrderType, mInputMaxSize,
                                                mInputTimeout, mOutputOrderType, mOutputMaxSize,
                                                mOutputTimeout, mLog, mLogLevel);
@@ -1284,7 +1215,6 @@ public final class InvocationConfiguration {
             mPriority = configuration.mPriority;
             mMaxInstances = configuration.mMaxInstances;
             mCoreInstances = configuration.mCoreInstances;
-            mAvailableTimeout = configuration.mAvailableTimeout;
             mExecutionTimeout = configuration.mExecutionTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mInputOrderType = configuration.mInputOrderType;

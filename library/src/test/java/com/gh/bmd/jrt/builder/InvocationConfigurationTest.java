@@ -41,14 +41,13 @@ public class InvocationConfigurationTest {
     @Test
     public void testAsyncRunnerEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withPriority(11)
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withPriority(11)
+                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withAsyncRunner(Runners.sharedRunner()).set());
         assertThat(configuration.builderFrom()
@@ -58,37 +57,15 @@ public class InvocationConfigurationTest {
     }
 
     @Test
-    public void testAvailableTimeoutEquals() {
-
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withPriority(11)
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
-        assertThat(configuration).isNotEqualTo(
-                builder().withAvailInstanceTimeout(TimeDuration.ZERO).set());
-        assertThat(configuration).isNotEqualTo(
-                builder().withAvailInstanceTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom()
-                                .withAvailInstanceTimeout(TimeDuration.millis(1))
-                                .set()).isNotEqualTo(
-                builder().withAvailInstanceTimeout(1, TimeUnit.MILLISECONDS).set());
-    }
-
-    @Test
     public void testBuildFrom() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withPriority(11)
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withPriority(11)
+                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(builderFrom(configuration).set().hashCode()).isEqualTo(configuration.hashCode());
         assertThat(builderFrom(configuration).set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set().hashCode()).isEqualTo(
@@ -125,14 +102,13 @@ public class InvocationConfigurationTest {
     @Test
     public void testBuilderFromEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withPriority(11)
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withPriority(11)
+                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(builder().with(configuration).set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).set()).isEqualTo(
@@ -142,14 +118,13 @@ public class InvocationConfigurationTest {
     @Test
     public void testCoreInvocationsEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withCoreInstances(27)
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withCoreInstances(27)
+                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withCoreInstances(3).set());
         assertThat(configuration.builderFrom().withCoreInstances(27).set()).isNotEqualTo(
                 builder().withCoreInstances(27).set());
@@ -173,13 +148,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testExecutionTimeoutActionEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withExecutionTimeoutAction(TimeoutActionType.ABORT).set());
         assertThat(configuration).isNotEqualTo(
@@ -193,13 +167,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testExecutionTimeoutEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withExecutionTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
@@ -213,13 +186,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputOrderEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withInputOrder(OrderType.BY_CHANCE).set());
         assertThat(
                 configuration.builderFrom().withInputOrder(OrderType.BY_CALL).set()).isNotEqualTo(
@@ -229,13 +201,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputSizeEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withInputMaxSize(10).set());
         assertThat(configuration.builderFrom().withInputMaxSize(31).set()).isNotEqualTo(
                 builder().withInputMaxSize(31).set());
@@ -259,13 +230,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputTimeoutEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withInputTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
                 builder().withInputTimeout(1, TimeUnit.MILLISECONDS).set());
@@ -303,13 +273,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testLogEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withLog(Logs.nullLog()).set());
         assertThat(configuration.builderFrom().withLog(Logs.systemLog()).set()).isNotEqualTo(
                 builder().withLog(Logs.systemLog()).set());
@@ -318,13 +287,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testLogLevelEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withLogLevel(LogLevel.DEBUG).set());
         assertThat(configuration.builderFrom().withLogLevel(LogLevel.WARNING).set()).isNotEqualTo(
                 builder().withLogLevel(LogLevel.WARNING).set());
@@ -333,13 +301,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testMaxInvocationsEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withMaxInstances(4).set());
         assertThat(configuration.builderFrom().withMaxInstances(41).set()).isNotEqualTo(
                 builder().withMaxInstances(41).set());
@@ -363,13 +330,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputOrderEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withOutputOrder(OrderType.BY_CHANCE).set());
         assertThat(
@@ -380,13 +346,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputSizeEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withOutputMaxSize(10).set());
         assertThat(configuration.builderFrom().withOutputMaxSize(1).set()).isNotEqualTo(
                 builder().withOutputMaxSize(1).set());
@@ -410,13 +375,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputTimeoutEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withOutputTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
@@ -455,15 +419,14 @@ public class InvocationConfigurationTest {
     @Test
     public void testPriorityEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withPriority(17)
-                         .withCoreInstances(27)
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withPriority(17)
+                                                               .withCoreInstances(27)
+                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(builder().withPriority(3).set());
         assertThat(configuration.builderFrom().withPriority(17).set()).isNotEqualTo(
                 builder().withPriority(17).set());
@@ -472,13 +435,12 @@ public class InvocationConfigurationTest {
     @Test
     public void testSyncRunnerEquals() {
 
-        final InvocationConfiguration configuration =
-                builder().withAvailInstanceTimeout(TimeDuration.millis(100))
-                         .withInputOrder(OrderType.BY_CALL)
-                         .withAsyncRunner(Runners.queuedRunner())
-                         .withLog(new NullLog())
-                         .withOutputMaxSize(100)
-                         .set();
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withAsyncRunner(
+                                                                       Runners.queuedRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withSyncRunner(Runners.queuedRunner()).set());
         assertThat(configuration.builderFrom()

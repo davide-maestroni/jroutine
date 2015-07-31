@@ -233,6 +233,12 @@ class ThrottlingRunner implements Runner {
 
             synchronized (mMutex) {
 
+                if (mRunningCount >= mMaxRunning) {
+
+                    mQueue.addFirst(new PendingExecution(mExecution, 0, TimeUnit.MILLISECONDS));
+                    return;
+                }
+
                 ++mRunningCount;
             }
 

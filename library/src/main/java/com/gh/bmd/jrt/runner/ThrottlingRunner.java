@@ -135,10 +135,11 @@ class ThrottlingRunner implements Runner {
     @Nonnull
     private ThrottlingExecution getThrottlingExecution(@Nonnull final Execution execution) {
 
-        ThrottlingExecution throttlingExecution;
         final WeakReference<ThrottlingExecution> executionReference = mExecutions.get(execution);
+        ThrottlingExecution throttlingExecution =
+                (executionReference != null) ? executionReference.get() : null;
 
-        if (executionReference == null) {
+        if (throttlingExecution == null) {
 
             throttlingExecution = new ThrottlingExecution(execution);
 
@@ -146,21 +147,6 @@ class ThrottlingRunner implements Runner {
 
                 mExecutions.put(execution,
                                 new WeakReference<ThrottlingExecution>(throttlingExecution));
-            }
-
-        } else {
-
-            throttlingExecution = executionReference.get();
-
-            if (throttlingExecution == null) {
-
-                throttlingExecution = new ThrottlingExecution(execution);
-
-                if (execution.mayBeCanceled()) {
-
-                    mExecutions.put(execution,
-                                    new WeakReference<ThrottlingExecution>(throttlingExecution));
-                }
             }
         }
 
@@ -231,11 +217,15 @@ class ThrottlingRunner implements Runner {
 
         public void run() {
 
+            final int maxRunning = mMaxRunning;
+            final Execution execution = mExecution;
+            final LinkedList<PendingExecution> queue = mQueue;
+
             synchronized (mMutex) {
 
-                if (mRunningCount >= mMaxRunning) {
+                if (mRunningCount >= maxRunning) {
 
-                    mQueue.addFirst(new PendingExecution(mExecution, 0, TimeUnit.MILLISECONDS));
+                    queue.addFirst(new PendingExecution(execution, 0, TimeUnit.MILLISECONDS));
                     return;
                 }
 
@@ -244,25 +234,23 @@ class ThrottlingRunner implements Runner {
 
             try {
 
-                mExecution.run();
+                execution.run();
 
             } finally {
 
-                PendingExecution execution = null;
+                PendingExecution pendingExecution = null;
 
                 synchronized (mMutex) {
 
-                    final LinkedList<PendingExecution> queue = mQueue;
+                    if ((--mRunningCount < maxRunning) && !queue.isEmpty()) {
 
-                    if ((--mRunningCount < mMaxRunning) && !queue.isEmpty()) {
-
-                        execution = queue.removeFirst();
+                        pendingExecution = queue.removeFirst();
                     }
                 }
 
-                if (execution != null) {
+                if (pendingExecution != null) {
 
-                    execution.run();
+                    pendingExecution.run();
                 }
             }
         }

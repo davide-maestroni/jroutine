@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.android.v11.core;
 
 import android.annotation.TargetApi;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.SparseArray;
@@ -55,6 +56,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testInputMap() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final ArrayList<ParcelableSelectable<Object>> outputs =
                 new ArrayList<ParcelableSelectable<Object>>();
         outputs.add(new ParcelableSelectable<Object>("test21", Sort.STRING));
@@ -81,6 +87,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testInputMapAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class)).buildRoutine();
@@ -133,6 +144,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testInputMapError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 

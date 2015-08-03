@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.android.core;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.util.SparseArrayCompat;
 
 import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -24,7 +23,6 @@ import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.JRoutine;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -46,90 +44,6 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      */
     protected Channels() {
 
-    }
-
-    /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     *
-     * @param channel the selectable channel.
-     * @param indexes the collection of indexes.
-     * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
-     * @return the map of indexes and output channels.
-     */
-    @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArrayCompat<InputChannel<INPUT>> mapParcelable(
-            @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
-            @Nonnull final Collection<Integer> indexes) {
-
-        final int size = indexes.size();
-        final SparseArrayCompat<InputChannel<INPUT>> channelMap =
-                new SparseArrayCompat<InputChannel<INPUT>>(size);
-
-        for (final Integer index : indexes) {
-
-            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
-        }
-
-        return channelMap;
-    }
-
-    /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     *
-     * @param channel the selectable channel.
-     * @param indexes the array of indexes.
-     * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
-     * @return the map of indexes and output channels.
-     */
-    @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArrayCompat<InputChannel<INPUT>> mapParcelable(
-            @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
-            @Nonnull final int... indexes) {
-
-        final int size = indexes.length;
-        final SparseArrayCompat<InputChannel<INPUT>> channelMap =
-                new SparseArrayCompat<InputChannel<INPUT>>(size);
-
-        for (final int index : indexes) {
-
-            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
-        }
-
-        return channelMap;
-    }
-
-    /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     *
-     * @param startIndex the selectable start index.
-     * @param rangeSize  the size of the range of indexes (must be positive).
-     * @param channel    the selectable channel.
-     * @param <DATA>     the channel data type.
-     * @param <INPUT>    the input data type.
-     * @return the map of indexes and output channels.
-     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     */
-    @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArrayCompat<InputChannel<INPUT>> mapParcelable(
-            final int startIndex, final int rangeSize,
-            @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
-
-        if (rangeSize <= 0) {
-
-            throw new IllegalArgumentException("invalid range size: " + rangeSize);
-        }
-
-        final SparseArrayCompat<InputChannel<INPUT>> channelMap =
-                new SparseArrayCompat<InputChannel<INPUT>>(rangeSize);
-
-        for (int index = startIndex; index < rangeSize; index++) {
-
-            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
-        }
-
-        return channelMap;
     }
 
     /**
@@ -227,39 +141,6 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
             @Nonnull final OutputChannel<?>... channels) {
 
         return mergeParcelable(0, channels);
-    }
-
-    /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
-     * Note that the channels will be bound as a result of the call.
-     *
-     * @param channelMap the map of indexes and output channels.
-     * @param <OUTPUT>   the output data type.
-     * @return the selectable output channel.
-     * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     */
-    @Nonnull
-    public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> mergeParcelable(
-            @Nonnull final SparseArrayCompat<? extends OutputChannel<? extends OUTPUT>>
-                    channelMap) {
-
-        final int size = channelMap.size();
-
-        if (size == 0) {
-
-            throw new IllegalArgumentException("the map of channels must not be empty");
-        }
-
-        final TransportChannel<ParcelableSelectable<OUTPUT>> transportChannel =
-                JRoutine.transport().buildChannel();
-
-        for (int i = 0; i < size; i++) {
-
-            transportChannel.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
-        }
-
-        return transportChannel.close();
     }
 
     /**

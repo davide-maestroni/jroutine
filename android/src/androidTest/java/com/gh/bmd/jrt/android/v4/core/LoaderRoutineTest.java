@@ -60,6 +60,7 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryTo;
 import static com.gh.bmd.jrt.android.v4.core.RoutineContext.contextFrom;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
@@ -304,8 +305,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final ClassToken<GetContextInvocation<String>> classToken =
                 new ClassToken<GetContextInvocation<String>>() {};
-        assertThat(JRoutine.on(factoryFrom(getActivity(), factoryOf(classToken))).syncCall().next())
-                .isSameAs(getActivity());
+        assertThat(JRoutine.on(factoryTo(getActivity(), factoryOf(classToken)))
+                           .syncCall()
+                           .next()).isSameAs(getActivity());
         assertThat(JRoutine.on(contextFrom(getActivity()), factoryOf(classToken)).syncCall().next())
                 .isSameAs(getActivity().getApplicationContext());
     }

@@ -53,8 +53,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryTo;
 import static com.gh.bmd.jrt.android.service.RoutineService.getAbortError;
 import static com.gh.bmd.jrt.android.service.RoutineService.getValue;
 import static com.gh.bmd.jrt.android.service.RoutineService.putAsyncInvocation;
@@ -117,8 +117,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
-        mRoutine = JRoutine.on(factoryFrom(serviceContext.getApplicationContext(),
-                                           factoryOf(invocationClass, factoryArgs)))
+        mRoutine = JRoutine.on(factoryTo(serviceContext.getApplicationContext(),
+                                         factoryOf(invocationClass, factoryArgs)))
                            .invocations()
                            .with(invocationConfiguration)
                            .set()

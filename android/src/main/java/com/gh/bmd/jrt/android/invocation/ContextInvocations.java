@@ -39,23 +39,6 @@ public class ContextInvocations {
     }
 
     /**
-     * Converts the specified context invocation factory into a factory of invocations.
-     *
-     * @param context  the routine context.
-     * @param factory  the context invocation factory.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the invocation factory.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryFrom(
-            @Nonnull final Context context,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
-
-        return new AdaptingContextInvocationFactory<INPUT, OUTPUT>(context, factory);
-    }
-
-    /**
      * Converts the specified invocation factory into a factory of context invocations.
      *
      * @param factory  the invocation factory.
@@ -160,6 +143,23 @@ public class ContextInvocations {
             @Nullable final Object... args) {
 
         return factoryOf(invocationToken.getRawClass(), args);
+    }
+
+    /**
+     * Converts the specified context invocation factory into a factory of invocations.
+     *
+     * @param context  the routine context.
+     * @param factory  the context invocation factory.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the invocation factory.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryTo(
+            @Nonnull final Context context,
+            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
+
+        return new AdaptingContextInvocationFactory<INPUT, OUTPUT>(context, factory);
     }
 
     /**

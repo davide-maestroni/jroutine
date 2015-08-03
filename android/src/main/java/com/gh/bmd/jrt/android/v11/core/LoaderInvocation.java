@@ -53,7 +53,7 @@ import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryTo;
 
 /**
  * Invocation implementation employing loaders to perform background operations.
@@ -397,8 +397,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         }
 
         final Routine<INPUT, OUTPUT> routine =
-                JRoutine.on(factoryFrom(loaderContext.getApplicationContext(), this))
-                        .buildRoutine();
+                JRoutine.on(factoryTo(loaderContext.getApplicationContext(), this)).buildRoutine();
         routine.syncInvoke().abort(reason);
         routine.purge();
     }

@@ -136,23 +136,21 @@ public class WeakIdentityHashMapTest {
     }
 
     @Test
-    @SuppressWarnings({"UnnecessaryBoxing", "Annotator"})
     public void testIdentity() {
 
-        final Integer key0 = new Integer(3);
-        final Integer key1 = new Integer(3);
+        final MyInteger key0 = new MyInteger(3);
+        final MyInteger key1 = new MyInteger(3);
 
         assertThat(key0).isEqualTo(key1);
 
-        final WeakIdentityHashMap<Integer, String> map = new WeakIdentityHashMap<Integer, String>();
+        final WeakIdentityHashMap<MyInteger, String> map =
+                new WeakIdentityHashMap<MyInteger, String>();
 
         map.put(key0, "test0");
         map.put(key1, "test1");
 
         assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"));
-
         map.remove(key0);
-
         assertThat(map).contains(MapEntry.entry(key1, "test1"));
     }
 
@@ -387,5 +385,38 @@ public class WeakIdentityHashMapTest {
         }
 
         fail();
+    }
+
+    private static class MyInteger {
+
+        private final int mInt;
+
+        private MyInteger(final int i) {
+
+            mInt = i;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mInt;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof MyInteger)) {
+
+                return false;
+            }
+
+            final MyInteger myInteger = (MyInteger) o;
+            return mInt == myInteger.mInt;
+        }
     }
 }

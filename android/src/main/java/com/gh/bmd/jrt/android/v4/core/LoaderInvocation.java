@@ -19,7 +19,7 @@ import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.util.SparseArray;
+import android.support.v4.util.SparseArrayCompat;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
@@ -65,10 +65,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         implements ContextInvocationFactory<INPUT, OUTPUT> {
 
     private static final WeakIdentityHashMap<Object,
-            SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+            SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
             sCallbackMap =
             new WeakIdentityHashMap<Object,
-                    SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>();
+                    SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>();
 
     private final CacheStrategyType mCacheStrategyType;
 
@@ -135,9 +135,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     static void purgeLoader(@Nonnull final RoutineContext context, final int loaderId) {
 
         final Object component = context.getComponent();
-        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+        final WeakIdentityHashMap<Object,
+                SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
-        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+        final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
         if (callbackArray == null) {
@@ -160,7 +161,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
             if (callbacks == null) {
 
-                callbackArray.remove(callbackArray.keyAt(i));
+                callbackArray.removeAt(i);
                 continue;
             }
 
@@ -169,7 +170,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             if ((loaderId == callbackArray.keyAt(i)) && (loader.getInvocationCount() == 0)) {
 
                 loaderManager.destroyLoader(loaderId);
-                callbackArray.remove(loaderId);
+                callbackArray.removeAt(i);
                 continue;
             }
 
@@ -195,9 +196,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             @Nonnull final ContextInvocationFactory<?, ?> factory, @Nonnull final List<?> inputs) {
 
         final Object component = context.getComponent();
-        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+        final WeakIdentityHashMap<Object,
+                SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
-        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+        final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
         if (callbackArray == null) {
@@ -220,7 +222,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
             if (callbacks == null) {
 
-                callbackArray.remove(callbackArray.keyAt(i));
+                callbackArray.removeAt(i);
                 continue;
             }
 
@@ -236,7 +238,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                         && loader.areSameInputs(inputs)) {
 
                     loaderManager.destroyLoader(id);
-                    callbackArray.remove(id);
+                    callbackArray.removeAt(i);
                     continue;
                 }
             }
@@ -262,9 +264,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             @Nonnull final List<?> inputs) {
 
         final Object component = context.getComponent();
-        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+        final WeakIdentityHashMap<Object,
+                SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
-        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+        final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
         if (callbackArray == null) {
@@ -287,7 +290,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
             if (callbacks == null) {
 
-                callbackArray.remove(callbackArray.keyAt(i));
+                callbackArray.removeAt(i);
                 continue;
             }
 
@@ -298,7 +301,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                     .areSameInputs(inputs)) {
 
                 loaderManager.destroyLoader(loaderId);
-                callbackArray.remove(loaderId);
+                callbackArray.removeAt(i);
                 continue;
             }
 
@@ -322,9 +325,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             @Nonnull final ContextInvocationFactory<?, ?> factory) {
 
         final Object component = context.getComponent();
-        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+        final WeakIdentityHashMap<Object,
+                SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
-        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+        final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
         if (callbackArray == null) {
@@ -347,7 +351,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
             if (callbacks == null) {
 
-                callbackArray.remove(callbackArray.keyAt(i));
+                callbackArray.removeAt(i);
                 continue;
             }
 
@@ -361,7 +365,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                 if ((loaderId == LoaderConfiguration.AUTO) || (loaderId == id)) {
 
                     loaderManager.destroyLoader(id);
-                    callbackArray.remove(id);
+                    callbackArray.removeAt(i);
                     continue;
                 }
             }
@@ -427,14 +431,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
         final ClashType clashType = getClashType(loader, loaderId, inputs);
-        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+        final WeakIdentityHashMap<Object,
+                SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
-        SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+        SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
         if (callbackArray == null) {
 
-            callbackArray = new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>();
+            callbackArray = new SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>();
             callbackMap.put(component, callbackArray);
         }
 

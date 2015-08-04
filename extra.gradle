@@ -48,19 +48,6 @@ Project.metaClass.setJavaCompileArgs = { args ->
         options.compilerArgs = args
     }
 }
-Project.metaClass.addConditionalDependency = { String name, Closure closure ->
-
-    def dependsOnProject = parent.subprojects.find { it.name.equals(name) };
-    def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
-    def projectVersion = hasProperty('releaseVersion') ? getProperty('releaseVersion') : 'PREVIEW'
-    dependencies {
-        if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
-            compile group: group, name: closure(dependsOnProject), version: toVersionRange(dependsOnVersion)
-        } else {
-            compile project(":${name}")
-        }
-    }
-}
 Project.metaClass.conditionalDependencies = { Closure closure ->
 
     closure.delegate = new ConditionalDependencySpecs(delegate)
@@ -311,9 +298,8 @@ class ConditionalDependencySpecs {
 
         def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
         def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
-        def projectVersion = myProject.hasProperty('releaseVersion') ? myProject.getProperty('releaseVersion') : 'PREVIEW'
         myProject.dependencies {
-            if (!projectVersion.contains('PREVIEW') && !dependsOnVersion.contains('PREVIEW')) {
+            if (!dependsOnVersion.contains('PREVIEW')) {
                 delegate.compile group: myProject.group, name: config.artifact(dependsOnProject), version: myProject.toVersionRange(dependsOnVersion)
             } else {
                 delegate.compile myProject.project(":${config.name}")

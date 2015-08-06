@@ -436,7 +436,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     /**
-     * Class token of a {@link AliasMethodInvocation}.
+     * Class token of a {@link AliasMethodInvocation AliasMethodInvocation}.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
@@ -531,7 +531,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     /**
-     * Class token of a {@link MethodSignatureInvocation}.
+     * Class token of a {@link MethodSignatureInvocation MethodSignatureInvocation}.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.

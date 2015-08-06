@@ -42,7 +42,7 @@ public abstract class AbstractContextInvocationFactory<INPUT, OUTPUT>
     /**
      * Forces the inheriting classes to explicitly pass the arguments.
      *
-     * @throws IllegalArgumentException always.
+     * @throws java.lang.IllegalArgumentException always.
      */
     @SuppressWarnings("unused")
     protected AbstractContextInvocationFactory() {

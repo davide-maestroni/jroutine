@@ -509,7 +509,7 @@ public final class ChannelConfiguration {
 
         /**
          * Sets the maximum number of data that the channel can retain before they are consumed. A
-         * {@link ChannelConfiguration#DEFAULT} value means that it is up to the specific
+         * {@link ChannelConfiguration#DEFAULT DEFAULT} value means that it is up to the specific
          * implementation to choose a default one.
          *
          * @param maxSize the maximum size.

@@ -455,7 +455,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     /**
-     * Factory of {@link AliasMethodInvocation}s.
+     * Factory of {@link AliasMethodInvocation AliasMethodInvocation}s.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
@@ -578,7 +578,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     /**
-     * Factory of {@link MethodInvocation}s.
+     * Factory of {@link MethodInvocation MethodInvocation}s.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
@@ -704,7 +704,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     /**
-     * Factory of {@link ProxyInvocation}s.
+     * Factory of {@link ProxyInvocation ProxyInvocation}s.
      */
     private static class ProxyInvocationFactory
             extends AbstractContextInvocationFactory<Object, Object> {

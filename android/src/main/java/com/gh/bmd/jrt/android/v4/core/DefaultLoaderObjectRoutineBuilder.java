@@ -19,6 +19,7 @@ import com.gh.bmd.jrt.android.annotation.CacheStrategy;
 import com.gh.bmd.jrt.android.annotation.ClashResolution;
 import com.gh.bmd.jrt.android.annotation.InputClashResolution;
 import com.gh.bmd.jrt.android.annotation.LoaderId;
+import com.gh.bmd.jrt.android.annotation.StaleTime;
 import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
@@ -175,6 +176,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         if (cacheAnnotation != null) {
 
             builder.withCacheStrategy(cacheAnnotation.value());
+        }
+
+        final StaleTime staleTimeAnnotation = method.getAnnotation(StaleTime.class);
+
+        if (staleTimeAnnotation != null) {
+
+            builder.withResultStaleTime(staleTimeAnnotation.value(), staleTimeAnnotation.unit());
         }
 
         return builder.set();

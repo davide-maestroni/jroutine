@@ -55,6 +55,8 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
     private boolean mIsComplete;
 
+    private long mResultTimestamp = Long.MAX_VALUE;
+
     /**
      * Constructor.
      *
@@ -137,6 +139,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                 throw mAbortException;
             }
 
+            mResultTimestamp = System.currentTimeMillis();
             deliverResult = mLastResults.isEmpty();
             mLastResults.add(output);
         }
@@ -185,6 +188,14 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             synchronized (mMutex) {
 
                 return mAbortException;
+            }
+        }
+
+        public long getResultTimestamp() {
+
+            synchronized (mMutex) {
+
+                return mResultTimestamp;
             }
         }
 

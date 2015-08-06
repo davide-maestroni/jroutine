@@ -44,6 +44,14 @@ interface InvocationResult<OUTPUT> {
     RoutineException getAbortException();
 
     /**
+     * Returns the timestamp of the latest delivered result or {@link Long#MAX_VALUE} if no result
+     * has been produced yet.
+     *
+     * @return the timestamp.
+     */
+    long getResultTimestamp();
+
+    /**
      * Checks if this result represents an error.
      *
      * @return whether the result is an error.

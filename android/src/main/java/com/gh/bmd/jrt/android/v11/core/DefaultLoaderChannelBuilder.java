@@ -24,6 +24,7 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.TemplateExecution;
+import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,6 +107,13 @@ class DefaultLoaderChannelBuilder
                        inputResolutionType);
         }
 
+        final TimeDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOr(null);
+
+        if (resultStaleTime != null) {
+
+            logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
+        }
+
         return builder.invocations()
                       .with(invocationConfiguration)
                       .set()
@@ -113,6 +121,7 @@ class DefaultLoaderChannelBuilder
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.MERGE)
                       .withInputClashResolution(ClashResolutionType.MERGE)
+                      .withResultStaleTime(TimeDuration.INFINITY)
                       .set()
                       .asyncCall();
     }

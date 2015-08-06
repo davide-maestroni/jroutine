@@ -91,6 +91,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
     private final OrderType mOrderType;
 
+    private final long mResultStaleTimeMillis;
+
     /**
      * Constructor.
      *
@@ -125,6 +127,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         mInputClashResolutionType =
                 configuration.getInputClashResolutionTypeOr(ClashResolutionType.MERGE);
         mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
+        mResultStaleTimeMillis =
+                configuration.getResultStaleTimeOr(TimeDuration.INFINITY).toMillis();
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }
@@ -459,12 +463,17 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             throw clashException;
         }
 
-        if ((callbacks == null) || (loader == null) || (clashType != ClashType.NONE)) {
+        final boolean isRoutineLoader =
+                (loader != null) && (loader.getClass() == RoutineLoader.class);
+        final boolean isStaleResult =
+                isRoutineLoader && ((RoutineLoader) loader).isStaleResult(mResultStaleTimeMillis);
+
+        if (isStaleResult || (callbacks == null) || (loader == null) || (clashType
+                == ClashType.ABORT_THAT)) {
 
             final RoutineLoader<INPUT, OUTPUT> routineLoader;
 
-            if ((clashType == ClashType.NONE) && (loader != null) && (loader.getClass()
-                    == RoutineLoader.class)) {
+            if ((clashType == ClashType.NONE) && isRoutineLoader && !isStaleResult) {
 
                 routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
 
@@ -490,7 +499,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         callbacks.setCacheStrategy(mCacheStrategyType);
         result.pass(callbacks.newChannel(mLooper));
 
-        if (clashType == ClashType.ABORT_THAT) {
+        if ((clashType == ClashType.ABORT_THAT) || isStaleResult) {
 
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
@@ -654,50 +663,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             mLogger = logger.subContextLogger(this);
         }
 
-        /**
-         * Creates and returns a new output channel.<br/>
-         * The channel will be used to deliver the loader results.
-         *
-         * @param looper the looper instance.
-         * @return the new output channel.
-         */
-        @Nonnull
-        public OutputChannel<OUTPUT> newChannel(@Nullable final Looper looper) {
-
-            final Logger logger = mLogger;
-            logger.dbg("creating new result channel");
-            final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final ArrayList<TransportChannel<OUTPUT>> channels = mNewChannels;
-            final TransportChannel<OUTPUT> channel = JRoutine.transport()
-                                                             .channels()
-                                                             .withChannelMaxSize(Integer.MAX_VALUE)
-                                                             .withChannelTimeout(TimeDuration.ZERO)
-                                                             .withLog(logger.getLog())
-                                                             .withLogLevel(logger.getLogLevel())
-                                                             .set()
-                                                             .buildChannel();
-            channels.add(channel);
-            internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
-                                                       internalLoader.getInvocationCount()));
-
-            if ((looper != null) && (looper != Looper.getMainLooper())) {
-
-                return JRoutine.on(PassingInvocation.<OUTPUT>factoryOf())
-                               .invocations()
-                               .withAsyncRunner(Runners.looperRunner(looper))
-                               .withInputMaxSize(Integer.MAX_VALUE)
-                               .withInputTimeout(TimeDuration.ZERO)
-                               .withOutputMaxSize(Integer.MAX_VALUE)
-                               .withOutputTimeout(TimeDuration.ZERO)
-                               .withLog(logger.getLog())
-                               .withLogLevel(logger.getLogLevel())
-                               .set()
-                               .asyncCall(channel);
-            }
-
-            return channel;
-        }
-
         public Loader<InvocationResult<OUTPUT>> onCreateLoader(final int id, final Bundle args) {
 
             mLogger.dbg("creating Android loader: %d", id);
@@ -775,6 +740,43 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());
             reset(new InvocationClashException(mLoader.getId()));
+        }
+
+        @Nonnull
+        private OutputChannel<OUTPUT> newChannel(@Nullable final Looper looper) {
+
+            final Logger logger = mLogger;
+            logger.dbg("creating new result channel");
+            final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
+            final ArrayList<TransportChannel<OUTPUT>> channels = mNewChannels;
+            final TransportChannel<OUTPUT> channel = JRoutine.transport()
+                                                             .channels()
+                                                             .withChannelMaxSize(Integer.MAX_VALUE)
+                                                             .withChannelTimeout(TimeDuration.ZERO)
+                                                             .withLog(logger.getLog())
+                                                             .withLogLevel(logger.getLogLevel())
+                                                             .set()
+                                                             .buildChannel();
+            channels.add(channel);
+            internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
+                                                       internalLoader.getInvocationCount()));
+
+            if ((looper != null) && (looper != Looper.getMainLooper())) {
+
+                return JRoutine.on(PassingInvocation.<OUTPUT>factoryOf())
+                               .invocations()
+                               .withAsyncRunner(Runners.looperRunner(looper))
+                               .withInputMaxSize(Integer.MAX_VALUE)
+                               .withInputTimeout(TimeDuration.ZERO)
+                               .withOutputMaxSize(Integer.MAX_VALUE)
+                               .withOutputTimeout(TimeDuration.ZERO)
+                               .withLog(logger.getLog())
+                               .withLogLevel(logger.getLogLevel())
+                               .set()
+                               .asyncCall(channel);
+            }
+
+            return channel;
         }
 
         private void reset(@Nullable final Throwable reason) {

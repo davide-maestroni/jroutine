@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Routine channels unit tests.
  * <p/>
- * Created by davide on 03/08/15.
+ * Created by davide-maestroni on 03/08/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity> {

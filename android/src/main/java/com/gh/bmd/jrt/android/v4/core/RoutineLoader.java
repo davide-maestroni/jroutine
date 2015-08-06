@@ -120,16 +120,18 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     protected void onStartLoading() {
 
         super.onStartLoading();
-        mLogger.dbg("start background invocation");
+        final Logger logger = mLogger;
+        logger.dbg("start background invocation");
+        final InvocationResult<OUTPUT> result = mResult;
 
-        if (mResult != null) {
-
-            deliverResult(mResult);
-        }
-
-        if (takeContentChanged() || (mResult == null)) {
+        if (takeContentChanged() || (result == null)) {
 
             forceLoad();
+
+        } else {
+
+            logger.dbg("re-delivering result: %s", result);
+            super.deliverResult(result);
         }
     }
 
@@ -210,5 +212,19 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     ContextInvocationFactory<INPUT, OUTPUT> getInvocationFactory() {
 
         return mInvocationFactory;
+    }
+
+    /**
+     * Checks if the last result has been delivered more than the specified milliseconds in the
+     * past.
+     *
+     * @param staleTimeMillis the stale time in milliseconds.
+     * @return whether the result is stale.
+     */
+    boolean isStaleResult(final long staleTimeMillis) {
+
+        final InvocationResult<OUTPUT> result = mResult;
+        return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
+                > staleTimeMillis);
     }
 }

@@ -15,8 +15,14 @@ package com.gh.bmd.jrt.android.builder;
 
 import android.os.Looper;
 
+import com.gh.bmd.jrt.util.TimeDuration;
+
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
 
 /**
  * Class storing the invocation loader configuration.
@@ -27,6 +33,7 @@ import javax.annotation.Nullable;
  * The configuration is used to set a specific ID to each invocation created by a routine.<br/>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
  * is, they share the same ID, and to set a specific type of caching of the invocation results.<br/>
+ * TODO<br/>
  * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
  * coming from the invocation.
  * <p/>
@@ -54,6 +61,8 @@ public final class LoaderConfiguration {
 
     private final ClashResolutionType mResolutionType;
 
+    private final TimeDuration mStaleTime;
+
     private final CacheStrategyType mStrategyType;
 
     /**
@@ -64,17 +73,20 @@ public final class LoaderConfiguration {
      * @param resolutionType      the type of resolution.
      * @param inputResolutionType the type of input resolution.
      * @param strategyType        the cache strategy type.
+     * @param staleTime           TODO
      */
     private LoaderConfiguration(@Nullable final Looper looper, final int loaderId,
             @Nullable final ClashResolutionType resolutionType,
             @Nullable final ClashResolutionType inputResolutionType,
-            @Nullable final CacheStrategyType strategyType) {
+            @Nullable final CacheStrategyType strategyType,
+            @Nullable final TimeDuration staleTime) {
 
         mLooper = looper;
         mLoaderId = loaderId;
         mResolutionType = resolutionType;
         mInputResolutionType = inputResolutionType;
         mStrategyType = strategyType;
+        mStaleTime = staleTime;
     }
 
     /**
@@ -221,6 +233,18 @@ public final class LoaderConfiguration {
     }
 
     /**
+     * Returns the time after which results are considered as stale (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the results stale time.
+     */
+    public TimeDuration getResultStaleTimeOr(@Nullable final TimeDuration valueIfNotSet) {
+
+        final TimeDuration staleTime = mStaleTime;
+        return (staleTime != null) ? staleTime : valueIfNotSet;
+    }
+
+    /**
      * Result cache type enumeration.<br/>
      * The cache strategy type indicates what will happen to the result of an invocation after its
      * completion.
@@ -312,6 +336,8 @@ public final class LoaderConfiguration {
         private Looper mLooper;
 
         private ClashResolutionType mResolutionType;
+
+        private TimeDuration mStaleTime;
 
         private CacheStrategyType mStrategyType;
 
@@ -413,6 +439,13 @@ public final class LoaderConfiguration {
                 withCacheStrategy(strategyType);
             }
 
+            final TimeDuration staleTime = configuration.mStaleTime;
+
+            if (staleTime != null) {
+
+                withResultStaleTime(staleTime);
+            }
+
             return this;
         }
 
@@ -489,11 +522,38 @@ public final class LoaderConfiguration {
             return this;
         }
 
+        /**
+         * TODO
+         *
+         * @param staleTime
+         * @return
+         */
+        @Nonnull
+        public Builder<TYPE> withResultStaleTime(@Nullable final TimeDuration staleTime) {
+
+            mStaleTime = staleTime;
+            return this;
+        }
+
+        /**
+         * TODO
+         *
+         * @param time
+         * @param timeUnit
+         * @return
+         */
+        @Nonnull
+        public Builder<TYPE> withResultStaleTime(final long time,
+                @Nonnull final TimeUnit timeUnit) {
+
+            return withResultStaleTime(fromUnit(time, timeUnit));
+        }
+
         @Nonnull
         private LoaderConfiguration buildConfiguration() {
 
             return new LoaderConfiguration(mLooper, mLoaderId, mResolutionType,
-                                           mInputResolutionType, mStrategyType);
+                                           mInputResolutionType, mStrategyType, mStaleTime);
         }
 
         private void setConfiguration(@Nonnull final LoaderConfiguration configuration) {
@@ -503,6 +563,7 @@ public final class LoaderConfiguration {
             mResolutionType = configuration.mResolutionType;
             mInputResolutionType = configuration.mInputResolutionType;
             mStrategyType = configuration.mStrategyType;
+            mStaleTime = configuration.mStaleTime;
         }
     }
 

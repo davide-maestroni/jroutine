@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.processor.RoutineProcessor;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -67,6 +68,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private TypeElement mServiceProxyElement;
 
+    private TypeMirror mStaleTimeAnnotationType;
+
     private TypeElement mV11ProxyElement;
 
     private TypeElement mV4ProxyElement;
@@ -82,6 +85,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getTypeFromName("com.gh.bmd.jrt.android.annotation.InputClashResolution").asType();
         mCacheAnnotationType =
                 getTypeFromName("com.gh.bmd.jrt.android.annotation.CacheStrategy").asType();
+        mStaleTimeAnnotationType =
+                getTypeFromName("com.gh.bmd.jrt.android.annotation.StaleTime").asType();
     }
 
     @Nonnull
@@ -328,6 +333,24 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             builder.append(".withCacheStrategy(com.gh.bmd.jrt.android.builder.LoaderConfiguration"
                                    + ".CacheStrategyType.").append(strategyType).append(")");
+        }
+
+        final TypeMirror staleTimeAnnotationType = mStaleTimeAnnotationType;
+        final Object staleTime =
+                getAnnotationValue(methodElement, staleTimeAnnotationType, "value");
+
+        if (staleTime != null) {
+
+            final Object staleTimeUnit =
+                    getAnnotationValue(methodElement, staleTimeAnnotationType, "unit");
+
+            builder.append(".withResultStaleTime(")
+                   .append(staleTime)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append((staleTimeUnit != null) ? staleTimeUnit : TimeUnit.MILLISECONDS)
+                   .append(")");
         }
 
         return builder.toString();

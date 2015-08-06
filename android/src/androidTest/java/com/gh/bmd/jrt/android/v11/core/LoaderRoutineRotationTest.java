@@ -18,6 +18,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -47,6 +48,29 @@ public class LoaderRoutineRotationTest
         super(RotationTestActivity.class);
     }
 
+    public void testActivityNotStaleResult() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
+        final Routine<String, String> routine =
+                JRoutine.on(contextFrom(getActivity()), factoryOf(ToUpperCase.class))
+                        .loaders()
+                        .withId(0)
+                        .withClashResolution(ClashResolutionType.MERGE)
+                        .withResultStaleTime(TimeDuration.minutes(1))
+                        .set()
+                        .buildRoutine();
+        routine.asyncCall("test1");
+
+        simulateRotation();
+        TimeDuration.millis(1000).sleepAtLeast();
+        assertThat(routine.asyncCall("test2").afterMax(timeout).next()).isEqualTo("TEST1");
+    }
+
     public void testActivityRotationChannel() throws InterruptedException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -64,19 +88,7 @@ public class LoaderRoutineRotationTest
                 .set()
                 .asyncCall("test1", "test2");
 
-        final Semaphore semaphore = new Semaphore(0);
-
-        getActivity().runOnUiThread(new Runnable() {
-
-            public void run() {
-
-                getActivity().recreate();
-                semaphore.release();
-            }
-        });
-
-        semaphore.acquire();
-        getInstrumentation().waitForIdleSync();
+        simulateRotation();
 
         final OutputChannel<String> channel =
                 JRoutine.on(contextFrom(getActivity())).loaders().withId(0).set().buildChannel();
@@ -98,19 +110,7 @@ public class LoaderRoutineRotationTest
         routine1.asyncCall("test1");
         routine1.asyncCall("test2");
 
-        final Semaphore semaphore = new Semaphore(0);
-
-        getActivity().runOnUiThread(new Runnable() {
-
-            public void run() {
-
-                getActivity().recreate();
-                semaphore.release();
-            }
-        });
-
-        semaphore.acquire();
-        getInstrumentation().waitForIdleSync();
+        simulateRotation();
 
         final Routine<String, String> routine2 =
                 JRoutine.on(contextFrom(getActivity()), factoryOf(ToUpperCase.class))
@@ -136,6 +136,42 @@ public class LoaderRoutineRotationTest
         routine1.asyncCall(data1);
         routine1.asyncCall(data1);
 
+        simulateRotation();
+
+        final Routine<Data, Data> routine2 =
+                JRoutine.on(contextFrom(getActivity()), factoryOf(Delay.class)).buildRoutine();
+        final OutputChannel<Data> result1 = routine2.asyncCall(data1).afterMax(timeout);
+        final OutputChannel<Data> result2 = routine2.asyncCall(data1).afterMax(timeout);
+
+        assertThat(result1.next()).isSameAs(data1);
+        assertThat(result2.next()).isSameAs(data1);
+    }
+
+    public void testActivityStaleResult() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
+        final Routine<String, String> routine =
+                JRoutine.on(contextFrom(getActivity()), factoryOf(ToUpperCase.class))
+                        .loaders()
+                        .withId(0)
+                        .withClashResolution(ClashResolutionType.MERGE)
+                        .withResultStaleTime(TimeDuration.ZERO)
+                        .set()
+                        .buildRoutine();
+        routine.asyncCall("test1");
+
+        simulateRotation();
+        TimeDuration.millis(1000).sleepAtLeast();
+        assertThat(routine.asyncCall("test2").afterMax(timeout).next()).isEqualTo("TEST2");
+    }
+
+    private void simulateRotation() throws InterruptedException {
+
         final Semaphore semaphore = new Semaphore(0);
 
         getActivity().runOnUiThread(new Runnable() {
@@ -149,14 +185,6 @@ public class LoaderRoutineRotationTest
 
         semaphore.acquire();
         getInstrumentation().waitForIdleSync();
-
-        final Routine<Data, Data> routine2 =
-                JRoutine.on(contextFrom(getActivity()), factoryOf(Delay.class)).buildRoutine();
-        final OutputChannel<Data> result1 = routine2.asyncCall(data1).afterMax(timeout);
-        final OutputChannel<Data> result2 = routine2.asyncCall(data1).afterMax(timeout);
-
-        assertThat(result1.next()).isSameAs(data1);
-        assertThat(result2.next()).isSameAs(data1);
     }
 
     private static class Data {

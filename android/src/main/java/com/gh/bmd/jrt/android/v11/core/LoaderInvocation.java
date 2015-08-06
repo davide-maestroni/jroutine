@@ -125,7 +125,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         mClashResolutionType =
                 configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT);
         mInputClashResolutionType =
-                configuration.getInputClashResolutionTypeOr(ClashResolutionType.MERGE);
+                configuration.getInputClashResolutionTypeOr(ClashResolutionType.JOIN);
         mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
         mResultStaleTimeMillis =
                 configuration.getResultStaleTimeOr(TimeDuration.INFINITY).toMillis();
@@ -466,7 +466,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         final boolean isRoutineLoader =
                 (loader != null) && (loader.getClass() == RoutineLoader.class);
         final boolean isStaleResult =
-                isRoutineLoader && ((RoutineLoader) loader).isStaleResult(mResultStaleTimeMillis);
+                isRoutineLoader && ((RoutineLoader<?, OUTPUT>) loader).isStaleResult(
+                        mResultStaleTimeMillis);
 
         if (isStaleResult || (callbacks == null) || (loader == null) || (clashType
                 == ClashType.ABORT_THAT)) {
@@ -585,7 +586,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                 routineLoader.areSameInputs(inputs) ? mInputClashResolutionType
                         : mClashResolutionType;
 
-        if (resolution == ClashResolutionType.MERGE) {
+        if (resolution == ClashResolutionType.JOIN) {
 
             logger.dbg("keeping existing invocation [%d]", loaderId);
             return ClashType.NONE;

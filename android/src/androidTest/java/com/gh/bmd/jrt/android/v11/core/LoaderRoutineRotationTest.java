@@ -60,7 +60,7 @@ public class LoaderRoutineRotationTest
                 JRoutine.on(contextFrom(getActivity()), factoryOf(ToUpperCase.class))
                         .loaders()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.MERGE)
+                        .withClashResolution(ClashResolutionType.JOIN)
                         .withResultStaleTime(TimeDuration.minutes(1))
                         .set()
                         .buildRoutine();
@@ -159,7 +159,7 @@ public class LoaderRoutineRotationTest
                 JRoutine.on(contextFrom(getActivity()), factoryOf(ToUpperCase.class))
                         .loaders()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.MERGE)
+                        .withClashResolution(ClashResolutionType.JOIN)
                         .withResultStaleTime(TimeDuration.ZERO)
                         .set()
                         .buildRoutine();

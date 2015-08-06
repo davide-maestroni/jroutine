@@ -33,7 +33,9 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  * The configuration is used to set a specific ID to each invocation created by a routine.<br/>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
  * is, they share the same ID, and to set a specific type of caching of the invocation results.<br/>
- * TODO<br/>
+ * In case is a clash resolved by joining the two invocations, it is possible to specify a maximum
+ * time after which the results of the first invocation are considered to be stale, and thus the
+ * invocation is repeated.<br/>
  * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
  * coming from the invocation.
  * <p/>
@@ -141,8 +143,10 @@ public final class LoaderConfiguration {
 
         final LoaderConfiguration that = (LoaderConfiguration) o;
         return mLoaderId == that.mLoaderId && mInputResolutionType == that.mInputResolutionType
-                && mResolutionType == that.mResolutionType && mStrategyType == that.mStrategyType
-                && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null);
+                && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null)
+                && mResolutionType == that.mResolutionType && !(mStaleTime != null
+                ? !mStaleTime.equals(that.mStaleTime) : that.mStaleTime != null)
+                && mStrategyType == that.mStrategyType;
     }
 
     @Override
@@ -151,9 +155,10 @@ public final class LoaderConfiguration {
         // auto-generated code
         int result = mInputResolutionType != null ? mInputResolutionType.hashCode() : 0;
         result = 31 * result + mLoaderId;
-        result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
-        result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
         result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
+        result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
+        result = 31 * result + (mStaleTime != null ? mStaleTime.hashCode() : 0);
+        result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
         return result;
     }
 
@@ -163,9 +168,10 @@ public final class LoaderConfiguration {
         return "LoaderConfiguration{" +
                 "mInputResolutionType=" + mInputResolutionType +
                 ", mLoaderId=" + mLoaderId +
-                ", mResolutionType=" + mResolutionType +
-                ", mStrategyType=" + mStrategyType +
                 ", mLooper=" + mLooper +
+                ", mResolutionType=" + mResolutionType +
+                ", mStaleTime=" + mStaleTime +
+                ", mStrategyType=" + mStrategyType +
                 '}';
     }
 
@@ -233,7 +239,7 @@ public final class LoaderConfiguration {
     }
 
     /**
-     * Returns the time after which results are considered as stale (null by default).
+     * Returns the time after which results are considered to be stale (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the results stale time.
@@ -275,7 +281,7 @@ public final class LoaderConfiguration {
      * The clash of two invocations happens when the same loader ID is already in use at the time of
      * the routine execution. The possible outcomes are:
      * <ul>
-     * <li>the running invocation is retained and merged with the current one</li>
+     * <li>the running invocation is retained and the current one joins it</li>
      * <li>the running invocation is aborted</li>
      * <li>the current invocation is aborted</li>
      * <li>both running and current invocations are aborted</li>
@@ -286,9 +292,9 @@ public final class LoaderConfiguration {
     public enum ClashResolutionType {
 
         /**
-         * The clash is resolved by merging the two invocations.
+         * The clash is resolved by joining the two invocations.
          */
-        MERGE,
+        JOIN,
         /**
          * The clash is resolved by aborting the running invocation.
          */
@@ -523,10 +529,12 @@ public final class LoaderConfiguration {
         }
 
         /**
-         * TODO
+         * Sets the time after which results are considered to be stale. In case a clash is resolved
+         * by joining the two invocations, and the results of the running one are stale, the
+         * invocation execution is repeated. A null value means that the results are always valid.
          *
-         * @param staleTime
-         * @return
+         * @param staleTime the stale time.
+         * @return this builder.
          */
         @Nonnull
         public Builder<TYPE> withResultStaleTime(@Nullable final TimeDuration staleTime) {
@@ -536,11 +544,12 @@ public final class LoaderConfiguration {
         }
 
         /**
-         * TODO
+         * Sets the time after which results are considered to be stale.
          *
-         * @param time
-         * @param timeUnit
-         * @return
+         * @param time     the time.
+         * @param timeUnit the time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @Nonnull
         public Builder<TYPE> withResultStaleTime(final long time,

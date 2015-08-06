@@ -45,7 +45,8 @@ public interface LoaderProxyBuilder<TYPE>
      * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy},
      * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} annotations.<br/>
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} and
+     * {@link com.gh.bmd.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with

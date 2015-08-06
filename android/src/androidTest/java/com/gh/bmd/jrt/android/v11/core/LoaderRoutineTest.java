@@ -446,7 +446,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(getActivity()), factoryOf(ToUpperCase.class))
                         .loaders()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.MERGE)
+                        .withClashResolution(ClashResolutionType.JOIN)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
@@ -1139,7 +1139,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(fragment), factoryOf(ToUpperCase.class))
                         .loaders()
                         .withId(0)
-                        .withClashResolution(ClashResolutionType.MERGE)
+                        .withClashResolution(ClashResolutionType.JOIN)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
@@ -1539,7 +1539,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .set()
                 .loaders()
                 .withId(0)
-                .withInputClashResolution(ClashResolutionType.MERGE)
+                .withInputClashResolution(ClashResolutionType.JOIN)
                 .set()
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(1);
@@ -1553,7 +1553,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .set()
                 .loaders()
                 .withId(0)
-                .withInputClashResolution(ClashResolutionType.MERGE)
+                .withInputClashResolution(ClashResolutionType.JOIN)
                 .set()
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(2);

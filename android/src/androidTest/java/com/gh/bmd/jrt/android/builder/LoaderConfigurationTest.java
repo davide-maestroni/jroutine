@@ -20,6 +20,9 @@ import android.test.AndroidTestCase;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.Builder;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
+import com.gh.bmd.jrt.util.TimeDuration;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.gh.bmd.jrt.android.builder.LoaderConfiguration.builder;
 import static com.gh.bmd.jrt.android.builder.LoaderConfiguration.builderFrom;
@@ -41,6 +44,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
         assertThat(builderFrom(null).set()).isEqualTo(LoaderConfiguration.DEFAULT_CONFIGURATION);
@@ -79,6 +83,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
         assertThat(builder().with(configuration).set()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().set()).isEqualTo(configuration);
@@ -95,6 +100,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withCacheStrategy(CacheStrategyType.CLEAR).set());
@@ -113,11 +119,14 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withClashResolution(ClashResolutionType.ABORT_THIS).set());
-        assertThat(configuration.builderFrom().withClashResolution(ClashResolutionType.MERGE).set())
-                .isNotEqualTo(builder().withClashResolution(ClashResolutionType.MERGE).set());
+        assertThat(configuration.builderFrom()
+                                .withClashResolution(ClashResolutionType.JOIN)
+                                .set()).isNotEqualTo(
+                builder().withClashResolution(ClashResolutionType.JOIN).set());
     }
 
     public void testIdEquals() {
@@ -129,6 +138,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
         assertThat(configuration).isNotEqualTo(builder().withId(3).set());
         assertThat(configuration.builderFrom().withId(27).set()).isNotEqualTo(
@@ -144,13 +154,14 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withInputClashResolution(ClashResolutionType.ABORT_THIS).set());
         assertThat(configuration.builderFrom()
-                                .withInputClashResolution(ClashResolutionType.MERGE)
+                                .withInputClashResolution(ClashResolutionType.JOIN)
                                 .set()).isNotEqualTo(
-                builder().withInputClashResolution(ClashResolutionType.MERGE).set());
+                builder().withInputClashResolution(ClashResolutionType.JOIN).set());
     }
 
     public void testLooperEquals() {
@@ -162,11 +173,55 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withResultLooper(new Handler().getLooper()).set());
         final Looper looper = new Handler().getLooper();
         assertThat(configuration.builderFrom().withResultLooper(looper).set()).isNotEqualTo(
                 builder().withResultLooper(looper).set());
+    }
+
+    public void testStaleTimeEquals() {
+
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
+        final LoaderConfiguration configuration = builder().withId(-1)
+                                                           .withClashResolution(resolutionType)
+                                                           .withInputClashResolution(resolutionType)
+                                                           .withCacheStrategy(strategyType)
+                                                           .withResultLooper(Looper.getMainLooper())
+                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
+                                                           .set();
+        assertThat(configuration).isNotEqualTo(
+                builder().withResultStaleTime(TimeDuration.days(3)).set());
+        assertThat(configuration.builderFrom()
+                                .withResultStaleTime(TimeDuration.hours(7))
+                                .set()).isNotEqualTo(
+                builder().withResultStaleTime(TimeDuration.hours(7)).set());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testStaleTimeErrors() {
+
+        try {
+
+            builder().withResultStaleTime(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            builder().withResultStaleTime(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 }

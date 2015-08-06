@@ -97,6 +97,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                 throw mAbortException;
             }
 
+            mResultTimestamp = System.currentTimeMillis();
             deliverResult = mLastResults.isEmpty();
         }
 
@@ -139,7 +140,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                 throw mAbortException;
             }
 
-            mResultTimestamp = System.currentTimeMillis();
             deliverResult = mLastResults.isEmpty();
             mLastResults.add(output);
         }

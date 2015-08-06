@@ -35,8 +35,9 @@ import java.lang.annotation.Target;
  * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction}, as well as
  * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy},
  * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
- * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution} and
- * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} annotations defined for each
+ * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution},
+ * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} and
+ * {@link com.gh.bmd.jrt.android.annotation.StaleTime StaleTime} annotations defined for each
  * interface method.
  * <p/>
  * See {@link com.gh.bmd.jrt.android.proxy.annotation.V4Proxy V4Proxy} for support of API levels

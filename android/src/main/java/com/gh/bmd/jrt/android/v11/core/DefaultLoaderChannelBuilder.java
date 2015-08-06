@@ -119,8 +119,8 @@ class DefaultLoaderChannelBuilder
                       .set()
                       .loaders()
                       .with(loaderConfiguration)
-                      .withClashResolution(ClashResolutionType.MERGE)
-                      .withInputClashResolution(ClashResolutionType.MERGE)
+                      .withClashResolution(ClashResolutionType.JOIN)
+                      .withInputClashResolution(ClashResolutionType.JOIN)
                       .withResultStaleTime(TimeDuration.INFINITY)
                       .set()
                       .asyncCall();

@@ -13,8 +13,6 @@
  */
 package com.gh.bmd.jrt.android.v4.core;
 
-import android.annotation.TargetApi;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager.LayoutParams;
@@ -26,7 +24,6 @@ import com.gh.bmd.jrt.android.R;
  * <p/>
  * Created by davide-maestroni on 1/28/15.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
 public class RotationTestActivity extends FragmentActivity {
 
     @Override
@@ -35,6 +32,7 @@ public class RotationTestActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_v4_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // need to initialize the loader manager here in order to successfully simulate rotation
         getSupportLoaderManager();
     }
 }

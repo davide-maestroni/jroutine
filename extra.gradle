@@ -297,10 +297,9 @@ class ConditionalDependencySpecs {
     def compile(Object config) {
 
         def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
-        def dependsOnVersion = dependsOnProject.hasProperty('releaseVersion') ? dependsOnProject.getProperty('releaseVersion') : 'PREVIEW'
         myProject.dependencies {
-            if (!dependsOnVersion.contains('PREVIEW')) {
-                delegate.compile group: myProject.group, name: config.artifact(dependsOnProject), version: myProject.toVersionRange(dependsOnVersion)
+            if (!dependsOnProject.hasProperty('previewRelease') && dependsOnProject.hasProperty('releaseVersion')) {
+                delegate.compile group: myProject.group, name: config.artifact(dependsOnProject), version: myProject.toVersionRange(dependsOnProject.getProperty('releaseVersion'))
             } else {
                 delegate.compile myProject.project(":${config.name}")
             }

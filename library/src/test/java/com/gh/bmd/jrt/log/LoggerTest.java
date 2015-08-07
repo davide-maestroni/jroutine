@@ -94,7 +94,6 @@ public class LoggerTest {
 
         }
 
-
         try {
 
             Logger.setDefaultLogLevel(null);

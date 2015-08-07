@@ -21,8 +21,8 @@ import javax.annotation.Nullable;
 /**
  * Interface defining a log object responsible for formatting and writing the log messages.
  * <p/>
- * A default global log instance can be set by invoking the proper logger methods. Note, however,
- * that a routine instance cannot dynamically change its log after creation.
+ * A default log instance can be set by invoking the proper logger methods. Note, however, that a
+ * routine instance cannot dynamically change its log after creation.
  * <p/>
  * Note also that a log instance is typically accessed from different threads, so, it is
  * responsibility of the implementing class to avoid concurrency issues by synchronizing mutable

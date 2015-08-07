@@ -172,7 +172,7 @@ public class Invocations {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    public static class DefaultInvocationFactory<INPUT, OUTPUT>
+    private static class DefaultInvocationFactory<INPUT, OUTPUT>
             implements InvocationFactory<INPUT, OUTPUT> {
 
         private final Object[] mArgs;

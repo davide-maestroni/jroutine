@@ -106,7 +106,7 @@ public class RoutineService extends Service {
     @SuppressWarnings("unused")
     public RoutineService() {
 
-        this(Logger.getGlobalLog(), Logger.getGlobalLogLevel());
+        this(Logger.getDefaultLog(), Logger.getDefaultLogLevel());
     }
 
     /**

@@ -33,18 +33,14 @@ public class Logger {
 
     private static final int DEBUG_LEVEL = LogLevel.DEBUG.ordinal();
 
-    private static final LogLevel DEFAULT_LEVEL = LogLevel.ERROR;
-
-    private static final SystemLog DEFAULT_LOG = Logs.systemLog();
-
     private static final int ERROR_LEVEL = LogLevel.ERROR.ordinal();
 
     private static final int WARNING_LEVEL = LogLevel.WARNING.ordinal();
 
-    private static final AtomicReference<Log> sLog = new AtomicReference<Log>(DEFAULT_LOG);
+    private static final AtomicReference<Log> sLog = new AtomicReference<Log>(Logs.systemLog());
 
     private static final AtomicReference<LogLevel> sLogLevel =
-            new AtomicReference<LogLevel>(DEFAULT_LEVEL);
+            new AtomicReference<LogLevel>(LogLevel.ERROR);
 
     private final List<Object> mContextList;
 
@@ -67,52 +63,64 @@ public class Logger {
             @Nullable final LogLevel level) {
 
         mContexts = contexts.clone();
-        mLog = (log == null) ? DEFAULT_LOG : log;
-        mLogLevel = (level == null) ? DEFAULT_LEVEL : level;
+        mLog = (log == null) ? sLog.get() : log;
+        mLogLevel = (level == null) ? sLogLevel.get() : level;
         mLevel = mLogLevel.ordinal();
         mContextList = Arrays.asList(mContexts);
     }
 
     /**
-     * Gets the global log instance.
+     * Gets the default log instance.
      *
      * @return the log instance.
      */
     @Nonnull
-    public static Log getGlobalLog() {
+    public static Log getDefaultLog() {
 
         return sLog.get();
     }
 
     /**
-     * Sets the global log instance.
+     * Sets the default log instance.
      *
      * @param log the log instance.
      */
-    public static void setGlobalLog(@Nullable final Log log) {
+    @SuppressWarnings("ConstantConditions")
+    public static void setDefaultLog(@Nonnull final Log log) {
 
-        sLog.set((log == null) ? DEFAULT_LOG : log);
+        if (log == null) {
+
+            throw new NullPointerException("the default log instance must not be null");
+        }
+
+        sLog.set(log);
     }
 
     /**
-     * Gets the global log level.
+     * Gets the default log level.
      *
      * @return the log level.
      */
     @Nonnull
-    public static LogLevel getGlobalLogLevel() {
+    public static LogLevel getDefaultLogLevel() {
 
         return sLogLevel.get();
     }
 
     /**
-     * Sets the global log level.
+     * Sets the default log level.
      *
      * @param level the log level.
      */
-    public static void setGlobalLogLevel(@Nullable final LogLevel level) {
+    @SuppressWarnings("ConstantConditions")
+    public static void setDefaultLogLevel(@Nonnull final LogLevel level) {
 
-        sLogLevel.set((level == null) ? DEFAULT_LEVEL : level);
+        if (level == null) {
+
+            throw new NullPointerException("the default log level must not be null");
+        }
+
+        sLogLevel.set(level);
     }
 
     /**

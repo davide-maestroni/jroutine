@@ -16,6 +16,8 @@ package com.gh.bmd.jrt.android.core;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.log.Logs;
+import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
@@ -179,5 +181,11 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
             @Nullable final Object... factoryArgs) {
 
         return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken, factoryArgs);
+    }
+
+    static {
+
+        // sets the Android log as default
+        Logger.setDefaultLog(Logs.androidLog());
     }
 }

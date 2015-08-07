@@ -14,6 +14,11 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+/*
+    EXPORT JAR: ./gradlew eJ -PexportDir=$HOME/javadoc
+    UPLOAD ARCHIVE: ./gradlew upA
+*/
+
 Project.metaClass.toVersionRange = { String version ->
 
     def versions = version.split('\\.')

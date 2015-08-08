@@ -28,6 +28,7 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.InvocationClashException;
 import com.gh.bmd.jrt.android.invocation.InvocationTypeException;
+import com.gh.bmd.jrt.android.invocation.StaleResultsException;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
@@ -471,8 +472,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
                 isRoutineLoader && ((RoutineLoader<?, OUTPUT>) loader).isStaleResult(
                         mResultStaleTimeMillis);
 
-        if (isStaleResult || (callbacks == null) || (loader == null) || (clashType
-                == ClashType.ABORT_THAT)) {
+        if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_THAT)
+                || isStaleResult) {
 
             final RoutineLoader<INPUT, OUTPUT> routineLoader;
 
@@ -491,7 +492,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             if (callbacks != null) {
 
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
-                callbacks.reset(new InvocationClashException(loaderId));
+                callbacks.reset(((clashType == ClashType.ABORT_THAT) || !isStaleResult)
+                                        ? new InvocationClashException(loaderId)
+                                        : new StaleResultsException(loaderId));
             }
 
             callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(newCallbacks));

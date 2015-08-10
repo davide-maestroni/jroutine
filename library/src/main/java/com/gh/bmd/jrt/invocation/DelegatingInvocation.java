@@ -61,7 +61,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryWith(
+    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryFrom(
             @Nonnull final Routine<INPUT, OUTPUT> routine) {
 
         return new DelegatingInvocationFactory<INPUT, OUTPUT>(routine);

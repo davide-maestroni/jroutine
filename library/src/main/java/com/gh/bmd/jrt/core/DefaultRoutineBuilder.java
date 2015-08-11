@@ -36,6 +36,8 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT,
      * Constructor.
      *
      * @param factory the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {

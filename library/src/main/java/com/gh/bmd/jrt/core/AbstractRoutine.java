@@ -27,8 +27,10 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
+import com.gh.bmd.jrt.runner.TemplateExecution;
 
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -261,8 +263,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             if (mAsyncManager == null) {
 
-                mAsyncManager =
-                        new DefaultInvocationManager(type, mAsyncInvocations, mSyncInvocations);
+                mAsyncManager = new DefaultInvocationManager(type, mAsyncRunner, mAsyncInvocations,
+                                                             mSyncInvocations);
             }
 
             return mAsyncManager;
@@ -270,7 +272,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         if (mSyncManager == null) {
 
-            mSyncManager = new DefaultInvocationManager(type, mSyncInvocations, mAsyncInvocations);
+            mSyncManager = new DefaultInvocationManager(type, mSyncRunner, mSyncInvocations,
+                                                        mAsyncInvocations);
         }
 
         return mSyncManager;
@@ -292,8 +295,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      */
     protected enum InvocationType {
 
-        ASYNC,  // asynchronous
-        SYNC    // synchronous
+        SYNC,   // synchronous
+        ASYNC   // asynchronous
     }
 
     /**
@@ -324,10 +327,27 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         }
     }
 
+    private class CreateExecution extends TemplateExecution {
+
+        private final DefaultInvocationManager mManager;
+
+        private CreateExecution(@Nonnull final DefaultInvocationManager invocationManager) {
+
+            mManager = invocationManager;
+        }
+
+        public void run() {
+
+            mManager.create(null, true);
+        }
+    }
+
     /**
      * Default implementation of an invocation manager supporting recycling of invocation instances.
      */
     private class DefaultInvocationManager implements InvocationManager<INPUT, OUTPUT> {
+
+        private final CreateExecution mCreateExecution;
 
         private final LinkedList<Invocation<INPUT, OUTPUT>> mFallbackInvocations;
 
@@ -335,20 +355,26 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         private final LinkedList<Invocation<INPUT, OUTPUT>> mPrimaryInvocations;
 
+        private final Runner mRunner;
+
         /**
          * Constructor.
          *
          * @param type                the invocation type.
+         * @param runner              the invocation runner.
          * @param primaryInvocations  the primary pool of invocations.
          * @param fallbackInvocations the fallback pool of invocations.
          */
         private DefaultInvocationManager(@Nonnull final InvocationType type,
+                @Nonnull final Runner runner,
                 @Nonnull final LinkedList<Invocation<INPUT, OUTPUT>> primaryInvocations,
                 @Nonnull final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations) {
 
             mInvocationType = type;
+            mRunner = runner;
             mPrimaryInvocations = primaryInvocations;
             mFallbackInvocations = fallbackInvocations;
+            mCreateExecution = new CreateExecution(this);
         }
 
         public void create(@Nonnull final InvocationObserver<INPUT, OUTPUT> observer) {
@@ -384,7 +410,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             if (hasDelayed) {
 
-                create(null, true);
+                mRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
             }
         }
 
@@ -433,7 +459,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             if (hasDelayed) {
 
-                create(null, true);
+                mRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
             }
         }
 
@@ -453,6 +479,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                     final SimpleQueue<InvocationObserver<INPUT, OUTPUT>> observers = mObservers;
 
                     if (isDelayed) {
+
+                        if (observers.isEmpty()) {
+
+                            return;
+                        }
 
                         invocationObserver = observers.removeFirst();
                     }

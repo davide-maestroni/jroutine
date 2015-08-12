@@ -26,6 +26,8 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
+import com.gh.bmd.jrt.invocation.MethodInvocation;
+import com.gh.bmd.jrt.invocation.MethodInvocationDecorator;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
@@ -185,19 +187,19 @@ class DefaultClassRoutineBuilder
     /**
      * Gets or creates the routine.
      *
-     * @param configuration the invocation configuration.
-     * @param shareGroup    the share group name.
-     * @param method        the method to wrap.
-     * @param inputMode     the input transfer mode.
-     * @param outputMode    the output transfer mode.
+     * @param invocationConfiguration the invocation configuration.
+     * @param proxyConfiguration      the proxy configuration.
+     * @param method                  the method to wrap.
+     * @param inputMode               the input transfer mode.
+     * @param outputMode              the output transfer mode.
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
-            @Nonnull final InvocationConfiguration configuration, @Nullable final String shareGroup,
-            @Nonnull final Method method, @Nullable final InputMode inputMode,
-            @Nullable final OutputMode outputMode) {
+            @Nonnull final InvocationConfiguration invocationConfiguration,
+            @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
+            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
         final Object target = (mTargetReference != null) ? mTargetReference.get() : mTargetClass;
 
@@ -218,27 +220,17 @@ class DefaultClassRoutineBuilder
                 routineCache.put(target, routineMap);
             }
 
-            final String methodShareGroup = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(configuration, method, methodShareGroup, inputMode, outputMode);
+                    new RoutineInfo(invocationConfiguration, proxyConfiguration, method, inputMode,
+                                    outputMode);
             Routine<?, ?> routine = routineMap.get(routineInfo);
 
             if (routine == null) {
 
-                final Object mutex;
-
-                if (!ShareGroup.NONE.equals(methodShareGroup)) {
-
-                    mutex = getSharedMutex(target, methodShareGroup);
-
-                } else {
-
-                    mutex = null;
-                }
-
                 final MethodInvocationFactory factory =
-                        new MethodInvocationFactory(target, method, mutex, inputMode, outputMode);
-                routine = new DefaultRoutine<Object, Object>(configuration, factory);
+                        new MethodInvocationFactory(proxyConfiguration, target, method, inputMode,
+                                                    outputMode);
+                routine = new DefaultRoutine<Object, Object>(invocationConfiguration, factory);
                 routineMap.put(routineInfo, routine);
             }
 
@@ -272,7 +264,7 @@ class DefaultClassRoutineBuilder
      * Returns a routine used to call the specified method.
      *
      * @param invocationConfiguration the invocation configuration.
-     * @param proxyConfiguration      the share configuration.
+     * @param proxyConfiguration      the proxy configuration.
      * @param targetMethod            the target method.
      * @return the routine.
      */
@@ -282,44 +274,49 @@ class DefaultClassRoutineBuilder
             @Nonnull final ProxyConfiguration proxyConfiguration,
             @Nonnull final Method targetMethod) {
 
-        String methodShareGroup = proxyConfiguration.getShareGroupOr(null);
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+        final InvocationConfiguration.Builder<InvocationConfiguration> invocationBuilder =
                 invocationConfiguration.builderFrom();
         final Priority priorityAnnotation = targetMethod.getAnnotation(Priority.class);
 
         if (priorityAnnotation != null) {
 
-            builder.withPriority(priorityAnnotation.value());
-        }
-
-        final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
-
-        if (shareGroupAnnotation != null) {
-
-            methodShareGroup = shareGroupAnnotation.value();
+            invocationBuilder.withPriority(priorityAnnotation.value());
         }
 
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
 
-            builder.withExecutionTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            invocationBuilder.withExecutionTimeout(timeoutAnnotation.value(),
+                                                   timeoutAnnotation.unit());
         }
 
         final TimeoutAction actionAnnotation = targetMethod.getAnnotation(TimeoutAction.class);
 
         if (actionAnnotation != null) {
 
-            builder.withExecutionTimeoutAction(actionAnnotation.value());
+            invocationBuilder.withExecutionTimeoutAction(actionAnnotation.value());
         }
 
-        return getRoutine(builder.set(), methodShareGroup, targetMethod, null, null);
+        final ProxyConfiguration.Builder<ProxyConfiguration> proxyBuilder =
+                proxyConfiguration.builderFrom();
+        final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
+
+        if (shareGroupAnnotation != null) {
+
+            proxyBuilder.withShareGroup(shareGroupAnnotation.value());
+        }
+
+        return getRoutine(invocationBuilder.set(), proxyBuilder.set(), targetMethod, null, null);
     }
 
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodFunctionInvocation extends FunctionInvocation<Object, Object> {
+    private static class MethodFunctionInvocation extends FunctionInvocation<Object, Object>
+            implements MethodInvocation<Object, Object> {
+
+        private final MethodInvocationDecorator mDecorator;
 
         private final InputMode mInputMode;
 
@@ -334,25 +331,37 @@ class DefaultClassRoutineBuilder
         /**
          * Constructor.
          *
-         * @param targetReference the reference to target object.
-         * @param method          the method to wrap.
-         * @param mutex           the mutex used for synchronization.
-         * @param inputMode       the input transfer mode.
-         * @param outputMode      the output transfer mode.
+         * @param proxyConfiguration the proxy configuration.
+         * @param targetReference    the reference to target object.
+         * @param method             the method to wrap.
+         * @param inputMode          the input transfer mode.
+         * @param outputMode         the output transfer mode.
          */
-        public MethodFunctionInvocation(@Nonnull final WeakReference<?> targetReference,
-                @Nonnull final Method method, @Nullable final Object mutex,
+        public MethodFunctionInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
+                @Nonnull final WeakReference<?> targetReference, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
+            final Object target = targetReference.get();
+            final String shareGroup = proxyConfiguration.getShareGroupOr(null);
+
+            if ((target != null) && !ShareGroup.NONE.equals(shareGroup)) {
+
+                mMutex = getSharedMutex(target, shareGroup);
+
+            } else {
+
+                mMutex = this;
+            }
+
+            mDecorator = proxyConfiguration.getMethodDecoratorOr(
+                    MethodInvocationDecorator.NO_DECORATION);
             mTargetReference = targetReference;
             mMethod = method;
-            mMutex = (mutex != null) ? mutex : this;
             mInputMode = inputMode;
             mOutputMode = outputMode;
         }
 
-        @Override
-        public void onCall(@Nonnull final List<?> objects,
+        public void onInvocation(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
             final Object target = mTargetReference.get();
@@ -363,6 +372,15 @@ class DefaultClassRoutineBuilder
             }
 
             callFromInvocation(mMethod, mMutex, target, objects, result, mInputMode, mOutputMode);
+        }
+
+        @Override
+        protected void onCall(@Nonnull final List<?> objects,
+                @Nonnull final ResultChannel<Object> result) {
+
+            final Method method = mMethod;
+            mDecorator.decorate(this, method.getName(), method.getParameterTypes())
+                      .onInvocation(objects, result);
         }
     }
 
@@ -375,28 +393,28 @@ class DefaultClassRoutineBuilder
 
         private final Method mMethod;
 
-        private final Object mMutex;
-
         private final OutputMode mOutputMode;
+
+        private final ProxyConfiguration mProxyConfiguration;
 
         private final WeakReference<?> mTargetReference;
 
         /**
          * Constructor.
          *
-         * @param target     the target object.
-         * @param method     the method to wrap.
-         * @param mutex      the mutex used for synchronization.
-         * @param inputMode  the input transfer mode.
-         * @param outputMode the output transfer mode.
+         * @param proxyConfiguration the proxy configuration.
+         * @param target             the target object.
+         * @param method             the method to wrap.
+         * @param inputMode          the input transfer mode.
+         * @param outputMode         the output transfer mode.
          */
-        public MethodInvocationFactory(@Nonnull final Object target, @Nonnull final Method method,
-                @Nullable final Object mutex, @Nullable final InputMode inputMode,
-                @Nullable final OutputMode outputMode) {
+        public MethodInvocationFactory(@Nonnull final ProxyConfiguration proxyConfiguration,
+                @Nonnull final Object target, @Nonnull final Method method,
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
+            mProxyConfiguration = proxyConfiguration;
             mTargetReference = new WeakReference<Object>(target);
             mMethod = method;
-            mMutex = (mutex != null) ? mutex : this;
             mInputMode = inputMode;
             mOutputMode = outputMode;
         }
@@ -404,8 +422,8 @@ class DefaultClassRoutineBuilder
         @Nonnull
         public Invocation<Object, Object> newInvocation() {
 
-            return new MethodFunctionInvocation(mTargetReference, mMethod, mMutex, mInputMode,
-                                                mOutputMode);
+            return new MethodFunctionInvocation(mProxyConfiguration, mTargetReference, mMethod,
+                                                mInputMode, mOutputMode);
         }
     }
 
@@ -414,32 +432,32 @@ class DefaultClassRoutineBuilder
      */
     private static final class RoutineInfo {
 
-        private final InvocationConfiguration mConfiguration;
-
         private final InputMode mInputMode;
+
+        private final InvocationConfiguration mInvocationConfiguration;
 
         private final Method mMethod;
 
         private final OutputMode mOutputMode;
 
-        private final String mShareGroup;
+        private final ProxyConfiguration mProxyConfiguration;
 
         /**
          * Constructor.
          *
-         * @param configuration the invocation configuration.
-         * @param method        the method to wrap.
-         * @param shareGroup    the group name.
-         * @param inputMode     the input transfer mode.
-         * @param outputMode    the output transfer mode.
+         * @param invocationConfiguration the invocation configuration.
+         * @param proxyConfiguration      the proxy configuration.
+         * @param method                  the method to wrap.
+         * @param inputMode               the input transfer mode.
+         * @param outputMode              the output transfer mode.
          */
-        public RoutineInfo(@Nonnull final InvocationConfiguration configuration,
-                @Nonnull final Method method, @Nonnull final String shareGroup,
+        public RoutineInfo(@Nonnull final InvocationConfiguration invocationConfiguration,
+                @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
+            mInvocationConfiguration = invocationConfiguration;
+            mProxyConfiguration = proxyConfiguration;
             mMethod = method;
-            mShareGroup = shareGroup;
-            mConfiguration = configuration;
             mInputMode = inputMode;
             mOutputMode = outputMode;
         }
@@ -448,11 +466,11 @@ class DefaultClassRoutineBuilder
         public int hashCode() {
 
             // auto-generated code
-            int result = mConfiguration.hashCode();
-            result = 31 * result + (mInputMode != null ? mInputMode.hashCode() : 0);
+            int result = mInputMode != null ? mInputMode.hashCode() : 0;
+            result = 31 * result + mInvocationConfiguration.hashCode();
             result = 31 * result + mMethod.hashCode();
             result = 31 * result + (mOutputMode != null ? mOutputMode.hashCode() : 0);
-            result = 31 * result + mShareGroup.hashCode();
+            result = 31 * result + mProxyConfiguration.hashCode();
             return result;
         }
 
@@ -471,9 +489,10 @@ class DefaultClassRoutineBuilder
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mInputMode == that.mInputMode
-                    && mMethod.equals(that.mMethod) && mOutputMode == that.mOutputMode
-                    && mShareGroup.equals(that.mShareGroup);
+            return mInputMode == that.mInputMode && mInvocationConfiguration.equals(
+                    that.mInvocationConfiguration) && mMethod.equals(that.mMethod)
+                    && mOutputMode == that.mOutputMode && mProxyConfiguration.equals(
+                    that.mProxyConfiguration);
         }
     }
 }

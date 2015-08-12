@@ -31,6 +31,8 @@ import javax.annotation.Nullable;
  */
 public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
+    private final DelegationType mDelegationType;
+
     private final Routine<INPUT, OUTPUT> mRoutine;
 
     private InvocationChannel<INPUT, OUTPUT> mChannel = null;
@@ -38,33 +40,43 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
     /**
      * Constructor.
      *
-     * @param routine the routine used to execute this invocation.
+     * @param routine        the routine used to execute this invocation.
+     * @param delegationType the type of routine invocation.
      */
     @SuppressWarnings("ConstantConditions")
-    public DelegatingInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+    public DelegatingInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine,
+            @Nonnull final DelegationType delegationType) {
 
         if (routine == null) {
 
             throw new NullPointerException("the routine must not be null");
         }
 
+        if (delegationType == null) {
+
+            throw new NullPointerException("the invocation type must not be null");
+        }
+
         mRoutine = routine;
+        mDelegationType = delegationType;
     }
 
     /**
      * Returns a factory of delegating invocations.
      *
-     * @param routine  the routine used to execute this invocation.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param routine        the routine used to execute this invocation.
+     * @param delegationType the type of routine invocation.
+     * @param <INPUT>        the input data type.
+     * @param <OUTPUT>       the output data type.
      * @return the factory.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryFrom(
-            @Nonnull final Routine<INPUT, OUTPUT> routine) {
+            @Nonnull final Routine<INPUT, OUTPUT> routine,
+            @Nonnull final DelegationType delegationType) {
 
-        return new DelegatingInvocationFactory<INPUT, OUTPUT>(routine);
+        return new DelegatingInvocationFactory<INPUT, OUTPUT>(routine, delegationType);
     }
 
     public void onAbort(@Nullable final RoutineException reason) {
@@ -79,7 +91,10 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
 
     public void onInitialize() {
 
-        mChannel = mRoutine.asyncInvoke();
+        final DelegationType delegationType = mDelegationType;
+        mChannel = (delegationType == DelegationType.SYNC) ? mRoutine.syncInvoke()
+                : (delegationType == DelegationType.ASYNC) ? mRoutine.asyncInvoke()
+                        : mRoutine.parallelInvoke();
     }
 
     public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
@@ -98,6 +113,16 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
     }
 
     /**
+     * Delegation type enumeration.
+     */
+    public enum DelegationType {
+
+        SYNC,       // synchronous
+        ASYNC,      // asynchronous
+        PARALLEL    // parallel
+    }
+
+    /**
      * Factory creating delegating invocation instances.
      *
      * @param <INPUT>  the input data type.
@@ -106,28 +131,38 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
     private static class DelegatingInvocationFactory<INPUT, OUTPUT>
             implements InvocationFactory<INPUT, OUTPUT> {
 
+        private final DelegationType mDelegationType;
+
         private final Routine<INPUT, OUTPUT> mRoutine;
 
         /**
          * Constructor.
          *
-         * @param routine the delegated routine.
+         * @param routine        the delegated routine.
+         * @param delegationType the type of routine invocation.
          */
         @SuppressWarnings("ConstantConditions")
-        private DelegatingInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+        private DelegatingInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine,
+                @Nonnull final DelegationType delegationType) {
 
             if (routine == null) {
 
                 throw new NullPointerException("the routine must not be null");
             }
 
+            if (delegationType == null) {
+
+                throw new NullPointerException("the invocation type must not be null");
+            }
+
             mRoutine = routine;
+            mDelegationType = delegationType;
         }
 
         @Nonnull
         public Invocation<INPUT, OUTPUT> newInvocation() {
 
-            return new DelegatingInvocation<INPUT, OUTPUT>(mRoutine);
+            return new DelegatingInvocation<INPUT, OUTPUT>(mRoutine, mDelegationType);
         }
     }
 }

@@ -198,39 +198,43 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
 
-            String shareGroup = mProxyConfiguration.getShareGroupOr(null);
             final InvocationConfiguration configuration = mInvocationConfiguration;
-            final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+            final InvocationConfiguration.Builder<InvocationConfiguration> invocationBuilder =
                     configuration.builderFrom();
             final Priority priorityAnnotation = method.getAnnotation(Priority.class);
 
             if (priorityAnnotation != null) {
 
-                builder.withPriority(priorityAnnotation.value());
-            }
-
-            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
-
-            if (shareGroupAnnotation != null) {
-
-                shareGroup = shareGroupAnnotation.value();
+                invocationBuilder.withPriority(priorityAnnotation.value());
             }
 
             final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
             if (timeoutAnnotation != null) {
 
-                builder.withExecutionTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+                invocationBuilder.withExecutionTimeout(timeoutAnnotation.value(),
+                                                       timeoutAnnotation.unit());
             }
 
             final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
 
             if (actionAnnotation != null) {
 
-                builder.withExecutionTimeoutAction(actionAnnotation.value());
+                invocationBuilder.withExecutionTimeoutAction(actionAnnotation.value());
             }
 
-            return getRoutine(builder.set(), shareGroup, targetMethod, inputMode, outputMode);
+            final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
+            final ProxyConfiguration.Builder<ProxyConfiguration> proxyBuilder =
+                    proxyConfiguration.builderFrom();
+            final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+
+            if (shareGroupAnnotation != null) {
+
+                proxyBuilder.withShareGroup(shareGroupAnnotation.value());
+            }
+
+            return getRoutine(invocationBuilder.set(), proxyBuilder.set(), targetMethod, inputMode,
+                              outputMode);
         }
     }
 }

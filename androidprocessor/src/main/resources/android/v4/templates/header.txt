@@ -105,18 +105,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         return target;
     }
 
-    @javax.annotation.Nullable
-    private static Object getMutex(@javax.annotation.Nonnull final Object target,
-            @javax.annotation.Nullable final String shareGroup) {
-
-        if (com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
-
-            return null;
-        }
-
-        return com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
-    }
-
     private static class LoaderProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {
 
         private final com.gh.bmd.jrt.android.v4.core.RoutineContext mContext;

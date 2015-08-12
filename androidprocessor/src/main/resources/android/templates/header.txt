@@ -22,8 +22,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private final Object[] mFactoryArgs;
 
-    private final String mShareGroup;
-
     private final Class<?> mTargetClass;
 
     @SuppressWarnings("ConstantConditions")
@@ -47,7 +45,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         mContext = context;
         mTargetClass = targetClass;
         mFactoryArgs = (factoryArgs != null) ? factoryArgs : com.gh.bmd.jrt.util.Reflection.NO_ARGS;
-        mShareGroup = proxyConfiguration.getShareGroupOr(com.gh.bmd.jrt.annotation.ShareGroup.ALL);
         ${routineFieldsInit}
     }
 
@@ -96,18 +93,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         return target;
-    }
-
-    @javax.annotation.Nullable
-    private static Object getMutex(@javax.annotation.Nonnull final Object target,
-            @javax.annotation.Nullable final String shareGroup) {
-
-        if (com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
-
-            return null;
-        }
-
-        return com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
     }
 
     private static class ServiceProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {

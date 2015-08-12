@@ -39,6 +39,7 @@ import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
@@ -319,7 +320,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(getActivity()), PassingContextInvocation.factoryOf())
                         .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, "test_routine");
+                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.SYNC,
+                                                        "test_routine");
         final Routine<Object, Object> routine2 =
                 JRoutine.on(contextFrom(getActivity()), factory).buildRoutine();
 
@@ -904,7 +906,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(fragment), PassingContextInvocation.factoryOf())
                         .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, "test_routine");
+                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.ASYNC,
+                                                        "test_routine");
         final Routine<Object, Object> routine2 =
                 JRoutine.on(contextFrom(fragment), factory).buildRoutine();
 
@@ -1522,7 +1525,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             extends FunctionContextInvocation<String, String> {
 
         @Override
-        public void onCall(@Nonnull final List<? extends String> strings,
+        protected void onCall(@Nonnull final List<? extends String> strings,
                 @Nonnull final ResultChannel<String> result) {
 
             result.pass(strings);

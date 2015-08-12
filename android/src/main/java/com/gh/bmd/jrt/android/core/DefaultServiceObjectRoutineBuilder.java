@@ -237,7 +237,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{targetClass.getName(), mFactoryArgs, shareGroup, name};
-        return JRoutine.on(mContext, new AliasMethodToken<INPUT, OUTPUT>(), args)
+        return JRoutine.on(mContext, new MethodAliasToken<INPUT, OUTPUT>(), args)
                        .invocations()
                        .with(configurationWithAnnotations(invocationConfiguration, targetMethod))
                        .set()
@@ -363,7 +363,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class AliasMethodInvocation<INPUT, OUTPUT>
+    private static class MethodAliasInvocation<INPUT, OUTPUT>
             extends FunctionContextInvocation<INPUT, OUTPUT> {
 
         private final String mAliasName;
@@ -387,7 +387,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param name            the alias name.
          */
         @SuppressWarnings("unchecked")
-        public AliasMethodInvocation(@Nonnull final String targetClassName,
+        public MethodAliasInvocation(@Nonnull final String targetClassName,
                 @Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final String name) throws ClassNotFoundException {
 
@@ -395,18 +395,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mArgs = args;
             mShareGroup = shareGroup;
             mAliasName = name;
-        }
-
-        @Override
-        public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                @Nonnull final ResultChannel<OUTPUT> result) {
-
-            if (mTarget == null) {
-
-                throw new IllegalStateException("such error should never happen");
-            }
-
-            result.pass(mRoutine.syncCall(inputs));
         }
 
         @Override
@@ -433,16 +421,28 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 throw new InvocationException(t);
             }
         }
+
+        @Override
+        protected void onCall(@Nonnull final List<? extends INPUT> inputs,
+                @Nonnull final ResultChannel<OUTPUT> result) {
+
+            if (mTarget == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
+            result.pass(mRoutine.syncCall(inputs));
+        }
     }
 
     /**
-     * Class token of a {@link AliasMethodInvocation AliasMethodInvocation}.
+     * Class token of a {@link MethodAliasInvocation MethodAliasInvocation}.
      *
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      */
-    private static class AliasMethodToken<INPUT, OUTPUT>
-            extends ClassToken<AliasMethodInvocation<INPUT, OUTPUT>> {
+    private static class MethodAliasToken<INPUT, OUTPUT>
+            extends ClassToken<MethodAliasInvocation<INPUT, OUTPUT>> {
 
     }
 
@@ -493,7 +493,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onCall(@Nonnull final List<? extends INPUT> inputs,
+        protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
             if (mTarget == null) {
@@ -593,8 +593,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        @SuppressWarnings("SynchronizeOnNonFinalField")
-        public void onCall(@Nonnull final List<?> objects,
+        protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
             callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,

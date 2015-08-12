@@ -13,8 +13,12 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.invocation.MethodInvocationDecorator;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.gh.bmd.jrt.util.Reflection.isStaticClass;
 
 /**
  * Class storing the proxy configuration.
@@ -41,14 +45,19 @@ public final class ProxyConfiguration {
 
     private final String mGroupName;
 
+    private final MethodInvocationDecorator mMethodDecorator;
+
     /**
      * Constructor.
      *
-     * @param groupName the share group name.
+     * @param groupName       the share group name.
+     * @param methodDecorator the method invocation decorator.
      */
-    private ProxyConfiguration(@Nullable final String groupName) {
+    private ProxyConfiguration(@Nullable final String groupName,
+            @Nullable final MethodInvocationDecorator methodDecorator) {
 
         mGroupName = groupName;
+        mMethodDecorator = methodDecorator;
     }
 
     /**
@@ -82,9 +91,22 @@ public final class ProxyConfiguration {
      * @return the builder.
      */
     @Nonnull
-    public Builder builderFrom() {
+    public Builder<ProxyConfiguration> builderFrom() {
 
         return builderFrom(this);
+    }
+
+    /**
+     * Returns the method invocation decorator (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the method decorator.
+     */
+    public MethodInvocationDecorator getMethodDecoratorOr(
+            @Nullable final MethodInvocationDecorator valueIfNotSet) {
+
+        final MethodInvocationDecorator methodDecorator = mMethodDecorator;
+        return (methodDecorator != null) ? methodDecorator : valueIfNotSet;
     }
 
     /**
@@ -103,7 +125,9 @@ public final class ProxyConfiguration {
     public int hashCode() {
 
         // auto-generated code
-        return mGroupName != null ? mGroupName.hashCode() : 0;
+        int result = mGroupName != null ? mGroupName.hashCode() : 0;
+        result = 31 * result + (mMethodDecorator != null ? mMethodDecorator.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -121,8 +145,9 @@ public final class ProxyConfiguration {
         }
 
         final ProxyConfiguration that = (ProxyConfiguration) o;
-        return !(mGroupName != null ? !mGroupName.equals(that.mGroupName)
-                : that.mGroupName != null);
+        return !(mGroupName != null ? !mGroupName.equals(that.mGroupName) : that.mGroupName != null)
+                && !(mMethodDecorator != null ? !mMethodDecorator.equals(that.mMethodDecorator)
+                : that.mMethodDecorator != null);
     }
 
     @Override
@@ -130,6 +155,7 @@ public final class ProxyConfiguration {
 
         return "ProxyConfiguration{" +
                 "mGroupName='" + mGroupName + '\'' +
+                ", mMethodDecorator=" + mMethodDecorator +
                 '}';
     }
 
@@ -160,6 +186,8 @@ public final class ProxyConfiguration {
         private final Configurable<? extends TYPE> mConfigurable;
 
         private String mGroupName;
+
+        private MethodInvocationDecorator mMethodDecorator;
 
         /**
          * Constructor.
@@ -231,6 +259,36 @@ public final class ProxyConfiguration {
                 withShareGroup(groupName);
             }
 
+            final MethodInvocationDecorator methodDecorator = configuration.mMethodDecorator;
+
+            if (methodDecorator != null) {
+
+                withMethodDecorator(methodDecorator);
+            }
+
+            return this;
+        }
+
+        /**
+         * Sets the invocation decorator instance. A null value means that no decoration is applied.
+         *
+         * @param methodDecorator the method invocation decorator.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation
+         *                                            decorator is not static.
+         */
+        @Nonnull
+        public Builder<TYPE> withMethodDecorator(
+                @Nullable final MethodInvocationDecorator methodDecorator) {
+
+            if ((methodDecorator != null) && !isStaticClass(methodDecorator.getClass())) {
+
+                throw new IllegalArgumentException(
+                        "the routine decorator class must be static: " + methodDecorator.getClass()
+                                                                                        .getName());
+            }
+
+            mMethodDecorator = methodDecorator;
             return this;
         }
 
@@ -251,7 +309,7 @@ public final class ProxyConfiguration {
         @Nonnull
         private ProxyConfiguration buildConfiguration() {
 
-            return new ProxyConfiguration(mGroupName);
+            return new ProxyConfiguration(mGroupName, mMethodDecorator);
         }
 
         private void setConfiguration(@Nonnull final ProxyConfiguration configuration) {

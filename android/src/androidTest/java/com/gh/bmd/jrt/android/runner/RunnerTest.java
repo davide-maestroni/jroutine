@@ -214,7 +214,7 @@ public class RunnerTest extends AndroidTestCase {
             return new FunctionInvocation<Object, Object>() {
 
                 @Override
-                public void onCall(@Nonnull final List<?> objects,
+                protected void onCall(@Nonnull final List<?> objects,
                         @Nonnull final ResultChannel<Object> result) {
 
                     try {

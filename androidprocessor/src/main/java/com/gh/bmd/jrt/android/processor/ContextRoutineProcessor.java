@@ -104,11 +104,13 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             if (annotationElement == serviceProxyElement) {
 
-                builder.append("(invocationConfiguration, serviceConfiguration);");
+                builder.append(
+                        "(invocationConfiguration, proxyConfiguration, serviceConfiguration);");
 
             } else {
 
-                builder.append("(invocationConfiguration, loaderConfiguration);");
+                builder.append(
+                        "(invocationConfiguration, proxyConfiguration, loaderConfiguration);");
             }
 
             builder.append(NEW_LINE);

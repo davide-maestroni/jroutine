@@ -19,9 +19,10 @@
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, mTargetClass, mFactoryArgs, ${shareGroup})
+        return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, null, ${shareGroup}, mTargetClass, mFactoryArgs)
                                            .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}

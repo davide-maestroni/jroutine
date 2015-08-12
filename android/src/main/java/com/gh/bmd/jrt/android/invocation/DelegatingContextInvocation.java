@@ -34,27 +34,31 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
     /**
      * Constructor.
      *
-     * @param routine the routine used to execute this invocation.
+     * @param routine        the routine used to execute this invocation.
+     * @param delegationType the type of routine invocation.
      */
-    public DelegatingContextInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+    public DelegatingContextInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine,
+            @Nonnull final DelegationType delegationType) {
 
-        super(routine);
+        super(routine, delegationType);
     }
 
     /**
      * Returns a factory of delegating invocations.
      *
-     * @param routine  the routine used to execute this invocation.
-     * @param tag      the tag used to identify the routine.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param routine        the routine used to execute this invocation.
+     * @param delegationType the type of routine invocation.
+     * @param tags           the objects used to uniquely identify the routine.
+     * @param <INPUT>        the input data type.
+     * @param <OUTPUT>       the output data type.
      * @return the factory.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryFrom(
-            @Nonnull final Routine<INPUT, OUTPUT> routine, @Nonnull final String tag) {
+            @Nonnull final Routine<INPUT, OUTPUT> routine,
+            @Nonnull final DelegationType delegationType, @Nonnull final Object... tags) {
 
-        return new DelegatingContextInvocationFactory<INPUT, OUTPUT>(routine, tag);
+        return new DelegatingContextInvocationFactory<INPUT, OUTPUT>(routine, delegationType, tags);
     }
 
     public void onContext(@Nonnull final Context context) {
@@ -70,37 +74,46 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
     private static class DelegatingContextInvocationFactory<INPUT, OUTPUT>
             extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
 
+        private final DelegationType mDelegationType;
+
         private final Routine<INPUT, OUTPUT> mRoutine;
 
         /**
          * Constructor.
          *
-         * @param routine the delegated routine.
-         * @param tag     the routine tag.
+         * @param routine        the delegated routine.
+         * @param delegationType the type of routine invocation.
+         * @param tags           the routine tags.
          */
         @SuppressWarnings("ConstantConditions")
         private DelegatingContextInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine,
-                @Nonnull final String tag) {
+                @Nonnull final DelegationType delegationType, @Nonnull final Object[] tags) {
 
-            super(tag);
+            super(delegationType, tags);
 
             if (routine == null) {
 
                 throw new NullPointerException("the routine must not be null");
             }
 
-            if (tag == null) {
+            if (delegationType == null) {
 
-                throw new NullPointerException("the routine tag must not be null");
+                throw new NullPointerException("the invocation type must not be null");
+            }
+
+            if ((tags == null) || (tags.length == 0)) {
+
+                throw new NullPointerException("the routine tag must not be empty");
             }
 
             mRoutine = routine;
+            mDelegationType = delegationType;
         }
 
         @Nonnull
         public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
-            return new DelegatingContextInvocation<INPUT, OUTPUT>(mRoutine);
+            return new DelegatingContextInvocation<INPUT, OUTPUT>(mRoutine, mDelegationType);
         }
     }
 }

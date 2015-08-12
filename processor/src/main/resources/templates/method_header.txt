@@ -18,33 +18,34 @@
 
     private static class InvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
 
-        private final Object mMutex;
+        private final com.gh.bmd.jrt.builder.ProxyConfiguration mProxyConfiguration;
 
         private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
         private InvocationFactory${methodCount}(
-                @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped,
-                @javax.annotation.Nullable final Object mutex) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
+                @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped) {
 
+            mProxyConfiguration = proxyConfiguration;
             mWrapped = wrapped;
-            mMutex = mutex;
         }
 
         @javax.annotation.Nonnull
-        @SuppressWarnings("unchecked")
         public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
 
-            return new Invocation${methodCount}${genericTypes}(mWrapped, mMutex);
+            return new Invocation${methodCount}${genericTypes}(mProxyConfiguration, mWrapped);
         }
     }
 
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration configuration) {
+            @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(mWrapped, getMutex(${shareGroup})))
+        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, wrapped))
                                            .invocations()
-                                           .with(configuration)
+                                           .with(invocationConfiguration)
                                            ${routineBuilderOptions}
                                            .set()
                                            .buildRoutine();

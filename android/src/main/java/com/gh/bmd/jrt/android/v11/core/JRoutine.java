@@ -33,12 +33,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * in the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will be dispatched on the configured looper thread, no matter the calling one
  * was, so that, waiting for the outputs right after the routine invocation, may result in a
- * deadlock.
+ * deadlock.<br/>
+ * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
+ * prevent out of memory errors.
  * <p/>
- * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
- * objects and the invocation factory, might be employed to check for clashing of invocation
- * instances or compute the loader ID.<br/>
- * In case the caller cannot guarantee the correct behavior of the aforementioned method
+ * The <code>equals()</code> and <code>hashCode()</code> methods of the input parameter objects and
+ * the invocation factory, might be employed to check for clashing of invocation instances or
+ * compute the loader ID.<br/>
+ * In case the caller could not guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or an input independent clash resolution should be used in
  * order to avoid unexpected results.
  * <p/>

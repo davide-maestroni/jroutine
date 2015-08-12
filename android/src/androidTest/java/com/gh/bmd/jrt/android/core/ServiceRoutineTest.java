@@ -547,7 +547,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
             extends FunctionContextInvocation<String, String> {
 
         @Override
-        public void onCall(@Nonnull final List<? extends String> strings,
+        protected void onCall(@Nonnull final List<? extends String> strings,
                 @Nonnull final ResultChannel<String> result) {
 
             result.pass(strings);

@@ -15,7 +15,7 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
     @SuppressWarnings({"unchecked", "RedundantCast"})
-    public void ${methodName}(${paramTypes}) {
+    public void ${methodName}(${paramVars}) {
 
         final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
         $$routine.${invokeMethod}()${inputParams}.result().checkComplete();

@@ -39,6 +39,7 @@ import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.gh.bmd.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.gh.bmd.jrt.core.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.invocation.DelegatingInvocation;
+import com.gh.bmd.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
@@ -415,7 +416,7 @@ public class RoutineTest {
                 new FunctionInvocation<Integer, Integer>() {
 
                     @Override
-                    public void onCall(@Nonnull final List<? extends Integer> integers,
+                    protected void onCall(@Nonnull final List<? extends Integer> integers,
                             @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
@@ -462,7 +463,7 @@ public class RoutineTest {
                 new FunctionInvocation<Integer, Integer>() {
 
                     @Override
-                    public void onCall(@Nonnull final List<? extends Integer> integers,
+                    protected void onCall(@Nonnull final List<? extends Integer> integers,
                             @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
@@ -855,7 +856,8 @@ public class RoutineTest {
         final Routine<Object, Object> routine1 =
                 JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
         final Routine<Object, Object> routine2 =
-                JRoutine.on(DelegatingInvocation.factoryFrom(routine1)).buildRoutine();
+                JRoutine.on(DelegatingInvocation.factoryFrom(routine1, DelegationType.SYNC))
+                        .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
 
@@ -875,7 +877,8 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(TestDestroy.class)).buildRoutine();
         final Routine<String, String> routine4 =
-                JRoutine.on(DelegatingInvocation.factoryFrom(routine3)).buildRoutine();
+                JRoutine.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.ASYNC))
+                        .buildRoutine();
 
         assertThat(routine4.asyncCall("test4").afterMax(timeout).all()).containsExactly("test4");
         routine4.purge();
@@ -888,7 +891,18 @@ public class RoutineTest {
 
         try {
 
-            DelegatingInvocation.factoryFrom(null);
+            DelegatingInvocation.factoryFrom(null, DelegationType.SYNC);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            DelegatingInvocation.factoryFrom(
+                    JRoutine.on(PassingInvocation.factoryOf()).buildRoutine(), null);
 
             fail();
 
@@ -1773,7 +1787,7 @@ public class RoutineTest {
                 JRoutine.on(factoryOf(new FunctionInvocation<String, String>() {
 
                     @Override
-                    public void onCall(@Nonnull final List<? extends String> strings,
+                    protected void onCall(@Nonnull final List<? extends String> strings,
                             @Nonnull final ResultChannel<String> result) {
 
                         result.pass(strings);
@@ -1799,7 +1813,7 @@ public class RoutineTest {
                 JRoutine.on(factoryOf(new FunctionInvocation<String, String>() {
 
                     @Override
-                    public void onCall(@Nonnull final List<? extends String> strings,
+                    protected void onCall(@Nonnull final List<? extends String> strings,
                             @Nonnull final ResultChannel<String> result) {
 
                         result.pass(strings.toArray(new String[strings.size()]));
@@ -2317,7 +2331,7 @@ public class RoutineTest {
                 new FunctionInvocation<Integer, Integer>() {
 
                     @Override
-                    public void onCall(@Nonnull final List<? extends Integer> integers,
+                    protected void onCall(@Nonnull final List<? extends Integer> integers,
                             @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;

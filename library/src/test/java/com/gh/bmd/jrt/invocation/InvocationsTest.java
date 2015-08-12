@@ -14,6 +14,8 @@
 package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.core.JRoutine;
+import com.gh.bmd.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
 
@@ -115,7 +117,18 @@ public class InvocationsTest {
 
         try {
 
-            new DelegatingInvocation<Object, Object>(null);
+            new DelegatingInvocation<Object, Object>(null, DelegationType.ASYNC);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DelegatingInvocation<Object, Object>(
+                    JRoutine.on(Invocations.factoryOf(TestInvocation.class)), null);
 
             fail();
 

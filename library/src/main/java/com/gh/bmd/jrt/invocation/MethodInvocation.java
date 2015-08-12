@@ -13,26 +13,27 @@
  */
 package com.gh.bmd.jrt.invocation;
 
+import com.gh.bmd.jrt.channel.ResultChannel;
+
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 /**
- * Invocation factory interface.
+ * Interface defining a method invocation through a routine instance.
  * <p/>
- * Created by davide-maestroni on 2/12/15.
+ * Created by davide-maestroni on 12/08/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface InvocationFactory<INPUT, OUTPUT> {
+public interface MethodInvocation<INPUT, OUTPUT> {
 
     /**
-     * Creates and return a new invocation instance.<br/>
-     * A proper implementation will return a new invocation instance each time it is called, unless
-     * the returned object is immutable and does not cause any side effect.<br/>
-     * Any behavior other than that may lead to unexpected results.
+     * Called when the method is invoked.
      *
-     * @return the invocation instance.
+     * @param inputs the input list.
+     * @param result the result channel.
      */
-    @Nonnull
-    Invocation<INPUT, OUTPUT> newInvocation();
+    void onInvocation(@Nonnull List<? extends INPUT> inputs, @Nonnull ResultChannel<OUTPUT> result);
 }

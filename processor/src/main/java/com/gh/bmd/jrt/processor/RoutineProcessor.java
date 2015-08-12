@@ -75,6 +75,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class RoutineProcessor extends AbstractProcessor {
 
+    // TODO: 12/08/15 split method_invocation and method_invocation_header templates
+
     protected static final String NEW_LINE = System.getProperty("line.separator");
 
     private static final boolean DEBUG = false;
@@ -379,33 +381,6 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
-     * Builds the string used to replace "${paramTypes}" in the template.
-     *
-     * @param methodElement the method element.
-     * @return the string.
-     */
-    @Nonnull
-    protected String buildParamTypes(@Nonnull final ExecutableElement methodElement) {
-
-        final StringBuilder builder = new StringBuilder();
-
-        for (final VariableElement variableElement : methodElement.getParameters()) {
-
-            if (builder.length() > 0) {
-
-                builder.append(", ");
-            }
-
-            builder.append("final ")
-                   .append(variableElement.asType())
-                   .append(" ")
-                   .append(variableElement);
-        }
-
-        return builder.toString();
-    }
-
-    /**
      * Builds the string used to replace "${paramValues}" in the template.
      *
      * @param targetMethodElement the target method element.
@@ -429,6 +404,33 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(") objects.get(")
                    .append(count++)
                    .append(")");
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Builds the string used to replace "${paramVars}" in the template.
+     *
+     * @param methodElement the method element.
+     * @return the string.
+     */
+    @Nonnull
+    protected String buildParamVars(@Nonnull final ExecutableElement methodElement) {
+
+        final StringBuilder builder = new StringBuilder();
+
+        for (final VariableElement variableElement : methodElement.getParameters()) {
+
+            if (builder.length() > 0) {
+
+                builder.append(", ");
+            }
+
+            builder.append("final ")
+                   .append(variableElement.asType())
+                   .append(" ")
+                   .append(variableElement);
         }
 
         return builder.toString();
@@ -476,7 +478,7 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(" = ")
                    .append("initRoutine")
                    .append(i)
-                   .append("(invocationConfiguration);")
+                   .append("(wrapped, invocationConfiguration, proxyConfiguration);")
                    .append(NEW_LINE);
         }
 
@@ -519,6 +521,28 @@ public class RoutineProcessor extends AbstractProcessor {
         } else {
 
             builder.append(returnType).append("[$$size]");
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Builds the string used to replace "${targetMethodParamTypes}" in the template.
+     *
+     * @param targetMethodElement the target method element.
+     * @return the string.
+     */
+    @Nonnull
+    protected String buildTargetParamTypes(final ExecutableElement targetMethodElement) {
+
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final StringBuilder builder = new StringBuilder();
+
+        for (final VariableElement variableElement : targetMethodElement.getParameters()) {
+
+            builder.append(", ")
+                   .append(typeUtils.erasure(variableElement.asType()))
+                   .append(".class");
         }
 
         return builder.toString();
@@ -1968,7 +1992,6 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
                                             buildRoutineOptions(methodElement));
-
         final ShareGroup shareGroupAnnotation = methodElement.getAnnotation(ShareGroup.class);
 
         if (shareGroupAnnotation != null) {
@@ -1978,7 +2001,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else {
 
-            methodHeader = methodHeader.replace("${shareGroup}", "mShareGroup");
+            methodHeader = methodHeader.replace("${shareGroup}",
+                                                "proxyConfiguration.getShareGroupOr(null)");
         }
 
         writer.append(methodHeader);
@@ -1989,7 +2013,7 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${methodCount}", Integer.toString(count));
         method = method.replace("${methodName}", methodElement.getSimpleName());
         method = method.replace("${params}", buildParams(methodElement));
-        method = method.replace("${paramTypes}", buildParamTypes(methodElement));
+        method = method.replace("${paramVars}", buildParamVars(methodElement));
         method = method.replace("${inputOptions}", buildInputOptions(methodElement, inputMode));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
         method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
@@ -2025,9 +2049,21 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocation = methodInvocation.replace("${resultClassName}", resultClassName);
         methodInvocation = methodInvocation.replace("${methodCount}", Integer.toString(count));
         methodInvocation = methodInvocation.replace("${genericTypes}", buildGenericTypes(element));
-        methodInvocation = methodInvocation.replace("${methodName}", methodElement.getSimpleName());
         methodInvocation =
                 methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
+        methodInvocation = methodInvocation.replace("${targetMethodParamTypes}",
+                                                    buildTargetParamTypes(targetMethod));
+
+        if (shareGroupAnnotation != null) {
+
+            methodInvocation = methodInvocation.replace("${shareGroup}",
+                                                        "\"" + shareGroupAnnotation.value() + "\"");
+
+        } else {
+
+            methodInvocation = methodInvocation.replace("${shareGroup}",
+                                                        "proxyConfiguration.getShareGroupOr(null)");
+        }
 
         if (inputMode == InputMode.COLLECTION) {
 

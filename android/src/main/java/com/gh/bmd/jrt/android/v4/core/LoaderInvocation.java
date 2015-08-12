@@ -412,7 +412,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
     @SuppressWarnings("unchecked")
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
             justification = "class comparison with == is done")
-    public void onCall(@Nonnull final List<? extends INPUT> inputs,
+    protected void onCall(@Nonnull final List<? extends INPUT> inputs,
             @Nonnull final ResultChannel<OUTPUT> result) {
 
         final RoutineContext context = mContext;

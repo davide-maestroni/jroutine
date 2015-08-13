@@ -64,6 +64,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private String mMethodInvocationCollection;
 
+    private String mMethodInvocationFooter;
+
+    private String mMethodInvocationHeader;
+
     private String mMethodInvocationVoid;
 
     private TypeElement mServiceProxyElement;
@@ -241,6 +245,34 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         }
 
         return mMethodInvocationCollection;
+    }
+
+    @Nonnull
+    @Override
+    protected String getMethodInvocationFooterTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodInvocationFooter == null) {
+
+            mMethodInvocationFooter =
+                    parseTemplate("/android/templates/method_invocation_footer.txt");
+        }
+
+        return mMethodInvocationFooter;
+    }
+
+    @Nonnull
+    @Override
+    protected String getMethodInvocationHeaderTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodInvocationHeader == null) {
+
+            mMethodInvocationHeader =
+                    parseTemplate("/android/templates/method_invocation_header.txt");
+        }
+
+        return mMethodInvocationHeader;
     }
 
     @Nonnull

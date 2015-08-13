@@ -14,82 +14,6 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}>
-            implements com.gh.bmd.jrt.invocation.MethodInvocation<Object, ${resultClassName}> {
-
-        private final com.gh.bmd.jrt.invocation.MethodInvocationDecorator mDecorator;
-
-        private final Object[] mFactoryArgs;
-
-        private final com.gh.bmd.jrt.builder.ProxyConfiguration mProxyConfiguration;
-
-        private final Class<?> mTargetClass;
-
-        private Object mMutex = this;
-
-        private ${classFullName} mTarget;
-
-        private ContextInvocation${methodCount}(@javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] factoryArgs) {
-
-            mDecorator = proxyConfiguration.getMethodDecoratorOr(
-                    com.gh.bmd.jrt.invocation.MethodInvocationDecorator.NO_DECORATION);
-            mProxyConfiguration = proxyConfiguration;
-            mTargetClass = targetClass;
-            mFactoryArgs = factoryArgs;
-        }
-
-        private ContextInvocation${methodCount}(@javax.annotation.Nullable final String decoratorClassName, @javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] factoryArgs) {
-
-            try {
-
-                mDecorator = (decoratorClassName != null) ? (com.gh.bmd.jrt.invocation.MethodInvocationDecorator) Class.forName(decoratorClassName).newInstance() :
-                        com.gh.bmd.jrt.invocation.MethodInvocationDecorator.NO_DECORATION;
-
-            } catch (final com.gh.bmd.jrt.channel.RoutineException e) {
-
-                throw e;
-
-            } catch (final Throwable t) {
-
-                throw new com.gh.bmd.jrt.invocation.InvocationException(t);
-            }
-
-            mProxyConfiguration = com.gh.bmd.jrt.builder.ProxyConfiguration.builder().withShareGroup(shareGroup).set();
-            mTargetClass = targetClass;
-            mFactoryArgs = factoryArgs;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public void onContext(@javax.annotation.Nonnull final android.content.Context context) {
-
-            super.onContext(context);
-
-            try {
-
-                final ${classFullName} target = (${classFullName}) getInstance(context, mTargetClass, mFactoryArgs);
-                final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration = mProxyConfiguration;
-                final String shareGroup = ${shareGroup};
-
-                if (!com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
-
-                    mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
-                }
-
-                mTarget = target;
-
-            } catch (final com.gh.bmd.jrt.channel.RoutineException e) {
-
-                throw e;
-
-            } catch (final Throwable t) {
-
-                throw new com.gh.bmd.jrt.invocation.InvocationException(t);
-            }
-        }
-
         @SuppressWarnings({"unchecked", "SynchronizeOnNonFinalField"})
         public void onInvocation(@javax.annotation.Nonnull final java.util.List<?> objects,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
@@ -130,12 +54,3 @@
                 }
             }
         }
-
-        @Override
-        protected void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
-
-            mDecorator.decorate(this, "${targetMethodName}"${targetMethodParamTypes})
-                      .onInvocation(objects, result);
-        }
-    }

@@ -40,7 +40,7 @@ class QueuedRunner implements Runner {
 
     public boolean isExecutionThread() {
 
-        return false;
+        return true;
     }
 
     public void run(@Nonnull final Execution execution, final long delay,

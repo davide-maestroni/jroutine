@@ -124,6 +124,6 @@ public @interface Input {
          * input mode, it is chosen the latter; finally the PARALLEL input mode conditions are
          * checked.
          */
-        AUTO
+        AUTO // TODO: 13/08/15 remove?
     }
 }

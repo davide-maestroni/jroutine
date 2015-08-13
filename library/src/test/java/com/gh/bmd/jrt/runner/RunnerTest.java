@@ -254,7 +254,7 @@ public class RunnerTest {
 
         final TestExecution execution = new TestExecution();
         Runner runner = Runners.throttlingRunner(Runners.queuedRunner(), 1);
-        assertThat(runner.isExecutionThread()).isFalse();
+        assertThat(runner.isExecutionThread()).isTrue();
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         assertThat(execution.isRun()).isTrue();
         execution.reset();

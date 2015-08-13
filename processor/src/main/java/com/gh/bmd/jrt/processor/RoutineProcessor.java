@@ -75,8 +75,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class RoutineProcessor extends AbstractProcessor {
 
-    // TODO: 12/08/15 split method_invocation and method_invocation_header templates
-
     protected static final String NEW_LINE = System.getProperty("line.separator");
 
     private static final boolean DEBUG = false;
@@ -114,6 +112,10 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodInvocation;
 
     private String mMethodInvocationCollection;
+
+    private String mMethodInvocationFooter;
+
+    private String mMethodInvocationHeader;
 
     private String mMethodInvocationVoid;
 
@@ -1198,6 +1200,48 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
+    protected String getMethodInvocationFooterTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodInvocationFooter == null) {
+
+            mMethodInvocationFooter = parseTemplate("/templates/method_invocation_footer.txt");
+        }
+
+        return mMethodInvocationFooter;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodInvocationHeaderTemplate(
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+
+        if (mMethodInvocationHeader == null) {
+
+            mMethodInvocationHeader = parseTemplate("/templates/method_invocation_header.txt");
+        }
+
+        return mMethodInvocationHeader;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
     protected String getMethodInvocationTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
 
@@ -2021,6 +2065,30 @@ public class RoutineProcessor extends AbstractProcessor {
                                 (inputMode == InputMode.PARALLEL) ? "parallelInvoke"
                                         : "asyncInvoke");
         writer.append(method);
+        String methodInvocationHeader;
+        methodInvocationHeader = getMethodInvocationHeaderTemplate(methodElement, count);
+        methodInvocationHeader = methodInvocationHeader.replace("${classFullName}",
+                                                                targetElement.asType().toString());
+        methodInvocationHeader =
+                methodInvocationHeader.replace("${resultClassName}", resultClassName);
+        methodInvocationHeader =
+                methodInvocationHeader.replace("${methodCount}", Integer.toString(count));
+        methodInvocationHeader =
+                methodInvocationHeader.replace("${genericTypes}", buildGenericTypes(element));
+
+        if (shareGroupAnnotation != null) {
+
+            methodInvocationHeader = methodInvocationHeader.replace("${shareGroup}", "\""
+                    + shareGroupAnnotation.value() + "\"");
+
+        } else {
+
+            methodInvocationHeader = methodInvocationHeader.replace("${shareGroup}",
+                                                                    "proxyConfiguration"
+                                                                            + ".getShareGroupOr"
+                                                                            + "(null)");
+        }
+        writer.append(methodInvocationHeader);
         String methodInvocation;
 
         if ((inputMode == InputMode.COLLECTION) && (
@@ -2051,19 +2119,6 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocation = methodInvocation.replace("${genericTypes}", buildGenericTypes(element));
         methodInvocation =
                 methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
-        methodInvocation = methodInvocation.replace("${targetMethodParamTypes}",
-                                                    buildTargetParamTypes(targetMethod));
-
-        if (shareGroupAnnotation != null) {
-
-            methodInvocation = methodInvocation.replace("${shareGroup}",
-                                                        "\"" + shareGroupAnnotation.value() + "\"");
-
-        } else {
-
-            methodInvocation = methodInvocation.replace("${shareGroup}",
-                                                        "proxyConfiguration.getShareGroupOr(null)");
-        }
 
         if (inputMode == InputMode.COLLECTION) {
 
@@ -2081,5 +2136,15 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         writer.append(methodInvocation);
+        String methodInvocationFooter;
+        methodInvocationFooter = getMethodInvocationFooterTemplate(methodElement, count);
+        methodInvocationFooter =
+                methodInvocationFooter.replace("${resultClassName}", resultClassName);
+        methodInvocationFooter =
+                methodInvocationFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
+        methodInvocationFooter = methodInvocationFooter.replace("${targetMethodParamTypes}",
+                                                                buildTargetParamTypes(
+                                                                        targetMethod));
+        writer.append(methodInvocationFooter);
     }
 }

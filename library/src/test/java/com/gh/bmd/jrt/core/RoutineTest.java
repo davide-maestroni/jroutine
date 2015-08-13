@@ -440,16 +440,9 @@ public class RoutineTest {
                              .all()).containsExactly(30);
         assertThat(sumRoutine.asyncCall(squareRoutine.syncCall(1, 2, 3, 4)).afterMax(timeout).all())
                 .containsExactly(30);
-
-        assertThat(sumRoutine.syncCall(squareRoutine.asyncCall(1, 2, 3, 4)).afterMax(timeout).all())
-                .containsExactly(30);
         assertThat(sumRoutine.asyncCall(squareRoutine.asyncCall(1, 2, 3, 4))
                              .afterMax(timeout)
                              .all()).containsExactly(30);
-
-        assertThat(
-                sumRoutine.syncCall(squareRoutine.parallelCall(1, 2, 3, 4)).afterMax(timeout).all())
-                .containsExactly(30);
         assertThat(sumRoutine.asyncCall(squareRoutine.parallelCall(1, 2, 3, 4))
                              .afterMax(timeout)
                              .all()).containsExactly(30);
@@ -517,8 +510,8 @@ public class RoutineTest {
                 JRoutine.on(factoryOf(invokeSquareSum, this, sumRoutine, squareRoutine))
                         .buildRoutine();
 
-        assertThat(squareSumRoutine.syncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(
-                30);
+//        assertThat(squareSumRoutine.syncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(
+//                30);
         assertThat(squareSumRoutine.asyncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(
                 30);
     }
@@ -2124,7 +2117,7 @@ public class RoutineTest {
                         .set()
                         .buildRoutine();
         final Iterator<String> iterator =
-                routine1.syncCall("test").afterMax(millis(500)).eventuallyExit().iterator();
+                routine1.asyncCall("test").afterMax(millis(500)).eventuallyExit().iterator();
 
         assertThat(iterator.next()).isEqualTo("test");
 
@@ -2829,31 +2822,6 @@ public class RoutineTest {
 
         try {
 
-            before.syncCall(after.asyncCall(input)).afterMax(timeout).all();
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
-            for (final String s : before.syncCall(after.asyncCall(input)).afterMax(timeout)) {
-
-                assertThat(s).isNotEmpty();
-            }
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
             before.asyncCall(after.asyncCall(input)).afterMax(timeout).all();
 
             fail();
@@ -2866,34 +2834,6 @@ public class RoutineTest {
         try {
 
             for (final String s : before.asyncCall(after.asyncCall(input)).afterMax(timeout)) {
-
-                assertThat(s).isNotEmpty();
-            }
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
-            before.syncInvoke().pass(after.asyncCall(input)).result().afterMax(timeout).all();
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
-            for (final String s : before.syncInvoke()
-                                        .pass(after.asyncCall(input))
-                                        .result()
-                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2935,31 +2875,6 @@ public class RoutineTest {
 
         try {
 
-            before.syncCall(after.parallelCall(input)).afterMax(timeout).all();
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
-            for (final String s : before.syncCall(after.parallelCall(input)).afterMax(timeout)) {
-
-                assertThat(s).isNotEmpty();
-            }
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
             before.asyncCall(after.parallelCall(input)).afterMax(timeout).all();
 
             fail();
@@ -2972,34 +2887,6 @@ public class RoutineTest {
         try {
 
             for (final String s : before.asyncCall(after.parallelCall(input)).afterMax(timeout)) {
-
-                assertThat(s).isNotEmpty();
-            }
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
-            before.syncInvoke().pass(after.parallelCall(input)).result().afterMax(timeout).all();
-
-            fail();
-
-        } catch (final InvocationException e) {
-
-            assertThat(e.getCause().getMessage()).isEqualTo(expected);
-        }
-
-        try {
-
-            for (final String s : before.syncInvoke()
-                                        .pass(after.parallelCall(input))
-                                        .result()
-                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }

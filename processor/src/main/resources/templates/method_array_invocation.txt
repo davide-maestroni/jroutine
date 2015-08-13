@@ -14,35 +14,6 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class Invocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.invocation.FunctionInvocation<Object, ${resultClassName}>
-            implements com.gh.bmd.jrt.invocation.MethodInvocation<Object, ${resultClassName}> {
-
-        private final com.gh.bmd.jrt.invocation.MethodInvocationDecorator mDecorator;
-
-        private final Object mMutex;
-
-        private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
-
-        private Invocation${methodCount}(@javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                 @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped) {
-
-            final Object target = wrapped.get();
-            final String shareGroup = ${shareGroup};
-
-            if ((target != null) && !com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
-
-                mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
-
-            } else {
-
-                mMutex = this;
-            }
-
-            mDecorator = proxyConfiguration.getMethodDecoratorOr(
-                    com.gh.bmd.jrt.invocation.MethodInvocationDecorator.NO_DECORATION);
-            mWrapped = wrapped;
-        }
-
         @SuppressWarnings("unchecked")
         public void onInvocation(@javax.annotation.Nonnull final java.util.List<?> objects,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
@@ -78,12 +49,3 @@
                 }
             }
         }
-
-        @Override
-        protected void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
-
-            mDecorator.decorate(this, "${targetMethodName}"${targetMethodParamTypes})
-                      .onInvocation(objects, result);
-        }
-    }

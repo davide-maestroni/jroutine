@@ -569,12 +569,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             verifyBound();
             final Logger logger = mLogger;
             final NestedQueue<Object> outputQueue = mOutputQueue;
+            final boolean isDone = mState.isDone();
 
-            if (timeout.isZero() || mState.isDone()) {
+            if (timeout.isZero() || isDone) {
 
-                final boolean hasNext = !outputQueue.isEmpty();
-
-                if (!hasNext && !mState.isDone()) {
+                if (outputQueue.isEmpty() && !isDone) {
 
                     logger.wrn("has output timeout: [%s] => [%s]", timeout, timeoutAction);
 
@@ -588,6 +587,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         isAbort = (timeoutAction == TimeoutActionType.ABORT);
                     }
                 }
+
+            } else if (!outputQueue.isEmpty()) {
+
+                logger.dbg("has output: true [%s]", timeout);
+                return true;
 
             } else {
 
@@ -1062,6 +1066,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public boolean checkComplete() {
 
             synchronized (mMutex) {
+
+                if (mState.isDone()) {
+
+                    return true;
+                }
 
                 final TimeDuration executionTimeout = mExecutionTimeout;
 

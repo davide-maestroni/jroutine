@@ -1,0 +1,44 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// GENERATED CODE - PLEASE DO NOT EDIT
+
+    private static class Invocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.invocation.FunctionInvocation<Object, ${resultClassName}>
+            implements com.gh.bmd.jrt.invocation.MethodInvocation<Object, ${resultClassName}> {
+
+        private final com.gh.bmd.jrt.invocation.MethodInvocationDecorator mDecorator;
+
+        private final Object mMutex;
+
+        private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
+
+        private Invocation${methodCount}(@javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
+                 @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped) {
+
+            final Object target = wrapped.get();
+            final String shareGroup = ${shareGroup};
+
+            if ((target != null) && !com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
+
+                mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
+
+            } else {
+
+                mMutex = this;
+            }
+
+            mDecorator = proxyConfiguration.getMethodDecoratorOr(
+                    com.gh.bmd.jrt.invocation.MethodInvocationDecorator.NO_DECORATION);
+            mWrapped = wrapped;
+        }

@@ -207,7 +207,10 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the input transfer mode associated to the specified method parameter.
+     * Gets the input transfer mode associated to the specified method parameter, by resolving the
+     * default {@link com.gh.bmd.jrt.annotation.Input.InputMode#AUTO AUTO} mode into a specific one.
+     * <br/>
+     * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
      * @param index  the index of the parameter.
@@ -352,7 +355,10 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the inputs transfer mode associated to the specified method.
+     * Gets the inputs transfer mode associated to the specified method, by resolving the
+     * default {@link com.gh.bmd.jrt.annotation.Input.InputMode#AUTO AUTO} mode into a specific one.
+     * <br/>
+     * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
      * @return the input mode.

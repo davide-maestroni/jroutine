@@ -61,7 +61,7 @@ public interface Runner {
      * <p/>
      * The implementation of this method is not strictly mandatory, even if, the classes always
      * returning false effectively prevent the correct detection of possible deadlocks.<br/>
-     * A synchronous runner implementation will always return false.
+     * A synchronous runner implementation will always return true.
      *
      * @return whether the calling thread is managed by the runner.
      */

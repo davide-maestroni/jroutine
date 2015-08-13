@@ -343,7 +343,10 @@ public class RoutineBuilders {
                             + " must have no input parameters: " + method);
         }
 
-        if (!method.getReturnType().isAssignableFrom(InvocationChannel.class)) {
+        final Class<?> returnType = method.getReturnType();
+
+        if (!returnType.isAssignableFrom(InvocationChannel.class) && !returnType.isAssignableFrom(
+                Routine.class)) {
 
             throw new IllegalArgumentException(
                     "the proxy method has incompatible return type: " + method);
@@ -532,7 +535,6 @@ public class RoutineBuilders {
                 OutputMode outputMode = null;
                 final Class<?>[] targetParameterTypes;
                 final Inputs inputsAnnotation = proxyMethod.getAnnotation(Inputs.class);
-                final Output outputAnnotation = proxyMethod.getAnnotation(Output.class);
 
                 if (inputsAnnotation != null) {
 
@@ -570,6 +572,7 @@ public class RoutineBuilders {
                         getTargetMethod(proxyMethod, targetClass, targetParameterTypes);
                 final Class<?> returnType = proxyMethod.getReturnType();
                 final Class<?> targetReturnType = targetMethod.getReturnType();
+                final Output outputAnnotation = proxyMethod.getAnnotation(Output.class);
                 boolean isError = false;
 
                 if (outputAnnotation != null) {
@@ -618,7 +621,12 @@ public class RoutineBuilders {
             @Nonnull final Method method, @Nonnull final Object[] args,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-        if (method.getAnnotation(Inputs.class) != null) {
+        if (method.isAnnotationPresent(Inputs.class)) {
+
+            if (method.getReturnType().isAssignableFrom(Routine.class)) {
+
+                return routine;
+            }
 
             return (inputMode == InputMode.PARALLEL) ? routine.parallelInvoke()
                     : routine.asyncInvoke();

@@ -97,7 +97,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                     "the specified class is not an interface: " + itfClass.getName());
         }
 
-        if (itfClass.getAnnotation(ServiceProxy.class) == null) {
+        if (!itfClass.isAnnotationPresent(ServiceProxy.class)) {
 
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + ServiceProxy.class.getName()

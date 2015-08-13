@@ -26,6 +26,7 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.routine.Routine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -91,6 +92,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     protected TypeMirror outputChannelType;
 
+    protected TypeMirror routineType;
+
     private String mFooter;
 
     private String mHeader;
@@ -107,7 +110,9 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodHeader;
 
-    private String mMethodInputs;
+    private String mMethodInputsChannel;
+
+    private String mMethodInputsRoutine;
 
     private String mMethodInvocation;
 
@@ -180,6 +185,7 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
+        routineType = getTypeFromName(Routine.class.getCanonicalName()).asType();
         invocationChannelType =
                 getTypeFromName(InvocationChannel.class.getCanonicalName()).asType();
         outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
@@ -900,9 +906,10 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final Types typeUtils = processingEnv.getTypeUtils();
+        final TypeMirror returnType = methodElement.getReturnType();
 
-        if (!typeUtils.isAssignable(invocationChannelType,
-                                    typeUtils.erasure(methodElement.getReturnType()))) {
+        if (!typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
+                && !typeUtils.isAssignable(routineType, typeUtils.erasure(returnType))) {
 
             throw new IllegalArgumentException(
                     "the proxy method has incompatible return type: " + methodElement);
@@ -1097,15 +1104,36 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
-    protected String getMethodInputsTemplate(@Nonnull final ExecutableElement methodElement,
+    protected String getMethodInputsChannelTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
 
-        if (mMethodInputs == null) {
+        if (mMethodInputsChannel == null) {
 
-            mMethodInputs = parseTemplate("/templates/method_inputs.txt");
+            mMethodInputsChannel = parseTemplate("/templates/method_inputs_channel.txt");
         }
 
-        return mMethodInputs;
+        return mMethodInputsChannel;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodInputsRoutineTemplate(@Nonnull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodInputsRoutine == null) {
+
+            mMethodInputsRoutine = parseTemplate("/templates/method_inputs_routine.txt");
+        }
+
+        return mMethodInputsRoutine;
     }
 
     /**
@@ -1855,14 +1883,27 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (inputsAnnotation != null) {
 
+            if (outputAnnotation != null) {
+
+                getOutputMode(methodElement, targetMethod);
+            }
+
             inputMode = getInputsMode(methodElement, inputsAnnotation);
             outputMode = OutputMode.VALUE;
-            method = getMethodInputsTemplate(methodElement, count);
+            final TypeMirror returnType = methodElement.getReturnType();
+
+            if (typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))) {
+
+                method = getMethodInputsChannelTemplate(methodElement, count);
+
+            } else {
+
+                method = getMethodInputsRoutineTemplate(methodElement, count);
+            }
 
         } else if (outputAnnotation != null) {
 
             outputMode = getOutputMode(methodElement, targetMethod);
-
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
 

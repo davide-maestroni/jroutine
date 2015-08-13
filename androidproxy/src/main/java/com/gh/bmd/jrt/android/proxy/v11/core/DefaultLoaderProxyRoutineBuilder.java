@@ -97,7 +97,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                     "the specified class is not an interface: " + itfClass.getName());
         }
 
-        if (itfClass.getAnnotation(V11Proxy.class) == null) {
+        if (!itfClass.isAnnotationPresent(V11Proxy.class)) {
 
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + V11Proxy.class.getName() + ": "

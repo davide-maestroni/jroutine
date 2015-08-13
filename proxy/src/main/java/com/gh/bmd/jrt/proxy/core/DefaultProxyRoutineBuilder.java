@@ -76,7 +76,7 @@ class DefaultProxyRoutineBuilder
                     "the specified class is not an interface: " + itfClass.getName());
         }
 
-        if (itfClass.getAnnotation(Proxy.class) == null) {
+        if (!itfClass.isAnnotationPresent(Proxy.class)) {
 
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + Proxy.class.getName() + ": "

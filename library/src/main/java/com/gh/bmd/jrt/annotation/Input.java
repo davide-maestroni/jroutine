@@ -49,8 +49,8 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Note that the transfer mode is automatically inferred by the proxy and the target types, unless
- * specifically chosen through the annotation <code>mode</code> attribute.
+ * Note that the transfer mode is specifically chosen through the annotation <code>mode</code>
+ * attribute.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

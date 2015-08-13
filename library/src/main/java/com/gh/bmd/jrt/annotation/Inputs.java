@@ -30,8 +30,8 @@ import java.lang.annotation.Target;
  * routines as well.
  * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a proxy
- * of another class methods. The interface can take its input parameters in an asynchronous way. In
- * such case, the values specified in the annotation will indicate the type of the parameters
+ * of another class methods. The interface can take all its input parameters in an asynchronous way.
+ * In such case, the values specified in the annotation will indicate the type of the parameters
  * expected by the target method.
  * <p/>
  * For example, a method taking two integers:
@@ -52,8 +52,20 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Note that the transfer mode is automatically inferred by the target types, unless specifically
- * chosen through the annotation <code>mode</code> attribute.
+ * Note that the transfer mode is specifically chosen through the annotation <code>mode</code>
+ * attribute.
+ * <p/>
+ * The proxying method can also return the routine wrapping the target one, as:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Inputs({int.class, int.class})
+ *         public Routine&lt;Integer, Integer&gt; sum();
+ *     </code>
+ * </pre>
+ * <p/>
+ * In such case, it is up to the caller to invoke it in the proper mode.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

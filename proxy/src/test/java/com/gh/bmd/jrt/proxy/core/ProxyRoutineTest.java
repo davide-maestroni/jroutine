@@ -982,30 +982,35 @@ public class ProxyRoutineTest {
 
         @Timeout(300)
         @Output
-        Iterable<Iterable> getList(@Input(List.class) List<? extends List<String>> i);
+        Iterable<Iterable> getList(@Input(value = List.class,
+                mode = InputMode.PARALLEL) List<? extends List<String>> i);
 
         @Timeout(300)
         @Output
         OutputChannel<Integer> getOne();
 
         @Timeout(300)
-        String getString(@Input(int.class) int... i);
+        String getString(@Input(value = int.class, mode = InputMode.PARALLEL) int... i);
 
         @Timeout(300)
         @Output
-        OutputChannel<String> getString(@Input(int.class) HashSet<Integer> i);
+        OutputChannel<String> getString(
+                @Input(value = int.class, mode = InputMode.PARALLEL) HashSet<Integer> i);
 
         @Timeout(300)
         @Output
-        List<String> getString(@Input(int.class) List<Integer> i);
+        List<String> getString(
+                @Input(value = int.class, mode = InputMode.PARALLEL) List<Integer> i);
 
         @Timeout(300)
         @Output
-        Iterable<String> getString(@Input(int.class) Iterable<Integer> i);
+        Iterable<String> getString(
+                @Input(value = int.class, mode = InputMode.PARALLEL) Iterable<Integer> i);
 
         @Timeout(300)
         @Output
-        String[] getString(@Input(int.class) Collection<Integer> i);
+        String[] getString(
+                @Input(value = int.class, mode = InputMode.PARALLEL) Collection<Integer> i);
 
         @Timeout(300)
         String getString(@Input(int.class) OutputChannel<Integer> i);

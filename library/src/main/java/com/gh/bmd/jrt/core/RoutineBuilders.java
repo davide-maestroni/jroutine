@@ -207,9 +207,7 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the input transfer mode associated to the specified method parameter, by resolving the
-     * default {@link com.gh.bmd.jrt.annotation.Input.InputMode#AUTO AUTO} mode into a specific one.
-     * <br/>
+     * Gets the input transfer mode associated to the specified method parameter.<br/>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
@@ -239,57 +237,10 @@ public class RoutineBuilders {
         }
 
         InputMode inputMode = inputAnnotation.mode();
-        final Class<?> paramClass = inputAnnotation.value();
         final Class<?>[] parameterTypes = method.getParameterTypes();
         final Class<?> parameterType = parameterTypes[index];
-        final int length = parameterTypes.length;
-        final boolean isArray = parameterType.isArray();
 
-        if (inputMode == InputMode.AUTO) {
-
-            if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                if ((length == 1) && (paramClass.isArray() || paramClass.isAssignableFrom(
-                        List.class))) {
-
-                    inputMode = InputMode.COLLECTION;
-
-                } else {
-
-                    inputMode = InputMode.VALUE;
-                }
-
-            } else if (isArray || Iterable.class.isAssignableFrom(parameterType)) {
-
-                if (isArray && !boxingClass(paramClass).isAssignableFrom(
-                        boxingClass(parameterType.getComponentType()))) {
-
-                    throw new IllegalArgumentException(
-                            "[" + method + "] the async input array with mode " + InputMode.PARALLEL
-                                    + " does not match the bound type: "
-                                    + paramClass.getCanonicalName());
-                }
-
-                if (length > 1) {
-
-                    throw new IllegalArgumentException(
-                            "[" + method + "] an async input with mode " + InputMode.PARALLEL
-                                    + " cannot be applied to a method taking " + length +
-                                    " input parameters");
-
-                }
-
-                inputMode = InputMode.PARALLEL;
-
-            } else {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] cannot automatically choose an "
-                                + "input mode for an output of type: "
-                                + parameterType.getCanonicalName());
-            }
-
-        } else if (inputMode == InputMode.VALUE) {
+        if (inputMode == InputMode.VALUE) {
 
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
@@ -307,6 +258,8 @@ public class RoutineBuilders {
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
+            final Class<?> paramClass = inputAnnotation.value();
+
             if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
 
                 throw new IllegalArgumentException(
@@ -314,6 +267,8 @@ public class RoutineBuilders {
                                 + " must be bound to an array or a superclass of "
                                 + List.class.getCanonicalName());
             }
+
+            final int length = parameterTypes.length;
 
             if (length > 1) {
 
@@ -325,6 +280,8 @@ public class RoutineBuilders {
 
         } else { // InputMode.PARALLEL
 
+            final boolean isArray = parameterType.isArray();
+
             if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
@@ -332,6 +289,8 @@ public class RoutineBuilders {
                                 + " must be an array or implement an "
                                 + Iterable.class.getCanonicalName());
             }
+
+            final Class<?> paramClass = inputAnnotation.value();
 
             if (isArray && !boxingClass(paramClass).isAssignableFrom(
                     boxingClass(parameterType.getComponentType()))) {
@@ -341,6 +300,8 @@ public class RoutineBuilders {
                                 + " does not match the bound type: "
                                 + paramClass.getCanonicalName());
             }
+
+            final int length = parameterTypes.length;
 
             if (length > 1) {
 
@@ -355,9 +316,7 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the inputs transfer mode associated to the specified method, by resolving the
-     * default {@link com.gh.bmd.jrt.annotation.Input.InputMode#AUTO AUTO} mode into a specific one.
-     * <br/>
+     * Gets the inputs transfer mode associated to the specified method.<br/>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
@@ -391,27 +350,7 @@ public class RoutineBuilders {
         final Class<?>[] parameterTypes = methodAnnotation.value();
         InputMode inputMode = methodAnnotation.mode();
 
-        if (inputMode == InputMode.AUTO) {
-
-            if (parameterTypes.length == 1) {
-
-                final Class<?> parameterType = parameterTypes[0];
-
-                if (parameterType.isArray() || parameterType.isAssignableFrom(List.class)) {
-
-                    inputMode = InputMode.COLLECTION;
-
-                } else {
-
-                    inputMode = InputMode.PARALLEL;
-                }
-
-            } else {
-
-                inputMode = InputMode.VALUE;
-            }
-
-        } else if (inputMode == InputMode.COLLECTION) {
+        if (inputMode == InputMode.COLLECTION) {
 
             final Class<?> parameterType = parameterTypes[0];
 

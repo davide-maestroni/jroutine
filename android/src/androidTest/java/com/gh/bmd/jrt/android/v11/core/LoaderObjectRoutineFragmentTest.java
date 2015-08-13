@@ -1618,12 +1618,13 @@ public class LoaderObjectRoutineFragmentTest
 
         @Timeout(10000)
         @Output
-        int[] inc(@Input(int.class) int... i);
+        int[] inc(@Input(value = int.class, mode = InputMode.PARALLEL) int... i);
 
         @Timeout(10000)
         @Alias("inc")
         @Output
-        Iterable<Integer> incIterable(@Input(int.class) int... i);
+        Iterable<Integer> incIterable(
+                @Input(value = int.class, mode = InputMode.PARALLEL) int... i);
     }
 
     private interface SquareItf {
@@ -1648,16 +1649,19 @@ public class LoaderObjectRoutineFragmentTest
         @ShareGroup(ShareGroup.NONE)
         @Alias("compute")
         @Output
-        OutputChannel<Integer> computeParallel1(@Input(int.class) int... i);
+        OutputChannel<Integer> computeParallel1(
+                @Input(value = int.class, mode = InputMode.PARALLEL) int... i);
 
         @Alias("compute")
         @Output
-        OutputChannel<Integer> computeParallel2(@Input(int.class) Integer... i);
+        OutputChannel<Integer> computeParallel2(
+                @Input(value = int.class, mode = InputMode.PARALLEL) Integer... i);
 
         @ShareGroup(ShareGroup.NONE)
         @Alias("compute")
         @Output
-        OutputChannel<Integer> computeParallel3(@Input(int.class) List<Integer> i);
+        OutputChannel<Integer> computeParallel3(
+                @Input(value = int.class, mode = InputMode.PARALLEL) List<Integer> i);
 
         @ShareGroup(ShareGroup.NONE)
         @Alias("compute")
@@ -1693,13 +1697,15 @@ public class LoaderObjectRoutineFragmentTest
 
         int compute(int a, @Input(int.class) OutputChannel<Integer> b);
 
-        int compute(@Input(int[].class) OutputChannel<Integer> ints);
+        int compute(@Input(value = int[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
 
         @Alias("compute")
-        int compute1(@Input(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> ints);
+        int compute1(@Input(int[].class) OutputChannel<int[]> ints);
 
         @Alias("compute")
-        int computeList(@Input(List.class) OutputChannel<Integer> ints);
+        int computeList(@Input(value = List.class,
+                mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
 
         @Alias("compute")
         int computeList1(@Input(value = List.class,

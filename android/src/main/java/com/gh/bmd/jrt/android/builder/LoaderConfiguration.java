@@ -75,7 +75,7 @@ public final class LoaderConfiguration {
      * @param resolutionType      the type of resolution.
      * @param inputResolutionType the type of input resolution.
      * @param strategyType        the cache strategy type.
-     * @param staleTime           TODO
+     * @param staleTime           the stale time.
      */
     private LoaderConfiguration(@Nullable final Looper looper, final int loaderId,
             @Nullable final ClashResolutionType resolutionType,

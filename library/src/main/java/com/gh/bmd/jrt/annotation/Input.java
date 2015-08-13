@@ -116,6 +116,6 @@ public @interface Input {
          * The annotated parameter must be an array or implement an {@link java.lang.Iterable} and
          * must be the only parameter accepted by the method.
          */
-        PARALLEL,
+        PARALLEL
     }
 }

@@ -207,7 +207,8 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the input transfer mode associated to the specified method parameter.<br/>
+     * Gets the input transfer mode associated to the specified method parameter, while also
+     * validating the use of the {@link com.gh.bmd.jrt.annotation.Input Input} annotation.<br/>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
@@ -316,7 +317,8 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the inputs transfer mode associated to the specified method.<br/>
+     * Gets the inputs transfer mode associated to the specified method, while also
+     * validating the use of the {@link com.gh.bmd.jrt.annotation.Inputs Inputs} annotation.<br/>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
@@ -385,7 +387,9 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the output transfer mode of the return type of the specified method.
+     * Gets the output transfer mode of the return type of the specified method, while also
+     * validating the use of the {@link com.gh.bmd.jrt.annotation.Output Output} annotation.<br/>
+     * In case no annotation is present, the function will return with null.
      *
      * @param method           the proxy method.
      * @param targetReturnType the target return type.
@@ -407,43 +411,7 @@ public class RoutineBuilders {
         final Class<?> returnType = method.getReturnType();
         OutputMode outputMode = outputAnnotation.value();
 
-        if (outputMode == OutputMode.AUTO) {
-
-            if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
-
-                if (returnType.isArray() && !boxingClass(
-                        returnType.getComponentType()).isAssignableFrom(
-                        boxingClass(targetReturnType))) {
-
-                    throw new IllegalArgumentException(
-                            "[" + method + "] the async output array with mode "
-                                    + OutputMode.COLLECTION + " does not match the bound type: "
-                                    + targetReturnType.getCanonicalName());
-                }
-
-                outputMode = OutputMode.COLLECTION;
-
-            } else if (returnType.isAssignableFrom(OutputChannel.class)) {
-
-                if (targetReturnType.isArray() || Iterable.class.isAssignableFrom(
-                        targetReturnType)) {
-
-                    outputMode = OutputMode.ELEMENT;
-
-                } else {
-
-                    outputMode = OutputMode.VALUE;
-                }
-
-            } else {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] cannot automatically choose an "
-                                + "output mode for an output of type: "
-                                + returnType.getCanonicalName());
-            }
-
-        } else if (outputMode == OutputMode.VALUE) {
+        if (outputMode == OutputMode.VALUE) {
 
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 

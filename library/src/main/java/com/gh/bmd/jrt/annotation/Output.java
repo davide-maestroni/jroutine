@@ -88,7 +88,7 @@ public @interface Output {
      *
      * @return the mode.
      */
-    OutputMode value() default OutputMode.AUTO;
+    OutputMode value() default OutputMode.VALUE;
 
     /**
      * Output transfer mode type.<br/>
@@ -118,13 +118,6 @@ public @interface Output {
          * <p/>
          * The annotated method must return an array or a superclass of {@link java.util.List}.
          */
-        COLLECTION,
-        /**
-         * Automatic mode.<br/>
-         * The mode is automatically assigned based on the return type. Namely: if the return type
-         * matches the COLLECTION output mode, that one is chosen; if it  matches the ELEMENT output
-         * mode, it is chosen the latter; finally the VALUE output mode conditions are checked.
-         */
-        AUTO
+        COLLECTION
     }
 }

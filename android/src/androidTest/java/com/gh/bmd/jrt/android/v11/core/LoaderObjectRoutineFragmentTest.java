@@ -1595,7 +1595,7 @@ public class LoaderObjectRoutineFragmentTest
 
     private interface CountItf {
 
-        @Output
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> count(int length);
 
         @Alias("count")
@@ -1606,7 +1606,7 @@ public class LoaderObjectRoutineFragmentTest
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> count2(int length);
 
-        @Output
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> countList(int length);
 
         @Alias("countList")
@@ -1617,7 +1617,7 @@ public class LoaderObjectRoutineFragmentTest
     private interface IncItf {
 
         @Timeout(10000)
-        @Output
+        @Output(OutputMode.COLLECTION)
         int[] inc(@Input(value = int.class, mode = InputMode.PARALLEL) int... i);
 
         @Timeout(10000)
@@ -1727,7 +1727,7 @@ public class LoaderObjectRoutineFragmentTest
 
     private interface TestTimeoutItf {
 
-        @Output
+        @Output(OutputMode.COLLECTION)
         @TimeoutAction(TimeoutActionType.ABORT)
         List<Integer> getInt();
     }

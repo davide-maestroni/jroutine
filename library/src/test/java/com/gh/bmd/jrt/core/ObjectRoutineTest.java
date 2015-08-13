@@ -1540,7 +1540,7 @@ public class ObjectRoutineTest {
 
     private interface CountItf {
 
-        @Output
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> count(int length);
 
         @Alias("count")
@@ -1551,7 +1551,7 @@ public class ObjectRoutineTest {
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> count2(int length);
 
-        @Output
+        @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> countList(int length);
 
         @Alias("countList")
@@ -1562,7 +1562,7 @@ public class ObjectRoutineTest {
     private interface IncItf {
 
         @Timeout(1000)
-        @Output
+        @Output(OutputMode.COLLECTION)
         int[] inc(@Input(value = int.class, mode = InputMode.PARALLEL) int... i);
 
         @Timeout(1000)
@@ -1692,7 +1692,7 @@ public class ObjectRoutineTest {
 
     private interface TestTimeoutItf {
 
-        @Output
+        @Output(OutputMode.COLLECTION)
         @TimeoutAction(TimeoutActionType.ABORT)
         List<Integer> getInt();
     }

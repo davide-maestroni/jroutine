@@ -1006,7 +1006,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         OutputChannel<TYPE> getAsync(int i);
 
         @Alias("get")
-        @Output
+        @Output(OutputMode.COLLECTION)
         List<TYPE> getList(int i);
     }
 
@@ -1032,17 +1032,17 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 @Input(value = int.class, mode = InputMode.PARALLEL) HashSet<Integer> i);
 
         @Timeout(3000)
-        @Output
+        @Output(OutputMode.COLLECTION)
         List<String> getString(
                 @Input(value = int.class, mode = InputMode.PARALLEL) List<Integer> i);
 
         @Timeout(3000)
-        @Output
+        @Output(OutputMode.COLLECTION)
         Iterable<String> getString(
                 @Input(value = int.class, mode = InputMode.PARALLEL) Iterable<Integer> i);
 
         @Timeout(3000)
-        @Output
+        @Output(OutputMode.COLLECTION)
         String[] getString(
                 @Input(value = int.class, mode = InputMode.PARALLEL) Collection<Integer> i);
 
@@ -1053,7 +1053,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     @V11Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
-        @Output
+        @Output(OutputMode.COLLECTION)
         @TimeoutAction(TimeoutActionType.ABORT)
         List<Integer> getInt();
     }

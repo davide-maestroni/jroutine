@@ -26,6 +26,7 @@ import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AbstractContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
+import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
 import com.gh.bmd.jrt.annotation.Priority;
@@ -235,7 +236,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
+    public <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
         final Class<?> targetClass = mTargetClass;
         final Method targetMethod = getAnnotatedMethod(name, targetClass);
@@ -266,7 +267,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
+    public <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
         return method(findMethod(mTargetClass, name, parameterTypes));
@@ -274,7 +275,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+    public <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         final ProxyConfiguration proxyConfiguration =
                 configurationWithAnnotations(mProxyConfiguration, method);
@@ -805,14 +806,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(proxyConfiguration, targetMethod, mTargetClass,
                                                mFactoryArgs, inputMode, outputMode);
-            final Routine<Object, Object> routine = JRoutine.on(mContext, factory)
-                                                            .invocations()
-                                                            .with(invocationConfiguration)
-                                                            .set()
-                                                            .loaders()
-                                                            .with(loaderConfiguration)
-                                                            .set()
-                                                            .buildRoutine();
+            final LoaderRoutine<Object, Object> routine = JRoutine.on(mContext, factory)
+                                                                  .invocations()
+                                                                  .with(invocationConfiguration)
+                                                                  .set()
+                                                                  .loaders()
+                                                                  .with(loaderConfiguration)
+                                                                  .set()
+                                                                  .buildRoutine();
             return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
                                  inputMode, outputMode);
         }

@@ -63,8 +63,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         ProxyConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceObjectRoutineBuilder> {
 
-    // TODO: 13/08/15 test android proxy service on Lollipop (class in bundle issue)
-
     private static final ClassToken<ProxyInvocation> PROXY_TOKEN =
             ClassToken.tokenOf(ProxyInvocation.class);
 

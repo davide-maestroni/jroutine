@@ -13,10 +13,10 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
-import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.reflect.Method;
@@ -56,7 +56,7 @@ public interface LoaderObjectRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
+    <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
 
     /**
      * Returns a routine used to call the specified method.
@@ -81,7 +81,7 @@ public interface LoaderObjectRoutineBuilder
      * @throws java.lang.IllegalArgumentException if no matching method is found.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
+    <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull String name,
             @Nonnull Class<?>... parameterTypes);
 
     /**
@@ -107,7 +107,7 @@ public interface LoaderObjectRoutineBuilder
      * @return the routine.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
+    <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull Method method);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

@@ -38,8 +38,6 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
-import com.gh.bmd.jrt.invocation.MethodInvocation;
-import com.gh.bmd.jrt.invocation.MethodInvocationDecorator;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
@@ -630,12 +628,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object>
-            implements MethodInvocation<Object, Object> {
+    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
 
         private final Object[] mArgs;
-
-        private final MethodInvocationDecorator mDecorator;
 
         private final InputMode mInputMode;
 
@@ -666,8 +661,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
 
-            mDecorator = proxyConfiguration.getMethodDecoratorOr(
-                    MethodInvocationDecorator.NO_DECORATION);
             mProxyConfiguration = proxyConfiguration;
             mArgs = args;
             mTargetClass = targetClass;
@@ -677,20 +670,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mMutex = this;
         }
 
-        public void onInvocation(@Nonnull final List<?> objects,
-                @Nonnull final ResultChannel<Object> result) {
-
-            callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,
-                               mOutputMode);
-        }
-
         @Override
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            final Method method = mTargetMethod;
-            mDecorator.decorate(this, method.getName(), method.getParameterTypes())
-                      .onInvocation(objects, result);
+            callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,
+                               mOutputMode);
         }
 
         @Override

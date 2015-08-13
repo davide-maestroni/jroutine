@@ -20,15 +20,14 @@
 
         private final Object[] mFactoryArgs;
 
-        private final com.gh.bmd.jrt.builder.ProxyConfiguration mProxyConfiguration;
+        private final String mShareGroup;
 
         private final Class<?> mTargetClass;
 
-        private ContextInvocationFactory${methodCount}(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
+        private ContextInvocationFactory${methodCount}(@javax.annotation.Nullable final String shareGroup,
                 @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] factoryArgs) {
 
-            mProxyConfiguration = proxyConfiguration;
+            mShareGroup = shareGroup;
             mTargetClass = targetClass;
             mFactoryArgs = factoryArgs;
         }
@@ -36,7 +35,7 @@
         @javax.annotation.Nonnull
         public com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation() {
 
-            return new ContextInvocation${methodCount}${genericTypes}(mProxyConfiguration, mTargetClass, mFactoryArgs);
+            return new ContextInvocation${methodCount}${genericTypes}(mShareGroup, mTargetClass, mFactoryArgs);
         }
     }
 
@@ -46,7 +45,7 @@
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(proxyConfiguration, mTargetClass, mFactoryArgs))
+        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${shareGroup}, mTargetClass, mFactoryArgs))
                                            .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}

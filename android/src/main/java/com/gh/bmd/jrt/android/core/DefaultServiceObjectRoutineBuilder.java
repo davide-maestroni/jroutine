@@ -31,8 +31,6 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
-import com.gh.bmd.jrt.invocation.MethodInvocation;
-import com.gh.bmd.jrt.invocation.MethodInvocationDecorator;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
@@ -64,6 +62,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         InvocationConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ProxyConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceObjectRoutineBuilder> {
+
+    // TODO: 13/08/15 test android proxy service on Lollipop (class in bundle issue)
 
     private static final ClassToken<ProxyInvocation> PROXY_TOKEN =
             ClassToken.tokenOf(ProxyInvocation.class);
@@ -235,25 +235,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     "no annotated method with alias '" + name + "' has been found");
         }
 
-        final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
-        final MethodInvocationDecorator decorator = proxyConfiguration.getMethodDecoratorOr(null);
-        final String decoratorClassName;
-
-        if (decorator != null) {
-
-            final Class<?> decoratorClass = decorator.getClass();
-            findConstructor(decoratorClass);
-            decoratorClassName = decoratorClass.getName();
-
-        } else {
-
-            decoratorClassName = null;
-        }
-
-        final String shareGroup = groupWithShareAnnotation(proxyConfiguration, targetMethod);
-        final Object[] args =
-                new Object[]{decoratorClassName, shareGroup, targetClass.getName(), mFactoryArgs,
-                             name};
+        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
+        final Object[] args = new Object[]{shareGroup, targetClass.getName(), mFactoryArgs, name};
         return JRoutine.on(mContext, new MethodAliasToken<INPUT, OUTPUT>(), args)
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
@@ -270,25 +253,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final Class<?> targetClass = mTargetClass;
         final Method targetMethod = findMethod(targetClass, name, parameterTypes);
-        final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
-        final MethodInvocationDecorator decorator = proxyConfiguration.getMethodDecoratorOr(null);
-        final String decoratorClassName;
-
-        if (decorator != null) {
-
-            final Class<?> decoratorClass = decorator.getClass();
-            findConstructor(decoratorClass);
-            decoratorClassName = decoratorClass.getName();
-
-        } else {
-
-            decoratorClassName = null;
-        }
-
-        final String shareGroup = groupWithShareAnnotation(proxyConfiguration, targetMethod);
-        final Object[] args =
-                new Object[]{decoratorClassName, shareGroup, targetClass.getName(), mFactoryArgs,
-                             name, toNames(parameterTypes)};
+        final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
+        final Object[] args = new Object[]{shareGroup, targetClass.getName(), mFactoryArgs, name,
+                                           toNames(parameterTypes)};
         return JRoutine.on(mContext, new MethodSignatureToken<INPUT, OUTPUT>(), args)
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
@@ -401,8 +368,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Object[] mArgs;
 
-        private final MethodInvocationDecorator mDecorator;
-
         private final String mShareGroup;
 
         private final Class<?> mTargetClass;
@@ -414,42 +379,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param decoratorClassName the method decorator class name.
-         * @param shareGroup         the share group name.
-         * @param targetClassName    the target object class name.
-         * @param args               the factory constructor arguments.
-         * @param name               the alias name.
+         * @param shareGroup      the share group name.
+         * @param targetClassName the target object class name.
+         * @param args            the factory constructor arguments.
+         * @param name            the alias name.
          */
-        @SuppressWarnings("unchecked")
-        public MethodAliasInvocation(@Nullable final String decoratorClassName,
-                @Nullable final String shareGroup, @Nonnull final String targetClassName,
-                @Nonnull final Object[] args, @Nonnull final String name) throws
-                ClassNotFoundException {
-
-            if (decoratorClassName != null) {
-
-                try {
-
-                    mDecorator = (MethodInvocationDecorator) Class.forName(decoratorClassName)
-                                                                  .newInstance();
-
-                } catch (final ClassNotFoundException e) {
-
-                    throw e;
-
-                } catch (final RoutineException e) {
-
-                    throw e;
-
-                } catch (final Throwable t) {
-
-                    throw new InvocationException(t);
-                }
-
-            } else {
-
-                mDecorator = null;
-            }
+        public MethodAliasInvocation(@Nullable final String shareGroup,
+                @Nonnull final String targetClassName, @Nonnull final Object[] args,
+                @Nonnull final String name) throws ClassNotFoundException {
 
             mShareGroup = shareGroup;
             mTargetClass = Class.forName(targetClassName);
@@ -467,7 +404,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
                                    .proxies()
-                                   .withMethodDecorator(mDecorator)
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .aliasMethod(mAliasName);
@@ -518,8 +454,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Object[] mArgs;
 
-        private final MethodInvocationDecorator mDecorator;
-
         private final String mMethodName;
 
         private final Class<?>[] mParameterTypes;
@@ -535,44 +469,17 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param decoratorClassName the method decorator class name.
-         * @param shareGroup         the share group name.
-         * @param targetClassName    the target object class name.
-         * @param args               the factory constructor arguments.
-         * @param name               the method name.
-         * @param parameterTypes     the method parameter type names.
+         * @param shareGroup      the share group name.
+         * @param targetClassName the target object class name.
+         * @param args            the factory constructor arguments.
+         * @param name            the method name.
+         * @param parameterTypes  the method parameter type names.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
-        @SuppressWarnings("unchecked")
-        public MethodSignatureInvocation(@Nullable final String decoratorClassName,
-                @Nullable final String shareGroup, @Nonnull final String targetClassName,
-                @Nonnull final Object[] args, @Nonnull final String name,
-                @Nonnull final String[] parameterTypes) throws ClassNotFoundException {
-
-            if (decoratorClassName != null) {
-
-                try {
-
-                    mDecorator = (MethodInvocationDecorator) Class.forName(decoratorClassName)
-                                                                  .newInstance();
-
-                } catch (final ClassNotFoundException e) {
-
-                    throw e;
-
-                } catch (final RoutineException e) {
-
-                    throw e;
-
-                } catch (final Throwable t) {
-
-                    throw new InvocationException(t);
-                }
-
-            } else {
-
-                mDecorator = null;
-            }
+        public MethodSignatureInvocation(@Nullable final String shareGroup,
+                @Nonnull final String targetClassName, @Nonnull final Object[] args,
+                @Nonnull final String name, @Nonnull final String[] parameterTypes) throws
+                ClassNotFoundException {
 
             mShareGroup = shareGroup;
             mTargetClass = Class.forName(targetClassName);
@@ -603,7 +510,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 final Object target = getInstance(context, mTargetClass, mArgs);
                 mRoutine = JRoutine.on(target)
                                    .proxies()
-                                   .withMethodDecorator(mDecorator)
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .method(mMethodName, mParameterTypes);
@@ -634,12 +540,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object>
-            implements MethodInvocation<Object, Object> {
+    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
 
         private final Object[] mArgs;
-
-        private final MethodInvocationDecorator mDecorator;
 
         private final InputMode mInputMode;
 
@@ -658,7 +561,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param decoratorClassName   the method decorator class name.
          * @param shareGroup           the share group name.
          * @param targetClassName      the target object class name.
          * @param args                 the factory constructor arguments.
@@ -669,38 +571,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
-        @SuppressWarnings("unchecked")
-        public ProxyInvocation(@Nullable final String decoratorClassName,
-                @Nullable final String shareGroup, @Nonnull final String targetClassName,
-                @Nonnull final Object[] args, @Nonnull final String targetMethodName,
+        public ProxyInvocation(@Nullable final String shareGroup,
+                @Nonnull final String targetClassName, @Nonnull final Object[] args,
+                @Nonnull final String targetMethodName,
                 @Nonnull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) throws ClassNotFoundException,
                 NoSuchMethodException {
-
-            if (decoratorClassName != null) {
-
-                try {
-
-                    mDecorator = (MethodInvocationDecorator) Class.forName(decoratorClassName)
-                                                                  .newInstance();
-
-                } catch (final ClassNotFoundException e) {
-
-                    throw e;
-
-                } catch (final RoutineException e) {
-
-                    throw e;
-
-                } catch (final Throwable t) {
-
-                    throw new InvocationException(t);
-                }
-
-            } else {
-
-                mDecorator = MethodInvocationDecorator.NO_DECORATION;
-            }
 
             mShareGroup = shareGroup;
             final Class<?> targetClass = Class.forName(targetClassName);
@@ -712,20 +588,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mMutex = this;
         }
 
-        public void onInvocation(@Nonnull final List<?> objects,
-                @Nonnull final ResultChannel<Object> result) {
-
-            callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,
-                               mOutputMode);
-        }
-
         @Override
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            final Method targetMethod = mTargetMethod;
-            mDecorator.decorate(this, targetMethod.getName(), targetMethod.getParameterTypes())
-                      .onInvocation(objects, result);
+            callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,
+                               mOutputMode);
         }
 
         @Override
@@ -797,27 +665,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
-            final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
-            final MethodInvocationDecorator decorator =
-                    proxyConfiguration.getMethodDecoratorOr(null);
-            final String decoratorClassName;
-
-            if (decorator != null) {
-
-                final Class<?> decoratorClass = decorator.getClass();
-                findConstructor(decoratorClass);
-                decoratorClassName = decoratorClass.getName();
-
-            } else {
-
-                decoratorClassName = null;
-            }
-
-            final String shareGroup = groupWithShareAnnotation(proxyConfiguration, method);
+            final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
             final Object[] factoryArgs =
-                    new Object[]{decoratorClassName, shareGroup, targetClass.getName(), mArgs,
-                                 targetMethod.getName(), toNames(targetParameterTypes), inputMode,
-                                 outputMode};
+                    new Object[]{shareGroup, targetClass.getName(), mArgs, targetMethod.getName(),
+                                 toNames(targetParameterTypes), inputMode, outputMode};
             final Routine<Object, Object> routine = JRoutine.on(mContext, PROXY_TOKEN, factoryArgs)
                                                             .invocations()
                                                             .with(configurationWithAnnotations(

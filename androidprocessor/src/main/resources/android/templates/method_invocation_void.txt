@@ -14,8 +14,9 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-        @SuppressWarnings({"unchecked", "SynchronizeOnNonFinalField"})
-        public void onInvocation(@javax.annotation.Nonnull final java.util.List<?> objects,
+        @Override
+        @SuppressWarnings("unchecked")
+        protected void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
 
             synchronized(mMutex) {

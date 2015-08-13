@@ -510,8 +510,9 @@ public class RoutineTest {
                 JRoutine.on(factoryOf(invokeSquareSum, this, sumRoutine, squareRoutine))
                         .buildRoutine();
 
-//        assertThat(squareSumRoutine.syncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(
-//                30);
+        //        assertThat(squareSumRoutine.syncCall(1, 2, 3, 4).afterMax(timeout).all())
+        // .containsExactly(
+        //                30);
         assertThat(squareSumRoutine.asyncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(
                 30);
     }

@@ -26,8 +26,6 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
-import com.gh.bmd.jrt.invocation.MethodInvocation;
-import com.gh.bmd.jrt.invocation.MethodInvocationDecorator;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
@@ -313,10 +311,7 @@ class DefaultClassRoutineBuilder
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodFunctionInvocation extends FunctionInvocation<Object, Object>
-            implements MethodInvocation<Object, Object> {
-
-        private final MethodInvocationDecorator mDecorator;
+    private static class MethodFunctionInvocation extends FunctionInvocation<Object, Object> {
 
         private final InputMode mInputMode;
 
@@ -353,15 +348,14 @@ class DefaultClassRoutineBuilder
                 mMutex = this;
             }
 
-            mDecorator = proxyConfiguration.getMethodDecoratorOr(
-                    MethodInvocationDecorator.NO_DECORATION);
             mTargetReference = targetReference;
             mMethod = method;
             mInputMode = inputMode;
             mOutputMode = outputMode;
         }
 
-        public void onInvocation(@Nonnull final List<?> objects,
+        @Override
+        protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
             final Object target = mTargetReference.get();
@@ -372,15 +366,6 @@ class DefaultClassRoutineBuilder
             }
 
             callFromInvocation(mMethod, mMutex, target, objects, result, mInputMode, mOutputMode);
-        }
-
-        @Override
-        protected void onCall(@Nonnull final List<?> objects,
-                @Nonnull final ResultChannel<Object> result) {
-
-            final Method method = mMethod;
-            mDecorator.decorate(this, method.getName(), method.getParameterTypes())
-                      .onInvocation(objects, result);
         }
     }
 

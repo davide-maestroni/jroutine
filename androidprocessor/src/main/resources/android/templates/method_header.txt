@@ -22,21 +22,7 @@
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final String decoratorClassName;
-        final com.gh.bmd.jrt.invocation.MethodInvocationDecorator decorator = proxyConfiguration.getMethodDecoratorOr(null);
-
-        if (decorator != null) {
-
-            final Class<?> decoratorClass = decorator.getClass();
-            com.gh.bmd.jrt.util.Reflection.findConstructor(decoratorClass);
-            decoratorClassName = decoratorClass.getName();
-
-        } else {
-
-            decoratorClassName = null;
-        }
-
-        return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, decoratorClassName, ${shareGroup}, mTargetClass, mFactoryArgs)
+        return getBuilder(mContext, new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${shareGroup}, mTargetClass, mFactoryArgs)
                                            .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}

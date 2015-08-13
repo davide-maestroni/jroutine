@@ -800,8 +800,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror outputChannelType = this.outputChannelType;
-        final TypeMirror iterableType = this.iterableType;
-        final TypeMirror listType = this.listType;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
         final TypeElement annotationElement = getTypeFromName(Input.class.getCanonicalName());
@@ -810,57 +808,13 @@ public class RoutineProcessor extends AbstractProcessor {
                 (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
         InputMode inputMode = annotation.mode();
 
-        if (inputMode == InputMode.AUTO) {
-
-            if (typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
-
-                if ((length == 1) && (targetMirror != null) && (
-                        (targetMirror.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
-                                listType, targetMirror))) {
-
-                    inputMode = InputMode.COLLECTION;
-
-                } else {
-
-                    inputMode = InputMode.VALUE;
-                }
-
-            } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
-                    targetTypeErasure, iterableType)) {
-
-                if ((targetType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
-                        getBoxedType(((ArrayType) targetType).getComponentType()),
-                        getBoxedType(targetMirror))) {
-
-                    throw new IllegalArgumentException(
-                            "[" + methodElement + "] the async input array with mode "
-                                    + InputMode.PARALLEL + " does not match the bound type: "
-                                    + targetMirror);
-                }
-
-                if (length > 1) {
-
-                    throw new IllegalArgumentException(
-                            "[" + methodElement + "] an async input with mode " + InputMode.PARALLEL
-                                    + " cannot be applied to a method taking " + length
-                                    + " input parameters");
-                }
-
-                inputMode = InputMode.PARALLEL;
-
-            } else {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement + "] cannot automatically choose an "
-                                + "input mode for an output of type: " + targetParameter);
-            }
-
-        } else if (inputMode == InputMode.VALUE) {
+        if (inputMode == InputMode.VALUE) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.VALUE
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.VALUE
                                 + " must implement an " + outputChannelType);
             }
 
@@ -869,7 +823,8 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.COLLECTION
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.COLLECTION
                                 + " must implement an " + outputChannelType);
             }
 
@@ -877,14 +832,16 @@ public class RoutineProcessor extends AbstractProcessor {
                     && !typeUtils.isAssignable(listType, targetMirror)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.COLLECTION
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.COLLECTION
                                 + " must be bound to an array or a superclass of " + listType);
             }
 
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.COLLECTION
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.COLLECTION
                                 + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
@@ -895,7 +852,8 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetTypeErasure, iterableType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.PARALLEL
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.PARALLEL
                                 + " must be an array or implement an " + iterableType);
             }
 
@@ -904,15 +862,16 @@ public class RoutineProcessor extends AbstractProcessor {
                     getBoxedType(targetMirror))) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] the async input array with mode "
-                                + InputMode.PARALLEL + " does not match the bound type: "
-                                + targetMirror);
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] the async input array with mode " + InputMode.PARALLEL
+                                + " does not match the bound type: " + targetMirror);
             }
 
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.PARALLEL
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.PARALLEL
                                 + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
@@ -949,7 +908,6 @@ public class RoutineProcessor extends AbstractProcessor {
                     "the proxy method has incompatible return type: " + methodElement);
         }
 
-        final TypeMirror listType = this.listType;
         final TypeElement annotationElement = getTypeFromName(Inputs.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final List<AnnotationValue> targetMirrors =
@@ -964,28 +922,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         InputMode inputMode = annotation.mode();
 
-        if (inputMode == InputMode.AUTO) {
-
-            if (targetMirrors.size() == 1) {
-
-                final TypeMirror targetType = (TypeMirror) targetMirrors.get(0).getValue();
-
-                if ((targetType != null) && ((targetType.getKind() == TypeKind.ARRAY)
-                        || typeUtils.isAssignable(listType, typeUtils.erasure(targetType)))) {
-
-                    inputMode = InputMode.COLLECTION;
-
-                } else {
-
-                    inputMode = InputMode.PARALLEL;
-                }
-
-            } else {
-
-                inputMode = InputMode.VALUE;
-            }
-
-        } else if (inputMode == InputMode.COLLECTION) {
+        if (inputMode == InputMode.COLLECTION) {
 
             final TypeMirror targetType = (TypeMirror) targetMirrors.get(0).getValue();
 
@@ -993,14 +930,16 @@ public class RoutineProcessor extends AbstractProcessor {
                     && !typeUtils.isAssignable(listType, typeUtils.erasure(targetType)))) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.COLLECTION
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.COLLECTION
                                 + " must be bound to an array or a superclass of " + listType);
             }
 
             if (targetMirrors.size() > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.COLLECTION +
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.COLLECTION +
                                 " cannot be applied to a method taking " + targetMirrors.size()
                                 + " input parameters");
             }
@@ -1010,7 +949,8 @@ public class RoutineProcessor extends AbstractProcessor {
             if (targetMirrors.size() > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async input with mode " + InputMode.PARALLEL +
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async input with mode " + InputMode.PARALLEL +
                                 " cannot be applied to a method taking " + targetMirrors.size()
                                 + " input parameters");
             }
@@ -1472,9 +1412,9 @@ public class RoutineProcessor extends AbstractProcessor {
                         getBoxedType(((ArrayType) returnType).getComponentType()))) {
 
                     throw new IllegalArgumentException(
-                            "[" + methodElement + "] the async output array with mode "
-                                    + OutputMode.COLLECTION + " does not match the bound type: "
-                                    + targetMirror);
+                            "[" + methodElement.getEnclosingElement() + methodElement
+                                    + "] the async output array with mode " + OutputMode.COLLECTION
+                                    + " does not match the bound type: " + targetMirror);
                 }
 
                 outputMode = OutputMode.COLLECTION;
@@ -1494,7 +1434,8 @@ public class RoutineProcessor extends AbstractProcessor {
             } else {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] cannot automatically choose an "
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] cannot automatically choose an "
                                 + "output mode for an input of type: " + returnType);
             }
 
@@ -1503,7 +1444,8 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with mode " + OutputMode.VALUE
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async output with mode " + OutputMode.VALUE
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1512,7 +1454,8 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with mode " + OutputMode.VALUE
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async output with mode " + OutputMode.VALUE
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1520,7 +1463,8 @@ public class RoutineProcessor extends AbstractProcessor {
                     && !typeUtils.isAssignable(targetMirror, iterableType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with mode " + OutputMode.ELEMENT
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async output with mode " + OutputMode.ELEMENT
                                 + " must be bound to an array or a type implementing an "
                                 + iterableType);
             }
@@ -1531,7 +1475,8 @@ public class RoutineProcessor extends AbstractProcessor {
                                                                                     erasure)) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] an async output with mode " + OutputMode.COLLECTION
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] an async output with mode " + OutputMode.COLLECTION
                                 + " must be an array or a superclass of " + listType);
             }
 
@@ -1540,9 +1485,9 @@ public class RoutineProcessor extends AbstractProcessor {
                     getBoxedType(((ArrayType) returnType).getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "[" + methodElement + "] the async output array with mode "
-                                + OutputMode.COLLECTION + " does not match the bound type: "
-                                + targetMirror);
+                        "[" + methodElement.getEnclosingElement() + methodElement
+                                + "] the async output array with mode " + OutputMode.COLLECTION
+                                + " does not match the bound type: " + targetMirror);
             }
         }
 

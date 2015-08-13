@@ -80,7 +80,7 @@ public @interface Inputs {
      *
      * @return the mode.
      */
-    InputMode mode() default InputMode.AUTO;
+    InputMode mode() default InputMode.VALUE;
 
     /**
      * The array of parameter types.

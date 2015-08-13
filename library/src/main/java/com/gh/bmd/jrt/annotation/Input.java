@@ -77,7 +77,7 @@ public @interface Input {
      *
      * @return the mode.
      */
-    InputMode mode() default InputMode.AUTO;
+    InputMode mode() default InputMode.VALUE;
 
     /**
      * The parameter class.
@@ -117,13 +117,5 @@ public @interface Input {
          * must be the only parameter accepted by the method.
          */
         PARALLEL,
-        /**
-         * Automatic mode.<br/>
-         * The mode is automatically assigned based to the parameter or return type. Namely: if the
-         * parameters match the COLLECTION input mode, that one is chosen; if they match the VALUE
-         * input mode, it is chosen the latter; finally the PARALLEL input mode conditions are
-         * checked.
-         */
-        AUTO // TODO: 13/08/15 remove?
     }
 }

@@ -22,12 +22,11 @@ import javax.annotation.Nullable;
 /**
  * Abstract implementation of a context invocation factory.
  * <p/>
- * This class implements <code>equals()</code> and <code>hashCode()</code> methods employing the
- * arguments specified in the constructor. Note, however, that based on the specific object
- * implementation the equality check may unexpectedly fail. For example, in case of a collection of
- * arrays, the object will not be equal to another collection containing different arrays storing
- * the same data. In fact an array <code>equals()</code> implementation does not override the Object
- * one.
+ * This class implements {@code equals()} and {@code hashCode()} methods employing the arguments
+ * specified in the constructor. Note, however, that based on the specific object implementation, the
+ * equality check may unexpectedly fail. For example, in case of a collection of arrays, the object
+ * will not be equal to another collection containing different arrays storing the same data. In
+ * fact an array {@code equals()} implementation does not override the {@code Object} one.
  * <p/>
  * Created by davide-maestroni on 28/05/15.
  *

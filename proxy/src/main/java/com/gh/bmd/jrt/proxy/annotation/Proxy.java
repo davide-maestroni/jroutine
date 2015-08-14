@@ -35,8 +35,8 @@ import java.lang.annotation.Target;
  * <p/>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
  * proxy interface must declare the same generic types as the wrapped class or interface.
- * Additionally, the generic parameters must be declared as <code>Object</code> in order for the
- * proxy interface methods to match the target ones.<br/>
+ * Additionally, the generic parameters must be declared as {@code Object} in order for the proxy
+ * interface methods to match the target ones.<br/>
  * Be also aware that it is responsibility of the caller to ensure that the same instance is not
  * wrapped around two different generic interfaces.<br/>
  * For example, a class of the type:

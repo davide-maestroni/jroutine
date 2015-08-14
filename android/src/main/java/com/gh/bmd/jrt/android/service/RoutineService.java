@@ -868,15 +868,10 @@ public class RoutineService extends Service {
                 invocation.onContext(mContext);
                 return invocation;
 
-            } catch (final RoutineException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw e;
-
             } catch (final Throwable t) {
 
                 logger.err(t, "error creating the invocation instance");
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
     }

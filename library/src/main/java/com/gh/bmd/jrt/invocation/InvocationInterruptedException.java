@@ -32,4 +32,25 @@ public class InvocationInterruptedException extends InvocationException {
         super(cause);
         Thread.currentThread().interrupt();
     }
+
+    /**
+     * Checks if the specified throwable is not an interrupted exception.
+     *
+     * @param t the throwable.
+     * @throws InvocationInterruptedException if the specified throwable is an instance of
+     *                                        {@code InvocationInterruptedException} or
+     *                                        {@code InterruptedException}.
+     */
+    public static void ignoreIfPossible(@Nullable final Throwable t) {
+
+        if (t instanceof InvocationInterruptedException) {
+
+            throw ((InvocationInterruptedException) t);
+        }
+
+        if (t instanceof InterruptedException) {
+
+            throw new InvocationInterruptedException((InterruptedException) t);
+        }
+    }
 }

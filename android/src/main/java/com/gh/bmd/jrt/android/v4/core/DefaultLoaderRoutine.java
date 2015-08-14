@@ -22,7 +22,6 @@ import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
-import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.AbstractRoutine;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
@@ -116,13 +115,10 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
 
             invocation.onDestroy();
 
-        } catch (final InvocationInterruptedException e) {
+        } catch (final Throwable t) {
 
-            throw e;
-
-        } catch (final Throwable ignored) {
-
-            getLogger().wrn(ignored, "ignoring exception while destroying invocation instance");
+            InvocationInterruptedException.ignoreIfPossible(t);
+            getLogger().wrn(t, "ignoring exception while destroying invocation instance");
         }
 
         return newInvocation(type);
@@ -155,15 +151,10 @@ class DefaultLoaderRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT>
             invocation.onContext(loaderContext.getApplicationContext());
             return invocation;
 
-        } catch (final RoutineException e) {
-
-            logger.err(e, "error creating the invocation instance");
-            throw e;
-
         } catch (final Throwable t) {
 
             logger.err(t, "error creating the invocation instance");
-            throw new InvocationException(t);
+            throw InvocationException.wrapIfNeeded(t);
         }
     }
 

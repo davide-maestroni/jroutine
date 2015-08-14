@@ -136,10 +136,10 @@ public class Reflection {
     }
 
     /**
-     * Checks if the specified class is static or is a top class.
+     * Checks if the specified class is static or is a top level class.
      *
      * @param type the class.
-     * @return whether the class is static or a top class.
+     * @return whether the class is static or a top level class.
      */
     public static boolean isStaticClass(@Nonnull final Class<?> type) {
 

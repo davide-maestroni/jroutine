@@ -36,7 +36,6 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
@@ -435,13 +434,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                    .aliasMethod(mAliasName);
                 mTarget = target;
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
 
@@ -570,13 +565,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                    .method(mMethod);
                 mTarget = target;
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
     }
@@ -696,13 +687,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
                 mTarget = target;
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
     }

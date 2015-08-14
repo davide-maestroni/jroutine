@@ -22,7 +22,7 @@ import android.view.WindowManager.LayoutParams;
 import com.gh.bmd.jrt.android.R;
 
 /**
- * Test activity ensuring the creation of the loader manager during call to <code>onCreate()</code>.
+ * Test activity ensuring the creation of the loader manager during call to {@code onCreate()}.
  * <p/>
  * Created by davide-maestroni on 1/28/15.
  */

@@ -498,13 +498,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                                 logger.dbg("aborting consumer (%s): %s", consumer, output);
                                 consumer.onError(((RoutineExceptionWrapper) output).raise());
 
-                            } catch (final InvocationInterruptedException e) {
+                            } catch (final Throwable t) {
 
-                                throw e;
-
-                            } catch (final Throwable ignored) {
-
-                                logger.wrn(ignored, "ignoring consumer exception (%s)", consumer);
+                                InvocationInterruptedException.ignoreIfPossible(t);
+                                logger.wrn(t, "ignoring consumer exception (%s)", consumer);
                             }
 
                             break;
@@ -1773,13 +1770,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 logger.dbg("closing consumer (%s)", consumer);
                 consumer.onComplete();
 
-            } catch (final InvocationInterruptedException e) {
+            } catch (final Throwable t) {
 
-                throw e;
-
-            } catch (final Throwable ignored) {
-
-                logger.wrn(ignored, "ignoring consumer exception (%s)", consumer);
+                InvocationInterruptedException.ignoreIfPossible(t);
+                logger.wrn(t, "ignoring consumer exception (%s)", consumer);
             }
         }
 

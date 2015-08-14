@@ -58,22 +58,22 @@ import javax.annotation.Nullable;
  *            -----------------
  *     </code>
  * </pre>
- * Note that the <b><code>onInput()</code></b> method will be called for each input passed to the
- * routine, so, in case no input is expected, the <b><code>onResult()</code></b> method will be
- * called soon after the initialization.
+ * Note that the {@code onInput()} method will be called for each input passed to the routine, so,
+ * in case no input is expected, the {@code onResult()} method will be called soon after the
+ * initialization.
  * <p/>
- * Note also that <b><code>onAbort()</code></b> might be called at any time between
- * <b><code>onInitialize()</code></b> and <b><code>onTerminate()</code></b> in case the execution is
- * aborted.<br/>
- * The only case in which the <b><code>onTerminate()</code></b> method does not get call at all, is
- * when an exception escapes the <b><code>onAbort()</code></b> method invocation.
+ * Note also that {@code onAbort()} might be called at any time between {@code onInitialize()} and
+ * {@code onTerminate()} in case the execution is aborted.
+ * <br/>
+ * The only case in which the {@code onTerminate()} method does not get call at all, is when an
+ * exception escapes the {@code onAbort()} method invocation.
  * <p/>
- * The <b><code>onTerminate()</code></b> method is meant to allow the clean up and reset operations
- * needed to prepare the invocation object to be reused. When the method is not called or does not
- * complete successfully, the invocation object is discarded.<br/>
- * The <b><code>onDestroy()</code></b> method is meant to indicate that the invocation object is no
- * longer needed, so any associated resource can be safely released. Note that this method may never
- * get called if the routine is automatically garbage collected.
+ * The {@code onTerminate()} method is meant to allow the clean up and reset operations needed to
+ * prepare the invocation object to be reused. When the method is not called or does not complete
+ * successfully, the invocation object is discarded.<br/>
+ * The {@code onDestroy()} method is meant to indicate that the invocation object is no longer
+ * needed, so any associated resource can be safely released. Note that this method may never get
+ * called if the routine is automatically garbage collected.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
  * {@link com.gh.bmd.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause

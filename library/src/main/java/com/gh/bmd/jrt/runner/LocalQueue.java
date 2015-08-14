@@ -277,30 +277,16 @@ class LocalQueue {
 
                 try {
 
-                    // This call could be re-entrant
                     execution.run();
 
-                } catch (final InvocationInterruptedException e) {
+                } finally {
 
-                    throw e;
-
-                } catch (final Throwable ignored) {
-
-                }
-
-                // Note that the field values may have changed here
-                final int n = mFirst;
-                mExecutions[n] = null;
-                mDelays[n] = null;
-                final int newFirst = mFirst + 1;
-
-                if (newFirst >= mExecutions.length) {
-
-                    mFirst = 0;
-
-                } else {
-
-                    mFirst = newFirst;
+                    // Note that the field values may have changed here
+                    final int n = mFirst;
+                    mExecutions[n] = null;
+                    mDelays[n] = null;
+                    final int newFirst = n + 1;
+                    mFirst = (newFirst < mExecutions.length) ? newFirst : 0;
                 }
             }
 

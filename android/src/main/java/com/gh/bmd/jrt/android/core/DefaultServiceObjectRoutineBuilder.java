@@ -28,7 +28,6 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
@@ -407,13 +406,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                    .aliasMethod(mAliasName);
                 mTarget = target;
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
 
@@ -513,13 +508,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                    .method(mMethodName, mParameterTypes);
                 mTarget = target;
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
     }
@@ -611,13 +602,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
                 mTarget = target;
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
     }

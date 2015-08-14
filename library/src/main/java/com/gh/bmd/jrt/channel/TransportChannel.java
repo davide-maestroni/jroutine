@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
  * <p/>
  * A transport channel is useful to make other asynchronous tasks communicate with a routine.<br/>
  * The channel output can be passed to a routine input channel in order to feed it with data coming
- * asynchronously from other sources. Note however that, in any case, the <code>close()</code>
- * method must be called in order to correctly terminate the invocation lifecycle.
+ * asynchronously from other sources. Note however that, in any case, the {@code close()} method
+ * must be called in order to correctly terminate the invocation lifecycle.
  * <p/>
  * Created by davide-maestroni on 10/25/14.
  *

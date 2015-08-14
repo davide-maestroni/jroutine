@@ -288,13 +288,15 @@
             private interface AsyncMain {
 
                 &commat;Output
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Input(String.class) String[] args);
+                OutputChannel&lt;Integer&gt; parseArg(
+                        &commat;Input(value = String.class, mode = InputMode.PARALLEL) String[] args);
 
                 &commat;Output
                 OutputChannel&lt;Integer&gt; square(
                         &commat;Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
-                double squareRootMean(&commat;Input(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(
+                        &commat;Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>

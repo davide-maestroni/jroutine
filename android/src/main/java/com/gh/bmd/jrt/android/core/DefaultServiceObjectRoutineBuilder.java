@@ -97,9 +97,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             throw new NullPointerException("the context must not be null");
         }
 
-        if (targetClass == null) {
+        if (targetClass.isPrimitive()) {
 
-            throw new NullPointerException("the target class must not be null");
+            // the parceling of primitive classes is broken...
+            throw new IllegalArgumentException("the target class cannot be primitive");
         }
 
         mContext = context;
@@ -141,6 +142,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private static Class<?>[] forNames(@Nonnull final String[] names) throws
             ClassNotFoundException {
 
+        // the forName() of primitive classes is broken...
         final int length = names.length;
         final Class<?>[] classes = new Class[length];
         final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
@@ -233,7 +235,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{shareGroup, targetClass.getName(), mFactoryArgs, name};
+        final Object[] args = new Object[]{shareGroup, targetClass, mFactoryArgs, name};
         return JRoutine.on(mContext, new MethodAliasToken<INPUT, OUTPUT>(), args)
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
@@ -251,8 +253,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Class<?> targetClass = mTargetClass;
         final Method targetMethod = findMethod(targetClass, name, parameterTypes);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{shareGroup, targetClass.getName(), mFactoryArgs, name,
-                                           toNames(parameterTypes)};
+        final Object[] args =
+                new Object[]{shareGroup, targetClass, mFactoryArgs, name, toNames(parameterTypes)};
         return JRoutine.on(mContext, new MethodSignatureToken<INPUT, OUTPUT>(), args)
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
@@ -376,17 +378,17 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param shareGroup      the share group name.
-         * @param targetClassName the target object class name.
-         * @param args            the factory constructor arguments.
-         * @param name            the alias name.
+         * @param shareGroup  the share group name.
+         * @param targetClass the target object class.
+         * @param args        the factory constructor arguments.
+         * @param name        the alias name.
          */
         public MethodAliasInvocation(@Nullable final String shareGroup,
-                @Nonnull final String targetClassName, @Nonnull final Object[] args,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
                 @Nonnull final String name) throws ClassNotFoundException {
 
             mShareGroup = shareGroup;
-            mTargetClass = Class.forName(targetClassName); // TODO: 14/08/15 test on Lollipop
+            mTargetClass = targetClass;
             mArgs = args;
             mAliasName = name;
         }
@@ -462,20 +464,20 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param shareGroup      the share group name.
-         * @param targetClassName the target object class name.
-         * @param args            the factory constructor arguments.
-         * @param name            the method name.
-         * @param parameterTypes  the method parameter type names.
+         * @param shareGroup     the share group name.
+         * @param targetClass    the target object class.
+         * @param args           the factory constructor arguments.
+         * @param name           the method name.
+         * @param parameterTypes the method parameter type names.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
         public MethodSignatureInvocation(@Nullable final String shareGroup,
-                @Nonnull final String targetClassName, @Nonnull final Object[] args,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
                 @Nonnull final String name, @Nonnull final String[] parameterTypes) throws
                 ClassNotFoundException {
 
             mShareGroup = shareGroup;
-            mTargetClass = Class.forName(targetClassName);
+            mTargetClass = targetClass;
             mArgs = args;
             mMethodName = name;
             mParameterTypes = forNames(parameterTypes);
@@ -551,7 +553,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * Constructor.
          *
          * @param shareGroup           the share group name.
-         * @param targetClassName      the target object class name.
+         * @param targetClass          the target object class.
          * @param args                 the factory constructor arguments.
          * @param targetMethodName     the target method name.
          * @param targetParameterTypes the target method parameter type names.
@@ -561,14 +563,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
         public ProxyInvocation(@Nullable final String shareGroup,
-                @Nonnull final String targetClassName, @Nonnull final Object[] args,
+                @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
                 @Nonnull final String targetMethodName,
                 @Nonnull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) throws ClassNotFoundException,
                 NoSuchMethodException {
 
             mShareGroup = shareGroup;
-            final Class<?> targetClass = Class.forName(targetClassName);
             mTargetClass = targetClass;
             mArgs = args;
             mTargetMethod = targetClass.getMethod(targetMethodName, forNames(targetParameterTypes));
@@ -652,7 +653,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
             final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, method);
             final Object[] factoryArgs =
-                    new Object[]{shareGroup, targetClass.getName(), mArgs, targetMethod.getName(),
+                    new Object[]{shareGroup, targetClass, mArgs, targetMethod.getName(),
                                  toNames(targetParameterTypes), inputMode, outputMode};
             final Routine<Object, Object> routine = JRoutine.on(mContext, PROXY_TOKEN, factoryArgs)
                                                             .invocations()

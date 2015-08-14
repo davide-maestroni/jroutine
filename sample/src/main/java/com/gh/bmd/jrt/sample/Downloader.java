@@ -146,8 +146,8 @@ public class Downloader {
             // in order to be able to abort the download at any time, we need to split the
             // processing between the routine responsible for reading the data from the socket, and
             // the one writing the next chunk of bytes to the local file
-            // in such way we can abort the download between two chunks are passed to the specific
-            // routine
+            // in such way we can abort the download between two chunks, while they are passed to
+            // the specific routine
             // for this reason we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
                     JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).invocations()
@@ -186,7 +186,7 @@ public class Downloader {
     }
 
     /**
-     * Waits for the specified time for the resource to complete downloading.
+     * Waits for the specified time for the resource to complete the downloading.
      *
      * @param uri     the URI of the resource.
      * @param timeout the time to wait for the download to complete.

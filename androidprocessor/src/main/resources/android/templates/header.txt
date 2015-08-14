@@ -37,9 +37,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             throw new NullPointerException("the service context must not be null");
         }
 
-        if (targetClass == null) {
+        if (targetClass.isPrimitive()) {
 
-            throw new NullPointerException("the target class must not be null");
+            // the parceling of primitive classes is broken...
+            throw new IllegalArgumentException("the target class cannot be primitive");
         }
 
         mContext = context;
@@ -114,9 +115,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
                 throw new NullPointerException("the service context must not be null");
             }
 
-            if (targetClass == null) {
+            if (targetClass.isPrimitive()) {
 
-                throw new NullPointerException("the target class must not be null");
+                // the parceling of primitive classes is broken...
+                throw new IllegalArgumentException("the target class cannot be primitive");
             }
 
             mContext = context;

@@ -188,13 +188,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     invocation.onDestroy();
 
-                } catch (final InvocationInterruptedException e) {
+                } catch (final Throwable t) {
 
-                    throw e;
-
-                } catch (final Throwable ignored) {
-
-                    logger.wrn(ignored, "ignoring exception while destroying invocation instance");
+                    InvocationInterruptedException.ignoreIfPossible(t);
+                    logger.wrn(t, "ignoring exception while destroying invocation instance");
                 }
             }
 
@@ -208,13 +205,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     invocation.onDestroy();
 
-                } catch (final InvocationInterruptedException e) {
+                } catch (final Throwable t) {
 
-                    throw e;
-
-                } catch (final Throwable ignored) {
-
-                    logger.wrn(ignored, "ignoring exception while destroying invocation instance");
+                    InvocationInterruptedException.ignoreIfPossible(t);
+                    logger.wrn(t, "ignoring exception while destroying invocation instance");
                 }
             }
 
@@ -397,13 +391,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     invocation.onDestroy();
 
-                } catch (final InvocationInterruptedException e) {
+                } catch (final Throwable t) {
 
-                    throw e;
-
-                } catch (final Throwable ignored) {
-
-                    logger.wrn(ignored, "ignoring exception while destroying invocation instance");
+                    InvocationInterruptedException.ignoreIfPossible(t);
+                    logger.wrn(t, "ignoring exception while destroying invocation instance");
                 }
 
                 hasDelayed = !mObservers.isEmpty();
@@ -444,14 +435,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                         invocation.onDestroy();
 
-                    } catch (final InvocationInterruptedException e) {
+                    } catch (final Throwable t) {
 
-                        throw e;
-
-                    } catch (final Throwable ignored) {
-
-                        logger.wrn(ignored,
-                                   "ignoring exception while destroying invocation instance");
+                        InvocationInterruptedException.ignoreIfPossible(t);
+                        logger.wrn(t, "ignoring exception while destroying invocation instance");
                     }
                 }
 

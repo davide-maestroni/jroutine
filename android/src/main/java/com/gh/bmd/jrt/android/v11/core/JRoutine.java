@@ -37,9 +37,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
  * prevent out of memory errors.
  * <p/>
- * The <code>equals()</code> and <code>hashCode()</code> methods of the input parameter objects and
- * the invocation factory, might be employed to check for clashing of invocation instances or
- * compute the loader ID.<br/>
+ * The {@code equals()} and {@code hashCode()} methods of the input parameter objects and the
+ * invocation factory, might be employed to check for clashing of invocation instances or compute
+ * the loader ID.<br/>
  * In case the caller could not guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or an input independent clash resolution should be used in
  * order to avoid unexpected results.

@@ -16,7 +16,6 @@ package com.gh.bmd.jrt.android.proxy.app;
 import android.app.Application;
 
 import com.gh.bmd.jrt.android.builder.FactoryContext;
-import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 
 import java.util.Arrays;
@@ -54,13 +53,9 @@ public class TestApp extends Application implements FactoryContext {
                 instance = findConstructor(type, args).newInstance(args);
                 instanceMap.put(instanceInfo, instance);
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
 

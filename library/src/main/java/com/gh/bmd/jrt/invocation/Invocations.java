@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.invocation;
 
-import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.util.ClassToken;
 
 import java.lang.reflect.Constructor;
@@ -230,13 +229,9 @@ public class Invocations {
 
                 return mConstructor.newInstance(mArgs);
 
-            } catch (final RoutineException e) {
-
-                throw e;
-
             } catch (final Throwable t) {
 
-                throw new InvocationException(t);
+                throw InvocationException.wrapIfNeeded(t);
             }
         }
     }

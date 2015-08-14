@@ -83,7 +83,7 @@ import javax.annotation.Nullable;
 public interface Routine<INPUT, OUTPUT> {
 
     /**
-     * Short for <b><code>asyncInvoke().result()</code></b>.
+     * Short for {@code asyncInvoke().result()}.
      *
      * @return the output channel.
      */
@@ -91,7 +91,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> asyncCall();
 
     /**
-     * Short for <b><code>asyncInvoke().pass(input).result()</code></b>.
+     * Short for {@code asyncInvoke().pass(input).result()}.
      *
      * @param input the input.
      * @return the output channel.
@@ -100,7 +100,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> asyncCall(@Nullable INPUT input);
 
     /**
-     * Short for <b><code>asyncInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code asyncInvoke().pass(inputs).result()}.
      *
      * @param inputs the input data.
      * @return the output channel.
@@ -109,7 +109,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> asyncCall(@Nullable INPUT... inputs);
 
     /**
-     * Short for <b><code>asyncInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code asyncInvoke().pass(inputs).result()}.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
@@ -118,7 +118,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> asyncCall(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <b><code>asyncInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code asyncInvoke().pass(inputs).result()}.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
@@ -135,7 +135,7 @@ public interface Routine<INPUT, OUTPUT> {
     InvocationChannel<INPUT, OUTPUT> asyncInvoke();
 
     /**
-     * Short for <b><code>parallelInvoke().result()</code></b>.
+     * Short for {@code parallelInvoke().result()}.
      * <p/>
      * (This method actually makes little sense, and should never need to be called, thought it is
      * here for completeness)
@@ -146,7 +146,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> parallelCall();
 
     /**
-     * Short for <b><code>parallelInvoke().pass(input).result()</code></b>.
+     * Short for {@code parallelInvoke().pass(input).result()}.
      * <p/>
      * (This method actually makes little sense, and should never need to be called, thought it is
      * here for completeness)
@@ -158,7 +158,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> parallelCall(@Nullable INPUT input);
 
     /**
-     * Short for <b><code>parallelInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code parallelInvoke().pass(inputs).result()}.
      *
      * @param inputs the input data.
      * @return the output channel.
@@ -167,7 +167,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> parallelCall(@Nullable INPUT... inputs);
 
     /**
-     * Short for <b><code>parallelInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code parallelInvoke().pass(inputs).result()}.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
@@ -176,7 +176,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> parallelCall(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <b><code>parallelInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code parallelInvoke().pass(inputs).result()}.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
@@ -203,7 +203,7 @@ public interface Routine<INPUT, OUTPUT> {
     void purge();
 
     /**
-     * Short for <b><code>syncInvoke().result()</code></b>.
+     * Short for {@code syncInvoke().result()}.
      *
      * @return the output channel.
      */
@@ -211,7 +211,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> syncCall();
 
     /**
-     * Short for <b><code>syncInvoke().pass(input).result()</code></b>.
+     * Short for {@code syncInvoke().pass(input).result()}.
      *
      * @param input the input.
      * @return the output channel.
@@ -220,7 +220,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> syncCall(@Nullable INPUT input);
 
     /**
-     * Short for <b><code>syncInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code syncInvoke().pass(inputs).result()}.
      *
      * @param inputs the input data.
      * @return the output channel.
@@ -229,7 +229,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> syncCall(@Nullable INPUT... inputs);
 
     /**
-     * Short for <b><code>syncInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code syncInvoke().pass(inputs).result()}.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
@@ -238,7 +238,7 @@ public interface Routine<INPUT, OUTPUT> {
     OutputChannel<OUTPUT> syncCall(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <b><code>syncInvoke().pass(inputs).result()</code></b>.
+     * Short for {@code syncInvoke().pass(inputs).result()}.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.

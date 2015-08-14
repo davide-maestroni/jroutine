@@ -145,13 +145,10 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
             mInvocation.onDestroy();
 
-        } catch (final InvocationInterruptedException e) {
+        } catch (final Throwable t) {
 
-            throw e;
-
-        } catch (final Throwable ignored) {
-
-            mLogger.wrn(ignored, "ignoring exception while destroying invocation instance");
+            InvocationInterruptedException.ignoreIfPossible(t);
+            mLogger.wrn(t, "ignoring exception while destroying invocation instance");
         }
 
         mLogger.dbg("resetting result");

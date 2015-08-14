@@ -540,15 +540,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             logger.dbg("creating a new invocation instance [%d]", loaderId);
             invocation = factory.newInvocation();
 
-        } catch (final RoutineException e) {
-
-            logger.err(e, "error creating the invocation instance [%d]", loaderId);
-            throw e;
-
         } catch (final Throwable t) {
 
             logger.err(t, "error creating the invocation instance [%d]", loaderId);
-            throw new InvocationException(t);
+            throw InvocationException.wrapIfNeeded(t);
         }
 
         return invocation;

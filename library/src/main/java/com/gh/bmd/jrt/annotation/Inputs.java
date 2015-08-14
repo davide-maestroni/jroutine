@@ -52,8 +52,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Note that the transfer mode is specifically chosen through the annotation <code>mode</code>
- * attribute.
+ * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute.
  * <p/>
  * The proxying method can also return the routine wrapping the target one, as:
  * <p/>

@@ -386,7 +386,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 @Nonnull final String name) throws ClassNotFoundException {
 
             mShareGroup = shareGroup;
-            mTargetClass = Class.forName(targetClassName);
+            mTargetClass = Class.forName(targetClassName); // TODO: 14/08/15 test on Lollipop
             mArgs = args;
             mAliasName = name;
         }

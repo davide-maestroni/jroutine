@@ -44,13 +44,9 @@
                         result.pass(element);
                     }
 
-                } catch (final com.gh.bmd.jrt.channel.RoutineException e) {
-
-                    throw e;
-
                 } catch (final Throwable t) {
 
-                    throw new com.gh.bmd.jrt.invocation.InvocationException(t);
+                    throw com.gh.bmd.jrt.invocation.InvocationException.wrapIfNeeded(t);
                 }
             }
         }

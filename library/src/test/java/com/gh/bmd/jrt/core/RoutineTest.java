@@ -116,7 +116,7 @@ public class RoutineTest {
         assertThat(inputChannel1.isOpen()).isFalse();
         assertThat(outputChannel1.isOpen()).isTrue();
         assertThat(outputChannel1.afterMax(timeout).hasNext()).isTrue();
-        assertThat(outputChannel1.afterMax(timeout).next()).isEqualTo("test1");
+        assertThat(outputChannel1.afterMax(timeout).all()).containsExactly("test1");
         assertThat(outputChannel1.isOpen()).isFalse();
         assertThat(outputChannel1.afterMax(timeout).hasNext()).isFalse();
 

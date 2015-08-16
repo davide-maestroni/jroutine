@@ -43,6 +43,7 @@ import com.gh.bmd.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.FunctionInvocation;
 import com.gh.bmd.jrt.invocation.Invocation;
+import com.gh.bmd.jrt.invocation.InvocationDeadlockException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
@@ -1690,7 +1691,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final NoSuchElementException ignored) {
+        } catch (final InvocationDeadlockException ignored) {
 
         }
     }

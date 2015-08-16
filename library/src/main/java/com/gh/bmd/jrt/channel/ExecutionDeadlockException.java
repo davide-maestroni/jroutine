@@ -23,6 +23,15 @@ import javax.annotation.Nullable;
 public class ExecutionDeadlockException extends DeadlockException {
 
     /**
+     * Constructor.<br/>
+     * A default message will be set.
+     */
+    public ExecutionDeadlockException() {
+
+        super("cannot wait on the invocation runner thread: " + Thread.currentThread());
+    }
+
+    /**
      * Constructor.
      *
      * @param message the error message.

@@ -351,7 +351,8 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
         if (mRunner.isExecutionThread()) {
 
             mInputCount -= count;
-            throw new InputDeadlockException("cannot wait on the invocation runner thread");
+            throw new InputDeadlockException(
+                    "cannot wait on the invocation runner thread: " + Thread.currentThread());
         }
 
         try {

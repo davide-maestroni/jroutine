@@ -26,6 +26,7 @@ import com.gh.bmd.jrt.channel.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.OutputTimeoutException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.invocation.InvocationDeadlockException;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
@@ -98,6 +99,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private Object mConsumerMutex;
 
+    private boolean mIsWaitingInvocation;
+
     private OutputConsumer<? super OUTPUT> mOutputConsumer;
 
     private int mOutputCount;
@@ -158,7 +161,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             public boolean isTrue() {
 
-                return (mOutputCount <= maxOutputSize);
+                return (mOutputCount <= maxOutputSize) || mIsWaitingInvocation;
             }
         };
         mState = new OutputChannelState();
@@ -430,6 +433,29 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return outputChannel;
     }
 
+    /**
+     * Tells the channel that the invocation instance is not available.
+     */
+    void startWaitingInvocation() {
+
+        synchronized (mMutex) {
+
+            mIsWaitingInvocation = true;
+            mMutex.notifyAll();
+        }
+    }
+
+    /**
+     * Tells the channel that the invocation instance became available.
+     */
+    void stopWaitingInvocation() {
+
+        synchronized (mMutex) {
+
+            mIsWaitingInvocation = false;
+        }
+    }
+
     private void closeConsumer(@Nonnull final OutputChannelState state,
             @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
@@ -594,8 +620,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (mRunner.isExecutionThread()) {
 
-                    throw new ExecutionDeadlockException(
-                            "cannot wait on the invocation runner thread");
+                    throw new ExecutionDeadlockException();
+                }
+
+                if (mIsWaitingInvocation) {
+
+                    throw new InvocationDeadlockException();
                 }
 
                 if (mOutputHasNext == null) {
@@ -604,7 +634,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         public boolean isTrue() {
 
-                            return !outputQueue.isEmpty() || mState.isDone();
+                            return !outputQueue.isEmpty() || mState.isDone()
+                                    || mIsWaitingInvocation;
                         }
                     };
                 }
@@ -618,6 +649,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 } catch (final InterruptedException e) {
 
                     throw new InvocationInterruptedException(e);
+                }
+
+                if (mIsWaitingInvocation) {
+
+                    throw new InvocationDeadlockException();
                 }
 
                 if (isTimeout) {
@@ -717,7 +753,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (mRunner.isExecutionThread()) {
 
-            throw new ExecutionDeadlockException("cannot wait on the invocation runner thread");
+            throw new ExecutionDeadlockException();
+        }
+
+        if (mIsWaitingInvocation) {
+
+            throw new InvocationDeadlockException();
         }
 
         if (mOutputNotEmpty == null) {
@@ -726,7 +767,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 public boolean isTrue() {
 
-                    return !outputQueue.isEmpty() || mState.isDone();
+                    return !outputQueue.isEmpty() || mState.isDone() || mIsWaitingInvocation;
                 }
             };
         }
@@ -740,6 +781,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         } catch (final InterruptedException e) {
 
             throw new InvocationInterruptedException(e);
+        }
+
+        if (mIsWaitingInvocation) {
+
+            throw new InvocationDeadlockException();
         }
 
         if (isTimeout) {
@@ -776,7 +822,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         if (!delay.isZero() && mRunner.isExecutionThread()) {
 
             mOutputCount -= count;
-            throw new OutputDeadlockException("cannot wait on the invocation runner thread");
+            throw new OutputDeadlockException(
+                    "cannot wait on the invocation runner thread: " + Thread.currentThread());
         }
 
         try {
@@ -1020,8 +1067,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                             if (mRunner.isExecutionThread()) {
 
-                                throw new ExecutionDeadlockException(
-                                        "cannot wait on the invocation runner thread");
+                                throw new ExecutionDeadlockException();
+                            }
+
+                            if (mIsWaitingInvocation) {
+
+                                throw new InvocationDeadlockException();
                             }
 
                         } while (executionTimeout.waitSinceMillis(mMutex, startTime));
@@ -1071,10 +1122,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final TimeDuration executionTimeout = mExecutionTimeout;
 
-                if (!executionTimeout.isZero() && mRunner.isExecutionThread()) {
+                if (!executionTimeout.isZero()) {
 
-                    throw new ExecutionDeadlockException(
-                            "cannot wait on the invocation runner thread");
+                    if (mRunner.isExecutionThread()) {
+
+                        throw new ExecutionDeadlockException();
+                    }
+
+                    if (mIsWaitingInvocation) {
+
+                        throw new InvocationDeadlockException();
+                    }
                 }
 
                 final boolean isDone;
@@ -1085,13 +1143,18 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         public boolean isTrue() {
 
-                            return mState.isDone();
+                            return mState.isDone() || mIsWaitingInvocation;
                         }
                     });
 
                 } catch (final InterruptedException e) {
 
                     throw new InvocationInterruptedException(e);
+                }
+
+                if (mIsWaitingInvocation) {
+
+                    throw new InvocationDeadlockException();
                 }
 
                 if (!isDone) {

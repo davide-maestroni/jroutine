@@ -173,9 +173,11 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
             } finally {
 
-                if (mIsWaitingAbortInvocation) {
+                final AbortExecution abortExecution = mAbortExecution;
 
-                    mAbortExecution.onCreate(invocation);
+                if (mIsWaitingAbortInvocation && (abortExecution != null)) {
+
+                    abortExecution.onCreate(invocation);
                 }
             }
         }

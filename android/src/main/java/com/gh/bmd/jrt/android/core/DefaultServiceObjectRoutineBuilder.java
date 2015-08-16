@@ -418,7 +418,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if (mTarget == null) {
+            if ((mTarget == null) || (mRoutine == null)) {
 
                 throw new IllegalStateException("such error should never happen");
             }
@@ -487,7 +487,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if (mTarget == null) {
+            if ((mTarget == null) || (mRoutine == null)) {
 
                 throw new IllegalStateException("such error should never happen");
             }

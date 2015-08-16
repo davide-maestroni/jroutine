@@ -40,6 +40,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class Channels {
 
+    // TODO: 16/08/15 recyclable data
+
     /**
      * Avoid direct instantiation.
      */

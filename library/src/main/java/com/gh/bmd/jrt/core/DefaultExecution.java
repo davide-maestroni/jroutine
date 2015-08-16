@@ -50,6 +50,10 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
     private Invocation<INPUT, OUTPUT> mInvocation;
 
+    private boolean mIsWaitingAbortInvocation;
+
+    private boolean mIsWaitingInvocation;
+
     /**
      * Constructor.
      *
@@ -112,9 +116,11 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
         synchronized (mMutex) {
 
+            mIsWaitingInvocation = false;
             final InputIterator<INPUT> inputIterator = mInputIterator;
             final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+            resultChannel.stopWaitingInvocation();
 
             try {
 
@@ -164,6 +170,13 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
             } catch (final Throwable t) {
 
                 resultChannel.abortImmediately(t);
+
+            } finally {
+
+                if (mIsWaitingAbortInvocation) {
+
+                    mAbortExecution.onCreate(invocation);
+                }
             }
         }
     }
@@ -174,7 +187,18 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
         synchronized (mMutex) {
 
+            if (mIsWaitingInvocation) {
+
+                return;
+            }
+
             invocation = mInvocation;
+            mIsWaitingInvocation = (invocation == null);
+
+            if (mIsWaitingAbortInvocation) {
+
+                return;
+            }
         }
 
         if (invocation != null) {
@@ -184,6 +208,14 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
         } else {
 
             mInvocationManager.create(this);
+
+            synchronized (mMutex) {
+
+                if (mInvocation == null) {
+
+                    mResultChannel.startWaitingInvocation();
+                }
+            }
         }
     }
 
@@ -258,6 +290,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
             synchronized (mMutex) {
 
+                mIsWaitingAbortInvocation = false;
                 final InputIterator<INPUT> inputIterator = mInputIterator;
 
                 if (!inputIterator.isAborting()) {
@@ -293,6 +326,11 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
                 } finally {
 
                     inputIterator.onAbortComplete();
+
+                    if (mIsWaitingInvocation) {
+
+                        DefaultExecution.this.onCreate(invocation);
+                    }
                 }
             }
         }
@@ -311,7 +349,18 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
             synchronized (mMutex) {
 
+                if (mIsWaitingAbortInvocation) {
+
+                    return;
+                }
+
                 invocation = mInvocation;
+                mIsWaitingAbortInvocation = (invocation == null);
+
+                if (mIsWaitingInvocation) {
+
+                    return;
+                }
             }
 
             if (invocation != null) {
@@ -321,6 +370,14 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
             } else {
 
                 mInvocationManager.create(this);
+
+                synchronized (mMutex) {
+
+                    if (mInvocation == null) {
+
+                        mResultChannel.startWaitingInvocation();
+                    }
+                }
             }
         }
     }

@@ -48,8 +48,6 @@ import javax.annotation.Nullable;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
-    // TODO: 12/08/15 incomplete invocations deadlock
-
     private static final int DEFAULT_CORE_INVOCATIONS = 10;
 
     private static final int DEFAULT_MAX_INVOCATIONS = Integer.MAX_VALUE;

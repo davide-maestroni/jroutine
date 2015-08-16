@@ -57,6 +57,7 @@ public class ExceptionTest {
     @Test
     public void testExecutionDeadlockException() {
 
+        assertThat(new ExecutionDeadlockException().getMessage()).isNotEmpty();
         assertThat(new ExecutionDeadlockException("")).hasNoCause();
     }
 

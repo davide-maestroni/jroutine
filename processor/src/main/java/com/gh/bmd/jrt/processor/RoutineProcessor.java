@@ -76,8 +76,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class RoutineProcessor extends AbstractProcessor {
 
-    // TODO: 14/08/15 provided
-
     protected static final String NEW_LINE = System.getProperty("line.separator");
 
     private static final boolean DEBUG = false;

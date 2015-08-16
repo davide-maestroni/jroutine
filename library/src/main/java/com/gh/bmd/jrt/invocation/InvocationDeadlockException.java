@@ -26,6 +26,15 @@ import javax.annotation.Nullable;
 public class InvocationDeadlockException extends DeadlockException {
 
     /**
+     * Constructor.<br/>
+     * A default message will be set.
+     */
+    public InvocationDeadlockException() {
+
+        super("cannot wait while no invocation instance is available");
+    }
+
+    /**
      * Constructor.
      *
      * @param message the error message.

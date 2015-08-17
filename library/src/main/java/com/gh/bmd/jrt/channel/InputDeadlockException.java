@@ -29,6 +29,6 @@ public class InputDeadlockException extends DeadlockException {
      */
     public InputDeadlockException(@Nullable final String message) {
 
-        super(message);
+        super(message + "\nTry increasing the timeout or the max number of inputs");
     }
 }

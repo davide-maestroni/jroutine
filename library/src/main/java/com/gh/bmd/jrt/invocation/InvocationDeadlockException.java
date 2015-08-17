@@ -41,6 +41,6 @@ public class InvocationDeadlockException extends DeadlockException {
      */
     public InvocationDeadlockException(@Nullable final String message) {
 
-        super(message);
+        super(message + "\nTry increasing the max number of instances");
     }
 }

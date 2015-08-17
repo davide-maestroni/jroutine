@@ -48,6 +48,8 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
     private AbortExecution mAbortExecution;
 
+    private int mExecutionCount = 1;
+
     private Invocation<INPUT, OUTPUT> mInvocation;
 
     private boolean mIsWaitingAbortInvocation;
@@ -121,55 +123,63 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
             final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
             resultChannel.stopWaitingInvocation();
+            final int count = mExecutionCount;
+            mExecutionCount = 1;
 
             try {
 
-                inputIterator.onConsumeStart();
-                mLogger.dbg("running execution");
-                final boolean isComplete;
-
-                try {
-
-                    if (mInvocation == null) {
-
-                        mInvocation = invocation;
-                        mLogger.dbg("initializing invocation: %s", invocation);
-                        invocation.onInitialize();
-                    }
-
-                    while (inputIterator.hasInput()) {
-
-                        invocation.onInput(inputIterator.nextInput(), resultChannel);
-                    }
-
-                } finally {
-
-                    isComplete = inputIterator.onConsumeComplete();
-                }
-
-                if (isComplete) {
-
-                    invocation.onResult(resultChannel);
+                for (int i = 0; i < count; i++) {
 
                     try {
 
-                        invocation.onTerminate();
-                        manager.recycle(invocation);
+                        inputIterator.onConsumeStart();
+                        mLogger.dbg("running execution");
+                        final boolean isComplete;
 
-                    } catch (final Throwable ignored) {
+                        try {
 
-                        manager.discard(invocation);
+                            if (mInvocation == null) {
 
-                    } finally {
+                                mInvocation = invocation;
+                                mLogger.dbg("initializing invocation: %s", invocation);
+                                invocation.onInitialize();
+                            }
 
-                        resultChannel.close();
-                        inputIterator.onInvocationComplete();
+                            while (inputIterator.hasInput()) {
+
+                                invocation.onInput(inputIterator.nextInput(), resultChannel);
+                            }
+
+                        } finally {
+
+                            isComplete = inputIterator.onConsumeComplete();
+                        }
+
+                        if (isComplete) {
+
+                            invocation.onResult(resultChannel);
+
+                            try {
+
+                                invocation.onTerminate();
+                                manager.recycle(invocation);
+
+                            } catch (final Throwable ignored) {
+
+                                manager.discard(invocation);
+
+                            } finally {
+
+                                resultChannel.close();
+                                inputIterator.onInvocationComplete();
+                            }
+                        }
+
+                    } catch (final Throwable t) {
+
+                        resultChannel.abortImmediately(t);
                     }
                 }
-
-            } catch (final Throwable t) {
-
-                resultChannel.abortImmediately(t);
 
             } finally {
 
@@ -191,6 +201,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
             if (mIsWaitingInvocation) {
 
+                ++mExecutionCount;
                 return;
             }
 
@@ -288,42 +299,52 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
     private class AbortExecution extends TemplateExecution
             implements InvocationObserver<INPUT, OUTPUT> {
 
+        private int mAbortExecutionCount = 1;
+
         public void onCreate(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
                 mIsWaitingAbortInvocation = false;
                 final InputIterator<INPUT> inputIterator = mInputIterator;
-
-                if (!inputIterator.isAborting()) {
-
-                    mLogger.wrn("avoiding aborting since input is already aborted");
-                    return;
-                }
-
                 final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
                 final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-                final RoutineException exception = inputIterator.getAbortException();
-                mLogger.dbg(exception, "aborting invocation");
+                final int count = mAbortExecutionCount;
+                mAbortExecutionCount = 1;
 
                 try {
 
-                    if (mInvocation == null) {
+                    for (int i = 0; i < count; i++) {
 
-                        mInvocation = invocation;
-                        mLogger.dbg("initializing invocation: %s", invocation);
-                        invocation.onInitialize();
+                        if (!inputIterator.isAborting()) {
+
+                            mLogger.wrn("avoiding aborting since input is already aborted");
+                            return;
+                        }
+
+                        final RoutineException exception = inputIterator.getAbortException();
+                        mLogger.dbg(exception, "aborting invocation");
+
+                        try {
+
+                            if (mInvocation == null) {
+
+                                mInvocation = invocation;
+                                mLogger.dbg("initializing invocation: %s", invocation);
+                                invocation.onInitialize();
+                            }
+
+                            invocation.onAbort(exception);
+                            invocation.onTerminate();
+                            manager.recycle(invocation);
+                            resultChannel.close(exception);
+
+                        } catch (final Throwable t) {
+
+                            manager.discard(invocation);
+                            resultChannel.close(t);
+                        }
                     }
-
-                    invocation.onAbort(exception);
-                    invocation.onTerminate();
-                    manager.recycle(invocation);
-                    resultChannel.close(exception);
-
-                } catch (final Throwable t) {
-
-                    manager.discard(invocation);
-                    resultChannel.close(t);
 
                 } finally {
 
@@ -353,6 +374,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
                 if (mIsWaitingAbortInvocation) {
 
+                    ++mAbortExecutionCount;
                     return;
                 }
 

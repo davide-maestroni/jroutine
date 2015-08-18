@@ -332,7 +332,7 @@ class DefaultClassRoutineBuilder
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        public MethodFunctionInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
+        private MethodFunctionInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final WeakReference<?> targetReference, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
@@ -393,7 +393,7 @@ class DefaultClassRoutineBuilder
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        public MethodInvocationFactory(@Nonnull final ProxyConfiguration proxyConfiguration,
+        private MethodInvocationFactory(@Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final Object target, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
@@ -436,7 +436,7 @@ class DefaultClassRoutineBuilder
          * @param inputMode               the input transfer mode.
          * @param outputMode              the output transfer mode.
          */
-        public RoutineInfo(@Nonnull final InvocationConfiguration invocationConfiguration,
+        private RoutineInfo(@Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 

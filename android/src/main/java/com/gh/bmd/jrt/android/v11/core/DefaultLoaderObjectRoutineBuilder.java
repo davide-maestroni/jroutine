@@ -409,7 +409,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param name               the alias name.
          */
         @SuppressWarnings("unchecked")
-        public AliasContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
+        private AliasContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nonnull final String name) {
 
@@ -528,7 +528,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param method             the method.
          */
         @SuppressWarnings("unchecked")
-        public MethodContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
+        private MethodContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final Class<?> targetClass, @Nonnull final Object[] factoryArgs,
                 @Nonnull final Method method) {
 
@@ -648,7 +648,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        public ProxyInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
+        private ProxyInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final Object[] args, @Nonnull final Class<?> targetClass,
                 @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {

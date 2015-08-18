@@ -29,10 +29,11 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class FilterInvocation<INPUT, OUTPUT>
-        implements Invocation<INPUT, OUTPUT>, InvocationFactory<INPUT, OUTPUT> {
+public abstract class FilterInvocation<INPUT, OUTPUT> extends InvocationFactory<INPUT, OUTPUT>
+        implements Invocation<INPUT, OUTPUT> {
 
     @Nonnull
+    @Override
     public final Invocation<INPUT, OUTPUT> newInvocation() {
 
         return this;

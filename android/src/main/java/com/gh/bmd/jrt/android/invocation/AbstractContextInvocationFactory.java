@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 public abstract class AbstractContextInvocationFactory<INPUT, OUTPUT>
-        implements ContextInvocationFactory<INPUT, OUTPUT> {
+        extends ContextInvocationFactory<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 

@@ -169,7 +169,7 @@ public class ContextInvocations {
      * @param <OUTPUT> the output data type.
      */
     private static class AdaptingContextInvocationFactory<INPUT, OUTPUT>
-            implements InvocationFactory<INPUT, OUTPUT> {
+            extends InvocationFactory<INPUT, OUTPUT> {
 
         private final Context mContext;
 
@@ -199,6 +199,7 @@ public class ContextInvocations {
         }
 
         @Nonnull
+        @Override
         public Invocation<INPUT, OUTPUT> newInvocation() {
 
             final ContextInvocation<INPUT, OUTPUT> invocation = mFactory.newInvocation();

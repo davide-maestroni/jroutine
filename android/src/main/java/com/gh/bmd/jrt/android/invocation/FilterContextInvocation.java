@@ -32,9 +32,11 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 public abstract class FilterContextInvocation<INPUT, OUTPUT>
-        implements ContextInvocation<INPUT, OUTPUT>, ContextInvocationFactory<INPUT, OUTPUT> {
+        extends ContextInvocationFactory<INPUT, OUTPUT>
+        implements ContextInvocation<INPUT, OUTPUT> {
 
     @Nonnull
+    @Override
     public final ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
         return this;

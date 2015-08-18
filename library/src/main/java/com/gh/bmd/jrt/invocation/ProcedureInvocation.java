@@ -28,10 +28,11 @@ import javax.annotation.Nullable;
  *
  * @param <OUTPUT> the output data type.
  */
-public abstract class ProcedureInvocation<OUTPUT>
-        implements Invocation<Void, OUTPUT>, InvocationFactory<Void, OUTPUT> {
+public abstract class ProcedureInvocation<OUTPUT> extends InvocationFactory<Void, OUTPUT>
+        implements Invocation<Void, OUTPUT> {
 
     @Nonnull
+    @Override
     public final Invocation<Void, OUTPUT> newInvocation() {
 
         return this;

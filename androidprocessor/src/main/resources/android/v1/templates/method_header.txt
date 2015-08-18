@@ -16,7 +16,7 @@
 
     private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class ContextInvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
+    private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
 
         private final Object[] mFactoryArgs;
 
@@ -33,6 +33,7 @@
         }
 
         @javax.annotation.Nonnull
+        @Override
         public com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation() {
 
             return new ContextInvocation${methodCount}${genericTypes}(mShareGroup, mTargetClass, mFactoryArgs);

@@ -13,24 +13,26 @@
  */
 package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.builder.ChannelConfiguration.Builder;
 
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of transport channel objects.
+ * Interface defining a configurable builder of routines.
  * <p/>
- * Created by davide-maestroni on 3/7/15.
+ * Created by davide-maestroni on 18/08/15.
+ *
+ * @param <TYPE> the builder type.
  */
-public interface TransportChannelBuilder
-        extends ConfigurableChannelBuilder<TransportChannelBuilder> {
+public interface ConfigurableChannelBuilder<TYPE> {
 
     /**
-     * Builds and returns the transport channel instance.
+     * Gets the channel configuration builder related to the channel builder instance.
+     * <p/>
+     * Note that the configuration builder will be initialized with the current configuration.
      *
-     * @param <DATA> the data type.
-     * @return the newly created channel.
+     * @return the invocation configuration builder.
      */
     @Nonnull
-    <DATA> TransportChannel<DATA> buildChannel();
+    Builder<? extends TYPE> channels();
 }

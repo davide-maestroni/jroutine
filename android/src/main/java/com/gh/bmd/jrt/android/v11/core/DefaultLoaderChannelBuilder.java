@@ -19,6 +19,7 @@ import com.gh.bmd.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.MissingInvocationException;
 import com.gh.bmd.jrt.android.runner.Runners;
+import com.gh.bmd.jrt.builder.ChannelConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
@@ -41,12 +42,11 @@ import javax.annotation.Nullable;
  */
 class DefaultLoaderChannelBuilder
         implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
-        InvocationConfiguration.Configurable<LoaderChannelBuilder> {
+        ChannelConfiguration.Configurable<LoaderChannelBuilder> {
 
     private final RoutineContext mContext;
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
@@ -88,7 +88,8 @@ class DefaultLoaderChannelBuilder
 
         final LoaderRoutineBuilder<Void, OUTPUT> builder =
                 JRoutine.on(mContext, new MissingLoaderInvocation<OUTPUT>(loaderId));
-        final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
+        final InvocationConfiguration invocationConfiguration =
+                mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);
         final ClashResolutionType resolutionType =
                 loaderConfiguration.getClashResolutionTypeOr(null);
@@ -211,10 +212,10 @@ class DefaultLoaderChannelBuilder
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends LoaderChannelBuilder> invocations() {
+    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channels() {
 
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<LoaderChannelBuilder>(this, config);
+        final ChannelConfiguration config = mChannelConfiguration;
+        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @Nonnull
@@ -233,14 +234,14 @@ class DefaultLoaderChannelBuilder
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     public LoaderChannelBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @Nonnull final ChannelConfiguration configuration) {
 
         if (configuration == null) {
 
-            throw new NullPointerException("the invocation configuration must not be null");
+            throw new NullPointerException("the channel configuration must not be null");
         }
 
-        mInvocationConfiguration = configuration;
+        mChannelConfiguration = configuration;
         return this;
     }
 

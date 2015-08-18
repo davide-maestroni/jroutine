@@ -33,8 +33,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
-
 /**
  * Default implementation of a transport channel.
  * <p/>
@@ -56,7 +54,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     DefaultTransportChannel(@Nonnull final ChannelConfiguration configuration) {
 
         final InvocationConfiguration invocationConfiguration =
-                asInvocationConfiguration(configuration);
+                configuration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<DATA> inputChannel =
@@ -67,22 +65,6 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         mInputChannel = inputChannel;
         mOutputChannel = inputChannel.getOutput();
         logger.dbg("building transport channel with configuration: %s", configuration);
-    }
-
-    @Nonnull
-    private static InvocationConfiguration asInvocationConfiguration(
-            @Nonnull final ChannelConfiguration configuration) {
-
-        return builder().withAsyncRunner(configuration.getAsyncRunnerOr(null))
-                        .withOutputMaxSize(
-                                configuration.getChannelMaxSizeOr(InvocationConfiguration.DEFAULT))
-                        .withOutputOrder(configuration.getChannelOrderTypeOr(null))
-                        .withOutputTimeout(configuration.getChannelTimeoutOr(null))
-                        .withExecutionTimeout(configuration.getPassTimeoutOr(null))
-                        .withExecutionTimeoutAction(configuration.getPassTimeoutActionOr(null))
-                        .withLog(configuration.getLogOr(null))
-                        .withLogLevel(configuration.getLogLevelOr(null))
-                        .set();
     }
 
     public boolean abort() {

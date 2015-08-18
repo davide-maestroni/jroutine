@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.gh.bmd.jrt.builder.ChannelConfiguration.builder;
 import static com.gh.bmd.jrt.builder.ChannelConfiguration.builderFrom;
+import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -170,9 +171,7 @@ public class ChannelConfigurationTest {
                 builder().withChannelTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
                 builder().withChannelTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom()
-                                .withChannelTimeout(TimeDuration.millis(1))
-                                .set()).isNotEqualTo(
+        assertThat(configuration.builderFrom().withChannelTimeout(millis(1)).set()).isNotEqualTo(
                 builder().withChannelTimeout(1, TimeUnit.MILLISECONDS).set());
     }
 
@@ -254,9 +253,88 @@ public class ChannelConfigurationTest {
         assertThat(configuration).isNotEqualTo(builder().withPassTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
                 builder().withPassTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom()
-                                .withPassTimeout(TimeDuration.millis(1))
-                                .set()).isNotEqualTo(
+        assertThat(configuration.builderFrom().withPassTimeout(millis(1)).set()).isNotEqualTo(
                 builder().withPassTimeout(1, TimeUnit.MILLISECONDS).set());
+    }
+
+    @Test
+    public void testToInputChannelConfiguration() {
+
+        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+                                                            .withChannelMaxSize(100)
+                                                            .withChannelTimeout(millis(33))
+                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withPassTimeout(millis(100))
+                                                            .withPassTimeoutAction(
+                                                                    TimeoutActionType.ABORT)
+                                                            .withLog(Logs.nullLog())
+                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .set();
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builder();
+        final InvocationConfiguration invocationConfiguration =
+                builder.withAsyncRunner(Runners.queuedRunner())
+                       .withExecutionTimeout(millis(100))
+                       .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                       .withLog(Logs.nullLog())
+                       .withLogLevel(LogLevel.SILENT)
+                       .withInputOrder(OrderType.BY_CALL)
+                       .withInputMaxSize(100)
+                       .withInputTimeout(millis(33))
+                       .set();
+        assertThat(configuration.toInputChannelConfiguration()).isEqualTo(invocationConfiguration);
+    }
+
+    @Test
+    public void testToInvocationConfiguration() {
+
+        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+                                                            .withChannelMaxSize(100)
+                                                            .withChannelTimeout(millis(33))
+                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withPassTimeout(millis(100))
+                                                            .withPassTimeoutAction(
+                                                                    TimeoutActionType.ABORT)
+                                                            .withLog(Logs.nullLog())
+                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .set();
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builder();
+        final InvocationConfiguration invocationConfiguration =
+                builder.withAsyncRunner(Runners.queuedRunner())
+                       .withExecutionTimeout(millis(100))
+                       .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                       .withLog(Logs.nullLog())
+                       .withLogLevel(LogLevel.SILENT)
+                       .set();
+        assertThat(configuration.toInvocationConfiguration()).isEqualTo(invocationConfiguration);
+    }
+
+    @Test
+    public void testToOutputChannelConfiguration() {
+
+        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+                                                            .withChannelMaxSize(100)
+                                                            .withChannelTimeout(millis(33))
+                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withPassTimeout(millis(100))
+                                                            .withPassTimeoutAction(
+                                                                    TimeoutActionType.ABORT)
+                                                            .withLog(Logs.nullLog())
+                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .set();
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builder();
+        final InvocationConfiguration invocationConfiguration =
+                builder.withAsyncRunner(Runners.queuedRunner())
+                       .withExecutionTimeout(millis(100))
+                       .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                       .withLog(Logs.nullLog())
+                       .withLogLevel(LogLevel.SILENT)
+                       .withOutputOrder(OrderType.BY_CALL)
+                       .withOutputMaxSize(100)
+                       .withOutputTimeout(millis(33))
+                       .set();
+        assertThat(configuration.toOutputChannelConfiguration()).isEqualTo(invocationConfiguration);
     }
 }

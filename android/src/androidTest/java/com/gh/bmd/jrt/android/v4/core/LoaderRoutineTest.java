@@ -33,6 +33,8 @@ import com.gh.bmd.jrt.android.invocation.TemplateContextInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
 import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
+import com.gh.bmd.jrt.builder.ChannelConfiguration;
+import com.gh.bmd.jrt.builder.ChannelConfiguration.Builder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.AbortException;
@@ -681,20 +683,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testChannelBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration =
-                builder().withAsyncRunner(Runners.taskRunner())
-                         .withInputMaxSize(3)
-                         .withInputTimeout(seconds(10))
-                         .withOutputMaxSize(3)
-                         .withOutputTimeout(seconds(10))
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(countLog)
-                         .set();
+        final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
+        final ChannelConfiguration configuration = builder.withAsyncRunner(Runners.taskRunner())
+                                                          .withChannelMaxSize(3)
+                                                          .withChannelTimeout(seconds(10))
+                                                          .withLogLevel(LogLevel.DEBUG)
+                                                          .withLog(countLog)
+                                                          .set();
         JRoutine.on(contextFrom(getActivity()))
                 .loaders()
                 .withId(0)
                 .set()
-                .invocations()
+                .channels()
                 .with(configuration)
                 .set()
                 .buildChannel();
@@ -707,7 +707,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 .loaders()
                 .withId(0)
                 .set()
-                .invocations()
+                .channels()
                 .with(configuration)
                 .set()
                 .buildChannel();

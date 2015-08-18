@@ -34,6 +34,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * invocation results will be dispatched on the configured looper thread, no matter the calling one
  * was, so that, waiting for the outputs right after the routine invocation, may result in a
  * deadlock.<br/>
+ * Note that the configuration of the maximum number of concurrent invocations might not work as
+ * expected, since the number of running loaders cannot be computed.<br/>
  * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
  * prevent out of memory errors.
  * <p/>
@@ -229,7 +231,8 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
 
     /**
      * Returns a builder of routines bound to the specified context.<br/>
-     * In order to prevent undesired leaks, the class of the specified factory must be static.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must be static, and
+     * should never be a platform component (like Activity, Fragment, etc.).<br/>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.

@@ -27,6 +27,8 @@ import javax.annotation.Nonnull;
  * invocation results will be dispatched on the configured looper thread, no matter the calling one
  * was, so that, waiting for the outputs right after the routine invocation, may result in a
  * deadlock.<br/>
+ * Note that the configuration of the maximum number of concurrent invocations might not work as
+ * expected, since the number of running loaders cannot be computed.<br/>
  * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
  * prevent out of memory errors.<br/>
  * The local context of the invocations will always be the application one.

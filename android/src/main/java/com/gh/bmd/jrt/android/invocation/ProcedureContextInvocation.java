@@ -29,9 +29,10 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 public abstract class ProcedureContextInvocation<OUTPUT>
-        implements ContextInvocation<Void, OUTPUT>, ContextInvocationFactory<Void, OUTPUT> {
+        extends ContextInvocationFactory<Void, OUTPUT> implements ContextInvocation<Void, OUTPUT> {
 
     @Nonnull
+    @Override
     public final ContextInvocation<Void, OUTPUT> newInvocation() {
 
         return this;

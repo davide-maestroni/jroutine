@@ -26,7 +26,6 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.List;
 
@@ -42,8 +41,7 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>>
-        implements InvocationFactory<INPUT, OUTPUT> {
+class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
 
     private final List<? extends INPUT> mInputs;
 
@@ -162,26 +160,16 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         final Logger logger = mLogger;
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
-        JRoutine.on(this)
+        JRoutine.on(new LoaderInvocationFactory<INPUT, OUTPUT>(getContext(), mInvocation))
                 .invocations()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withOutputOrder(mOrderType)
-                .withOutputMaxSize(Integer.MAX_VALUE)
-                .withOutputTimeout(TimeDuration.ZERO)
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())
                 .set()
                 .syncCall(mInputs)
                 .passTo(consumer);
         return consumer.createResult();
-    }
-
-    @Nonnull
-    public Invocation<INPUT, OUTPUT> newInvocation() {
-
-        final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
-        invocation.onContext(getContext());
-        return invocation;
     }
 
     /**
@@ -226,5 +214,41 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         final InvocationResult<OUTPUT> result = mResult;
         return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
                 > staleTimeMillis);
+    }
+
+    /**
+     * Invocation factory implementation.
+     *
+     * @param <INPUT>
+     * @param <OUTPUT>
+     */
+    private static class LoaderInvocationFactory<INPUT, OUTPUT>
+            extends InvocationFactory<INPUT, OUTPUT> {
+
+        private final Context mContext;
+
+        private final ContextInvocation<INPUT, OUTPUT> mInvocation;
+
+        /**
+         * Constructor.
+         *
+         * @param context    the loader context.
+         * @param invocation the invocation instance.
+         */
+        private LoaderInvocationFactory(@Nonnull final Context context,
+                @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation) {
+
+            mContext = context;
+            mInvocation = invocation;
+        }
+
+        @Nonnull
+        @Override
+        public Invocation<INPUT, OUTPUT> newInvocation() {
+
+            final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
+            invocation.onContext(mContext);
+            return invocation;
+        }
     }
 }

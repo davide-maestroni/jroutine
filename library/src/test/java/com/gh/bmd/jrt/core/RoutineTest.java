@@ -1121,6 +1121,7 @@ public class RoutineTest {
             new DefaultRoutine<Object, Object>(null, new InvocationFactory<Object, Object>() {
 
                 @Nonnull
+                @Override
                 public Invocation<Object, Object> newInvocation() {
 
                     return null;

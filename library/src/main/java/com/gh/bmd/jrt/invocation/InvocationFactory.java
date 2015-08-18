@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface InvocationFactory<INPUT, OUTPUT> {
+public abstract class InvocationFactory<INPUT, OUTPUT> {
 
     /**
      * Creates and return a new invocation instance.<br/>
@@ -34,5 +34,5 @@ public interface InvocationFactory<INPUT, OUTPUT> {
      * @return the invocation instance.
      */
     @Nonnull
-    Invocation<INPUT, OUTPUT> newInvocation();
+    public abstract Invocation<INPUT, OUTPUT> newInvocation();
 }

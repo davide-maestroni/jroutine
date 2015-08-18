@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface ContextInvocationFactory<INPUT, OUTPUT> {
+public abstract class ContextInvocationFactory<INPUT, OUTPUT> {
 
     /**
      * Creates and return a new context invocation instance.
@@ -31,5 +31,5 @@ public interface ContextInvocationFactory<INPUT, OUTPUT> {
      * @return the context invocation instance.
      */
     @Nonnull
-    ContextInvocation<INPUT, OUTPUT> newInvocation();
+    public abstract ContextInvocation<INPUT, OUTPUT> newInvocation();
 }

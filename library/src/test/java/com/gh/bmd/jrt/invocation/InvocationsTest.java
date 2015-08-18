@@ -54,6 +54,7 @@ public class InvocationsTest {
         assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
 
             @Nonnull
+            @Override
             public Invocation<Object, Object> newInvocation() {
 
                 return new TemplateInvocation<Object, Object>() {};

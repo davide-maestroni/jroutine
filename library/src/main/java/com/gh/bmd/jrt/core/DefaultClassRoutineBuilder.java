@@ -372,7 +372,7 @@ class DefaultClassRoutineBuilder
     /**
      * Factory creating method invocations.
      */
-    private static class MethodInvocationFactory implements InvocationFactory<Object, Object> {
+    private static class MethodInvocationFactory extends InvocationFactory<Object, Object> {
 
         private final InputMode mInputMode;
 
@@ -405,6 +405,7 @@ class DefaultClassRoutineBuilder
         }
 
         @Nonnull
+        @Override
         public Invocation<Object, Object> newInvocation() {
 
             return new MethodFunctionInvocation(mProxyConfiguration, mTargetReference, mMethod,

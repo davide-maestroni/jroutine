@@ -172,7 +172,7 @@ public class Invocations {
      * @param <OUTPUT> the output data type.
      */
     private static class DefaultInvocationFactory<INPUT, OUTPUT>
-            implements InvocationFactory<INPUT, OUTPUT> {
+            extends InvocationFactory<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
@@ -223,6 +223,7 @@ public class Invocations {
         }
 
         @Nonnull
+        @Override
         public Invocation<INPUT, OUTPUT> newInvocation() {
 
             try {

@@ -16,7 +16,7 @@
 
     private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class InvocationFactory${methodCount}${genericTypes} implements com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
+    private static class InvocationFactory${methodCount}${genericTypes} extends com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
 
         private final com.gh.bmd.jrt.builder.ProxyConfiguration mProxyConfiguration;
 
@@ -31,6 +31,7 @@
         }
 
         @javax.annotation.Nonnull
+        @Override
         public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
 
             return new Invocation${methodCount}${genericTypes}(mProxyConfiguration, mWrapped);

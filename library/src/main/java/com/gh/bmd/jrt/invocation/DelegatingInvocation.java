@@ -129,7 +129,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
      * @param <OUTPUT> the output data type.
      */
     private static class DelegatingInvocationFactory<INPUT, OUTPUT>
-            implements InvocationFactory<INPUT, OUTPUT> {
+            extends InvocationFactory<INPUT, OUTPUT> {
 
         private final DelegationType mDelegationType;
 
@@ -160,6 +160,7 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
         }
 
         @Nonnull
+        @Override
         public Invocation<INPUT, OUTPUT> newInvocation() {
 
             return new DelegatingInvocation<INPUT, OUTPUT>(mRoutine, mDelegationType);

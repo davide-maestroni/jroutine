@@ -65,8 +65,7 @@ import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryTo;
  * @param <OUTPUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
-        implements ContextInvocationFactory<INPUT, OUTPUT> {
+class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> {
 
     private static final WeakIdentityHashMap<Object,
             SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -383,12 +382,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         }
     }
 
-    @Nonnull
-    public ContextInvocation<INPUT, OUTPUT> newInvocation() {
-
-        return createInvocation(mLoaderId);
-    }
-
     @Override
     public void onAbort(@Nullable final RoutineException reason) {
 
@@ -401,8 +394,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
             return;
         }
 
+        final LoaderContextInvocationFactory<INPUT, OUTPUT> factory =
+                new LoaderContextInvocationFactory<INPUT, OUTPUT>(this, mLoaderId);
         final Routine<INPUT, OUTPUT> routine =
-                JRoutine.on(factoryTo(loaderContext.getApplicationContext(), this)).buildRoutine();
+                JRoutine.on(factoryTo(loaderContext.getApplicationContext(), factory))
+                        .buildRoutine();
         routine.syncInvoke().abort(reason);
         routine.purge();
     }
@@ -616,6 +612,40 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT>
         NONE,       // no clash detected
         ABORT_THAT, // need to abort the running loader
         ABORT_BOTH  // need to abort both the invocation and the running loader
+    }
+
+    /**
+     * Context invocation factory implementation.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class LoaderContextInvocationFactory<INPUT, OUTPUT>
+            extends ContextInvocationFactory<INPUT, OUTPUT> {
+
+        private final LoaderInvocation<INPUT, OUTPUT> mInvocation;
+
+        private final int mLoaderId;
+
+        /**
+         * Constructor.
+         *
+         * @param invocation the loader invocation instance.
+         * @param loaderId   the loader ID.
+         */
+        private LoaderContextInvocationFactory(
+                @Nonnull final LoaderInvocation<INPUT, OUTPUT> invocation, final int loaderId) {
+
+            mInvocation = invocation;
+            mLoaderId = loaderId;
+        }
+
+        @Nonnull
+        @Override
+        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+
+            return mInvocation.createInvocation(mLoaderId);
+        }
     }
 
     /**

@@ -206,9 +206,10 @@ public class RunnerTest extends AndroidTestCase {
         testRunner(Runners.handlerRunner(new HandlerThread("test")));
     }
 
-    private static class LooperInvocationFactory implements InvocationFactory<Object, Object> {
+    private static class LooperInvocationFactory extends InvocationFactory<Object, Object> {
 
         @Nonnull
+        @Override
         public Invocation<Object, Object> newInvocation() {
 
             return new FunctionInvocation<Object, Object>() {

@@ -383,7 +383,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param args        the factory constructor arguments.
          * @param name        the alias name.
          */
-        public MethodAliasInvocation(@Nullable final String shareGroup,
+        private MethodAliasInvocation(@Nullable final String shareGroup,
                 @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
                 @Nonnull final String name) throws ClassNotFoundException {
 
@@ -471,7 +471,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param parameterTypes the method parameter type names.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
-        public MethodSignatureInvocation(@Nullable final String shareGroup,
+        private MethodSignatureInvocation(@Nullable final String shareGroup,
                 @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
                 @Nonnull final String name, @Nonnull final String[] parameterTypes) throws
                 ClassNotFoundException {
@@ -562,7 +562,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
-        public ProxyInvocation(@Nullable final String shareGroup,
+        private ProxyInvocation(@Nullable final String shareGroup,
                 @Nonnull final Class<?> targetClass, @Nonnull final Object[] args,
                 @Nonnull final String targetMethodName,
                 @Nonnull final String[] targetParameterTypes, @Nullable final InputMode inputMode,

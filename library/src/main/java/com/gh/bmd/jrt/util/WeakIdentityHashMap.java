@@ -237,7 +237,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
          * @param queue    the reference queue.
          * @see java.lang.ref.WeakReference#WeakReference(Object, ReferenceQueue)
          */
-        public IdentityWeakReference(final Object referent,
+        private IdentityWeakReference(final Object referent,
                 final ReferenceQueue<? super Object> queue) {
 
             super(referent, queue);

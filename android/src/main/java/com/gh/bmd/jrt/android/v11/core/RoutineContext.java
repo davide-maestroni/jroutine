@@ -138,7 +138,7 @@ public abstract class RoutineContext {
          * @param activity the wrapped activity.
          */
         @SuppressWarnings("ConstantConditions")
-        public ActivityContext(@Nonnull final Activity activity) {
+        private ActivityContext(@Nonnull final Activity activity) {
 
             if (activity == null) {
 
@@ -185,7 +185,7 @@ public abstract class RoutineContext {
          * @param fragment the wrapped fragment.
          */
         @SuppressWarnings("ConstantConditions")
-        public FragmentContext(@Nonnull final Fragment fragment) {
+        private FragmentContext(@Nonnull final Fragment fragment) {
 
             if (fragment == null) {
 
@@ -233,7 +233,7 @@ public abstract class RoutineContext {
          * @param context  the wrapped context.
          */
         @SuppressWarnings("ConstantConditions")
-        public WrappedActivityContext(@Nonnull final Activity activity,
+        private WrappedActivityContext(@Nonnull final Activity activity,
                 @Nonnull final Context context) {
 
             super(activity);
@@ -271,7 +271,7 @@ public abstract class RoutineContext {
          * @param context  the wrapped context.
          */
         @SuppressWarnings("ConstantConditions")
-        public WrappedFragmentContext(@Nonnull final Fragment fragment,
+        private WrappedFragmentContext(@Nonnull final Fragment fragment,
                 @Nonnull final Context context) {
 
             super(fragment);

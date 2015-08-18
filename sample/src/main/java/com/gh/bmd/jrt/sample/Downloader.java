@@ -155,7 +155,7 @@ public class Downloader {
                             // make the file writing happen in a dedicated runner, so that waiting
                             // for available space becomes allowed
                             .withAsyncRunner(mWriteRunner)
-                            .withInputMaxSize(8)
+                            .withInputMaxSize(32)
                             .withInputTimeout(seconds(30))
                             .set()
                             .buildRoutine();

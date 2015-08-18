@@ -329,6 +329,57 @@ public final class ChannelConfiguration {
     }
 
     /**
+     * Converts this configuration into an invocation one by applying the matching options to the
+     * invocation input channel.
+     *
+     * @return the invocation configuration.
+     */
+    @Nonnull
+    public InvocationConfiguration toInputChannelConfiguration() {
+
+        return toInvocationConfiguration().builderFrom()
+                                          .withInputMaxSize(getChannelMaxSizeOr(
+                                                  InvocationConfiguration.DEFAULT))
+                                          .withInputOrder(getChannelOrderTypeOr(null))
+                                          .withInputTimeout(getChannelTimeoutOr(null))
+                                          .set();
+    }
+
+    /**
+     * Converts this configuration into an invocation one by mapping the matching options.
+     *
+     * @return the invocation configuration.
+     */
+    @Nonnull
+    public InvocationConfiguration toInvocationConfiguration() {
+
+        return InvocationConfiguration.builder()
+                                      .withAsyncRunner(getAsyncRunnerOr(null))
+                                      .withExecutionTimeout(getPassTimeoutOr(null))
+                                      .withExecutionTimeoutAction(getPassTimeoutActionOr(null))
+                                      .withLog(getLogOr(null))
+                                      .withLogLevel(getLogLevelOr(null))
+                                      .set();
+    }
+
+    /**
+     * Converts this configuration into an invocation one by applying the matching options to the
+     * invocation output channel.
+     *
+     * @return the invocation configuration.
+     */
+    @Nonnull
+    public InvocationConfiguration toOutputChannelConfiguration() {
+
+        return toInvocationConfiguration().builderFrom()
+                                          .withOutputMaxSize(getChannelMaxSizeOr(
+                                                  InvocationConfiguration.DEFAULT))
+                                          .withOutputOrder(getChannelOrderTypeOr(null))
+                                          .withOutputTimeout(getChannelTimeoutOr(null))
+                                          .set();
+    }
+
+    /**
      * Interface defining a configurable object.
      *
      * @param <TYPE> the configurable object type.

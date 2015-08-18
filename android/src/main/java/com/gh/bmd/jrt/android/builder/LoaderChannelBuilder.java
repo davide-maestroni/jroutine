@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.android.builder.LoaderConfiguration.Builder;
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
+import com.gh.bmd.jrt.builder.ConfigurableChannelBuilder;
 import com.gh.bmd.jrt.channel.OutputChannel;
 
 import javax.annotation.Nonnull;
@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  *
  * @see com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder LoaderRoutineBuilder
  */
-public interface LoaderChannelBuilder extends ConfigurableBuilder<LoaderChannelBuilder>,
+public interface LoaderChannelBuilder extends ConfigurableChannelBuilder<LoaderChannelBuilder>,
         LoaderConfigurableBuilder<LoaderChannelBuilder> {
 
     /**

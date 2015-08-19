@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
  * <p/>
  * Created by davide-maestroni on 2/16/15.
  */
-public class InvocationsTest {
+public class InvocationTest {
 
     @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")

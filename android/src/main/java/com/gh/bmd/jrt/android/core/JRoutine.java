@@ -32,10 +32,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * specified by the service context. Be aware, though, that the invocation results will be
  * dispatched into the configured looper, so that, waiting for the outputs on the very same looper
  * thread, immediately after its invocation, will result in a deadlock.<br/>
- * By default output results are dispatched in the main looper.
+ * By default output results are dispatched in the main looper.<br/>
+ * Note that the configuration of the maximum number of concurrent invocations will not be shared
+ * among synchronous and asynchronous invocations, but the invocations created inside the service
+ * and the synchronous will respect the same limit separately.
  * <p/>
- * Note that it is up to the caller to properly declare the service in the manifest file. Note also
- * that it is possible to manage the service lifecycle starting it through the
+ * It is up to the caller to properly declare the service in the manifest file. Note also that it is
+ * possible to manage the service lifecycle starting it through the
  * {@link android.content.Context#startService(android.content.Intent)} method. Normally the service
  * will stay active only during a routine invocation. In fact, it is responsibility of the caller
  * to ensure that the started invocations have completed or have been aborted when the relative

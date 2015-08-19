@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.android.core;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
-import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
@@ -184,68 +183,61 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
     public void testExecutionTimeout() {
 
-        final ClassToken<PassingContextInvocation<String>> classToken =
-                new ClassToken<PassingContextInvocation<String>>() {};
-        assertThat(JRoutine.on(serviceFrom(getActivity()), classToken)
-                           .invocations()
-                           .withExecutionTimeout(millis(10))
-                           .withExecutionTimeoutAction(TimeoutActionType.EXIT)
-                           .set()
-                           .service()
-                           .withResultLooper(Looper.myLooper())
-                           .set()
-                           .asyncCall("test1")
-                           .all()).isEmpty();
+        final OutputChannel<String> channel =
+                JRoutine.on(serviceFrom(getActivity()), tokenOf(StringDelay.class))
+                        .invocations()
+                        .withExecutionTimeout(millis(10))
+                        .withExecutionTimeoutAction(TimeoutActionType.EXIT)
+                        .set()
+                        .asyncCall("test1");
+        assertThat(channel.all()).isEmpty();
+        assertThat(channel.eventually().checkComplete()).isTrue();
     }
 
     public void testExecutionTimeout2() {
 
-        final ClassToken<PassingContextInvocation<String>> classToken =
-                new ClassToken<PassingContextInvocation<String>>() {};
+        final OutputChannel<String> channel =
+                JRoutine.on(serviceFrom(getActivity()), tokenOf(StringDelay.class))
+                        .invocations()
+                        .withExecutionTimeout(millis(10))
+                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                        .set()
+                        .asyncCall("test2");
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()), classToken)
-                    .invocations()
-                    .withExecutionTimeout(millis(10))
-                    .withExecutionTimeoutAction(TimeoutActionType.ABORT)
-                    .set()
-                    .service()
-                    .withResultLooper(Looper.myLooper())
-                    .set()
-                    .asyncCall("test2")
-                    .all();
+            channel.all();
 
             fail();
 
         } catch (final AbortException ignored) {
 
         }
+
+        assertThat(channel.eventually().checkComplete()).isTrue();
     }
 
     public void testExecutionTimeout3() {
 
-        final ClassToken<PassingContextInvocation<String>> classToken =
-                new ClassToken<PassingContextInvocation<String>>() {};
+        final OutputChannel<String> channel =
+                JRoutine.on(serviceFrom(getActivity()), tokenOf(StringDelay.class))
+                        .invocations()
+                        .withExecutionTimeout(millis(10))
+                        .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                        .set()
+                        .asyncCall("test3");
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()), classToken)
-                    .invocations()
-                    .withExecutionTimeout(millis(10))
-                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
-                    .set()
-                    .service()
-                    .withResultLooper(Looper.myLooper())
-                    .set()
-                    .asyncCall("test3")
-                    .all();
+            channel.all();
 
             fail();
 
         } catch (final ExecutionTimeoutException ignored) {
 
         }
+
+        assertThat(channel.eventually().checkComplete()).isTrue();
     }
 
     public void testInvocations() throws InterruptedException {
@@ -540,6 +532,15 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         public PassingWrapper() {
 
             super(PassingInvocation.<DATA>factoryOf().newInvocation());
+        }
+    }
+
+    private static class StringDelay extends TemplateContextInvocation<String, String> {
+
+        @Override
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            result.after(TimeDuration.millis(100)).pass(s);
         }
     }
 

@@ -235,7 +235,7 @@ public class PriorityRunner {
     private static class PriorityExecutionComparator
             implements Comparator<PriorityExecution>, Serializable {
 
-        // just don't care...
+        // Just don't care...
         private static final long serialVersionUID = -1;
 
         public int compare(final PriorityExecution o1, final PriorityExecution o2) {

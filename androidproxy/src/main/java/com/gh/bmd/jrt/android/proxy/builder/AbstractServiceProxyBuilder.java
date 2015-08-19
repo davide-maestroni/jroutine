@@ -217,7 +217,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
         @Override
         public boolean equals(final Object o) {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;
@@ -238,7 +238,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
         @Override
         public int hashCode() {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             int result = mProxyConfiguration.hashCode();
             result = 31 * result + mInvocationConfiguration.hashCode();
             result = 31 * result + mServiceConfiguration.hashCode();

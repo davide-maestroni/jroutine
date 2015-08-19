@@ -130,7 +130,7 @@ public final class LoaderConfiguration {
     @Override
     public boolean equals(final Object o) {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         if (this == o) {
 
             return true;
@@ -152,7 +152,7 @@ public final class LoaderConfiguration {
     @Override
     public int hashCode() {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         int result = mInputResolutionType != null ? mInputResolutionType.hashCode() : 0;
         result = 31 * result + mLoaderId;
         result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
@@ -165,6 +165,7 @@ public final class LoaderConfiguration {
     @Override
     public String toString() {
 
+        // AUTO-GENERATED CODE
         return "LoaderConfiguration{" +
                 "mInputResolutionType=" + mInputResolutionType +
                 ", mLoaderId=" + mLoaderId +

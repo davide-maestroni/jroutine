@@ -99,7 +99,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         if (targetClass.isPrimitive()) {
 
-            // the parceling of primitive classes is broken...
+            // The parceling of primitive classes is broken...
             throw new IllegalArgumentException("the target class cannot be primitive");
         }
 
@@ -142,7 +142,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private static Class<?>[] forNames(@Nonnull final String[] names) throws
             ClassNotFoundException {
 
-        // the forName() of primitive classes is broken...
+        // The forName() of primitive classes is broken...
         final int length = names.length;
         final Class<?>[] classes = new Class[length];
         final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
@@ -175,7 +175,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         if (context instanceof FactoryContext) {
 
-            // the only safe way is to synchronize the factory using the very same instance
+            // The only safe way is to synchronize the factory using the very same instance
             synchronized (context) {
 
                 target = ((FactoryContext) context).geInstance(targetClass, args);

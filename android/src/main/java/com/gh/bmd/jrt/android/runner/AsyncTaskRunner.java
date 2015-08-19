@@ -108,7 +108,7 @@ class AsyncTaskRunner extends MainRunner {
             }
         }
 
-        // the super method is called to ensure that a task is always started from the main thread
+        // The super method is called to ensure that a task is always started from the main thread
         super.run(task, delay, timeUnit);
     }
 

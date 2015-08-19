@@ -243,7 +243,7 @@ public final class ChannelConfiguration {
     @Override
     public int hashCode() {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
         result = 31 * result + mChannelMaxSize;
         result = 31 * result + (mChannelOrderType != null ? mChannelOrderType.hashCode() : 0);
@@ -259,7 +259,7 @@ public final class ChannelConfiguration {
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(final Object o) {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         if (this == o) {
 
             return true;
@@ -316,6 +316,7 @@ public final class ChannelConfiguration {
     @Override
     public String toString() {
 
+        // AUTO-GENERATED CODE
         return "ChannelConfiguration{" +
                 "mAsyncRunner=" + mAsyncRunner +
                 ", mChannelMaxSize=" + mChannelMaxSize +

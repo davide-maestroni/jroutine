@@ -226,7 +226,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
         @Override
         public boolean equals(final Object o) {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;
@@ -247,7 +247,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
         @Override
         public int hashCode() {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             int result = mLoaderConfiguration.hashCode();
             result = 31 * result + mProxyConfiguration.hashCode();
             result = 31 * result + mInvocationConfiguration.hashCode();

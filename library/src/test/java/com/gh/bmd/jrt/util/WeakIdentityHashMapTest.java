@@ -372,7 +372,7 @@ public class WeakIdentityHashMapTest {
 
         key2 = null;
 
-        // this is not guaranteed to work, so let's try a few times...
+        // This is not guaranteed to work, so let's try a few times...
         for (int i = 0; i < 5; i++) {
 
             System.gc();

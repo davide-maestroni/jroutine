@@ -295,7 +295,7 @@ public class DownloaderTest {
 
         try {
 
-            // the only way to be sure that a file does not exists is to read it
+            // The only way to be sure that a file does not exists is to read it
             assertThat(new FileInputStream(file).read()).isEqualTo(-1);
 
         } catch (IOException ignored) {

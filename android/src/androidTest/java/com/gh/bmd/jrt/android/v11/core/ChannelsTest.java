@@ -25,7 +25,6 @@ import com.gh.bmd.jrt.android.invocation.FilterContextInvocation;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
 import com.gh.bmd.jrt.channel.AbortException;
-import com.gh.bmd.jrt.channel.InputChannel;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -67,22 +66,22 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         outputs.add(new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class)).buildRoutine();
-        SparseArray<InputChannel<Object>> channelMap;
+        SparseArray<TransportChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.mapParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
-        channelMap.get(Sort.INTEGER).pass(-11);
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.INTEGER).pass(-11).close();
+        channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.mapParcelable(channel, Sort.INTEGER, Sort.STRING);
-        channelMap.get(Sort.INTEGER).pass(-11);
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.INTEGER).pass(-11).close();
+        channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.mapParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
-        channelMap.get(Sort.INTEGER).pass(-11);
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.INTEGER).pass(-11).close();
+        channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
     }
 
@@ -95,11 +94,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class)).buildRoutine();
-        SparseArray<InputChannel<Object>> channelMap;
+        SparseArray<TransportChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.mapParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
-        channelMap.get(Sort.INTEGER).pass(-11);
+        channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).abort();
 
         try {
@@ -115,7 +114,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channel = routine.asyncInvoke();
         channelMap = Channels.mapParcelable(channel, Sort.INTEGER, Sort.STRING);
         channelMap.get(Sort.INTEGER).abort();
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.STRING).pass("test21").close();
 
         try {
 
@@ -168,10 +167,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannelBuilder builder =
                 JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
+        final TransportChannel<String> channel1 = builder.buildChannel();
+        final TransportChannel<Integer> channel2 = builder.buildChannel();
         final SparseArray<OutputChannel<?>> channelMap = new SparseArray<OutputChannel<?>>(2);
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
@@ -237,12 +234,14 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
                 case INTEGER:
                     Channels.<Object, Integer>selectParcelable(result, INTEGER)
-                            .pass((Integer) selectable.data);
+                            .pass((Integer) selectable.data)
+                            .close();
                     break;
 
                 case STRING:
                     Channels.<Object, String>selectParcelable(result, STRING)
-                            .pass((String) selectable.data);
+                            .pass((String) selectable.data)
+                            .close();
                     break;
             }
         }

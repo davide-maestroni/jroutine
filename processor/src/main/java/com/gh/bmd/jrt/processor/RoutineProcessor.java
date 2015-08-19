@@ -922,7 +922,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (targetMirrors == null) {
 
-            // should never happen
+            // It should never happen
             throw new NullPointerException(
                     Inputs.class.getSimpleName() + " annotation value must not be null");
         }

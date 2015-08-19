@@ -102,14 +102,14 @@ public final class ProxyConfiguration {
     @Override
     public int hashCode() {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         return mGroupName != null ? mGroupName.hashCode() : 0;
     }
 
     @Override
     public boolean equals(final Object o) {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         if (this == o) {
 
             return true;
@@ -128,6 +128,7 @@ public final class ProxyConfiguration {
     @Override
     public String toString() {
 
+        // AUTO-GENERATED CODE
         return "ProxyConfiguration{" +
                 "mGroupName='" + mGroupName + '\'' +
                 '}';

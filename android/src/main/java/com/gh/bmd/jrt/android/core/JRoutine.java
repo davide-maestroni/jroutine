@@ -185,7 +185,7 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
 
     static {
 
-        // sets the Android log as default
+        // Sets the Android log as default
         Logger.setDefaultLog(Logs.androidLog());
     }
 }

@@ -39,7 +39,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (targetClass.isPrimitive()) {
 
-            // the parceling of primitive classes is broken...
+            // The parceling of primitive classes is broken...
             throw new IllegalArgumentException("the target class cannot be primitive");
         }
 
@@ -77,7 +77,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         if (context instanceof com.gh.bmd.jrt.android.builder.FactoryContext) {
 
-            // the only safe way is to synchronize the factory using the very same instance
+            // The only safe way is to synchronize the factory using the very same instance
             synchronized (context) {
 
                 target = ((com.gh.bmd.jrt.android.builder.FactoryContext) context).geInstance(targetClass, args);
@@ -117,7 +117,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
             if (targetClass.isPrimitive()) {
 
-                // the parceling of primitive classes is broken...
+                // The parceling of primitive classes is broken...
                 throw new IllegalArgumentException("the target class cannot be primitive");
             }
 

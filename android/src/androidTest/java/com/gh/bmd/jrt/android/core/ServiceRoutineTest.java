@@ -21,7 +21,7 @@ import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
-import com.gh.bmd.jrt.android.invocation.ContextInvocationDecorator;
+import com.gh.bmd.jrt.android.invocation.ContextInvocationWrapper;
 import com.gh.bmd.jrt.android.invocation.FilterContextInvocation;
 import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
 import com.gh.bmd.jrt.android.invocation.PassingContextInvocation;
@@ -167,7 +167,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testDecorator() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final ClassToken<PassingDecorator<String>> token = tokenOf(new PassingDecorator<String>());
+        final ClassToken<PassingWrapper<String>> token = tokenOf(new PassingWrapper<String>());
         final Routine<String, String> routine = JRoutine.on(serviceFrom(getActivity()), token)
                                                         .invocations()
                                                         .withSyncRunner(Runners.queuedRunner())
@@ -535,9 +535,9 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class PassingDecorator<DATA> extends ContextInvocationDecorator<DATA, DATA> {
+    private static class PassingWrapper<DATA> extends ContextInvocationWrapper<DATA, DATA> {
 
-        public PassingDecorator() {
+        public PassingWrapper() {
 
             super(PassingInvocation.<DATA>factoryOf().newInvocation());
         }

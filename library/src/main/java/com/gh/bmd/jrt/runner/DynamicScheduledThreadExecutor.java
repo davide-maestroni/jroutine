@@ -121,7 +121,7 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      */
     private static class RejectingBlockingQueue extends LinkedBlockingQueue<Runnable> {
 
-        // just don't care...
+        // Just don't care...
         private static final long serialVersionUID = -1;
 
         /**

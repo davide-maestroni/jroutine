@@ -153,18 +153,21 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      * @return the input channel.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> InputChannel<INPUT> selectParcelable(
+    public static <DATA, INPUT extends DATA> TransportChannel<INPUT> selectParcelable(
             @Nullable final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
 
-        final TransportChannel<INPUT> transportChannel = JRoutine.transport().buildChannel();
+        final TransportChannel<INPUT> inputChannel = JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            transportChannel.passTo(new SelectableInputConsumer<DATA, INPUT>(channel, index));
+            final TransportChannel<ParcelableSelectable<DATA>> transportChannel =
+                    JRoutine.transport().buildChannel();
+            transportChannel.passTo(channel);
+            inputChannel.passTo(new SelectableInputConsumer<DATA, INPUT>(transportChannel, index));
         }
 
-        return transportChannel;
+        return inputChannel;
     }
 
     /**
@@ -261,36 +264,37 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
     private static class SelectableInputConsumer<DATA, INPUT extends DATA>
             implements OutputConsumer<INPUT> {
 
-        private final int mIndex;
+        private final TransportChannel<? super ParcelableSelectable<DATA>> mChannel;
 
-        private final InputChannel<? super ParcelableSelectable<DATA>> mInputChannel;
+        private final int mIndex;
 
         /**
          * Constructor.
          *
-         * @param inputChannel the selectable channel.
-         * @param index        the selectable index.
+         * @param channel the selectable channel.
+         * @param index   the selectable index.
          */
         private SelectableInputConsumer(
-                @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> inputChannel,
+                @Nonnull final TransportChannel<? super ParcelableSelectable<DATA>> channel,
                 final int index) {
 
-            mInputChannel = inputChannel;
+            mChannel = channel;
             mIndex = index;
         }
 
         public void onComplete() {
 
+            mChannel.close();
         }
 
         public void onError(@Nullable final RoutineException error) {
 
-            mInputChannel.abort(error);
+            mChannel.abort(error);
         }
 
         public void onOutput(final INPUT input) {
 
-            mInputChannel.pass(new ParcelableSelectable<DATA>(input, mIndex));
+            mChannel.pass(new ParcelableSelectable<DATA>(input, mIndex));
         }
     }
 
@@ -301,37 +305,37 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
      */
     private static class SelectableOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 
-        private final int mIndex;
+        private final TransportChannel<ParcelableSelectable<OUTPUT>> mChannel;
 
-        private final TransportChannel<ParcelableSelectable<OUTPUT>> mInputChannel;
+        private final int mIndex;
 
         /**
          * Constructor.
          *
-         * @param inputChannel the transport input channel.
-         * @param index        the selectable index.
+         * @param channel the transport input channel.
+         * @param index   the selectable index.
          */
         private SelectableOutputConsumer(
-                @Nonnull final TransportChannel<ParcelableSelectable<OUTPUT>> inputChannel,
+                @Nonnull final TransportChannel<ParcelableSelectable<OUTPUT>> channel,
                 final int index) {
 
-            mInputChannel = inputChannel;
+            mChannel = channel;
             mIndex = index;
         }
 
         public void onComplete() {
 
-            mInputChannel.close();
+            mChannel.close();
         }
 
         public void onError(@Nullable final RoutineException error) {
 
-            mInputChannel.abort(error);
+            mChannel.abort(error);
         }
 
         public void onOutput(final OUTPUT output) {
 
-            mInputChannel.pass(new ParcelableSelectable<OUTPUT>(output, mIndex));
+            mChannel.pass(new ParcelableSelectable<OUTPUT>(output, mIndex));
         }
     }
 }

@@ -17,36 +17,37 @@ import android.content.Context;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.invocation.Invocation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Base context invocation decorator implementation.
+ * Implementation of a platform specific Android invocation wrapping a base invocation instance.
  * <p/>
- * Created by davide-maestroni on 19/08/15.
+ * Created by davide-maestroni on 3/21/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public class ContextInvocationWrapper<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
 
-    private final ContextInvocation<INPUT, OUTPUT> mInvocation;
+    private final Invocation<INPUT, OUTPUT> mInvocation;
 
     /**
      * Constructor.
      *
-     * @param wrapped the wrapped invocation instance.
+     * @param invocation the wrapped invocation.
      */
     @SuppressWarnings("ConstantConditions")
-    public ContextInvocationDecorator(@Nonnull final ContextInvocation<INPUT, OUTPUT> wrapped) {
+    public ContextInvocationWrapper(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
-        if (wrapped == null) {
+        if (invocation == null) {
 
-            throw new NullPointerException("the wrapped invocation instance must not be null");
+            throw new NullPointerException("the invocation must not be null");
         }
 
-        mInvocation = wrapped;
+        mInvocation = invocation;
     }
 
     public void onAbort(@Nullable final RoutineException reason) {
@@ -81,6 +82,5 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
 
     public void onContext(@Nonnull final Context context) {
 
-        mInvocation.onContext(context);
     }
 }

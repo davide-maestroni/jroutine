@@ -198,7 +198,7 @@ public class Invocations {
         @Override
         public int hashCode() {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             int result = Arrays.hashCode(mArgs);
             result = 31 * result + mConstructor.hashCode();
             return result;
@@ -207,7 +207,7 @@ public class Invocations {
         @Override
         public boolean equals(final Object o) {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;

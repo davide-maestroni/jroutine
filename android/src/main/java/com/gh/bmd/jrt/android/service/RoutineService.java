@@ -660,7 +660,7 @@ public class RoutineService extends Service {
         @Override
         public boolean equals(final Object o) {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;
@@ -682,7 +682,7 @@ public class RoutineService extends Service {
         @Override
         public int hashCode() {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             int result = Arrays.hashCode(mFactoryArgs);
             result = 31 * result + mInvocationClass.hashCode();
             result = 31 * result + (mLogClass != null ? mLogClass.hashCode() : 0);

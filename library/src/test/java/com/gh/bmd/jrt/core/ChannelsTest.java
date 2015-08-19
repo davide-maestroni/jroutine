@@ -61,23 +61,28 @@ public class ChannelsTest {
                 JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(channel1, channel2)
                 .pass(new Selectable<String>("test1", 0))
-                .pass(new Selectable<Integer>(1, 1));
+                .pass(new Selectable<Integer>(1, 1))
+                .close();
         Channels.combine(3, channel1, channel2)
                 .pass(new Selectable<String>("test2", 3))
-                .pass(new Selectable<Integer>(2, 4));
+                .pass(new Selectable<Integer>(2, 4))
+                .close();
         Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
                 .pass(new Selectable<String>("test3", 0))
-                .pass(new Selectable<Integer>(3, 1));
+                .pass(new Selectable<Integer>(3, 1))
+                .close();
         Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
                 .pass(new Selectable<String>("test4", -5))
-                .pass(new Selectable<Integer>(4, -4));
+                .pass(new Selectable<Integer>(4, -4))
+                .close();
         final HashMap<Integer, InvocationChannel<?, ?>> map =
                 new HashMap<Integer, InvocationChannel<?, ?>>(2);
         map.put(31, channel1);
         map.put(17, channel2);
         Channels.combine(map)
                 .pass(new Selectable<String>("test5", 31))
-                .pass(new Selectable<Integer>(5, 17));
+                .pass(new Selectable<Integer>(5, 17))
+                .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1", "test2", "test3",
                                                                          "test4", "test5");
         assertThat(channel2.result().eventually().all()).containsExactly(1, 2, 3, 4, 5);
@@ -274,10 +279,15 @@ public class ChannelsTest {
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<String, String> channel2 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distribute(channel1, channel2).pass(Arrays.<Object>asList("test1-1", "test1-2"));
+        Channels.distribute(channel1, channel2)
+                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .close();
         Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"));
-        Channels.distribute(channel1, channel2).pass(Collections.<Object>singletonList("test3-1"));
+                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
+                .close();
+        Channels.distribute(channel1, channel2)
+                .pass(Collections.<Object>singletonList("test3-1"))
+                .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
         assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2");
@@ -345,11 +355,14 @@ public class ChannelsTest {
         final InvocationChannel<String, String> channel2 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"));
+                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .close();
         Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"));
+                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
+                .close();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Collections.<Object>singletonList("test3-1"));
+                .pass(Collections.<Object>singletonList("test3-1"))
+                .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
         assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2",
@@ -415,7 +428,9 @@ public class ChannelsTest {
 
         final InvocationChannel<String, String> channel1 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2"));
+        Channels.distributeAndFlush(channel1)
+                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .close();
 
         try {
 
@@ -453,7 +468,7 @@ public class ChannelsTest {
 
         final InvocationChannel<String, String> channel1 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2"));
+        Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2")).close();
 
         try {
 
@@ -494,22 +509,22 @@ public class ChannelsTest {
         outputs.add(new Selectable<Object>(-11, Sort.INTEGER));
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        Map<Integer, InputChannel<Object>> channelMap;
+        Map<Integer, TransportChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
-        channelMap.get(Sort.INTEGER).pass(-11);
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.INTEGER).pass(-11).close();
+        channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
-        channelMap.get(Sort.INTEGER).pass(-11);
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.INTEGER).pass(-11).close();
+        channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
-        channelMap.get(Sort.INTEGER).pass(-11);
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.INTEGER).pass(-11).close();
+        channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
     }
 
@@ -518,11 +533,11 @@ public class ChannelsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        Map<Integer, InputChannel<Object>> channelMap;
+        Map<Integer, TransportChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
-        channelMap.get(Sort.INTEGER).pass(-11);
+        channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).abort();
 
         try {
@@ -538,7 +553,7 @@ public class ChannelsTest {
         channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
         channelMap.get(Sort.INTEGER).abort();
-        channelMap.get(Sort.STRING).pass("test21");
+        channelMap.get(Sort.STRING).pass("test21").close();
 
         try {
 
@@ -585,7 +600,7 @@ public class ChannelsTest {
     public void testInputSelect() {
 
         final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
-        Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3");
+        Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3").close();
         assertThat(channel.close().all()).containsExactly(new Selectable<String>("test1", 33),
                                                           new Selectable<String>("test2", 33),
                                                           new Selectable<String>("test3", 33));
@@ -615,7 +630,8 @@ public class ChannelsTest {
         final TransportChannel<String> channel = JRoutine.transport().buildChannel();
         Channels.toSelectable(channel.asInput(), 33)
                 .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
-                      new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
+                      new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
+                .close();
         assertThat(channel.close().eventually().all()).containsExactly("test1", "test3");
     }
 
@@ -1350,11 +1366,14 @@ public class ChannelsTest {
 
                 case INTEGER:
                     Channels.<Object, Integer>select(result, INTEGER)
-                            .pass(selectable.<Integer>data());
+                            .pass(selectable.<Integer>data())
+                            .close();
                     break;
 
                 case STRING:
-                    Channels.<Object, String>select(result, STRING).pass(selectable.<String>data());
+                    Channels.<Object, String>select(result, STRING)
+                            .pass(selectable.<String>data())
+                            .close();
                     break;
             }
         }

@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.android.invocation;
-
-import android.content.Context;
+package com.gh.bmd.jrt.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
@@ -22,16 +20,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Base context invocation decorator implementation.
+ * Base invocation decorator implementation.
  * <p/>
  * Created by davide-maestroni on 19/08/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public class InvocationDecorator<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
-    private final ContextInvocation<INPUT, OUTPUT> mInvocation;
+    private final Invocation<INPUT, OUTPUT> mInvocation;
 
     /**
      * Constructor.
@@ -39,7 +37,7 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
      * @param wrapped the wrapped invocation instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public ContextInvocationDecorator(@Nonnull final ContextInvocation<INPUT, OUTPUT> wrapped) {
+    public InvocationDecorator(@Nonnull final Invocation<INPUT, OUTPUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -77,10 +75,5 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
     public void onTerminate() {
 
         mInvocation.onTerminate();
-    }
-
-    public void onContext(@Nonnull final Context context) {
-
-        mInvocation.onContext(context);
     }
 }

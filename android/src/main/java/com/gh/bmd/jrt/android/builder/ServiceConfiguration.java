@@ -100,7 +100,7 @@ public final class ServiceConfiguration {
     @Override
     public boolean equals(final Object o) {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         if (this == o) {
 
             return true;
@@ -122,7 +122,7 @@ public final class ServiceConfiguration {
     @Override
     public int hashCode() {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         int result = mLogClass != null ? mLogClass.hashCode() : 0;
         result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
         result = 31 * result + (mRunnerClass != null ? mRunnerClass.hashCode() : 0);
@@ -132,6 +132,7 @@ public final class ServiceConfiguration {
     @Override
     public String toString() {
 
+        // AUTO-GENERATED CODE
         return "ServiceConfiguration{" +
                 "mLogClass=" + mLogClass +
                 ", mLooper=" + mLooper +

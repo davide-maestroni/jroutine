@@ -451,7 +451,7 @@ class DefaultClassRoutineBuilder
         @Override
         public int hashCode() {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             int result = mInputMode != null ? mInputMode.hashCode() : 0;
             result = 31 * result + mInvocationConfiguration.hashCode();
             result = 31 * result + mMethod.hashCode();
@@ -463,7 +463,7 @@ class DefaultClassRoutineBuilder
         @Override
         public boolean equals(final Object o) {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;

@@ -543,7 +543,7 @@ public class RunnerTest {
 
         public void run() {
 
-            // the JVM might not have nanosecond precision...
+            // The JVM might not have nanosecond precision...
             mIsPassed = (current().toMillis() - mStartTime.toMillis() >= mDelay.toMillis());
             mSemaphore.release();
         }

@@ -39,6 +39,7 @@ import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.RoutineException;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.invocation.InvocationException;
+import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -402,30 +403,31 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
 
                 mIsUnbound = true;
+            }
 
-                // unbind on main thread to avoid crashing the IPC
-                Runners.mainRunner().run(new TemplateExecution() {
+            // Unbind on main thread to avoid crashing the IPC
+            Runners.mainRunner().run(new TemplateExecution() {
 
-                    public void run() {
+                public void run() {
 
-                        final Context serviceContext = mContext.getServiceContext();
+                    final Context serviceContext = mContext.getServiceContext();
 
-                        if (serviceContext != null) {
+                    if (serviceContext != null) {
 
-                            // unfortunately there is no way to know if the context is still valid
-                            try {
+                        // Unfortunately there is no way to know if the context is still valid
+                        try {
 
-                                serviceContext.unbindService(mConnection);
+                            serviceContext.unbindService(mConnection);
 
-                            } catch (final Throwable t) {
+                        } catch (final Throwable t) {
 
-                                mLogger.wrn(t, "unbinding failed (maybe the connection was "
-                                        + "leaked...)");
-                            }
+                            InvocationInterruptedException.ignoreIfPossible(t);
+                            mLogger.wrn(t, "unbinding failed (maybe the connection was "
+                                    + "leaked...)");
                         }
                     }
-                }, 0, TimeUnit.MILLISECONDS);
-            }
+                }
+            }, 0, TimeUnit.MILLISECONDS);
         }
 
         /**

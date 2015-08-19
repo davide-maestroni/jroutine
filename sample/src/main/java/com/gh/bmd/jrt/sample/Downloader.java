@@ -54,9 +54,9 @@ public class Downloader {
      */
     public Downloader(final int maxParallelDownloads) {
 
-        // the read connection invocation is stateless so we can just use a single instance of it
+        // The read connection invocation is stateless so we can just use a single instance of it
         mReadConnection = JRoutine.on(new ReadConnection()).invocations()
-                // by setting the maximum number of parallel invocations we effectively limit the
+                // By setting the maximum number of parallel invocations we effectively limit the
                 // number of parallel downloads
                 .withMaxInstances(maxParallelDownloads).set().buildRoutine();
     }
@@ -138,20 +138,20 @@ public class Downloader {
 
         final HashMap<URI, OutputChannel<Boolean>> downloadMap = mDownloadMap;
 
-        // check if we are already downloading the same resource
+        // Check if we are already downloading the same resource
         if (!downloadMap.containsKey(uri)) {
 
-            // remove it from the downloaded set
+            // Remove it from the downloaded set
             mDownloadedSet.remove(uri);
-            // in order to be able to abort the download at any time, we need to split the
+            // In order to be able to abort the download at any time, we need to split the
             // processing between the routine responsible for reading the data from the socket, and
             // the one writing the next chunk of bytes to the local file
-            // in such way we can abort the download between two chunks, while they are passed to
+            // In such way we can abort the download between two chunks, while they are passed to
             // the specific routine
-            // for this reason we store the routine output channel in an internal map
+            // That's why we store the routine output channel in an internal map
             final Routine<Chunk, Boolean> writeFile =
                     JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).invocations()
-                            // since we want to limit the number of allocated chunks, we have to
+                            // Since we want to limit the number of allocated chunks, we have to
                             // make the file writing happen in a dedicated runner, so that waiting
                             // for available space becomes allowed
                             .withAsyncRunner(mWriteRunner)
@@ -197,21 +197,21 @@ public class Downloader {
         final HashMap<URI, OutputChannel<Boolean>> downloadMap = mDownloadMap;
         final OutputChannel<Boolean> channel = downloadMap.get(uri);
 
-        // check if the output channel is in the map, that is, the resource is currently downloading
+        // Check if the output channel is in the map, that is, the resource is currently downloading
         if (channel != null) {
 
             try {
 
-                // wait for the routine to complete
+                // Wait for the routine to complete
                 if (channel.afterMax(timeout).checkComplete()) {
 
-                    // if completed, remove the resource from the download map
+                    // If completed, remove the resource from the download map
                     downloadMap.remove(uri);
 
-                    // read the result
+                    // Read the result
                     if (channel.next()) {
 
-                        // if successful, add the resource to the downloaded set
+                        // If successful, add the resource to the downloaded set
                         mDownloadedSet.add(uri);
                         return true;
                     }
@@ -221,13 +221,13 @@ public class Downloader {
 
             } catch (final InvocationException ignored) {
 
-                // something went wrong or the routine has been aborted
-                // just remove the resource from the download map
+                // Something went wrong or the routine has been aborted
+                // Just remove the resource from the download map
                 downloadMap.remove(uri);
             }
         }
 
-        // check if the resource is in the downloaded set
+        // Check if the resource is in the downloaded set
         return mDownloadedSet.contains(uri);
     }
 }

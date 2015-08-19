@@ -153,7 +153,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             @Override
             public void close() {
 
-                // prevents closing
+                // Prevents closing
             }
         };
         final int maxOutputSize = mMaxOutput;

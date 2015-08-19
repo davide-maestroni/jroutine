@@ -51,13 +51,13 @@ public class Channels extends com.gh.bmd.jrt.android.core.Channels {
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArray<InputChannel<INPUT>> mapParcelable(
+    public static <DATA, INPUT extends DATA> SparseArray<TransportChannel<INPUT>> mapParcelable(
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
-        final SparseArray<InputChannel<INPUT>> channelMap =
-                new SparseArray<InputChannel<INPUT>>(size);
+        final SparseArray<TransportChannel<INPUT>> channelMap =
+                new SparseArray<TransportChannel<INPUT>>(size);
 
         for (final Integer index : indexes) {
 
@@ -77,13 +77,13 @@ public class Channels extends com.gh.bmd.jrt.android.core.Channels {
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArray<InputChannel<INPUT>> mapParcelable(
+    public static <DATA, INPUT extends DATA> SparseArray<TransportChannel<INPUT>> mapParcelable(
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final int... indexes) {
 
         final int size = indexes.length;
-        final SparseArray<InputChannel<INPUT>> channelMap =
-                new SparseArray<InputChannel<INPUT>>(size);
+        final SparseArray<TransportChannel<INPUT>> channelMap =
+                new SparseArray<TransportChannel<INPUT>>(size);
 
         for (final int index : indexes) {
 
@@ -105,7 +105,7 @@ public class Channels extends com.gh.bmd.jrt.android.core.Channels {
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArray<InputChannel<INPUT>> mapParcelable(
+    public static <DATA, INPUT extends DATA> SparseArray<TransportChannel<INPUT>> mapParcelable(
             final int startIndex, final int rangeSize,
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
 
@@ -114,8 +114,8 @@ public class Channels extends com.gh.bmd.jrt.android.core.Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final SparseArray<InputChannel<INPUT>> channelMap =
-                new SparseArray<InputChannel<INPUT>>(rangeSize);
+        final SparseArray<TransportChannel<INPUT>> channelMap =
+                new SparseArray<TransportChannel<INPUT>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 

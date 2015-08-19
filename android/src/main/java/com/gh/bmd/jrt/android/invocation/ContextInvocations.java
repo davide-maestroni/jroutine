@@ -241,7 +241,7 @@ public class ContextInvocations {
         @Nonnull
         public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
-            return new ContextInvocationDecorator<INPUT, OUTPUT>(mFactory.newInvocation());
+            return new ContextInvocationWrapper<INPUT, OUTPUT>(mFactory.newInvocation());
         }
     }
 

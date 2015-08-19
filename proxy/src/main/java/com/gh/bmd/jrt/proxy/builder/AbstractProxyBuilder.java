@@ -180,7 +180,7 @@ public abstract class AbstractProxyBuilder<TYPE>
         @Override
         public int hashCode() {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             int result = mProxyConfiguration.hashCode();
             result = 31 * result + mInvocationConfiguration.hashCode();
             result = 31 * result + mType.hashCode();
@@ -190,7 +190,7 @@ public abstract class AbstractProxyBuilder<TYPE>
         @Override
         public boolean equals(final Object o) {
 
-            // auto-generated code
+            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;

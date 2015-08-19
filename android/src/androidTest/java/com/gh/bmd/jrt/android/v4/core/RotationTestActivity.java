@@ -32,7 +32,7 @@ public class RotationTestActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_v4_layout);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // need to initialize the loader manager here in order to successfully simulate rotation
+        // Need to initialize the loader manager here in order to successfully simulate rotation
         getSupportLoaderManager();
     }
 }

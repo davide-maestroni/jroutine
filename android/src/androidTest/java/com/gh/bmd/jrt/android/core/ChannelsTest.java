@@ -71,23 +71,28 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                         .orderByCall();
         Channels.combine(channel1, channel2)
                 .pass(new ParcelableSelectable<String>("test1", 0))
-                .pass(new ParcelableSelectable<Integer>(1, 1));
+                .pass(new ParcelableSelectable<Integer>(1, 1))
+                .close();
         Channels.combine(3, channel1, channel2)
                 .pass(new ParcelableSelectable<String>("test2", 3))
-                .pass(new ParcelableSelectable<Integer>(2, 4));
+                .pass(new ParcelableSelectable<Integer>(2, 4))
+                .close();
         Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
                 .pass(new ParcelableSelectable<String>("test3", 0))
-                .pass(new ParcelableSelectable<Integer>(3, 1));
+                .pass(new ParcelableSelectable<Integer>(3, 1))
+                .close();
         Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
                 .pass(new ParcelableSelectable<String>("test4", -5))
-                .pass(new ParcelableSelectable<Integer>(4, -4));
+                .pass(new ParcelableSelectable<Integer>(4, -4))
+                .close();
         final HashMap<Integer, InvocationChannel<?, ?>> map =
                 new HashMap<Integer, InvocationChannel<?, ?>>(2);
         map.put(31, channel1);
         map.put(17, channel2);
         Channels.combine(map)
                 .pass(new ParcelableSelectable<String>("test5", 31))
-                .pass(new ParcelableSelectable<Integer>(5, 17));
+                .pass(new ParcelableSelectable<Integer>(5, 17))
+                .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1", "test2", "test3",
                                                                          "test4", "test5");
         assertThat(channel2.result().eventually().all()).containsExactly(1, 2, 3, 4, 5);
@@ -305,10 +310,15 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
-        Channels.distribute(channel1, channel2).pass(Arrays.<Object>asList("test1-1", "test1-2"));
+        Channels.distribute(channel1, channel2)
+                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .close();
         Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"));
-        Channels.distribute(channel1, channel2).pass(Collections.<Object>singletonList("test3-1"));
+                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
+                .close();
+        Channels.distribute(channel1, channel2)
+                .pass(Collections.<Object>singletonList("test3-1"))
+                .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
         assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2");
@@ -386,11 +396,14 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                         .asyncInvoke()
                         .orderByCall();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"));
+                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .close();
         Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"));
+                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
+                .close();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Collections.<Object>singletonList("test3-1"));
+                .pass(Collections.<Object>singletonList("test3-1"))
+                .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
         assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2",
@@ -464,7 +477,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
-        Channels.distributeAndFlush(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2"));
+        Channels.distributeAndFlush(channel1)
+                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .close();
 
         try {
 
@@ -503,7 +518,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
-        Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2"));
+        Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2")).close();
 
         try {
 
@@ -541,7 +556,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannel<ParcelableSelectable<String>> channel =
                 JRoutine.transport().buildChannel();
-        Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3");
+        Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3").close();
         channel.close();
         assertThat(channel.all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
                                                   new ParcelableSelectable<String>("test2", 33),
@@ -574,7 +589,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 .pass(new ParcelableSelectable<String>("test1", 33),
                       new ParcelableSelectable<String>("test2", -33),
                       new ParcelableSelectable<String>("test3", 33),
-                      new ParcelableSelectable<String>("test4", 333));
+                      new ParcelableSelectable<String>("test4", 333))
+                .close();
         channel.close();
         assertThat(channel.eventually().all()).containsExactly("test1", "test3");
     }
@@ -1284,12 +1300,14 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
                 case INTEGER:
                     Channels.<Object, Integer>selectParcelable(result, INTEGER)
-                            .pass((Integer) selectable.data);
+                            .pass((Integer) selectable.data)
+                            .close();
                     break;
 
                 case STRING:
                     Channels.<Object, String>selectParcelable(result, STRING)
-                            .pass((String) selectable.data);
+                            .pass((String) selectable.data)
+                            .close();
                     break;
             }
         }

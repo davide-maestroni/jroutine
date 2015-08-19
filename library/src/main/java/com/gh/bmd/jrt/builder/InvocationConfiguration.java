@@ -387,7 +387,7 @@ public final class InvocationConfiguration {
     @Override
     public int hashCode() {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
         result = 31 * result + mCoreInstances;
         result = 31 * result + (mExecutionTimeout != null ? mExecutionTimeout.hashCode() : 0);
@@ -410,7 +410,7 @@ public final class InvocationConfiguration {
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(final Object o) {
 
-        // auto-generated code
+        // AUTO-GENERATED CODE
         if (this == o) {
 
             return true;
@@ -504,6 +504,7 @@ public final class InvocationConfiguration {
     @Override
     public String toString() {
 
+        // AUTO-GENERATED CODE
         return "InvocationConfiguration{" +
                 "mAsyncRunner=" + mAsyncRunner +
                 ", mCoreInstances=" + mCoreInstances +

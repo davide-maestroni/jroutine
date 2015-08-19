@@ -114,7 +114,7 @@ class DefaultInvocationChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT
             @Override
             public void close() {
 
-                // prevents closing
+                // Prevents closing
             }
         };
         final int maxInputSize = mMaxInput;

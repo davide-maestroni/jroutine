@@ -15,14 +15,12 @@ package com.gh.bmd.jrt.android.core;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Class implementing a builder of routine objects executed in a dedicated service.
@@ -50,39 +48,39 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     private final ServiceContext mContext;
 
-    private final Object[] mFactoryArgs;
-
-    private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
+    private final InvocationServiceTarget<INPUT, OUTPUT> mInvocationTarget;
 
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Constructor.
      *
-     * @param context     the routine context.
-     * @param classToken  the invocation class token.
-     * @param factoryArgs the invocation factory arguments.
+     * @param context the routine context.
+     * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken,
-            @Nullable final Object[] factoryArgs) {
+            @Nonnull final InvocationServiceTarget<INPUT, OUTPUT> target) {
 
         if (context == null) {
 
             throw new NullPointerException("the context must not be null");
         }
 
+        if (target == null) {
+
+            throw new NullPointerException("the invocation target not be null");
+        }
+
         mContext = context;
-        mInvocationClass = classToken.getRawClass();
-        mFactoryArgs = factoryArgs;
+        mInvocationTarget = target;
     }
 
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationClass, mFactoryArgs,
-                                                 getConfiguration(), mServiceConfiguration);
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationTarget, getConfiguration(),
+                                                 mServiceConfiguration);
     }
 
     @Nonnull

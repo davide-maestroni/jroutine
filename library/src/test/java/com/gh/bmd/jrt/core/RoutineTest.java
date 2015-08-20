@@ -78,6 +78,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
+import static com.gh.bmd.jrt.core.InvocationTarget.targetClass;
+import static com.gh.bmd.jrt.core.InvocationTarget.targetObject;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
@@ -1702,42 +1704,46 @@ public class RoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        assertThat(JRoutine.on(test)
+        assertThat(JRoutine.on(targetObject(test))
                            .method(TestClass.class.getMethod("getOne"))
                            .syncCall()
                            .afterMax(timeout)
                            .all()).containsExactly(1);
-        assertThat(JRoutine.on(test)
-                           .method("getOne")
-                           .syncCall()
-                           .afterMax(timeout)
-                           .all()).containsExactly(1);
-        assertThat(JRoutine.on(test)
+        assertThat(
+                JRoutine.on(targetObject(test)).method("getOne").syncCall().afterMax(timeout).all())
+                .containsExactly(1);
+        assertThat(JRoutine.on(targetObject(test))
                            .aliasMethod(TestClass.GET)
                            .syncCall()
                            .afterMax(timeout)
                            .all()).containsExactly(1);
-        assertThat(JRoutine.on(TestClass.class)
+        assertThat(JRoutine.on(targetClass(TestClass.class))
                            .aliasMethod(TestClass.GET)
                            .syncCall(3)
                            .afterMax(timeout)
                            .all()).containsExactly(3);
-        assertThat(JRoutine.on(TestClass.class)
+        assertThat(JRoutine.on(targetClass(TestClass.class))
                            .aliasMethod("get")
                            .asyncCall(-3)
                            .afterMax(timeout)
                            .all()).containsExactly(-3);
-        assertThat(JRoutine.on(TestClass.class)
+        assertThat(JRoutine.on(targetClass(TestClass.class))
                            .method("get", int.class)
                            .parallelCall(17)
                            .afterMax(timeout)
                            .all()).containsExactly(17);
 
-        assertThat(JRoutine.on(test).buildProxy(TestInterface.class).getInt(2)).isEqualTo(2);
+        assertThat(JRoutine.on(targetObject(test))
+                           .buildProxy(TestInterface.class)
+                           .getInt(2)).isEqualTo(2);
 
         try {
 
-            JRoutine.on(TestClass.class).aliasMethod("get").asyncCall().afterMax(timeout).all();
+            JRoutine.on(targetClass(TestClass.class))
+                    .aliasMethod("get")
+                    .asyncCall()
+                    .afterMax(timeout)
+                    .all();
 
             fail();
 
@@ -1747,7 +1753,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(TestClass.class).aliasMethod("take");
+            JRoutine.on(targetClass(TestClass.class)).aliasMethod("take");
 
             fail();
 
@@ -1755,19 +1761,19 @@ public class RoutineTest {
 
         }
 
-        assertThat(JRoutine.on(test)
+        assertThat(JRoutine.on(targetObject(test))
                            .invocations()
                            .withExecutionTimeout(timeout)
                            .set()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
-        assertThat(JRoutine.on(test)
+        assertThat(JRoutine.on(targetObject(test))
                            .buildProxy(TestInterfaceAsync.class)
                            .getOne()
                            .afterMax(timeout)
                            .next()).isEqualTo(1);
 
-        final TestInterfaceAsync testInterfaceAsync = JRoutine.on(test)
+        final TestInterfaceAsync testInterfaceAsync = JRoutine.on(targetObject(test))
                                                               .invocations()
                                                               .withExecutionTimeout(1,
                                                                                     TimeUnit.SECONDS)

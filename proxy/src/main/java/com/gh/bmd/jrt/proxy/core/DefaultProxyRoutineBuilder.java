@@ -36,6 +36,8 @@ class DefaultProxyRoutineBuilder
         implements ProxyRoutineBuilder, InvocationConfiguration.Configurable<ProxyRoutineBuilder>,
         ProxyConfiguration.Configurable<ProxyRoutineBuilder> {
 
+    // TODO: 20/08/15 class proxy?
+
     private final WeakReference<?> mTargetReference;
 
     private InvocationConfiguration mInvocationConfiguration =

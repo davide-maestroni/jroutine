@@ -15,10 +15,7 @@ package com.gh.bmd.jrt.core;
 
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
-import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
-import com.gh.bmd.jrt.annotation.Timeout;
-import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
@@ -38,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.core.RoutineBuilders.callFromInvocation;
+import static com.gh.bmd.jrt.core.RoutineBuilders.configurationWithAnnotations;
 import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedStaticMethod;
 import static com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
@@ -54,9 +52,7 @@ class DefaultClassRoutineBuilder
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
 
-    private final Class<?> mTargetClass;
-
-    private final WeakReference<?> mTargetReference;
+    private final InvocationTarget mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -66,10 +62,13 @@ class DefaultClassRoutineBuilder
     /**
      * Constructor.
      *
-     * @param targetClass the target class.
-     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
+     * @param target the invocation target.
+     * @throws java.lang.IllegalArgumentException if the class of specified target represents an
+     *                                            interface.
      */
-    DefaultClassRoutineBuilder(@Nonnull final Class<?> targetClass) {
+    DefaultClassRoutineBuilder(@Nonnull final InvocationTarget target) {
+
+        final Class<?> targetClass = target.getTargetClass();
 
         if (targetClass.isInterface()) {
 
@@ -77,25 +76,13 @@ class DefaultClassRoutineBuilder
                     "the target class must not be an interface: " + targetClass.getName());
         }
 
-        mTargetClass = targetClass;
-        mTargetReference = null;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param target the target object.
-     */
-    DefaultClassRoutineBuilder(@Nonnull final Object target) {
-
-        mTargetClass = target.getClass();
-        mTargetReference = new WeakReference<Object>(target);
+        mTarget = target;
     }
 
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        final Method method = getAnnotatedStaticMethod(name, mTargetClass);
+        final Method method = getAnnotatedStaticMethod(name, mTarget.getTargetClass());
 
         if (method == null) {
 
@@ -110,7 +97,7 @@ class DefaultClassRoutineBuilder
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
-        return method(findMethod(mTargetClass, name, parameterTypes));
+        return method(findMethod(mTarget.getTargetClass(), name, parameterTypes));
     }
 
     @Nonnull
@@ -172,6 +159,17 @@ class DefaultClassRoutineBuilder
     }
 
     /**
+     * Returns the builder invocation target.
+     *
+     * @return the invocation target.
+     */
+    @Nonnull
+    protected InvocationTarget getInvocationTarget() {
+
+        return mTarget;
+    }
+
+    /**
      * Returns the internal proxy configuration.
      *
      * @return the configuration.
@@ -199,7 +197,7 @@ class DefaultClassRoutineBuilder
             @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-        final Object target = (mTargetReference != null) ? mTargetReference.get() : mTargetClass;
+        final Object target = mTarget.getTarget();
 
         if (target == null) {
 
@@ -237,28 +235,6 @@ class DefaultClassRoutineBuilder
     }
 
     /**
-     * Returns the builder target class.
-     *
-     * @return the target class.
-     */
-    @Nonnull
-    protected Class<?> getTargetClass() {
-
-        return mTargetClass;
-    }
-
-    /**
-     * Returns the builder reference to the target object.
-     *
-     * @return the target reference.
-     */
-    @Nullable
-    protected WeakReference<?> getTargetReference() {
-
-        return mTargetReference;
-    }
-
-    /**
      * Returns a routine used to call the specified method.
      *
      * @param invocationConfiguration the invocation configuration.
@@ -272,40 +248,9 @@ class DefaultClassRoutineBuilder
             @Nonnull final ProxyConfiguration proxyConfiguration,
             @Nonnull final Method targetMethod) {
 
-        final InvocationConfiguration.Builder<InvocationConfiguration> invocationBuilder =
-                invocationConfiguration.builderFrom();
-        final Priority priorityAnnotation = targetMethod.getAnnotation(Priority.class);
-
-        if (priorityAnnotation != null) {
-
-            invocationBuilder.withPriority(priorityAnnotation.value());
-        }
-
-        final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
-
-        if (timeoutAnnotation != null) {
-
-            invocationBuilder.withExecutionTimeout(timeoutAnnotation.value(),
-                                                   timeoutAnnotation.unit());
-        }
-
-        final TimeoutAction actionAnnotation = targetMethod.getAnnotation(TimeoutAction.class);
-
-        if (actionAnnotation != null) {
-
-            invocationBuilder.withExecutionTimeoutAction(actionAnnotation.value());
-        }
-
-        final ProxyConfiguration.Builder<ProxyConfiguration> proxyBuilder =
-                proxyConfiguration.builderFrom();
-        final ShareGroup shareGroupAnnotation = targetMethod.getAnnotation(ShareGroup.class);
-
-        if (shareGroupAnnotation != null) {
-
-            proxyBuilder.withShareGroup(shareGroupAnnotation.value());
-        }
-
-        return getRoutine(invocationBuilder.set(), proxyBuilder.set(), targetMethod, null, null);
+        return getRoutine(configurationWithAnnotations(invocationConfiguration, targetMethod),
+                          configurationWithAnnotations(proxyConfiguration, targetMethod),
+                          targetMethod, null, null);
     }
 
     /**

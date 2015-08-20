@@ -19,7 +19,12 @@ import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Inputs;
 import com.gh.bmd.jrt.annotation.Output;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
+import com.gh.bmd.jrt.annotation.Priority;
 import com.gh.bmd.jrt.annotation.ShareGroup;
+import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.annotation.TimeoutAction;
+import com.gh.bmd.jrt.builder.InvocationConfiguration;
+import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -172,6 +177,72 @@ public class RoutineBuilders {
 
             throw new InvocationException(t);
         }
+    }
+
+    /**
+     * Returns a configuration properly modified by taking into account the annotations added to the
+     * specified method.
+     *
+     * @param configuration the initial configuration.
+     * @param method        the target method.
+     * @return the modified configuration.
+     * @see com.gh.bmd.jrt.annotation.Priority Priority
+     * @see com.gh.bmd.jrt.annotation.Timeout Timeout
+     * @see com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction
+     */
+    @Nonnull
+    public static InvocationConfiguration configurationWithAnnotations(
+            @Nullable final InvocationConfiguration configuration, @Nonnull final Method method) {
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builderFrom(configuration);
+        final Priority priorityAnnotation = method.getAnnotation(Priority.class);
+
+        if (priorityAnnotation != null) {
+
+            builder.withPriority(priorityAnnotation.value());
+        }
+
+        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            builder.withExecutionTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+        }
+
+        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.withExecutionTimeoutAction(actionAnnotation.value());
+        }
+
+        return builder.set();
+    }
+
+    /**
+     * Returns a configuration properly modified by taking into account the annotations added to the
+     * specified method.
+     *
+     * @param configuration the initial configuration.
+     * @param method        the target method.
+     * @return the modified configuration.
+     * @see com.gh.bmd.jrt.annotation.ShareGroup ShareGroup
+     */
+    @Nonnull
+    public static ProxyConfiguration configurationWithAnnotations(
+            @Nullable final ProxyConfiguration configuration, @Nonnull final Method method) {
+
+        final ProxyConfiguration.Builder<ProxyConfiguration> builder =
+                ProxyConfiguration.builderFrom(configuration);
+        final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+
+        if (shareGroupAnnotation != null) {
+
+            builder.withShareGroup(shareGroupAnnotation.value());
+        }
+
+        return builder.set();
     }
 
     /**

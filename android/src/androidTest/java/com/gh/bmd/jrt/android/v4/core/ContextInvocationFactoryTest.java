@@ -26,7 +26,7 @@ import com.gh.bmd.jrt.android.routine.LoaderRoutine;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.android.v4.core.RoutineContext.contextFrom;
+import static com.gh.bmd.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 

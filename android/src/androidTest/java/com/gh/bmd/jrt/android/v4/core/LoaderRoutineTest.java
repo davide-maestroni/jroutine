@@ -64,7 +64,7 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryTo;
-import static com.gh.bmd.jrt.android.v4.core.RoutineContext.contextFrom;
+import static com.gh.bmd.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -421,7 +421,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null, factoryOf(ToUpperCase.class));
+            JRoutine.on((LoaderContext) null, factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -441,7 +441,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null, ToUpperCase.class);
+            JRoutine.on((LoaderContext) null, ToUpperCase.class);
 
             fail();
 
@@ -451,7 +451,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null, ToUpperCase.class, Reflection.NO_ARGS);
+            JRoutine.on((LoaderContext) null, ToUpperCase.class, Reflection.NO_ARGS);
 
             fail();
 
@@ -481,7 +481,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null);
+            JRoutine.on((LoaderContext) null);
 
             fail();
 
@@ -1020,7 +1020,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null, factoryOf(ToUpperCase.class));
+            JRoutine.on((LoaderContext) null, factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -1040,7 +1040,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null, ToUpperCase.class);
+            JRoutine.on((LoaderContext) null, ToUpperCase.class);
 
             fail();
 
@@ -1050,7 +1050,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null, ToUpperCase.class, Reflection.NO_ARGS);
+            JRoutine.on((LoaderContext) null, ToUpperCase.class, Reflection.NO_ARGS);
 
             fail();
 
@@ -1080,7 +1080,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((RoutineContext) null);
+            JRoutine.on((LoaderContext) null);
 
             fail();
 
@@ -1267,7 +1267,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final Logger logger = Logger.newLogger(null, null, this);
         final LoaderConfiguration configuration = LoaderConfiguration.DEFAULT_CONFIGURATION;
-        final RoutineContext context = contextFrom(getActivity());
+        final LoaderContext context = contextFrom(getActivity());
 
         try {
 
@@ -1355,7 +1355,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testRoutineError() throws NoSuchMethodException {
 
         final LoaderConfiguration configuration = LoaderConfiguration.DEFAULT_CONFIGURATION;
-        final RoutineContext context = contextFrom(getActivity());
+        final LoaderContext context = contextFrom(getActivity());
 
         try {
 

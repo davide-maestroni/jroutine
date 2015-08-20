@@ -36,6 +36,7 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.core.InvocationTarget;
 import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
@@ -73,7 +74,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
-    private final RoutineContext mContext;
+    private final LoaderContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -94,7 +95,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param factoryArgs the object factory arguments.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderObjectRoutineBuilder(@Nonnull final RoutineContext context,
+    DefaultLoaderObjectRoutineBuilder(@Nonnull final LoaderContext context,
             @Nonnull final Class<?> targetClass, @Nullable final Object[] factoryArgs) {
 
         if (context == null) {
@@ -427,7 +428,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             try {
 
                 final Object target = getInstance(context, mTargetClass, mFactoryArgs);
-                mRoutine = JRoutine.on(target)
+                mRoutine = JRoutine.on(InvocationTarget.targetObject(target))
                                    .proxies()
                                    .with(mProxyConfiguration)
                                    .set()
@@ -558,7 +559,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             try {
 
                 final Object target = getInstance(context, mTargetClass, mFactoryArgs);
-                mRoutine = JRoutine.on(target)
+                mRoutine = JRoutine.on(InvocationTarget.targetObject(target))
                                    .proxies()
                                    .with(mProxyConfiguration)
                                    .set()
@@ -750,7 +751,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocationHandler implements InvocationHandler {
 
-        private final RoutineContext mContext;
+        private final LoaderContext mContext;
 
         private final Object[] mFactoryArgs;
 

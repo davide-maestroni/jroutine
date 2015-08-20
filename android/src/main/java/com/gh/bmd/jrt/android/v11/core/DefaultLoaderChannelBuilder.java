@@ -44,7 +44,7 @@ class DefaultLoaderChannelBuilder
         implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
         ChannelConfiguration.Configurable<LoaderChannelBuilder> {
 
-    private final RoutineContext mContext;
+    private final LoaderContext mContext;
 
     private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
@@ -56,7 +56,7 @@ class DefaultLoaderChannelBuilder
      * @param context the context instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderChannelBuilder(@Nonnull final RoutineContext context) {
+    DefaultLoaderChannelBuilder(@Nonnull final LoaderContext context) {
 
         if (context == null) {
 
@@ -136,7 +136,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Iterable<?> inputs) {
 
-        final RoutineContext context = mContext;
+        final LoaderContext context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -164,7 +164,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge() {
 
-        final RoutineContext context = mContext;
+        final LoaderContext context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -176,7 +176,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Object input) {
 
-        final RoutineContext context = mContext;
+        final LoaderContext context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -189,7 +189,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Object... inputs) {
 
-        final RoutineContext context = mContext;
+        final LoaderContext context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -250,7 +250,7 @@ class DefaultLoaderChannelBuilder
      */
     private static class PurgeExecution extends TemplateExecution {
 
-        private final RoutineContext mContext;
+        private final LoaderContext mContext;
 
         private final int mLoaderId;
 
@@ -260,7 +260,7 @@ class DefaultLoaderChannelBuilder
          * @param context  the context instance.
          * @param loaderId the loader ID.
          */
-        private PurgeExecution(@Nonnull final RoutineContext context, final int loaderId) {
+        private PurgeExecution(@Nonnull final LoaderContext context, final int loaderId) {
 
             mContext = context;
             mLoaderId = loaderId;
@@ -277,7 +277,7 @@ class DefaultLoaderChannelBuilder
      */
     private static class PurgeInputsExecution extends TemplateExecution {
 
-        private final RoutineContext mContext;
+        private final LoaderContext mContext;
 
         private final List<Object> mInputs;
 
@@ -290,7 +290,7 @@ class DefaultLoaderChannelBuilder
          * @param loaderId the loader ID.
          * @param inputs   the list of inputs.
          */
-        private PurgeInputsExecution(@Nonnull final RoutineContext context, final int loaderId,
+        private PurgeInputsExecution(@Nonnull final LoaderContext context, final int loaderId,
                 @Nonnull final List<Object> inputs) {
 
             mContext = context;

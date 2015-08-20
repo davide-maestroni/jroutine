@@ -25,6 +25,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
+import com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.android.service.RoutineService;
@@ -46,7 +47,6 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.TemplateExecution;
-import com.gh.bmd.jrt.util.Reflection;
 import com.gh.bmd.jrt.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
@@ -77,11 +77,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
     private final ServiceContext mContext;
 
-    private final Object[] mFactoryArgs;
-
-    private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
-
     private final InvocationConfiguration mInvocationConfiguration;
+
+    private final InvocationServiceTarget<INPUT, OUTPUT> mInvocationTarget;
 
     private final Logger mLogger;
 
@@ -93,15 +91,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * Constructor.
      *
      * @param context                 the service context.
-     * @param invocationClass         the invocation class.
-     * @param factoryArgs             the invocation factory arguments.
+     * @param target                  the invocation target.
      * @param invocationConfiguration the invocation configuration.
      * @param serviceConfiguration    the service configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     ServiceRoutine(@Nonnull final ServiceContext context,
-            @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
-            @Nullable final Object[] factoryArgs,
+            @Nonnull final InvocationServiceTarget<INPUT, OUTPUT> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
@@ -112,14 +108,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             throw new IllegalStateException("the service context has been destroyed");
         }
 
+        final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
+                target.getTargetClass();
         mContext = context;
-        mInvocationClass = invocationClass;
-        mFactoryArgs = (factoryArgs != null) ? factoryArgs : Reflection.NO_ARGS;
+        mInvocationTarget = target;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
         mRoutine = JRoutine.on(factoryTo(serviceContext.getApplicationContext(),
-                                         factoryOf(invocationClass, factoryArgs)))
+                                         factoryOf(invocationClass, target.getFactoryArgs())))
                            .invocations()
                            .with(invocationConfiguration)
                            .set()
@@ -132,7 +129,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     @Nonnull
     public InvocationChannel<INPUT, OUTPUT> asyncInvoke() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationClass, mFactoryArgs,
+        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mInvocationTarget,
                                                  mInvocationConfiguration, mServiceConfiguration,
                                                  mLogger);
     }
@@ -140,7 +137,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     @Nonnull
     public InvocationChannel<INPUT, OUTPUT> parallelInvoke() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationClass, mFactoryArgs,
+        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mInvocationTarget,
                                                  mInvocationConfiguration, mServiceConfiguration,
                                                  mLogger);
     }
@@ -167,13 +164,11 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private final ServiceContext mContext;
 
-        private final Object[] mFactoryArgs;
-
         private final Messenger mInMessenger;
 
-        private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mInvocationClass;
-
         private final InvocationConfiguration mInvocationConfiguration;
+
+        private final InvocationServiceTarget<INPUT, OUTPUT> mInvocationTarget;
 
         private final boolean mIsParallel;
 
@@ -202,15 +197,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          *
          * @param isParallel              whether the invocation is parallel.
          * @param context                 the routine context.
-         * @param invocationClass         the invocation class.
-         * @param factoryArgs             the invocation factory arguments.
+         * @param target                  the invocation target.
          * @param invocationConfiguration the invocation configuration.
          * @param serviceConfiguration    the service configuration.
          * @param logger                  the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final ServiceContext context,
-                @Nonnull Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
-                @Nonnull final Object[] factoryArgs,
+                @Nonnull final InvocationServiceTarget<INPUT, OUTPUT> target,
                 @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ServiceConfiguration serviceConfiguration,
                 @Nonnull final Logger logger) {
@@ -220,8 +213,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mContext = context;
             mInMessenger = new Messenger(new IncomingHandler(
                     serviceConfiguration.getResultLooperOr(Looper.getMainLooper())));
-            mInvocationClass = invocationClass;
-            mFactoryArgs = factoryArgs;
+            mInvocationTarget = target;
             mInvocationConfiguration = invocationConfiguration;
             mServiceConfiguration = serviceConfiguration;
             mLogger = logger;
@@ -581,7 +573,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 if (mIsParallel) {
 
                     logger.dbg("sending parallel invocation message");
-                    putParallelInvocation(message.getData(), mUUID, mInvocationClass, mFactoryArgs,
+                    putParallelInvocation(message.getData(), mUUID, mInvocationTarget,
                                           mInvocationConfiguration,
                                           serviceConfiguration.getRunnerClassOr(null),
                                           serviceConfiguration.getLogClassOr(null));
@@ -589,7 +581,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 } else {
 
                     logger.dbg("sending async invocation message");
-                    putAsyncInvocation(message.getData(), mUUID, mInvocationClass, mFactoryArgs,
+                    putAsyncInvocation(message.getData(), mUUID, mInvocationTarget,
                                        mInvocationConfiguration,
                                        serviceConfiguration.getRunnerClassOr(null),
                                        serviceConfiguration.getLogClassOr(null));

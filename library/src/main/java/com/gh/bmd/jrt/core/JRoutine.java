@@ -17,6 +17,8 @@ import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
+import com.gh.bmd.jrt.core.InvocationTarget.ClassTarget;
+import com.gh.bmd.jrt.core.InvocationTarget.ObjectTarget;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 
 import javax.annotation.Nonnull;
@@ -157,7 +159,7 @@ public class JRoutine {
      * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     @Nonnull
-    public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
+    public static ClassRoutineBuilder on(@Nonnull final ClassTarget target) {
 
         return new DefaultClassRoutineBuilder(target);
     }
@@ -189,7 +191,7 @@ public class JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ObjectRoutineBuilder on(@Nonnull final Object target) {
+    public static ObjectRoutineBuilder on(@Nonnull final ObjectTarget target) {
 
         return new DefaultObjectRoutineBuilder(target);
     }

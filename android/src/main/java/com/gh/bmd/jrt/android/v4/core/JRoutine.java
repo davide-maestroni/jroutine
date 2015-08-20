@@ -151,7 +151,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the channel builder instance.
      */
     @Nonnull
-    public static LoaderChannelBuilder on(@Nonnull final RoutineContext context) {
+    public static LoaderChannelBuilder on(@Nonnull final LoaderContext context) {
 
         return new DefaultLoaderChannelBuilder(context);
     }
@@ -171,7 +171,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static LoaderObjectRoutineBuilder on(@Nonnull final RoutineContext context,
+    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
             @Nonnull final Class<?> target) {
 
         return on(context, target, (Object[]) null);
@@ -193,7 +193,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static LoaderObjectRoutineBuilder on(@Nonnull final RoutineContext context,
+    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
             @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
         return new DefaultLoaderObjectRoutineBuilder(context, target, factoryArgs);
@@ -217,7 +217,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
      */
     @Nonnull
     public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final RoutineContext context,
+            @Nonnull final LoaderContext context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         return new DefaultLoaderRoutineBuilder<INPUT, OUTPUT>(context, factory);

@@ -18,7 +18,7 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    private final com.gh.bmd.jrt.android.v11.core.RoutineContext mContext;
+    private final com.gh.bmd.jrt.android.v11.core.LoaderContext mContext;
 
     private final Object[] mFactoryArgs;
 
@@ -27,7 +27,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     private final Class<?> mTargetClass;
 
     @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.RoutineContext context,
+    public ${generatedClassName}(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nullable final Object[] factoryArgs,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
@@ -53,7 +53,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.RoutineContext context,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
             @javax.annotation.Nonnull final Class<?> targetClass) {
 
         return on(context, targetClass, (Object[]) null);
@@ -61,7 +61,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.RoutineContext context,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
             @javax.annotation.Nonnull final Class<?> targetClass,
             @javax.annotation.Nullable final Object... factoryArgs) {
 
@@ -70,7 +70,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @javax.annotation.Nonnull
     private static <OUTPUT> com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder<Object, OUTPUT> getBuilder(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.RoutineContext context,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, OUTPUT> factory) {
 
         return com.gh.bmd.jrt.android.v11.core.JRoutine.on(context, factory);
@@ -107,7 +107,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private static class LoaderProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {
 
-        private final com.gh.bmd.jrt.android.v11.core.RoutineContext mContext;
+        private final com.gh.bmd.jrt.android.v11.core.LoaderContext mContext;
 
         private final Object[] mFactoryArgs;
 
@@ -116,7 +116,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
-        private LoaderProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.RoutineContext context,
+        private LoaderProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
                 @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final Object... factoryArgs) {
 
             if (context == null) {

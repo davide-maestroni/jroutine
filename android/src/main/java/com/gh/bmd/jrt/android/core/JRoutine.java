@@ -13,15 +13,16 @@
  */
 package com.gh.bmd.jrt.android.core;
 
+import com.gh.bmd.jrt.android.builder.ServiceClassRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
-import com.gh.bmd.jrt.android.invocation.ContextInvocation;
+import com.gh.bmd.jrt.android.core.ServiceTarget.ClassServiceTarget;
+import com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget;
+import com.gh.bmd.jrt.android.core.ServiceTarget.ObjectServiceTarget;
 import com.gh.bmd.jrt.android.log.Logs;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.util.ClassToken;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -89,25 +90,47 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
 
     /**
      * Returns a builder of routines running in a service based on the specified context, wrapping
-     * the specified object instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the invocation
-     * service.
+     * the specified object class.
      * <p/>
      * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the service context.
-     * @param targetClass the wrapped object class.
+     * @param context the service context.
+     * @param target  the invocation target.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ServiceObjectRoutineBuilder on(@Nonnull final ServiceContext context,
-            @Nonnull final Class<?> targetClass) {
+    public static ServiceClassRoutineBuilder on(@Nonnull final ServiceContext context,
+            @Nonnull final ClassServiceTarget target) {
 
-        return on(context, targetClass, (Object[]) null);
+        return new DefaultServiceClassRoutineBuilder(context, target);
+    }
+
+    /**
+     * Returns a builder of routines running in a service based on the specified context.<br/>
+     * In order to customize the invocation creation, the caller must override the method
+     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory
+     * getInvocationFactory(InvocationServiceTarget)} of the routine service.
+     * <p/>
+     * Note that the built routine results will be dispatched into the configured looper, thus,
+     * waiting for the outputs on the very same looper thread, immediately after its invocation,
+     * will result in a deadlock.<br/>
+     * By default output results are dispatched in the main looper.
+     *
+     * @param context  the service context.
+     * @param target   the invocation target.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine builder instance.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final ServiceContext context,
+            @Nonnull final InvocationServiceTarget<INPUT, OUTPUT> target) {
+
+        return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, target);
     }
 
     /**
@@ -122,68 +145,15 @@ public class JRoutine extends com.gh.bmd.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context     the service context.
-     * @param targetClass the wrapped object class.
-     * @param factoryArgs the object factory arguments.
+     * @param context the service context.
+     * @param target  the invocation target.
      * @return the routine builder instance.
      */
     @Nonnull
     public static ServiceObjectRoutineBuilder on(@Nonnull final ServiceContext context,
-            @Nonnull final Class<?> targetClass, @Nullable final Object... factoryArgs) {
+            @Nonnull final ObjectServiceTarget target) {
 
-        return new DefaultServiceObjectRoutineBuilder(context, targetClass, factoryArgs);
-    }
-
-    /**
-     * Returns a builder of routines running in a service based on the specified context.<br/>
-     * In order to customize the invocation creation, the caller must override the method
-     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])
-     * getInvocationFactory(Class, Object[])} of the routine service.
-     * <p/>
-     * Note that the built routine results will be dispatched into the configured looper, thus,
-     * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock.<br/>
-     * By default output results are dispatched in the main looper.
-     *
-     * @param context    the service context.
-     * @param classToken the invocation class token.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ServiceContext context,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken) {
-
-        return on(context, classToken, (Object[]) null);
-    }
-
-    /**
-     * Returns a builder of routines running in a service based on the specified context.<br/>
-     * In order to customize the invocation creation, the caller must override the method
-     * {@link com.gh.bmd.jrt.android.service.RoutineService#getInvocationFactory(Class, Object[])
-     * getInvocationFactory(Class, Object[])} of the routine service.
-     * <p/>
-     * Note that the built routine results will be dispatched into the configured looper, thus,
-     * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock.<br/>
-     * By default output results are dispatched in the main looper.
-     *
-     * @param context     the service context.
-     * @param classToken  the invocation class token.
-     * @param factoryArgs the invocation factory arguments.
-     * @param <INPUT>     the input data type.
-     * @param <OUTPUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ServiceContext context,
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> classToken,
-            @Nullable final Object... factoryArgs) {
-
-        return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken, factoryArgs);
+        return new DefaultServiceObjectRoutineBuilder(context, target);
     }
 
     static {

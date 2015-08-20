@@ -29,12 +29,12 @@ import com.gh.bmd.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.core.InvocationTarget.targetClass;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -50,7 +50,7 @@ public class ClassRoutineTest {
     public void testAliasMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine = JRoutine.on(targetClass(TestStatic.class))
                                                         .invocations()
                                                         .withSyncRunner(Runners.sequentialRunner())
                                                         .withAsyncRunner(Runners.poolRunner())
@@ -67,7 +67,7 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder(TestStatic.class).aliasMethod("test");
+            new DefaultClassRoutineBuilder(targetClass(TestStatic.class)).aliasMethod("test");
 
             fail();
 
@@ -82,7 +82,7 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder(TestStatic.class).setConfiguration(
+            new DefaultClassRoutineBuilder(targetClass(TestStatic.class)).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -93,7 +93,7 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder(TestStatic.class).setConfiguration(
+            new DefaultClassRoutineBuilder(targetClass(TestStatic.class)).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -108,7 +108,8 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder(DuplicateAnnotationStatic.class).aliasMethod(
+            new DefaultClassRoutineBuilder(
+                    targetClass(DuplicateAnnotationStatic.class)).aliasMethod(
                     DuplicateAnnotationStatic.GET);
 
             fail();
@@ -124,7 +125,7 @@ public class ClassRoutineTest {
         final TimeDuration timeout = seconds(1);
 
         final Routine<Object, Object> routine3 =
-                JRoutine.on(TestStatic.class).aliasMethod(TestStatic.THROW);
+                JRoutine.on(targetClass(TestStatic.class)).aliasMethod(TestStatic.THROW);
 
         try {
 
@@ -144,7 +145,7 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder(TestItf.class);
+            new DefaultClassRoutineBuilder(targetClass(TestItf.class));
 
             fail();
 
@@ -157,7 +158,7 @@ public class ClassRoutineTest {
     public void testMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
@@ -177,7 +178,7 @@ public class ClassRoutineTest {
     public void testMethodBySignature() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.poolRunner())
@@ -194,7 +195,7 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder(TestStatic.class).method("test");
+            new DefaultClassRoutineBuilder(targetClass(TestStatic.class)).method("test");
 
             fail();
 
@@ -209,7 +210,7 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder((Object) null);
+            new DefaultClassRoutineBuilder(null);
 
             fail();
 
@@ -219,7 +220,7 @@ public class ClassRoutineTest {
 
         try {
 
-            new DefaultClassRoutineBuilder((WeakReference<?>) null);
+            new DefaultClassRoutineBuilder(targetClass(null));
 
             fail();
 
@@ -232,7 +233,7 @@ public class ClassRoutineTest {
     public void testRoutineCache() {
 
         final NullLog nullLog = new NullLog();
-        final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
@@ -243,7 +244,7 @@ public class ClassRoutineTest {
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
                                                          .withSyncRunner(Runners.sequentialRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
@@ -255,7 +256,7 @@ public class ClassRoutineTest {
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
-        final Routine<Object, Object> routine3 = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine3 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
@@ -268,7 +269,7 @@ public class ClassRoutineTest {
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
-        final Routine<Object, Object> routine4 = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine4 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
@@ -280,7 +281,7 @@ public class ClassRoutineTest {
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
-        final Routine<Object, Object> routine5 = JRoutine.on(TestStatic.class)
+        final Routine<Object, Object> routine5 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
                                                          .withSyncRunner(Runners.queuedRunner())
                                                          .withAsyncRunner(Runners.sharedRunner())
@@ -296,8 +297,10 @@ public class ClassRoutineTest {
     @Test
     public void testShareGroup() throws NoSuchMethodException {
 
-        final ClassRoutineBuilder builder =
-                JRoutine.on(TestStatic2.class).invocations().withExecutionTimeout(seconds(2)).set();
+        final ClassRoutineBuilder builder = JRoutine.on(targetClass(TestStatic2.class))
+                                                    .invocations()
+                                                    .withExecutionTimeout(seconds(2))
+                                                    .set();
 
         long startTime = System.currentTimeMillis();
 

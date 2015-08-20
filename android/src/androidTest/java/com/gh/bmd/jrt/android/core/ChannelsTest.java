@@ -41,8 +41,8 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import static com.gh.bmd.jrt.android.core.ServiceContext.serviceFrom;
+import static com.gh.bmd.jrt.android.core.ServiceTarget.targetInvocation;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
-import static com.gh.bmd.jrt.util.ClassToken.tokenOf;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,11 +62,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testCombine() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
         final InvocationChannel<Integer, Integer> channel2 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingInteger.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingInteger.class))
                         .asyncInvoke()
                         .orderByCall();
         Channels.combine(channel1, channel2)
@@ -102,10 +102,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         InvocationChannel<String, String> channel1;
         InvocationChannel<Integer, Integer> channel2;
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingInteger.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.combine(channel1, channel2).abort();
@@ -130,10 +130,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingInteger.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.combine(3, channel1, channel2).abort();
@@ -158,10 +158,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingInteger.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
@@ -186,10 +186,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingInteger.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
@@ -214,10 +214,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingInteger.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
         final HashMap<Integer, InvocationChannel<?, ?>> map =
@@ -303,11 +303,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
         final InvocationChannel<String, String> channel2 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
         Channels.distribute(channel1, channel2)
@@ -328,10 +328,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         InvocationChannel<String, String> channel1;
         InvocationChannel<String, String> channel2;
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.distribute(channel1, channel2).abort();
@@ -356,10 +356,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2)).abort();
@@ -388,11 +388,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testDistributeAndFlush() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
         final InvocationChannel<String, String> channel2 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
         Channels.distributeAndFlush(channel1, channel2)
@@ -414,10 +414,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         InvocationChannel<String, String> channel1;
         InvocationChannel<String, String> channel2;
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.distributeAndFlush(channel1, channel2).abort();
@@ -442,10 +442,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel1 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel1 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
-        channel2 = JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+        channel2 = JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                            .asyncInvoke()
                            .orderByCall();
         Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2)).abort();
@@ -474,7 +474,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testDistributeAndFlushError() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
         Channels.distributeAndFlush(channel1)
@@ -515,7 +515,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testDistributeError() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(PassingString.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingString.class))
                         .asyncInvoke()
                         .orderByCall();
         Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2")).close();
@@ -616,7 +616,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(CharAt.class)).buildRoutine();
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(CharAt.class))
+                        .buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -652,7 +653,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(CharAt.class)).buildRoutine();
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(CharAt.class))
+                        .buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -692,7 +694,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(CharAt.class)).buildRoutine();
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(CharAt.class))
+                        .buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -735,7 +738,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final TransportChannelBuilder builder = JRoutine.transport();
         final Routine<List<?>, Character> routine =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(CharAt.class)).buildRoutine();
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(CharAt.class))
+                        .buildRoutine();
         TransportChannel<String> channel1;
         TransportChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -828,7 +832,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final OutputChannel<? extends ParcelableSelectable<Object>> channel =
                 Channels.mergeParcelable(Arrays.<TransportChannel<?>>asList(channel1, channel2));
         final OutputChannel<ParcelableSelectable<Object>> output =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class))
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(Sort.class))
                         .invocations()
                         .withInputOrder(OrderType.BY_CALL)
                         .set()
@@ -1044,8 +1048,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputMap() {
 
-        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class)).buildRoutine();
+        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine = JRoutine
+                .on(serviceFrom(getActivity()), targetInvocation(Sort.class))
+                .buildRoutine();
         Map<Integer, OutputChannel<Object>> channelMap;
         OutputChannel<ParcelableSelectable<Object>> channel;
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
@@ -1068,8 +1073,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputMapAbort() {
 
-        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class)).buildRoutine();
+        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine = JRoutine
+                .on(serviceFrom(getActivity()), targetInvocation(Sort.class))
+                .buildRoutine();
         Map<Integer, OutputChannel<Object>> channelMap;
         OutputChannel<ParcelableSelectable<Object>> channel;
         channel = routine.asyncInvoke()
@@ -1161,8 +1167,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.map(0, 0,
-                         JRoutine.on(serviceFrom(getActivity()), tokenOf(Sort.class)).asyncCall());
+            Channels.map(0, 0, JRoutine.on(serviceFrom(getActivity()), targetInvocation(Sort.class))
+                                       .asyncCall());
 
             fail();
 

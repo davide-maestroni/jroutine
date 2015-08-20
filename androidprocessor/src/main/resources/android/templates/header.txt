@@ -61,10 +61,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @javax.annotation.Nonnull
     private static <OUTPUT> com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder<Object, OUTPUT> getBuilder(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.util.ClassToken<? extends com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, OUTPUT>> classToken,
-            @javax.annotation.Nullable final Object... args) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget<Object, OUTPUT> target) {
 
-        return com.gh.bmd.jrt.android.core.JRoutine.on(context, classToken, args);
+        return com.gh.bmd.jrt.android.core.JRoutine.on(context, target);
     }
 
     @javax.annotation.Nonnull

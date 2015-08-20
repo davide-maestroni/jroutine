@@ -22,11 +22,11 @@ import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
+import com.gh.bmd.jrt.core.InvocationTarget.ObjectTarget;
 import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -72,9 +72,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     /**
      * Constructor.
      *
-     * @param target the target object instance.
+     * @param target the invocation target.
      */
-    DefaultObjectRoutineBuilder(@Nonnull final Object target) {
+    DefaultObjectRoutineBuilder(@Nonnull final ObjectTarget target) {
 
         super(target);
     }
@@ -82,7 +82,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        final Method method = getAnnotatedMethod(name, getTargetClass());
+        final Method method = getAnnotatedMethod(name, getInvocationTarget().getTargetClass());
 
         if (method == null) {
 
@@ -170,21 +170,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final WeakReference<?> targetReference = getTargetReference();
-
-            if (targetReference == null) {
-
-                throw new IllegalStateException("the target reference must not be null");
-            }
-
-            final Object target = targetReference.get();
-
-            if (target == null) {
-
-                throw new IllegalStateException("the target object has been destroyed");
-            }
-
-            final MethodInfo methodInfo = getTargetMethodInfo(method, getTargetClass());
+            final MethodInfo methodInfo =
+                    getTargetMethodInfo(method, getInvocationTarget().getTargetClass());
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =

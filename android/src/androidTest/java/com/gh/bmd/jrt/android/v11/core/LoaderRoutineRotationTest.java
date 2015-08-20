@@ -31,7 +31,7 @@ import java.util.concurrent.Semaphore;
 import javax.annotation.Nonnull;
 
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.gh.bmd.jrt.android.v11.core.RoutineContext.contextFrom;
+import static com.gh.bmd.jrt.android.v11.core.LoaderContext.contextFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

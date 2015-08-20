@@ -17,7 +17,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
-import com.gh.bmd.jrt.android.v11.core.RoutineContext;
+import com.gh.bmd.jrt.android.v11.core.LoaderContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -76,7 +76,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * @return the routine builder instance.
      */
     @Nonnull
-    public static LoaderProxyRoutineBuilder on(@Nonnull final RoutineContext context,
+    public static LoaderProxyRoutineBuilder on(@Nonnull final LoaderContext context,
             @Nonnull final Class<?> target) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -104,7 +104,7 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
      * @return the routine builder instance.
      */
     @Nonnull
-    public static LoaderProxyRoutineBuilder on(@Nonnull final RoutineContext context,
+    public static LoaderProxyRoutineBuilder on(@Nonnull final LoaderContext context,
             @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

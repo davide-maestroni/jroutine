@@ -13,12 +13,9 @@
  */
 package com.gh.bmd.jrt.core;
 
-import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.TransportChannelBuilder;
-import com.gh.bmd.jrt.core.InvocationTarget.ClassTarget;
-import com.gh.bmd.jrt.core.InvocationTarget.ObjectTarget;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 
 import javax.annotation.Nonnull;
@@ -152,19 +149,6 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder wrapping the specified target class.
-     *
-     * @param target the target class.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
-     */
-    @Nonnull
-    public static ClassRoutineBuilder on(@Nonnull final ClassTarget target) {
-
-        return new DefaultClassRoutineBuilder(target);
-    }
-
-    /**
      * Returns a routine builder based on the specified invocation factory.<br/>
      * In order to prevent undesired leaks, the class of the specified factory must be static.
      *
@@ -183,15 +167,17 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder wrapping a weak reference to the specified target object.<br/>
+     * Returns a routine builder wrapping the specified target object.<br/>
      * Note that it is responsibility of the caller to retain a strong reference to the target
      * instance to prevent it from being garbage collected.
      *
-     * @param target the target object.
+     * @param target the invocation target.
      * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the specified object class represents an
+     *                                            interface.
      */
     @Nonnull
-    public static ObjectRoutineBuilder on(@Nonnull final ObjectTarget target) {
+    public static ObjectRoutineBuilder on(@Nonnull final InvocationTarget target) {
 
         return new DefaultObjectRoutineBuilder(target);
     }

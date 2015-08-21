@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
 import com.gh.bmd.jrt.util.Reflection;
@@ -53,6 +54,14 @@ public abstract class LoaderContext {
     @Nonnull
     public static LoaderContext contextFrom(@Nonnull final Activity activity) {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            throw new UnsupportedOperationException(
+                    "this method is supported only for API level >= " +
+                            VERSION_CODES.HONEYCOMB
+                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
+        }
+
         return new ActivityContext(activity);
     }
 
@@ -68,6 +77,14 @@ public abstract class LoaderContext {
     @Nonnull
     public static LoaderContext contextFrom(@Nonnull final Activity activity,
             @Nonnull final Context context) {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            throw new UnsupportedOperationException(
+                    "this method is supported only for API level >= " +
+                            VERSION_CODES.HONEYCOMB
+                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
+        }
 
         return new WrappedActivityContext(activity, context);
     }

@@ -18,35 +18,33 @@
 
     private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
 
-        private final Object[] mFactoryArgs;
-
         private final String mShareGroup;
 
-        private final Class<?> mTargetClass;
+        private final com.gh.bmd.jrt.android.core.ContextInvocationTarget mTarget;
 
         private ContextInvocationFactory${methodCount}(@javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] factoryArgs) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
 
             mShareGroup = shareGroup;
-            mTargetClass = targetClass;
-            mFactoryArgs = factoryArgs;
+            mTarget = target;
         }
 
         @javax.annotation.Nonnull
         @Override
         public com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation() {
 
-            return new ContextInvocation${methodCount}${genericTypes}(mShareGroup, mTargetClass, mFactoryArgs);
+            return new ContextInvocation${methodCount}${genericTypes}(mShareGroup, mTarget);
         }
     }
 
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${shareGroup}, mTargetClass, mFactoryArgs))
+        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${shareGroup}, target))
                                            .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}

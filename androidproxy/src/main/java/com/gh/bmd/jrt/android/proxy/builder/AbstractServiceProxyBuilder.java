@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.android.proxy.builder;
 
+import android.content.Context;
+
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
@@ -23,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Abstract implementation of a builder of async proxy objects, whose methods are executed in a
@@ -37,8 +40,9 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
         ProxyConfiguration.Configurable<ServiceProxyBuilder<TYPE>>,
         ServiceConfiguration.Configurable<ServiceProxyBuilder<TYPE>> {
 
-    private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
-            new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
+    private static final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
+            sContextProxyMap =
+            new WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -50,26 +54,42 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     @Nonnull
     public TYPE buildProxy() {
 
-        synchronized (sClassMap) {
+        synchronized (sContextProxyMap) {
 
-            final Object target = getTargetClass();
-            final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
-            HashMap<ClassInfo, Object> classes = classMap.get(target);
+            final Context context = getInvocationContext();
 
-            if (classes == null) {
+            if (context == null) {
 
-                classes = new HashMap<ClassInfo, Object>();
-                classMap.put(target, classes);
+                throw new NullPointerException("the invocation context has been destroyed");
+            }
+
+            final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
+                    contextProxyMap = sContextProxyMap;
+            HashMap<Class<?>, HashMap<ProxyInfo, Object>> proxyMap = contextProxyMap.get(context);
+
+            if (proxyMap == null) {
+
+                proxyMap = new HashMap<Class<?>, HashMap<ProxyInfo, Object>>();
+                contextProxyMap.put(context, proxyMap);
+            }
+
+            final Class<?> targetClass = getTargetClass();
+            HashMap<ProxyInfo, Object> proxies = proxyMap.get(targetClass);
+
+            if (proxies == null) {
+
+                proxies = new HashMap<ProxyInfo, Object>();
+                proxyMap.put(targetClass, proxies);
             }
 
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
-            final ClassInfo classInfo =
-                    new ClassInfo(token, invocationConfiguration, proxyConfiguration,
+            final ProxyInfo proxyInfo =
+                    new ProxyInfo(token, invocationConfiguration, proxyConfiguration,
                                   serviceConfiguration);
-            final Object instance = classes.get(classInfo);
+            final Object instance = proxies.get(proxyInfo);
 
             if (instance != null) {
 
@@ -80,7 +100,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
 
                 final TYPE newInstance =
                         newProxy(invocationConfiguration, proxyConfiguration, serviceConfiguration);
-                classes.put(classInfo, newInstance);
+                proxies.put(proxyInfo, newInstance);
                 return newInstance;
 
             } catch (final Throwable t) {
@@ -162,6 +182,16 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     protected abstract ClassToken<TYPE> getInterfaceToken();
 
     /**
+     * Returns the context on which the invocation is based.
+     * <br/>
+     * Returning null means that the context has been destroyed, so an exception will be thrown.
+     *
+     * @return the invocation context.
+     */
+    @Nullable
+    protected abstract Context getInvocationContext();
+
+    /**
      * Returns the builder target class.
      *
      * @return the target class.
@@ -185,7 +215,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     /**
      * Class used as key to identify a specific proxy instance.
      */
-    private static class ClassInfo {
+    private static class ProxyInfo {
 
         private final InvocationConfiguration mInvocationConfiguration;
 
@@ -203,7 +233,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
          * @param proxyConfiguration      the proxy configuration.
          * @param serviceConfiguration    the service configuration.
          */
-        private ClassInfo(@Nonnull final ClassToken<?> token,
+        private ProxyInfo(@Nonnull final ClassToken<?> token,
                 @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final ServiceConfiguration serviceConfiguration) {
@@ -223,24 +253,24 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
                 return true;
             }
 
-            if (!(o instanceof ClassInfo)) {
+            if (!(o instanceof ProxyInfo)) {
 
                 return false;
             }
 
-            final ClassInfo classInfo = (ClassInfo) o;
-            return mProxyConfiguration.equals(classInfo.mProxyConfiguration)
-                    && mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
-                    && mServiceConfiguration.equals(classInfo.mServiceConfiguration)
-                    && mType.equals(classInfo.mType);
+            final ProxyInfo proxyInfo = (ProxyInfo) o;
+            return mInvocationConfiguration.equals(proxyInfo.mInvocationConfiguration)
+                    && mProxyConfiguration.equals(proxyInfo.mProxyConfiguration)
+                    && mServiceConfiguration.equals(proxyInfo.mServiceConfiguration)
+                    && mType.equals(proxyInfo.mType);
         }
 
         @Override
         public int hashCode() {
 
             // AUTO-GENERATED CODE
-            int result = mProxyConfiguration.hashCode();
-            result = 31 * result + mInvocationConfiguration.hashCode();
+            int result = mInvocationConfiguration.hashCode();
+            result = 31 * result + mProxyConfiguration.hashCode();
             result = 31 * result + mServiceConfiguration.hashCode();
             result = 31 * result + mType.hashCode();
             return result;

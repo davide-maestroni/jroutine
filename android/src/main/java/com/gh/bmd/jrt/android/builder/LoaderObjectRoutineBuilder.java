@@ -59,6 +59,56 @@ public interface LoaderObjectRoutineBuilder
     <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
 
     /**
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction}, as well as
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy},
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} and
+     * {@link com.gh.bmd.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     *
+     * @param itf    the token of the interface implemented by the return object.
+     * @param <TYPE> the interface type.
+     * @return the proxy object.
+     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
+     *                                            interface.
+     */
+    @Nonnull
+    <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
+
+    /**
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout},
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction}, as well as
+     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy},
+     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution},
+     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} and
+     * {@link com.gh.bmd.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     *
+     * @param itf    the token of the interface implemented by the return object.
+     * @param <TYPE> the interface type.
+     * @return the proxy object.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     */
+    @Nonnull
+    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
+
+    /**
      * Returns a routine used to call the specified method.
      * <p/>
      * The method is searched via reflection ignoring a name specified in an
@@ -108,56 +158,6 @@ public interface LoaderObjectRoutineBuilder
      */
     @Nonnull
     <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull Method method);
-
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
-     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
-     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction}, as well as
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.gh.bmd.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
-     * Note that such annotations will override any configuration set through the builder.
-     *
-     * @param itf    the token of the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
-     */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
-
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
-     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
-     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
-     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout},
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction}, as well as
-     * {@link com.gh.bmd.jrt.android.annotation.CacheStrategy CacheStrategy},
-     * {@link com.gh.bmd.jrt.android.annotation.ClashResolution ClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.gh.bmd.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.gh.bmd.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
-     * Note that such annotations will override any configuration set through the builder.
-     *
-     * @param itf    the token of the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
-     *                                            interface.
-     */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
      * Note that the configured asynchronous runner will be ignored.

@@ -16,10 +16,10 @@ package com.gh.bmd.jrt.android.v4.core;
 import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
+import com.gh.bmd.jrt.android.core.ContextInvocationTarget;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -157,49 +157,6 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
     }
 
     /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified object
-     * instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
-     * context.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param context the routine context.
-     * @param target  the wrapped object class.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final Class<?> target) {
-
-        return on(context, target, (Object[]) null);
-    }
-
-    /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified object
-     * instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
-     * context.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param context     the routine context.
-     * @param target      the wrapped object class.
-     * @param factoryArgs the object factory arguments.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
-
-        return new DefaultLoaderObjectRoutineBuilder(context, target, factoryArgs);
-    }
-
-    /**
      * Returns a builder of routines bound to the specified context.<br/>
      * In order to prevent undesired leaks, the class of the specified factory must be static, and
      * should never be a platform component (like Activity, Fragment, etc.).<br/>
@@ -221,5 +178,26 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
         return new DefaultLoaderRoutineBuilder<INPUT, OUTPUT>(context, factory);
+    }
+
+    /**
+     * Returns a builder of routines bound to the specified context, wrapping the specified target
+     * object.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
+     * context.<br/>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param context the routine context.
+     * @param target  the invocation target.
+     * @return the routine builder instance.
+     */
+    @Nonnull
+    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
+            @Nonnull final ContextInvocationTarget target) {
+
+        return new DefaultLoaderObjectRoutineBuilder(context, target);
     }
 }

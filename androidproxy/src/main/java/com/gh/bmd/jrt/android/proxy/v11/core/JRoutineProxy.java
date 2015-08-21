@@ -13,14 +13,11 @@
  */
 package com.gh.bmd.jrt.android.proxy.v11.core;
 
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
-
+import com.gh.bmd.jrt.android.core.ContextInvocationTarget;
 import com.gh.bmd.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.gh.bmd.jrt.android.v11.core.LoaderContext;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -65,57 +62,20 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
     }
 
     /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified object
-     * instances.<br/>
+     * Returns a builder of routines bound to the specified context, wrapping the specified target
+     * object.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
      * context.
      *
      * @param context the routine context.
-     * @param target  the wrapped object class.
+     * @param target  the invocation target.
      * @return the routine builder instance.
      */
     @Nonnull
     public static LoaderProxyRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final Class<?> target) {
+            @Nonnull final ContextInvocationTarget target) {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.proxy.v4.core.JRoutineProxy class "
-                            + "instead");
-        }
-
-        return on(context, target, (Object[]) null);
-    }
-
-    /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified object
-     * instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
-     * context.
-     *
-     * @param context     the routine context.
-     * @param target      the wrapped object class.
-     * @param factoryArgs the object factory arguments.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static LoaderProxyRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.proxy.v4.core.JRoutineProxy class "
-                            + "instead");
-        }
-
-        return new DefaultLoaderProxyRoutineBuilder(context, target, factoryArgs);
+        return new DefaultLoaderProxyRoutineBuilder(context, target);
     }
 }

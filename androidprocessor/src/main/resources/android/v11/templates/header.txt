@@ -20,16 +20,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private final com.gh.bmd.jrt.android.v11.core.LoaderContext mContext;
 
-    private final Object[] mFactoryArgs;
-
-    private final String mShareGroup;
-
-    private final Class<?> mTargetClass;
-
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
-            @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nullable final Object[] factoryArgs,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
@@ -39,33 +32,22 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             throw new NullPointerException("the routine context must not be null");
         }
 
-        if (targetClass == null) {
+        if (!${classErasure}.class.isAssignableFrom(target.getTargetClass())) {
 
-            throw new NullPointerException("the target class must not be null");
+            throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
+                    "${classFullName}");
         }
 
         mContext = context;
-        mTargetClass = targetClass;
-        mFactoryArgs = (factoryArgs != null) ? factoryArgs : com.gh.bmd.jrt.util.Reflection.NO_ARGS;
-        mShareGroup = proxyConfiguration.getShareGroupOr(com.gh.bmd.jrt.annotation.ShareGroup.ALL);
         ${routineFieldsInit}
     }
 
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
-            @javax.annotation.Nonnull final Class<?> targetClass) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
 
-        return on(context, targetClass, (Object[]) null);
-    }
-
-    @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
-            @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nullable final Object... factoryArgs) {
-
-        return new LoaderProxyBuilder${genericTypes}(context, targetClass, factoryArgs);
+        return new LoaderProxyBuilder${genericTypes}(context, target);
     }
 
     @javax.annotation.Nonnull
@@ -76,62 +58,30 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         return com.gh.bmd.jrt.android.v11.core.JRoutine.on(context, factory);
     }
 
-    @javax.annotation.Nonnull
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    private static Object getInstance(@javax.annotation.Nonnull final android.content.Context context,
-            @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] args)
-            throws IllegalAccessException, java.lang.reflect.InvocationTargetException, InstantiationException {
-
-        Object target = null;
-
-        if (context instanceof com.gh.bmd.jrt.android.builder.FactoryContext) {
-
-            // The only safe way is to synchronize the factory using the very same instance
-            synchronized (context) {
-
-                target = ((com.gh.bmd.jrt.android.builder.FactoryContext) context).geInstance(targetClass, args);
-            }
-        }
-
-        if (target == null) {
-
-            target = com.gh.bmd.jrt.util.Reflection.findConstructor(targetClass, args).newInstance(args);
-
-        } else if (!targetClass.isInstance(target)) {
-
-            throw new InstantiationException();
-        }
-
-        return target;
-    }
-
     private static class LoaderProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {
 
         private final com.gh.bmd.jrt.android.v11.core.LoaderContext mContext;
 
-        private final Object[] mFactoryArgs;
-
-        private final Class<?> mTargetClass;
+        private final com.gh.bmd.jrt.android.core.ContextInvocationTarget mTarget;
 
         private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
         private LoaderProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v11.core.LoaderContext context,
-                @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final Object... factoryArgs) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
 
             if (context == null) {
 
                 throw new NullPointerException("the routine context must not be null");
             }
 
-            if (targetClass == null) {
+            if (target == null) {
 
-                throw new NullPointerException("the target class must not be null");
+                throw new NullPointerException("the invocation target must not be null");
             }
 
             mContext = context;
-            mTargetClass = targetClass;
-            mFactoryArgs = factoryArgs;
+            mTarget = target;
         }
 
         @Override
@@ -142,10 +92,17 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @Override
+        @javax.annotation.Nullable
+        protected Object getInvocationContext() {
+
+            return mContext.getComponent();
+        }
+
+        @Override
         @javax.annotation.Nonnull
         protected Class<?> getTargetClass() {
 
-            return mTargetClass;
+            return mTarget.getTargetClass();
         }
 
         @Override
@@ -155,6 +112,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-            return new ${generatedClassName}${genericTypes}(mContext, mTargetClass, mFactoryArgs, invocationConfiguration, proxyConfiguration, loaderConfiguration);
+            return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, proxyConfiguration, loaderConfiguration);
         }
     }

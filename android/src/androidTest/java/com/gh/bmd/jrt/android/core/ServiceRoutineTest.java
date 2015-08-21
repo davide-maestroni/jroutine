@@ -20,7 +20,6 @@ import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
-import com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationWrapper;
 import com.gh.bmd.jrt.android.invocation.FilterContextInvocation;
 import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
@@ -49,8 +48,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation;
 import static com.gh.bmd.jrt.android.core.ServiceContext.serviceFrom;
-import static com.gh.bmd.jrt.android.core.ServiceTarget.targetInvocation;
 import static com.gh.bmd.jrt.util.ClassToken.tokenOf;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,7 +123,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()), (InvocationServiceTarget) null);
+            JRoutine.on(serviceFrom(getActivity()), (InvocationFactoryTarget) null);
 
             fail();
 
@@ -180,7 +179,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testDecorator() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationServiceTarget<String, String> targetInvocation =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 targetInvocation(new PassingWrapper<String>());
         final Routine<String, String> routine =
                 JRoutine.on(serviceFrom(getActivity()), targetInvocation)
@@ -259,7 +258,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationServiceTarget<String, String> targetInvocation =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 targetInvocation(StringPassingInvocation.class);
         final Routine<String, String> routine1 =
                 JRoutine.on(serviceFrom(getActivity()), targetInvocation)
@@ -311,7 +310,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations3() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationServiceTarget<String, String> targetInvocation =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 targetInvocation(StringFunctionInvocation.class);
         final Routine<String, String> routine3 =
                 JRoutine.on(serviceFrom(getActivity()), targetInvocation)
@@ -334,7 +333,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations4() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationServiceTarget<String, String> targetInvocation =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 targetInvocation(StringFunctionInvocation.class);
         final Routine<String, String> routine4 =
                 JRoutine.on(serviceFrom(getActivity()), targetInvocation)

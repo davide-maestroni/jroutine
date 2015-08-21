@@ -1718,12 +1718,12 @@ public class RoutineTest {
                            .afterMax(timeout)
                            .all()).containsExactly(1);
         assertThat(JRoutine.on(targetClass(TestClass.class))
-                           .aliasMethod(TestClass.GET)
+                           .aliasMethod(TestClass.STATIC_GET)
                            .syncCall(3)
                            .afterMax(timeout)
                            .all()).containsExactly(3);
         assertThat(JRoutine.on(targetClass(TestClass.class))
-                           .aliasMethod("get")
+                           .aliasMethod("sget")
                            .asyncCall(-3)
                            .afterMax(timeout)
                            .all()).containsExactly(-3);
@@ -1740,7 +1740,7 @@ public class RoutineTest {
         try {
 
             JRoutine.on(targetClass(TestClass.class))
-                    .aliasMethod("get")
+                    .aliasMethod("sget")
                     .asyncCall()
                     .afterMax(timeout)
                     .all();
@@ -3637,7 +3637,9 @@ public class RoutineTest {
 
         public static final String GET = "get";
 
-        @Alias(GET)
+        public static final String STATIC_GET = "sget";
+
+        @Alias(STATIC_GET)
         public static int get(final int i) {
 
             return i;

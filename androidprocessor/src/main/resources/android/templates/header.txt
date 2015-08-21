@@ -20,14 +20,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private final com.gh.bmd.jrt.android.core.ServiceContext mContext;
 
-    private final Object[] mFactoryArgs;
-
-    private final Class<?> mTargetClass;
-
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
-            @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nullable final Object[] factoryArgs,
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
@@ -37,92 +32,63 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             throw new NullPointerException("the service context must not be null");
         }
 
-        if (targetClass.isPrimitive()) {
+        if (target.getTargetClass().isPrimitive()) {
 
             // The parceling of primitive classes is broken...
             throw new IllegalArgumentException("the target class cannot be primitive");
         }
 
+        if (!${classErasure}.class.isAssignableFrom(target.getTargetClass())) {
+
+            throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
+                    "${classFullName}");
+        }
+
         mContext = context;
-        mTargetClass = targetClass;
-        mFactoryArgs = (factoryArgs != null) ? factoryArgs : com.gh.bmd.jrt.util.Reflection.NO_ARGS;
         ${routineFieldsInit}
     }
 
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> on(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
-            @javax.annotation.Nonnull final Class<?> targetClass,
-            @javax.annotation.Nullable final Object... factoryArgs) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
 
-        return new ServiceProxyBuilder${genericTypes}(context, targetClass, factoryArgs);
+        return new ServiceProxyBuilder${genericTypes}(context, target);
     }
 
     @javax.annotation.Nonnull
     private static <OUTPUT> com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder<Object, OUTPUT> getBuilder(
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget<Object, OUTPUT> target) {
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.InvocationFactoryTarget<Object, OUTPUT> target) {
 
         return com.gh.bmd.jrt.android.core.JRoutine.on(context, target);
-    }
-
-    @javax.annotation.Nonnull
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    private static Object getInstance(@javax.annotation.Nonnull final android.content.Context context,
-            @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] args)
-            throws IllegalAccessException, java.lang.reflect.InvocationTargetException, InstantiationException {
-
-        Object target = null;
-
-        if (context instanceof com.gh.bmd.jrt.android.builder.FactoryContext) {
-
-            // The only safe way is to synchronize the factory using the very same instance
-            synchronized (context) {
-
-                target = ((com.gh.bmd.jrt.android.builder.FactoryContext) context).geInstance(targetClass, args);
-            }
-        }
-
-        if (target == null) {
-
-            target = com.gh.bmd.jrt.util.Reflection.findConstructor(targetClass, args).newInstance(args);
-
-        } else if (!targetClass.isInstance(target)) {
-
-            throw new InstantiationException();
-        }
-
-        return target;
     }
 
     private static class ServiceProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {
 
         private final com.gh.bmd.jrt.android.core.ServiceContext mContext;
 
-        private final Object[] mFactoryArgs;
-
-        private final Class<?> mTargetClass;
+        private final com.gh.bmd.jrt.android.core.ContextInvocationTarget mTarget;
 
         private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
         private ServiceProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ServiceContext context,
-                @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nullable final Object... factoryArgs) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
 
             if (context == null) {
 
                 throw new NullPointerException("the service context must not be null");
             }
 
-            if (targetClass.isPrimitive()) {
+            if (target.getTargetClass().isPrimitive()) {
 
                 // The parceling of primitive classes is broken...
                 throw new IllegalArgumentException("the target class cannot be primitive");
             }
 
             mContext = context;
-            mTargetClass = targetClass;
-            mFactoryArgs = factoryArgs;
+            mTarget = target;
         }
 
         @Override
@@ -133,10 +99,17 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @Override
+        @javax.annotation.Nullable
+        protected android.content.Context getInvocationContext() {
+
+            return mContext.getServiceContext();
+        }
+
+        @Override
         @javax.annotation.Nonnull
         protected Class<?> getTargetClass() {
 
-            return mTargetClass;
+            return mTarget.getTargetClass();
         }
 
         @Override
@@ -146,6 +119,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-            return new ${generatedClassName}${genericTypes}(mContext, mTargetClass, mFactoryArgs, invocationConfiguration, proxyConfiguration, serviceConfiguration);
+            return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, proxyConfiguration, serviceConfiguration);
         }
     }

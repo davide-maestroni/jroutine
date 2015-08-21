@@ -53,6 +53,7 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
@@ -486,7 +487,7 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(" = ")
                    .append("initRoutine")
                    .append(i)
-                   .append("(wrapped, invocationConfiguration, proxyConfiguration);")
+                   .append("(target, invocationConfiguration, proxyConfiguration);")
                    .append(NEW_LINE);
         }
 
@@ -1667,6 +1668,7 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             String header;
+            final Types typeUtils = processingEnv.getTypeUtils();
             final String packageName =
                     getGeneratedClassPackage(annotationElement, element, targetElement);
             header = getHeaderTemplate().replace("${generatedPackage}",
@@ -1682,6 +1684,8 @@ public class RoutineProcessor extends AbstractProcessor {
             header = header.replace("${genericTypes}", buildGenericTypes(element));
             header = header.replace("${classFullName}", targetElement.asType().toString());
             header = header.replace("${interfaceFullName}", element.asType().toString());
+            header = header.replace("${classErasure}",
+                                    typeUtils.erasure(targetElement.asType()).toString());
             header = header.replace("${routineFieldsInit}",
                                     buildRoutineFieldsInit(methodElements.size()));
             writer.append(header);
@@ -2035,6 +2039,10 @@ public class RoutineProcessor extends AbstractProcessor {
                                                                             + ".getShareGroupOr"
                                                                             + "(null)");
         }
+
+        final boolean isStatic = targetMethod.getModifiers().contains(Modifier.STATIC);
+        methodInvocationHeader = methodInvocationHeader.replace("${mutexTarget}", (isStatic)
+                ? "target.getTargetClass()" : "target");
         writer.append(methodInvocationHeader);
         String methodInvocation;
 
@@ -2064,6 +2072,8 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocation = methodInvocation.replace("${resultClassName}", resultClassName);
         methodInvocation = methodInvocation.replace("${methodCount}", Integer.toString(count));
         methodInvocation = methodInvocation.replace("${genericTypes}", buildGenericTypes(element));
+        methodInvocation =
+                methodInvocation.replace("${invocationTarget}", (isStatic) ? "" : "mTarget.getTarget()");
         methodInvocation =
                 methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
 

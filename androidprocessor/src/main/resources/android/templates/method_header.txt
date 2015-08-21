@@ -18,12 +18,13 @@
 
     @javax.annotation.Nonnull
     private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget<Object, ${resultClassName}> invocationTarget = com.gh.bmd.jrt.android.core.ServiceTarget.targetInvocation(
-                new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${shareGroup}, mTargetClass, mFactoryArgs);
+        final com.gh.bmd.jrt.android.core.InvocationFactoryTarget<Object, ${resultClassName}> invocationTarget = com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation(
+                new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${shareGroup}, target);
         return getBuilder(mContext, invocationTarget).invocations()
                                                      .with(invocationConfiguration)
                                                      ${routineBuilderOptions}

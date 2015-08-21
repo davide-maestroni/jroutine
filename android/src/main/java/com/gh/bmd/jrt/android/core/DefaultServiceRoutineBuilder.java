@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.android.core;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
-import com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.routine.Routine;
@@ -48,7 +47,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     private final ServiceContext mContext;
 
-    private final InvocationServiceTarget<INPUT, OUTPUT> mInvocationTarget;
+    private final InvocationFactoryTarget<INPUT, OUTPUT> mFactoryTarget;
 
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
@@ -56,11 +55,11 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * Constructor.
      *
      * @param context the routine context.
-     * @param target  the invocation target.
+     * @param target  the invocation factory target.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final InvocationServiceTarget<INPUT, OUTPUT> target) {
+            @Nonnull final InvocationFactoryTarget<INPUT, OUTPUT> target) {
 
         if (context == null) {
 
@@ -73,13 +72,13 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         }
 
         mContext = context;
-        mInvocationTarget = target;
+        mFactoryTarget = target;
     }
 
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mInvocationTarget, getConfiguration(),
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mFactoryTarget, getConfiguration(),
                                                  mServiceConfiguration);
     }
 

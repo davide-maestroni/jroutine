@@ -50,25 +50,13 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private TypeMirror mInputClashAnnotationType;
 
-    private String mMethodArrayInvocation;
-
-    private String mMethodArrayInvocationCollection;
-
-    private String mMethodArrayInvocationVoid;
-
     private String mMethodHeader;
 
     private String mMethodHeaderV1;
 
-    private String mMethodInvocation;
-
-    private String mMethodInvocationCollection;
-
     private String mMethodInvocationFooter;
 
     private String mMethodInvocationHeader;
-
-    private String mMethodInvocationVoid;
 
     private TypeElement mServiceProxyElement;
 
@@ -109,12 +97,14 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             if (annotationElement == serviceProxyElement) {
 
                 builder.append(
-                        "(invocationConfiguration, proxyConfiguration, serviceConfiguration);");
+                        "(target, invocationConfiguration, proxyConfiguration, "
+                                + "serviceConfiguration);");
 
             } else {
 
                 builder.append(
-                        "(invocationConfiguration, proxyConfiguration, loaderConfiguration);");
+                        "(target, invocationConfiguration, proxyConfiguration, "
+                                + "loaderConfiguration);");
             }
 
             builder.append(NEW_LINE);
@@ -166,49 +156,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @Nonnull
     @Override
-    protected String getMethodArrayInvocationCollectionTemplate(
-            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
-
-        if (mMethodArrayInvocationCollection == null) {
-
-            mMethodArrayInvocationCollection =
-                    parseTemplate("/android/templates/method_array_invocation_collection.txt");
-        }
-
-        return mMethodArrayInvocationCollection;
-    }
-
-    @Nonnull
-    @Override
-    protected String getMethodArrayInvocationTemplate(
-            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
-
-        if (mMethodArrayInvocation == null) {
-
-            mMethodArrayInvocation =
-                    parseTemplate("/android/templates/method_array_invocation.txt");
-        }
-
-        return mMethodArrayInvocation;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodArrayInvocationVoidTemplate(
-            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
-
-        if (mMethodArrayInvocationVoid == null) {
-
-            mMethodArrayInvocationVoid =
-                    parseTemplate("/android/templates/method_array_invocation_void.txt");
-        }
-
-        return mMethodArrayInvocationVoid;
-    }
-
-    @Nonnull
-    @Override
     @SuppressWarnings("UnusedParameters")
     protected String getMethodHeaderTemplate(@Nonnull final ExecutableElement methodElement,
             final int count) throws IOException {
@@ -230,21 +177,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         }
 
         return mMethodHeader;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodInvocationCollectionTemplate(
-            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
-
-        if (mMethodInvocationCollection == null) {
-
-            mMethodInvocationCollection =
-                    parseTemplate("/android/templates/method_invocation_collection.txt");
-        }
-
-        return mMethodInvocationCollection;
     }
 
     @Nonnull
@@ -273,34 +205,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         }
 
         return mMethodInvocationHeader;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodInvocationTemplate(@Nonnull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodInvocation == null) {
-
-            mMethodInvocation = parseTemplate("/android/templates/method_invocation.txt");
-        }
-
-        return mMethodInvocation;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodInvocationVoidTemplate(@Nonnull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodInvocationVoid == null) {
-
-            mMethodInvocationVoid = parseTemplate("/android/templates/method_invocation_void.txt");
-        }
-
-        return mMethodInvocationVoid;
     }
 
     @Nonnull

@@ -57,6 +57,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.core.InvocationTarget.targetClass;
 import static com.gh.bmd.jrt.core.InvocationTarget.targetObject;
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
@@ -118,6 +119,36 @@ public class ObjectRoutineTest {
     }
 
     @Test
+    public void testAliasStaticMethod() throws NoSuchMethodException {
+
+        final TimeDuration timeout = seconds(1);
+        final Routine<Object, Object> routine = JRoutine.on(targetClass(TestStatic.class))
+                                                        .invocations()
+                                                        .withSyncRunner(Runners.sequentialRunner())
+                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .set()
+                                                        .aliasMethod(TestStatic.GET);
+
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
+    }
+
+    @Test
+    public void testAliasStaticMethodError() {
+
+        try {
+
+            JRoutine.on(targetClass(TestStatic.class)).aliasMethod("test");
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testAsyncInputProxyRoutine() {
 
         final TimeDuration timeout = seconds(1);
@@ -174,7 +205,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(TestClass.class)).setConfiguration(
+            new DefaultObjectRoutineBuilder(targetClass(TestStatic.class)).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -185,7 +216,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(TestClass.class)).setConfiguration(
+            new DefaultObjectRoutineBuilder(targetClass(TestStatic.class)).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -200,8 +231,19 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(new DuplicateAnnotation())).aliasMethod(
-                    DuplicateAnnotation.GET);
+            JRoutine.on(targetObject(new DuplicateAnnotation()))
+                    .aliasMethod(DuplicateAnnotation.GET);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(targetClass(DuplicateAnnotationStatic.class))
+                    .aliasMethod(DuplicateAnnotationStatic.GET);
 
             fail();
 
@@ -232,14 +274,48 @@ public class ObjectRoutineTest {
     }
 
     @Test
+    public void testException2() throws NoSuchMethodException {
+
+        final TimeDuration timeout = seconds(1);
+
+        final Routine<Object, Object> routine3 =
+                JRoutine.on(targetClass(TestStatic.class)).aliasMethod(TestStatic.THROW);
+
+        try {
+
+            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(e.getCause().getMessage()).isEqualTo("test");
+        }
+    }
+
+    @Test
+    public void testInterfaceError() {
+
+        try {
+
+            JRoutine.on(targetClass(TestItf.class));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testInvalidInputsAnnotationError() {
 
         final Sum sum = new Sum();
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(sum)).buildProxy(SumError2.class)
-                                                              .compute1();
+            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute1();
 
             fail();
 
@@ -249,8 +325,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(sum)).buildProxy(SumError2.class)
-                                                              .compute2();
+            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute2();
 
             fail();
 
@@ -260,8 +335,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(sum)).buildProxy(SumError2.class)
-                                                              .compute3();
+            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute3();
 
             fail();
 
@@ -271,8 +345,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(sum)).buildProxy(SumError2.class)
-                                                              .compute4();
+            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute4();
 
             fail();
 
@@ -282,8 +355,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(sum)).buildProxy(SumError2.class)
-                                                              .compute5();
+            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute5();
 
             fail();
 
@@ -293,8 +365,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(sum)).buildProxy(SumError2.class)
-                                                              .compute6();
+            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute6();
 
             fail();
 
@@ -304,8 +375,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(sum)).buildProxy(SumError2.class)
-                                                              .compute7(7);
+            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute7(7);
 
             fail();
 
@@ -321,7 +391,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(test)).buildProxy(TestClass.class);
+            JRoutine.on(targetObject(test)).buildProxy(TestClass.class);
 
             fail();
 
@@ -331,8 +401,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(test)).buildProxy(
-                    ClassToken.tokenOf(TestClass.class));
+            JRoutine.on(targetObject(test)).buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -615,7 +684,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(test)).aliasMethod("test");
+            JRoutine.on(targetObject(test)).aliasMethod("test");
 
             fail();
 
@@ -631,7 +700,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(test)).method("test");
+            JRoutine.on(targetObject(test)).method("test");
 
             fail();
 
@@ -646,7 +715,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(null);
+            JRoutine.on((InvocationTarget) null);
 
             fail();
 
@@ -656,7 +725,17 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(null));
+            JRoutine.on(targetObject(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(targetClass(null));
 
             fail();
 
@@ -673,7 +752,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(test)).buildProxy((Class<?>) null);
+            JRoutine.on(targetObject(test)).buildProxy((Class<?>) null);
 
             fail();
 
@@ -683,7 +762,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetObject(test)).buildProxy((ClassToken<?>) null);
+            JRoutine.on(targetObject(test)).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -1048,13 +1127,78 @@ public class ObjectRoutineTest {
     }
 
     @Test
+    public void testRoutineCache2() {
+
+        final NullLog nullLog = new NullLog();
+        final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
+                                                         .invocations()
+                                                         .withSyncRunner(Runners.sequentialRunner())
+                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLog(nullLog)
+                                                         .set()
+                                                         .aliasMethod(TestStatic.GET);
+
+        assertThat(routine1.syncCall().all()).containsExactly(-77L);
+
+        final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
+                                                         .invocations()
+                                                         .withSyncRunner(Runners.sequentialRunner())
+                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLog(nullLog)
+                                                         .set()
+                                                         .aliasMethod(TestStatic.GET);
+
+        assertThat(routine2.syncCall().all()).containsExactly(-77L);
+        assertThat(routine1).isEqualTo(routine2);
+
+        final Routine<Object, Object> routine3 = JRoutine.on(targetClass(TestStatic.class))
+                                                         .invocations()
+                                                         .withSyncRunner(Runners.queuedRunner())
+                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLog(nullLog)
+                                                         .set()
+                                                         .aliasMethod(TestStatic.GET);
+
+        assertThat(routine3.syncCall().all()).containsExactly(-77L);
+        assertThat(routine1).isNotEqualTo(routine3);
+        assertThat(routine2).isNotEqualTo(routine3);
+
+        final Routine<Object, Object> routine4 = JRoutine.on(targetClass(TestStatic.class))
+                                                         .invocations()
+                                                         .withSyncRunner(Runners.queuedRunner())
+                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLog(nullLog)
+                                                         .set()
+                                                         .aliasMethod(TestStatic.GET);
+
+        assertThat(routine4.syncCall().all()).containsExactly(-77L);
+        assertThat(routine3).isNotEqualTo(routine4);
+
+        final Routine<Object, Object> routine5 = JRoutine.on(targetClass(TestStatic.class))
+                                                         .invocations()
+                                                         .withSyncRunner(Runners.queuedRunner())
+                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLog(new NullLog())
+                                                         .set()
+                                                         .aliasMethod(TestStatic.GET);
+
+        assertThat(routine5.syncCall().all()).containsExactly(-77L);
+        assertThat(routine4).isNotEqualTo(routine5);
+    }
+
+    @Test
     public void testShareGroup() throws NoSuchMethodException {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder = JRoutine.on(targetObject(test2))
-                                                     .invocations()
-                                                     .withExecutionTimeout(seconds(2))
-                                                     .set();
+                                                    .invocations()
+                                                    .withExecutionTimeout(seconds(2))
+                                                    .set();
 
         long startTime = System.currentTimeMillis();
 
@@ -1075,6 +1219,85 @@ public class ObjectRoutineTest {
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+    }
+
+    @Test
+    public void testShareGroup2() throws NoSuchMethodException {
+
+        final ObjectRoutineBuilder builder = JRoutine.on(targetClass(TestStatic2.class))
+                                                    .invocations()
+                                                    .withExecutionTimeout(seconds(2))
+                                                    .set();
+
+        long startTime = System.currentTimeMillis();
+
+        OutputChannel<Object> getOne =
+                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
+        OutputChannel<Object> getTwo =
+                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+    }
+
+    @Test
+    public void testStaticMethod() throws NoSuchMethodException {
+
+        final TimeDuration timeout = seconds(1);
+        final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
+                                                         .invocations()
+                                                         .withSyncRunner(Runners.queuedRunner())
+                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .withMaxInstances(1)
+                                                         .withCoreInstances(0)
+                                                         .set()
+                                                         .proxies()
+                                                         .withShareGroup("test")
+                                                         .set()
+                                                         .method(TestStatic.class.getMethod(
+                                                                 "getLong"));
+
+        assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
+    }
+
+    @Test
+    public void testStaticMethodBySignature() throws NoSuchMethodException {
+
+        final TimeDuration timeout = seconds(1);
+        final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
+                                                         .invocations()
+                                                         .withSyncRunner(Runners.queuedRunner())
+                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .withMaxInstances(1)
+                                                         .set()
+                                                         .method("getLong");
+
+        assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
+
+    }
+
+    @Test
+    public void testStaticMethodError() {
+
+        try {
+
+            JRoutine.on(targetClass(TestStatic.class)).method("test");
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     @Test
@@ -1961,6 +2184,24 @@ public class ObjectRoutineTest {
     }
 
     @SuppressWarnings("unused")
+    private static class DuplicateAnnotationStatic {
+
+        public static final String GET = "get";
+
+        @Alias(GET)
+        public static int getOne() {
+
+            return 1;
+        }
+
+        @Alias(GET)
+        public static int getTwo() {
+
+            return 2;
+        }
+    }
+
+    @SuppressWarnings("unused")
     private static class Inc {
 
         public int inc(final int i) {
@@ -2093,6 +2334,44 @@ public class ObjectRoutineTest {
                 iterator.remove();
                 execution.run();
             }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TestStatic {
+
+        public static final String GET = "get";
+
+        public static final String THROW = "throw";
+
+        @Alias(GET)
+        public static long getLong() {
+
+            return -77;
+        }
+
+        @Alias(THROW)
+        public static void throwException(final RuntimeException ex) {
+
+            throw ex;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TestStatic2 {
+
+        public static int getOne() throws InterruptedException {
+
+            TimeDuration.millis(500).sleepAtLeast();
+
+            return 1;
+        }
+
+        public static int getTwo() throws InterruptedException {
+
+            TimeDuration.millis(500).sleepAtLeast();
+
+            return 2;
         }
     }
 

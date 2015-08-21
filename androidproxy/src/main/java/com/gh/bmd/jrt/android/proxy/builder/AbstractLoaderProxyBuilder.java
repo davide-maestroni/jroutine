@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Abstract implementation of a builder of async proxy objects, bound to a context lifecycle.
@@ -37,8 +38,9 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
         ProxyConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
         LoaderConfiguration.Configurable<LoaderProxyBuilder<TYPE>> {
 
-    private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
-            new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
+    private static final WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
+            sContextProxyMap =
+            new WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -50,26 +52,42 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     @Nonnull
     public TYPE buildProxy() {
 
-        synchronized (sClassMap) {
+        synchronized (sContextProxyMap) {
 
-            final Object target = getTargetClass();
-            final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
-            HashMap<ClassInfo, Object> classes = classMap.get(target);
+            final Object context = getInvocationContext();
 
-            if (classes == null) {
+            if (context == null) {
 
-                classes = new HashMap<ClassInfo, Object>();
-                classMap.put(target, classes);
+                throw new NullPointerException("the invocation context has been destroyed");
+            }
+
+            final WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
+                    contextProxyMap = sContextProxyMap;
+            HashMap<Class<?>, HashMap<ProxyInfo, Object>> proxyMap = contextProxyMap.get(context);
+
+            if (proxyMap == null) {
+
+                proxyMap = new HashMap<Class<?>, HashMap<ProxyInfo, Object>>();
+                contextProxyMap.put(context, proxyMap);
+            }
+
+            final Class<?> targetClass = getTargetClass();
+            HashMap<ProxyInfo, Object> proxies = proxyMap.get(targetClass);
+
+            if (proxies == null) {
+
+                proxies = new HashMap<ProxyInfo, Object>();
+                proxyMap.put(targetClass, proxies);
             }
 
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
             final ClassToken<TYPE> token = getInterfaceToken();
-            final ClassInfo classInfo =
-                    new ClassInfo(token, invocationConfiguration, proxyConfiguration,
+            final ProxyInfo proxyInfo =
+                    new ProxyInfo(token, invocationConfiguration, proxyConfiguration,
                                   loaderConfiguration);
-            final Object instance = classes.get(classInfo);
+            final Object instance = proxies.get(proxyInfo);
 
             if (instance != null) {
 
@@ -89,7 +107,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
 
                 final TYPE newInstance =
                         newProxy(invocationConfiguration, proxyConfiguration, loaderConfiguration);
-                classes.put(classInfo, newInstance);
+                proxies.put(proxyInfo, newInstance);
                 return newInstance;
 
             } catch (final Throwable t) {
@@ -171,6 +189,16 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     protected abstract ClassToken<TYPE> getInterfaceToken();
 
     /**
+     * Returns the context or component (Activity, Fragment, etc.) on which the invocation is based.
+     * <br/>
+     * Returning null means that the context has been destroyed, so an exception will be thrown.
+     *
+     * @return the invocation context.
+     */
+    @Nullable
+    protected abstract Object getInvocationContext();
+
+    /**
      * Returns the builder target class.
      *
      * @return the target class.
@@ -194,7 +222,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     /**
      * Class used as key to identify a specific proxy instance.
      */
-    private static class ClassInfo {
+    private static class ProxyInfo {
 
         private final InvocationConfiguration mInvocationConfiguration;
 
@@ -212,7 +240,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
          * @param proxyConfiguration      the proxy configuration.
          * @param loaderConfiguration     the loader configuration.
          */
-        private ClassInfo(@Nonnull final ClassToken<?> token,
+        private ProxyInfo(@Nonnull final ClassToken<?> token,
                 @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
                 @Nonnull final LoaderConfiguration loaderConfiguration) {
@@ -232,25 +260,25 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
                 return true;
             }
 
-            if (!(o instanceof ClassInfo)) {
+            if (!(o instanceof ProxyInfo)) {
 
                 return false;
             }
 
-            final ClassInfo classInfo = (ClassInfo) o;
-            return mLoaderConfiguration.equals(classInfo.mLoaderConfiguration)
-                    && mProxyConfiguration.equals(classInfo.mProxyConfiguration)
-                    && mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
-                    && mType.equals(classInfo.mType);
+            final ProxyInfo proxyInfo = (ProxyInfo) o;
+            return mInvocationConfiguration.equals(proxyInfo.mInvocationConfiguration)
+                    && mLoaderConfiguration.equals(proxyInfo.mLoaderConfiguration)
+                    && mProxyConfiguration.equals(proxyInfo.mProxyConfiguration) && mType.equals(
+                    proxyInfo.mType);
         }
 
         @Override
         public int hashCode() {
 
             // AUTO-GENERATED CODE
-            int result = mLoaderConfiguration.hashCode();
+            int result = mInvocationConfiguration.hashCode();
+            result = 31 * result + mLoaderConfiguration.hashCode();
             result = 31 * result + mProxyConfiguration.hashCode();
-            result = 31 * result + mInvocationConfiguration.hashCode();
             result = 31 * result + mType.hashCode();
             return result;
         }

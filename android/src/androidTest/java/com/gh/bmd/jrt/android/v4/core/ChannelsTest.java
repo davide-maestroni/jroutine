@@ -35,8 +35,8 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
+import static com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation;
 import static com.gh.bmd.jrt.android.core.ServiceContext.serviceFrom;
-import static com.gh.bmd.jrt.android.core.ServiceTarget.targetInvocation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

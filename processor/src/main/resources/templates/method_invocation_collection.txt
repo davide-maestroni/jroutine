@@ -15,18 +15,11 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
         @Override
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
         protected void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
 
             synchronized(mMutex) {
-
-                final ${classFullName} wrapped = mWrapped.get();
-
-                if (wrapped == null) {
-
-                    throw new IllegalStateException("target object has been destroyed");
-                }
 
                 if (objects.size() > ${maxParamSize}) {
 
@@ -39,7 +32,7 @@
 
                     result.orderByCall();
 
-                    for (final ${resultClassName} element : wrapped.${targetMethodName}(${paramValues})) {
+                    for (final ${resultClassName} element : ((${classFullName})${invocationTarget}).${targetMethodName}(${paramValues})) {
 
                         result.pass(element);
                     }

@@ -15,18 +15,11 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
         @Override
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
         protected void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
 
             synchronized(mMutex) {
-
-                final ${classFullName} wrapped = mWrapped.get();
-
-                if (wrapped == null) {
-
-                    throw new IllegalStateException("target object has been destroyed");
-                }
 
                 int i = 0;
                 final ${componentType}[] array = new ${componentType}[objects.size()];
@@ -38,7 +31,7 @@
 
                 try {
 
-                    result.pass(wrapped.${targetMethodName}(array));
+                    result.pass(((${classFullName})${invocationTarget}).${targetMethodName}(array));
 
                 } catch (final Throwable t) {
 

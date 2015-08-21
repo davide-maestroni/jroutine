@@ -15,10 +15,8 @@ package com.gh.bmd.jrt.android.core;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.android.builder.FactoryContext;
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
-import com.gh.bmd.jrt.android.core.ServiceTarget.ObjectServiceTarget;
 import com.gh.bmd.jrt.android.invocation.FunctionContextInvocation;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
 import com.gh.bmd.jrt.annotation.Output.OutputMode;
@@ -26,6 +24,7 @@ import com.gh.bmd.jrt.annotation.ShareGroup;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.core.InvocationTarget;
 import com.gh.bmd.jrt.core.RoutineBuilders.MethodInfo;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.routine.Routine;
@@ -33,7 +32,6 @@ import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -42,15 +40,13 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.android.core.ServiceTarget.targetInvocation;
-import static com.gh.bmd.jrt.core.InvocationTarget.targetObject;
+import static com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation;
 import static com.gh.bmd.jrt.core.RoutineBuilders.callFromInvocation;
 import static com.gh.bmd.jrt.core.RoutineBuilders.configurationWithAnnotations;
 import static com.gh.bmd.jrt.core.RoutineBuilders.getAnnotatedMethod;
 import static com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.core.RoutineBuilders.getTargetMethodInfo;
 import static com.gh.bmd.jrt.core.RoutineBuilders.invokeRoutine;
-import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
@@ -71,7 +67,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     private final ServiceContext mContext;
 
-    private final ObjectServiceTarget mTarget;
+    private final ContextInvocationTarget mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -88,17 +84,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceObjectRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final ObjectServiceTarget target) {
+            @Nonnull final ContextInvocationTarget target) {
 
         if (context == null) {
 
             throw new NullPointerException("the context must not be null");
         }
 
-        if (target.getTargetClass().isPrimitive()) {
+        if (target == null) {
 
-            // The parceling of primitive classes is broken...
-            throw new IllegalArgumentException("the target class cannot be primitive");
+            throw new NullPointerException("the invocation target must not be null");
         }
 
         mContext = context;
@@ -132,37 +127,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return classes;
     }
 
-    @Nonnull
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    private static Object getInstance(@Nonnull final Context context,
-            @Nonnull final ObjectServiceTarget invocationTarget) throws IllegalAccessException,
-            InvocationTargetException, InstantiationException {
-
-        Object target = null;
-        final Class<?> targetClass = invocationTarget.getTargetClass();
-        final Object[] factoryArgs = invocationTarget.getFactoryArgs();
-
-        if (context instanceof FactoryContext) {
-
-            // The only safe way is to synchronize the factory using the very same instance
-            synchronized (context) {
-
-                target = ((FactoryContext) context).geInstance(targetClass, factoryArgs);
-            }
-        }
-
-        if (target == null) {
-
-            target = findConstructor(targetClass, factoryArgs).newInstance(factoryArgs);
-
-        } else if (!targetClass.isInstance(target)) {
-
-            throw new InstantiationException();
-        }
-
-        return target;
-    }
-
     @Nullable
     private static String groupWithShareAnnotation(@Nonnull final ProxyConfiguration configuration,
             @Nonnull final Method method) {
@@ -194,7 +158,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
 
-        final ObjectServiceTarget target = mTarget;
+        final ContextInvocationTarget target = mTarget;
         final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
 
         if (targetMethod == null) {
@@ -216,10 +180,30 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
+    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
+    }
+
+    @Nonnull
+    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+
+        if (!itf.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getName());
+        }
+
+        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+                                                    new ProxyInvocationHandler(this));
+        return itf.cast(proxy);
+    }
+
+    @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
-        final ObjectServiceTarget target = mTarget;
+        final ContextInvocationTarget target = mTarget;
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name, toNames(parameterTypes)};
@@ -238,26 +222,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         return method(method.getName(), method.getParameterTypes());
-    }
-
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
-
-        if (!itf.isInterface()) {
-
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getName());
-        }
-
-        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                                                    new ProxyInvocationHandler(this));
-        return itf.cast(proxy);
-    }
-
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
-
-        return buildProxy(itf.getRawClass());
     }
 
     @Nonnull
@@ -334,27 +298,24 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final String mAliasName;
 
-        private final ObjectServiceTarget mInvocationTarget;
-
         private final String mShareGroup;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private final ContextInvocationTarget mTarget;
 
-        private Object mTarget;
+        private Routine<INPUT, OUTPUT> mRoutine;
 
         /**
          * Constructor.
          *
-         * @param shareGroup       the share group name.
-         * @param invocationTarget the invocation target.
-         * @param name             the alias name.
+         * @param shareGroup the share group name.
+         * @param target     the invocation target.
+         * @param name       the alias name.
          */
         private MethodAliasInvocation(@Nullable final String shareGroup,
-                @Nonnull final ObjectServiceTarget invocationTarget,
-                @Nonnull final String name) throws ClassNotFoundException {
+                @Nonnull final ContextInvocationTarget target, @Nonnull final String name) {
 
             mShareGroup = shareGroup;
-            mInvocationTarget = invocationTarget;
+            mTarget = target;
             mAliasName = name;
         }
 
@@ -365,13 +326,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                final Object target = getInstance(context, mInvocationTarget);
-                mRoutine = JRoutine.on(targetObject(target))
+                mRoutine = JRoutine.on(mTarget.getInvocationTarget(context))
                                    .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .aliasMethod(mAliasName);
-                mTarget = target;
 
             } catch (final Throwable t) {
 
@@ -383,7 +342,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if ((mTarget == null) || (mRoutine == null)) {
+            if (mRoutine == null) {
 
                 throw new IllegalStateException("such error should never happen");
             }
@@ -412,33 +371,31 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private static class MethodSignatureInvocation<INPUT, OUTPUT>
             extends FunctionContextInvocation<INPUT, OUTPUT> {
 
-        private final ObjectServiceTarget mInvocationTarget;
-
         private final String mMethodName;
 
         private final Class<?>[] mParameterTypes;
 
         private final String mShareGroup;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private final ContextInvocationTarget mTarget;
 
-        private Object mTarget;
+        private Routine<INPUT, OUTPUT> mRoutine;
 
         /**
          * Constructor.
          *
-         * @param shareGroup       the share group name.
-         * @param invocationTarget the invocation target.
-         * @param name             the method name.
-         * @param parameterTypes   the method parameter type names.
+         * @param shareGroup     the share group name.
+         * @param target         the invocation target.
+         * @param name           the method name.
+         * @param parameterTypes the method parameter type names.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
         private MethodSignatureInvocation(@Nullable final String shareGroup,
-                @Nonnull final ObjectServiceTarget invocationTarget, @Nonnull final String name,
+                @Nonnull final ContextInvocationTarget target, @Nonnull final String name,
                 @Nonnull final String[] parameterTypes) throws ClassNotFoundException {
 
             mShareGroup = shareGroup;
-            mInvocationTarget = invocationTarget;
+            mTarget = target;
             mMethodName = name;
             mParameterTypes = forNames(parameterTypes);
         }
@@ -447,7 +404,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if ((mTarget == null) || (mRoutine == null)) {
+            if (mRoutine == null) {
 
                 throw new IllegalStateException("such error should never happen");
             }
@@ -462,13 +419,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                final Object target = getInstance(context, mInvocationTarget);
-                mRoutine = JRoutine.on(targetObject(target))
+                mRoutine = JRoutine.on(mTarget.getInvocationTarget(context))
                                    .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
                                    .method(mMethodName, mParameterTypes);
-                mTarget = target;
 
             } catch (final Throwable t) {
 
@@ -495,23 +450,23 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final InputMode mInputMode;
 
-        private final ObjectServiceTarget mInvocationTarget;
-
         private final OutputMode mOutputMode;
 
         private final String mShareGroup;
+
+        private final ContextInvocationTarget mTarget;
 
         private final Method mTargetMethod;
 
         private Object mMutex;
 
-        private Object mTarget;
+        private Object mTargetInstance;
 
         /**
          * Constructor.
          *
          * @param shareGroup           the share group name.
-         * @param invocationTarget     the invocation target.
+         * @param target               the invocation target.
          * @param targetMethodName     the target method name.
          * @param targetParameterTypes the target method parameter type names.
          * @param inputMode            the input transfer mode.
@@ -520,17 +475,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
         private ProxyInvocation(@Nullable final String shareGroup,
-                @Nonnull final ObjectServiceTarget invocationTarget,
+                @Nonnull final ContextInvocationTarget target,
                 @Nonnull final String targetMethodName,
                 @Nonnull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) throws ClassNotFoundException,
                 NoSuchMethodException {
 
             mShareGroup = shareGroup;
-            mInvocationTarget = invocationTarget;
-            mTargetMethod = invocationTarget.getTargetClass()
-                                            .getMethod(targetMethodName,
-                                                       forNames(targetParameterTypes));
+            mTarget = target;
+            mTargetMethod = target.getTargetClass()
+                                  .getMethod(targetMethodName, forNames(targetParameterTypes));
             mInputMode = inputMode;
             mOutputMode = outputMode;
             mMutex = this;
@@ -540,7 +494,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            callFromInvocation(mTargetMethod, mMutex, mTarget, objects, result, mInputMode,
+            callFromInvocation(mTargetMethod, mMutex, mTargetInstance, objects, result, mInputMode,
                                mOutputMode);
         }
 
@@ -551,15 +505,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                final Object target = getInstance(context, mInvocationTarget);
+                final InvocationTarget invocationTarget = mTarget.getInvocationTarget(context);
+                final Object targetInstance = invocationTarget.getTarget();
                 final String shareGroup = mShareGroup;
 
-                if (!ShareGroup.NONE.equals(shareGroup)) {
+                if ((targetInstance != null) && !ShareGroup.NONE.equals(shareGroup)) {
 
-                    mMutex = getSharedMutex(target, shareGroup);
+                    mMutex = getSharedMutex(targetInstance, shareGroup);
                 }
 
-                mTarget = target;
+                mTargetInstance = targetInstance;
 
             } catch (final Throwable t) {
 
@@ -581,7 +536,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final ServiceConfiguration mServiceConfiguration;
 
-        private final ObjectServiceTarget mTarget;
+        private final ContextInvocationTarget mTarget;
 
         /**
          * Constructor.
@@ -600,7 +555,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final ObjectServiceTarget target = mTarget;
+            final ContextInvocationTarget target = mTarget;
             final MethodInfo methodInfo = getTargetMethodInfo(method, target.getTargetClass());
             final Method targetMethod = methodInfo.method;
             final InputMode inputMode = methodInfo.inputMode;

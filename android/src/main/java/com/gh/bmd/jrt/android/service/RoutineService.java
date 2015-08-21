@@ -23,7 +23,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.gh.bmd.jrt.android.core.ServiceTarget.InvocationServiceTarget;
+import com.gh.bmd.jrt.android.core.InvocationFactoryTarget;
 import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.invocation.ContextInvocations;
@@ -70,9 +70,9 @@ public class RoutineService extends Service {
 
     private static final String KEY_DATA_VALUE = "data_value";
 
-    private static final String KEY_INVOCATION_ID = "invocation_id";
+    private static final String KEY_FACTORY_TARGET = "factory_target";
 
-    private static final String KEY_INVOCATION_TARGET = "invocation_target";
+    private static final String KEY_INVOCATION_ID = "invocation_id";
 
     private static final String KEY_LOG_CLASS = "log_class";
 
@@ -170,7 +170,7 @@ public class RoutineService extends Service {
      * @param logClass                the invocation log class.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
-            @Nonnull final String invocationId, @Nonnull final InvocationServiceTarget<?, ?> target,
+            @Nonnull final String invocationId, @Nonnull final InvocationFactoryTarget<?, ?> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -216,7 +216,7 @@ public class RoutineService extends Service {
      * @param logClass                the invocation log class.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
-            @Nonnull final String invocationId, @Nonnull final InvocationServiceTarget<?, ?> target,
+            @Nonnull final String invocationId, @Nonnull final InvocationFactoryTarget<?, ?> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -246,7 +246,7 @@ public class RoutineService extends Service {
 
     @SuppressWarnings("ConstantConditions")
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
-            @Nonnull final String invocationId, @Nonnull final InvocationServiceTarget<?, ?> target,
+            @Nonnull final String invocationId, @Nonnull final InvocationFactoryTarget<?, ?> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -258,7 +258,7 @@ public class RoutineService extends Service {
 
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
-        bundle.putParcelable(KEY_INVOCATION_TARGET, target);
+        bundle.putParcelable(KEY_FACTORY_TARGET, target);
         bundle.putInt(KEY_CORE_INVOCATIONS,
                       invocationConfiguration.getCoreInstancesOr(InvocationConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
@@ -283,9 +283,9 @@ public class RoutineService extends Service {
      */
     @Nonnull
     public ContextInvocationFactory<?, ?> getInvocationFactory(
-            @Nonnull final InvocationServiceTarget<?, ?> target) {
+            @Nonnull final InvocationFactoryTarget<?, ?> target) {
 
-        return ContextInvocations.factoryOf(target.getTargetClass(), target.getFactoryArgs());
+        return ContextInvocations.factoryOf(target.getInvocationClass(), target.getFactoryArgs());
     }
 
     @Override
@@ -368,10 +368,9 @@ public class RoutineService extends Service {
                     "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
-        final InvocationServiceTarget<?, ?> invocationTarget =
-                data.getParcelable(KEY_INVOCATION_TARGET);
+        final InvocationFactoryTarget<?, ?> factoryTarget = data.getParcelable(KEY_FACTORY_TARGET);
 
-        if (invocationTarget == null) {
+        if (factoryTarget == null) {
 
             mLogger.err("the service message has no invocation target");
             throw new IllegalArgumentException(
@@ -398,8 +397,8 @@ public class RoutineService extends Service {
                     (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
             final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
-            final RoutineInfo routineInfo = new RoutineInfo(invocationTarget.getTargetClass(),
-                                                            invocationTarget.getFactoryArgs(),
+            final RoutineInfo routineInfo = new RoutineInfo(factoryTarget.getInvocationClass(),
+                                                            factoryTarget.getFactoryArgs(),
                                                             outputOrderType, runnerClass, logClass,
                                                             logLevel);
             final HashMap<RoutineInfo, RoutineState> routineMap = mRoutineMap;
@@ -440,8 +439,7 @@ public class RoutineService extends Service {
                        .withMaxInstances(maxInvocations)
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
-                final ContextInvocationFactory<?, ?> factory =
-                        getInvocationFactory(invocationTarget);
+                final ContextInvocationFactory<?, ?> factory = getInvocationFactory(factoryTarget);
                 final SyncContextRoutine syncContextRoutine =
                         new SyncContextRoutine(this, builder.set(), factory);
                 routineState = new RoutineState(syncContextRoutine);

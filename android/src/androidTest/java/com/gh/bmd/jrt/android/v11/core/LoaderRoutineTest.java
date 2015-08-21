@@ -62,6 +62,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.core.ContextInvocationTarget.targetClass;
+import static com.gh.bmd.jrt.android.core.ContextInvocationTarget.targetObject;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryTo;
@@ -512,7 +514,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((LoaderContext) null, ToUpperCase.class);
+            JRoutine.on((LoaderContext) null, targetClass(ToUpperCase.class));
 
             fail();
 
@@ -522,7 +524,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((LoaderContext) null, ToUpperCase.class, Reflection.NO_ARGS);
+            JRoutine.on((LoaderContext) null, targetObject(ToUpperCase.class, Reflection.NO_ARGS));
 
             fail();
 
@@ -532,7 +534,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(contextFrom(getActivity()), (Class<?>) null);
+            JRoutine.on(contextFrom(getActivity()), targetClass((Class<?>) null));
 
             fail();
 
@@ -542,7 +544,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(contextFrom(getActivity()), null, Reflection.NO_ARGS);
+            JRoutine.on(contextFrom(getActivity()), targetObject(null, Reflection.NO_ARGS));
 
             fail();
 
@@ -1211,7 +1213,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((LoaderContext) null, ToUpperCase.class);
+            JRoutine.on((LoaderContext) null, targetClass(ToUpperCase.class));
 
             fail();
 
@@ -1221,7 +1223,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on((LoaderContext) null, ToUpperCase.class, Reflection.NO_ARGS);
+            JRoutine.on((LoaderContext) null, targetObject(ToUpperCase.class, Reflection.NO_ARGS));
 
             fail();
 
@@ -1231,7 +1233,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(contextFrom(fragment), (Class<?>) null);
+            JRoutine.on(contextFrom(fragment), targetClass((Class<?>) null));
 
             fail();
 
@@ -1241,7 +1243,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.on(contextFrom(fragment), null, Reflection.NO_ARGS);
+            JRoutine.on(contextFrom(fragment), targetObject(null, Reflection.NO_ARGS));
 
             fail();
 

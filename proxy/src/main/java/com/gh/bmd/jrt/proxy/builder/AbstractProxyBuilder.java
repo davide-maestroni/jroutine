@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Abstract implementation of a builder of async proxy objects.
@@ -136,7 +137,7 @@ public abstract class AbstractProxyBuilder<TYPE>
      *
      * @return the target object.
      */
-    @Nonnull
+    @Nullable
     protected abstract Object getTarget();
 
     /**

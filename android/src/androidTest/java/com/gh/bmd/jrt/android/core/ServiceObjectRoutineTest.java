@@ -18,7 +18,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.gh.bmd.jrt.android.builder.ServiceConfiguration;
-import com.gh.bmd.jrt.android.core.ServiceTarget.ObjectServiceTarget;
+import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.annotation.Alias;
 import com.gh.bmd.jrt.annotation.Input;
 import com.gh.bmd.jrt.annotation.Input.InputMode;
@@ -30,7 +30,6 @@ import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.TimeoutAction;
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.TimeoutActionType;
-import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
@@ -55,8 +54,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.core.ContextInvocationTarget.targetObject;
 import static com.gh.bmd.jrt.android.core.ServiceContext.serviceFrom;
-import static com.gh.bmd.jrt.android.core.ServiceTarget.targetObject;
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -546,7 +545,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()), (ObjectServiceTarget) null);
+            JRoutine.on(serviceFrom(getActivity()), (ContextInvocationTarget) null);
 
             fail();
 
@@ -879,7 +878,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testShareGroup() throws NoSuchMethodException {
 
-        final ObjectRoutineBuilder builder =
+        final ServiceObjectRoutineBuilder builder =
                 JRoutine.on(serviceFrom(getActivity(), TestService.class),
                             targetObject(TestClass2.class))
                         .invocations()

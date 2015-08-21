@@ -16,22 +16,19 @@
 
     private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
 
-        private final Object[] mFactoryArgs;
+        private final  com.gh.bmd.jrt.android.core.ContextInvocationTarget mInvocationTarget;
 
         private final String mShareGroup;
 
-        private final Class<?> mTargetClass;
-
         private Object mMutex = this;
 
-        private ${classFullName} mTarget;
+        private com.gh.bmd.jrt.core.InvocationTarget mTarget;
 
         private ContextInvocation${methodCount}(@javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final Class<?> targetClass, @javax.annotation.Nonnull final Object[] factoryArgs) {
+                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
 
             mShareGroup = shareGroup;
-            mTargetClass = targetClass;
-            mFactoryArgs = factoryArgs;
+            mInvocationTarget = target;
         }
 
         @Override
@@ -42,12 +39,12 @@
 
             try {
 
-                final ${classFullName} target = (${classFullName}) getInstance(context, mTargetClass, mFactoryArgs);
+                final com.gh.bmd.jrt.core.InvocationTarget target = mInvocationTarget.getInvocationTarget(context);
                 final String shareGroup = mShareGroup;
 
                 if (!com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
 
-                    mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
+                    mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, shareGroup);
                 }
 
                 mTarget = target;

@@ -18,39 +18,40 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@javax.annotation.Nonnull final ${classFullName} target,
+    @SuppressWarnings({"ConstantConditions", "EqualsBetweenInconvertibleTypes"})
+    public ${generatedClassName}(@javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-        if (target == null) {
+        if (!target.isAssignableTo(${classErasure}.class)) {
 
-            throw new NullPointerException("the target instance must not be null");
+            throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
+                    "${classFullName}");
         }
 
-        final java.lang.ref.WeakReference<${classFullName}> wrapped = new java.lang.ref.WeakReference<${classFullName}>(target);
         ${routineFieldsInit}
+    }
+
+    @javax.annotation.Nonnull
+    public static ${genericTypes} com.gh.bmd.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on() {
+
+        return new ProxyBuilder${genericTypes}(com.gh.bmd.jrt.core.InvocationTarget.targetClass(${classErasure}.class));
     }
 
     @javax.annotation.Nonnull
     public static ${genericTypes} com.gh.bmd.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
 
-        return new ProxyBuilder${genericTypes}(wrapped);
+        return new ProxyBuilder${genericTypes}(com.gh.bmd.jrt.core.InvocationTarget.targetObject(wrapped));
     }
 
     private static class ProxyBuilder${genericTypes} extends com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
 
-        private final ${classFullName} mTarget;
+        private final com.gh.bmd.jrt.core.InvocationTarget mTarget;
 
         private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
-        private ProxyBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
-
-            if (target == null) {
-
-                throw new NullPointerException("the wrapped instance must not be null");
-            }
+        private ProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target) {
 
             mTarget = target;
         }
@@ -63,10 +64,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @Override
-        @javax.annotation.Nonnull
+        @javax.annotation.Nullable
         protected Object getTarget() {
 
-            return mTarget;
+            return mTarget.getTarget();
         }
 
         @Override

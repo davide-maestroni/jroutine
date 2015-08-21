@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.proxy.core;
 
+import com.gh.bmd.jrt.core.InvocationTarget;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import javax.annotation.Nonnull;
@@ -52,11 +53,11 @@ public class JRoutineProxy {
      * Note that it is responsibility of the caller to retain a strong reference to the target
      * instance to prevent it from being garbage collected.
      *
-     * @param target the target object.
+     * @param target the invocation target.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ProxyRoutineBuilder on(@Nonnull final Object target) {
+    public static ProxyRoutineBuilder on(@Nonnull final InvocationTarget target) {
 
         return new DefaultProxyRoutineBuilder(target);
     }

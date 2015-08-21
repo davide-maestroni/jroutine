@@ -40,8 +40,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import static com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation;
 import static com.gh.bmd.jrt.android.core.ServiceContext.serviceFrom;
-import static com.gh.bmd.jrt.android.core.ServiceTarget.targetInvocation;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;

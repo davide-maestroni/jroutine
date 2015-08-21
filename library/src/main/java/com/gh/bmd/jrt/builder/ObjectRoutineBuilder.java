@@ -13,15 +13,15 @@
  */
 package com.gh.bmd.jrt.builder;
 
+import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
+
+import java.lang.reflect.Method;
 
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of routines wrapping an object instance.
- * <p/>
- * Note that only instance methods can be asynchronously invoked through the routines created by
- * this builder.
+ * Interface defining a builder of routines wrapping an object methods.
  * <p/>
  * Created by davide-maestroni on 3/7/15.
  *
@@ -34,35 +34,30 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.Timeout Timeout
  * @see com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction
  */
-public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
+public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineBuilder>,
+        ProxyConfigurableBuilder<ObjectRoutineBuilder> {
 
     /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
-     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * Returns a routine used to call the method whose identifying name is specified in a
+     * {@link com.gh.bmd.jrt.annotation.Alias Alias} annotation.<br/>
+     * Optional {@link com.gh.bmd.jrt.annotation.Priority Priority},
      * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
      * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
-     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
+     * honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
-     * In case the wrapped object does not implement the specified interface, the alias annotation
-     * value will be used to bind the interface method with the instance ones. If no annotation is
-     * present, the method name will be used instead.<br/>
-     * The interface will be interpreted as a proxy of the target object methods, and the optional
-     * {@link com.gh.bmd.jrt.annotation.Input Input},
-     * {@link com.gh.bmd.jrt.annotation.Inputs Inputs} and
-     * {@link com.gh.bmd.jrt.annotation.Output Output} annotations will be honored.
+     * Note that it is up to the caller to ensure that the input data are passed to the routine in
+     * the correct order.
      *
-     * @param itf    the interface implemented by the returned object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
+     * @param name     the name specified in the annotation.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine.
+     * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -93,14 +88,77 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
-     * {@inheritDoc}
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link com.gh.bmd.jrt.annotation.Alias Alias},
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * In case the wrapped object does not implement the specified interface, the alias annotation
+     * value will be used to bind the interface method with the instance ones. If no annotation is
+     * present, the method name will be used instead.<br/>
+     * The interface will be interpreted as a proxy of the target object methods, and the optional
+     * {@link com.gh.bmd.jrt.annotation.Input Input},
+     * {@link com.gh.bmd.jrt.annotation.Inputs Inputs} and
+     * {@link com.gh.bmd.jrt.annotation.Output Output} annotations will be honored.
+     *
+     * @param itf    the interface implemented by the returned object.
+     * @param <TYPE> the interface type.
+     * @return the proxy object.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> invocations();
+    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
 
     /**
-     * {@inheritDoc}
+     * Returns a routine used to call the specified method.
+     * <p/>
+     * The method is searched via reflection ignoring a name specified in a
+     * {@link com.gh.bmd.jrt.annotation.Alias Alias} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
+     * honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * Note that it is up to the caller to ensure that the input data are passed to the routine in
+     * the correct order.
+     *
+     * @param name           the method name.
+     * @param parameterTypes the method parameter types.
+     * @return the routine.
+     * @throws java.lang.IllegalArgumentException if no matching method is found.
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxies();
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
+            @Nonnull Class<?>... parameterTypes);
+
+    /**
+     * Returns a routine used to call the specified method.
+     * <p/>
+     * The method is invoked ignoring a name specified in a
+     * {@link com.gh.bmd.jrt.annotation.Alias Alias} annotation. Though, optional
+     * {@link com.gh.bmd.jrt.annotation.Priority Priority},
+     * {@link com.gh.bmd.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.gh.bmd.jrt.annotation.Timeout Timeout} and
+     * {@link com.gh.bmd.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
+     * honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * Note that it is up to the caller to ensure that the input data are passed to the routine in
+     * the correct order.
+     *
+     * @param method   the method instance.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine.
+     */
+    @Nonnull
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
 }

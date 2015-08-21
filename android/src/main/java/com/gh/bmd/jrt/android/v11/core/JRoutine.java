@@ -13,16 +13,13 @@
  */
 package com.gh.bmd.jrt.android.v11.core;
 
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
-
 import com.gh.bmd.jrt.android.builder.LoaderChannelBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder;
+import com.gh.bmd.jrt.android.core.ContextInvocationTarget;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -159,74 +156,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
     @Nonnull
     public static LoaderChannelBuilder on(@Nonnull final LoaderContext context) {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
         return new DefaultLoaderChannelBuilder(context);
-    }
-
-    /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified object
-     * instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
-     * context.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param context the routine context.
-     * @param target  the wrapped object class.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final Class<?> target) {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        return on(context, target, (Object[]) null);
-    }
-
-    /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified object
-     * instances.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
-     * context.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param context     the routine context.
-     * @param target      the wrapped object class.
-     * @param factoryArgs the object factory arguments.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final Class<?> target, @Nullable final Object... factoryArgs) {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        return new DefaultLoaderObjectRoutineBuilder(context, target, factoryArgs);
     }
 
     /**
@@ -250,14 +180,27 @@ public class JRoutine extends com.gh.bmd.jrt.android.core.JRoutine {
             @Nonnull final LoaderContext context,
             @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.gh.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
         return new DefaultLoaderRoutineBuilder<INPUT, OUTPUT>(context, factory);
+    }
+
+    /**
+     * Returns a builder of routines bound to the specified context, wrapping the specified target
+     * object.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
+     * context.<br/>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param context the routine context.
+     * @param target  the invocation target.
+     * @return the routine builder instance.
+     */
+    @Nonnull
+    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
+            @Nonnull final ContextInvocationTarget target) {
+
+        return new DefaultLoaderObjectRoutineBuilder(context, target);
     }
 }

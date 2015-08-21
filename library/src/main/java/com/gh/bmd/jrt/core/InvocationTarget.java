@@ -39,9 +39,9 @@ public abstract class InvocationTarget {
      * @return the invocation target.
      */
     @Nonnull
-    public static ClassTarget targetClass(@Nonnull final Class<?> targetClass) {
+    public static InvocationTarget targetClass(@Nonnull final Class<?> targetClass) {
 
-        return new ClassTarget(targetClass);
+        return new ClassInvocationTarget(targetClass);
     }
 
     /**
@@ -51,9 +51,9 @@ public abstract class InvocationTarget {
      * @return the invocation target.
      */
     @Nonnull
-    public static ObjectTarget targetObject(@Nonnull final Object target) {
+    public static InvocationTarget targetObject(@Nonnull final Object target) {
 
-        return new ObjectTarget(target);
+        return new ObjectInvocationTarget(target);
     }
 
     /**
@@ -73,9 +73,17 @@ public abstract class InvocationTarget {
     public abstract Class<?> getTargetClass();
 
     /**
+     * Checks if this invocation target is assignable to the specified class.
+     *
+     * @param targetClass the target class.
+     * @return whether the invocation target is assignable to the class.
+     */
+    public abstract boolean isAssignableTo(@Nonnull final Class<?> targetClass);
+
+    /**
      * Invocation target wrapping a class.
      */
-    public static class ClassTarget extends InvocationTarget {
+    private static class ClassInvocationTarget extends InvocationTarget {
 
         private final Class<?> mTargetClass;
 
@@ -85,7 +93,7 @@ public abstract class InvocationTarget {
          * @param targetClass the target class.
          */
         @SuppressWarnings("ConstantConditions")
-        private ClassTarget(@Nonnull final Class<?> targetClass) {
+        private ClassInvocationTarget(@Nonnull final Class<?> targetClass) {
 
             if (targetClass == null) {
 
@@ -108,12 +116,18 @@ public abstract class InvocationTarget {
 
             return mTargetClass;
         }
+
+        @Override
+        public boolean isAssignableTo(@Nonnull final Class<?> targetClass) {
+
+            return targetClass.isAssignableFrom(mTargetClass);
+        }
     }
 
     /**
      * Invocation target wrapping an object instance.
      */
-    public static class ObjectTarget extends InvocationTarget {
+    private static class ObjectInvocationTarget extends InvocationTarget {
 
         private final WeakReference<Object> mTarget;
 
@@ -124,7 +138,7 @@ public abstract class InvocationTarget {
          *
          * @param target the target instance.
          */
-        private ObjectTarget(@Nonnull final Object target) {
+        private ObjectInvocationTarget(@Nonnull final Object target) {
 
             mTarget = new WeakReference<Object>(target);
             mTargetClass = target.getClass();
@@ -142,6 +156,12 @@ public abstract class InvocationTarget {
         public Class<?> getTargetClass() {
 
             return mTargetClass;
+        }
+
+        @Override
+        public boolean isAssignableTo(@Nonnull final Class<?> targetClass) {
+
+            return targetClass.isInstance(mTarget.get());
         }
     }
 }

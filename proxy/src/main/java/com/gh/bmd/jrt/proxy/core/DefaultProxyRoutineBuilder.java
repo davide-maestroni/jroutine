@@ -15,15 +15,16 @@ package com.gh.bmd.jrt.proxy.core;
 
 import com.gh.bmd.jrt.builder.InvocationConfiguration;
 import com.gh.bmd.jrt.builder.ProxyConfiguration;
+import com.gh.bmd.jrt.core.InvocationTarget;
 import com.gh.bmd.jrt.proxy.annotation.Proxy;
 import com.gh.bmd.jrt.proxy.builder.AbstractProxyBuilder;
 import com.gh.bmd.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.gh.bmd.jrt.util.ClassToken;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
@@ -36,9 +37,7 @@ class DefaultProxyRoutineBuilder
         implements ProxyRoutineBuilder, InvocationConfiguration.Configurable<ProxyRoutineBuilder>,
         ProxyConfiguration.Configurable<ProxyRoutineBuilder> {
 
-    // TODO: 20/08/15 class proxy?
-
-    private final WeakReference<?> mTargetReference;
+    private final InvocationTarget mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -48,17 +47,17 @@ class DefaultProxyRoutineBuilder
     /**
      * Constructor.
      *
-     * @param target the target object.
+     * @param target the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultProxyRoutineBuilder(@Nonnull final Object target) {
+    DefaultProxyRoutineBuilder(@Nonnull final InvocationTarget target) {
 
         if (target == null) {
 
-            throw new NullPointerException("the target object must not be null");
+            throw new NullPointerException("the invocation target must not be null");
         }
 
-        mTargetReference = new WeakReference<Object>(target);
+        mTarget = target;
     }
 
     @Nonnull
@@ -85,14 +84,7 @@ class DefaultProxyRoutineBuilder
                             + itfClass.getName());
         }
 
-        final Object target = mTargetReference.get();
-
-        if (target == null) {
-
-            throw new IllegalStateException("the target object has been destroyed");
-        }
-
-        final ObjectProxyBuilder<TYPE> builder = new ObjectProxyBuilder<TYPE>(target, itf);
+        final ObjectProxyBuilder<TYPE> builder = new ObjectProxyBuilder<TYPE>(mTarget, itf);
         return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
@@ -152,15 +144,15 @@ class DefaultProxyRoutineBuilder
 
         private final ClassToken<TYPE> mInterfaceToken;
 
-        private final Object mTarget;
+        private final InvocationTarget mTarget;
 
         /**
          * Constructor.
          *
-         * @param target         the target object instance.
+         * @param target         the invocation target.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectProxyBuilder(@Nonnull final Object target,
+        private ObjectProxyBuilder(@Nonnull final InvocationTarget target,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mTarget = target;
@@ -174,11 +166,11 @@ class DefaultProxyRoutineBuilder
             return mInterfaceToken;
         }
 
-        @Nonnull
+        @Nullable
         @Override
         protected Object getTarget() {
 
-            return mTarget;
+            return mTarget.getTarget();
         }
 
         @Nonnull

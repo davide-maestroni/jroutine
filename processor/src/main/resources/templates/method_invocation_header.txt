@@ -18,22 +18,21 @@
 
         private final Object mMutex;
 
-        private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
+        private final com.gh.bmd.jrt.core.InvocationTarget mTarget;
 
         private Invocation${methodCount}(@javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                 @javax.annotation.Nonnull final java.lang.ref.WeakReference<${classFullName}> wrapped) {
+                 @javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target) {
 
-            final Object target = wrapped.get();
             final String shareGroup = ${shareGroup};
 
-            if ((target != null) && !com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
+            if (!com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
 
-                mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(target, shareGroup);
+                mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, shareGroup);
 
             } else {
 
                 mMutex = this;
             }
 
-            mWrapped = wrapped;
+            mTarget = target;
         }

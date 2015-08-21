@@ -37,7 +37,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +66,6 @@ public class RoutineBuilders {
 
     private static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexCache =
             new WeakIdentityHashMap<Object, Map<String, Object>>();
-
-    private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sStaticAliasCache =
-            new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
 
     /**
      * Avoid direct instantiation.
@@ -246,7 +242,7 @@ public class RoutineBuilders {
     }
 
     /**
-     * Gets the member method annotated with the specified alias name.
+     * Gets the method annotated with the specified alias name.
      *
      * @param name        the alias name.
      * @param targetClass the target class.
@@ -255,26 +251,38 @@ public class RoutineBuilders {
      *                                            found.
      */
     @Nullable
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public static Method getAnnotatedMethod(@Nonnull final String name,
             @Nonnull final Class<?> targetClass) {
 
-        return getAnnotatedMethod(name, targetClass, false);
-    }
+        final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasCache = sAliasCache;
 
-    /**
-     * Gets the class method annotated with the specified alias name.
-     *
-     * @param name        the alias name.
-     * @param targetClass the target class.
-     * @return the method.
-     * @throws java.lang.IllegalArgumentException if no method with the specified alias name was
-     *                                            found.
-     */
-    @Nullable
-    public static Method getAnnotatedStaticMethod(@Nonnull final String name,
-            @Nonnull final Class<?> targetClass) {
+        synchronized (aliasCache) {
 
-        return getAnnotatedMethod(name, targetClass, true);
+            Map<String, Method> methodMap = aliasCache.get(targetClass);
+
+            if (methodMap == null) {
+
+                methodMap = new HashMap<String, Method>();
+                fillMap(methodMap, targetClass.getMethods());
+                final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
+                fillMap(declaredMethodMap, targetClass.getDeclaredMethods());
+
+                for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
+
+                    final String methodName = methodEntry.getKey();
+
+                    if (!methodMap.containsKey(methodName)) {
+
+                        methodMap.put(methodName, methodEntry.getValue());
+                    }
+                }
+
+                aliasCache.put(targetClass, methodMap);
+            }
+
+            return methodMap.get(name);
+        }
     }
 
     /**
@@ -813,23 +821,9 @@ public class RoutineBuilders {
     }
 
     private static void fillMap(@Nonnull final Map<String, Method> map,
-            @Nonnull final Method[] methods, boolean isStatic) {
+            @Nonnull final Method[] methods) {
 
         for (final Method method : methods) {
-
-            final boolean isStaticMethod = Modifier.isStatic(method.getModifiers());
-
-            if (isStatic) {
-
-                if (!isStaticMethod) {
-
-                    continue;
-                }
-
-            } else if (isStaticMethod) {
-
-                continue;
-            }
 
             final Alias annotation = method.getAnnotation(Alias.class);
 
@@ -849,42 +843,6 @@ public class RoutineBuilders {
         }
     }
 
-    @Nullable
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    private static Method getAnnotatedMethod(@Nonnull final String name,
-            @Nonnull final Class<?> targetClass, final boolean isStatic) {
-
-        final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasCache =
-                (isStatic) ? sStaticAliasCache : sAliasCache;
-
-        synchronized (aliasCache) {
-
-            Map<String, Method> methodMap = aliasCache.get(targetClass);
-
-            if (methodMap == null) {
-
-                methodMap = new HashMap<String, Method>();
-                fillMap(methodMap, targetClass.getMethods(), isStatic);
-                final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
-                fillMap(declaredMethodMap, targetClass.getDeclaredMethods(), isStatic);
-
-                for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
-
-                    final String methodName = methodEntry.getKey();
-
-                    if (!methodMap.containsKey(methodName)) {
-
-                        methodMap.put(methodName, methodEntry.getValue());
-                    }
-                }
-
-                aliasCache.put(targetClass, methodMap);
-            }
-
-            return methodMap.get(name);
-        }
-    }
-
     @Nonnull
     private static Method getTargetMethod(@Nonnull final Method method,
             @Nonnull final Class<?> targetClass, @Nonnull final Class<?>[] targetParameterTypes) {
@@ -896,7 +854,7 @@ public class RoutineBuilders {
         if (annotation != null) {
 
             name = annotation.value();
-            targetMethod = getAnnotatedMethod(name, targetClass, false);
+            targetMethod = getAnnotatedMethod(name, targetClass);
         }
 
         if (targetMethod == null) {

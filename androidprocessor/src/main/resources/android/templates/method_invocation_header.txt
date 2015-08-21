@@ -39,7 +39,8 @@
 
             try {
 
-                final com.gh.bmd.jrt.core.InvocationTarget target = mInvocationTarget.getInvocationTarget(context);
+                final com.gh.bmd.jrt.core.InvocationTarget invocationTarget = mInvocationTarget.getInvocationTarget(context);
+                final Object target = invocationTarget.getTarget();
                 final String shareGroup = mShareGroup;
 
                 if (!com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
@@ -47,7 +48,7 @@
                     mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, shareGroup);
                 }
 
-                mTarget = target;
+                mTarget = invocationTarget;
 
             } catch (final Throwable t) {
 

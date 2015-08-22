@@ -187,12 +187,13 @@
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder = on(Main.class).proxies()
-                                                                  .withShareGroup(ShareGroup.NONE)
-                                                                  .set()
-                                                                  .invocations()
-                                                                  .withExecutionTimeout(TimeDuration.INFINITY)
-                                                                  .set();
+                final ClassRoutineBuilder builder =
+                        on(targetClass(Main.class)).proxies()
+                                                   .withShareGroup(ShareGroup.NONE)
+                                                   .set()
+                                                   .invocations()
+                                                   .withExecutionTimeout(TimeDuration.INFINITY)
+                                                   .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
@@ -246,13 +247,14 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = on(instance).proxies()
-                                                    .withShareGroup(ShareGroup.NONE)
-                                                    .set()
-                                                    .invocations()
-                                                    .withExecutionTimeout(TimeDuration.INFINITY)
-                                                    .set()
-                                                    .buildProxy(AsyncMain.class);
+                final AsyncMain proxy =
+                        on(targetObject(instance)).proxies()
+                                                  .withShareGroup(ShareGroup.NONE)
+                                                  .set()
+                                                  .invocations()
+                                                  .withExecutionTimeout(TimeDuration.INFINITY)
+                                                  .set()
+                                                  .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
                 System.out.println(rms);
                 System.exit(0);

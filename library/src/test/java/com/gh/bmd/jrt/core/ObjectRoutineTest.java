@@ -1196,9 +1196,9 @@ public class ObjectRoutineTest {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder = JRoutine.on(targetObject(test2))
-                                                    .invocations()
-                                                    .withExecutionTimeout(seconds(2))
-                                                    .set();
+                                                     .invocations()
+                                                     .withExecutionTimeout(seconds(2))
+                                                     .set();
 
         long startTime = System.currentTimeMillis();
 
@@ -1225,9 +1225,9 @@ public class ObjectRoutineTest {
     public void testShareGroup2() throws NoSuchMethodException {
 
         final ObjectRoutineBuilder builder = JRoutine.on(targetClass(TestStatic2.class))
-                                                    .invocations()
-                                                    .withExecutionTimeout(seconds(2))
-                                                    .set();
+                                                     .invocations()
+                                                     .withExecutionTimeout(seconds(2))
+                                                     .set();
 
         long startTime = System.currentTimeMillis();
 

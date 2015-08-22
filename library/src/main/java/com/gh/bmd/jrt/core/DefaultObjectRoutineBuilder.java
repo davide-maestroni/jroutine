@@ -28,9 +28,9 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.WeakIdentityHashMap;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
@@ -183,9 +183,10 @@ class DefaultObjectRoutineBuilder
             @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-        final Object target = mTarget.getTarget();
+        final InvocationTarget target = mTarget;
+        final Object targetInstance = target.getTarget();
 
-        if (target == null) {
+        if (targetInstance == null) {
 
             throw new IllegalStateException("the target object has been destroyed");
         }
@@ -194,12 +195,12 @@ class DefaultObjectRoutineBuilder
 
             final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>> routineCache =
                     sRoutineCache;
-            HashMap<RoutineInfo, Routine<?, ?>> routineMap = routineCache.get(target);
+            HashMap<RoutineInfo, Routine<?, ?>> routineMap = routineCache.get(targetInstance);
 
             if (routineMap == null) {
 
                 routineMap = new HashMap<RoutineInfo, Routine<?, ?>>();
-                routineCache.put(target, routineMap);
+                routineCache.put(targetInstance, routineMap);
             }
 
             final RoutineInfo routineInfo =
@@ -233,34 +234,36 @@ class DefaultObjectRoutineBuilder
 
         private final OutputMode mOutputMode;
 
-        private final WeakReference<?> mTargetReference;
+        private final InvocationTarget mTarget;
 
         /**
          * Constructor.
          *
          * @param proxyConfiguration the proxy configuration.
-         * @param targetReference    the reference to target object.
+         * @param target             the invocation target.
          * @param method             the method to wrap.
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
         private MethodFunctionInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final WeakReference<?> targetReference, @Nonnull final Method method,
+                @Nonnull final InvocationTarget target, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-            final Object target = targetReference.get();
+            final Object mutexTarget =
+                    (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass()
+                            : target.getTarget();
             final String shareGroup = proxyConfiguration.getShareGroupOr(null);
 
-            if ((target != null) && !ShareGroup.NONE.equals(shareGroup)) {
+            if ((mutexTarget != null) && !ShareGroup.NONE.equals(shareGroup)) {
 
-                mMutex = getSharedMutex(target, shareGroup);
+                mMutex = getSharedMutex(mutexTarget, shareGroup);
 
             } else {
 
                 mMutex = this;
             }
 
-            mTargetReference = targetReference;
+            mTarget = target;
             mMethod = method;
             mInputMode = inputMode;
             mOutputMode = outputMode;
@@ -270,7 +273,7 @@ class DefaultObjectRoutineBuilder
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            final Object target = mTargetReference.get();
+            final Object target = mTarget.getTarget();
 
             if (target == null) {
 
@@ -294,23 +297,23 @@ class DefaultObjectRoutineBuilder
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final WeakReference<?> mTargetReference;
+        private final InvocationTarget mTarget;
 
         /**
          * Constructor.
          *
          * @param proxyConfiguration the proxy configuration.
-         * @param target             the target object.
+         * @param target             the invocation target.
          * @param method             the method to wrap.
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
         private MethodInvocationFactory(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final Object target, @Nonnull final Method method,
+                @Nonnull final InvocationTarget target, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mProxyConfiguration = proxyConfiguration;
-            mTargetReference = new WeakReference<Object>(target);
+            mTarget = target;
             mMethod = method;
             mInputMode = inputMode;
             mOutputMode = outputMode;
@@ -320,8 +323,8 @@ class DefaultObjectRoutineBuilder
         @Override
         public Invocation<Object, Object> newInvocation() {
 
-            return new MethodFunctionInvocation(mProxyConfiguration, mTargetReference, mMethod,
-                                                mInputMode, mOutputMode);
+            return new MethodFunctionInvocation(mProxyConfiguration, mTarget, mMethod, mInputMode,
+                                                mOutputMode);
         }
     }
 
@@ -419,19 +422,11 @@ class DefaultObjectRoutineBuilder
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =
-                    buildRoutine(method, methodInfo.method, inputMode, outputMode);
+                    getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
+                               configurationWithAnnotations(mProxyConfiguration, method),
+                               methodInfo.method, inputMode, outputMode);
             return invokeRoutine(routine, method, (args != null) ? args : NO_ARGS, inputMode,
                                  outputMode);
-        }
-
-        @Nonnull
-        private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
-                @Nonnull final Method targetMethod, @Nullable final InputMode inputMode,
-                @Nullable final OutputMode outputMode) {
-
-            return getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
-                              configurationWithAnnotations(mProxyConfiguration, method),
-                              targetMethod, inputMode, outputMode);
         }
     }
 }

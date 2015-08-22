@@ -33,6 +33,7 @@ import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
@@ -342,12 +343,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if (mRoutine == null) {
+            final Routine<INPUT, OUTPUT> routine = mRoutine;
+
+            if (routine == null) {
 
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.syncCall(inputs));
+            result.pass(routine.syncCall(inputs));
         }
     }
 
@@ -404,12 +407,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if (mRoutine == null) {
+            final Routine<INPUT, OUTPUT> routine = mRoutine;
+
+            if (routine == null) {
 
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.syncCall(inputs));
+            result.pass(routine.syncCall(inputs));
         }
 
         @Override
@@ -448,13 +453,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      */
     private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
 
+        private final ContextInvocationTarget mContextTarget;
+
         private final InputMode mInputMode;
 
         private final OutputMode mOutputMode;
 
         private final String mShareGroup;
-
-        private final ContextInvocationTarget mTarget;
 
         private final Method mTargetMethod;
 
@@ -482,7 +487,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 NoSuchMethodException {
 
             mShareGroup = shareGroup;
-            mTarget = target;
+            mContextTarget = target;
             mTargetMethod = target.getTargetClass()
                                   .getMethod(targetMethodName, forNames(targetParameterTypes));
             mInputMode = inputMode;
@@ -494,7 +499,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            callFromInvocation(mTargetMethod, mMutex, mTargetInstance, objects, result, mInputMode,
+            final Object targetInstance = mTargetInstance;
+
+            if (targetInstance == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
+            callFromInvocation(mTargetMethod, mMutex, targetInstance, objects, result, mInputMode,
                                mOutputMode);
         }
 
@@ -505,16 +517,18 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                final InvocationTarget invocationTarget = mTarget.getInvocationTarget(context);
-                final Object targetInstance = invocationTarget.getTarget();
+                final InvocationTarget target = mContextTarget.getInvocationTarget(context);
+                final Object mutexTarget =
+                        (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
+                                : target.getTarget();
                 final String shareGroup = mShareGroup;
 
-                if ((targetInstance != null) && !ShareGroup.NONE.equals(shareGroup)) {
+                if ((mutexTarget != null) && !ShareGroup.NONE.equals(shareGroup)) {
 
-                    mMutex = getSharedMutex(targetInstance, shareGroup);
+                    mMutex = getSharedMutex(mutexTarget, shareGroup);
                 }
 
-                mTargetInstance = targetInstance;
+                mTargetInstance = target.getTarget();
 
             } catch (final Throwable t) {
 

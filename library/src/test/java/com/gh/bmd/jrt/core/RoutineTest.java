@@ -853,7 +853,7 @@ public class RoutineTest {
         final Routine<Object, Object> routine1 =
                 JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
         final Routine<Object, Object> routine2 =
-                JRoutine.on(DelegatingInvocation.factoryFrom(routine1, DelegationType.SYNC))
+                JRoutine.on(DelegatingInvocation.factoryFrom(routine1, DelegationType.SYNCHRONOUS))
                         .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
@@ -874,7 +874,7 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(TestDestroy.class)).buildRoutine();
         final Routine<String, String> routine4 =
-                JRoutine.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.ASYNC))
+                JRoutine.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.ASYNCHRONOUS))
                         .buildRoutine();
 
         assertThat(routine4.asyncCall("test4").afterMax(timeout).all()).containsExactly("test4");
@@ -888,7 +888,7 @@ public class RoutineTest {
 
         try {
 
-            DelegatingInvocation.factoryFrom(null, DelegationType.SYNC);
+            DelegatingInvocation.factoryFrom(null, DelegationType.SYNCHRONOUS);
 
             fail();
 

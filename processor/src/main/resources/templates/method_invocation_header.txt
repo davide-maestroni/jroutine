@@ -23,11 +23,12 @@
         private Invocation${methodCount}(@javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
                  @javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target) {
 
+            final Object mutexTarget = ${mutexTarget};
             final String shareGroup = ${shareGroup};
 
-            if (!com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
+            if ((mutexTarget != null) && !com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
 
-                mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, shareGroup);
+                mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, shareGroup);
 
             } else {
 

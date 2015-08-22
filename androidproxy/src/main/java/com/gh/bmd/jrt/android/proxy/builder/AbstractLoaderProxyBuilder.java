@@ -58,7 +58,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
 
             if (context == null) {
 
-                throw new NullPointerException("the invocation context has been destroyed");
+                throw new IllegalStateException("the invocation context has been destroyed");
             }
 
             final WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>

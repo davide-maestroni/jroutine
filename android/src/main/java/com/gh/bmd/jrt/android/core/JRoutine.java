@@ -57,7 +57,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             setContentView(R.layout.my_activity_layout);
  *
  *             final Routine&lt;URI, MyResource&gt; routine =
- *                     JRoutine.on(serviceFrom(this), tokenOf(LoadResourceUri.class))
+ *                     JRoutine.on(serviceFrom(this), factoryOf(LoadResourceUri.class))
  *                             .buildRoutine();
  *             routine.asyncCall(RESOURCE_URI)
  *                    .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {

@@ -92,8 +92,8 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
     public void onInitialize() {
 
         final DelegationType delegationType = mDelegationType;
-        mChannel = (delegationType == DelegationType.SYNC) ? mRoutine.syncInvoke()
-                : (delegationType == DelegationType.ASYNC) ? mRoutine.asyncInvoke()
+        mChannel = (delegationType == DelegationType.SYNCHRONOUS) ? mRoutine.syncInvoke()
+                : (delegationType == DelegationType.ASYNCHRONOUS) ? mRoutine.asyncInvoke()
                         : mRoutine.parallelInvoke();
     }
 
@@ -117,9 +117,18 @@ public class DelegatingInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OU
      */
     public enum DelegationType {
 
-        SYNC,       // synchronous
-        ASYNC,      // asynchronous
-        PARALLEL    // parallel
+        /**
+         * The delegated routine is invoked in synchronous mode.
+         */
+        SYNCHRONOUS,
+        /**
+         * The delegated routine is invoked in asynchronous mode.
+         */
+        ASYNCHRONOUS,
+        /**
+         * The delegated routine is invoked in parallel mode.
+         */
+        PARALLEL
     }
 
     /**

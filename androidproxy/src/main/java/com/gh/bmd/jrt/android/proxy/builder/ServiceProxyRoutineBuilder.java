@@ -22,8 +22,8 @@ import com.gh.bmd.jrt.util.ClassToken;
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of routines wrapping an object instance, whose methods are executed
- * in a dedicated service.
+ * Interface defining a builder of routines wrapping an object, whose methods are executed in a
+ * dedicated service.
  * <p/>
  * Note that only instance methods can be asynchronously invoked through the routines created by
  * this builder.

@@ -100,15 +100,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                             + itfClass.getName());
         }
 
-        final LoaderContext context = mContext;
-
-        if (context.getComponent() == null) {
-
-            throw new IllegalStateException("the context object has been destroyed");
-        }
-
         final ObjectLoaderProxyBuilder<TYPE> builder =
-                new ObjectLoaderProxyBuilder<TYPE>(context, mTarget, itf);
+                new ObjectLoaderProxyBuilder<TYPE>(mContext, mTarget, itf);
         return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()

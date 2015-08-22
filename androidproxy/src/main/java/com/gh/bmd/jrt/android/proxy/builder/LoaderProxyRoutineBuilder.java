@@ -22,7 +22,7 @@ import com.gh.bmd.jrt.util.ClassToken;
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of routines wrapping an object instance, bound to a context
+ * Interface defining a builder of routines wrapping an object methods, bound to a context
  * lifecycle.
  * <p/>
  * Note that only instance methods can be asynchronously invoked through the routines created by

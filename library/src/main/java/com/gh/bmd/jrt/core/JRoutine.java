@@ -97,7 +97,7 @@ import javax.annotation.Nonnull;
  *                  &#64;Input(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
- *         final AsyncCallback callback = JRoutine.on(myCallback)
+ *         final AsyncCallback callback = JRoutine.on(targetObject(myCallback))
  *                                                .buildProxy(AsyncCallback.class);
  *         callback.onResults(doSomething1.asyncCall(), doSomething2.asyncCall());
  *     </code>

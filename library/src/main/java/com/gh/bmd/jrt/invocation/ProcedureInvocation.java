@@ -20,7 +20,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Abstract implementation of an invocation performing a procedure eventually returning output data.
+ * Abstract implementation of an invocation performing a procedure (that is, no input is required)
+ * eventually returning output data.
  * <p/>
  * Note that the implementing class must not retain an internal variable state.
  * <p/>

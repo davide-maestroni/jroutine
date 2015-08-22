@@ -2042,7 +2042,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final boolean isStatic = targetMethod.getModifiers().contains(Modifier.STATIC);
         methodInvocationHeader = methodInvocationHeader.replace("${mutexTarget}", (isStatic)
-                ? "target.getTargetClass()" : "target");
+                ? "target.getTargetClass()" : "target.getTarget()");
         writer.append(methodInvocationHeader);
         String methodInvocation;
 
@@ -2072,8 +2072,8 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocation = methodInvocation.replace("${resultClassName}", resultClassName);
         methodInvocation = methodInvocation.replace("${methodCount}", Integer.toString(count));
         methodInvocation = methodInvocation.replace("${genericTypes}", buildGenericTypes(element));
-        methodInvocation =
-                methodInvocation.replace("${invocationTarget}", (isStatic) ? "" : "mTarget.getTarget()");
+        methodInvocation = methodInvocation.replace("${invocationTarget}",
+                                                    (isStatic) ? "" : "mTarget.getTarget()");
         methodInvocation =
                 methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
 

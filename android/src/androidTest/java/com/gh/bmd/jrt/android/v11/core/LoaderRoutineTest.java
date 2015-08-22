@@ -365,7 +365,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(getActivity()), PassingContextInvocation.factoryOf())
                         .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.SYNC,
+                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.SYNCHRONOUS,
                                                         "test_routine");
         final Routine<Object, Object> routine2 =
                 JRoutine.on(contextFrom(getActivity()), factory).buildRoutine();
@@ -1049,7 +1049,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(fragment), PassingContextInvocation.factoryOf())
                         .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.ASYNC,
+                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.ASYNCHRONOUS,
                                                         "test_routine");
         final Routine<Object, Object> routine2 =
                 JRoutine.on(contextFrom(fragment), factory).buildRoutine();

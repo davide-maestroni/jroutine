@@ -46,9 +46,10 @@ public abstract class AbstractProxyBuilder<TYPE>
     @Nonnull
     public TYPE buildProxy() {
 
+        final Object target = getTarget();
+
         synchronized (sClassMap) {
 
-            final Object target = getTarget();
             final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
             HashMap<ClassInfo, Object> classes = classMap.get(target);
 

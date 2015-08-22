@@ -60,7 +60,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
 
             if (context == null) {
 
-                throw new NullPointerException("the invocation context has been destroyed");
+                throw new IllegalStateException("the invocation context has been destroyed");
             }
 
             final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>

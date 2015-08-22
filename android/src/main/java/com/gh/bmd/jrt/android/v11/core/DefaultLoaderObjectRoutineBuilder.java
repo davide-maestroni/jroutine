@@ -42,6 +42,7 @@ import com.gh.bmd.jrt.util.Reflection;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
@@ -352,12 +353,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if (mRoutine == null) {
+            final Routine<INPUT, OUTPUT> routine = mRoutine;
+
+            if (routine == null) {
 
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.syncCall(inputs));
+            result.pass(routine.syncCall(inputs));
         }
     }
 
@@ -438,12 +441,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<? extends INPUT> inputs,
                 @Nonnull final ResultChannel<OUTPUT> result) {
 
-            if (mRoutine == null) {
+            final Routine<INPUT, OUTPUT> routine = mRoutine;
+
+            if (routine == null) {
 
                 throw new IllegalStateException("such error should never happen");
             }
 
-            result.pass(mRoutine.syncCall(inputs));
+            result.pass(routine.syncCall(inputs));
         }
 
         @Override
@@ -512,13 +517,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
 
+        private final ContextInvocationTarget mContextTarget;
+
         private final InputMode mInputMode;
 
         private final OutputMode mOutputMode;
 
         private final ProxyConfiguration mProxyConfiguration;
-
-        private final ContextInvocationTarget mTarget;
 
         private final Method mTargetMethod;
 
@@ -542,7 +547,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             mTargetMethod = targetMethod;
             mProxyConfiguration = proxyConfiguration;
-            mTarget = target;
+            mContextTarget = target;
             mInputMode = inputMode;
             mOutputMode = outputMode;
             mMutex = this;
@@ -552,7 +557,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            callFromInvocation(mTargetMethod, mMutex, mTargetInstance, objects, result, mInputMode,
+            final Object targetInstance = mTargetInstance;
+
+            if (targetInstance == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
+            callFromInvocation(mTargetMethod, mMutex, targetInstance, objects, result, mInputMode,
                                mOutputMode);
         }
 
@@ -563,16 +575,18 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final InvocationTarget invocationTarget = mTarget.getInvocationTarget(context);
-                final Object targetInstance = invocationTarget.getTarget();
+                final InvocationTarget target = mContextTarget.getInvocationTarget(context);
+                final Object mutexTarget =
+                        (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
+                                : target.getTarget();
                 final String shareGroup = mProxyConfiguration.getShareGroupOr(null);
 
-                if ((targetInstance != null) && !ShareGroup.NONE.equals(shareGroup)) {
+                if ((mutexTarget != null) && !ShareGroup.NONE.equals(shareGroup)) {
 
-                    mMutex = getSharedMutex(targetInstance, shareGroup);
+                    mMutex = getSharedMutex(mutexTarget, shareGroup);
                 }
 
-                mTargetInstance = targetInstance;
+                mTargetInstance = target.getTarget();
 
             } catch (final Throwable t) {
 

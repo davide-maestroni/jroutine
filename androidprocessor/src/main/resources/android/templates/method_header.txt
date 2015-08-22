@@ -23,14 +23,14 @@
             @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final com.gh.bmd.jrt.android.core.InvocationFactoryTarget<Object, ${resultClassName}> invocationTarget = com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation(
+        final com.gh.bmd.jrt.android.core.InvocationFactoryTarget<Object, ${resultClassName}> factoryTarget = com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation(
                 new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${shareGroup}, target);
-        return getBuilder(mContext, invocationTarget).invocations()
-                                                     .with(invocationConfiguration)
-                                                     ${routineBuilderOptions}
-                                                     .set()
-                                                     .service()
-                                                     .with(serviceConfiguration)
-                                                     .set()
-                                                     .buildRoutine();
+        return getBuilder(mContext, factoryTarget).invocations()
+                                                  .with(invocationConfiguration)
+                                                  ${routineBuilderOptions}
+                                                  .set()
+                                                  .service()
+                                                  .with(serviceConfiguration)
+                                                  .set()
+                                                  .buildRoutine();
     }

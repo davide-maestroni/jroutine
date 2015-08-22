@@ -24,7 +24,7 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = JRoutineProxy.on(instance)
+                final AsyncMain proxy = JRoutineProxy.on(targetObject(instance))
                                                      .proxies()
                                                      .withShareGroup(ShareGroup.NONE)
                                                      .set()
@@ -93,7 +93,7 @@
             public static void main(final String[] args) {
 
                 final Main instance = new Main();
-                final AsyncMain proxy = Proxy_Main_AsyncMain.on(instance)
+                final AsyncMain proxy = Proxy_Main_AsyncMain.on(targetObject(instance))
                                                             .proxies()
                                                             .withShareGroup(ShareGroup.NONE)
                                                             .set()

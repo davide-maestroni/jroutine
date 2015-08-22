@@ -185,11 +185,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
 
         private final Object[] mFactoryArgs;
 
-        private final Object mMutex = new Object();
-
         private final Class<?> mTargetClass;
-
-        private Object mTarget;
 
         private ObjectContextInvocationTarget(@Nonnull final Parcel source) {
 
@@ -244,48 +240,34 @@ public abstract class ContextInvocationTarget implements Parcelable {
         @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
         public InvocationTarget getInvocationTarget(@Nonnull final Context context) {
 
-            Object target;
+            Object target = null;
+            final Class<?> targetClass = mTargetClass;
+            final Object[] factoryArgs = mFactoryArgs;
 
-            synchronized (mMutex) {
+            if (context instanceof FactoryContext) {
 
-                target = mTarget;
+                // The only safe way is to synchronize the factory using the very same instance
+                synchronized (context) {
 
-                if (target == null) {
-
-                    final Class<?> targetClass = mTargetClass;
-                    final Object[] factoryArgs = mFactoryArgs;
-
-                    if (context instanceof FactoryContext) {
-
-                        // The only safe way is to synchronize the factory using the very same
-                        // instance
-                        synchronized (context) {
-
-                            target =
-                                    ((FactoryContext) context).geInstance(targetClass, factoryArgs);
-                        }
-                    }
-
-                    if (target == null) {
-
-                        try {
-
-                            target = findConstructor(targetClass, factoryArgs).newInstance(
-                                    factoryArgs);
-
-                        } catch (final Throwable t) {
-
-                            throw InvocationException.wrapIfNeeded(t);
-                        }
-
-                    } else if (!targetClass.isInstance(target)) {
-
-                        throw new RoutineException(
-                                target + " is not an instance of " + targetClass.getName());
-                    }
-
-                    mTarget = target;
+                    target = ((FactoryContext) context).geInstance(targetClass, factoryArgs);
                 }
+            }
+
+            if (target == null) {
+
+                try {
+
+                    target = findConstructor(targetClass, factoryArgs).newInstance(factoryArgs);
+
+                } catch (final Throwable t) {
+
+                    throw InvocationException.wrapIfNeeded(t);
+                }
+
+            } else if (!targetClass.isInstance(target)) {
+
+                throw new RoutineException(
+                        target + " is not an instance of " + targetClass.getName());
             }
 
             return InvocationTarget.targetObject(target);

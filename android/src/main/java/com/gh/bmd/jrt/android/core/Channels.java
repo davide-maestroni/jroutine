@@ -144,7 +144,9 @@ public class Channels extends com.gh.bmd.jrt.core.Channels {
     }
 
     /**
-     * Returns a new channel transforming the input data into selectable ones.
+     * Returns a new channel transforming the input data into selectable ones.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.

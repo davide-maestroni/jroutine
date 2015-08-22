@@ -22,8 +22,6 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.android.invocation.ContextInvocationFactory;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.InvocationConfiguration.OrderType;
-import com.gh.bmd.jrt.invocation.Invocation;
-import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.InvocationInterruptedException;
 import com.gh.bmd.jrt.log.Logger;
 
@@ -31,6 +29,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.gh.bmd.jrt.android.invocation.ContextInvocations.factoryTo;
 
 /**
  * Loader implementation performing the routine invocation.
@@ -160,7 +160,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         final Logger logger = mLogger;
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
-        JRoutine.on(new LoaderInvocationFactory<INPUT, OUTPUT>(getContext(), mInvocation))
+        final LoaderContextInvocationFactory<INPUT, OUTPUT> factory =
+                new LoaderContextInvocationFactory<INPUT, OUTPUT>(mInvocation);
+        JRoutine.on(factoryTo(getContext(), factory))
                 .invocations()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withOutputOrder(mOrderType)
@@ -217,38 +219,32 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Invocation factory implementation.
+     * Context invocation factory implementation.
      *
-     * @param <INPUT>
-     * @param <OUTPUT>
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      */
-    private static class LoaderInvocationFactory<INPUT, OUTPUT>
-            extends InvocationFactory<INPUT, OUTPUT> {
-
-        private final Context mContext;
+    private static class LoaderContextInvocationFactory<INPUT, OUTPUT>
+            extends ContextInvocationFactory<INPUT, OUTPUT> {
 
         private final ContextInvocation<INPUT, OUTPUT> mInvocation;
 
         /**
          * Constructor.
          *
-         * @param context    the loader context.
-         * @param invocation the invocation instance.
+         * @param invocation the loader invocation instance.
          */
-        private LoaderInvocationFactory(@Nonnull final Context context,
+        private LoaderContextInvocationFactory(
                 @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation) {
 
-            mContext = context;
             mInvocation = invocation;
         }
 
         @Nonnull
         @Override
-        public Invocation<INPUT, OUTPUT> newInvocation() {
+        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
 
-            final ContextInvocation<INPUT, OUTPUT> invocation = mInvocation;
-            invocation.onContext(mContext);
-            return invocation;
+            return mInvocation;
         }
     }
 }

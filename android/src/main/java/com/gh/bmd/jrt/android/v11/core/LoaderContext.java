@@ -165,11 +165,36 @@ public abstract class LoaderContext {
             mActivity = new WeakReference<Activity>(activity);
         }
 
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ActivityContext)) {
+
+                return false;
+            }
+
+            final ActivityContext that = (ActivityContext) o;
+            final Activity referent = mActivity.get();
+            return (referent != null) && referent.equals(that.mActivity.get());
+        }
+
         @Nullable
         @Override
         public Object getComponent() {
 
             return mActivity.get();
+        }
+
+        @Override
+        public int hashCode() {
+
+            final Activity referent = mActivity.get();
+            return (referent != null) ? referent.hashCode() : 0;
         }
 
         @Nullable
@@ -210,6 +235,31 @@ public abstract class LoaderContext {
             }
 
             mFragment = new WeakReference<Fragment>(fragment);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof FragmentContext)) {
+
+                return false;
+            }
+
+            final FragmentContext that = (FragmentContext) o;
+            final Fragment referent = mFragment.get();
+            return (referent != null) && referent.equals(that.mFragment.get());
+        }
+
+        @Override
+        public int hashCode() {
+
+            final Fragment referent = mFragment.get();
+            return (referent != null) ? referent.hashCode() : 0;
         }
 
         @Nullable
@@ -266,6 +316,38 @@ public abstract class LoaderContext {
             mContext = new WeakReference<Context>(context);
         }
 
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof WrappedActivityContext)) {
+
+                return false;
+            }
+
+            if (!super.equals(o)) {
+
+                return false;
+            }
+
+            final WrappedActivityContext that = (WrappedActivityContext) o;
+            final Context referent = mContext.get();
+            return (referent != null) && referent.equals(that.mContext.get());
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = super.hashCode();
+            final Context referent = mContext.get();
+            result = 31 * result + (referent != null ? referent.hashCode() : 0);
+            return result;
+        }
+
         @Nullable
         @Override
         public Context getLoaderContext() {
@@ -302,6 +384,38 @@ public abstract class LoaderContext {
             }
 
             mContext = new WeakReference<Context>(context);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof WrappedFragmentContext)) {
+
+                return false;
+            }
+
+            if (!super.equals(o)) {
+
+                return false;
+            }
+
+            final WrappedFragmentContext that = (WrappedFragmentContext) o;
+            final Context referent = mContext.get();
+            return (referent != null) && referent.equals(that.mContext.get());
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = super.hashCode();
+            final Context referent = mContext.get();
+            result = 31 * result + (referent != null ? referent.hashCode() : 0);
+            return result;
         }
 
         @Nullable

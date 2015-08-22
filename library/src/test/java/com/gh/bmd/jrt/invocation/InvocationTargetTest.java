@@ -41,6 +41,18 @@ public class InvocationTargetTest {
     }
 
     @Test
+    public void testClassTargetEquals() {
+
+        final InvocationTarget target = targetClass(TargetClass.class);
+        assertThat(target).isEqualTo(target);
+        assertThat(target).isNotEqualTo("");
+        assertThat(target.hashCode()).isEqualTo(targetClass(TargetClass.class).hashCode());
+        assertThat(target).isEqualTo(targetClass(TargetClass.class));
+        assertThat(target.hashCode()).isNotEqualTo(targetClass(TestClass.class).hashCode());
+        assertThat(target).isNotEqualTo(targetClass(TestClass.class));
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testClassTargetError() {
 
@@ -65,6 +77,19 @@ public class InvocationTargetTest {
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
         assertThat(target.isAssignableTo(String.class)).isFalse();
+    }
+
+    @Test
+    public void testObjectTargetEquals() {
+
+        final TargetClass t = new TargetClass();
+        final InvocationTarget target = targetObject(t);
+        assertThat(target).isEqualTo(target);
+        assertThat(target).isNotEqualTo("");
+        assertThat(target.hashCode()).isEqualTo(targetObject(t).hashCode());
+        assertThat(target).isEqualTo(targetObject(t));
+        assertThat(target.hashCode()).isNotEqualTo(targetObject(new TestClass()).hashCode());
+        assertThat(target).isNotEqualTo(targetObject(new TestClass()));
     }
 
     @Test

@@ -497,8 +497,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
             callbacks = newCallbacks;
         }
 
-        logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheStrategyType);
-        callbacks.setCacheStrategy(mCacheStrategyType);
+        final CacheStrategyType strategyType = mCacheStrategyType;
+        logger.dbg("setting result cache type [%d]: %s", loaderId, strategyType);
+        callbacks.setCacheStrategy(strategyType);
         result.pass(callbacks.newChannel(mLooper));
 
         if ((clashType == ClashType.ABORT_THAT) || isStaleResult) {

@@ -59,7 +59,7 @@ import static com.gh.bmd.jrt.core.RoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
- * Class implementing a builder of routines wrapping an object instance.
+ * Class implementing a builder of routines wrapping an object methods.
  * <p/>
  * Created by davide-maestroni on 4/6/2015.
  */

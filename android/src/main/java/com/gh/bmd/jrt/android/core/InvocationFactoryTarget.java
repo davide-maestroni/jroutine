@@ -1,3 +1,16 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.gh.bmd.jrt.android.core;
 
 import android.os.Parcel;
@@ -7,27 +20,50 @@ import com.gh.bmd.jrt.android.invocation.ContextInvocation;
 import com.gh.bmd.jrt.util.ClassToken;
 import com.gh.bmd.jrt.util.Reflection;
 
+import java.util.Arrays;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.util.ClassToken.tokenOf;
+
 /**
- * // TODO: 20/08/15 javadoc
+ * Class representing a context invocation factory target.
  * <p/>
  * Created by davide-maestroni on 20/08/15.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 public abstract class InvocationFactoryTarget<INPUT, OUTPUT> implements Parcelable {
 
+    /**
+     * Avoid direct instantiation.
+     */
     private InvocationFactoryTarget() {
 
     }
 
+    /**
+     * Returns a target based on the specified invocation class.
+     *
+     * @param targetClass the target invocation class.
+     * @return the invocation factory target.
+     */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactoryTarget<INPUT, OUTPUT> targetInvocation(
             @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> targetClass) {
 
-        return new DefaultInvocationFactoryTarget<INPUT, OUTPUT>(targetClass, null);
+        return targetInvocation(targetClass, (Object[]) null);
     }
 
+    /**
+     * Returns a target based on the specified invocation class.
+     *
+     * @param targetClass the target invocation class.
+     * @param factoryArgs the invocation factory arguments.
+     * @return the invocation factory target.
+     */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactoryTarget<INPUT, OUTPUT> targetInvocation(
             @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> targetClass,
@@ -36,41 +72,60 @@ public abstract class InvocationFactoryTarget<INPUT, OUTPUT> implements Parcelab
         return new DefaultInvocationFactoryTarget<INPUT, OUTPUT>(targetClass, factoryArgs);
     }
 
+    /**
+     * Returns a target based on the specified invocation token.
+     *
+     * @param targetToken the target invocation token.
+     * @return the invocation factory target.
+     */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactoryTarget<INPUT, OUTPUT> targetInvocation(
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> targetToken) {
 
-        return new DefaultInvocationFactoryTarget<INPUT, OUTPUT>(targetToken.getRawClass(), null);
+        return targetInvocation(targetToken.getRawClass());
     }
 
+    /**
+     * Returns a target based on the specified invocation token.
+     *
+     * @param targetToken the target invocation token.
+     * @param factoryArgs the invocation factory arguments.
+     * @return the invocation factory target.
+     */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationFactoryTarget<INPUT, OUTPUT> targetInvocation(
             @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> targetToken,
             @Nullable final Object... factoryArgs) {
 
-        return new DefaultInvocationFactoryTarget<INPUT, OUTPUT>(targetToken.getRawClass(),
-                                                                 factoryArgs);
+        return targetInvocation(targetToken.getRawClass(), factoryArgs);
     }
 
+    /**
+     * Returns a target based on the specified invocation.
+     *
+     * @param targetInvocation the target invocation.
+     * @return the invocation factory target.
+     */
     @Nonnull
-    @SuppressWarnings("unchecked")
     public static <INPUT, OUTPUT> InvocationFactoryTarget<INPUT, OUTPUT> targetInvocation(
             @Nonnull final ContextInvocation<INPUT, OUTPUT> targetInvocation) {
 
-        return new DefaultInvocationFactoryTarget<INPUT, OUTPUT>(
-                (Class<? extends ContextInvocation<INPUT, OUTPUT>>) targetInvocation.getClass(),
-                null);
+        return targetInvocation(tokenOf(targetInvocation));
     }
 
+    /**
+     * Returns a target based on the specified invocation.
+     *
+     * @param targetInvocation the target invocation.
+     * @param factoryArgs      the invocation factory arguments.
+     * @return the invocation factory target.
+     */
     @Nonnull
-    @SuppressWarnings("unchecked")
     public static <INPUT, OUTPUT> InvocationFactoryTarget<INPUT, OUTPUT> targetInvocation(
             @Nonnull final ContextInvocation<INPUT, OUTPUT> targetInvocation,
             @Nullable final Object... factoryArgs) {
 
-        return new DefaultInvocationFactoryTarget<INPUT, OUTPUT>(
-                (Class<? extends ContextInvocation<INPUT, OUTPUT>>) targetInvocation.getClass(),
-                factoryArgs);
+        return targetInvocation(tokenOf(targetInvocation), factoryArgs);
     }
 
     @Nonnull
@@ -84,6 +139,12 @@ public abstract class InvocationFactoryTarget<INPUT, OUTPUT> implements Parcelab
     @Nonnull
     public abstract Class<? extends ContextInvocation<INPUT, OUTPUT>> getInvocationClass();
 
+    /**
+     * Invocation factory target implementation.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
     private static class DefaultInvocationFactoryTarget<INPUT, OUTPUT>
             extends InvocationFactoryTarget<INPUT, OUTPUT> {
 
@@ -110,6 +171,11 @@ public abstract class InvocationFactoryTarget<INPUT, OUTPUT> implements Parcelab
 
         private final Class<? extends ContextInvocation<INPUT, OUTPUT>> mTargetClass;
 
+        /**
+         * Constructor.
+         *
+         * @param source the source parcel.
+         */
         @SuppressWarnings("unchecked")
         private DefaultInvocationFactoryTarget(@Nonnull final Parcel source) {
 
@@ -117,11 +183,16 @@ public abstract class InvocationFactoryTarget<INPUT, OUTPUT> implements Parcelab
                  source.readArray(InvocationFactoryTarget.class.getClassLoader()));
         }
 
+        /**
+         * Constructor.
+         *
+         * @param targetClass the target invocation class.
+         * @param factoryArgs the invocation factory arguments.
+         */
         @SuppressWarnings("ConstantConditions")
         private DefaultInvocationFactoryTarget(
                 @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> targetClass,
                 @Nullable final Object[] factoryArgs) {
-
 
             if (targetClass == null) {
 
@@ -141,6 +212,35 @@ public abstract class InvocationFactoryTarget<INPUT, OUTPUT> implements Parcelab
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            // AUTO-GENERATED CODE
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof DefaultInvocationFactoryTarget)) {
+
+                return false;
+            }
+
+            final DefaultInvocationFactoryTarget<?, ?> that =
+                    (DefaultInvocationFactoryTarget<?, ?>) o;
+            return Arrays.equals(mFactoryArgs, that.mFactoryArgs) && mTargetClass.equals(
+                    that.mTargetClass);
+        }
+
+        @Override
+        public int hashCode() {
+
+            // AUTO-GENERATED CODE
+            int result = Arrays.hashCode(mFactoryArgs);
+            result = 31 * result + mTargetClass.hashCode();
+            return result;
         }
 
         @Nonnull

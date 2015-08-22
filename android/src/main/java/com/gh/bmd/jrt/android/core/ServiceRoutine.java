@@ -107,13 +107,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             throw new IllegalStateException("the service context has been destroyed");
         }
 
-        final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
-                target.getInvocationClass();
         mContext = context;
         mFactoryTarget = target;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
+        final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
+                target.getInvocationClass();
         mRoutine = JRoutine.on(factoryTo(serviceContext.getApplicationContext(),
                                          factoryOf(invocationClass, target.getFactoryArgs())))
                            .invocations()

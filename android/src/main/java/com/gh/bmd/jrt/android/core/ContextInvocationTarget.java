@@ -31,22 +31,51 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.util.Reflection.findConstructor;
 
 /**
- * // TODO: 21/08/15 javadoc
+ * Class representing a context invocation target.
  * <p/>
  * Created by davide-maestroni on 21/08/15.
  */
 public abstract class ContextInvocationTarget implements Parcelable {
 
+    /**
+     * Avoid direct instantiation.
+     */
     private ContextInvocationTarget() {
 
     }
 
+    /**
+     * Returns a target based on the specified class.
+     *
+     * @param targetClass the target class.
+     * @return the context invocation target.
+     */
     @Nonnull
     public static ContextInvocationTarget targetClass(@Nonnull final Class<?> targetClass) {
 
         return new ClassContextInvocationTarget(targetClass);
     }
 
+    /**
+     * Returns a target based on the specified instance.<br/>
+     * No argument will be passed to the object factory.
+     *
+     * @param targetClass the target class.
+     * @return the context invocation target.
+     */
+    @Nonnull
+    public static ContextInvocationTarget targetObject(@Nonnull final Class<?> targetClass) {
+
+        return targetObject(targetClass, (Object[]) null);
+    }
+
+    /**
+     * Returns a target based on the specified instance.
+     *
+     * @param targetClass the target class.
+     * @param factoryArgs the object factory arguments.
+     * @return the context invocation target.
+     */
     @Nonnull
     public static ContextInvocationTarget targetObject(@Nonnull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
@@ -54,12 +83,13 @@ public abstract class ContextInvocationTarget implements Parcelable {
         return new ObjectContextInvocationTarget(targetClass, factoryArgs);
     }
 
-    @Nonnull
-    public static ContextInvocationTarget targetObject(@Nonnull final Class<?> targetClass) {
-
-        return new ObjectContextInvocationTarget(targetClass, null);
-    }
-
+    /**
+     * Returns an invocation target based on the specified context.<br/>
+     * Note that a new instance will be returned each time the method is invoked.
+     *
+     * @param context the target context.
+     * @return the invocation target.
+     */
     @Nonnull
     public abstract InvocationTarget getInvocationTarget(@Nonnull final Context context);
 
@@ -71,6 +101,9 @@ public abstract class ContextInvocationTarget implements Parcelable {
     @Nonnull
     public abstract Class<?> getTargetClass();
 
+    /**
+     * Context invocation target wrapping a class.
+     */
     private static class ClassContextInvocationTarget extends ContextInvocationTarget {
 
         /**
@@ -82,7 +115,8 @@ public abstract class ContextInvocationTarget implements Parcelable {
                     public ClassContextInvocationTarget createFromParcel(
                             @Nonnull final Parcel source) {
 
-                        return new ClassContextInvocationTarget(source);
+                        return new ClassContextInvocationTarget(
+                                (Class<?>) source.readSerializable());
                     }
 
                     @Nonnull
@@ -94,11 +128,11 @@ public abstract class ContextInvocationTarget implements Parcelable {
 
         private final Class<?> mTargetClass;
 
-        private ClassContextInvocationTarget(@Nonnull final Parcel source) {
-
-            this((Class<?>) source.readSerializable());
-        }
-
+        /**
+         * Constructor.
+         *
+         * @param targetClass the target class.
+         */
         @SuppressWarnings("ConstantConditions")
         private ClassContextInvocationTarget(@Nonnull final Class<?> targetClass) {
 
@@ -148,7 +182,6 @@ public abstract class ContextInvocationTarget implements Parcelable {
             return mTargetClass.hashCode();
         }
 
-
         @Nonnull
         @Override
         public Class<?> getTargetClass() {
@@ -162,6 +195,9 @@ public abstract class ContextInvocationTarget implements Parcelable {
         }
     }
 
+    /**
+     * Context invocation target wrapping an object instance.
+     */
     private static class ObjectContextInvocationTarget extends ContextInvocationTarget {
 
         /**
@@ -173,7 +209,9 @@ public abstract class ContextInvocationTarget implements Parcelable {
                     public ObjectContextInvocationTarget createFromParcel(
                             @Nonnull final Parcel source) {
 
-                        return new ObjectContextInvocationTarget(source);
+                        return new ObjectContextInvocationTarget(
+                                (Class<?>) source.readSerializable(),
+                                source.readArray(InvocationFactoryTarget.class.getClassLoader()));
                     }
 
                     @Nonnull
@@ -187,12 +225,12 @@ public abstract class ContextInvocationTarget implements Parcelable {
 
         private final Class<?> mTargetClass;
 
-        private ObjectContextInvocationTarget(@Nonnull final Parcel source) {
-
-            this((Class<?>) source.readSerializable(),
-                 source.readArray(InvocationFactoryTarget.class.getClassLoader()));
-        }
-
+        /**
+         * Constructor.
+         *
+         * @param targetClass the target class.
+         * @param factoryArgs the object factory arguments.
+         */
         @SuppressWarnings("ConstantConditions")
         private ObjectContextInvocationTarget(@Nonnull final Class<?> targetClass,
                 @Nullable final Object[] factoryArgs) {

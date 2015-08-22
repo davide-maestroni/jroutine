@@ -23,7 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
- * calls, bound to a context lifecycle, of their methods.
+ * calls of their methods, bound to a context lifecycle.
  * <p/>
  * The builders returned by this class are based on compile time code generation, enabled by
  * pre-processing of Java annotations.<br/>
@@ -61,6 +61,8 @@ public class JRoutineProxy extends com.gh.bmd.jrt.android.proxy.core.JRoutinePro
     /**
      * Returns a builder of routines bound to the specified context, wrapping the specified target
      * object.<br/>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.<br/>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.gh.bmd.jrt.android.builder.FactoryContext FactoryContext} as the application
      * context.

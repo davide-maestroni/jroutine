@@ -20,7 +20,7 @@ import com.gh.bmd.jrt.builder.ProxyConfiguration;
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining a builder of routines wrapping an object instance.
+ * Interface defining a builder of routines wrapping an object methods.
  * <p/>
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.

@@ -116,7 +116,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             public void onContext(&#64;Nonnull final Context context) {
  *
  *                 super.onContext(context);
- *                 mRoutine = JRoutine.on(serviceFrom(context), factoryOf(LoadResourceUri.class))
+ *                 mRoutine =
+ *                      JRoutine.on(serviceFrom(context), targetInvocation(LoadResourceUri.class))
  *                                    .buildRoutine();
  *             }
  *

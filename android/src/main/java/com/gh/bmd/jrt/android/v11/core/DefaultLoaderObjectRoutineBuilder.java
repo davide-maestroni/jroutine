@@ -59,7 +59,7 @@ import static com.gh.bmd.jrt.core.RoutineBuilders.invokeRoutine;
 import static com.gh.bmd.jrt.util.Reflection.findMethod;
 
 /**
- * Class implementing a builder of routines wrapping an object instance.
+ * Class implementing a builder of routines wrapping an object methods.
  * <p/>
  * Created by davide-maestroni on 4/6/2015.
  */
@@ -529,7 +529,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private Object mMutex;
 
-        private Object mTargetInstance;
+        private InvocationTarget mTarget;
 
         /**
          * Constructor.
@@ -557,11 +557,18 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            final Object targetInstance = mTargetInstance;
+            final InvocationTarget target = mTarget;
+
+            if (target == null) {
+
+                throw new IllegalStateException("such error should never happen");
+            }
+
+            final Object targetInstance = target.getTarget();
 
             if (targetInstance == null) {
 
-                throw new IllegalStateException("such error should never happen");
+                throw new IllegalStateException("the target object has been destroyed");
             }
 
             callFromInvocation(mTargetMethod, mMutex, targetInstance, objects, result, mInputMode,
@@ -586,7 +593,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     mMutex = getSharedMutex(mutexTarget, shareGroup);
                 }
 
-                mTargetInstance = target.getTarget();
+                mTarget = target;
 
             } catch (final Throwable t) {
 

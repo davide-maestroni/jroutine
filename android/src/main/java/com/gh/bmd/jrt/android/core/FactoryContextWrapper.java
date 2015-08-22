@@ -20,7 +20,7 @@ import com.gh.bmd.jrt.android.builder.FactoryContext;
 
 /**
  * Abstract implementation of a context wrapper implementing a factory context.<br/>
- * This class wraps the application context of the specified base context.
+ * The class wraps the application context of the specified base context.
  * <p/>
  * Created by davide-maestroni on 09/07/15.
  */

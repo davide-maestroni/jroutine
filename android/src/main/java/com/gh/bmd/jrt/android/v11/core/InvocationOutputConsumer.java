@@ -264,8 +264,9 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                     lastResults.clear();
                 }
 
-                logger.dbg("invocation is complete: %s", mIsComplete);
-                return mIsComplete;
+                final boolean isComplete = mIsComplete;
+                logger.dbg("invocation is complete: %s", isComplete);
+                return isComplete;
             }
         }
     }

@@ -41,6 +41,7 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Runner;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -291,12 +292,16 @@ public class RoutineService extends Service {
     @Override
     public void onDestroy() {
 
+        final ArrayList<RoutineState> routineStates;
+
         synchronized (mMutex) {
 
-            for (final RoutineState routineState : mRoutineMap.values()) {
+            routineStates = new ArrayList<RoutineState>(mRoutineMap.values());
+        }
 
-                routineState.purge();
-            }
+        for (final RoutineState routineState : routineStates) {
+
+            routineState.mRoutine.purge();
         }
 
         super.onDestroy();
@@ -699,14 +704,6 @@ public class RoutineService extends Service {
 
             ++mInvocationCount;
             return mRoutine.parallelInvoke();
-        }
-
-        /**
-         * Makes the routine purge all the cached invocation instances.
-         */
-        public void purge() {
-
-            mRoutine.purge();
         }
 
         /**

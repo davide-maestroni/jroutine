@@ -77,7 +77,8 @@ class DefaultLoaderChannelBuilder
             throw new IllegalArgumentException("the loader ID must not be generated");
         }
 
-        final Object component = mContext.getComponent();
+        final LoaderContext context = mContext;
+        final Object component = context.getComponent();
 
         if (component == null) {
 
@@ -87,7 +88,7 @@ class DefaultLoaderChannelBuilder
         }
 
         final LoaderRoutineBuilder<Void, OUTPUT> builder =
-                JRoutine.on(mContext, new MissingLoaderInvocation<OUTPUT>(loaderId));
+                JRoutine.on(context, new MissingLoaderInvocation<OUTPUT>(loaderId));
         final InvocationConfiguration invocationConfiguration =
                 mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);

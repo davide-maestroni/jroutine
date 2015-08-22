@@ -110,6 +110,31 @@ public abstract class InvocationTarget {
             return mTargetClass;
         }
 
+        @Override
+        public int hashCode() {
+
+            // AUTO-GENERATED CODE
+            return mTargetClass.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            // AUTO-GENERATED CODE
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ClassInvocationTarget)) {
+
+                return false;
+            }
+
+            final ClassInvocationTarget that = (ClassInvocationTarget) o;
+            return mTargetClass.equals(that.mTargetClass);
+        }
+
         @Nonnull
         @Override
         public Class<?> getTargetClass() {
@@ -142,6 +167,34 @@ public abstract class InvocationTarget {
 
             mTarget = new WeakReference<Object>(target);
             mTargetClass = target.getClass();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ObjectInvocationTarget)) {
+
+                return false;
+            }
+
+            final ObjectInvocationTarget that = (ObjectInvocationTarget) o;
+            final Object referent = mTarget.get();
+            return (referent != null) && referent.equals(that.mTarget.get()) && mTargetClass.equals(
+                    that.mTargetClass);
+        }
+
+        @Override
+        public int hashCode() {
+
+            final Object referent = mTarget.get();
+            int result = (referent != null) ? referent.hashCode() : 0;
+            result = 31 * result + mTargetClass.hashCode();
+            return result;
         }
 
         @Nullable

@@ -772,6 +772,23 @@ public class ObjectRoutineTest {
     }
 
     @Test
+    public void testObjectStaticMethod() {
+
+        final TimeDuration timeout = seconds(1);
+        final TestStatic test = new TestStatic();
+        final Routine<Object, Object> routine = JRoutine.on(targetObject(test))
+                                                        .invocations()
+                                                        .withSyncRunner(Runners.sequentialRunner())
+                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .set()
+                                                        .aliasMethod(TestStatic.GET);
+
+        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void testProxyAnnotations() {
 

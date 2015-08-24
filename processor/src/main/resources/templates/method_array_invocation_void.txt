@@ -31,7 +31,7 @@
 
                 try {
 
-                    ((${classFullName})${invocationTarget}).${targetMethodName}(array);
+                    ${invocationTarget}.${targetMethodName}(array);
 
                 } catch (final Throwable t) {
 

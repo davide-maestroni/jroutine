@@ -35,6 +35,7 @@ import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
@@ -55,6 +56,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.core.ContextInvocationTarget.targetClass;
 import static com.gh.bmd.jrt.android.core.ContextInvocationTarget.targetObject;
 import static com.gh.bmd.jrt.android.core.ServiceContext.serviceFrom;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
@@ -73,6 +75,32 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     public ServiceProxyActivityTest() {
 
         super(TestActivity.class);
+    }
+
+    public void testClassStaticMethod() {
+
+        final TestStatic testStatic =
+                JRoutineProxy.on(serviceFrom(getActivity(), TestService.class),
+                                 targetClass(TestClass.class))
+                             .invocations()
+                             .withSyncRunner(Runners.sequentialRunner())
+                             .withAsyncRunner(Runners.poolRunner())
+                             .withLogLevel(LogLevel.DEBUG)
+                             .withLog(new NullLog())
+                             .set()
+                             .buildProxy(TestStatic.class);
+
+        try {
+
+            assertThat(testStatic.getOne().all()).containsExactly(1);
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
 
     public void testGenericProxyCache() {
@@ -142,6 +170,23 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testObjectStaticMethod() {
+
+        final TestStatic testStatic =
+                JRoutineProxy.on(serviceFrom(getActivity(), TestService.class),
+                                 targetObject(TestClass.class))
+                             .invocations()
+                             .withSyncRunner(Runners.sequentialRunner())
+                             .withAsyncRunner(Runners.poolRunner())
+                             .withLogLevel(LogLevel.DEBUG)
+                             .withLog(new NullLog())
+                             .set()
+                             .buildProxy(TestStatic.class);
+
+        assertThat(testStatic.getOne().all()).containsExactly(1);
+        assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
 
     public void testProxy() {
@@ -1060,6 +1105,18 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
+    @ServiceProxy(TestClass.class)
+    public interface TestStatic {
+
+        @Timeout(300)
+        @Output
+        OutputChannel<Integer> getOne();
+
+        @Timeout(300)
+        @Output
+        OutputChannel<Integer> getTwo();
+    }
+
     @ServiceProxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
@@ -1142,6 +1199,11 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     @SuppressWarnings("unused")
     public static class TestClass implements TestClassInterface {
+
+        public static int getTwo() {
+
+            return 2;
+        }
 
         public List<String> getList(final List<String> list) {
 

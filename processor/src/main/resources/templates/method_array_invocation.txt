@@ -31,7 +31,7 @@
 
                 try {
 
-                    result.pass(((${classFullName})${invocationTarget}).${targetMethodName}(array));
+                    result.pass(${invocationTarget}.${targetMethodName}(array));
 
                 } catch (final Throwable t) {
 

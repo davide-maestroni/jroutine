@@ -18,8 +18,10 @@
 
         private final Object mMutex;
 
+        @SuppressWarnings("unused")
         private final com.gh.bmd.jrt.core.InvocationTarget mTarget;
 
+        @SuppressWarnings("ConstantConditions")
         private Invocation${methodCount}(@javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
                  @javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target) {
 

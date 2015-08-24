@@ -30,7 +30,7 @@
 
                 try {
 
-                    result.pass(((${classFullName})${invocationTarget}).${targetMethodName}(${paramValues}));
+                    result.pass(${invocationTarget}.${targetMethodName}(${paramValues}));
 
                 } catch (final Throwable t) {
 

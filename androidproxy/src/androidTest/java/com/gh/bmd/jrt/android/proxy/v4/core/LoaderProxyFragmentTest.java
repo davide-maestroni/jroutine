@@ -36,6 +36,7 @@ import com.gh.bmd.jrt.channel.AbortException;
 import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
@@ -54,6 +55,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.android.core.ContextInvocationTarget.targetClass;
 import static com.gh.bmd.jrt.android.core.ContextInvocationTarget.targetObject;
 import static com.gh.bmd.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
@@ -72,6 +74,34 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     public LoaderProxyFragmentTest() {
 
         super(TestActivity.class);
+    }
+
+    public void testClassStaticMethod() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final TestStatic testStatic =
+                JRoutineProxy.on(contextFrom(fragment), targetClass(TestClass.class))
+                             .invocations()
+                             .withSyncRunner(Runners.sequentialRunner())
+                             .withAsyncRunner(Runners.poolRunner())
+                             .withLogLevel(LogLevel.DEBUG)
+                             .withLog(new NullLog())
+                             .set()
+                             .buildProxy(TestStatic.class);
+
+        try {
+
+            assertThat(testStatic.getOne().all()).containsExactly(1);
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
 
     public void testGenericProxyCache() {
@@ -149,6 +179,25 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testObjectStaticMethod() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final TestStatic testStatic =
+                JRoutineProxy.on(contextFrom(fragment), targetObject(TestClass.class))
+                             .invocations()
+                             .withSyncRunner(Runners.sequentialRunner())
+                             .withAsyncRunner(Runners.poolRunner())
+                             .withLogLevel(LogLevel.DEBUG)
+                             .withLog(new NullLog())
+                             .set()
+                             .buildProxy(TestStatic.class);
+
+        assertThat(testStatic.getOne().all()).containsExactly(1);
+        assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
 
     public void testProxy() {
@@ -1004,6 +1053,18 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
+    @V4Proxy(TestClass.class)
+    public interface TestStatic {
+
+        @Timeout(300)
+        @Output
+        OutputChannel<Integer> getOne();
+
+        @Timeout(300)
+        @Output
+        OutputChannel<Integer> getTwo();
+    }
+
     @V4Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
@@ -1086,6 +1147,11 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     @SuppressWarnings("unused")
     public static class TestClass implements TestClassInterface {
+
+        public static int getTwo() {
+
+            return 2;
+        }
 
         public List<String> getList(final List<String> list) {
 

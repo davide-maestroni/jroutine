@@ -2073,7 +2073,11 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocation = methodInvocation.replace("${methodCount}", Integer.toString(count));
         methodInvocation = methodInvocation.replace("${genericTypes}", buildGenericTypes(element));
         methodInvocation = methodInvocation.replace("${invocationTarget}",
-                                                    (isStatic) ? "" : "mTarget.getTarget()");
+                                                    (isStatic) ? typeUtils.erasure(
+                                                            targetElement.asType()).toString()
+                                                            : "((" + targetElement.asType()
+                                                                                  .toString()
+                                                                    + ") mTarget.getTarget())");
         methodInvocation =
                 methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
 

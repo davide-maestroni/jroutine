@@ -30,7 +30,7 @@
 
                 try {
 
-                    ((${classFullName})${invocationTarget}).${targetMethodName}(${paramValues});
+                    ${invocationTarget}.${targetMethodName}(${paramValues});
 
                 } catch (final Throwable t) {
 

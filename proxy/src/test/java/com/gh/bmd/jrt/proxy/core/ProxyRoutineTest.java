@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.channel.InvocationChannel;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.TransportChannel;
 import com.gh.bmd.jrt.core.JRoutine;
+import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
@@ -58,6 +59,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.InvocationConfiguration.builder;
+import static com.gh.bmd.jrt.core.InvocationTarget.targetClass;
 import static com.gh.bmd.jrt.core.InvocationTarget.targetObject;
 import static com.gh.bmd.jrt.util.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.util.TimeDuration.seconds;
@@ -95,6 +97,31 @@ public class ProxyRoutineTest {
         assertThat(output1.all()).containsExactly("test1");
         runner.run(Integer.MAX_VALUE);
         assertThat(output2.all()).containsExactly("test2");
+    }
+
+    @Test
+    public void testClassStaticMethod() {
+
+        final TestStatic testStatic = JRoutineProxy.on(targetClass(TestClass.class))
+                                                   .invocations()
+                                                   .withSyncRunner(Runners.sequentialRunner())
+                                                   .withAsyncRunner(Runners.poolRunner())
+                                                   .withLogLevel(LogLevel.DEBUG)
+                                                   .withLog(new NullLog())
+                                                   .set()
+                                                   .buildProxy(TestStatic.class);
+
+        try {
+
+            assertThat(testStatic.getOne().all()).containsExactly(1);
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
 
     @Test
@@ -166,6 +193,23 @@ public class ProxyRoutineTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testObjectStaticMethod() {
+
+        final TestClass test = new TestClass();
+        final TestStatic testStatic = JRoutineProxy.on(targetObject(test))
+                                                   .invocations()
+                                                   .withSyncRunner(Runners.sequentialRunner())
+                                                   .withAsyncRunner(Runners.poolRunner())
+                                                   .withLogLevel(LogLevel.DEBUG)
+                                                   .withLog(new NullLog())
+                                                   .set()
+                                                   .buildProxy(TestStatic.class);
+
+        assertThat(testStatic.getOne().all()).containsExactly(1);
+        assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
 
     @Test
@@ -1092,6 +1136,18 @@ public class ProxyRoutineTest {
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
+    @Proxy(TestClass.class)
+    public interface TestStatic {
+
+        @Timeout(300)
+        @Output
+        OutputChannel<Integer> getOne();
+
+        @Timeout(300)
+        @Output
+        OutputChannel<Integer> getTwo();
+    }
+
     @Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
@@ -1183,6 +1239,11 @@ public class ProxyRoutineTest {
 
     @SuppressWarnings("unused")
     public static class TestClass implements TestClassInterface {
+
+        public static int getTwo() {
+
+            return 2;
+        }
 
         public List<String> getList(final List<String> list) {
 

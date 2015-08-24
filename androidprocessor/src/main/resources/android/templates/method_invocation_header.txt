@@ -22,6 +22,7 @@
 
         private Object mMutex = this;
 
+        @SuppressWarnings("unused")
         private com.gh.bmd.jrt.core.InvocationTarget mTarget;
 
         private ContextInvocation${methodCount}(@javax.annotation.Nullable final String shareGroup,
@@ -32,7 +33,7 @@
         }
 
         @Override
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "ConstantConditions"})
         public void onContext(@javax.annotation.Nonnull final android.content.Context context) {
 
             super.onContext(context);

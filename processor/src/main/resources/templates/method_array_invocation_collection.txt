@@ -33,7 +33,7 @@
 
                     result.orderByCall();
 
-                    for (final ${resultClassName} element : ((${classFullName})${invocationTarget}).${targetMethodName}(array)) {
+                    for (final ${resultClassName} element : ${invocationTarget}.${targetMethodName}(array)) {
 
                         result.pass(element);
                     }

@@ -1056,11 +1056,11 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     @V4Proxy(TestClass.class)
     public interface TestStatic {
 
-        @Timeout(300)
+        @Timeout(3000)
         @Output
         OutputChannel<Integer> getOne();
 
-        @Timeout(300)
+        @Timeout(3000)
         @Output
         OutputChannel<Integer> getTwo();
     }

@@ -47,7 +47,9 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
-     * same as the list ones.
+     * same as the list ones.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the array of input channels.
      * @return the selectable input channel.
@@ -61,7 +63,9 @@ public class Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one.
+     * Combines the specified channels into a selectable one.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of input channels.
@@ -97,7 +101,9 @@ public class Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one.
+     * Combines the specified channels into a selectable one.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of input channels.
@@ -132,7 +138,9 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
-     * same as the list ones.
+     * same as the list ones.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the list of input channels.
      * @return the selectable input channel.
@@ -146,7 +154,9 @@ public class Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one.
+     * Combines the specified channels into a selectable one.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the map of indexes and input channels.
      * @return the selectable input channel.
@@ -180,7 +190,9 @@ public class Channels {
 
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data exceeds the number of channels, the invocation will be aborted.
+     * of data exceeds the number of channels, the invocation will be aborted.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the array of channels.
      * @return the input channel.
@@ -194,7 +206,9 @@ public class Channels {
 
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data exceeds the number of channels, the invocation will be aborted.
+     * of data exceeds the number of channels, the invocation will be aborted.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the list of channels.
      * @return the input channel.
@@ -211,7 +225,9 @@ public class Channels {
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
      * null objects. While, if the list of data exceeds the number of channels, the invocation will
-     * be aborted.
+     * be aborted.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the array of channels.
      * @return the input channel.
@@ -228,7 +244,9 @@ public class Channels {
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
      * null objects. While, if the list of data exceeds the number of channels, the invocation will
-     * be aborted.
+     * be aborted.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the list of channels.
      * @return the input channel.
@@ -317,6 +335,9 @@ public class Channels {
 
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
+     * <br/>
+     * Note that the returned channels must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the collection of indexes.
@@ -343,6 +364,9 @@ public class Channels {
 
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
+     * <br/>
+     * Note that the returned channels must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
@@ -369,6 +393,9 @@ public class Channels {
 
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
+     * <br/>
+     * Note that the returned channels must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -630,7 +657,9 @@ public class Channels {
     }
 
     /**
-     * Returns a new channel transforming the input data into selectable ones.
+     * Returns a new channel transforming the input data into selectable ones.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
@@ -682,7 +711,9 @@ public class Channels {
 
     /**
      * Returns a new selectable channel feeding the specified one.<br/>
-     * Each output will be filtered based on the specified index.
+     * Each output will be filtered based on the specified index.<br/>
+     * Note that the returned channel must be closed in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.

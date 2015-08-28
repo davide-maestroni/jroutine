@@ -76,7 +76,7 @@ public class PriorityRunner {
 
     private final Runner mRunner;
 
-    private final WeakHashMap<QueuingRunner, Void> mRunnerMap =
+    private final WeakHashMap<QueuingRunner, Void> mRunners =
             new WeakHashMap<QueuingRunner, Void>();
 
     /**
@@ -133,11 +133,11 @@ public class PriorityRunner {
     @Nonnull
     public Runner getRunner(final int priority) {
 
-        synchronized (mRunnerMap) {
+        synchronized (mRunners) {
 
-            final WeakHashMap<QueuingRunner, Void> runnerMap = mRunnerMap;
+            final WeakHashMap<QueuingRunner, Void> runners = mRunners;
 
-            for (final QueuingRunner runner : runnerMap.keySet()) {
+            for (final QueuingRunner runner : runners.keySet()) {
 
                 if (runner.mPriority == priority) {
 
@@ -146,7 +146,7 @@ public class PriorityRunner {
             }
 
             final QueuingRunner runner = new QueuingRunner(priority);
-            runnerMap.put(runner, null);
+            runners.put(runner, null);
             return runner;
         }
     }

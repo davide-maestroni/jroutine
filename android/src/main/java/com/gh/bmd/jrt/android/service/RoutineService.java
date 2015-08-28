@@ -89,14 +89,14 @@ public class RoutineService extends Service {
 
     private final Messenger mInMessenger = new Messenger(new IncomingHandler(this));
 
-    private final HashMap<String, RoutineInvocation> mInvocationMap =
+    private final HashMap<String, RoutineInvocation> mInvocations =
             new HashMap<String, RoutineInvocation>();
 
     private final Logger mLogger;
 
     private final Object mMutex = new Object();
 
-    private final HashMap<RoutineInfo, RoutineState> mRoutineMap =
+    private final HashMap<RoutineInfo, RoutineState> mRoutines =
             new HashMap<RoutineInfo, RoutineState>();
 
     /**
@@ -296,7 +296,7 @@ public class RoutineService extends Service {
 
         synchronized (mMutex) {
 
-            routineStates = new ArrayList<RoutineState>(mRoutineMap.values());
+            routineStates = new ArrayList<RoutineState>(mRoutines.values());
         }
 
         for (final RoutineState routineState : routineStates) {
@@ -337,7 +337,7 @@ public class RoutineService extends Service {
 
         synchronized (mMutex) {
 
-            final RoutineInvocation invocation = mInvocationMap.get(invocationId);
+            final RoutineInvocation invocation = mInvocations.get(invocationId);
 
             if (invocation == null) {
 
@@ -384,9 +384,9 @@ public class RoutineService extends Service {
 
         synchronized (mMutex) {
 
-            final HashMap<String, RoutineInvocation> invocationMap = mInvocationMap;
+            final HashMap<String, RoutineInvocation> invocations = mInvocations;
 
-            if (invocationMap.containsKey(invocationId)) {
+            if (invocations.containsKey(invocationId)) {
 
                 mLogger.err("an invocation with the same ID is already running: %d", invocationId);
                 throw new IllegalArgumentException(
@@ -406,8 +406,8 @@ public class RoutineService extends Service {
                                                             factoryTarget.getFactoryArgs(),
                                                             outputOrderType, runnerClass, logClass,
                                                             logLevel);
-            final HashMap<RoutineInfo, RoutineState> routineMap = mRoutineMap;
-            RoutineState routineState = routineMap.get(routineInfo);
+            final HashMap<RoutineInfo, RoutineState> routines = mRoutines;
+            RoutineState routineState = routines.get(routineInfo);
 
             if (routineState == null) {
 
@@ -448,7 +448,7 @@ public class RoutineService extends Service {
                 final SyncContextRoutine syncContextRoutine =
                         new SyncContextRoutine(this, builder.set(), factory);
                 routineState = new RoutineState(syncContextRoutine);
-                routineMap.put(routineInfo, routineState);
+                routines.put(routineInfo, routineState);
             }
 
             final boolean isParallel = data.getBoolean(KEY_PARALLEL_INVOCATION);
@@ -456,7 +456,7 @@ public class RoutineService extends Service {
                     (isParallel) ? routineState.parallelInvoke() : routineState.asyncInvoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
-            invocationMap.put(invocationId, routineInvocation);
+            invocations.put(invocationId, routineInvocation);
         }
     }
 
@@ -550,7 +550,7 @@ public class RoutineService extends Service {
                             synchronized (service.mMutex) {
 
                                 final RoutineInvocation invocation =
-                                        service.mInvocationMap.get(invocationId);
+                                        service.mInvocations.get(invocationId);
 
                                 if (invocation != null) {
 
@@ -899,11 +899,11 @@ public class RoutineService extends Service {
 
             synchronized (mMutex) {
 
-                mInvocationMap.remove(mId);
+                mInvocations.remove(mId);
 
                 if (mRoutineState.releaseInvocation() <= 0) {
 
-                    mRoutineMap.remove(mRoutineInfo);
+                    mRoutines.remove(mRoutineInfo);
                 }
             }
         }

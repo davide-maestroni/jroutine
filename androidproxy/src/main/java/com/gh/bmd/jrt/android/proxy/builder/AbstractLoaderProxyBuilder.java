@@ -39,7 +39,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
         LoaderConfiguration.Configurable<LoaderProxyBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
-            sContextProxyMap =
+            sContextProxies =
             new WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
     private InvocationConfiguration mInvocationConfiguration =
@@ -52,7 +52,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     @Nonnull
     public TYPE buildProxy() {
 
-        synchronized (sContextProxyMap) {
+        synchronized (sContextProxies) {
 
             final Object context = getInvocationContext();
 
@@ -62,13 +62,13 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
             }
 
             final WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
-                    contextProxyMap = sContextProxyMap;
-            HashMap<Class<?>, HashMap<ProxyInfo, Object>> proxyMap = contextProxyMap.get(context);
+                    contextProxies = sContextProxies;
+            HashMap<Class<?>, HashMap<ProxyInfo, Object>> proxyMap = contextProxies.get(context);
 
             if (proxyMap == null) {
 
                 proxyMap = new HashMap<Class<?>, HashMap<ProxyInfo, Object>>();
-                contextProxyMap.put(context, proxyMap);
+                contextProxies.put(context, proxyMap);
             }
 
             final Class<?> targetClass = getTargetClass();

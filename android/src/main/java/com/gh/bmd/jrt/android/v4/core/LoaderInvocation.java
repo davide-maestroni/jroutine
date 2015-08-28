@@ -66,7 +66,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
 
     private static final WeakIdentityHashMap<Object,
             SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
-            sCallbackMap =
+            sCallbacks =
             new WeakIdentityHashMap<Object,
                     SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>();
 
@@ -141,7 +141,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
-                callbackMap = sCallbackMap;
+                callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
@@ -202,7 +202,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
-                callbackMap = sCallbackMap;
+                callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
@@ -270,7 +270,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
-                callbackMap = sCallbackMap;
+                callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
@@ -331,7 +331,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
-                callbackMap = sCallbackMap;
+                callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 
@@ -434,7 +434,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends FunctionInvocation<INPUT, OUTPUT> 
         final ClashType clashType = getClashType(loader, loaderId, inputs);
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
-                callbackMap = sCallbackMap;
+                callbackMap = sCallbacks;
         SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
 

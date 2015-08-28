@@ -57,7 +57,7 @@ class DefaultObjectRoutineBuilder
         ProxyConfiguration.Configurable<ObjectRoutineBuilder> {
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
-            sRoutineCache = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
+            sRoutines = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
 
     private final InvocationTarget mTarget;
 
@@ -191,16 +191,16 @@ class DefaultObjectRoutineBuilder
             throw new IllegalStateException("the target object has been destroyed");
         }
 
-        synchronized (sRoutineCache) {
+        synchronized (sRoutines) {
 
-            final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>> routineCache =
-                    sRoutineCache;
-            HashMap<RoutineInfo, Routine<?, ?>> routineMap = routineCache.get(targetInstance);
+            final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>> routines =
+                    sRoutines;
+            HashMap<RoutineInfo, Routine<?, ?>> routineMap = routines.get(targetInstance);
 
             if (routineMap == null) {
 
                 routineMap = new HashMap<RoutineInfo, Routine<?, ?>>();
-                routineCache.put(targetInstance, routineMap);
+                routines.put(targetInstance, routineMap);
             }
 
             final RoutineInfo routineInfo =

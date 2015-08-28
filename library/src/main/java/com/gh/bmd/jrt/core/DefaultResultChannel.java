@@ -68,7 +68,7 @@ import static com.gh.bmd.jrt.util.TimeDuration.fromUnit;
  */
 class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
-    private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sMutexMap =
+    private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sConsumerMutexes =
             new WeakIdentityHashMap<OutputConsumer<?>, Object>();
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
@@ -170,15 +170,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Nonnull
     private static Object getMutex(@Nonnull final OutputConsumer<?> consumer) {
 
-        synchronized (sMutexMap) {
+        synchronized (sConsumerMutexes) {
 
-            final WeakIdentityHashMap<OutputConsumer<?>, Object> mutexMap = sMutexMap;
-            Object mutex = mutexMap.get(consumer);
+            final WeakIdentityHashMap<OutputConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
+            Object mutex = consumerMutexes.get(consumer);
 
             if (mutex == null) {
 
                 mutex = new Object();
-                mutexMap.put(consumer, mutex);
+                consumerMutexes.put(consumer, mutex);
             }
 
             return mutex;

@@ -47,7 +47,7 @@ public class PriorityRunner {
     private static final PriorityExecutionComparator PRIORITY_EXECUTION_COMPARATOR =
             new PriorityExecutionComparator();
 
-    private static final WeakIdentityHashMap<Runner, PriorityRunner> sRunnerMap =
+    private static final WeakIdentityHashMap<Runner, PriorityRunner> sRunners =
             new WeakIdentityHashMap<Runner, PriorityRunner>();
 
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
@@ -104,15 +104,15 @@ public class PriorityRunner {
             return ((QueuingRunner) wrapped).enclosingRunner();
         }
 
-        synchronized (sRunnerMap) {
+        synchronized (sRunners) {
 
-            final WeakIdentityHashMap<Runner, PriorityRunner> runnerMap = sRunnerMap;
-            PriorityRunner runner = runnerMap.get(wrapped);
+            final WeakIdentityHashMap<Runner, PriorityRunner> runners = sRunners;
+            PriorityRunner runner = runners.get(wrapped);
 
             if (runner == null) {
 
                 runner = new PriorityRunner(wrapped);
-                runnerMap.put(wrapped, runner);
+                runners.put(wrapped, runner);
             }
 
             return runner;

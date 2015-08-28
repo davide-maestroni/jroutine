@@ -41,7 +41,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
         ServiceConfiguration.Configurable<ServiceProxyBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
-            sContextProxyMap =
+            sContextProxies =
             new WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
     private InvocationConfiguration mInvocationConfiguration =
@@ -54,7 +54,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     @Nonnull
     public TYPE buildProxy() {
 
-        synchronized (sContextProxyMap) {
+        synchronized (sContextProxies) {
 
             final Context context = getInvocationContext();
 
@@ -64,13 +64,13 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
             }
 
             final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
-                    contextProxyMap = sContextProxyMap;
-            HashMap<Class<?>, HashMap<ProxyInfo, Object>> proxyMap = contextProxyMap.get(context);
+                    contextProxies = sContextProxies;
+            HashMap<Class<?>, HashMap<ProxyInfo, Object>> proxyMap = contextProxies.get(context);
 
             if (proxyMap == null) {
 
                 proxyMap = new HashMap<Class<?>, HashMap<ProxyInfo, Object>>();
-                contextProxyMap.put(context, proxyMap);
+                contextProxies.put(context, proxyMap);
             }
 
             final Class<?> targetClass = getTargetClass();

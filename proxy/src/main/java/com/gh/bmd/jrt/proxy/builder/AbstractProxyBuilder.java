@@ -35,7 +35,7 @@ public abstract class AbstractProxyBuilder<TYPE>
         implements ProxyBuilder<TYPE>, InvocationConfiguration.Configurable<ProxyBuilder<TYPE>>,
         ProxyConfiguration.Configurable<ProxyBuilder<TYPE>> {
 
-    private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
+    private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sProxies =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
     private InvocationConfiguration mInvocationConfiguration =
@@ -48,15 +48,15 @@ public abstract class AbstractProxyBuilder<TYPE>
 
         final Object target = getTarget();
 
-        synchronized (sClassMap) {
+        synchronized (sProxies) {
 
-            final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
-            HashMap<ClassInfo, Object> classes = classMap.get(target);
+            final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> proxies = sProxies;
+            HashMap<ClassInfo, Object> proxyMap = proxies.get(target);
 
-            if (classes == null) {
+            if (proxyMap == null) {
 
-                classes = new HashMap<ClassInfo, Object>();
-                classMap.put(target, classes);
+                proxyMap = new HashMap<ClassInfo, Object>();
+                proxies.put(target, proxyMap);
             }
 
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
@@ -64,7 +64,7 @@ public abstract class AbstractProxyBuilder<TYPE>
             final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo =
                     new ClassInfo(token, invocationConfiguration, proxyConfiguration);
-            final Object instance = classes.get(classInfo);
+            final Object instance = proxyMap.get(classInfo);
 
             if (instance != null) {
 
@@ -74,7 +74,7 @@ public abstract class AbstractProxyBuilder<TYPE>
             try {
 
                 final TYPE newInstance = newProxy(invocationConfiguration, proxyConfiguration);
-                classes.put(classInfo, newInstance);
+                proxyMap.put(classInfo, newInstance);
                 return newInstance;
 
             } catch (final Throwable t) {

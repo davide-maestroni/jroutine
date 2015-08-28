@@ -58,13 +58,13 @@ import static com.gh.bmd.jrt.util.Reflection.makeAccessible;
  */
 public class RoutineBuilders {
 
-    private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasCache =
+    private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasMethods =
             new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
 
-    private static final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> sMethodCache =
+    private static final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> sMethods =
             new WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>>();
 
-    private static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexCache =
+    private static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexes =
             new WeakIdentityHashMap<Object, Map<String, Object>>();
 
     /**
@@ -251,15 +251,13 @@ public class RoutineBuilders {
      *                                            found.
      */
     @Nullable
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public static Method getAnnotatedMethod(@Nonnull final String name,
             @Nonnull final Class<?> targetClass) {
 
-        final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasCache = sAliasCache;
+        synchronized (sAliasMethods) {
 
-        synchronized (aliasCache) {
-
-            Map<String, Method> methodMap = aliasCache.get(targetClass);
+            final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasMethods = sAliasMethods;
+            Map<String, Method> methodMap = aliasMethods.get(targetClass);
 
             if (methodMap == null) {
 
@@ -278,7 +276,7 @@ public class RoutineBuilders {
                     }
                 }
 
-                aliasCache.put(targetClass, methodMap);
+                aliasMethods.put(targetClass, methodMap);
             }
 
             return methodMap.get(name);
@@ -557,9 +555,9 @@ public class RoutineBuilders {
     public static Object getSharedMutex(@Nonnull final Object target,
             @Nullable final String shareGroup) {
 
-        synchronized (sMutexCache) {
+        synchronized (sMutexes) {
 
-            final WeakIdentityHashMap<Object, Map<String, Object>> mutexCache = sMutexCache;
+            final WeakIdentityHashMap<Object, Map<String, Object>> mutexCache = sMutexes;
             Map<String, Object> mutexMap = mutexCache.get(target);
 
             if (mutexMap == null) {
@@ -595,9 +593,9 @@ public class RoutineBuilders {
 
         MethodInfo methodInfo;
 
-        synchronized (sMethodCache) {
+        synchronized (sMethods) {
 
-            final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> methodCache = sMethodCache;
+            final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> methodCache = sMethods;
             Map<Method, MethodInfo> methodMap = methodCache.get(targetClass);
 
             if (methodMap == null) {

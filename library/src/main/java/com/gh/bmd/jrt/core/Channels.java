@@ -46,6 +46,52 @@ public class Channels {
     }
 
     /**
+     * Returns a new recyclable channel.
+     *
+     * @return the recyclable channel.
+     */
+    @Nonnull
+    public static RecyclerByteChannel byteChannel() {
+
+        return new RecyclerByteChannel(RecyclerByteChannel.DEFAULT_BUFFER_SIZE,
+                                       RecyclerByteChannel.DEFAULT_POOL_SIZE);
+    }
+
+    /**
+     * Returns a new recyclable byte channel.
+     *
+     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
+     *                       routine channels.
+     * @return the recyclable channel.
+     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
+     */
+    @Nonnull
+    public static RecyclerByteChannel byteChannel(final int dataBufferSize) {
+
+        final int poolSize =
+                (RecyclerByteChannel.DEFAULT_POOL_SIZE * RecyclerByteChannel.DEFAULT_BUFFER_SIZE)
+                        / dataBufferSize;
+        return new RecyclerByteChannel(dataBufferSize, poolSize);
+    }
+
+    /**
+     * Returns a new recyclable byte channel.
+     *
+     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
+     *                       routine channels.
+     * @param corePoolSize   the maximum number of data retained in the pool. Additional data
+     *                       created to fulfill the bytes requirement will be discarded.
+     * @return the recyclable channel.
+     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
+     */
+    @Nonnull
+    public static RecyclerByteChannel byteChannel(final int dataBufferSize,
+            final int corePoolSize) {
+
+        return new RecyclerByteChannel(dataBufferSize, corePoolSize);
+    }
+
+    /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
      * same as the list ones.<br/>
      * Note that the returned channel must be closed in order to ensure the completion of the
@@ -1355,22 +1401,22 @@ public class Channels {
      */
     private static class SortingInputMapConsumer implements OutputConsumer<Selectable<?>> {
 
-        private final HashMap<Integer, TransportChannel<?>> mChannelMap;
+        private final HashMap<Integer, TransportChannel<?>> mChannels;
 
         /**
          * Constructor.
          *
-         * @param channelMap the map of indexes and input channels.
+         * @param channels the map of indexes and input channels.
          */
         private SortingInputMapConsumer(
-                @Nonnull final HashMap<Integer, TransportChannel<?>> channelMap) {
+                @Nonnull final HashMap<Integer, TransportChannel<?>> channels) {
 
-            mChannelMap = channelMap;
+            mChannels = channels;
         }
 
         public void onComplete() {
 
-            for (final TransportChannel<?> inputChannel : mChannelMap.values()) {
+            for (final TransportChannel<?> inputChannel : mChannels.values()) {
 
                 inputChannel.close();
             }
@@ -1378,7 +1424,7 @@ public class Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            for (final TransportChannel<?> inputChannel : mChannelMap.values()) {
+            for (final TransportChannel<?> inputChannel : mChannels.values()) {
 
                 inputChannel.abort(error);
             }
@@ -1388,7 +1434,7 @@ public class Channels {
         public void onOutput(final Selectable<?> selectable) {
 
             final TransportChannel<Object> inputChannel =
-                    (TransportChannel<Object>) mChannelMap.get(selectable.index);
+                    (TransportChannel<Object>) mChannels.get(selectable.index);
 
             if (inputChannel != null) {
 
@@ -1405,22 +1451,22 @@ public class Channels {
     private static class SortingOutputConsumer<OUTPUT>
             implements OutputConsumer<Selectable<? extends OUTPUT>> {
 
-        private final HashMap<Integer, TransportChannel<OUTPUT>> mChannelMap;
+        private final HashMap<Integer, TransportChannel<OUTPUT>> mChannels;
 
         /**
          * Constructor.
          *
-         * @param channelMap the map of indexes and transport channels.
+         * @param channels the map of indexes and transport channels.
          */
         private SortingOutputConsumer(
-                @Nonnull final HashMap<Integer, TransportChannel<OUTPUT>> channelMap) {
+                @Nonnull final HashMap<Integer, TransportChannel<OUTPUT>> channels) {
 
-            mChannelMap = channelMap;
+            mChannels = channels;
         }
 
         public void onComplete() {
 
-            for (final TransportChannel<OUTPUT> channel : mChannelMap.values()) {
+            for (final TransportChannel<OUTPUT> channel : mChannels.values()) {
 
                 channel.close();
             }
@@ -1428,7 +1474,7 @@ public class Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            for (final TransportChannel<OUTPUT> channel : mChannelMap.values()) {
+            for (final TransportChannel<OUTPUT> channel : mChannels.values()) {
 
                 channel.abort(error);
             }
@@ -1436,7 +1482,7 @@ public class Channels {
 
         public void onOutput(final Selectable<? extends OUTPUT> selectable) {
 
-            final TransportChannel<OUTPUT> channel = mChannelMap.get(selectable.index);
+            final TransportChannel<OUTPUT> channel = mChannels.get(selectable.index);
 
             if (channel != null) {
 

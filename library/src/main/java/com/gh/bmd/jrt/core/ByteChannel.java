@@ -610,22 +610,6 @@ public class ByteChannel {
             mState = updated;
         }
 
-        private byte[] getBuffer() {
-
-            synchronized (mMutex) {
-
-                final BufferState state = mState;
-
-                if (state != BufferState.READ) {
-
-                    throw new IllegalStateException(
-                            "attempting to read from buffer while in illegal state: " + state);
-                }
-            }
-
-            return mBuffer;
-        }
-
         private int getSize() {
 
             synchronized (mMutex) {
@@ -658,6 +642,22 @@ public class ByteChannel {
             return this;
         }
 
+        private byte[] readBuffer() {
+
+            synchronized (mMutex) {
+
+                final BufferState state = mState;
+
+                if (state != BufferState.READ) {
+
+                    throw new IllegalStateException(
+                            "attempting to read buffer data while in illegal state: " + state);
+                }
+            }
+
+            return mBuffer;
+        }
+
         private void recycle() {
 
             synchronized (mMutex) {
@@ -680,6 +680,22 @@ public class ByteChannel {
             }
 
             return this;
+        }
+
+        private byte[] writeBuffer() {
+
+            synchronized (mMutex) {
+
+                final BufferState state = mState;
+
+                if (state != BufferState.WRITE) {
+
+                    throw new IllegalStateException(
+                            "attempting to write buffer data while in illegal state: " + state);
+                }
+            }
+
+            return mBuffer;
         }
     }
 
@@ -723,8 +739,7 @@ public class ByteChannel {
                 }
 
                 final int count = size - offset;
-                // TODO: 27/08/15 inside mutex
-                out.write(buffer.getBuffer(), offset, count);
+                out.write(buffer.readBuffer(), offset, count);
                 mOffset = size;
                 return count;
             }
@@ -752,7 +767,7 @@ public class ByteChannel {
                 }
 
                 final int count = Math.min(len, size - offset);
-                System.arraycopy(buffer.getBuffer(), offset, b, 0, count);
+                System.arraycopy(buffer.readBuffer(), offset, b, 0, count);
                 mOffset += count;
                 return count;
             }
@@ -787,7 +802,7 @@ public class ByteChannel {
                 }
 
                 final int count = Math.min(len, size - offset);
-                System.arraycopy(buffer.getBuffer(), offset, b, off, count);
+                System.arraycopy(buffer.readBuffer(), offset, b, off, count);
                 mOffset += count;
                 return count;
             }
@@ -856,7 +871,7 @@ public class ByteChannel {
                     return -1;
                 }
 
-                return buffer.getBuffer()[mOffset++];
+                return buffer.readBuffer()[mOffset++];
             }
         }
 
@@ -885,7 +900,7 @@ public class ByteChannel {
 
         private final Object mMutex = new Object();
 
-        private ByteBuffer mByteBuffer;
+        private ByteBuffer mBuffer;
 
         private boolean mIsClosed;
 
@@ -932,10 +947,9 @@ public class ByteChannel {
                 }
 
                 byteBuffer = getBuffer();
-                final byte[] buffer = byteBuffer.mBuffer;
+                final byte[] buffer = byteBuffer.writeBuffer();
                 final int length = buffer.length;
                 final int offset = mOffset;
-                // TODO: 26/08/15 inside mutex
                 read = in.read(buffer, offset, length - offset);
                 mOffset += read;
                 size = mOffset;
@@ -944,7 +958,7 @@ public class ByteChannel {
                 if (isPass) {
 
                     mOffset = 0;
-                    mByteBuffer = null;
+                    mBuffer = null;
                 }
             }
 
@@ -973,7 +987,7 @@ public class ByteChannel {
 
                 byteBuffer = getBuffer();
                 mOffset = 0;
-                mByteBuffer = null;
+                mBuffer = null;
             }
 
             mChannel.pass(byteBuffer.lock(size));
@@ -1010,7 +1024,7 @@ public class ByteChannel {
                 }
 
                 byteBuffer = getBuffer();
-                final byte[] buffer = byteBuffer.mBuffer;
+                final byte[] buffer = byteBuffer.writeBuffer();
                 buffer[mOffset++] = (byte) b;
                 size = mOffset;
                 isPass = (size >= buffer.length);
@@ -1018,7 +1032,7 @@ public class ByteChannel {
                 if (isPass) {
 
                     mOffset = 0;
-                    mByteBuffer = null;
+                    mBuffer = null;
                 }
             }
 
@@ -1054,7 +1068,7 @@ public class ByteChannel {
                     }
 
                     byteBuffer = getBuffer();
-                    final byte[] buffer = byteBuffer.mBuffer;
+                    final byte[] buffer = byteBuffer.writeBuffer();
                     final int length = buffer.length;
                     final int offset = mOffset;
                     final int count = Math.min(len - written, length - offset);
@@ -1067,7 +1081,7 @@ public class ByteChannel {
                     if (isPass) {
 
                         mOffset = 0;
-                        mByteBuffer = null;
+                        mBuffer = null;
                     }
                 }
 
@@ -1113,7 +1127,7 @@ public class ByteChannel {
                     }
 
                     byteBuffer = getBuffer();
-                    final byte[] buffer = byteBuffer.mBuffer;
+                    final byte[] buffer = byteBuffer.writeBuffer();
                     final int length = buffer.length;
                     final int offset = mOffset;
                     final int count = Math.min(len - written, length - offset);
@@ -1126,7 +1140,7 @@ public class ByteChannel {
                     if (isPass) {
 
                         mOffset = 0;
-                        mByteBuffer = null;
+                        mBuffer = null;
                     }
                 }
 
@@ -1141,14 +1155,14 @@ public class ByteChannel {
         @Nonnull
         private ByteBuffer getBuffer() {
 
-            final ByteBuffer byteBuffer = mByteBuffer;
+            final ByteBuffer byteBuffer = mBuffer;
 
             if (byteBuffer != null) {
 
                 return byteBuffer;
             }
 
-            return (mByteBuffer = acquire());
+            return (mBuffer = acquire());
         }
     }
 }

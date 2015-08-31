@@ -44,21 +44,25 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
     }
 
     /**
-     * Returns a factory of delegating invocations.
+     * Returns a factory of delegating invocations.<br/>
+     * Note that the specified identifier will be used to detect clashing of invocations (see
+     * {@link com.gh.bmd.jrt.android.v11.core.JRoutine} and
+     * {@link com.gh.bmd.jrt.android.v4.core.JRoutine}).
      *
      * @param routine        the routine used to execute this invocation.
+     * @param routineId      the routine identifier.
      * @param delegationType the type of routine invocation.
-     * @param tags           the objects used to uniquely identify the routine.
      * @param <INPUT>        the input data type.
      * @param <OUTPUT>       the output data type.
      * @return the factory.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryFrom(
-            @Nonnull final Routine<INPUT, OUTPUT> routine,
-            @Nonnull final DelegationType delegationType, @Nonnull final Object... tags) {
+            @Nonnull final Routine<INPUT, OUTPUT> routine, final int routineId,
+            @Nonnull final DelegationType delegationType) {
 
-        return new DelegatingContextInvocationFactory<INPUT, OUTPUT>(routine, delegationType, tags);
+        return new DelegatingContextInvocationFactory<INPUT, OUTPUT>(routine, routineId,
+                                                                     delegationType);
     }
 
     public void onContext(@Nonnull final Context context) {
@@ -82,14 +86,14 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
          * Constructor.
          *
          * @param routine        the delegated routine.
+         * @param routineId      the routine identifier.
          * @param delegationType the type of routine invocation.
-         * @param tags           the routine tags.
          */
         @SuppressWarnings("ConstantConditions")
         private DelegatingContextInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine,
-                @Nonnull final DelegationType delegationType, @Nonnull final Object[] tags) {
+                final int routineId, @Nonnull final DelegationType delegationType) {
 
-            super(delegationType, tags);
+            super(routineId, delegationType);
 
             if (routine == null) {
 
@@ -99,11 +103,6 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
             if (delegationType == null) {
 
                 throw new NullPointerException("the invocation type must not be null");
-            }
-
-            if ((tags == null) || (tags.length == 0)) {
-
-                throw new NullPointerException("the routine tag must not be empty");
             }
 
             mRoutine = routine;

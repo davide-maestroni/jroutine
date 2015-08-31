@@ -18,14 +18,14 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    private final com.gh.bmd.jrt.android.v4.core.LoaderContext mContext;
+    private final com.github.dm.jrt.android.v4.core.LoaderContext mContext;
 
     @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v4.core.LoaderContext context,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
+    public ${generatedClassName}(@javax.annotation.Nonnull final com.github.dm.jrt.android.v4.core.LoaderContext context,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
         if (context == null) {
 
@@ -43,32 +43,32 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v4.core.LoaderContext context,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
+    public static ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.v4.core.LoaderContext context,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
 
         return new LoaderProxyBuilder${genericTypes}(context, target);
     }
 
     @javax.annotation.Nonnull
-    private static <OUTPUT> com.gh.bmd.jrt.android.builder.LoaderRoutineBuilder<Object, OUTPUT> getBuilder(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.v4.core.LoaderContext context,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, OUTPUT> factory) {
+    private static <OUTPUT> com.github.dm.jrt.android.builder.LoaderRoutineBuilder<Object, OUTPUT> getBuilder(
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.v4.core.LoaderContext context,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.invocation.ContextInvocationFactory<Object, OUTPUT> factory) {
 
-        return com.gh.bmd.jrt.android.v4.core.JRoutine.on(context, factory);
+        return com.github.dm.jrt.android.v4.core.JRoutine.on(context, factory);
     }
 
-    private static class LoaderProxyBuilder${genericTypes} extends com.gh.bmd.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {
+    private static class LoaderProxyBuilder${genericTypes} extends com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {
 
-        private final com.gh.bmd.jrt.android.v4.core.LoaderContext mContext;
+        private final com.github.dm.jrt.android.v4.core.LoaderContext mContext;
 
-        private final com.gh.bmd.jrt.android.core.ContextInvocationTarget mTarget;
+        private final com.github.dm.jrt.android.core.ContextInvocationTarget mTarget;
 
-        private final com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}>() {};
+        private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
-        private LoaderProxyBuilder(@javax.annotation.Nonnull final com.gh.bmd.jrt.android.v4.core.LoaderContext context,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
+        private LoaderProxyBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.android.v4.core.LoaderContext context,
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
 
             if (context == null) {
 
@@ -86,7 +86,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         @Override
         @javax.annotation.Nonnull
-        protected com.gh.bmd.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
+        protected com.github.dm.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }
@@ -108,9 +108,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @Override
         @javax.annotation.Nonnull
         protected ${interfaceFullName} newProxy(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+                @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
             return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, proxyConfiguration, loaderConfiguration);
         }

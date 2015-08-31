@@ -14,17 +14,17 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
+    private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class InvocationFactory${methodCount}${genericTypes} extends com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
+    private static class InvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
 
-        private final com.gh.bmd.jrt.builder.ProxyConfiguration mProxyConfiguration;
+        private final com.github.dm.jrt.builder.ProxyConfiguration mProxyConfiguration;
 
-        private final com.gh.bmd.jrt.core.InvocationTarget mTarget;
+        private final com.github.dm.jrt.core.InvocationTarget mTarget;
 
         private InvocationFactory${methodCount}(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+                @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -32,19 +32,19 @@
 
         @javax.annotation.Nonnull
         @Override
-        public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
+        public com.github.dm.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
 
             return new Invocation${methodCount}${genericTypes}(mProxyConfiguration, mTarget);
         }
     }
 
     @javax.annotation.Nonnull
-    private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration) {
+    private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-        return com.gh.bmd.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, target))
+        return com.github.dm.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, target))
                                            .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}

@@ -14,16 +14,16 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
+    private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
+    private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
 
         private final String mShareGroup;
 
-        private final com.gh.bmd.jrt.android.core.ContextInvocationTarget mTarget;
+        private final com.github.dm.jrt.android.core.ContextInvocationTarget mTarget;
 
         private ContextInvocationFactory${methodCount}(@javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
 
             mShareGroup = shareGroup;
             mTarget = target;
@@ -31,18 +31,18 @@
 
         @javax.annotation.Nonnull
         @Override
-        public com.gh.bmd.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation() {
+        public com.github.dm.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation() {
 
             return new ContextInvocation${methodCount}${genericTypes}(mShareGroup, mTarget);
         }
     }
 
     @javax.annotation.Nonnull
-    private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
+    private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${shareGroup}, target))
                                            .invocations()

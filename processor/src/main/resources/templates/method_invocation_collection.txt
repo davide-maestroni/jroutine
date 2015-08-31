@@ -17,7 +17,7 @@
         @Override
         @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
         protected void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) {
 
             synchronized(mMutex) {
 
@@ -39,7 +39,7 @@
 
                 } catch (final Throwable t) {
 
-                    throw com.gh.bmd.jrt.invocation.InvocationException.wrapIfNeeded(t);
+                    throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
                 }
             }
         }

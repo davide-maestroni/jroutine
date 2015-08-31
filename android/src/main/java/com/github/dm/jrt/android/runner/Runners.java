@@ -1,0 +1,148 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.dm.jrt.android.runner;
+
+import android.os.HandlerThread;
+import android.os.Looper;
+
+import com.github.dm.jrt.runner.Runner;
+
+import java.util.concurrent.Executor;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+/**
+ * Utility class for creating and sharing runner instances, employing specific Android classes.
+ * <p/>
+ * Created by davide-maestroni on 9/28/14.
+ */
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
+        justification = "utility class extending the functions of another utility class")
+public class Runners extends com.github.dm.jrt.runner.Runners {
+
+    private static final Runner sMainRunner = new MainRunner();
+
+    /**
+     * Returns a runner employing the specified handler thread.
+     *
+     * @param thread the thread.
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner handlerRunner(@Nonnull final HandlerThread thread) {
+
+        if (!thread.isAlive()) {
+
+            thread.start();
+        }
+
+        return looperRunner(thread.getLooper(), queuedRunner());
+    }
+
+    /**
+     * Returns a runner employing the specified looper.<br/>
+     * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
+     * will be performed synchronously, while the ones with a positive delay will be posted on the
+     * same thread.
+     *
+     * @param looper the looper instance.
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner looperRunner(@Nonnull final Looper looper) {
+
+        return new LooperRunner(looper);
+    }
+
+    /**
+     * Returns a runner employing the specified looper.<br/>
+     * Note that, based on the choice of the runner to be used when the invocation runs in the
+     * looper thread, waiting for results in the very same thread may result in a deadlock
+     * exception.
+     *
+     * @param looper           the looper instance.
+     * @param sameThreadRunner the runner to be used when the specified looper is called on its own
+     *                         thread. If null, the invocation will be posted on the same looper.
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner looperRunner(@Nonnull final Looper looper,
+            @Nullable final Runner sameThreadRunner) {
+
+        return new LooperRunner(looper, sameThreadRunner);
+    }
+
+    /**
+     * Returns the shared runner employing the main thread looper.<br/>
+     * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will
+     * be performed synchronously, while the ones with a positive delay will be posted on the main
+     * thread.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner mainRunner() {
+
+        return sMainRunner;
+    }
+
+    /**
+     * Returns a runner employing the calling thread looper.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public static Runner myRunner() {
+
+        return looperRunner(Looper.myLooper(), queuedRunner());
+    }
+
+    /**
+     * Returns a runner employing async tasks.
+     * <p/>
+     * Beware of the caveats of using
+     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
+     * especially on some platform versions.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner taskRunner() {
+
+        return taskRunner(null);
+    }
+
+    /**
+     * Returns a runner employing async tasks running on the specified executor.
+     * <p/>
+     * Beware of the caveats of using
+     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
+     * especially on some platform versions.
+     * <p/>
+     * Note also that the executor instance will be ignored on platforms with API level less than
+     * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
+     *
+     * @param executor the executor.
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner taskRunner(@Nullable final Executor executor) {
+
+        return new AsyncTaskRunner(executor);
+    }
+}

@@ -14,23 +14,23 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class Invocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.invocation.FunctionInvocation<Object, ${resultClassName}> {
+    private static class Invocation${methodCount}${genericTypes} extends com.github.dm.jrt.invocation.FunctionInvocation<Object, ${resultClassName}> {
 
         private final Object mMutex;
 
         @SuppressWarnings("unused")
-        private final com.gh.bmd.jrt.core.InvocationTarget mTarget;
+        private final com.github.dm.jrt.core.InvocationTarget mTarget;
 
         @SuppressWarnings("ConstantConditions")
-        private Invocation${methodCount}(@javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-                 @javax.annotation.Nonnull final com.gh.bmd.jrt.core.InvocationTarget target) {
+        private Invocation${methodCount}(@javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+                 @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
 
             final Object mutexTarget = ${mutexTarget};
             final String shareGroup = ${shareGroup};
 
-            if ((mutexTarget != null) && !com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
+            if ((mutexTarget != null) && !com.github.dm.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
 
-                mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, shareGroup);
+                mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, shareGroup);
 
             } else {
 

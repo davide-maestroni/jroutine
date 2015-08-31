@@ -80,6 +80,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
+    private static final int TEST_ROUTINE_ID = 0;
+
     public LoaderRoutineTest() {
 
         super(TestActivity.class);
@@ -365,8 +367,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(getActivity()), PassingContextInvocation.factoryOf())
                         .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.SYNCHRONOUS,
-                                                        "test_routine");
+                DelegatingContextInvocation.factoryFrom(routine1, TEST_ROUTINE_ID,
+                                                        DelegationType.SYNCHRONOUS);
         final Routine<Object, Object> routine2 =
                 JRoutine.on(contextFrom(getActivity()), factory).buildRoutine();
 
@@ -1049,8 +1051,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutine.on(contextFrom(fragment), PassingContextInvocation.factoryOf())
                         .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, DelegationType.ASYNCHRONOUS,
-                                                        "test_routine");
+                DelegatingContextInvocation.factoryFrom(routine1, TEST_ROUTINE_ID,
+                                                        DelegationType.ASYNCHRONOUS);
         final Routine<Object, Object> routine2 =
                 JRoutine.on(contextFrom(fragment), factory).buildRoutine();
 

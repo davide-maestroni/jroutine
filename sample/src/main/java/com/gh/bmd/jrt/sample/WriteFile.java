@@ -15,6 +15,9 @@ package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.channel.RoutineException;
+import com.gh.bmd.jrt.core.ByteChannel;
+import com.gh.bmd.jrt.core.ByteChannel.BufferInputStream;
+import com.gh.bmd.jrt.core.ByteChannel.ByteBuffer;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.TemplateInvocation;
 
@@ -32,7 +35,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 10/17/14.
  */
-public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
+public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
     private final File mFile;
 
@@ -70,15 +73,25 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
     }
 
     @Override
-    public void onInput(final Chunk chunk, @Nonnull final ResultChannel<Boolean> result) {
+    @SuppressWarnings("StatementWithEmptyBody")
+    public void onInput(final ByteBuffer buffer, @Nonnull final ResultChannel<Boolean> result) {
+
+        final BufferInputStream inputStream = ByteChannel.newStream(buffer);
 
         try {
 
-            chunk.writeTo(mOutputStream);
+            while (inputStream.read(mOutputStream) > 0) {
+
+                // Keep looping...
+            }
 
         } catch (final IOException e) {
 
             throw new InvocationException(e);
+
+        } finally {
+
+            inputStream.close();
         }
     }
 

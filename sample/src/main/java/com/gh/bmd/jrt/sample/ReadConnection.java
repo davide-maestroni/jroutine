@@ -14,6 +14,9 @@
 package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
+import com.gh.bmd.jrt.core.ByteChannel.BufferOutputStream;
+import com.gh.bmd.jrt.core.ByteChannel.ByteBuffer;
+import com.gh.bmd.jrt.core.Channels;
 import com.gh.bmd.jrt.invocation.FilterInvocation;
 import com.gh.bmd.jrt.invocation.InvocationException;
 
@@ -30,11 +33,12 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 10/17/14.
  */
-public class ReadConnection extends FilterInvocation<URI, Chunk> {
+public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 
-    public void onInput(final URI uri, @Nonnull final ResultChannel<Chunk> result) {
+    @SuppressWarnings("StatementWithEmptyBody")
+    public void onInput(final URI uri, @Nonnull final ResultChannel<ByteBuffer> result) {
 
         try {
 
@@ -51,12 +55,21 @@ public class ReadConnection extends FilterInvocation<URI, Chunk> {
             }
 
             final InputStream inputStream = connection.getInputStream();
-            Chunk chunk = new Chunk(MAX_CHUNK_SIZE, inputStream);
+            // We employ the utility class dedicated to the optimized transfer of bytes through a
+            // routine channel
+            final BufferOutputStream outputStream =
+                    Channels.byteChannel(MAX_CHUNK_SIZE).passTo(result);
 
-            while (chunk.getLength() > 0) {
+            try {
 
-                result.pass(chunk);
-                chunk = new Chunk(MAX_CHUNK_SIZE, inputStream);
+                while (outputStream.write(inputStream) > 0) {
+
+                    // Keep looping...
+                }
+
+            } finally {
+
+                outputStream.close();
             }
 
         } catch (final IOException e) {

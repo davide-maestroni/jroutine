@@ -123,7 +123,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()), (InvocationFactoryTarget) null);
+            JRoutine.on(serviceFrom(getActivity()), (InvocationFactoryTarget<Object, Object>) null);
 
             fail();
 

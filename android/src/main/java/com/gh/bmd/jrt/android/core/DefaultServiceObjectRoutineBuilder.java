@@ -303,6 +303,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final ContextInvocationTarget mTarget;
 
+        private Object mInstance;
+
         private Routine<INPUT, OUTPUT> mRoutine;
 
         /**
@@ -327,7 +329,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(mTarget.getInvocationTarget(context))
+                final InvocationTarget target = mTarget.getInvocationTarget(context);
+                mInstance = target.getTarget();
+                mRoutine = JRoutine.on(target)
                                    .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
@@ -345,7 +349,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             final Routine<INPUT, OUTPUT> routine = mRoutine;
 
-            if (routine == null) {
+            if ((routine == null) || (mInstance == null)) {
 
                 throw new IllegalStateException("such error should never happen");
             }
@@ -382,6 +386,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final ContextInvocationTarget mTarget;
 
+        private Object mInstance;
+
         private Routine<INPUT, OUTPUT> mRoutine;
 
         /**
@@ -409,7 +415,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             final Routine<INPUT, OUTPUT> routine = mRoutine;
 
-            if (routine == null) {
+            if ((routine == null) || (mInstance == null)) {
 
                 throw new IllegalStateException("such error should never happen");
             }
@@ -424,7 +430,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(mTarget.getInvocationTarget(context))
+                final InvocationTarget target = mTarget.getInvocationTarget(context);
+                mInstance = target.getTarget();
+                mRoutine = JRoutine.on(target)
                                    .proxies()
                                    .withShareGroup(mShareGroup)
                                    .set()
@@ -463,9 +471,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Method mTargetMethod;
 
-        private Object mMutex;
+        private Object mInstance;
 
-        private Object mTargetInstance;
+        private Object mMutex;
 
         /**
          * Constructor.
@@ -499,7 +507,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            final Object targetInstance = mTargetInstance;
+            final Object targetInstance = mInstance;
 
             if (targetInstance == null) {
 
@@ -528,7 +536,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     mMutex = getSharedMutex(mutexTarget, shareGroup);
                 }
 
-                mTargetInstance = target.getTarget();
+                mInstance = target.getTarget();
 
             } catch (final Throwable t) {
 

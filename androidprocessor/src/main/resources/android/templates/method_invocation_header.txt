@@ -14,9 +14,9 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class ContextInvocation${methodCount}${genericTypes} extends com.gh.bmd.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
+    private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
 
-        private final  com.gh.bmd.jrt.android.core.ContextInvocationTarget mContextTarget;
+        private final  com.github.dm.jrt.android.core.ContextInvocationTarget mContextTarget;
 
         private final String mShareGroup;
 
@@ -26,10 +26,10 @@
         private Object mMutex = this;
 
         @SuppressWarnings("unused")
-        private com.gh.bmd.jrt.core.InvocationTarget mTarget;
+        private com.github.dm.jrt.core.InvocationTarget mTarget;
 
         private ContextInvocation${methodCount}(@javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
 
             mShareGroup = shareGroup;
             mContextTarget = target;
@@ -43,13 +43,13 @@
 
             try {
 
-                final com.gh.bmd.jrt.core.InvocationTarget target = mContextTarget.getInvocationTarget(context);
+                final com.github.dm.jrt.core.InvocationTarget target = mContextTarget.getInvocationTarget(context);
                 final Object mutexTarget = ${mutexTarget};
                 final String shareGroup = mShareGroup;
 
-                if ((mutexTarget != null) && !com.gh.bmd.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
+                if ((mutexTarget != null) && !com.github.dm.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
 
-                    mMutex = com.gh.bmd.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, shareGroup);
+                    mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, shareGroup);
                 }
 
                 mTarget = target;
@@ -57,6 +57,6 @@
 
             } catch (final Throwable t) {
 
-                throw com.gh.bmd.jrt.invocation.InvocationException.wrapIfNeeded(t);
+                throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
             }
         }

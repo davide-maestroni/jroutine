@@ -14,17 +14,17 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
+    private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     @javax.annotation.Nonnull
-    private com.gh.bmd.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.core.ContextInvocationTarget target,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @javax.annotation.Nonnull final com.gh.bmd.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
+    private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final com.gh.bmd.jrt.android.core.InvocationFactoryTarget<Object, ${resultClassName}> factoryTarget = com.gh.bmd.jrt.android.core.InvocationFactoryTarget.targetInvocation(
-                new com.gh.bmd.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${shareGroup}, target);
+        final com.github.dm.jrt.android.core.InvocationFactoryTarget<Object, ${resultClassName}> factoryTarget = com.github.dm.jrt.android.core.InvocationFactoryTarget.targetInvocation(
+                new com.github.dm.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${shareGroup}, target);
         return getBuilder(mContext, factoryTarget).invocations()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}

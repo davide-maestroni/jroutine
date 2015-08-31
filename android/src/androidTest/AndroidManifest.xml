@@ -1,35 +1,35 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gh.bmd.jrt.android">
+    package="com.github.dm.jrt.android">
 
     <application
         android:name=".app.TestApp"
         android:label="@string/lib_name">
         <activity
-            android:name="com.gh.bmd.jrt.android.core.TestActivity"
+            android:name="com.github.dm.jrt.android.core.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v11.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v11.core.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v11.core.RotationTestActivity"
+            android:name="com.github.dm.jrt.android.v11.core.RotationTestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v4.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v4.core.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.gh.bmd.jrt.android.v4.core.RotationTestActivity"
+            android:name="com.github.dm.jrt.android.v4.core.RotationTestActivity"
             android:label="test">
         </activity>
 
         <service
-            android:name="com.gh.bmd.jrt.android.service.RoutineService"
+            android:name="com.github.dm.jrt.android.service.RoutineService"
             android:process=":remote"/>
         <service
-            android:name="com.gh.bmd.jrt.android.core.TestService"
+            android:name="com.github.dm.jrt.android.core.TestService"
             android:process=":remote"/>
     </application>
 

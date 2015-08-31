@@ -46,49 +46,46 @@ public class Channels {
     }
 
     /**
-     * Returns a new recyclable channel.
+     * Returns a new byte channel.
      *
-     * @return the recyclable channel.
+     * @return the byte channel.
      */
     @Nonnull
-    public static RecyclerByteChannel byteChannel() {
+    public static ByteChannel byteChannel() {
 
-        return new RecyclerByteChannel(RecyclerByteChannel.DEFAULT_BUFFER_SIZE,
-                                       RecyclerByteChannel.DEFAULT_POOL_SIZE);
+        return new ByteChannel(ByteChannel.DEFAULT_BUFFER_SIZE, ByteChannel.DEFAULT_POOL_SIZE);
     }
 
     /**
-     * Returns a new recyclable byte channel.
+     * Returns a new byte channel.
      *
      * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
      *                       routine channels.
-     * @return the recyclable channel.
+     * @return the byte channel.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
     @Nonnull
-    public static RecyclerByteChannel byteChannel(final int dataBufferSize) {
+    public static ByteChannel byteChannel(final int dataBufferSize) {
 
         final int poolSize =
-                (RecyclerByteChannel.DEFAULT_POOL_SIZE * RecyclerByteChannel.DEFAULT_BUFFER_SIZE)
-                        / dataBufferSize;
-        return new RecyclerByteChannel(dataBufferSize, poolSize);
+                (ByteChannel.DEFAULT_POOL_SIZE * ByteChannel.DEFAULT_BUFFER_SIZE) / dataBufferSize;
+        return new ByteChannel(dataBufferSize, poolSize);
     }
 
     /**
-     * Returns a new recyclable byte channel.
+     * Returns a new byte channel.
      *
      * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
      *                       routine channels.
      * @param corePoolSize   the maximum number of data retained in the pool. Additional data
      *                       created to fulfill the bytes requirement will be discarded.
-     * @return the recyclable channel.
+     * @return the byte channel.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
     @Nonnull
-    public static RecyclerByteChannel byteChannel(final int dataBufferSize,
-            final int corePoolSize) {
+    public static ByteChannel byteChannel(final int dataBufferSize, final int corePoolSize) {
 
-        return new RecyclerByteChannel(dataBufferSize, corePoolSize);
+        return new ByteChannel(dataBufferSize, corePoolSize);
     }
 
     /**

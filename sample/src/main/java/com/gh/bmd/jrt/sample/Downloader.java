@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.core.ByteChannel.ByteBuffer;
 import com.gh.bmd.jrt.core.JRoutine;
 import com.gh.bmd.jrt.invocation.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocations;
@@ -38,12 +39,12 @@ import static com.gh.bmd.jrt.util.TimeDuration.seconds;
  */
 public class Downloader {
 
-    private final HashMap<URI, OutputChannel<Boolean>> mDownloadMap =
+    private final HashSet<URI> mDownloaded = new HashSet<URI>();
+
+    private final HashMap<URI, OutputChannel<Boolean>> mDownloads =
             new HashMap<URI, OutputChannel<Boolean>>();
 
-    private final HashSet<URI> mDownloadedSet = new HashSet<URI>();
-
-    private final Routine<URI, Chunk> mReadConnection;
+    private final Routine<URI, ByteBuffer> mReadConnection;
 
     private final Runner mWriteRunner = Runners.poolRunner(1);
 
@@ -110,7 +111,7 @@ public class Downloader {
      */
     public boolean abort(final URI uri) {
 
-        final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
+        final OutputChannel<Boolean> channel = mDownloads.remove(uri);
         return (channel != null) && channel.abort();
     }
 
@@ -124,7 +125,7 @@ public class Downloader {
      */
     public boolean abortAndWait(final URI uri, final TimeDuration timeout) {
 
-        final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
+        final OutputChannel<Boolean> channel = mDownloads.remove(uri);
         return (channel != null) && channel.abort() && channel.afterMax(timeout).checkComplete();
     }
 
@@ -136,20 +137,20 @@ public class Downloader {
      */
     public void download(final URI uri, final File dstFile) {
 
-        final HashMap<URI, OutputChannel<Boolean>> downloadMap = mDownloadMap;
+        final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
 
         // Check if we are already downloading the same resource
-        if (!downloadMap.containsKey(uri)) {
+        if (!downloads.containsKey(uri)) {
 
             // Remove it from the downloaded set
-            mDownloadedSet.remove(uri);
+            mDownloaded.remove(uri);
             // In order to be able to abort the download at any time, we need to split the
             // processing between the routine responsible for reading the data from the socket, and
             // the one writing the next chunk of bytes to the local file
             // In such way we can abort the download between two chunks, while they are passed to
             // the specific routine
             // That's why we store the routine output channel in an internal map
-            final Routine<Chunk, Boolean> writeFile =
+            final Routine<ByteBuffer, Boolean> writeFile =
                     JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).invocations()
                             // Since we want to limit the number of allocated chunks, we have to
                             // make the file writing happen in a dedicated runner, so that waiting
@@ -159,7 +160,7 @@ public class Downloader {
                             .withInputTimeout(seconds(30))
                             .set()
                             .buildRoutine();
-            downloadMap.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
+            downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
         }
     }
 
@@ -182,7 +183,7 @@ public class Downloader {
      */
     public boolean isDownloading(final URI uri) {
 
-        return mDownloadMap.containsKey(uri);
+        return mDownloads.containsKey(uri);
     }
 
     /**
@@ -194,8 +195,8 @@ public class Downloader {
      */
     public boolean waitDone(final URI uri, final TimeDuration timeout) {
 
-        final HashMap<URI, OutputChannel<Boolean>> downloadMap = mDownloadMap;
-        final OutputChannel<Boolean> channel = downloadMap.get(uri);
+        final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
+        final OutputChannel<Boolean> channel = downloads.get(uri);
 
         // Check if the output channel is in the map, that is, the resource is currently downloading
         if (channel != null) {
@@ -206,13 +207,13 @@ public class Downloader {
                 if (channel.afterMax(timeout).checkComplete()) {
 
                     // If completed, remove the resource from the download map
-                    downloadMap.remove(uri);
+                    downloads.remove(uri);
 
                     // Read the result
                     if (channel.next()) {
 
                         // If successful, add the resource to the downloaded set
-                        mDownloadedSet.add(uri);
+                        mDownloaded.add(uri);
                         return true;
                     }
 
@@ -223,11 +224,11 @@ public class Downloader {
 
                 // Something went wrong or the routine has been aborted
                 // Just remove the resource from the download map
-                downloadMap.remove(uri);
+                downloads.remove(uri);
             }
         }
 
         // Check if the resource is in the downloaded set
-        return mDownloadedSet.contains(uri);
+        return mDownloaded.contains(uri);
     }
 }

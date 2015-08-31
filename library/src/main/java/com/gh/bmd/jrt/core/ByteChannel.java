@@ -83,7 +83,7 @@ public class ByteChannel {
      *                                         specified buffer.
      */
     @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final ByteBuffer buffer) {
+    public static BufferInputStream newStream(@Nonnull final ByteBuffer buffer) {
 
         return buffer.getStream();
     }
@@ -99,9 +99,9 @@ public class ByteChannel {
      *                                         of the specified buffers.
      */
     @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final ByteBuffer... buffers) {
+    public static BufferInputStream newStream(@Nonnull final ByteBuffer... buffers) {
 
-        return inputStream(Arrays.asList(buffers));
+        return newStream(Arrays.asList(buffers));
     }
 
     /**
@@ -115,7 +115,7 @@ public class ByteChannel {
      *                                         of the specified buffers.
      */
     @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final List<ByteBuffer> buffers) {
+    public static BufferInputStream newStream(@Nonnull final List<ByteBuffer> buffers) {
 
         return new MultiBufferInputStream(buffers);
     }
@@ -567,14 +567,14 @@ public class ByteChannel {
      * to minimize memory consumption. Byte buffers are automatically acquired by
      * <code>BufferOutputStream</code>s and passed to the underlying channel.<br/>
      * The data contained in a buffer can be read through the dedicated
-     * <code>BufferInputStream</code> returned by one of the <code>ByteChannel.inputStream()</code>
+     * <code>BufferInputStream</code> returned by one of the <code>ByteChannel.newStream()</code>
      * methods. Note that only one input stream can be created for each buffer, any further attempt
      * will generate an exception.<br/>
      * Used buffers will be recycled as soon as the corresponding input stream is closed.
      *
-     * @see ByteChannel#inputStream(ByteBuffer)
-     * @see ByteChannel#inputStream(ByteBuffer...)
-     * @see ByteChannel#inputStream(List)
+     * @see ByteChannel#newStream(ByteBuffer)
+     * @see ByteChannel#newStream(ByteBuffer...)
+     * @see ByteChannel#newStream(List)
      */
     public class ByteBuffer {
 

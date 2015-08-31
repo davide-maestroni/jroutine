@@ -445,9 +445,9 @@ public class RoutineService extends Service {
                        .withOutputOrder(outputOrderType)
                        .withLogLevel(logLevel);
                 final ContextInvocationFactory<?, ?> factory = getInvocationFactory(factoryTarget);
-                final SyncContextRoutine syncContextRoutine =
-                        new SyncContextRoutine(this, builder.set(), factory);
-                routineState = new RoutineState(syncContextRoutine);
+                final ContextRoutine contextRoutine =
+                        new ContextRoutine(this, builder.set(), factory);
+                routineState = new RoutineState(contextRoutine);
                 routines.put(routineInfo, routineState);
             }
 
@@ -457,6 +457,54 @@ public class RoutineService extends Service {
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
             invocations.put(invocationId, routineInvocation);
+        }
+    }
+
+    /**
+     * Context routine implementation.
+     */
+    private static class ContextRoutine extends AbstractRoutine<Object, Object> {
+
+        private final Context mContext;
+
+        private final ContextInvocationFactory<?, ?> mFactory;
+
+        /**
+         * Constructor.
+         *
+         * @param context       the routine context.
+         * @param configuration the invocation configuration.
+         * @param factory       the invocation factory.
+         */
+        private ContextRoutine(@Nonnull final Context context,
+                @Nonnull final InvocationConfiguration configuration,
+                @Nonnull final ContextInvocationFactory<?, ?> factory) {
+
+            super(configuration);
+            mContext = context;
+            mFactory = factory;
+        }
+
+        @Nonnull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
+
+            final Logger logger = getLogger();
+
+            try {
+
+                final ContextInvocationFactory<?, ?> factory = mFactory;
+                logger.dbg("creating a new instance");
+                final ContextInvocation<?, ?> invocation = factory.newInvocation();
+                invocation.onContext(mContext);
+                return (Invocation<Object, Object>) invocation;
+
+            } catch (final Throwable t) {
+
+                logger.err(t, "error creating the invocation instance");
+                throw InvocationException.wrapIfNeeded(t);
+            }
         }
     }
 
@@ -668,7 +716,7 @@ public class RoutineService extends Service {
      */
     private static class RoutineState {
 
-        private final SyncContextRoutine mRoutine;
+        private final ContextRoutine mRoutine;
 
         private int mInvocationCount;
 
@@ -677,7 +725,7 @@ public class RoutineService extends Service {
          *
          * @param routine the routine instance.
          */
-        private RoutineState(@Nonnull final SyncContextRoutine routine) {
+        private RoutineState(@Nonnull final ContextRoutine routine) {
 
             mRoutine = routine;
         }
@@ -787,54 +835,6 @@ public class RoutineService extends Service {
             } catch (final RemoteException e) {
 
                 throw new InvocationException(e);
-            }
-        }
-    }
-
-    /**
-     * Synchronous context routine implementation.
-     */
-    private static class SyncContextRoutine extends AbstractRoutine<Object, Object> {
-
-        private final Context mContext;
-
-        private final ContextInvocationFactory<?, ?> mFactory;
-
-        /**
-         * Constructor.
-         *
-         * @param context       the routine context.
-         * @param configuration the invocation configuration.
-         * @param factory       the invocation factory.
-         */
-        private SyncContextRoutine(@Nonnull final Context context,
-                @Nonnull final InvocationConfiguration configuration,
-                @Nonnull final ContextInvocationFactory<?, ?> factory) {
-
-            super(configuration);
-            mContext = context;
-            mFactory = factory;
-        }
-
-        @Nonnull
-        @Override
-        @SuppressWarnings("unchecked")
-        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
-
-            final Logger logger = getLogger();
-
-            try {
-
-                final ContextInvocationFactory<?, ?> factory = mFactory;
-                logger.dbg("creating a new instance");
-                final ContextInvocation<?, ?> invocation = factory.newInvocation();
-                invocation.onContext(mContext);
-                return (Invocation<Object, Object>) invocation;
-
-            } catch (final Throwable t) {
-
-                logger.err(t, "error creating the invocation instance");
-                throw InvocationException.wrapIfNeeded(t);
             }
         }
     }

@@ -47,7 +47,7 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
-Project.metaClass.setJavaCompileArgs = { args ->
+Project.metaClass.setJavaCompilerArgs = { args ->
 
     tasks.withType(JavaCompile) {
         options.compilerArgs = args

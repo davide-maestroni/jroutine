@@ -20,6 +20,9 @@
 
         private final String mShareGroup;
 
+        @SuppressWarnings("unused")
+        private Object mInstance;
+
         private Object mMutex = this;
 
         @SuppressWarnings("unused")
@@ -50,6 +53,7 @@
                 }
 
                 mTarget = target;
+                mInstance = target.getTarget();
 
             } catch (final Throwable t) {
 

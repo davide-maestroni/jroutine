@@ -312,6 +312,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ContextInvocationTarget mTarget;
 
+        private Object mInstance;
+
         private Routine<INPUT, OUTPUT> mRoutine = null;
 
         /**
@@ -337,7 +339,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(mTarget.getInvocationTarget(context))
+                final InvocationTarget target = mTarget.getInvocationTarget(context);
+                mInstance = target.getTarget();
+                mRoutine = JRoutine.on(target)
                                    .proxies()
                                    .with(mProxyConfiguration)
                                    .set()
@@ -355,7 +359,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             final Routine<INPUT, OUTPUT> routine = mRoutine;
 
-            if (routine == null) {
+            if ((routine == null) || (mInstance == null)) {
 
                 throw new IllegalStateException("such error should never happen");
             }
@@ -419,6 +423,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ContextInvocationTarget mTarget;
 
+        private Object mInstance;
+
         private Routine<INPUT, OUTPUT> mRoutine = null;
 
         /**
@@ -443,7 +449,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             final Routine<INPUT, OUTPUT> routine = mRoutine;
 
-            if (routine == null) {
+            if ((routine == null) || (mInstance == null)) {
 
                 throw new IllegalStateException("such error should never happen");
             }
@@ -458,7 +464,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                mRoutine = JRoutine.on(mTarget.getInvocationTarget(context))
+                final InvocationTarget target = mTarget.getInvocationTarget(context);
+                mInstance = target.getTarget();
+                mRoutine = JRoutine.on(target)
                                    .proxies()
                                    .with(mProxyConfiguration)
                                    .set()
@@ -527,9 +535,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final Method mTargetMethod;
 
-        private Object mMutex;
+        private Object mInstance;
 
-        private InvocationTarget mTarget;
+        private Object mMutex;
 
         /**
          * Constructor.
@@ -557,14 +565,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         protected void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
-            final InvocationTarget target = mTarget;
-
-            if (target == null) {
-
-                throw new IllegalStateException("such error should never happen");
-            }
-
-            final Object targetInstance = target.getTarget();
+            final Object targetInstance = mInstance;
 
             if (targetInstance == null) {
 
@@ -593,7 +594,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     mMutex = getSharedMutex(mutexTarget, shareGroup);
                 }
 
-                mTarget = target;
+                mInstance = target.getTarget();
 
             } catch (final Throwable t) {
 

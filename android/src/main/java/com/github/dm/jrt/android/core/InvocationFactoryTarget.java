@@ -220,7 +220,7 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
             return 0;
         }
 
-        public void writeToParcel(final Parcel dest, final int flags) {
+        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);

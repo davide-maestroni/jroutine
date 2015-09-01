@@ -90,7 +90,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<? extends ParcelableSelectable<Object>> mergeParcelable(
+    public static OutputChannel<? extends ParcelableSelectable<?>> mergeParcelable(
             final int startIndex, @Nonnull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
@@ -137,7 +137,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @Nonnull
-    public static OutputChannel<? extends ParcelableSelectable<Object>> mergeParcelable(
+    public static OutputChannel<? extends ParcelableSelectable<?>> mergeParcelable(
             @Nonnull final OutputChannel<?>... channels) {
 
         return mergeParcelable(0, channels);
@@ -211,7 +211,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
         public static final Creator<ParcelableSelectable> CREATOR =
                 new Creator<ParcelableSelectable>() {
 
-                    public ParcelableSelectable createFromParcel(final Parcel source) {
+                    public ParcelableSelectable createFromParcel(@Nonnull final Parcel source) {
 
                         return new ParcelableSelectable(source);
                     }
@@ -239,7 +239,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
          * @param source the source parcel.
          */
         @SuppressWarnings("unchecked")
-        protected ParcelableSelectable(final Parcel source) {
+        protected ParcelableSelectable(@Nonnull final Parcel source) {
 
             super((DATA) source.readValue(ParcelableSelectable.class.getClassLoader()),
                   source.readInt());
@@ -250,7 +250,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             return 0;
         }
 
-        public void writeToParcel(final Parcel dest, final int flags) {
+        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
             dest.writeValue(data);
             dest.writeInt(index);

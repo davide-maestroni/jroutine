@@ -91,7 +91,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
      * @return the invocation target.
      */
     @Nonnull
-    public abstract InvocationTarget getInvocationTarget(@Nonnull final Context context);
+    public abstract InvocationTarget getInvocationTarget(@Nonnull Context context);
 
     /**
      * Returns the target class.
@@ -189,7 +189,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
             return mTargetClass;
         }
 
-        public void writeToParcel(final Parcel dest, final int flags) {
+        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
         }
@@ -323,7 +323,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
             return 0;
         }
 
-        public void writeToParcel(final Parcel dest, final int flags) {
+        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);

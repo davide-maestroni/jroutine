@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -120,7 +119,7 @@ public class ByteChannel {
     @Nonnull
     public static BufferInputStream newStream(@Nonnull final ByteBuffer... buffers) {
 
-        return newStream(Arrays.asList(buffers));
+        return new MultiBufferInputStream(buffers);
     }
 
     /**
@@ -290,6 +289,22 @@ public class ByteChannel {
         private int mIndex;
 
         private int mMarkIndex;
+
+        /**
+         * Constructor.
+         *
+         * @param buffers the array of input streams whose data have to be concatenated.
+         */
+        private MultiBufferInputStream(@Nonnull final ByteBuffer[] buffers) {
+
+            final ArrayList<BufferInputStream> streams =
+                    (mStreams = new ArrayList<BufferInputStream>(buffers.length));
+
+            for (final ByteBuffer buffer : buffers) {
+
+                streams.add(buffer.getStream());
+            }
+        }
 
         /**
          * Constructor.

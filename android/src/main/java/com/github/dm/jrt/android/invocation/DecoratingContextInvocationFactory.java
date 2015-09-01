@@ -60,5 +60,5 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
      */
     @Nonnull
     protected abstract ContextInvocation<IN, OUT> decorate(
-            @Nonnull final ContextInvocation<IN, OUT> invocation);
+            @Nonnull ContextInvocation<IN, OUT> invocation);
 }

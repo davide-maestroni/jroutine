@@ -78,7 +78,7 @@ public abstract class InvocationTarget {
      * @param targetClass the target class.
      * @return whether the invocation target is assignable to the class.
      */
-    public abstract boolean isAssignableTo(@Nonnull final Class<?> targetClass);
+    public abstract boolean isAssignableTo(@Nonnull Class<?> targetClass);
 
     /**
      * Invocation target wrapping a class.

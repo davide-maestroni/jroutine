@@ -57,5 +57,5 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
      * @return the decorated invocation.
      */
     @Nonnull
-    protected abstract Invocation<IN, OUT> decorate(@Nonnull final Invocation<IN, OUT> invocation);
+    protected abstract Invocation<IN, OUT> decorate(@Nonnull Invocation<IN, OUT> invocation);
 }

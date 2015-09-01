@@ -35,7 +35,7 @@ import static org.junit.Assert.fail;
 /**
  * Channel configuration unit tests.
  * <p/>
- * Created by davide-maestroni on 07/03/15.
+ * Created by davide-maestroni on 07/03/2015.
  */
 public class ChannelConfigurationTest {
 

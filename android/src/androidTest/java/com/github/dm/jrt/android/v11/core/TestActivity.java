@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.R;
 /**
  * Test activity.
  * <p/>
- * Created by davide-maestroni on 12/16/14.
+ * Created by davide-maestroni on 12/16/2014.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestActivity extends Activity {

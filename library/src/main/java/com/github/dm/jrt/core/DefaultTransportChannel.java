@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 /**
  * Default implementation of a transport channel.
  * <p/>
- * Created by davide-maestroni on 10/24/14.
+ * Created by davide-maestroni on 10/24/2014.
  *
  * @param <DATA> the data type.
  */

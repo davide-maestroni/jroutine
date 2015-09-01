@@ -69,7 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Loader object routine activity unit tests.
  * <p/>
- * Created by davide-maestroni on 04/07/15.
+ * Created by davide-maestroni on 04/07/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderObjectRoutineActivityTest

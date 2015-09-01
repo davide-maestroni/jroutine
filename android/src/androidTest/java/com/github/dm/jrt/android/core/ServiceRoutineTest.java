@@ -57,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Service routine unit tests.
  * <p/>
- * Created by davide-maestroni on 12/01/15.
+ * Created by davide-maestroni on 12/01/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestActivity> {

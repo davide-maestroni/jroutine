@@ -79,7 +79,7 @@ import javax.annotation.Nullable;
  * {@link com.github.dm.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
  * <p/>
- * Created by davide-maestroni on 09/07/14.
+ * Created by davide-maestroni on 09/07/2014.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

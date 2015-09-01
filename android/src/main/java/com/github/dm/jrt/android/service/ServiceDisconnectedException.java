@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 /**
  * Exception indicating that the routine service has unexpectedly disconnected.
  * <p/>
- * Created by davide-maestroni on 05/25/15.
+ * Created by davide-maestroni on 05/25/2015.
  */
 public class ServiceDisconnectedException extends RoutineException {
 

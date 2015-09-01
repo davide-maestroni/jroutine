@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide-maestroni on 05/06/15.
+ * Created by davide-maestroni on 05/06/2015.
  *
  * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
  * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution

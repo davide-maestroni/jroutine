@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide-maestroni on 03/23/15.
+ * Created by davide-maestroni on 03/23/2015.
  *
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input

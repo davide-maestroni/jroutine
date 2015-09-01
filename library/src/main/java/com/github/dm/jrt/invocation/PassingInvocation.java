@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 /**
  * Implementation of an invocation simply passing on the input data.
  * <p/>
- * Created by davide-maestroni on 10/23/14.
+ * Created by davide-maestroni on 10/23/2014.
  *
  * @param <DATA> the data type.
  */

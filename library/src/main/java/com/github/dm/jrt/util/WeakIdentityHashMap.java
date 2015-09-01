@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Note that the map entries might change each time the object is explicitly accessed.
  * <p/>
- * Created by davide-maestroni on 11/17/14.
+ * Created by davide-maestroni on 11/17/2014.
  *
  * @param <K> the key type.
  * @param <V> the value type.

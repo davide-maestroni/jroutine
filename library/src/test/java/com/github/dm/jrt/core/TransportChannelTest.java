@@ -46,7 +46,7 @@ import static org.junit.Assert.fail;
 /**
  * Transport channel unit tests.
  * <p/>
- * Created by davide-maestroni on 10/26/14.
+ * Created by davide-maestroni on 10/26/2014.
  */
 public class TransportChannelTest {
 

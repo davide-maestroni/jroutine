@@ -21,7 +21,7 @@ import com.github.dm.jrt.log.Logger;
 /**
  * Android log unit tests.
  * <p/>
- * Created by davide-maestroni on 10/27/14.
+ * Created by davide-maestroni on 10/27/2014.
  */
 public class AndroidLogTest extends AndroidTestCase {
 

@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 /**
  * Abstract implementation of a builder of async proxy objects.
  * <p/>
- * Created by davide-maestroni on 02/26/15.
+ * Created by davide-maestroni on 02/26/2015.
  *
  * @param <TYPE> the interface type.
  */

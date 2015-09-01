@@ -14,6 +14,6 @@
 /**
  * Classes and interfaces related to routine channels.
  * <p/>
- * Created by davide-maestroni on 09/19/14.
+ * Created by davide-maestroni on 09/19/2014.
  */
 package com.github.dm.jrt.channel;

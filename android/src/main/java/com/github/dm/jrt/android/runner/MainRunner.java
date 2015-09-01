@@ -20,7 +20,7 @@ import android.os.Looper;
  * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will be
  * performed synchronously, while the ones with a positive delay will be posted on the UI thread.
  * <p/>
- * Created by davide-maestroni on 12/17/14.
+ * Created by davide-maestroni on 12/17/2014.
  */
 public class MainRunner extends LooperRunner {
 

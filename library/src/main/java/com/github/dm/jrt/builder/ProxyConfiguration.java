@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * parallel. In a dual way, methods belonging to different groups can be invoked in parallel but
  * should not access the same members to avoid concurrency issues.
  * <p/>
- * Created by davide-maestroni on 04/20/15.
+ * Created by davide-maestroni on 04/20/2015.
  */
 public final class ProxyConfiguration {
 

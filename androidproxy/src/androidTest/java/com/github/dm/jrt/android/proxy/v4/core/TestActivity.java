@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.proxy.R;
 /**
  * Test activity.
  * <p/>
- * Created by davide-maestroni on 12/16/14.
+ * Created by davide-maestroni on 12/16/2014.
  */
 public class TestActivity extends FragmentActivity {
 

@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 10/03/14.
+ * Created by davide-maestroni on 10/03/2014.
  *
  * @see com.github.dm.jrt.log.Logger Logger
  */

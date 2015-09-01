@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
  * delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increase in memory usage and computation.
  * <p/>
- * Created by davide-maestroni on 07/03/15.
+ * Created by davide-maestroni on 07/03/2015.
  */
 public final class ChannelConfiguration {
 

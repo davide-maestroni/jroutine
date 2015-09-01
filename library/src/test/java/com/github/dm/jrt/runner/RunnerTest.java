@@ -40,7 +40,7 @@ import static org.junit.Assert.fail;
 /**
  * Runners unit tests.
  * <p/>
- * Created by davide-maestroni on 10/02/14.
+ * Created by davide-maestroni on 10/02/2014.
  */
 public class RunnerTest {
 

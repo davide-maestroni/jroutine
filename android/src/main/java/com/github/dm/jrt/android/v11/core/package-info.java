@@ -14,6 +14,6 @@
 /**
  * Routine interfaces and implementations specific to the Android platform.
  * <p/>
- * Created by davide-maestroni on 09/25/14.
+ * Created by davide-maestroni on 09/25/2014.
  */
 package com.github.dm.jrt.android.v11.core;

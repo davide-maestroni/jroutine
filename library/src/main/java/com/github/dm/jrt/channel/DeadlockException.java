@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * Exception indicating a possible deadlock.
  * <p/>
- * Created by davide-maestroni on 06/18/15.
+ * Created by davide-maestroni on 06/18/2015.
  */
 public class DeadlockException extends RoutineException {
 

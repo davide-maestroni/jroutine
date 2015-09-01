@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  * Exception indicating that no room in the input channel buffer became available before the
  * specific timeout elapsed.
  * <p/>
- * Created by davide-maestroni on 11/25/14.
+ * Created by davide-maestroni on 11/25/2014.
  */
 public class InputTimeoutException extends ChannelTimeoutException {
 

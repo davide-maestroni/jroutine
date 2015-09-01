@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 /**
  * Utility class for handling time in different time units.
  * <p/>
- * Created by davide-maestroni on 09/09/14.
+ * Created by davide-maestroni on 09/09/2014.
  */
 public class Time {
 

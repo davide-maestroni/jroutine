@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * Exception indicating a possible deadlock while waiting for an invocation instance to become
  * available.
  * <p/>
- * Created by davide-maestroni on 07/19/15.
+ * Created by davide-maestroni on 07/19/2015.
  */
 public class InvocationDeadlockException extends DeadlockException {
 

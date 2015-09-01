@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 /**
  * Default implementation of an execution object.
  * <p/>
- * Created by davide-maestroni on 09/24/14.
+ * Created by davide-maestroni on 09/24/2014.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

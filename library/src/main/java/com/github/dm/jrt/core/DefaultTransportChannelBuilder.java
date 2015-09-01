@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a builder of transport channel objects.
  * <p/>
- * Created by davide-maestroni on 10/25/14.
+ * Created by davide-maestroni on 10/25/2014.
  */
 class DefaultTransportChannelBuilder
         implements TransportChannelBuilder, Configurable<TransportChannelBuilder> {

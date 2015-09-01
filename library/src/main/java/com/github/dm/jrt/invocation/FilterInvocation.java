@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Note that the implementing class must not retain an internal variable state.
  * <p/>
- * Created by davide-maestroni on 02/14/15.
+ * Created by davide-maestroni on 02/14/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

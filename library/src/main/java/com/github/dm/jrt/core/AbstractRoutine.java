@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
  * This class provides a default implementation of all the routine features. The inheriting class
  * just needs to create invocation objects when required.
  * <p/>
- * Created by davide-maestroni on 09/07/14.
+ * Created by davide-maestroni on 09/07/2014.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

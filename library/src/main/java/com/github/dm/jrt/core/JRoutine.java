@@ -128,7 +128,7 @@ import javax.annotation.Nonnull;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 09/07/14.
+ * Created by davide-maestroni on 09/07/2014.
  *
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input

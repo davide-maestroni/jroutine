@@ -26,13 +26,13 @@ import javax.annotation.Nonnull;
  * The implementing class may additionally override the invocation methods to specifically handle
  * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
  * <p/>
- * Created by davide-maestroni on 1/8/15.
+ * Created by davide-maestroni on 01/08/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class FunctionContextInvocation<INPUT, OUTPUT>
-        extends FunctionInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public abstract class FunctionContextInvocation<IN, OUT> extends FunctionInvocation<IN, OUT>
+        implements ContextInvocation<IN, OUT> {
 
     private Context mContext;
 

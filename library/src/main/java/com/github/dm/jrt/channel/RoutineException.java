@@ -13,10 +13,12 @@
  */
 package com.github.dm.jrt.channel;
 
+import javax.annotation.Nullable;
+
 /**
  * Common base exception class.
  * <p/>
- * Created by davide-maestroni on 1/23/15.
+ * Created by davide-maestroni on 01/23/15.
  */
 public class RoutineException extends RuntimeException {
 
@@ -32,7 +34,7 @@ public class RoutineException extends RuntimeException {
      *
      * @param message the error message.
      */
-    public RoutineException(final String message) {
+    public RoutineException(@Nullable final String message) {
 
         super(message);
     }
@@ -42,7 +44,7 @@ public class RoutineException extends RuntimeException {
      *
      * @param cause the error cause.
      */
-    public RoutineException(final Throwable cause) {
+    public RoutineException(@Nullable final Throwable cause) {
 
         super(cause);
     }

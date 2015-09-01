@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.R;
 /**
  * Test activity ensuring the creation of the loader manager during call to {@code onCreate()}.
  * <p/>
- * Created by davide-maestroni on 1/28/15.
+ * Created by davide-maestroni on 01/28/15.
  */
 public class RotationTestActivity extends FragmentActivity {
 

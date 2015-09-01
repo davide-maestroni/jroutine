@@ -29,7 +29,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
 /**
  * Test application.
  * <p/>
- * Created by davide-maestroni on 4/6/2015.
+ * Created by davide-maestroni on 04/06/2015.
  */
 @SuppressWarnings("unused")
 public class TestApp extends Application implements FactoryContext {

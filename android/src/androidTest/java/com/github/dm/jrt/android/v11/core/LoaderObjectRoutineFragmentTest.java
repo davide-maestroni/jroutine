@@ -70,7 +70,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Loader object routine fragment unit tests.
  * <p/>
- * Created by davide-maestroni on 4/7/15.
+ * Created by davide-maestroni on 04/07/15.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class LoaderObjectRoutineFragmentTest
@@ -2015,7 +2015,7 @@ public class LoaderObjectRoutineFragmentTest
          *
          * @param base the base context.
          */
-        public StringContext(final Context base) {
+        public StringContext(@Nonnull final Context base) {
 
             super(base);
         }

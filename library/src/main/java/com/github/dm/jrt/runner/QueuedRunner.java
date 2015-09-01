@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
  * of the call stack, and tries to prevent blocking the execution of the calling thread by
  * reordering delayed executions inside the queue.
  * <p/>
- * Created by davide-maestroni on 9/18/14.
+ * Created by davide-maestroni on 09/18/14.
  *
  * @see com.github.dm.jrt.runner.SequentialRunner SequentialRunner
  */

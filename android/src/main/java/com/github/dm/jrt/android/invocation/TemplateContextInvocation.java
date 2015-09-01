@@ -24,13 +24,13 @@ import javax.annotation.Nonnull;
  * <p/>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
- * Created by davide-maestroni on 1/8/15.
+ * Created by davide-maestroni on 01/08/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class TemplateContextInvocation<INPUT, OUTPUT>
-        extends TemplateInvocation<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public abstract class TemplateContextInvocation<IN, OUT> extends TemplateInvocation<IN, OUT>
+        implements ContextInvocation<IN, OUT> {
 
     private Context mContext;
 

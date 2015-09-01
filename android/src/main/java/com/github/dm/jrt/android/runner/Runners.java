@@ -28,7 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Utility class for creating and sharing runner instances, employing specific Android classes.
  * <p/>
- * Created by davide-maestroni on 9/28/14.
+ * Created by davide-maestroni on 09/28/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")

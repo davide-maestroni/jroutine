@@ -18,7 +18,6 @@ import android.support.v4.content.AsyncTaskLoader;
 
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.invocation.ContextInvocations;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
@@ -29,21 +28,23 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
+
 /**
  * Loader implementation performing the routine invocation.
  * <p/>
- * Created by davide-maestroni on 12/8/14.
+ * Created by davide-maestroni on 12/08/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
+class RoutineLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
-    private final List<? extends INPUT> mInputs;
+    private final List<? extends IN> mInputs;
 
-    private final ContextInvocation<INPUT, OUTPUT> mInvocation;
+    private final ContextInvocation<IN, OUT> mInvocation;
 
-    private final ContextInvocationFactory<INPUT, OUTPUT> mInvocationFactory;
+    private final ContextInvocationFactory<IN, OUT> mInvocationFactory;
 
     private final Logger mLogger;
 
@@ -51,7 +52,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
     private int mInvocationCount;
 
-    private InvocationResult<OUTPUT> mResult;
+    private InvocationResult<OUT> mResult;
 
     /**
      * Constructor.
@@ -65,9 +66,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
-            @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> invocationFactory,
-            @Nonnull final List<? extends INPUT> inputs, @Nullable final OrderType order,
+            @Nonnull final ContextInvocation<IN, OUT> invocation,
+            @Nonnull final ContextInvocationFactory<IN, OUT> invocationFactory,
+            @Nonnull final List<? extends IN> inputs, @Nullable final OrderType order,
             @Nonnull final Logger logger) {
 
         super(context);
@@ -100,13 +101,13 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      * @param inputs the input data.
      * @return whether the inputs are equal.
      */
-    public boolean areSameInputs(@Nullable final List<? extends INPUT> inputs) {
+    public boolean areSameInputs(@Nullable final List<? extends IN> inputs) {
 
         return mInputs.equals(inputs);
     }
 
     @Override
-    public void deliverResult(final InvocationResult<OUTPUT> data) {
+    public void deliverResult(final InvocationResult<OUT> data) {
 
         mLogger.dbg("delivering result: %s", data);
         mResult = data;
@@ -119,7 +120,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         super.onStartLoading();
         final Logger logger = mLogger;
         logger.dbg("start background invocation");
-        final InvocationResult<OUTPUT> result = mResult;
+        final InvocationResult<OUT> result = mResult;
 
         if (takeContentChanged() || (result == null)) {
 
@@ -151,14 +152,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     @Override
-    public InvocationResult<OUTPUT> loadInBackground() {
+    public InvocationResult<OUT> loadInBackground() {
 
         final Logger logger = mLogger;
-        final InvocationOutputConsumer<OUTPUT> consumer =
-                new InvocationOutputConsumer<OUTPUT>(this, logger);
-        final LoaderContextInvocationFactory<INPUT, OUTPUT> factory =
-                new LoaderContextInvocationFactory<INPUT, OUTPUT>(mInvocation);
-        JRoutine.on(ContextInvocations.factoryTo(getContext(), factory))
+        final InvocationOutputConsumer<OUT> consumer =
+                new InvocationOutputConsumer<OUT>(this, logger);
+        final LoaderContextInvocationFactory<IN, OUT> factory =
+                new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
+        JRoutine.on(fromFactory(getContext(), factory))
                 .invocations()
                 .withSyncRunner(Runners.sequentialRunner())
                 .withOutputOrder(mOrderType)
@@ -195,7 +196,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      *
      * @return the factory.
      */
-    ContextInvocationFactory<INPUT, OUTPUT> getInvocationFactory() {
+    ContextInvocationFactory<IN, OUT> getInvocationFactory() {
 
         return mInvocationFactory;
     }
@@ -209,7 +210,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      */
     boolean isStaleResult(final long staleTimeMillis) {
 
-        final InvocationResult<OUTPUT> result = mResult;
+        final InvocationResult<OUT> result = mResult;
         return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
                 > staleTimeMillis);
     }
@@ -217,13 +218,13 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     /**
      * Context invocation factory implementation.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class LoaderContextInvocationFactory<INPUT, OUTPUT>
-            extends ContextInvocationFactory<INPUT, OUTPUT> {
+    private static class LoaderContextInvocationFactory<IN, OUT>
+            extends ContextInvocationFactory<IN, OUT> {
 
-        private final ContextInvocation<INPUT, OUTPUT> mInvocation;
+        private final ContextInvocation<IN, OUT> mInvocation;
 
         /**
          * Constructor.
@@ -231,14 +232,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
          * @param invocation the loader invocation instance.
          */
         private LoaderContextInvocationFactory(
-                @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation) {
+                @Nonnull final ContextInvocation<IN, OUT> invocation) {
 
             mInvocation = invocation;
         }
 
         @Nonnull
         @Override
-        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
             return mInvocation;
         }

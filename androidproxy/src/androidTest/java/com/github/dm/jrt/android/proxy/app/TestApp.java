@@ -29,12 +29,12 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
 /**
  * Test application.
  * <p/>
- * Created by davide-maestroni on 4/6/2015.
+ * Created by davide-maestroni on 04/06/2015.
  */
 @SuppressWarnings("unused")
 public class TestApp extends Application implements FactoryContext {
 
-    private static final HashMap<InstanceInfo, Object> sInstanceMap =
+    private static final HashMap<InstanceInfo, Object> sInstances =
             new HashMap<InstanceInfo, Object>();
 
     @Nullable
@@ -42,16 +42,16 @@ public class TestApp extends Application implements FactoryContext {
     public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
             @Nonnull final Object[] args) {
 
-        final HashMap<InstanceInfo, Object> instanceMap = sInstanceMap;
+        final HashMap<InstanceInfo, Object> instances = sInstances;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
-        Object instance = instanceMap.get(instanceInfo);
+        Object instance = instances.get(instanceInfo);
 
         if (instance == null) {
 
             try {
 
                 instance = findConstructor(type, args).newInstance(args);
-                instanceMap.put(instanceInfo, instance);
+                instances.put(instanceInfo, instance);
 
             } catch (final Throwable t) {
 

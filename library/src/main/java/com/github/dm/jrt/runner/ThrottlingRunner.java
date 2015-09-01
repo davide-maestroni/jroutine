@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
  * Runner implementation throttling the number of running executions so to keep it under a specified
  * limit.
  * <p/>
- * Created by davide-maestroni on 18/07/15.
+ * Created by davide-maestroni on 07/18/15.
  */
 class ThrottlingRunner implements Runner {
 

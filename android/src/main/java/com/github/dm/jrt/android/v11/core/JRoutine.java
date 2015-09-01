@@ -135,7 +135,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * than
  * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
- * Created by davide-maestroni on 12/8/14.
+ * Created by davide-maestroni on 12/08/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")
@@ -169,20 +169,19 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      *
-     * @param context  the routine context.
-     * @param factory  the invocation factory.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param context the routine context.
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
      * @return the routine builder instance.
      * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
      *                                            static.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> LoaderRoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
+    public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(@Nonnull final LoaderContext context,
+            @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
 
-        return new DefaultLoaderRoutineBuilder<INPUT, OUTPUT>(context, factory);
+        return new DefaultLoaderRoutineBuilder<IN, OUT>(context, factory);
     }
 
     /**

@@ -25,11 +25,11 @@ import javax.annotation.Nullable;
  * <p/>
  * Note that the delivery order of the input data might not be guaranteed.
  * <p/>
- * Created by davide-maestroni on 9/4/14.
+ * Created by davide-maestroni on 09/04/14.
  *
- * @param <INPUT> the input data type.
+ * @param <IN> the input data type.
  */
-public interface InputChannel<INPUT> extends Channel {
+public interface InputChannel<IN> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
@@ -42,7 +42,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
     @Nonnull
-    InputChannel<INPUT> after(@Nonnull TimeDuration delay);
+    InputChannel<IN> after(@Nonnull TimeDuration delay);
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
@@ -57,7 +57,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
     @Nonnull
-    InputChannel<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    InputChannel<IN> after(long delay, @Nonnull TimeUnit timeUnit);
 
     /**
      * Tells the channel to not delay the transfer of data.
@@ -67,7 +67,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
     @Nonnull
-    InputChannel<INPUT> now();
+    InputChannel<IN> now();
 
     /**
      * Tells the channel to sort the passed input data based on the order of the calls to the pass
@@ -82,7 +82,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @see #orderByDelay()
      */
     @Nonnull
-    InputChannel<INPUT> orderByCall();
+    InputChannel<IN> orderByCall();
 
     /**
      * Tells the channel to avoid sorting the passed input in any particular order.
@@ -96,7 +96,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @see #orderByDelay()
      */
     @Nonnull
-    InputChannel<INPUT> orderByChance();
+    InputChannel<IN> orderByChance();
 
     /**
      * Tells the channel to sort the passed input data based on the specific delay.<br/>
@@ -113,7 +113,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @see #orderByChance()
      */
     @Nonnull
-    InputChannel<INPUT> orderByDelay();
+    InputChannel<IN> orderByDelay();
 
     /**
      * Passes the data returned by the specified channel to this one.
@@ -128,7 +128,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @see com.github.dm.jrt.channel.OutputChannel#passTo(InputChannel)
      */
     @Nonnull
-    InputChannel<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
+    InputChannel<IN> pass(@Nullable OutputChannel<? extends IN> channel);
 
     /**
      * Passes the data returned by the specified iterable to this channel.
@@ -139,7 +139,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
     @Nonnull
-    InputChannel<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+    InputChannel<IN> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * Passes the specified input to this channel.
@@ -150,7 +150,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
     @Nonnull
-    InputChannel<INPUT> pass(@Nullable INPUT input);
+    InputChannel<IN> pass(@Nullable IN input);
 
     /**
      * Passes the specified input data to this channel.
@@ -161,5 +161,5 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
     @Nonnull
-    InputChannel<INPUT> pass(@Nullable INPUT... inputs);
+    InputChannel<IN> pass(@Nullable IN... inputs);
 }

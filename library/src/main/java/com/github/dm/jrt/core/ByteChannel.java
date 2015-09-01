@@ -37,13 +37,21 @@ import javax.annotation.Nonnull;
  * Note that the streams used to write into and read from buffers should be properly closed as the
  * Java best practices suggest.
  * <p/>
- * Created by davide-maestroni on 26/08/15.
+ * Created by davide-maestroni on 08/26/15.
  */
 public class ByteChannel {
 
+    /**
+     * The default buffer size in number of bytes.
+     */
     public static final int DEFAULT_BUFFER_SIZE = 1024 << 3;
 
+    /**
+     * The default core pool size.
+     */
     public static final int DEFAULT_POOL_SIZE = 16;
+
+    private static final int DEFAULT_MEM_SIZE = DEFAULT_POOL_SIZE * DEFAULT_BUFFER_SIZE;
 
     private final LinkedList<ByteBuffer> mBufferPool = new LinkedList<ByteBuffer>();
 
@@ -54,6 +62,17 @@ public class ByteChannel {
     private final WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>
             mStreams =
             new WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>();
+
+    /**
+     * Constructor.
+     *
+     * @param dataBufferSize the data buffer size.
+     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
+     */
+    ByteChannel(final int dataBufferSize) {
+
+        this(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
+    }
 
     /**
      * Constructor.
@@ -642,6 +661,7 @@ public class ByteChannel {
             return this;
         }
 
+        @Nonnull
         private byte[] readBuffer() {
 
             synchronized (mMutex) {
@@ -682,6 +702,7 @@ public class ByteChannel {
             return this;
         }
 
+        @Nonnull
         private byte[] writeBuffer() {
 
             synchronized (mMutex) {
@@ -719,7 +740,7 @@ public class ByteChannel {
          *
          * @param buffer the internal buffer.
          */
-        private DefaultBufferInputStream(final ByteBuffer buffer) {
+        private DefaultBufferInputStream(@Nonnull final ByteBuffer buffer) {
 
             mBuffer = buffer;
         }

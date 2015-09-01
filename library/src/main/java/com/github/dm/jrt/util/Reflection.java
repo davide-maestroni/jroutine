@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 /**
  * Reflection utility class.
  * <p/>
- * Created by davide-maestroni on 9/9/14.
+ * Created by davide-maestroni on 09/09/14.
  */
 public class Reflection {
 
@@ -36,12 +36,13 @@ public class Reflection {
      */
     public static final Object[] NO_ARGS = new Object[0];
 
-    private static final HashMap<Class<?>, Class<?>> sBoxMap = new HashMap<Class<?>, Class<?>>(9);
+    private static final HashMap<Class<?>, Class<?>> sBoxingClasses =
+            new HashMap<Class<?>, Class<?>>(9);
 
     /**
      * Avoid direct instantiation.
      */
-    private Reflection() {
+    protected Reflection() {
 
     }
 
@@ -61,7 +62,7 @@ public class Reflection {
             return type;
         }
 
-        return sBoxMap.get(type);
+        return sBoxingClasses.get(type);
     }
 
     /**
@@ -299,7 +300,7 @@ public class Reflection {
 
     static {
 
-        final HashMap<Class<?>, Class<?>> boxMap = sBoxMap;
+        final HashMap<Class<?>, Class<?>> boxMap = sBoxingClasses;
         boxMap.put(boolean.class, Boolean.class);
         boxMap.put(byte.class, Byte.class);
         boxMap.put(char.class, Character.class);

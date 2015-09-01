@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * Implementation of a runner employing the Android {@link android.os.Looper} queue to execute the
  * routine invocations.
  * <p/>
- * Created by davide-maestroni on 9/28/14.
+ * Created by davide-maestroni on 09/28/14.
  */
 class LooperRunner implements Runner {
 
@@ -87,6 +87,11 @@ class LooperRunner implements Runner {
 
         private final Runner mQueuedRunner = Runners.queuedRunner();
 
+        /**
+         * Constructor.
+         *
+         * @param looper the looper instance.
+         */
         private LooperThreadRunner(@Nonnull final Looper looper) {
 
             mLooperRunner = new LooperRunner(looper, null);

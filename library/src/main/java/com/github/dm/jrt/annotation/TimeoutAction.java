@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 4/8/2015.
+ * Created by davide-maestroni on 04/08/2015.
  *
  * @see com.github.dm.jrt.builder.InvocationConfiguration InvocationConfiguration
  */

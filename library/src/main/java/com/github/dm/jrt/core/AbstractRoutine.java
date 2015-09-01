@@ -41,19 +41,19 @@ import javax.annotation.Nullable;
  * This class provides a default implementation of all the routine features. The inheriting class
  * just needs to create invocation objects when required.
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 09/07/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
+public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
     private static final int DEFAULT_CORE_INVOCATIONS = 10;
 
     private static final int DEFAULT_MAX_INVOCATIONS = Integer.MAX_VALUE;
 
-    private final LinkedList<Invocation<INPUT, OUTPUT>> mAsyncInvocations =
-            new LinkedList<Invocation<INPUT, OUTPUT>>();
+    private final LinkedList<Invocation<IN, OUT>> mAsyncInvocations =
+            new LinkedList<Invocation<IN, OUT>>();
 
     private final Runner mAsyncRunner;
 
@@ -67,19 +67,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final Object mMutex = new Object();
 
-    private final SimpleQueue<InvocationObserver<INPUT, OUTPUT>> mObservers =
-            new SimpleQueue<InvocationObserver<INPUT, OUTPUT>>();
+    private final SimpleQueue<InvocationObserver<IN, OUT>> mObservers =
+            new SimpleQueue<InvocationObserver<IN, OUT>>();
 
     private final Object mParallelMutex = new Object();
 
-    private final LinkedList<Invocation<INPUT, OUTPUT>> mSyncInvocations =
-            new LinkedList<Invocation<INPUT, OUTPUT>>();
+    private final LinkedList<Invocation<IN, OUT>> mSyncInvocations =
+            new LinkedList<Invocation<IN, OUT>>();
 
     private final Runner mSyncRunner;
 
     private volatile DefaultInvocationManager mAsyncManager;
 
-    private AbstractRoutine<INPUT, OUTPUT> mParallelRoutine;
+    private AbstractRoutine<IN, OUT> mParallelRoutine;
 
     private int mRunningCount;
 
@@ -135,13 +135,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> asyncInvoke() {
+    public InvocationChannel<IN, OUT> asyncInvoke() {
 
         return invoke(InvocationType.ASYNC);
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> parallelInvoke() {
+    public InvocationChannel<IN, OUT> parallelInvoke() {
 
         synchronized (mParallelMutex) {
 
@@ -149,17 +149,18 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             if (mParallelRoutine == null) {
 
-                mParallelRoutine = new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner,
-                                                                      mAsyncRunner, mLogger) {
+                mParallelRoutine =
+                        new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
+                                                     mLogger) {
 
-                    @Nonnull
-                    @Override
-                    protected Invocation<INPUT, OUTPUT> newInvocation(
-                            @Nonnull final InvocationType type) {
+                            @Nonnull
+                            @Override
+                            protected Invocation<IN, OUT> newInvocation(
+                                    @Nonnull final InvocationType type) {
 
-                        return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
-                    }
-                };
+                                return new ParallelInvocation<IN, OUT>(AbstractRoutine.this);
+                            }
+                        };
             }
         }
 
@@ -167,7 +168,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> syncInvoke() {
+    public InvocationChannel<IN, OUT> syncInvoke() {
 
         return invoke(InvocationType.SYNC);
     }
@@ -178,9 +179,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         synchronized (mMutex) {
 
             final Logger logger = mLogger;
-            final LinkedList<Invocation<INPUT, OUTPUT>> syncInvocations = mSyncInvocations;
+            final LinkedList<Invocation<IN, OUT>> syncInvocations = mSyncInvocations;
 
-            for (final Invocation<INPUT, OUTPUT> invocation : syncInvocations) {
+            for (final Invocation<IN, OUT> invocation : syncInvocations) {
 
                 try {
 
@@ -195,9 +196,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             syncInvocations.clear();
 
-            final LinkedList<Invocation<INPUT, OUTPUT>> asyncInvocations = mAsyncInvocations;
+            final LinkedList<Invocation<IN, OUT>> asyncInvocations = mAsyncInvocations;
 
-            for (final Invocation<INPUT, OUTPUT> invocation : asyncInvocations) {
+            for (final Invocation<IN, OUT> invocation : asyncInvocations) {
 
                 try {
 
@@ -223,8 +224,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      */
     @Nonnull
     @SuppressWarnings("UnusedParameters")
-    protected Invocation<INPUT, OUTPUT> convertInvocation(
-            @Nonnull final Invocation<INPUT, OUTPUT> invocation,
+    protected Invocation<IN, OUT> convertInvocation(@Nonnull final Invocation<IN, OUT> invocation,
             @Nonnull final InvocationType type) {
 
         return invocation;
@@ -248,7 +248,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      * @return the invocation instance.
      */
     @Nonnull
-    protected abstract Invocation<INPUT, OUTPUT> newInvocation(@Nonnull InvocationType type);
+    protected abstract Invocation<IN, OUT> newInvocation(@Nonnull InvocationType type);
 
     @Nonnull
     private DefaultInvocationManager getInvocationManager(@Nonnull final InvocationType type) {
@@ -274,14 +274,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    private InvocationChannel<INPUT, OUTPUT> invoke(@Nonnull final InvocationType type) {
+    private InvocationChannel<IN, OUT> invoke(@Nonnull final InvocationType type) {
 
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %s", type);
         final Runner runner = (type == InvocationType.ASYNC) ? mAsyncRunner : mSyncRunner;
-        return new DefaultInvocationChannel<INPUT, OUTPUT>(mConfiguration,
-                                                           getInvocationManager(type), runner,
-                                                           logger);
+        return new DefaultInvocationChannel<IN, OUT>(mConfiguration, getInvocationManager(type),
+                                                     runner, logger);
     }
 
     /**
@@ -296,35 +295,42 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     /**
      * Implementation of an invocation handling parallel mode.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class ParallelInvocation<INPUT, OUTPUT>
-            extends TemplateInvocation<INPUT, OUTPUT> {
+    private static class ParallelInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-        private final Routine<INPUT, OUTPUT> mRoutine;
+        private final Routine<IN, OUT> mRoutine;
 
         /**
          * Constructor.
          *
          * @param routine the routine to invoke in parallel mode.
          */
-        private ParallelInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+        private ParallelInvocation(@Nonnull final Routine<IN, OUT> routine) {
 
             mRoutine = routine;
         }
 
         @Override
-        public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+        public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
 
             result.pass(mRoutine.asyncCall(input));
         }
     }
 
+    /**
+     * Execution implementation used to delay the creation of invocations.
+     */
     private class CreateExecution extends TemplateExecution {
 
         private final DefaultInvocationManager mManager;
 
+        /**
+         * Constructor.
+         *
+         * @param invocationManager the invocation manager instance.
+         */
         private CreateExecution(@Nonnull final DefaultInvocationManager invocationManager) {
 
             mManager = invocationManager;
@@ -339,15 +345,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     /**
      * Default implementation of an invocation manager supporting recycling of invocation instances.
      */
-    private class DefaultInvocationManager implements InvocationManager<INPUT, OUTPUT> {
+    private class DefaultInvocationManager implements InvocationManager<IN, OUT> {
 
         private final CreateExecution mCreateExecution;
 
-        private final LinkedList<Invocation<INPUT, OUTPUT>> mFallbackInvocations;
+        private final LinkedList<Invocation<IN, OUT>> mFallbackInvocations;
 
         private final InvocationType mInvocationType;
 
-        private final LinkedList<Invocation<INPUT, OUTPUT>> mPrimaryInvocations;
+        private final LinkedList<Invocation<IN, OUT>> mPrimaryInvocations;
 
         private final Runner mRunner;
 
@@ -361,8 +367,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
          */
         private DefaultInvocationManager(@Nonnull final InvocationType type,
                 @Nonnull final Runner runner,
-                @Nonnull final LinkedList<Invocation<INPUT, OUTPUT>> primaryInvocations,
-                @Nonnull final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations) {
+                @Nonnull final LinkedList<Invocation<IN, OUT>> primaryInvocations,
+                @Nonnull final LinkedList<Invocation<IN, OUT>> fallbackInvocations) {
 
             mInvocationType = type;
             mRunner = runner;
@@ -371,12 +377,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             mCreateExecution = new CreateExecution(this);
         }
 
-        public void create(@Nonnull final InvocationObserver<INPUT, OUTPUT> observer) {
+        public void create(@Nonnull final InvocationObserver<IN, OUT> observer) {
 
             create(observer, false);
         }
 
-        public void discard(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+        public void discard(@Nonnull final Invocation<IN, OUT> invocation) {
 
             final boolean hasDelayed;
 
@@ -405,7 +411,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             }
         }
 
-        public void recycle(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+        public void recycle(@Nonnull final Invocation<IN, OUT> invocation) {
 
             final boolean hasDelayed;
 
@@ -413,10 +419,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 final Logger logger = mLogger;
                 final int coreInvocations = mCoreInvocations;
-                final LinkedList<Invocation<INPUT, OUTPUT>> primaryInvocations =
-                        mPrimaryInvocations;
-                final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations =
-                        mFallbackInvocations;
+                final LinkedList<Invocation<IN, OUT>> primaryInvocations = mPrimaryInvocations;
+                final LinkedList<Invocation<IN, OUT>> fallbackInvocations = mFallbackInvocations;
 
                 if ((primaryInvocations.size() + fallbackInvocations.size()) < coreInvocations) {
 
@@ -451,19 +455,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         }
 
         @SuppressWarnings("ConstantConditions")
-        private void create(@Nullable final InvocationObserver<INPUT, OUTPUT> observer,
+        private void create(@Nullable final InvocationObserver<IN, OUT> observer,
                 final boolean isDelayed) {
 
-            InvocationObserver<INPUT, OUTPUT> invocationObserver = observer;
+            InvocationObserver<IN, OUT> invocationObserver = observer;
 
             try {
 
                 Throwable error = null;
-                Invocation<INPUT, OUTPUT> invocation = null;
+                Invocation<IN, OUT> invocation = null;
 
                 synchronized (mMutex) {
 
-                    final SimpleQueue<InvocationObserver<INPUT, OUTPUT>> observers = mObservers;
+                    final SimpleQueue<InvocationObserver<IN, OUT>> observers = mObservers;
 
                     if (isDelayed) {
 
@@ -479,8 +483,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                         final InvocationType invocationType = mInvocationType;
                         final int coreInvocations = mCoreInvocations;
-                        final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
-                                mPrimaryInvocations;
+                        final LinkedList<Invocation<IN, OUT>> invocations = mPrimaryInvocations;
 
                         if (!invocations.isEmpty()) {
 
@@ -491,12 +494,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                         } else {
 
-                            final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations =
+                            final LinkedList<Invocation<IN, OUT>> fallbackInvocations =
                                     mFallbackInvocations;
 
                             if (!fallbackInvocations.isEmpty()) {
 
-                                final Invocation<INPUT, OUTPUT> convertInvocation =
+                                final Invocation<IN, OUT> convertInvocation =
                                         fallbackInvocations.removeFirst();
                                 mLogger.dbg("converting %s invocation instance [%d/%d]: %s",
                                             invocationType, invocations.size() + 1, coreInvocations,

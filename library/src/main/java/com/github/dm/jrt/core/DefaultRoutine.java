@@ -24,14 +24,14 @@ import javax.annotation.Nonnull;
 /**
  * Default implementation of a routine object instantiating invocation objects through a factory.
  * <p/>
- * Created by davide-maestroni on 9/9/14.
+ * Created by davide-maestroni on 09/09/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
+class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
-    private final InvocationFactory<INPUT, OUTPUT> mFactory;
+    private final InvocationFactory<IN, OUT> mFactory;
 
     /**
      * Constructor.
@@ -41,7 +41,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      */
     @SuppressWarnings("ConstantConditions")
     DefaultRoutine(@Nonnull final InvocationConfiguration configuration,
-            @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
+            @Nonnull final InvocationFactory<IN, OUT> factory) {
 
         super(configuration);
 
@@ -55,15 +55,15 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     @Nonnull
     @Override
-    protected Invocation<INPUT, OUTPUT> newInvocation(@Nonnull final InvocationType type) {
+    protected Invocation<IN, OUT> newInvocation(@Nonnull final InvocationType type) {
 
         final Logger logger = getLogger();
 
         try {
 
-            final InvocationFactory<INPUT, OUTPUT> factory = mFactory;
+            final InvocationFactory<IN, OUT> factory = mFactory;
             logger.dbg("creating a new invocation instance with factory: %s", factory);
-            final Invocation<INPUT, OUTPUT> invocation = factory.newInvocation();
+            final Invocation<IN, OUT> invocation = factory.newInvocation();
             logger.dbg("created a new instance of class: %s", invocation.getClass());
             return invocation;
 

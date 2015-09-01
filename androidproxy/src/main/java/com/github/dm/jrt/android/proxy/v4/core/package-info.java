@@ -15,6 +15,6 @@
  * Routine proxy core interfaces and implementations bound to an Android context, with support for
  * Android compatibility library.
  * <p/>
- * Created by davide-maestroni on 5/10/15.
+ * Created by davide-maestroni on 05/10/15.
  */
 package com.github.dm.jrt.android.proxy.v4.core;

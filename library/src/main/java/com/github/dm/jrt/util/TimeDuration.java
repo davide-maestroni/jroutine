@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Utility class for handling a time duration in different time units.
  * <p/>
- * Created by davide-maestroni on 9/9/14.
+ * Created by davide-maestroni on 09/09/14.
  */
 public class TimeDuration extends Time {
 

@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
  * The implementing class can optionally support the cancellation of executions not yet run (
  * waiting, for example, in a consuming queue).
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 09/07/14.
  */
 public interface Runner {
 

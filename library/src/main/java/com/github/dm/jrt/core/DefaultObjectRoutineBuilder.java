@@ -50,7 +50,7 @@ import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
 /**
  * Class implementing a builder of routines wrapping an object methods.
  * <p/>
- * Created by davide-maestroni on 9/21/14.
+ * Created by davide-maestroni on 09/21/14.
  */
 class DefaultObjectRoutineBuilder
         implements ObjectRoutineBuilder, Configurable<ObjectRoutineBuilder>,
@@ -87,7 +87,7 @@ class DefaultObjectRoutineBuilder
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
+    public <IN, OUT> Routine<IN, OUT> aliasMethod(@Nonnull final String name) {
 
         final Method method = getAnnotatedMethod(name, mTarget.getTargetClass());
 
@@ -121,14 +121,14 @@ class DefaultObjectRoutineBuilder
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
+    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
         return method(Reflection.findMethod(mTarget.getTargetClass(), name, parameterTypes));
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final Method method) {
 
         return getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
                           configurationWithAnnotations(mProxyConfiguration, method), method, null,
@@ -178,7 +178,7 @@ class DefaultObjectRoutineBuilder
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    private <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
+    private <IN, OUT> Routine<IN, OUT> getRoutine(
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
@@ -217,7 +217,7 @@ class DefaultObjectRoutineBuilder
                 routineMap.put(routineInfo, routine);
             }
 
-            return (Routine<INPUT, OUTPUT>) routine;
+            return (Routine<IN, OUT>) routine;
         }
     }
 

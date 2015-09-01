@@ -22,14 +22,14 @@ import javax.annotation.Nullable;
 /**
  * Base invocation decorator implementation.
  * <p/>
- * Created by davide-maestroni on 19/08/15.
+ * Created by davide-maestroni on 08/19/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public class InvocationDecorator<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
+public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
 
-    private final Invocation<INPUT, OUTPUT> mInvocation;
+    private final Invocation<IN, OUT> mInvocation;
 
     /**
      * Constructor.
@@ -37,7 +37,7 @@ public class InvocationDecorator<INPUT, OUTPUT> implements Invocation<INPUT, OUT
      * @param wrapped the wrapped invocation instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public InvocationDecorator(@Nonnull final Invocation<INPUT, OUTPUT> wrapped) {
+    public InvocationDecorator(@Nonnull final Invocation<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -62,12 +62,12 @@ public class InvocationDecorator<INPUT, OUTPUT> implements Invocation<INPUT, OUT
         mInvocation.onInitialize();
     }
 
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
 
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public void onResult(@Nonnull final ResultChannel<OUT> result) {
 
         mInvocation.onResult(result);
     }

@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.
  * <p/>
- * Created by davide-maestroni on 4/6/2015.
+ * Created by davide-maestroni on 04/06/2015.
  */
 public interface LoaderObjectRoutineBuilder
         extends ObjectRoutineBuilder, LoaderConfigurableBuilder<LoaderObjectRoutineBuilder> {
@@ -49,14 +49,14 @@ public interface LoaderObjectRoutineBuilder
      * honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
-     * @param name     the name specified in the annotation.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param name  the name specified in the annotation.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
-    <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
+    <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@Nonnull String name);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -127,11 +127,13 @@ public interface LoaderObjectRoutineBuilder
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
      */
     @Nonnull
-    <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull String name,
+    <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull String name,
             @Nonnull Class<?>... parameterTypes);
 
     /**
@@ -151,13 +153,13 @@ public interface LoaderObjectRoutineBuilder
      * honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
-     * @param method   the method instance.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param method the method instance.
+     * @param <IN>   the input data type.
+     * @param <OUT>  the output data type.
      * @return the routine.
      */
     @Nonnull
-    <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull Method method);
+    <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull Method method);
 
     /**
      * Note that the configured asynchronous runner will be ignored.

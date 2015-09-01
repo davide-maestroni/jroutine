@@ -34,7 +34,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Utility class for handling routine channels.
  * <p/>
- * Created by davide-maestroni on 3/15/15.
+ * Created by davide-maestroni on 03/15/15.
  */
 public class Channels {
 
@@ -67,9 +67,7 @@ public class Channels {
     @Nonnull
     public static ByteChannel byteChannel(final int dataBufferSize) {
 
-        final int poolSize =
-                (ByteChannel.DEFAULT_POOL_SIZE * ByteChannel.DEFAULT_BUFFER_SIZE) / dataBufferSize;
-        return new ByteChannel(dataBufferSize, poolSize);
+        return new ByteChannel(dataBufferSize);
     }
 
     /**
@@ -309,13 +307,13 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
-     * @param <OUTPUT> the output data type.
+     * @param <OUT>    the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<List<OUTPUT>> join(
-            @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
+    public static <OUT> OutputChannel<List<OUT>> join(
+            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(false, channels);
     }
@@ -346,13 +344,13 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
-     * @param <OUTPUT> the output data type.
+     * @param <OUT>    the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<List<OUTPUT>> joinAndFlush(
-            @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
+    public static <OUT> OutputChannel<List<OUT>> joinAndFlush(
+            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(true, channels);
     }
@@ -385,21 +383,21 @@ public class Channels {
      * @param channel the selectable channel.
      * @param indexes the collection of indexes.
      * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
+     * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> Map<Integer, TransportChannel<INPUT>> map(
+    public static <DATA, IN extends DATA> Map<Integer, TransportChannel<IN>> map(
             @Nonnull final InputChannel<? super Selectable<DATA>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
-        final HashMap<Integer, TransportChannel<INPUT>> channelMap =
-                new HashMap<Integer, TransportChannel<INPUT>>(size);
+        final HashMap<Integer, TransportChannel<IN>> channelMap =
+                new HashMap<Integer, TransportChannel<IN>>(size);
 
         for (final Integer index : indexes) {
 
-            channelMap.put(index, Channels.<DATA, INPUT>select(channel, index));
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
         }
 
         return channelMap;
@@ -414,21 +412,21 @@ public class Channels {
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
      * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
+     * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> Map<Integer, TransportChannel<INPUT>> map(
+    public static <DATA, IN extends DATA> Map<Integer, TransportChannel<IN>> map(
             @Nonnull final InputChannel<? super Selectable<DATA>> channel,
             @Nonnull final int... indexes) {
 
         final int size = indexes.length;
-        final HashMap<Integer, TransportChannel<INPUT>> channelMap =
-                new HashMap<Integer, TransportChannel<INPUT>>(size);
+        final HashMap<Integer, TransportChannel<IN>> channelMap =
+                new HashMap<Integer, TransportChannel<IN>>(size);
 
         for (final int index : indexes) {
 
-            channelMap.put(index, Channels.<DATA, INPUT>select(channel, index));
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
         }
 
         return channelMap;
@@ -444,12 +442,12 @@ public class Channels {
      * @param rangeSize  the size of the range of indexes (must be positive).
      * @param channel    the selectable channel.
      * @param <DATA>     the channel data type.
-     * @param <INPUT>    the input data type.
+     * @param <IN>       the input data type.
      * @return the map of indexes and output channels.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> Map<Integer, TransportChannel<INPUT>> map(
+    public static <DATA, IN extends DATA> Map<Integer, TransportChannel<IN>> map(
             final int startIndex, final int rangeSize,
             @Nonnull final InputChannel<? super Selectable<DATA>> channel) {
 
@@ -458,12 +456,12 @@ public class Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, TransportChannel<INPUT>> channelMap =
-                new HashMap<Integer, TransportChannel<INPUT>>(rangeSize);
+        final HashMap<Integer, TransportChannel<IN>> channelMap =
+                new HashMap<Integer, TransportChannel<IN>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
-            channelMap.put(index, Channels.<DATA, INPUT>select(channel, index));
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
         }
 
         return channelMap;
@@ -477,34 +475,34 @@ public class Channels {
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
      * @param channel    the selectable channel.
-     * @param <OUTPUT>   the output data type.
+     * @param <OUT>      the output data type.
      * @return the map of indexes and output channels.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @Nonnull
-    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> map(final int startIndex,
+    public static <OUT> Map<Integer, OutputChannel<OUT>> map(final int startIndex,
             final int rangeSize,
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUTPUT>> channel) {
+            @Nonnull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
         if (rangeSize <= 0) {
 
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, TransportChannel<OUTPUT>> inputMap =
-                new HashMap<Integer, TransportChannel<OUTPUT>>(rangeSize);
-        final HashMap<Integer, OutputChannel<OUTPUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUTPUT>>(rangeSize);
+        final HashMap<Integer, TransportChannel<OUT>> inputMap =
+                new HashMap<Integer, TransportChannel<OUT>>(rangeSize);
+        final HashMap<Integer, OutputChannel<OUT>> outputMap =
+                new HashMap<Integer, OutputChannel<OUT>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
             final Integer integer = index;
-            final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
+            final TransportChannel<OUT> transportChannel = JRoutine.transport().buildChannel();
             inputMap.put(integer, transportChannel);
             outputMap.put(integer, transportChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUTPUT>(inputMap));
+        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -513,30 +511,30 @@ public class Channels {
      * <p/>
      * Note that the channel will be bound as a result of the call.
      *
-     * @param channel  the selectable output channel.
-     * @param indexes  the list of indexes.
-     * @param <OUTPUT> the output data type.
+     * @param channel the selectable output channel.
+     * @param indexes the list of indexes.
+     * @param <OUT>   the output data type.
      * @return the channel map.
      */
     @Nonnull
-    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> map(
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUTPUT>> channel,
+    public static <OUT> Map<Integer, OutputChannel<OUT>> map(
+            @Nonnull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
-        final HashMap<Integer, TransportChannel<OUTPUT>> inputMap =
-                new HashMap<Integer, TransportChannel<OUTPUT>>(size);
-        final HashMap<Integer, OutputChannel<OUTPUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUTPUT>>(size);
+        final HashMap<Integer, TransportChannel<OUT>> inputMap =
+                new HashMap<Integer, TransportChannel<OUT>>(size);
+        final HashMap<Integer, OutputChannel<OUT>> outputMap =
+                new HashMap<Integer, OutputChannel<OUT>>(size);
 
         for (final Integer index : indexes) {
 
-            final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
+            final TransportChannel<OUT> transportChannel = JRoutine.transport().buildChannel();
             inputMap.put(index, transportChannel);
             outputMap.put(index, transportChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUTPUT>(inputMap));
+        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -545,30 +543,30 @@ public class Channels {
      * <p/>
      * Note that the channel will be bound as a result of the call.
      *
-     * @param channel  the selectable output channel.
-     * @param indexes  the list of indexes.
-     * @param <OUTPUT> the output data type.
+     * @param channel the selectable output channel.
+     * @param indexes the list of indexes.
+     * @param <OUT>   the output data type.
      * @return the channel map.
      */
     @Nonnull
-    public static <OUTPUT> Map<Integer, OutputChannel<OUTPUT>> map(
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUTPUT>> channel,
+    public static <OUT> Map<Integer, OutputChannel<OUT>> map(
+            @Nonnull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @Nonnull final int... indexes) {
 
         final int size = indexes.length;
-        final HashMap<Integer, TransportChannel<OUTPUT>> inputMap =
-                new HashMap<Integer, TransportChannel<OUTPUT>>(size);
-        final HashMap<Integer, OutputChannel<OUTPUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUTPUT>>(size);
+        final HashMap<Integer, TransportChannel<OUT>> inputMap =
+                new HashMap<Integer, TransportChannel<OUT>>(size);
+        final HashMap<Integer, OutputChannel<OUT>> outputMap =
+                new HashMap<Integer, OutputChannel<OUT>>(size);
 
         for (final Integer index : indexes) {
 
-            final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
+            final TransportChannel<OUT> transportChannel = JRoutine.transport().buildChannel();
             inputMap.put(index, transportChannel);
             outputMap.put(index, transportChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUTPUT>(inputMap));
+        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -579,24 +577,24 @@ public class Channels {
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of channels.
-     * @param <OUTPUT>   the output data type.
+     * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<? extends Selectable<OUTPUT>> merge(final int startIndex,
-            @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
+    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
+            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
 
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final TransportChannel<Selectable<OUTPUT>> transportChannel =
+        final TransportChannel<Selectable<OUT>> transportChannel =
                 JRoutine.transport().buildChannel();
         int i = startIndex;
 
-        for (final OutputChannel<? extends OUTPUT> channel : channels) {
+        for (final OutputChannel<? extends OUT> channel : channels) {
 
             transportChannel.pass(toSelectable(channel, i++));
         }
@@ -641,13 +639,13 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
-     * @param <OUTPUT> the output data type.
+     * @param <OUT>    the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<? extends Selectable<OUTPUT>> merge(
-            @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
+    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
+            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return merge(0, channels);
     }
@@ -658,23 +656,23 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
-     * @param <OUTPUT>   the output data type.
+     * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<? extends Selectable<OUTPUT>> merge(
-            @Nonnull final Map<Integer, ? extends OutputChannel<? extends OUTPUT>> channelMap) {
+    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
+            @Nonnull final Map<Integer, ? extends OutputChannel<? extends OUT>> channelMap) {
 
         if (channelMap.isEmpty()) {
 
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final TransportChannel<Selectable<OUTPUT>> transportChannel =
+        final TransportChannel<Selectable<OUT>> transportChannel =
                 JRoutine.transport().buildChannel();
 
-        for (final Entry<Integer, ? extends OutputChannel<? extends OUTPUT>> entry : channelMap
+        for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : channelMap
                 .entrySet()) {
 
             transportChannel.pass(toSelectable(entry.getValue(), entry.getKey()));
@@ -707,21 +705,21 @@ public class Channels {
      * @param channel the selectable channel.
      * @param index   the channel index.
      * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
+     * @param <IN>    the input data type.
      * @return the input channel.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> TransportChannel<INPUT> select(
+    public static <DATA, IN extends DATA> TransportChannel<IN> select(
             @Nullable final InputChannel<? super Selectable<DATA>> channel, final int index) {
 
-        final TransportChannel<INPUT> inputChannel = JRoutine.transport().buildChannel();
+        final TransportChannel<IN> inputChannel = JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
             final TransportChannel<Selectable<DATA>> transportChannel =
                     JRoutine.transport().buildChannel();
             transportChannel.passTo(channel);
-            inputChannel.passTo(new SelectableInputConsumer<DATA, INPUT>(transportChannel, index));
+            inputChannel.passTo(new SelectableInputConsumer<DATA, IN>(transportChannel, index));
         }
 
         return inputChannel;
@@ -732,21 +730,21 @@ public class Channels {
      * <p/>
      * Note that the channel will be bound as a result of the call.
      *
-     * @param channel  the selectable channel.
-     * @param index    the channel index.
-     * @param <OUTPUT> the output data type.
+     * @param channel the selectable channel.
+     * @param index   the channel index.
+     * @param <OUT>   the output data type.
      * @return the output channel.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<OUTPUT> select(
-            @Nullable final OutputChannel<? extends Selectable<? extends OUTPUT>> channel,
+    public static <OUT> OutputChannel<OUT> select(
+            @Nullable final OutputChannel<? extends Selectable<? extends OUT>> channel,
             final int index) {
 
-        final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
+        final TransportChannel<OUT> transportChannel = JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            channel.passTo(new FilterOutputConsumer<OUTPUT>(transportChannel, index));
+            channel.passTo(new FilterOutputConsumer<OUT>(transportChannel, index));
         }
 
         return transportChannel;
@@ -760,21 +758,20 @@ public class Channels {
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
-     * @param <INPUT> the input data type.
+     * @param <IN>    the input data type.
      * @return the selectable input channel.
      */
     @Nonnull
-    public static <INPUT> TransportChannel<Selectable<INPUT>> toSelectable(
-            @Nullable final InputChannel<? super INPUT> channel, final int index) {
+    public static <IN> TransportChannel<Selectable<IN>> toSelectable(
+            @Nullable final InputChannel<? super IN> channel, final int index) {
 
-        final TransportChannel<Selectable<INPUT>> inputChannel =
-                JRoutine.transport().buildChannel();
+        final TransportChannel<Selectable<IN>> inputChannel = JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            final TransportChannel<INPUT> transportChannel = JRoutine.transport().buildChannel();
+            final TransportChannel<IN> transportChannel = JRoutine.transport().buildChannel();
             transportChannel.passTo(channel);
-            inputChannel.passTo(new FilterInputConsumer<INPUT>(transportChannel, index));
+            inputChannel.passTo(new FilterInputConsumer<IN>(transportChannel, index));
         }
 
         return inputChannel;
@@ -786,21 +783,21 @@ public class Channels {
      * <p/>
      * Note that the channel will be bound as a result of the call.
      *
-     * @param channel  the channel to make selectable.
-     * @param index    the channel index.
-     * @param <OUTPUT> the output data type.
+     * @param channel the channel to make selectable.
+     * @param index   the channel index.
+     * @param <OUT>   the output data type.
      * @return the selectable output channel.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<? extends Selectable<OUTPUT>> toSelectable(
-            @Nullable final OutputChannel<? extends OUTPUT> channel, final int index) {
+    public static <OUT> OutputChannel<? extends Selectable<OUT>> toSelectable(
+            @Nullable final OutputChannel<? extends OUT> channel, final int index) {
 
-        final TransportChannel<Selectable<OUTPUT>> transportChannel =
+        final TransportChannel<Selectable<OUT>> transportChannel =
                 JRoutine.transport().buildChannel();
 
         if (channel != null) {
 
-            channel.passTo(new SelectableOutputConsumer<OUTPUT>(transportChannel, index));
+            channel.passTo(new SelectableOutputConsumer<OUT>(transportChannel, index));
         }
 
         return transportChannel;
@@ -857,8 +854,8 @@ public class Channels {
     }
 
     @Nonnull
-    private static <OUTPUT> OutputChannel<List<OUTPUT>> join(final boolean isFlush,
-            @Nonnull final List<? extends OutputChannel<? extends OUTPUT>> channels) {
+    private static <OUT> OutputChannel<List<OUT>> join(final boolean isFlush,
+            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         final int size = channels.size();
 
@@ -867,9 +864,9 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final TransportChannel<List<OUTPUT>> transportChannel = JRoutine.transport().buildChannel();
-        final JoinOutputConsumer<OUTPUT> consumer =
-                new JoinOutputConsumer<OUTPUT>(transportChannel, size, isFlush);
+        final TransportChannel<List<OUT>> transportChannel = JRoutine.transport().buildChannel();
+        final JoinOutputConsumer<OUT> consumer =
+                new JoinOutputConsumer<OUT>(transportChannel, size, isFlush);
         merge(channels).passTo(consumer);
         return transportChannel;
     }
@@ -1046,11 +1043,11 @@ public class Channels {
     /**
      * Output consumer filtering selectable input data.
      *
-     * @param <INPUT> the input data type.
+     * @param <IN> the input data type.
      */
-    private static class FilterInputConsumer<INPUT> implements OutputConsumer<Selectable<INPUT>> {
+    private static class FilterInputConsumer<IN> implements OutputConsumer<Selectable<IN>> {
 
-        private final TransportChannel<? super INPUT> mChannel;
+        private final TransportChannel<? super IN> mChannel;
 
         private final int mIndex;
 
@@ -1060,7 +1057,7 @@ public class Channels {
          * @param channel the input channel to feed.
          * @param index   the index to filter.
          */
-        private FilterInputConsumer(@Nonnull final TransportChannel<? super INPUT> channel,
+        private FilterInputConsumer(@Nonnull final TransportChannel<? super IN> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1077,7 +1074,7 @@ public class Channels {
             mChannel.abort(error);
         }
 
-        public void onOutput(final Selectable<INPUT> selectable) {
+        public void onOutput(final Selectable<IN> selectable) {
 
             if (selectable.index == mIndex) {
 
@@ -1089,12 +1086,12 @@ public class Channels {
     /**
      * Output consumer filtering selectable output data.
      *
-     * @param <OUTPUT> the output data type.
+     * @param <OUT> the output data type.
      */
-    private static class FilterOutputConsumer<OUTPUT>
-            implements OutputConsumer<Selectable<? extends OUTPUT>> {
+    private static class FilterOutputConsumer<OUT>
+            implements OutputConsumer<Selectable<? extends OUT>> {
 
-        private final TransportChannel<OUTPUT> mChannel;
+        private final TransportChannel<OUT> mChannel;
 
         private final int mIndex;
 
@@ -1104,7 +1101,7 @@ public class Channels {
          * @param channel the transport channel.
          * @param index   the index to filter.
          */
-        private FilterOutputConsumer(@Nonnull final TransportChannel<OUTPUT> channel,
+        private FilterOutputConsumer(@Nonnull final TransportChannel<OUT> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1121,7 +1118,7 @@ public class Channels {
             mChannel.abort(error);
         }
 
-        public void onOutput(final Selectable<? extends OUTPUT> selectable) {
+        public void onOutput(final Selectable<? extends OUT> selectable) {
 
             if (selectable.index == mIndex) {
 
@@ -1133,13 +1130,13 @@ public class Channels {
     /**
      * Output consumer joining the data coming from several channels.
      *
-     * @param <OUTPUT> the output data type.
+     * @param <OUT> the output data type.
      */
-    private static class JoinOutputConsumer<OUTPUT> implements OutputConsumer<Selectable<OUTPUT>> {
+    private static class JoinOutputConsumer<OUT> implements OutputConsumer<Selectable<OUT>> {
 
-        protected final TransportChannel<List<OUTPUT>> mChannel;
+        protected final TransportChannel<List<OUT>> mChannel;
 
-        protected final SimpleQueue<OUTPUT>[] mQueues;
+        protected final SimpleQueue<OUT>[] mQueues;
 
         private final boolean mIsFlush;
 
@@ -1151,32 +1148,32 @@ public class Channels {
          * @param isFlush whether the inputs have to be flushed.
          */
         @SuppressWarnings("unchecked")
-        private JoinOutputConsumer(@Nonnull final TransportChannel<List<OUTPUT>> channel,
+        private JoinOutputConsumer(@Nonnull final TransportChannel<List<OUT>> channel,
                 final int size, final boolean isFlush) {
 
-            final SimpleQueue<OUTPUT>[] queues = (mQueues = new SimpleQueue[size]);
+            final SimpleQueue<OUT>[] queues = (mQueues = new SimpleQueue[size]);
             mChannel = channel;
             mIsFlush = isFlush;
 
             for (int i = 0; i < size; i++) {
 
-                queues[i] = new SimpleQueue<OUTPUT>();
+                queues[i] = new SimpleQueue<OUT>();
             }
         }
 
         protected void flush() {
 
-            final TransportChannel<List<OUTPUT>> inputChannel = mChannel;
-            final SimpleQueue<OUTPUT>[] queues = mQueues;
+            final TransportChannel<List<OUT>> inputChannel = mChannel;
+            final SimpleQueue<OUT>[] queues = mQueues;
             final int length = queues.length;
-            final ArrayList<OUTPUT> outputs = new ArrayList<OUTPUT>(length);
+            final ArrayList<OUT> outputs = new ArrayList<OUT>(length);
             boolean isEmpty;
 
             do {
 
                 isEmpty = true;
 
-                for (final SimpleQueue<OUTPUT> queue : queues) {
+                for (final SimpleQueue<OUT> queue : queues) {
 
                     if (!queue.isEmpty()) {
 
@@ -1218,15 +1215,15 @@ public class Channels {
         }
 
         @SuppressWarnings("unchecked")
-        public void onOutput(final Selectable<OUTPUT> selectable) {
+        public void onOutput(final Selectable<OUT> selectable) {
 
             final int index = selectable.index;
-            final SimpleQueue<OUTPUT>[] queues = mQueues;
+            final SimpleQueue<OUT>[] queues = mQueues;
             queues[index].add(selectable.data);
             final int length = queues.length;
             boolean isFull = true;
 
-            for (final SimpleQueue<OUTPUT> queue : queues) {
+            for (final SimpleQueue<OUT> queue : queues) {
 
                 if (queue.isEmpty()) {
 
@@ -1237,9 +1234,9 @@ public class Channels {
 
             if (isFull) {
 
-                final ArrayList<OUTPUT> outputs = new ArrayList<OUTPUT>(length);
+                final ArrayList<OUT> outputs = new ArrayList<OUT>(length);
 
-                for (final SimpleQueue<OUTPUT> queue : queues) {
+                for (final SimpleQueue<OUT> queue : queues) {
 
                     outputs.add(queue.removeFirst());
                 }
@@ -1252,11 +1249,11 @@ public class Channels {
     /**
      * Output consumer transforming input data into selectable ones.
      *
-     * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
+     * @param <DATA> the channel data type.
+     * @param <IN>   the input data type.
      */
-    private static class SelectableInputConsumer<DATA, INPUT extends DATA>
-            implements OutputConsumer<INPUT> {
+    private static class SelectableInputConsumer<DATA, IN extends DATA>
+            implements OutputConsumer<IN> {
 
         private final TransportChannel<? super Selectable<DATA>> mChannel;
 
@@ -1286,7 +1283,7 @@ public class Channels {
             mChannel.abort(error);
         }
 
-        public void onOutput(final INPUT input) {
+        public void onOutput(final IN input) {
 
             mChannel.pass(new Selectable<DATA>(input, mIndex));
         }
@@ -1295,11 +1292,11 @@ public class Channels {
     /**
      * Output consumer transforming output data into selectable ones.
      *
-     * @param <OUTPUT> the output data type.
+     * @param <OUT> the output data type.
      */
-    private static class SelectableOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
+    private static class SelectableOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-        private final TransportChannel<Selectable<OUTPUT>> mChannel;
+        private final TransportChannel<Selectable<OUT>> mChannel;
 
         private final int mIndex;
 
@@ -1309,8 +1306,8 @@ public class Channels {
          * @param channel the transport channel.
          * @param index   the selectable index.
          */
-        private SelectableOutputConsumer(
-                @Nonnull final TransportChannel<Selectable<OUTPUT>> channel, final int index) {
+        private SelectableOutputConsumer(@Nonnull final TransportChannel<Selectable<OUT>> channel,
+                final int index) {
 
             mChannel = channel;
             mIndex = index;
@@ -1326,9 +1323,9 @@ public class Channels {
             mChannel.abort(error);
         }
 
-        public void onOutput(final OUTPUT output) {
+        public void onOutput(final OUT output) {
 
-            mChannel.pass(new Selectable<OUTPUT>(output, mIndex));
+            mChannel.pass(new Selectable<OUT>(output, mIndex));
         }
     }
 
@@ -1443,12 +1440,12 @@ public class Channels {
     /**
      * Output consumer sorting the output data among a map of output channels.
      *
-     * @param <OUTPUT> the output data type.
+     * @param <OUT> the output data type.
      */
-    private static class SortingOutputConsumer<OUTPUT>
-            implements OutputConsumer<Selectable<? extends OUTPUT>> {
+    private static class SortingOutputConsumer<OUT>
+            implements OutputConsumer<Selectable<? extends OUT>> {
 
-        private final HashMap<Integer, TransportChannel<OUTPUT>> mChannels;
+        private final HashMap<Integer, TransportChannel<OUT>> mChannels;
 
         /**
          * Constructor.
@@ -1456,14 +1453,14 @@ public class Channels {
          * @param channels the map of indexes and transport channels.
          */
         private SortingOutputConsumer(
-                @Nonnull final HashMap<Integer, TransportChannel<OUTPUT>> channels) {
+                @Nonnull final HashMap<Integer, TransportChannel<OUT>> channels) {
 
             mChannels = channels;
         }
 
         public void onComplete() {
 
-            for (final TransportChannel<OUTPUT> channel : mChannels.values()) {
+            for (final TransportChannel<OUT> channel : mChannels.values()) {
 
                 channel.close();
             }
@@ -1471,15 +1468,15 @@ public class Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            for (final TransportChannel<OUTPUT> channel : mChannels.values()) {
+            for (final TransportChannel<OUT> channel : mChannels.values()) {
 
                 channel.abort(error);
             }
         }
 
-        public void onOutput(final Selectable<? extends OUTPUT> selectable) {
+        public void onOutput(final Selectable<? extends OUT> selectable) {
 
-            final TransportChannel<OUTPUT> channel = mChannels.get(selectable.index);
+            final TransportChannel<OUT> channel = mChannels.get(selectable.index);
 
             if (channel != null) {
 

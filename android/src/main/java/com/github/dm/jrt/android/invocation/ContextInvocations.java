@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 /**
  * Utility class for creating context invocation factory objects.
  * <p/>
- * Created by davide-maestroni on 5/1/15.
+ * Created by davide-maestroni on 05/01/15.
  */
 public class ContextInvocations {
 
@@ -41,16 +41,16 @@ public class ContextInvocations {
     /**
      * Converts the specified invocation factory into a factory of context invocations.
      *
-     * @param factory  the invocation factory.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
      * @return the context invocation factory.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryFrom(
-            @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
+            @Nonnull final InvocationFactory<IN, OUT> factory) {
 
-        return new DecoratingContextInvocationFactory<INPUT, OUTPUT>(factory);
+        return new DecoratingContextInvocationFactory<IN, OUT>(factory);
     }
 
     /**
@@ -64,13 +64,13 @@ public class ContextInvocations {
      * variables captured in the closure.
      *
      * @param invocationClass the invocation class.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass) {
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
 
         return factoryOf(invocationClass, (Object[]) null);
     }
@@ -87,16 +87,16 @@ public class ContextInvocations {
      *
      * @param invocationClass the invocation class.
      * @param args            the invocation constructor arguments.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
-        return new DefaultContextInvocationFactory<INPUT, OUTPUT>(invocationClass, args);
+        return new DefaultContextInvocationFactory<IN, OUT>(invocationClass, args);
     }
 
     /**
@@ -110,13 +110,13 @@ public class ContextInvocations {
      * and all the variables captured in the closure.
      *
      * @param invocationToken the invocation class token.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> invocationToken) {
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
     }
@@ -133,13 +133,13 @@ public class ContextInvocations {
      *
      * @param invocationToken the invocation class token.
      * @param args            the invocation constructor arguments.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final ClassToken<? extends ContextInvocation<INPUT, OUTPUT>> invocationToken,
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
         return factoryOf(invocationToken.getRawClass(), args);
@@ -148,32 +148,31 @@ public class ContextInvocations {
     /**
      * Converts the specified context invocation factory into a factory of invocations.
      *
-     * @param context  the routine context.
-     * @param factory  the context invocation factory.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param context the routine context.
+     * @param factory the context invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
      * @return the invocation factory.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryTo(
-            @Nonnull final Context context,
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
+    public static <IN, OUT> InvocationFactory<IN, OUT> fromFactory(@Nonnull final Context context,
+            @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
 
-        return new AdaptingContextInvocationFactory<INPUT, OUTPUT>(context, factory);
+        return new AdaptingContextInvocationFactory<IN, OUT>(context, factory);
     }
 
     /**
      * Implementation of an invocation factory.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class AdaptingContextInvocationFactory<INPUT, OUTPUT>
-            extends InvocationFactory<INPUT, OUTPUT> {
+    private static class AdaptingContextInvocationFactory<IN, OUT>
+            extends InvocationFactory<IN, OUT> {
 
         private final Context mContext;
 
-        private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
+        private final ContextInvocationFactory<IN, OUT> mFactory;
 
         /**
          * Constructor.
@@ -182,7 +181,7 @@ public class ContextInvocations {
          */
         @SuppressWarnings("ConstantConditions")
         private AdaptingContextInvocationFactory(@Nonnull final Context context,
-                @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> factory) {
+                @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
 
             if (context == null) {
 
@@ -200,9 +199,9 @@ public class ContextInvocations {
 
         @Nonnull
         @Override
-        public Invocation<INPUT, OUTPUT> newInvocation() {
+        public Invocation<IN, OUT> newInvocation() {
 
-            final ContextInvocation<INPUT, OUTPUT> invocation = mFactory.newInvocation();
+            final ContextInvocation<IN, OUT> invocation = mFactory.newInvocation();
             invocation.onContext(mContext);
             return invocation;
         }
@@ -211,13 +210,13 @@ public class ContextInvocations {
     /**
      * Implementation of an invocation factory decorating base invocations.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class DecoratingContextInvocationFactory<INPUT, OUTPUT>
-            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
+    private static class DecoratingContextInvocationFactory<IN, OUT>
+            extends AbstractContextInvocationFactory<IN, OUT> {
 
-        private final InvocationFactory<INPUT, OUTPUT> mFactory;
+        private final InvocationFactory<IN, OUT> mFactory;
 
         /**
          * Constructor.
@@ -226,7 +225,7 @@ public class ContextInvocations {
          */
         @SuppressWarnings("ConstantConditions")
         private DecoratingContextInvocationFactory(
-                @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
+                @Nonnull final InvocationFactory<IN, OUT> factory) {
 
             super(factory);
 
@@ -239,22 +238,22 @@ public class ContextInvocations {
         }
 
         @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
-            return new ContextInvocationWrapper<INPUT, OUTPUT>(mFactory.newInvocation());
+            return new ContextInvocationWrapper<IN, OUT>(mFactory.newInvocation());
         }
     }
 
     /**
      * Default implementation of an invocation factory.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class DefaultContextInvocationFactory<INPUT, OUTPUT>
-            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
+    private static class DefaultContextInvocationFactory<IN, OUT>
+            extends AbstractContextInvocationFactory<IN, OUT> {
 
-        private final InvocationFactory<INPUT, OUTPUT> mFactory;
+        private final InvocationFactory<IN, OUT> mFactory;
 
         /**
          * Constructor.
@@ -263,18 +262,18 @@ public class ContextInvocations {
          * @param args            the invocation constructor arguments.
          */
         private DefaultContextInvocationFactory(
-                @Nonnull final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass,
+                @Nonnull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
             super(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS);
-            mFactory = Invocations.factoryOf(
-                    (Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass, args);
+            mFactory = Invocations.factoryOf((Class<? extends Invocation<IN, OUT>>) invocationClass,
+                                             args);
         }
 
         @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
-            return (ContextInvocation<INPUT, OUTPUT>) mFactory.newInvocation();
+            return (ContextInvocation<IN, OUT>) mFactory.newInvocation();
         }
     }
 }

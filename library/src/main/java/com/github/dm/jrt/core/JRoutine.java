@@ -128,7 +128,7 @@ import javax.annotation.Nonnull;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 09/07/14.
  *
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input
@@ -152,18 +152,18 @@ public class JRoutine {
      * Returns a routine builder based on the specified invocation factory.<br/>
      * In order to prevent undesired leaks, the class of the specified factory must be static.
      *
-     * @param factory  the invocation factory.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
      * @return the routine builder instance.
      * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
      *                                            static.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
+    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+            @Nonnull final InvocationFactory<IN, OUT> factory) {
 
-        return new DefaultRoutineBuilder<INPUT, OUTPUT>(factory);
+        return new DefaultRoutineBuilder<IN, OUT>(factory);
     }
 
     /**

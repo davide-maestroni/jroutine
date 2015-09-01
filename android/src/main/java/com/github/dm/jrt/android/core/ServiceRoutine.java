@@ -26,6 +26,7 @@ import android.os.RemoteException;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.invocation.ContextInvocation;
+import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.android.service.RoutineService;
 import com.github.dm.jrt.android.service.ServiceDisconnectedException;
@@ -54,7 +55,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryTo;
+import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
 import static com.github.dm.jrt.android.service.RoutineService.getAbortError;
 import static com.github.dm.jrt.android.service.RoutineService.getValue;
 import static com.github.dm.jrt.android.service.RoutineService.putAsyncInvocation;
@@ -67,22 +68,22 @@ import static java.util.UUID.randomUUID;
 /**
  * Routine implementation employing an Android service to run its invocations.
  * <p/>
- * Created by davide-maestroni on 1/8/15.
+ * Created by davide-maestroni on 01/08/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
+class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
     private final ServiceContext mContext;
 
-    private final InvocationFactoryTarget<INPUT, OUTPUT> mFactoryTarget;
+    private final InvocationFactoryTarget<IN, OUT> mFactoryTarget;
 
     private final InvocationConfiguration mInvocationConfiguration;
 
     private final Logger mLogger;
 
-    private final Routine<INPUT, OUTPUT> mRoutine;
+    private final Routine<IN, OUT> mRoutine;
 
     private final ServiceConfiguration mServiceConfiguration;
 
@@ -96,7 +97,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     ServiceRoutine(@Nonnull final ServiceContext context,
-            @Nonnull final InvocationFactoryTarget<INPUT, OUTPUT> target,
+            @Nonnull final InvocationFactoryTarget<IN, OUT> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
@@ -112,10 +113,11 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
-        final Class<? extends ContextInvocation<INPUT, OUTPUT>> invocationClass =
+        final Class<? extends ContextInvocation<IN, OUT>> invocationClass =
                 target.getInvocationClass();
-        mRoutine = JRoutine.on(factoryTo(serviceContext.getApplicationContext(),
-                                         factoryOf(invocationClass, target.getFactoryArgs())))
+        final ContextInvocationFactory<IN, OUT> factory =
+                factoryOf(invocationClass, target.getFactoryArgs());
+        mRoutine = JRoutine.on(fromFactory(serviceContext.getApplicationContext(), factory))
                            .invocations()
                            .with(invocationConfiguration)
                            .set()
@@ -126,23 +128,22 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> asyncInvoke() {
+    public InvocationChannel<IN, OUT> asyncInvoke() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mFactoryTarget,
-                                                 mInvocationConfiguration, mServiceConfiguration,
-                                                 mLogger);
+        return new ServiceChannel<IN, OUT>(false, mContext, mFactoryTarget,
+                                           mInvocationConfiguration, mServiceConfiguration,
+                                           mLogger);
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> parallelInvoke() {
+    public InvocationChannel<IN, OUT> parallelInvoke() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mFactoryTarget,
-                                                 mInvocationConfiguration, mServiceConfiguration,
-                                                 mLogger);
+        return new ServiceChannel<IN, OUT>(true, mContext, mFactoryTarget, mInvocationConfiguration,
+                                           mServiceConfiguration, mLogger);
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> syncInvoke() {
+    public InvocationChannel<IN, OUT> syncInvoke() {
 
         return mRoutine.syncInvoke();
     }
@@ -156,14 +157,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     /**
      * Service invocation channel implementation.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class ServiceChannel<INPUT, OUTPUT> implements InvocationChannel<INPUT, OUTPUT> {
+    private static class ServiceChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         private final ServiceContext mContext;
 
-        private final InvocationFactoryTarget<INPUT, OUTPUT> mFactoryTarget;
+        private final InvocationFactoryTarget<IN, OUT> mFactoryTarget;
 
         private final Messenger mInMessenger;
 
@@ -177,9 +178,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private final ServiceConfiguration mServiceConfiguration;
 
-        private final TransportChannel<INPUT> mTransportInput;
+        private final TransportChannel<IN> mTransportInput;
 
-        private final TransportChannel<OUTPUT> mTransportOutput;
+        private final TransportChannel<OUT> mTransportOutput;
 
         private final String mUUID;
 
@@ -202,7 +203,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          * @param logger                  the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final ServiceContext context,
-                @Nonnull final InvocationFactoryTarget<INPUT, OUTPUT> target,
+                @Nonnull final InvocationFactoryTarget<IN, OUT> target,
                 @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ServiceConfiguration serviceConfiguration,
                 @Nonnull final Logger logger) {
@@ -268,14 +269,14 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
+        public InvocationChannel<IN, OUT> after(@Nonnull final TimeDuration delay) {
 
             mTransportInput.after(delay);
             return this;
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> after(final long delay,
+        public InvocationChannel<IN, OUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
             mTransportInput.after(delay, timeUnit);
@@ -283,36 +284,36 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> now() {
+        public InvocationChannel<IN, OUT> now() {
 
             mTransportInput.now();
             return this;
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> orderByCall() {
+        public InvocationChannel<IN, OUT> orderByCall() {
 
             mTransportInput.orderByCall();
             return this;
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> orderByChance() {
+        public InvocationChannel<IN, OUT> orderByChance() {
 
             mTransportInput.orderByChance();
             return this;
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> orderByDelay() {
+        public InvocationChannel<IN, OUT> orderByDelay() {
 
             mTransportInput.orderByDelay();
             return this;
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> pass(
-                @Nullable final OutputChannel<? extends INPUT> channel) {
+        public InvocationChannel<IN, OUT> pass(
+                @Nullable final OutputChannel<? extends IN> channel) {
 
             bindService();
             mTransportInput.pass(channel);
@@ -320,8 +321,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> pass(
-                @Nullable final Iterable<? extends INPUT> inputs) {
+        public InvocationChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
 
             bindService();
             mTransportInput.pass(inputs);
@@ -329,7 +329,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
+        public InvocationChannel<IN, OUT> pass(@Nullable final IN input) {
 
             bindService();
             mTransportInput.pass(input);
@@ -337,7 +337,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public InvocationChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
+        public InvocationChannel<IN, OUT> pass(@Nullable final IN... inputs) {
 
             bindService();
             mTransportInput.pass(inputs);
@@ -345,7 +345,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        public OutputChannel<OUTPUT> result() {
+        public OutputChannel<OUT> result() {
 
             bindService();
             mTransportInput.close();
@@ -424,7 +424,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         /**
          * Output consumer sending messages to the service.
          */
-        private class ConnectionOutputConsumer implements OutputConsumer<INPUT> {
+        private class ConnectionOutputConsumer implements OutputConsumer<IN> {
 
             public void onComplete() {
 
@@ -460,7 +460,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            public void onOutput(final INPUT input) {
+            public void onOutput(final IN input) {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_DATA);
                 putValue(message.getData(), mUUID, input);
@@ -505,7 +505,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                         case RoutineService.MSG_DATA: {
 
-                            mTransportOutput.pass((OUTPUT) getValue(msg));
+                            mTransportOutput.pass((OUT) getValue(msg));
                         }
 
                         break;

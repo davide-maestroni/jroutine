@@ -24,17 +24,17 @@ import javax.annotation.Nullable;
  * <p/>
  * Note that the implementing class must not retain an internal variable state.
  * <p/>
- * Created by davide-maestroni on 2/14/15.
+ * Created by davide-maestroni on 02/14/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class FilterInvocation<INPUT, OUTPUT> extends InvocationFactory<INPUT, OUTPUT>
-        implements Invocation<INPUT, OUTPUT> {
+public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
+        implements Invocation<IN, OUT> {
 
     @Nonnull
     @Override
-    public final Invocation<INPUT, OUTPUT> newInvocation() {
+    public final Invocation<IN, OUT> newInvocation() {
 
         return this;
     }
@@ -51,7 +51,7 @@ public abstract class FilterInvocation<INPUT, OUTPUT> extends InvocationFactory<
 
     }
 
-    public final void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public final void onResult(@Nonnull final ResultChannel<OUT> result) {
 
     }
 

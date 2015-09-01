@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 /**
  * Interface defining a builder of routines wrapping an object methods.
  * <p/>
- * Created by davide-maestroni on 3/7/15.
+ * Created by davide-maestroni on 03/07/15.
  *
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input
@@ -50,14 +50,14 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
      * the correct order.
      *
-     * @param name     the name specified in the annotation.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param name  the name specified in the annotation.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull String name);
+    <IN, OUT> Routine<IN, OUT> aliasMethod(@Nonnull String name);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -136,8 +136,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @throws java.lang.IllegalArgumentException if no matching method is found.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
-            @Nonnull Class<?>... parameterTypes);
+    <IN, OUT> Routine<IN, OUT> method(@Nonnull String name, @Nonnull Class<?>... parameterTypes);
 
     /**
      * Returns a routine used to call the specified method.
@@ -154,11 +153,11 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
      * the correct order.
      *
-     * @param method   the method instance.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param method the method instance.
+     * @param <IN>   the input data type.
+     * @param <OUT>  the output data type.
      * @return the routine.
      */
     @Nonnull
-    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
+    <IN, OUT> Routine<IN, OUT> method(@Nonnull Method method);
 }

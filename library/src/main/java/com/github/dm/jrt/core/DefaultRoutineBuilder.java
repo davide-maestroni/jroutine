@@ -23,14 +23,14 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a builder of routine objects based on an invocation factory.
  * <p/>
- * Created by davide-maestroni on 9/21/14.
+ * Created by davide-maestroni on 09/21/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT> {
+class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
 
-    private final InvocationFactory<INPUT, OUTPUT> mFactory;
+    private final InvocationFactory<IN, OUT> mFactory;
 
     /**
      * Constructor.
@@ -40,7 +40,7 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT,
      *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
+    DefaultRoutineBuilder(@Nonnull final InvocationFactory<IN, OUT> factory) {
 
         final Class<? extends InvocationFactory> factoryClass = factory.getClass();
 
@@ -54,8 +54,8 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT,
     }
 
     @Nonnull
-    public Routine<INPUT, OUTPUT> buildRoutine() {
+    public Routine<IN, OUT> buildRoutine() {
 
-        return new DefaultRoutine<INPUT, OUTPUT>(getConfiguration(), mFactory);
+        return new DefaultRoutine<IN, OUT>(getConfiguration(), mFactory);
     }
 }

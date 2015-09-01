@@ -18,12 +18,12 @@ import javax.annotation.Nonnull;
 /**
  * Invocation factory interface.
  * <p/>
- * Created by davide-maestroni on 2/12/15.
+ * Created by davide-maestroni on 02/12/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class InvocationFactory<INPUT, OUTPUT> {
+public abstract class InvocationFactory<IN, OUT> {
 
     /**
      * Creates and return a new invocation instance.<br/>
@@ -34,5 +34,5 @@ public abstract class InvocationFactory<INPUT, OUTPUT> {
      * @return the invocation instance.
      */
     @Nonnull
-    public abstract Invocation<INPUT, OUTPUT> newInvocation();
+    public abstract Invocation<IN, OUT> newInvocation();
 }

@@ -78,7 +78,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 1/8/15.
+ * Created by davide-maestroni on 01/08/15.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")
@@ -118,18 +118,17 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
      * will result in a deadlock.<br/>
      * By default output results are dispatched in the main looper.
      *
-     * @param context  the service context.
-     * @param target   the invocation target.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param context the service context.
+     * @param target  the invocation target.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
      * @return the routine builder instance.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ServiceContext context,
-            @Nonnull final InvocationFactoryTarget<INPUT, OUTPUT> target) {
+    public static <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(@Nonnull final ServiceContext context,
+            @Nonnull final InvocationFactoryTarget<IN, OUT> target) {
 
-        return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, target);
+        return new DefaultServiceRoutineBuilder<IN, OUT>(context, target);
     }
 
     static {

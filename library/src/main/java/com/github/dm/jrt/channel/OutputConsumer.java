@@ -40,11 +40,11 @@ import javax.annotation.Nullable;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 09/07/14.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-public interface OutputConsumer<OUTPUT> {
+public interface OutputConsumer<OUT> {
 
     /**
      * Called when the channel closes after the invocation completes its execution.
@@ -63,5 +63,5 @@ public interface OutputConsumer<OUTPUT> {
      *
      * @param output the output.
      */
-    void onOutput(OUTPUT output);
+    void onOutput(OUT output);
 }

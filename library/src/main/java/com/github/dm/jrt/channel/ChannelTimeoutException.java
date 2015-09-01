@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * Exception indicating a timeout while waiting for data to flow through a channel.
  * <p/>
- * Created by davide-maestroni on 18/06/15.
+ * Created by davide-maestroni on 06/18/15.
  */
 public class ChannelTimeoutException extends TimeoutException {
 

@@ -29,17 +29,17 @@ import javax.annotation.Nonnull;
  * <p/>
  * The local context of the invocations will be the specific service instance.
  * <p/>
- * Created by davide-maestroni on 3/7/15.
+ * Created by davide-maestroni on 03/07/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT>,
-        ServiceConfigurableBuilder<ServiceRoutineBuilder<INPUT, OUTPUT>> {
+public interface ServiceRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>,
+        ServiceConfigurableBuilder<ServiceRoutineBuilder<IN, OUT>> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> invocations();
+    Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocations();
 }

@@ -66,7 +66,7 @@ import static com.github.dm.jrt.android.core.ContextInvocationTarget.targetClass
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.targetObject;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryTo;
+import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -348,9 +348,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final ClassToken<GetContextInvocation<String>> classToken =
                 new ClassToken<GetContextInvocation<String>>() {};
-        assertThat(JRoutine.on(factoryTo(getActivity(), factoryOf(classToken)))
-                           .syncCall()
-                           .next()).isSameAs(getActivity());
+        assertThat(JRoutine.on(fromFactory(getActivity(), factoryOf(classToken))).syncCall().next())
+                .isSameAs(getActivity());
         assertThat(JRoutine.on(contextFrom(getActivity()), factoryOf(classToken)).syncCall().next())
                 .isSameAs(getActivity().getApplicationContext());
     }

@@ -18,12 +18,12 @@ import javax.annotation.Nonnull;
 /**
  * Context invocation factory interface.
  * <p/>
- * Created by davide-maestroni on 5/1/15.
+ * Created by davide-maestroni on 05/01/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class ContextInvocationFactory<INPUT, OUTPUT> {
+public abstract class ContextInvocationFactory<IN, OUT> {
 
     /**
      * Creates and return a new context invocation instance.
@@ -31,5 +31,5 @@ public abstract class ContextInvocationFactory<INPUT, OUTPUT> {
      * @return the context invocation instance.
      */
     @Nonnull
-    public abstract ContextInvocation<INPUT, OUTPUT> newInvocation();
+    public abstract ContextInvocation<IN, OUT> newInvocation();
 }

@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * Interface defining a factory providing object instances, whose methods are to be called inside
  * asynchronous invocations.
  * <p/>
- * Created by davide-maestroni on 4/6/2015.
+ * Created by davide-maestroni on 04/06/2015.
  */
 public interface FactoryContext {
 
@@ -29,9 +29,9 @@ public interface FactoryContext {
      * If a null instance is returned, the constructor matching the specified arguments will be
      * called by default.
      *
-     * @param <TYPE> the wrapped object type.
      * @param type   the type of the returned instance.
      * @param args   the custom arguments.
+     * @param <TYPE> the target object type.
      * @return the object instance.
      */
     @Nullable

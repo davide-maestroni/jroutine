@@ -23,13 +23,13 @@ import javax.annotation.Nonnull;
 /**
  * Invocation implementation delegating the execution to another routine.
  * <p/>
- * Created by davide-maestroni on 19/04/15.
+ * Created by davide-maestroni on 04/19/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvocation<INPUT, OUTPUT>
-        implements ContextInvocation<INPUT, OUTPUT> {
+public class DelegatingContextInvocation<IN, OUT> extends DelegatingInvocation<IN, OUT>
+        implements ContextInvocation<IN, OUT> {
 
     /**
      * Constructor.
@@ -37,7 +37,7 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
      * @param routine        the routine used to execute this invocation.
      * @param delegationType the type of routine invocation.
      */
-    public DelegatingContextInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine,
+    public DelegatingContextInvocation(@Nonnull final Routine<IN, OUT> routine,
             @Nonnull final DelegationType delegationType) {
 
         super(routine, delegationType);
@@ -52,17 +52,16 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
      * @param routine        the routine used to execute this invocation.
      * @param routineId      the routine identifier.
      * @param delegationType the type of routine invocation.
-     * @param <INPUT>        the input data type.
-     * @param <OUTPUT>       the output data type.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
      * @return the factory.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ContextInvocationFactory<INPUT, OUTPUT> factoryFrom(
-            @Nonnull final Routine<INPUT, OUTPUT> routine, final int routineId,
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
+            @Nonnull final Routine<IN, OUT> routine, final int routineId,
             @Nonnull final DelegationType delegationType) {
 
-        return new DelegatingContextInvocationFactory<INPUT, OUTPUT>(routine, routineId,
-                                                                     delegationType);
+        return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, delegationType);
     }
 
     public void onContext(@Nonnull final Context context) {
@@ -72,15 +71,15 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
     /**
      * Factory creating delegating context invocation instances.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class DelegatingContextInvocationFactory<INPUT, OUTPUT>
-            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
+    private static class DelegatingContextInvocationFactory<IN, OUT>
+            extends AbstractContextInvocationFactory<IN, OUT> {
 
         private final DelegationType mDelegationType;
 
-        private final Routine<INPUT, OUTPUT> mRoutine;
+        private final Routine<IN, OUT> mRoutine;
 
         /**
          * Constructor.
@@ -90,7 +89,7 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
          * @param delegationType the type of routine invocation.
          */
         @SuppressWarnings("ConstantConditions")
-        private DelegatingContextInvocationFactory(@Nonnull final Routine<INPUT, OUTPUT> routine,
+        private DelegatingContextInvocationFactory(@Nonnull final Routine<IN, OUT> routine,
                 final int routineId, @Nonnull final DelegationType delegationType) {
 
             super(routineId, delegationType);
@@ -110,9 +109,9 @@ public class DelegatingContextInvocation<INPUT, OUTPUT> extends DelegatingInvoca
         }
 
         @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
-            return new DelegatingContextInvocation<INPUT, OUTPUT>(mRoutine, mDelegationType);
+            return new DelegatingContextInvocation<IN, OUT>(mRoutine, mDelegationType);
         }
     }
 }

@@ -24,72 +24,72 @@ import javax.annotation.Nullable;
  * Interface defining an invocation input channel, that is the channel used to pass input data to
  * the routine invocation.
  * <p/>
- * Created by davide-maestroni on 9/15/14.
+ * Created by davide-maestroni on 09/15/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface InvocationChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
+public interface InvocationChannel<IN, OUT> extends InputChannel<IN> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> after(@Nonnull TimeDuration delay);
+    InvocationChannel<IN, OUT> after(@Nonnull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    InvocationChannel<IN, OUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> now();
+    InvocationChannel<IN, OUT> now();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> orderByCall();
+    InvocationChannel<IN, OUT> orderByCall();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> orderByChance();
+    InvocationChannel<IN, OUT> orderByChance();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> orderByDelay();
+    InvocationChannel<IN, OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
+    InvocationChannel<IN, OUT> pass(@Nullable OutputChannel<? extends IN> channel);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+    InvocationChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
+    InvocationChannel<IN, OUT> pass(@Nullable IN input);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
+    InvocationChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
      * Closes the input channel and returns the output one.
@@ -98,5 +98,5 @@ public interface InvocationChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * @throws java.lang.IllegalStateException if this method has been already called.
      */
     @Nonnull
-    OutputChannel<OUTPUT> result();
+    OutputChannel<OUT> result();
 }

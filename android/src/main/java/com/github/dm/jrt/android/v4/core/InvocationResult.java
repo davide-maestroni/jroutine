@@ -24,11 +24,11 @@ import javax.annotation.Nullable;
 /**
  * Interface defining a loader invocation result.
  * <p/>
- * Created by davide-maestroni on 1/4/15.
+ * Created by davide-maestroni on 01/04/15.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-interface InvocationResult<OUTPUT> {
+interface InvocationResult<OUT> {
 
     /**
      * Aborts the loader invocation.
@@ -67,7 +67,7 @@ interface InvocationResult<OUTPUT> {
      *                        aborted while passing the results.
      * @return whether the invocation is complete.
      */
-    boolean passTo(@Nonnull Collection<TransportChannel<OUTPUT>> newChannels,
-            @Nonnull Collection<TransportChannel<OUTPUT>> oldChannels,
-            @Nonnull Collection<TransportChannel<OUTPUT>> abortedChannels);
+    boolean passTo(@Nonnull Collection<TransportChannel<OUT>> newChannels,
+            @Nonnull Collection<TransportChannel<OUT>> oldChannels,
+            @Nonnull Collection<TransportChannel<OUT>> abortedChannels);
 }

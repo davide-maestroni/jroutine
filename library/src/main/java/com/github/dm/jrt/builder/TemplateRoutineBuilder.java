@@ -26,43 +26,43 @@ import javax.annotation.Nonnull;
  * This class is useful to avoid the need of implementing some of the methods defined in the
  * interface.
  * <p/>
- * Created by davide-maestroni on 3/16/15.
+ * Created by davide-maestroni on 03/16/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
-        implements RoutineBuilder<INPUT, OUTPUT>, Configurable<RoutineBuilder<INPUT, OUTPUT>> {
+public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
+        implements RoutineBuilder<IN, OUT>, Configurable<RoutineBuilder<IN, OUT>> {
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> asyncInvoke() {
+    public InvocationChannel<IN, OUT> asyncInvoke() {
 
         return buildRoutine().asyncInvoke();
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> parallelInvoke() {
+    public InvocationChannel<IN, OUT> parallelInvoke() {
 
         return buildRoutine().parallelInvoke();
     }
 
     @Nonnull
-    public InvocationChannel<INPUT, OUTPUT> syncInvoke() {
+    public InvocationChannel<IN, OUT> syncInvoke() {
 
         return buildRoutine().syncInvoke();
     }
 
     @Nonnull
-    public Builder<? extends RoutineBuilder<INPUT, OUTPUT>> invocations() {
+    public Builder<? extends RoutineBuilder<IN, OUT>> invocations() {
 
-        return new Builder<RoutineBuilder<INPUT, OUTPUT>>(this, mConfiguration);
+        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> setConfiguration(
+    public RoutineBuilder<IN, OUT> setConfiguration(
             @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {

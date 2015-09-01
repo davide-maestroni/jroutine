@@ -24,12 +24,12 @@ import javax.annotation.Nullable;
  * <p/>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
- * Created by davide-maestroni on 9/11/14.
+ * Created by davide-maestroni on 09/11/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
+public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
     public void onAbort(@Nullable final RoutineException reason) {
 
@@ -43,11 +43,11 @@ public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<IN
 
     }
 
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
 
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public void onResult(@Nonnull final ResultChannel<OUT> result) {
 
     }
 

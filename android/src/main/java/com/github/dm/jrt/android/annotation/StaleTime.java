@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 05/08/15.
+ * Created by davide-maestroni on 08/05/15.
  *
  * @see com.github.dm.jrt.android.builder.LoaderConfiguration LoaderConfiguration
  */

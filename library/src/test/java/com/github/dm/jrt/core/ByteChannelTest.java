@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 /**
  * Recycler channel unit tests.
  * <p/>
- * Created by davide-maestroni on 29/08/15.
+ * Created by davide-maestroni on 08/29/15.
  */
 public class ByteChannelTest {
 

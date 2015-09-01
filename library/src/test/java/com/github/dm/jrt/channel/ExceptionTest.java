@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Exception unit tests.
  * <p/>
- * Created by davide-maestroni on 3/26/15.
+ * Created by davide-maestroni on 03/26/15.
  */
 public class ExceptionTest {
 

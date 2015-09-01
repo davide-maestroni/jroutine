@@ -22,11 +22,11 @@ import javax.annotation.Nonnull;
 /**
  * Invocation used to know whether a loader with a specific ID is present or not.
  * <p/>
- * Created by davide-maestroni on 1/14/15.
+ * Created by davide-maestroni on 01/14/15.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-final class MissingLoaderInvocation<OUTPUT> extends ProcedureContextInvocation<OUTPUT> {
+final class MissingLoaderInvocation<OUT> extends ProcedureContextInvocation<OUT> {
 
     private final int mId;
 
@@ -40,7 +40,7 @@ final class MissingLoaderInvocation<OUTPUT> extends ProcedureContextInvocation<O
         mId = id;
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public void onResult(@Nonnull final ResultChannel<OUT> result) {
 
         result.abort(new MissingInvocationException(mId));
     }

@@ -28,11 +28,11 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
 /**
  * Test service.
  * <p/>
- * Created by davide-maestroni on 1/16/15.
+ * Created by davide-maestroni on 01/16/15.
  */
 public class TestService extends RoutineService implements FactoryContext {
 
-    private static final HashMap<InstanceInfo, Object> sInstanceMap =
+    private static final HashMap<InstanceInfo, Object> sInstances =
             new HashMap<InstanceInfo, Object>();
 
     @Nullable
@@ -40,16 +40,16 @@ public class TestService extends RoutineService implements FactoryContext {
     public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
             @Nonnull final Object[] args) {
 
-        final HashMap<InstanceInfo, Object> instanceMap = sInstanceMap;
+        final HashMap<InstanceInfo, Object> instances = sInstances;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
-        Object instance = instanceMap.get(instanceInfo);
+        Object instance = instances.get(instanceInfo);
 
         if (instance == null) {
 
             try {
 
                 instance = findConstructor(type, args).newInstance(args);
-                instanceMap.put(instanceInfo, instance);
+                instances.put(instanceInfo, instance);
 
             } catch (final Throwable t) {
 

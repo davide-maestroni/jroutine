@@ -75,12 +75,12 @@ import javax.annotation.Nullable;
  * the implementation honors the specific contracts, it is possible to seamlessly combine different
  * routine implementations, even the ones coming from third party libraries.
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 09/07/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface Routine<INPUT, OUTPUT> {
+public interface Routine<IN, OUT> {
 
     /**
      * Short for {@code asyncInvoke().result()}.
@@ -88,7 +88,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> asyncCall();
+    OutputChannel<OUT> asyncCall();
 
     /**
      * Short for {@code asyncInvoke().pass(input).result()}.
@@ -97,7 +97,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> asyncCall(@Nullable INPUT input);
+    OutputChannel<OUT> asyncCall(@Nullable IN input);
 
     /**
      * Short for {@code asyncInvoke().pass(inputs).result()}.
@@ -106,7 +106,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> asyncCall(@Nullable INPUT... inputs);
+    OutputChannel<OUT> asyncCall(@Nullable IN... inputs);
 
     /**
      * Short for {@code asyncInvoke().pass(inputs).result()}.
@@ -115,7 +115,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> asyncCall(@Nullable Iterable<? extends INPUT> inputs);
+    OutputChannel<OUT> asyncCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * Short for {@code asyncInvoke().pass(inputs).result()}.
@@ -124,7 +124,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> asyncCall(@Nullable OutputChannel<? extends INPUT> inputs);
+    OutputChannel<OUT> asyncCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
      * Invokes the execution of this routine in asynchronous mode.
@@ -132,7 +132,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation channel.
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> asyncInvoke();
+    InvocationChannel<IN, OUT> asyncInvoke();
 
     /**
      * Short for {@code parallelInvoke().result()}.
@@ -143,7 +143,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> parallelCall();
+    OutputChannel<OUT> parallelCall();
 
     /**
      * Short for {@code parallelInvoke().pass(input).result()}.
@@ -155,7 +155,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> parallelCall(@Nullable INPUT input);
+    OutputChannel<OUT> parallelCall(@Nullable IN input);
 
     /**
      * Short for {@code parallelInvoke().pass(inputs).result()}.
@@ -164,7 +164,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> parallelCall(@Nullable INPUT... inputs);
+    OutputChannel<OUT> parallelCall(@Nullable IN... inputs);
 
     /**
      * Short for {@code parallelInvoke().pass(inputs).result()}.
@@ -173,7 +173,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> parallelCall(@Nullable Iterable<? extends INPUT> inputs);
+    OutputChannel<OUT> parallelCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * Short for {@code parallelInvoke().pass(inputs).result()}.
@@ -182,7 +182,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> parallelCall(@Nullable OutputChannel<? extends INPUT> inputs);
+    OutputChannel<OUT> parallelCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
      * Invokes the execution of this routine in parallel mode.
@@ -190,7 +190,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation channel.
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> parallelInvoke();
+    InvocationChannel<IN, OUT> parallelInvoke();
 
     /**
      * Makes the routine destroy all the cached invocation instances.
@@ -208,7 +208,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> syncCall();
+    OutputChannel<OUT> syncCall();
 
     /**
      * Short for {@code syncInvoke().pass(input).result()}.
@@ -217,7 +217,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> syncCall(@Nullable INPUT input);
+    OutputChannel<OUT> syncCall(@Nullable IN input);
 
     /**
      * Short for {@code syncInvoke().pass(inputs).result()}.
@@ -226,7 +226,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> syncCall(@Nullable INPUT... inputs);
+    OutputChannel<OUT> syncCall(@Nullable IN... inputs);
 
     /**
      * Short for {@code syncInvoke().pass(inputs).result()}.
@@ -235,7 +235,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> syncCall(@Nullable Iterable<? extends INPUT> inputs);
+    OutputChannel<OUT> syncCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * Short for {@code syncInvoke().pass(inputs).result()}.
@@ -244,7 +244,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> syncCall(@Nullable OutputChannel<? extends INPUT> inputs);
+    OutputChannel<OUT> syncCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
      * Invokes the execution of this routine in synchronous mode.
@@ -252,5 +252,5 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation channel.
      */
     @Nonnull
-    InvocationChannel<INPUT, OUTPUT> syncInvoke();
+    InvocationChannel<IN, OUT> syncInvoke();
 }

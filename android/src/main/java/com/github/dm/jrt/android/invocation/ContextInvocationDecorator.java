@@ -24,14 +24,14 @@ import javax.annotation.Nullable;
 /**
  * Base context invocation decorator implementation.
  * <p/>
- * Created by davide-maestroni on 19/08/15.
+ * Created by davide-maestroni on 08/19/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN, OUT> {
 
-    private final ContextInvocation<INPUT, OUTPUT> mInvocation;
+    private final ContextInvocation<IN, OUT> mInvocation;
 
     /**
      * Constructor.
@@ -39,7 +39,7 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
      * @param wrapped the wrapped invocation instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public ContextInvocationDecorator(@Nonnull final ContextInvocation<INPUT, OUTPUT> wrapped) {
+    public ContextInvocationDecorator(@Nonnull final ContextInvocation<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -64,12 +64,12 @@ public class ContextInvocationDecorator<INPUT, OUTPUT> implements ContextInvocat
         mInvocation.onInitialize();
     }
 
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
 
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public void onResult(@Nonnull final ResultChannel<OUT> result) {
 
         mInvocation.onResult(result);
     }

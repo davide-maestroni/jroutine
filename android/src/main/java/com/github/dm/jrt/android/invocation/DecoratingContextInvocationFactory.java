@@ -18,15 +18,15 @@ import javax.annotation.Nonnull;
 /**
  * Class decorating the invocations produced by a context invocation factory.
  * <p/>
- * Created by davide-maestroni on 19/08/15.
+ * Created by davide-maestroni on 08/19/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class DecoratingContextInvocationFactory<INPUT, OUTPUT>
-        extends ContextInvocationFactory<INPUT, OUTPUT> {
+public abstract class DecoratingContextInvocationFactory<IN, OUT>
+        extends ContextInvocationFactory<IN, OUT> {
 
-    private final ContextInvocationFactory<INPUT, OUTPUT> mFactory;
+    private final ContextInvocationFactory<IN, OUT> mFactory;
 
     /**
      * Constructor.
@@ -35,7 +35,7 @@ public abstract class DecoratingContextInvocationFactory<INPUT, OUTPUT>
      */
     @SuppressWarnings("ConstantConditions")
     public DecoratingContextInvocationFactory(
-            @Nonnull final ContextInvocationFactory<INPUT, OUTPUT> wrapped) {
+            @Nonnull final ContextInvocationFactory<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -47,7 +47,7 @@ public abstract class DecoratingContextInvocationFactory<INPUT, OUTPUT>
 
     @Nonnull
     @Override
-    public final ContextInvocation<INPUT, OUTPUT> newInvocation() {
+    public final ContextInvocation<IN, OUT> newInvocation() {
 
         return decorate(mFactory.newInvocation());
     }
@@ -59,6 +59,6 @@ public abstract class DecoratingContextInvocationFactory<INPUT, OUTPUT>
      * @return the decorated context invocation.
      */
     @Nonnull
-    protected abstract ContextInvocation<INPUT, OUTPUT> decorate(
-            @Nonnull final ContextInvocation<INPUT, OUTPUT> invocation);
+    protected abstract ContextInvocation<IN, OUT> decorate(
+            @Nonnull final ContextInvocation<IN, OUT> invocation);
 }

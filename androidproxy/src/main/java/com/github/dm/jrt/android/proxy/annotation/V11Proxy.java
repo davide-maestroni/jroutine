@@ -68,7 +68,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 06/05/15.
+ * Created by davide-maestroni on 05/06/15.
  *
  * @see com.github.dm.jrt.proxy.annotation.Proxy Proxy
  */

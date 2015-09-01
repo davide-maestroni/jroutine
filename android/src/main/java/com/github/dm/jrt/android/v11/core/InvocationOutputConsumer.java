@@ -35,17 +35,17 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 12/12/14.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
+class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
 
     private static final Runner sMainRunner = Runners.mainRunner();
 
-    private final ArrayList<OUTPUT> mCachedResults = new ArrayList<OUTPUT>();
+    private final ArrayList<OUT> mCachedResults = new ArrayList<OUT>();
 
     private final TemplateExecution mDeliverResult;
 
-    private final ArrayList<OUTPUT> mLastResults = new ArrayList<OUTPUT>();
+    private final ArrayList<OUT> mLastResults = new ArrayList<OUT>();
 
     private final Logger mLogger;
 
@@ -64,7 +64,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
      * @param logger the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationOutputConsumer(@Nonnull final RoutineLoader<?, OUTPUT> loader,
+    InvocationOutputConsumer(@Nonnull final RoutineLoader<?, OUT> loader,
             @Nonnull final Logger logger) {
 
         if (loader == null) {
@@ -128,7 +128,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
     }
 
     @Override
-    public void onOutput(final OUTPUT output) {
+    public void onOutput(final OUT output) {
 
         final boolean deliverResult;
 
@@ -156,7 +156,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
      *
      * @return the result object.
      */
-    InvocationResult<OUTPUT> createResult() {
+    InvocationResult<OUT> createResult() {
 
         // Need to create a new instance each time to trick the loader manager into thinking that a
         // brand new result is available
@@ -171,7 +171,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
     /**
      * Implementation of an invocation result.
      */
-    private class Result implements InvocationResult<OUTPUT> {
+    private class Result implements InvocationResult<OUT> {
 
         public void abort() {
 
@@ -207,15 +207,15 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             }
         }
 
-        public boolean passTo(@Nonnull final Collection<TransportChannel<OUTPUT>> newChannels,
-                @Nonnull final Collection<TransportChannel<OUTPUT>> oldChannels,
-                @Nonnull final Collection<TransportChannel<OUTPUT>> abortedChannels) {
+        public boolean passTo(@Nonnull final Collection<TransportChannel<OUT>> newChannels,
+                @Nonnull final Collection<TransportChannel<OUT>> oldChannels,
+                @Nonnull final Collection<TransportChannel<OUT>> abortedChannels) {
 
             synchronized (mMutex) {
 
                 final Logger logger = mLogger;
-                final ArrayList<OUTPUT> lastResults = mLastResults;
-                final ArrayList<OUTPUT> cachedResults = mCachedResults;
+                final ArrayList<OUT> lastResults = mLastResults;
+                final ArrayList<OUT> cachedResults = mCachedResults;
 
                 if (mAbortException != null) {
 
@@ -228,7 +228,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
                     logger.dbg("passing result: %s + %s", cachedResults, lastResults);
 
-                    for (final TransportChannel<OUTPUT> newChannel : newChannels) {
+                    for (final TransportChannel<OUT> newChannel : newChannels) {
 
                         try {
 
@@ -244,7 +244,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                         }
                     }
 
-                    for (final TransportChannel<OUTPUT> channel : oldChannels) {
+                    for (final TransportChannel<OUT> channel : oldChannels) {
 
                         try {
 

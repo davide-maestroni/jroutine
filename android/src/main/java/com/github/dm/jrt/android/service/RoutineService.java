@@ -53,7 +53,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
 /**
  * Basic implementation of a service running routine invocations.
  * <p/>
- * Created by davide-maestroni on 1/9/15.
+ * Created by davide-maestroni on 01/09/15.
  */
 public class RoutineService extends Service {
 
@@ -736,7 +736,7 @@ public class RoutineService extends Service {
          * @return the invocation channel.
          */
         @Nonnull
-        public InvocationChannel<Object, Object> asyncInvoke() {
+        InvocationChannel<Object, Object> asyncInvoke() {
 
             ++mInvocationCount;
             return mRoutine.asyncInvoke();
@@ -748,7 +748,7 @@ public class RoutineService extends Service {
          * @return the invocation channel.
          */
         @Nonnull
-        public InvocationChannel<Object, Object> parallelInvoke() {
+        InvocationChannel<Object, Object> parallelInvoke() {
 
             ++mInvocationCount;
             return mRoutine.parallelInvoke();
@@ -759,7 +759,7 @@ public class RoutineService extends Service {
          *
          * @return the running routines count.
          */
-        public int releaseInvocation() {
+        int releaseInvocation() {
 
             return --mInvocationCount;
         }
@@ -875,7 +875,7 @@ public class RoutineService extends Service {
          *
          * @param reason the throwable object identifying the reason of the routine abortion.
          */
-        public void abort(@Nullable final Throwable reason) {
+        void abort(@Nullable final Throwable reason) {
 
             mChannel.abort(reason);
         }
@@ -887,7 +887,7 @@ public class RoutineService extends Service {
          * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException            if the channel is already closed.
          */
-        public void pass(@Nullable final Object input) {
+        void pass(@Nullable final Object input) {
 
             mChannel.pass(input);
         }
@@ -895,7 +895,7 @@ public class RoutineService extends Service {
         /**
          * Recycles this invocation, that is, removes it from the service cache.
          */
-        public void recycle() {
+        void recycle() {
 
             synchronized (mMutex) {
 
@@ -915,7 +915,7 @@ public class RoutineService extends Service {
          * @throws java.lang.IllegalStateException            if the channel is already closed or
          *                                                    already bound to a consumer.
          */
-        public void result(@Nonnull final OutputConsumer<Object> consumer) {
+        void result(@Nonnull final OutputConsumer<Object> consumer) {
 
             mChannel.result().passTo(consumer);
         }

@@ -79,12 +79,12 @@ import javax.annotation.Nullable;
  * {@link com.github.dm.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 09/07/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface Invocation<INPUT, OUTPUT> {
+public interface Invocation<IN, OUT> {
 
     /**
      * Called when the routine execution is aborted.<br/>
@@ -112,7 +112,7 @@ public interface Invocation<INPUT, OUTPUT> {
      * @param input  the input.
      * @param result the result channel.
      */
-    void onInput(INPUT input, @Nonnull ResultChannel<OUTPUT> result);
+    void onInput(IN input, @Nonnull ResultChannel<OUT> result);
 
     /**
      * Called when all the inputs has been passed to the routine.<br/>
@@ -121,7 +121,7 @@ public interface Invocation<INPUT, OUTPUT> {
      *
      * @param result the result channel.
      */
-    void onResult(@Nonnull ResultChannel<OUTPUT> result);
+    void onResult(@Nonnull ResultChannel<OUT> result);
 
     /**
      * Called when the invocation execution has completed.

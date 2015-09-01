@@ -66,7 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Proxy builder fragment unit tests.
  * <p/>
- * Created by davide-maestroni on 11/05/15.
+ * Created by davide-maestroni on 05/11/15.
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<TestActivity> {

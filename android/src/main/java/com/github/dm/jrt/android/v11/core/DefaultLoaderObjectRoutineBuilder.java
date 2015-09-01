@@ -44,7 +44,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -61,15 +60,12 @@ import static com.github.dm.jrt.util.Reflection.findMethod;
 /**
  * Class implementing a builder of routines wrapping an object methods.
  * <p/>
- * Created by davide-maestroni on 4/6/2015.
+ * Created by davide-maestroni on 04/06/2015.
  */
 class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         LoaderConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder> {
-
-    private static final HashMap<String, Class<?>> sPrimitiveClassMap =
-            new HashMap<String, Class<?>>();
 
     private final LoaderContext mContext;
 
@@ -154,7 +150,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
+    public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@Nonnull final String name) {
 
         final ContextInvocationTarget target = mTarget;
         final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
@@ -167,9 +163,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         final ProxyConfiguration proxyConfiguration =
                 configurationWithAnnotations(mProxyConfiguration, targetMethod);
-        final AliasContextInvocationFactory<INPUT, OUTPUT> factory =
-                new AliasContextInvocationFactory<INPUT, OUTPUT>(targetMethod, proxyConfiguration,
-                                                                 target, name);
+        final AliasContextInvocationFactory<IN, OUT> factory =
+                new AliasContextInvocationFactory<IN, OUT>(targetMethod, proxyConfiguration, target,
+                                                           name);
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
@@ -205,7 +201,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull final String name,
+    public <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
         return method(findMethod(mTarget.getTargetClass(), name, parameterTypes));
@@ -213,13 +209,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    public <INPUT, OUTPUT> LoaderRoutine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+    public <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull final Method method) {
 
         final ProxyConfiguration proxyConfiguration =
                 configurationWithAnnotations(mProxyConfiguration, method);
-        final MethodContextInvocationFactory<INPUT, OUTPUT> factory =
-                new MethodContextInvocationFactory<INPUT, OUTPUT>(method, proxyConfiguration,
-                                                                  mTarget, method);
+        final MethodContextInvocationFactory<IN, OUT> factory =
+                new MethodContextInvocationFactory<IN, OUT>(method, proxyConfiguration, mTarget,
+                                                            method);
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(mInvocationConfiguration, method);
         final LoaderConfiguration loaderConfiguration =
@@ -300,11 +296,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Alias method invocation.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class AliasContextInvocation<INPUT, OUTPUT>
-            extends FunctionContextInvocation<INPUT, OUTPUT> {
+    private static class AliasContextInvocation<IN, OUT>
+            extends FunctionContextInvocation<IN, OUT> {
 
         private final String mAliasName;
 
@@ -314,7 +310,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private Object mInstance;
 
-        private Routine<INPUT, OUTPUT> mRoutine = null;
+        private Routine<IN, OUT> mRoutine = null;
 
         /**
          * Constructor.
@@ -354,10 +350,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends INPUT> inputs,
-                @Nonnull final ResultChannel<OUTPUT> result) {
+        protected void onCall(@Nonnull final List<? extends IN> inputs,
+                @Nonnull final ResultChannel<OUT> result) {
 
-            final Routine<INPUT, OUTPUT> routine = mRoutine;
+            final Routine<IN, OUT> routine = mRoutine;
 
             if ((routine == null) || (mInstance == null)) {
 
@@ -371,11 +367,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Factory of {@link AliasContextInvocation AliasContextInvocation}s.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class AliasContextInvocationFactory<INPUT, OUTPUT>
-            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
+    private static class AliasContextInvocationFactory<IN, OUT>
+            extends AbstractContextInvocationFactory<IN, OUT> {
 
         private final String mName;
 
@@ -402,20 +398,20 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
-            return new AliasContextInvocation<INPUT, OUTPUT>(mProxyConfiguration, mTarget, mName);
+            return new AliasContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mName);
         }
     }
 
     /**
      * Generic method invocation.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class MethodContextInvocation<INPUT, OUTPUT>
-            extends FunctionContextInvocation<INPUT, OUTPUT> {
+    private static class MethodContextInvocation<IN, OUT>
+            extends FunctionContextInvocation<IN, OUT> {
 
         private final Method mMethod;
 
@@ -425,7 +421,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private Object mInstance;
 
-        private Routine<INPUT, OUTPUT> mRoutine = null;
+        private Routine<IN, OUT> mRoutine = null;
 
         /**
          * Constructor.
@@ -444,10 +440,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends INPUT> inputs,
-                @Nonnull final ResultChannel<OUTPUT> result) {
+        protected void onCall(@Nonnull final List<? extends IN> inputs,
+                @Nonnull final ResultChannel<OUT> result) {
 
-            final Routine<INPUT, OUTPUT> routine = mRoutine;
+            final Routine<IN, OUT> routine = mRoutine;
 
             if ((routine == null) || (mInstance == null)) {
 
@@ -482,11 +478,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Factory of {@link MethodContextInvocation MethodContextInvocation}s.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class MethodContextInvocationFactory<INPUT, OUTPUT>
-            extends AbstractContextInvocationFactory<INPUT, OUTPUT> {
+    private static class MethodContextInvocationFactory<IN, OUT>
+            extends AbstractContextInvocationFactory<IN, OUT> {
 
         private final Method mMethod;
 
@@ -513,10 +509,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Nonnull
-        public ContextInvocation<INPUT, OUTPUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
-            return new MethodContextInvocation<INPUT, OUTPUT>(mProxyConfiguration, mTarget,
-                                                              mMethod);
+            return new MethodContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mMethod);
         }
     }
 
@@ -706,18 +701,5 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
                                  inputMode, outputMode);
         }
-    }
-
-    static {
-
-        final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
-        classMap.put(byte.class.getName(), byte.class);
-        classMap.put(char.class.getName(), char.class);
-        classMap.put(int.class.getName(), int.class);
-        classMap.put(long.class.getName(), long.class);
-        classMap.put(float.class.getName(), float.class);
-        classMap.put(double.class.getName(), double.class);
-        classMap.put(short.class.getName(), short.class);
-        classMap.put(void.class.getName(), void.class);
     }
 }

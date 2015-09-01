@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 /**
  * Log implementation simply discarding all messages.
  * <p/>
- * Created by davide-maestroni on 10/4/14.
+ * Created by davide-maestroni on 10/04/14.
  */
 public class NullLog extends TemplateLog {
 

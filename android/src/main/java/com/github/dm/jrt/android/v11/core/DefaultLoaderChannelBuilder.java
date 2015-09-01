@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 /**
  * Default implementation of a loader channel builder.
  * <p/>
- * Created by davide-maestroni on 1/14/15.
+ * Created by davide-maestroni on 01/14/15.
  */
 class DefaultLoaderChannelBuilder
         implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
@@ -67,7 +67,7 @@ class DefaultLoaderChannelBuilder
     }
 
     @Nonnull
-    public <OUTPUT> OutputChannel<OUTPUT> buildChannel() {
+    public <OUT> OutputChannel<OUT> buildChannel() {
 
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
         final int loaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
@@ -82,13 +82,13 @@ class DefaultLoaderChannelBuilder
 
         if (component == null) {
 
-            final TransportChannel<OUTPUT> transportChannel = JRoutine.transport().buildChannel();
+            final TransportChannel<OUT> transportChannel = JRoutine.transport().buildChannel();
             transportChannel.abort(new MissingInvocationException(loaderId));
             return transportChannel.close();
         }
 
-        final LoaderRoutineBuilder<Void, OUTPUT> builder =
-                JRoutine.on(context, new MissingLoaderInvocation<OUTPUT>(loaderId));
+        final LoaderRoutineBuilder<Void, OUT> builder =
+                JRoutine.on(context, new MissingLoaderInvocation<OUT>(loaderId));
         final InvocationConfiguration invocationConfiguration =
                 mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);

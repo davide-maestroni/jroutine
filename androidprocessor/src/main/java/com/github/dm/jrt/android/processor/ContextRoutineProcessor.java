@@ -30,7 +30,7 @@ import javax.lang.model.type.TypeMirror;
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations,
  * by leveraging Android platform specific classes.
  * <p/>
- * Created by davide-maestroni on 06/05/15.
+ * Created by davide-maestroni on 05/06/15.
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
 
@@ -260,10 +260,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         if (inputResolutionType != null) {
 
-            builder.append(
-                    ".withInputClashResolution(com.github.dm.jrt.android.builder"
-                            + ".LoaderConfiguration"
-                            + ".ClashResolutionType.").append(resolutionType).append(")");
+            builder.append(".withInputClashResolution(com.github.dm.jrt.android.builder"
+                                   + ".LoaderConfiguration" + ".ClashResolutionType.")
+                   .append(resolutionType)
+                   .append(")");
         }
 
         final Object strategyType =

@@ -26,15 +26,17 @@ import javax.annotation.Nullable;
  * eventually returning output data.
  * <p/>
  * Note that the implementing class must not retain an internal variable state.
+ * <p/>
+ * Created by davide-maestroni on 01/08/15.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-public abstract class ProcedureContextInvocation<OUTPUT>
-        extends ContextInvocationFactory<Void, OUTPUT> implements ContextInvocation<Void, OUTPUT> {
+public abstract class ProcedureContextInvocation<OUT> extends ContextInvocationFactory<Void, OUT>
+        implements ContextInvocation<Void, OUT> {
 
     @Nonnull
     @Override
-    public final ContextInvocation<Void, OUTPUT> newInvocation() {
+    public final ContextInvocation<Void, OUT> newInvocation() {
 
         return this;
     }
@@ -51,7 +53,7 @@ public abstract class ProcedureContextInvocation<OUTPUT>
 
     }
 
-    public final void onInput(final Void input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public final void onInput(final Void input, @Nonnull final ResultChannel<OUT> result) {
 
     }
 

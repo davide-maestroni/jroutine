@@ -22,12 +22,12 @@ import javax.annotation.Nonnull;
 /**
  * Interface defining an invocation aware of the specific Android context.
  * <p/>
- * Created by davide-maestroni on 1/8/15.
+ * Created by davide-maestroni on 01/08/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface ContextInvocation<INPUT, OUTPUT> extends Invocation<INPUT, OUTPUT> {
+public interface ContextInvocation<IN, OUT> extends Invocation<IN, OUT> {
 
     /**
      * Called right after the instantiation to specify the invocation context.

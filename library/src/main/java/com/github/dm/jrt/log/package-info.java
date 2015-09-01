@@ -14,6 +14,6 @@
 /**
  * Log related classes and definitions.
  * <p/>
- * Created by davide-maestroni on 10/4/14.
+ * Created by davide-maestroni on 10/04/14.
  */
 package com.github.dm.jrt.log;

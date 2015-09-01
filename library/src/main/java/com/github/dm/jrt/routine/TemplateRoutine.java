@@ -26,68 +26,67 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide-maestroni on 10/17/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
+public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
     @Nonnull
-    public OutputChannel<OUTPUT> asyncCall() {
+    public OutputChannel<OUT> asyncCall() {
 
         return asyncInvoke().result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> asyncCall(@Nullable final INPUT input) {
+    public OutputChannel<OUT> asyncCall(@Nullable final IN input) {
 
         return asyncInvoke().pass(input).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> asyncCall(@Nullable final INPUT... inputs) {
+    public OutputChannel<OUT> asyncCall(@Nullable final IN... inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> asyncCall(@Nullable final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUT> asyncCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> asyncCall(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUT> asyncCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> parallelCall() {
+    public OutputChannel<OUT> parallelCall() {
 
         return parallelInvoke().result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> parallelCall(@Nullable final INPUT input) {
+    public OutputChannel<OUT> parallelCall(@Nullable final IN input) {
 
         return parallelInvoke().pass(input).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> parallelCall(@Nullable final INPUT... inputs) {
+    public OutputChannel<OUT> parallelCall(@Nullable final IN... inputs) {
 
         return parallelInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> parallelCall(@Nullable final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUT> parallelCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return parallelInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> parallelCall(
-            @Nullable final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUT> parallelCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return parallelInvoke().pass(inputs).result();
     }
@@ -97,31 +96,31 @@ public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> syncCall() {
+    public OutputChannel<OUT> syncCall() {
 
         return syncInvoke().result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> syncCall(@Nullable final INPUT input) {
+    public OutputChannel<OUT> syncCall(@Nullable final IN input) {
 
         return syncInvoke().pass(input).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> syncCall(@Nullable final INPUT... inputs) {
+    public OutputChannel<OUT> syncCall(@Nullable final IN... inputs) {
 
         return syncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> syncCall(@Nullable final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUT> syncCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return syncInvoke().pass(inputs).result();
     }
 
     @Nonnull
-    public OutputChannel<OUTPUT> syncCall(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUT> syncCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return syncInvoke().pass(inputs).result();
     }

@@ -27,30 +27,30 @@ import javax.annotation.Nullable;
 /**
  * Default implementation of an execution object.
  * <p/>
- * Created by davide-maestroni on 9/24/14.
+ * Created by davide-maestroni on 09/24/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<INPUT, OUTPUT> {
+class DefaultExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT> {
 
     private final Object mAbortMutex = new Object();
 
-    private final InputIterator<INPUT> mInputIterator;
+    private final InputIterator<IN> mInputIterator;
 
-    private final InvocationManager<INPUT, OUTPUT> mInvocationManager;
+    private final InvocationManager<IN, OUT> mInvocationManager;
 
     private final Logger mLogger;
 
     private final Object mMutex = new Object();
 
-    private final DefaultResultChannel<OUTPUT> mResultChannel;
+    private final DefaultResultChannel<OUT> mResultChannel;
 
     private AbortExecution mAbortExecution;
 
     private int mExecutionCount = 1;
 
-    private Invocation<INPUT, OUTPUT> mInvocation;
+    private Invocation<IN, OUT> mInvocation;
 
     private boolean mIsWaitingAbortInvocation;
 
@@ -65,9 +65,9 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
      * @param logger  the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultExecution(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
-            @Nonnull final InputIterator<INPUT> inputs,
-            @Nonnull final DefaultResultChannel<OUTPUT> result, @Nonnull final Logger logger) {
+    DefaultExecution(@Nonnull final InvocationManager<IN, OUT> manager,
+            @Nonnull final InputIterator<IN> inputs,
+            @Nonnull final DefaultResultChannel<OUT> result, @Nonnull final Logger logger) {
 
         if (manager == null) {
 
@@ -114,14 +114,14 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
         return true;
     }
 
-    public void onCreate(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+    public void onCreate(@Nonnull final Invocation<IN, OUT> invocation) {
 
         synchronized (mMutex) {
 
             mIsWaitingInvocation = false;
-            final InputIterator<INPUT> inputIterator = mInputIterator;
-            final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
-            final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+            final InputIterator<IN> inputIterator = mInputIterator;
+            final InvocationManager<IN, OUT> manager = mInvocationManager;
+            final DefaultResultChannel<OUT> resultChannel = mResultChannel;
             resultChannel.stopWaitingInvocation();
             final int count = mExecutionCount;
             mExecutionCount = 1;
@@ -195,7 +195,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
     public void run() {
 
-        final Invocation<INPUT, OUTPUT> invocation;
+        final Invocation<IN, OUT> invocation;
 
         synchronized (mMutex) {
 
@@ -235,9 +235,9 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
     /**
      * Interface defining an iterator of input data.
      *
-     * @param <INPUT> the input data type.
+     * @param <IN> the input data type.
      */
-    interface InputIterator<INPUT> {
+    interface InputIterator<IN> {
 
         /**
          * Returns the exception identifying the abortion reason.
@@ -268,7 +268,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
          * @throws java.util.NoSuchElementException if no more inputs are available.
          */
         @Nullable
-        INPUT nextInput();
+        IN nextInput();
 
         /**
          * Notifies that the execution abortion is complete.
@@ -296,19 +296,18 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
     /**
      * Abort execution implementation.
      */
-    private class AbortExecution extends TemplateExecution
-            implements InvocationObserver<INPUT, OUTPUT> {
+    private class AbortExecution extends TemplateExecution implements InvocationObserver<IN, OUT> {
 
         private int mAbortExecutionCount = 1;
 
-        public void onCreate(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+        public void onCreate(@Nonnull final Invocation<IN, OUT> invocation) {
 
             synchronized (mMutex) {
 
                 mIsWaitingAbortInvocation = false;
-                final InputIterator<INPUT> inputIterator = mInputIterator;
-                final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
-                final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+                final InputIterator<IN> inputIterator = mInputIterator;
+                final InvocationManager<IN, OUT> manager = mInvocationManager;
+                final DefaultResultChannel<OUT> resultChannel = mResultChannel;
                 final int count = mAbortExecutionCount;
                 mAbortExecutionCount = 1;
 
@@ -368,7 +367,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution, InvocationObserver<I
 
         public void run() {
 
-            final Invocation<INPUT, OUTPUT> invocation;
+            final Invocation<IN, OUT> invocation;
 
             synchronized (mMutex) {
 

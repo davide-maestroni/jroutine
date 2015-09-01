@@ -261,7 +261,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     }
 
     @Nonnull
-    public <INPUT extends InputChannel<? super DATA>> INPUT passTo(@Nonnull final INPUT channel) {
+    public <IN extends InputChannel<? super DATA>> IN passTo(@Nonnull final IN channel) {
 
         return mOutputChannel.passTo(channel);
     }

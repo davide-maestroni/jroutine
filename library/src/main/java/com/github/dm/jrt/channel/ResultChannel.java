@@ -24,69 +24,69 @@ import javax.annotation.Nullable;
  * Interface defining a result channel, that is the channel used by the routine invocation to
  * publish the results into the output channel.
  * <p/>
- * Created by davide-maestroni on 9/15/14.
+ * Created by davide-maestroni on 09/15/14.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
+public interface ResultChannel<OUT> extends InputChannel<OUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> after(@Nonnull TimeDuration delay);
+    ResultChannel<OUT> after(@Nonnull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    ResultChannel<OUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> now();
+    ResultChannel<OUT> now();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> orderByCall();
+    ResultChannel<OUT> orderByCall();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> orderByChance();
+    ResultChannel<OUT> orderByChance();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> orderByDelay();
+    ResultChannel<OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> pass(@Nullable OutputChannel<? extends OUTPUT> channel);
+    ResultChannel<OUT> pass(@Nullable OutputChannel<? extends OUT> channel);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> pass(@Nullable Iterable<? extends OUTPUT> outputs);
+    ResultChannel<OUT> pass(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> pass(@Nullable OUTPUT output);
+    ResultChannel<OUT> pass(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ResultChannel<OUTPUT> pass(@Nullable OUTPUT... outputs);
+    ResultChannel<OUT> pass(@Nullable OUT... outputs);
 }

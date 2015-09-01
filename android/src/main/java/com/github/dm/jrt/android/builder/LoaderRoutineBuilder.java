@@ -33,20 +33,20 @@ import javax.annotation.Nonnull;
  * prevent out of memory errors.<br/>
  * The local context of the invocations will always be the application one.
  * <p/>
- * Created by davide-maestroni on 12/9/14.
+ * Created by davide-maestroni on 12/09/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface LoaderRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT>,
-        LoaderConfigurableBuilder<LoaderRoutineBuilder<INPUT, OUTPUT>>,
-        LoaderRoutine<INPUT, OUTPUT> {
+public interface LoaderRoutineBuilder<IN, OUT>
+        extends RoutineBuilder<IN, OUT>, LoaderConfigurableBuilder<LoaderRoutineBuilder<IN, OUT>>,
+        LoaderRoutine<IN, OUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    LoaderRoutine<INPUT, OUTPUT> buildRoutine();
+    LoaderRoutine<IN, OUT> buildRoutine();
 
     /**
      * Note that the configured asynchronous runner will be ignored.
@@ -54,5 +54,5 @@ public interface LoaderRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPU
      * @return the invocation configuration builder.
      */
     @Nonnull
-    Builder<? extends LoaderRoutineBuilder<INPUT, OUTPUT>> invocations();
+    Builder<? extends LoaderRoutineBuilder<IN, OUT>> invocations();
 }

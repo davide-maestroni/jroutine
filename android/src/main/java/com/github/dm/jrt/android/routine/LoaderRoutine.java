@@ -21,31 +21,31 @@ import javax.annotation.Nullable;
  * Interface defining a routine that can purge specific invocation instances, identifying them by
  * their inputs.
  * <p/>
- * Created by davide-maestroni on 3/9/15.
+ * Created by davide-maestroni on 03/09/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface LoaderRoutine<INPUT, OUTPUT> extends Routine<INPUT, OUTPUT> {
+public interface LoaderRoutine<IN, OUT> extends Routine<IN, OUT> {
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified input.
      *
      * @param input the input.
      */
-    void purge(@Nullable INPUT input);
+    void purge(@Nullable IN input);
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
-    void purge(@Nullable INPUT... inputs);
+    void purge(@Nullable IN... inputs);
 
     /**
      * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
-    void purge(@Nullable Iterable<? extends INPUT> inputs);
+    void purge(@Nullable Iterable<? extends IN> inputs);
 }

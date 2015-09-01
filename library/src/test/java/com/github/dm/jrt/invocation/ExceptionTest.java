@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Exceptions unit tests.
  * <p/>
- * Created by davide-maestroni on 10/2/14.
+ * Created by davide-maestroni on 10/02/14.
  */
 public class ExceptionTest {
 

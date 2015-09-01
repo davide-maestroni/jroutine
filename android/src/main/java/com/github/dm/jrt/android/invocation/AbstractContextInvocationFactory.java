@@ -29,13 +29,13 @@ import javax.annotation.Nullable;
  * will not be equal to another collection containing different arrays storing the same data. In
  * fact an array {@code equals()} implementation does not override the {@code Object} one.
  * <p/>
- * Created by davide-maestroni on 28/05/15.
+ * Created by davide-maestroni on 05/28/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class AbstractContextInvocationFactory<INPUT, OUTPUT>
-        extends ContextInvocationFactory<INPUT, OUTPUT> {
+public abstract class AbstractContextInvocationFactory<IN, OUT>
+        extends ContextInvocationFactory<IN, OUT> {
 
     private final Object[] mArgs;
 

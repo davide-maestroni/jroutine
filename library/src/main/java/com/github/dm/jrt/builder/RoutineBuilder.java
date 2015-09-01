@@ -25,11 +25,11 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide-maestroni on 11/11/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface RoutineBuilder<INPUT, OUTPUT>
-        extends ConfigurableBuilder<RoutineBuilder<INPUT, OUTPUT>>, Routine<INPUT, OUTPUT> {
+public interface RoutineBuilder<IN, OUT>
+        extends ConfigurableBuilder<RoutineBuilder<IN, OUT>>, Routine<IN, OUT> {
 
     /**
      * Builds and returns the routine.
@@ -37,5 +37,5 @@ public interface RoutineBuilder<INPUT, OUTPUT>
      * @return the newly created routine instance.
      */
     @Nonnull
-    Routine<INPUT, OUTPUT> buildRoutine();
+    Routine<IN, OUT> buildRoutine();
 }

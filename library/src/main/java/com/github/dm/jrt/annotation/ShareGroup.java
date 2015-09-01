@@ -52,7 +52,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 1/26/15.
+ * Created by davide-maestroni on 01/26/15.
  *
  * @see com.github.dm.jrt.builder.ProxyConfiguration ProxyConfiguration
  */
@@ -64,7 +64,7 @@ public @interface ShareGroup {
     /**
      * Constant indicating the default share group, that is, all member fields are protected.
      */
-    String ALL = "ShareGroup.ALL";
+    String ALL = "com.github.dm.jrt.annotation.ShareGroup.ALL";
 
     /**
      * Constant indicating that no member field needs to be protected.

@@ -25,16 +25,16 @@ import javax.annotation.Nullable;
  * <p/>
  * Note that the implementing class must not retain an internal variable state.
  * <p/>
- * Created by davide-maestroni on 05/06/15.
+ * Created by davide-maestroni on 06/05/15.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-public abstract class ProcedureInvocation<OUTPUT> extends InvocationFactory<Void, OUTPUT>
-        implements Invocation<Void, OUTPUT> {
+public abstract class ProcedureInvocation<OUT> extends InvocationFactory<Void, OUT>
+        implements Invocation<Void, OUT> {
 
     @Nonnull
     @Override
-    public final Invocation<Void, OUTPUT> newInvocation() {
+    public final Invocation<Void, OUT> newInvocation() {
 
         return this;
     }
@@ -51,7 +51,7 @@ public abstract class ProcedureInvocation<OUTPUT> extends InvocationFactory<Void
 
     }
 
-    public final void onInput(final Void input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public final void onInput(final Void input, @Nonnull final ResultChannel<OUT> result) {
 
     }
 

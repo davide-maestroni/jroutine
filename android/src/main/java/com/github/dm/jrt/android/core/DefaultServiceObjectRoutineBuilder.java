@@ -53,7 +53,7 @@ import static com.github.dm.jrt.util.Reflection.findMethod;
 /**
  * Class implementing a builder of routines wrapping an object methods.
  * <p/>
- * Created by davide-maestroni on 3/29/15.
+ * Created by davide-maestroni on 03/29/15.
  */
 class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         InvocationConfiguration.Configurable<ServiceObjectRoutineBuilder>,
@@ -157,7 +157,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> aliasMethod(@Nonnull final String name) {
+    public <IN, OUT> Routine<IN, OUT> aliasMethod(@Nonnull final String name) {
 
         final ContextInvocationTarget target = mTarget;
         final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
@@ -170,7 +170,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name};
-        return JRoutine.on(mContext, targetInvocation(new MethodAliasToken<INPUT, OUTPUT>(), args))
+        return JRoutine.on(mContext, targetInvocation(new MethodAliasToken<IN, OUT>(), args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
                        .set()
@@ -201,15 +201,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
+    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
         final ContextInvocationTarget target = mTarget;
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name, toNames(parameterTypes)};
-        return JRoutine.on(mContext,
-                           targetInvocation(new MethodSignatureToken<INPUT, OUTPUT>(), args))
+        return JRoutine.on(mContext, targetInvocation(new MethodSignatureToken<IN, OUT>(), args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
                        .set()
@@ -220,7 +219,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
+    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final Method method) {
 
         return method(method.getName(), method.getParameterTypes());
     }
@@ -291,11 +290,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Alias method invocation.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class MethodAliasInvocation<INPUT, OUTPUT>
-            extends FunctionContextInvocation<INPUT, OUTPUT> {
+    private static class MethodAliasInvocation<IN, OUT> extends FunctionContextInvocation<IN, OUT> {
 
         private final String mAliasName;
 
@@ -305,7 +303,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private Object mInstance;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private Routine<IN, OUT> mRoutine;
 
         /**
          * Constructor.
@@ -344,10 +342,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends INPUT> inputs,
-                @Nonnull final ResultChannel<OUTPUT> result) {
+        protected void onCall(@Nonnull final List<? extends IN> inputs,
+                @Nonnull final ResultChannel<OUT> result) {
 
-            final Routine<INPUT, OUTPUT> routine = mRoutine;
+            final Routine<IN, OUT> routine = mRoutine;
 
             if ((routine == null) || (mInstance == null)) {
 
@@ -361,22 +359,22 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Class token of a {@link MethodAliasInvocation MethodAliasInvocation}.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class MethodAliasToken<INPUT, OUTPUT>
-            extends ClassToken<MethodAliasInvocation<INPUT, OUTPUT>> {
+    private static class MethodAliasToken<IN, OUT>
+            extends ClassToken<MethodAliasInvocation<IN, OUT>> {
 
     }
 
     /**
      * Invocation based on method signature.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class MethodSignatureInvocation<INPUT, OUTPUT>
-            extends FunctionContextInvocation<INPUT, OUTPUT> {
+    private static class MethodSignatureInvocation<IN, OUT>
+            extends FunctionContextInvocation<IN, OUT> {
 
         private final String mMethodName;
 
@@ -388,7 +386,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private Object mInstance;
 
-        private Routine<INPUT, OUTPUT> mRoutine;
+        private Routine<IN, OUT> mRoutine;
 
         /**
          * Constructor.
@@ -410,10 +408,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends INPUT> inputs,
-                @Nonnull final ResultChannel<OUTPUT> result) {
+        protected void onCall(@Nonnull final List<? extends IN> inputs,
+                @Nonnull final ResultChannel<OUT> result) {
 
-            final Routine<INPUT, OUTPUT> routine = mRoutine;
+            final Routine<IN, OUT> routine = mRoutine;
 
             if ((routine == null) || (mInstance == null)) {
 
@@ -448,11 +446,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Class token of a {@link MethodSignatureInvocation MethodSignatureInvocation}.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class MethodSignatureToken<INPUT, OUTPUT>
-            extends ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> {
+    private static class MethodSignatureToken<IN, OUT>
+            extends ClassToken<MethodSignatureInvocation<IN, OUT>> {
 
     }
 

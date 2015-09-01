@@ -18,15 +18,14 @@ import javax.annotation.Nonnull;
 /**
  * Class decorating the invocations produced by an invocation factory.
  * <p/>
- * Created by davide-maestroni on 19/08/15.
+ * Created by davide-maestroni on 08/19/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class DecoratingInvocationFactory<INPUT, OUTPUT>
-        extends InvocationFactory<INPUT, OUTPUT> {
+public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final InvocationFactory<INPUT, OUTPUT> mFactory;
+    private final InvocationFactory<IN, OUT> mFactory;
 
     /**
      * Constructor.
@@ -34,7 +33,7 @@ public abstract class DecoratingInvocationFactory<INPUT, OUTPUT>
      * @param wrapped the wrapped factory instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public DecoratingInvocationFactory(@Nonnull final InvocationFactory<INPUT, OUTPUT> wrapped) {
+    public DecoratingInvocationFactory(@Nonnull final InvocationFactory<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -46,7 +45,7 @@ public abstract class DecoratingInvocationFactory<INPUT, OUTPUT>
 
     @Nonnull
     @Override
-    public final Invocation<INPUT, OUTPUT> newInvocation() {
+    public final Invocation<IN, OUT> newInvocation() {
 
         return decorate(mFactory.newInvocation());
     }
@@ -58,6 +57,5 @@ public abstract class DecoratingInvocationFactory<INPUT, OUTPUT>
      * @return the decorated invocation.
      */
     @Nonnull
-    protected abstract Invocation<INPUT, OUTPUT> decorate(
-            @Nonnull final Invocation<INPUT, OUTPUT> invocation);
+    protected abstract Invocation<IN, OUT> decorate(@Nonnull final Invocation<IN, OUT> invocation);
 }

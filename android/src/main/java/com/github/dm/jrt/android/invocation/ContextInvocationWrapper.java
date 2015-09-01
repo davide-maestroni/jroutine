@@ -25,14 +25,14 @@ import javax.annotation.Nullable;
 /**
  * Implementation of a platform specific Android invocation wrapping a base invocation instance.
  * <p/>
- * Created by davide-maestroni on 3/21/15.
+ * Created by davide-maestroni on 03/21/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public class ContextInvocationWrapper<INPUT, OUTPUT> implements ContextInvocation<INPUT, OUTPUT> {
+public class ContextInvocationWrapper<IN, OUT> implements ContextInvocation<IN, OUT> {
 
-    private final Invocation<INPUT, OUTPUT> mInvocation;
+    private final Invocation<IN, OUT> mInvocation;
 
     /**
      * Constructor.
@@ -40,7 +40,7 @@ public class ContextInvocationWrapper<INPUT, OUTPUT> implements ContextInvocatio
      * @param invocation the wrapped invocation.
      */
     @SuppressWarnings("ConstantConditions")
-    public ContextInvocationWrapper(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+    public ContextInvocationWrapper(@Nonnull final Invocation<IN, OUT> invocation) {
 
         if (invocation == null) {
 
@@ -65,12 +65,12 @@ public class ContextInvocationWrapper<INPUT, OUTPUT> implements ContextInvocatio
         mInvocation.onInitialize();
     }
 
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
 
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public void onResult(@Nonnull final ResultChannel<OUT> result) {
 
         mInvocation.onResult(result);
     }

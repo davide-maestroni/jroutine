@@ -28,11 +28,11 @@ import javax.annotation.Nonnull;
  * <p/>
  * Note that the delivery order of the output data might not be guaranteed.
  * <p/>
- * Created by davide-maestroni on 9/4/14.
+ * Created by davide-maestroni on 09/04/14.
  *
- * @param <OUTPUT> the output data type.
+ * @param <OUT> the output data type.
  */
-public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterable<OUTPUT> {
+public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT> {
 
     /**
      * Tells the channel to wait at the max the specified time duration for the next result to be
@@ -44,7 +44,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @return this channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+    OutputChannel<OUT> afterMax(@Nonnull TimeDuration timeout);
 
     /**
      * Tells the channel to wait at the max the specified time duration for the next result to be
@@ -58,7 +58,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
      */
     @Nonnull
-    OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+    OutputChannel<OUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
      * Consumes all the results by waiting for the routine to complete at the maximum for the set
@@ -81,7 +81,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @see #eventuallyThrow()
      */
     @Nonnull
-    List<OUTPUT> all();
+    List<OUT> all();
 
     /**
      * Consumes all the results by waiting for the routine to complete at the maximum for the set
@@ -105,7 +105,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @see #eventuallyThrow()
      */
     @Nonnull
-    OutputChannel<OUTPUT> allInto(@Nonnull Collection<? super OUTPUT> results);
+    OutputChannel<OUT> allInto(@Nonnull Collection<? super OUT> results);
 
     /**
      * Checks if the routine is complete, waiting at the maximum for the set timeout.
@@ -125,7 +125,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @return this channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> eventually();
+    OutputChannel<OUT> eventually();
 
     /**
      * Tells the channel to abort the invocation execution in case no result is available before
@@ -142,7 +142,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @see #eventuallyThrow()
      */
     @Nonnull
-    OutputChannel<OUTPUT> eventuallyAbort();
+    OutputChannel<OUT> eventuallyAbort();
 
     /**
      * Tells the channel to break execution in case no result is available before the timeout has
@@ -159,7 +159,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @see #eventuallyThrow()
      */
     @Nonnull
-    OutputChannel<OUTPUT> eventuallyExit();
+    OutputChannel<OUT> eventuallyExit();
 
     /**
      * Tells the channel to throw an {@link com.github.dm.jrt.channel.ExecutionTimeoutException
@@ -175,7 +175,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @see #eventuallyExit()
      */
     @Nonnull
-    OutputChannel<OUTPUT> eventuallyThrow();
+    OutputChannel<OUT> eventuallyThrow();
 
     /**
      * Checks if more results are available by waiting at the maximum for the set timeout.
@@ -222,7 +222,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */
-    OUTPUT next();
+    OUT next();
 
     /**
      * Tells the channel to not wait for results to be available.
@@ -232,7 +232,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @return this channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> immediately();
+    OutputChannel<OUT> immediately();
 
     /**
      * Checks if this channel is bound to a consumer or another channel.
@@ -248,13 +248,13 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * only to the specified input channel. Attempting to read through the dedicated methods will
      * cause an {@link java.lang.IllegalStateException} to be thrown.
      *
-     * @param channel   the input channel
-     * @param <CHANNEL> the input channel type.
+     * @param channel the input channel
+     * @param <IN>    the input channel type.
      * @return this channel.
      * @throws java.lang.IllegalStateException if this channel is already bound.
      */
     @Nonnull
-    <CHANNEL extends InputChannel<? super OUTPUT>> CHANNEL passTo(@Nonnull CHANNEL channel);
+    <IN extends InputChannel<? super OUT>> IN passTo(@Nonnull IN channel);
 
     /**
      * Binds this channel to the specified consumer. After the call, all the output will be passed
@@ -267,5 +267,5 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterator<OUTPUT>, Iterab
      * @throws java.lang.IllegalStateException if this channel is already bound.
      */
     @Nonnull
-    OutputChannel<OUTPUT> passTo(@Nonnull OutputConsumer<? super OUTPUT> consumer);
+    OutputChannel<OUT> passTo(@Nonnull OutputConsumer<? super OUT> consumer);
 }

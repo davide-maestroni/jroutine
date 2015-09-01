@@ -27,39 +27,39 @@ import javax.annotation.Nonnull;
  * The implementing class may additionally override the invocation methods to specifically handle
  * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
  * <p/>
- * Created by davide-maestroni on 9/7/14.
+ * Created by davide-maestroni on 09/07/14.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class FunctionInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT> {
+public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private ArrayList<INPUT> mInputs;
+    private ArrayList<IN> mInputs;
 
     @Override
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
 
         if (mInputs == null) {
 
-            mInputs = new ArrayList<INPUT>();
+            mInputs = new ArrayList<IN>();
         }
 
         mInputs.add(input);
     }
 
     @Override
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
+    public void onResult(@Nonnull final ResultChannel<OUT> result) {
 
-        final ArrayList<INPUT> inputs = mInputs;
-        final ArrayList<INPUT> clone;
+        final ArrayList<IN> inputs = mInputs;
+        final ArrayList<IN> clone;
 
         if (inputs == null) {
 
-            clone = new ArrayList<INPUT>(0);
+            clone = new ArrayList<IN>(0);
 
         } else {
 
-            clone = new ArrayList<INPUT>(inputs);
+            clone = new ArrayList<IN>(inputs);
         }
 
         onCall(clone, result);
@@ -68,7 +68,7 @@ public abstract class FunctionInvocation<INPUT, OUTPUT> extends TemplateInvocati
     @Override
     public void onTerminate() {
 
-        final ArrayList<INPUT> inputs = mInputs;
+        final ArrayList<IN> inputs = mInputs;
 
         if (inputs != null) {
 
@@ -82,6 +82,6 @@ public abstract class FunctionInvocation<INPUT, OUTPUT> extends TemplateInvocati
      * @param inputs the input list.
      * @param result the result channel.
      */
-    protected abstract void onCall(@Nonnull List<? extends INPUT> inputs,
-            @Nonnull ResultChannel<OUTPUT> result);
+    protected abstract void onCall(@Nonnull List<? extends IN> inputs,
+            @Nonnull ResultChannel<OUT> result);
 }

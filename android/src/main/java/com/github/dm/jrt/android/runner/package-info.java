@@ -14,6 +14,6 @@
 /**
  * Runner related classes and definitions specific to the Android platform.
  * <p/>
- * Created by davide-maestroni on 9/28/14.
+ * Created by davide-maestroni on 09/28/14.
  */
 package com.github.dm.jrt.android.runner;

@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 /**
  * Utility class for creating invocation factory objects.
  * <p/>
- * Created by davide-maestroni on 2/12/15.
+ * Created by davide-maestroni on 02/12/15.
  */
 public class Invocations {
 
@@ -40,14 +40,14 @@ public class Invocations {
      * Builds and returns a new invocation factory creating instances of the specified class.
      *
      * @param invocationClass the invocation class.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass) {
+    public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final Class<? extends Invocation<IN, OUT>> invocationClass) {
 
         return factoryOf(invocationClass, (Object[]) null);
     }
@@ -64,32 +64,32 @@ public class Invocations {
      *
      * @param invocationClass the invocation class.
      * @param args            the invocation constructor arguments.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
+    public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
-        return new DefaultInvocationFactory<INPUT, OUTPUT>(invocationClass, args);
+        return new DefaultInvocationFactory<IN, OUT>(invocationClass, args);
     }
 
     /**
      * Builds and returns a new invocation factory creating instances of the specified class token.
      *
      * @param invocationToken the invocation class token.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken) {
+    public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
     }
@@ -106,15 +106,15 @@ public class Invocations {
      *
      * @param invocationToken the invocation class token.
      * @param args            the invocation constructor arguments.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken,
+    public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
         return factoryOf(invocationToken.getRawClass(), args);
@@ -124,17 +124,17 @@ public class Invocations {
      * Builds and returns a new invocation factory creating instances of the specified object.
      *
      * @param invocation the invocation instance.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
+     * @param <IN>       the input data type.
+     * @param <OUT>      the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+    public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final Invocation<IN, OUT> invocation) {
 
-        return factoryOf((Class<? extends Invocation<INPUT, OUTPUT>>) invocation.getClass());
+        return factoryOf((Class<? extends Invocation<IN, OUT>>) invocation.getClass());
     }
 
     /**
@@ -149,32 +149,31 @@ public class Invocations {
      *
      * @param invocation the invocation instance.
      * @param args       the invocation constructor arguments.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
+     * @param <IN>       the input data type.
+     * @param <OUT>      the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf(
-            @Nonnull final Invocation<INPUT, OUTPUT> invocation, @Nullable final Object... args) {
+    public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+            @Nonnull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
 
-        return factoryOf((Class<? extends Invocation<INPUT, OUTPUT>>) invocation.getClass(), args);
+        return factoryOf((Class<? extends Invocation<IN, OUT>>) invocation.getClass(), args);
     }
 
     /**
      * Default implementation of an invocation factory.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class DefaultInvocationFactory<INPUT, OUTPUT>
-            extends InvocationFactory<INPUT, OUTPUT> {
+    private static class DefaultInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         private final Object[] mArgs;
 
-        private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
+        private final Constructor<? extends Invocation<IN, OUT>> mConstructor;
 
         /**
          * Constructor.
@@ -186,7 +185,7 @@ public class Invocations {
          */
         @SuppressWarnings("ConstantConditions")
         private DefaultInvocationFactory(
-                @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
+                @Nonnull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
             final Object[] invocationArgs =
@@ -223,7 +222,7 @@ public class Invocations {
 
         @Nonnull
         @Override
-        public Invocation<INPUT, OUTPUT> newInvocation() {
+        public Invocation<IN, OUT> newInvocation() {
 
             try {
 

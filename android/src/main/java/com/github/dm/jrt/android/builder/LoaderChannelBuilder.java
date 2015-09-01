@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
  * and still be running (or cached) at the time of the channel creation.
  * <p/>
- * Created by davide-maestroni on 1/14/15.
+ * Created by davide-maestroni on 01/14/15.
  *
  * @see com.github.dm.jrt.android.builder.LoaderRoutineBuilder LoaderRoutineBuilder
  */
@@ -35,11 +35,12 @@ public interface LoaderChannelBuilder extends ConfigurableChannelBuilder<LoaderC
     /**
      * Builds and returns an output channel bound to the routine invocation.
      *
+     * @param <OUT> the output data type.
      * @return the newly created output channel.
      * @throws java.lang.IllegalArgumentException if the configured loader ID is equal to AUTO.
      */
     @Nonnull
-    <OUTPUT> OutputChannel<OUTPUT> buildChannel();
+    <OUT> OutputChannel<OUT> buildChannel();
 
     /**
      * Note that the clash resolution types will be ignored.

@@ -28,7 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Utility class for handling routine channels.
  * <p/>
- * Created by davide-maestroni on 03/08/15.
+ * Created by davide-maestroni on 08/03/15.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")
@@ -50,21 +50,21 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * @param channel the selectable channel.
      * @param indexes the collection of indexes.
      * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
+     * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArray<TransportChannel<INPUT>> mapParcelable(
+    public static <DATA, IN extends DATA> SparseArray<TransportChannel<IN>> mapParcelable(
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final Collection<Integer> indexes) {
 
         final int size = indexes.size();
-        final SparseArray<TransportChannel<INPUT>> channelMap =
-                new SparseArray<TransportChannel<INPUT>>(size);
+        final SparseArray<TransportChannel<IN>> channelMap =
+                new SparseArray<TransportChannel<IN>>(size);
 
         for (final Integer index : indexes) {
 
-            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.append(index, Channels.<DATA, IN>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -79,21 +79,21 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
      * @param <DATA>  the channel data type.
-     * @param <INPUT> the input data type.
+     * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArray<TransportChannel<INPUT>> mapParcelable(
+    public static <DATA, IN extends DATA> SparseArray<TransportChannel<IN>> mapParcelable(
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @Nonnull final int... indexes) {
 
         final int size = indexes.length;
-        final SparseArray<TransportChannel<INPUT>> channelMap =
-                new SparseArray<TransportChannel<INPUT>>(size);
+        final SparseArray<TransportChannel<IN>> channelMap =
+                new SparseArray<TransportChannel<IN>>(size);
 
         for (final int index : indexes) {
 
-            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.append(index, Channels.<DATA, IN>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -109,12 +109,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * @param rangeSize  the size of the range of indexes (must be positive).
      * @param channel    the selectable channel.
      * @param <DATA>     the channel data type.
-     * @param <INPUT>    the input data type.
+     * @param <IN>       the input data type.
      * @return the map of indexes and output channels.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @Nonnull
-    public static <DATA, INPUT extends DATA> SparseArray<TransportChannel<INPUT>> mapParcelable(
+    public static <DATA, IN extends DATA> SparseArray<TransportChannel<IN>> mapParcelable(
             final int startIndex, final int rangeSize,
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
 
@@ -123,12 +123,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final SparseArray<TransportChannel<INPUT>> channelMap =
-                new SparseArray<TransportChannel<INPUT>>(rangeSize);
+        final SparseArray<TransportChannel<IN>> channelMap =
+                new SparseArray<TransportChannel<IN>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
-            channelMap.append(index, Channels.<DATA, INPUT>selectParcelable(channel, index));
+            channelMap.append(index, Channels.<DATA, IN>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -140,13 +140,13 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
-     * @param <OUTPUT>   the output data type.
+     * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @Nonnull
-    public static <OUTPUT> OutputChannel<? extends ParcelableSelectable<OUTPUT>> mergeParcelable(
-            @Nonnull final SparseArray<? extends OutputChannel<? extends OUTPUT>> channelMap) {
+    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> mergeParcelable(
+            @Nonnull final SparseArray<? extends OutputChannel<? extends OUT>> channelMap) {
 
         final int size = channelMap.size();
 
@@ -155,7 +155,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final TransportChannel<ParcelableSelectable<OUTPUT>> transportChannel =
+        final TransportChannel<ParcelableSelectable<OUT>> transportChannel =
                 JRoutine.transport().buildChannel();
 
         for (int i = 0; i < size; i++) {

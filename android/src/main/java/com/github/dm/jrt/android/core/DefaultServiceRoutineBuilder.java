@@ -24,21 +24,21 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a builder of routine objects executed in a dedicated service.
  * <p/>
- * Created by davide-maestroni on 1/8/15.
+ * Created by davide-maestroni on 01/08/15.
  *
- * @param <INPUT>  the input data type.
- * @param <OUTPUT> the output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
-        implements ServiceRoutineBuilder<INPUT, OUTPUT>,
-        ServiceConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>> {
+class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
+        implements ServiceRoutineBuilder<IN, OUT>,
+        ServiceConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>> {
 
-    private final InvocationConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>
+    private final InvocationConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>>
             mConfigurable =
-            new InvocationConfiguration.Configurable<ServiceRoutineBuilder<INPUT, OUTPUT>>() {
+            new InvocationConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>>() {
 
                 @Nonnull
-                public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+                public ServiceRoutineBuilder<IN, OUT> setConfiguration(
                         @Nonnull final InvocationConfiguration configuration) {
 
                     return DefaultServiceRoutineBuilder.this.setConfiguration(configuration);
@@ -47,7 +47,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     private final ServiceContext mContext;
 
-    private final InvocationFactoryTarget<INPUT, OUTPUT> mFactoryTarget;
+    private final InvocationFactoryTarget<IN, OUT> mFactoryTarget;
 
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
@@ -59,7 +59,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final InvocationFactoryTarget<INPUT, OUTPUT> target) {
+            @Nonnull final InvocationFactoryTarget<IN, OUT> target) {
 
         if (context == null) {
 
@@ -76,25 +76,24 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public Routine<INPUT, OUTPUT> buildRoutine() {
+    public Routine<IN, OUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mFactoryTarget, getConfiguration(),
-                                                 mServiceConfiguration);
+        return new ServiceRoutine<IN, OUT>(mContext, mFactoryTarget, getConfiguration(),
+                                           mServiceConfiguration);
     }
 
     @Nonnull
     @Override
-    public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>>
-    invocations() {
+    public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocations() {
 
         final InvocationConfiguration config = getConfiguration();
-        return new InvocationConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(
-                mConfigurable, config);
+        return new InvocationConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(mConfigurable,
+                                                                                   config);
     }
 
     @Nonnull
     @Override
-    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+    public ServiceRoutineBuilder<IN, OUT> setConfiguration(
             @Nonnull final InvocationConfiguration configuration) {
 
         super.setConfiguration(configuration);
@@ -102,15 +101,15 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<INPUT, OUTPUT>> service() {
+    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<INPUT, OUTPUT>>(this, config);
+        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ServiceRoutineBuilder<INPUT, OUTPUT> setConfiguration(
+    public ServiceRoutineBuilder<IN, OUT> setConfiguration(
             @Nonnull final ServiceConfiguration configuration) {
 
         if (configuration == null) {

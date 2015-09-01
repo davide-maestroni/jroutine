@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
 /**
  * Logger unit tests.
  * <p/>
- * Created by davide-maestroni on 10/04/14.
+ * Created by davide-maestroni on 10/04/2014.
  */
 public class LoggerTest {
 

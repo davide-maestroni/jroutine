@@ -57,7 +57,7 @@ import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactor
 /**
  * Invocation implementation employing loaders to perform background operations.
  * <p/>
- * Created by davide-maestroni on 12/11/14.
+ * Created by davide-maestroni on 12/11/2014.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

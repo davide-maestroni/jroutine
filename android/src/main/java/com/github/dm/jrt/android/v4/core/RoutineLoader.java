@@ -33,7 +33,7 @@ import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactor
 /**
  * Loader implementation performing the routine invocation.
  * <p/>
- * Created by davide-maestroni on 12/08/14.
+ * Created by davide-maestroni on 12/08/2014.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

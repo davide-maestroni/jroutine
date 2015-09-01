@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Loader routine rotation unit tests.
  * <p/>
- * Created by davide-maestroni on 01/28/15.
+ * Created by davide-maestroni on 01/28/2015.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class LoaderRoutineRotationTest

@@ -30,7 +30,7 @@ import static com.github.dm.jrt.util.ClassToken.tokenOf;
 /**
  * Class representing a context invocation factory target.
  * <p/>
- * Created by davide-maestroni on 08/20/15.
+ * Created by davide-maestroni on 08/20/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

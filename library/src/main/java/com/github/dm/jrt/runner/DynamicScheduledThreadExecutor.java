@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * When the numbers of running threads reaches the maximum pool size, further commands are queued
  * for later execution.
  * <p/>
- * Created by davide-maestroni on 01/23/15.
+ * Created by davide-maestroni on 01/23/2015.
  */
 class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
 

@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
 /**
  * Test fragment.
  * <p/>
- * Created by davide-maestroni on 12/16/14.
+ * Created by davide-maestroni on 12/16/2014.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestFragment extends Fragment {

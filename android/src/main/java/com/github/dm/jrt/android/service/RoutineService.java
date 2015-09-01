@@ -53,7 +53,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
 /**
  * Basic implementation of a service running routine invocations.
  * <p/>
- * Created by davide-maestroni on 01/09/15.
+ * Created by davide-maestroni on 01/09/2015.
  */
 public class RoutineService extends Service {
 

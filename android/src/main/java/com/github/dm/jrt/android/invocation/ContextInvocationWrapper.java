@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 /**
  * Implementation of a platform specific Android invocation wrapping a base invocation instance.
  * <p/>
- * Created by davide-maestroni on 03/21/15.
+ * Created by davide-maestroni on 03/21/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

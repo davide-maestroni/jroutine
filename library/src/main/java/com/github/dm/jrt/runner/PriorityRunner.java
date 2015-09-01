@@ -40,7 +40,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Note that the queue is not shared between different instances of this class.
  * <p/>
- * Created by davide-maestroni on 04/28/15.
+ * Created by davide-maestroni on 04/28/2015.
  */
 public class PriorityRunner {
 

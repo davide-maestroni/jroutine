@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 /**
  * Class representing an invocation target.
  * <p/>
- * Created by davide-maestroni on 08/20/15.
+ * Created by davide-maestroni on 08/20/2015.
  */
 public abstract class InvocationTarget {
 

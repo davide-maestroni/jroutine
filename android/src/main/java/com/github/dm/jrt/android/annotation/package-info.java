@@ -14,6 +14,6 @@
 /**
  * Android platform specific annotation definitions.
  * <p/>
- * Created by davide-maestroni on 04/09/15.
+ * Created by davide-maestroni on 04/09/2015.
  */
 package com.github.dm.jrt.android.annotation;

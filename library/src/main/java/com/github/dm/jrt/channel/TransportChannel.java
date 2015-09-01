@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  * asynchronously from other sources. Note however that, in any case, the {@code close()} method
  * must be called in order to correctly terminate the invocation lifecycle.
  * <p/>
- * Created by davide-maestroni on 10/25/14.
+ * Created by davide-maestroni on 10/25/2014.
  *
  * @param <DATA> the data type.
  */

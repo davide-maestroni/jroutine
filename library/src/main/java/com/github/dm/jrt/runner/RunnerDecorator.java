@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 /**
  * Implementation of a decorator of a runner object.
  * <p/>
- * Created by davide-maestroni on 09/22/14.
+ * Created by davide-maestroni on 09/22/2014.
  */
 public class RunnerDecorator implements Runner {
 

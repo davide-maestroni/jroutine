@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * Note that only instance methods can be asynchronously invoked through the routines created by
  * this builder.
  * <p/>
- * Created by davide-maestroni on 05/06/15.
+ * Created by davide-maestroni on 05/06/2015.
  */
 public interface LoaderProxyRoutineBuilder
         extends ProxyRoutineBuilder, LoaderConfigurableBuilder<LoaderProxyRoutineBuilder> {

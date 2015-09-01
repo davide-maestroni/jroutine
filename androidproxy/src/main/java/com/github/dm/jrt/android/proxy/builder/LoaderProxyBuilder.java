@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 /**
  * Interface defining a builder of async proxy objects, bound to a context lifecycle.
  * <p/>
- * Created by davide-maestroni on 05/06/15.
+ * Created by davide-maestroni on 05/06/2015.
  *
  * @param <TYPE> the interface type.
  */

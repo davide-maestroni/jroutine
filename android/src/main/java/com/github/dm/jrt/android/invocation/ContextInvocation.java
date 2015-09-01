@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 /**
  * Interface defining an invocation aware of the specific Android context.
  * <p/>
- * Created by davide-maestroni on 01/08/15.
+ * Created by davide-maestroni on 01/08/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * Exception indicating a possible deadlock while waiting for room in the input channel buffer.
  * <p/>
- * Created by davide-maestroni on 07/19/15.
+ * Created by davide-maestroni on 07/19/2015.
  */
 public class InputDeadlockException extends DeadlockException {
 

@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * The inheriting class may just implement the writing of the formatted message, or customize it
  * at any level.
  * <p/>
- * Created by davide-maestroni on 10/03/14.
+ * Created by davide-maestroni on 10/03/2014.
  */
 public abstract class TemplateLog implements Log {
 

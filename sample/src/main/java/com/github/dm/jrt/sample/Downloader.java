@@ -35,7 +35,7 @@ import static com.github.dm.jrt.util.TimeDuration.seconds;
 /**
  * The downloader implementation.
  * <p/>
- * Created by davide-maestroni on 10/17/14.
+ * Created by davide-maestroni on 10/17/2014.
  */
 public class Downloader {
 

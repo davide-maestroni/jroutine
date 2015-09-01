@@ -14,6 +14,6 @@
 /**
  * Annotation pre-processor implementation.
  * <p/>
- * Created by davide-maestroni on 10/14/14.
+ * Created by davide-maestroni on 10/14/2014.
  */
 package com.github.dm.jrt.processor;

@@ -62,7 +62,7 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * result channel puts data into the output queue and, on the other end, the output channel reads
  * them from the same queue.
  * <p/>
- * Created by davide-maestroni on 06/12/15.
+ * Created by davide-maestroni on 06/12/2015.
  *
  * @param <OUT> the output data type.
  */

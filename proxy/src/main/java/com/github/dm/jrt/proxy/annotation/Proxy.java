@@ -106,7 +106,7 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 11/03/14.
+ * Created by davide-maestroni on 11/03/2014.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

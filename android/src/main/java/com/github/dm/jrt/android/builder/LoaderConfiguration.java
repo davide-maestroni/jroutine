@@ -39,7 +39,7 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
  * coming from the invocation.
  * <p/>
- * Created by davide-maestroni on 04/19/15.
+ * Created by davide-maestroni on 04/19/2015.
  */
 public final class LoaderConfiguration {
 

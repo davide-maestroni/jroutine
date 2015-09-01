@@ -50,7 +50,7 @@ import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
 /**
  * Class implementing a builder of routines wrapping an object methods.
  * <p/>
- * Created by davide-maestroni on 09/21/14.
+ * Created by davide-maestroni on 09/21/2014.
  */
 class DefaultObjectRoutineBuilder
         implements ObjectRoutineBuilder, Configurable<ObjectRoutineBuilder>,

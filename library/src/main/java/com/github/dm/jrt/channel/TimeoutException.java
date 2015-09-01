@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * Exception indicating that a timeout occurred.
  * <p/>
- * Created by davide-maestroni on 11/25/14.
+ * Created by davide-maestroni on 11/25/2014.
  */
 public class TimeoutException extends RoutineException {
 

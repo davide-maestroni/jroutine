@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Note that the delivery order of the output data might not be guaranteed.
  * <p/>
- * Created by davide-maestroni on 09/04/14.
+ * Created by davide-maestroni on 09/04/2014.
  *
  * @param <OUT> the output data type.
  */

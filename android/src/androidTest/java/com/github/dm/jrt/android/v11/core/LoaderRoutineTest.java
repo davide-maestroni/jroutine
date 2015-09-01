@@ -75,7 +75,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Loader routine unit tests.
  * <p/>
- * Created by davide-maestroni on 12/10/14.
+ * Created by davide-maestroni on 12/10/2014.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActivity> {

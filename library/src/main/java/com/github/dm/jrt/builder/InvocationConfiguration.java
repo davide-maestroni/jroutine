@@ -67,7 +67,7 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increase in memory usage and computation.
  * <p/>
- * Created by davide-maestroni on 11/15/14.
+ * Created by davide-maestroni on 11/15/2014.
  */
 public final class InvocationConfiguration {
 

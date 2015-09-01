@@ -67,7 +67,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Proxy builder activity unit tests.
  * <p/>
- * Created by davide-maestroni on 05/07/15.
+ * Created by davide-maestroni on 05/07/2015.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {

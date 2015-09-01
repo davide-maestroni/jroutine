@@ -36,7 +36,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
 /**
  * Default implementation of a service proxy builder.
  * <p/>
- * Created by davide-maestroni on 05/13/15.
+ * Created by davide-maestroni on 05/13/2015.
  */
 class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>,

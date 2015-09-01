@@ -40,7 +40,7 @@ import javax.annotation.Nullable;
 /**
  * Routine implementation delegating to Android loaders the asynchronous processing.
  * <p/>
- * Created by davide-maestroni on 01/10/15.
+ * Created by davide-maestroni on 01/10/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.

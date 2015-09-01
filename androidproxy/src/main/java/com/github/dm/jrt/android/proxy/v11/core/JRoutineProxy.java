@@ -33,7 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * See {@link com.github.dm.jrt.android.proxy.v4.core.JRoutineProxy JRoutineProxy} for support of
  * API levels less than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
- * Created by davide-maestroni on 05/06/15.
+ * Created by davide-maestroni on 05/06/2015.
  *
  * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
  * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution

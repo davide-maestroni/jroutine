@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
  * Interface defining a builder of async proxy objects, whose methods are executed in a dedicated
  * service.
  * <p/>
- * Created by davide-maestroni on 05/13/15.
+ * Created by davide-maestroni on 05/13/2015.
  *
  * @param <TYPE> the interface type.
  */

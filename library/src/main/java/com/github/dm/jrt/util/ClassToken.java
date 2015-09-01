@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
  * The workaround consists in forcing the inheritance from a special generic class, then inspected
  * via reflection, to obtain the generic type rather than the class object.
  * <p/>
- * Created by davide-maestroni on 06/14/14.
+ * Created by davide-maestroni on 06/14/2014.
  *
  * @param <TYPE> the class type.
  */

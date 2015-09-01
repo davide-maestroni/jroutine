@@ -14,6 +14,6 @@
 /**
  * Android service classes implementation.
  * <p/>
- * Created by davide-maestroni on 01/10/15.
+ * Created by davide-maestroni on 01/10/2015.
  */
 package com.github.dm.jrt.android.service;

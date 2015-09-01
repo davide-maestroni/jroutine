@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 /**
  * Utility class used for logging messages.
  * <p/>
- * Created by davide-maestroni on 10/03/14.
+ * Created by davide-maestroni on 10/03/2014.
  */
 public class Logger {
 

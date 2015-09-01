@@ -37,7 +37,7 @@ import javax.annotation.Nonnull;
  * Note that the streams used to write into and read from buffers should be properly closed as the
  * Java best practices suggest.
  * <p/>
- * Created by davide-maestroni on 08/26/15.
+ * Created by davide-maestroni on 08/26/2015.
  */
 public class ByteChannel {
 

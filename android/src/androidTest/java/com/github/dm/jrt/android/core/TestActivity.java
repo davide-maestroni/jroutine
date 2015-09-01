@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.R;
 /**
  * Test activity.
  * <p/>
- * Created by davide-maestroni on 11/01/15.
+ * Created by davide-maestroni on 11/01/2015.
  */
 public class TestActivity extends Activity {
 

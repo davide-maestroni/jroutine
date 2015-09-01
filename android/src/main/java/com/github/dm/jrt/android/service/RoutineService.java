@@ -352,7 +352,7 @@ public class RoutineService extends Service {
     }
 
     @SuppressWarnings("unchecked")
-    private void initRoutine(final Message message) {
+    private void initRoutine(@Nonnull final Message message) {
 
         final Bundle data = message.peekData();
 
@@ -520,7 +520,7 @@ public class RoutineService extends Service {
          *
          * @param service the service.
          */
-        private IncomingHandler(final RoutineService service) {
+        private IncomingHandler(@Nonnull final RoutineService service) {
 
             mService = new WeakReference<RoutineService>(service);
         }

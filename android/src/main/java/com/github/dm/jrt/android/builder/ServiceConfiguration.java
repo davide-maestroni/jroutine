@@ -199,7 +199,7 @@ public final class ServiceConfiguration {
      *
      * @param <TYPE> the configurable object type.
      */
-    public static class Builder<TYPE> {
+    public static final class Builder<TYPE> {
 
         private final Configurable<? extends TYPE> mConfigurable;
 

@@ -58,7 +58,7 @@ What the library has to offer is:
 
 And more:
 
-* ***< 250KB Jar***
+* ***< 300KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
 * ***Nullability annotations***
 
@@ -83,7 +83,7 @@ Complete Javadoc with insights and examples is available for:
 * [JRoutine-Android][javadoc android]
 * [JRoutine-AndroidProxy][javadoc androidproxy]
 
-The project contains an additional [sample][sample] module showing how to implement a file downloader with just 4 classes.
+The project contains an additional [sample][sample] module showing how to implement a file downloader with just 3 classes.
 
 ## Versioning Convention
 

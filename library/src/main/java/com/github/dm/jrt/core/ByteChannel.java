@@ -66,17 +66,6 @@ public class ByteChannel {
      * Constructor.
      *
      * @param dataBufferSize the data buffer size.
-     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
-     */
-    ByteChannel(final int dataBufferSize) {
-
-        this(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param dataBufferSize the data buffer size.
      * @param corePoolSize   the maximum number of retained data buffers.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
@@ -99,7 +88,7 @@ public class ByteChannel {
     @Nonnull
     public static ByteChannel byteChannel() {
 
-        return new ByteChannel(ByteChannel.DEFAULT_BUFFER_SIZE, ByteChannel.DEFAULT_POOL_SIZE);
+        return new ByteChannel(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
     }
 
     /**
@@ -113,7 +102,7 @@ public class ByteChannel {
     @Nonnull
     public static ByteChannel byteChannel(final int dataBufferSize) {
 
-        return new ByteChannel(dataBufferSize);
+        return new ByteChannel(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
     }
 
     /**

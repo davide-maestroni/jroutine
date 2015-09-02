@@ -59,7 +59,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<DATA> inputChannel =
                 new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler,
-                                               invocationConfiguration.getAsyncRunnerOr(
+                                               invocationConfiguration.getRunnerOr(
                                                        Runners.sharedRunner()), logger);
         abortHandler.setChannel(inputChannel);
         mInputChannel = inputChannel;

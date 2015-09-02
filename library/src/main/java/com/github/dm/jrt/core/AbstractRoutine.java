@@ -94,10 +94,10 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     protected AbstractRoutine(@Nonnull final InvocationConfiguration configuration) {
 
         mConfiguration = configuration;
-        mSyncRunner = configuration.getSyncRunnerOr(Runners.queuedRunner());
+        mSyncRunner = Runners.syncRunner();
 
         final int priority = configuration.getPriorityOr(InvocationConfiguration.DEFAULT);
-        final Runner asyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
+        final Runner asyncRunner = configuration.getRunnerOr(Runners.sharedRunner());
 
         if (priority != InvocationConfiguration.DEFAULT) {
 

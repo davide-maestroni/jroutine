@@ -90,7 +90,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
         final InvocationConfiguration configuration = getConfiguration();
         final Runner mainRunner = Runners.mainRunner();
-        final Runner asyncRunner = configuration.getAsyncRunnerOr(mainRunner);
+        final Runner asyncRunner = configuration.getRunnerOr(mainRunner);
 
         if (asyncRunner != mainRunner) {
 
@@ -99,7 +99,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
         }
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                configuration.builderFrom().withAsyncRunner(mainRunner);
+                configuration.builderFrom().withRunner(mainRunner);
         return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.set(),
                                                  mLoaderConfiguration);
     }

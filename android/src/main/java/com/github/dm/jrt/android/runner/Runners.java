@@ -50,7 +50,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
             thread.start();
         }
 
-        return looperRunner(thread.getLooper(), queuedRunner());
+        return looperRunner(thread.getLooper(), syncRunner());
     }
 
     /**
@@ -109,7 +109,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
     @SuppressWarnings("ConstantConditions")
     public static Runner myRunner() {
 
-        return looperRunner(Looper.myLooper(), queuedRunner());
+        return looperRunner(Looper.myLooper(), syncRunner());
     }
 
     /**

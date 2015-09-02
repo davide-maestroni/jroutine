@@ -18,7 +18,6 @@ import android.support.v4.content.AsyncTaskLoader;
 
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
@@ -161,7 +160,6 @@ class RoutineLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
         JRoutine.on(fromFactory(getContext(), factory))
                 .invocations()
-                .withSyncRunner(Runners.sequentialRunner())
                 .withOutputOrder(mOrderType)
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())

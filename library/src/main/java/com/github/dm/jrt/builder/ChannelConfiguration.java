@@ -353,7 +353,7 @@ public final class ChannelConfiguration {
     public InvocationConfiguration toInvocationConfiguration() {
 
         return InvocationConfiguration.builder()
-                                      .withAsyncRunner(getAsyncRunnerOr(null))
+                                      .withRunner(getAsyncRunnerOr(null))
                                       .withExecutionTimeout(getPassTimeoutOr(null))
                                       .withExecutionTimeoutAction(getPassTimeoutActionOr(null))
                                       .withLog(getLogOr(null))

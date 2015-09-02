@@ -85,7 +85,7 @@ class LooperRunner implements Runner {
 
         private final LooperRunner mLooperRunner;
 
-        private final Runner mQueuedRunner = Runners.queuedRunner();
+        private final Runner mQueuedRunner = Runners.syncRunner();
 
         /**
          * Constructor.

@@ -30,8 +30,6 @@ public class Runners {
 
     private static final QueuedRunner sQueuedRunner = new QueuedRunner();
 
-    private static final SequentialRunner sSequentialRunner = new SequentialRunner();
-
     private static Runner sSharedRunner;
 
     /**
@@ -101,17 +99,6 @@ public class Runners {
     }
 
     /**
-     * Returns the shared instance of a queued synchronous runner.
-     *
-     * @return the runner instance.
-     */
-    @Nonnull
-    public static Runner queuedRunner() {
-
-        return sQueuedRunner;
-    }
-
-    /**
      * Returns a runner employing the specified executor service.
      *
      * @param service the executor service.
@@ -121,17 +108,6 @@ public class Runners {
     public static Runner scheduledRunner(@Nonnull final ScheduledExecutorService service) {
 
         return new ScheduledRunner(service);
-    }
-
-    /**
-     * Returns the shared instance of a sequential synchronous runner.
-     *
-     * @return the runner instance.
-     */
-    @Nonnull
-    public static Runner sequentialRunner() {
-
-        return sSequentialRunner;
     }
 
     /**
@@ -153,6 +129,17 @@ public class Runners {
 
             return sSharedRunner;
         }
+    }
+
+    /**
+     * Returns the shared instance of a synchronous runner.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner syncRunner() {
+
+        return sQueuedRunner;
     }
 
     /**

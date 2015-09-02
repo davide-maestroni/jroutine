@@ -78,7 +78,7 @@ public class ObjectRoutineTest {
         final TestRunner runner = new TestRunner();
         final PriorityPass priorityPass = JRoutine.on(targetObject(pass))
                                                   .invocations()
-                                                  .withAsyncRunner(runner)
+                                                  .withRunner(runner)
                                                   .set()
                                                   .buildProxy(PriorityPass.class);
         final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyExit();
@@ -104,8 +104,7 @@ public class ObjectRoutineTest {
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutine.on(targetObject(test))
                                                         .invocations()
-                                                        .withSyncRunner(Runners.sequentialRunner())
-                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
                                                         .withExecutionTimeoutAction(
@@ -124,8 +123,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine = JRoutine.on(targetClass(TestStatic.class))
                                                         .invocations()
-                                                        .withSyncRunner(Runners.sequentialRunner())
-                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
@@ -649,8 +647,7 @@ public class ObjectRoutineTest {
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine2 = JRoutine.on(targetObject(test))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
                                                          .set()
                                                          .proxies()
@@ -669,8 +666,7 @@ public class ObjectRoutineTest {
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine1 = JRoutine.on(targetObject(test))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .withRunner(Runners.poolRunner())
                                                          .set()
                                                          .method("getLong");
 
@@ -778,8 +774,7 @@ public class ObjectRoutineTest {
         final TestStatic test = new TestStatic();
         final Routine<Object, Object> routine = JRoutine.on(targetObject(test))
                                                         .invocations()
-                                                        .withSyncRunner(Runners.sequentialRunner())
-                                                        .withAsyncRunner(Runners.poolRunner())
+                                                        .withRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
@@ -1084,8 +1079,8 @@ public class ObjectRoutineTest {
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JRoutine.on(targetObject(test))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.sequentialRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(16)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1095,8 +1090,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine2 = JRoutine.on(targetObject(test))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.sequentialRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(16)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1107,8 +1102,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine3 = JRoutine.on(targetObject(test))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(32)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1120,8 +1115,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine4 = JRoutine.on(targetObject(test))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(32)
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1132,8 +1127,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine5 = JRoutine.on(targetObject(test))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(32)
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(new NullLog())
                                                          .set()
@@ -1149,8 +1144,8 @@ public class ObjectRoutineTest {
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.sequentialRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(16)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1160,8 +1155,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.sequentialRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(16)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1172,8 +1167,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine3 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(32)
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1185,8 +1180,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine4 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(32)
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(nullLog)
                                                          .set()
@@ -1197,8 +1192,8 @@ public class ObjectRoutineTest {
 
         final Routine<Object, Object> routine5 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.sharedRunner())
+                                                         .withRunner(Runners.sharedRunner())
+                                                         .withCoreInstances(32)
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(new NullLog())
                                                          .set()
@@ -1273,8 +1268,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
                                                          .withCoreInstances(0)
                                                          .set()
@@ -1293,8 +1287,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
-                                                         .withAsyncRunner(Runners.poolRunner())
+                                                         .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
                                                          .set()
                                                          .method("getLong");

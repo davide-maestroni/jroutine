@@ -83,8 +83,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                 JRoutineProxy.on(serviceFrom(getActivity(), TestService.class),
                                  targetClass(TestClass.class))
                              .invocations()
-                             .withSyncRunner(Runners.sequentialRunner())
-                             .withAsyncRunner(Runners.poolRunner())
+                             .withRunner(Runners.poolRunner())
                              .withLogLevel(LogLevel.DEBUG)
                              .withLog(new NullLog())
                              .set()
@@ -137,11 +136,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
         final TestInterfaceProxy testProxy =
                 JRoutineProxy.on(serviceFrom(getActivity(), TestService.class),
-                                 targetObject(TestClass.class))
-                             .invocations()
-                             .withSyncRunner(Runners.sequentialRunner())
-                             .set()
-                             .buildProxy(token);
+                                 targetObject(TestClass.class)).buildProxy(token);
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
     }
@@ -178,8 +173,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                 JRoutineProxy.on(serviceFrom(getActivity(), TestService.class),
                                  targetObject(TestClass.class))
                              .invocations()
-                             .withSyncRunner(Runners.sequentialRunner())
-                             .withAsyncRunner(Runners.poolRunner())
+                             .withRunner(Runners.poolRunner())
                              .withLogLevel(LogLevel.DEBUG)
                              .withLog(new NullLog())
                              .set()
@@ -195,8 +189,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final TestProxy testProxy = JRoutineProxy.on(serviceFrom(getActivity(), TestService.class),
                                                      targetObject(TestClass.class))
                                                  .invocations()
-                                                 .withSyncRunner(Runners.sequentialRunner())
-                                                 .withAsyncRunner(Runners.poolRunner())
+                                                 .withRunner(Runners.poolRunner())
                                                  .withLogLevel(LogLevel.DEBUG)
                                                  .withLog(log)
                                                  .set()
@@ -224,10 +217,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         final NullLog log = new NullLog();
         final InvocationConfiguration configuration =
-                builder().withSyncRunner(Runners.sequentialRunner())
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(log)
-                         .set();
+                builder().withLogLevel(LogLevel.DEBUG).withLog(log).set();
         final ServiceProxyBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.ServiceProxy_Test.on(
                         serviceFrom(getActivity(), TestService.class),
@@ -274,11 +264,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final InvocationConfiguration configuration =
-                builder().withSyncRunner(Runners.sequentialRunner())
-                         .withAsyncRunner(runner)
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(log)
-                         .set();
+                builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
         final TestProxy testProxy = JRoutineProxy.on(serviceFrom(getActivity(), TestService.class),
                                                      targetObject(TestClass.class))
                                                  .invocations()

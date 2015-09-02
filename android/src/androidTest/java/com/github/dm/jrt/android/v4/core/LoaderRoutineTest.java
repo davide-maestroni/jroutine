@@ -1231,7 +1231,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              PassingContextInvocation
                                                                      .<String>factoryOf())
                                                          .invocations()
-                                                         .withSyncRunner(Runners.queuedRunner())
                                                          .withLog(Logs.androidLog())
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .set()
@@ -1250,7 +1249,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<String, String> routine2 =
                 JRoutine.on(contextFrom(getActivity()), factoryOf(token2))
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
                         .withLog(Logs.androidLog())
                         .withLogLevel(LogLevel.WARNING)
                         .set()
@@ -1319,15 +1317,14 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testRoutineBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
-        final InvocationConfiguration configuration =
-                builder().withAsyncRunner(Runners.taskRunner())
-                         .withInputMaxSize(3)
-                         .withInputTimeout(seconds(10))
-                         .withOutputMaxSize(3)
-                         .withOutputTimeout(seconds(10))
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(countLog)
-                         .set();
+        final InvocationConfiguration configuration = builder().withRunner(Runners.taskRunner())
+                                                               .withInputMaxSize(3)
+                                                               .withInputTimeout(seconds(10))
+                                                               .withOutputMaxSize(3)
+                                                               .withOutputTimeout(seconds(10))
+                                                               .withLogLevel(LogLevel.DEBUG)
+                                                               .withLog(countLog)
+                                                               .set();
         JRoutine.on(contextFrom(getActivity()), factoryOf(ToUpperCase.class))
                 .invocations()
                 .with(configuration)

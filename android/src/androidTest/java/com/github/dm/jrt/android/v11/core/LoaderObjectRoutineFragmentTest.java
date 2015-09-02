@@ -95,8 +95,7 @@ public class LoaderObjectRoutineFragmentTest
         final Routine<Object, Object> routine =
                 JRoutine.on(contextFrom(fragment), targetObject(TestClass.class))
                         .invocations()
-                        .withSyncRunner(Runners.sequentialRunner())
-                        .withAsyncRunner(Runners.poolRunner())
+                        .withRunner(Runners.poolRunner())
                         .withMaxInstances(1)
                         .withCoreInstances(1)
                         .withExecutionTimeoutAction(TimeoutActionType.EXIT)
@@ -245,17 +244,16 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final InvocationConfiguration configuration =
-                builder().withAsyncRunner(Runners.poolRunner())
-                         .withInputOrder(OrderType.BY_CHANCE)
-                         .withInputMaxSize(3)
-                         .withInputTimeout(seconds(10))
-                         .withOutputOrder(OrderType.BY_CHANCE)
-                         .withOutputMaxSize(3)
-                         .withOutputTimeout(seconds(10))
-                         .withLogLevel(LogLevel.DEBUG)
-                         .withLog(countLog)
-                         .set();
+        final InvocationConfiguration configuration = builder().withRunner(Runners.poolRunner())
+                                                               .withInputOrder(OrderType.BY_CHANCE)
+                                                               .withInputMaxSize(3)
+                                                               .withInputTimeout(seconds(10))
+                                                               .withOutputOrder(OrderType.BY_CHANCE)
+                                                               .withOutputMaxSize(3)
+                                                               .withOutputTimeout(seconds(10))
+                                                               .withLogLevel(LogLevel.DEBUG)
+                                                               .withLog(countLog)
+                                                               .set();
         JRoutine.on(contextFrom(fragment), targetObject(TestClass.class))
                 .invocations()
                 .with(configuration)
@@ -658,8 +656,7 @@ public class LoaderObjectRoutineFragmentTest
         final Routine<Object, Object> routine2 =
                 JRoutine.on(contextFrom(fragment), targetObject(TestClass.class))
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
-                        .withAsyncRunner(Runners.poolRunner())
+                        .withRunner(Runners.poolRunner())
                         .withMaxInstances(1)
                         .set()
                         .proxies()
@@ -684,8 +681,7 @@ public class LoaderObjectRoutineFragmentTest
         final Routine<Object, Object> routine1 =
                 JRoutine.on(contextFrom(fragment), targetObject(TestClass.class))
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
-                        .withAsyncRunner(Runners.poolRunner())
+                        .withRunner(Runners.poolRunner())
                         .set()
                         .method("getLong");
 

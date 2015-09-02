@@ -796,7 +796,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
                 return JRoutine.on(PassingInvocation.<OUT>factoryOf())
                                .invocations()
-                               .withAsyncRunner(Runners.looperRunner(looper))
+                               .withRunner(Runners.looperRunner(looper))
                                .withInputMaxSize(Integer.MAX_VALUE)
                                .withInputTimeout(TimeDuration.ZERO)
                                .withOutputMaxSize(Integer.MAX_VALUE)

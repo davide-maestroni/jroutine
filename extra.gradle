@@ -117,13 +117,13 @@ afterEvaluate { project ->
             project.task('jacocoTest', dependsOn: 'connectedCheck') {
                 description = 'Runs the tests and generates the JaCoCo report files.'
             } << {
-                tasks.createDebugCoverageReport.execute()
+                tasks.createDebugAndroidTestCoverageReport.execute()
             }
 
             project.task('jacocoTestReport', dependsOn: 'assemble') {
                 description = 'Generates the JaCoCo report files.'
             } << {
-                tasks.createDebugCoverageReport.execute()
+                tasks.createDebugAndroidTestCoverageReport.execute()
             }
         }
 

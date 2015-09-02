@@ -14,9 +14,9 @@
 package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.ByteChannel;
 import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
 
@@ -58,7 +58,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
             // We employ the utility class dedicated to the optimized transfer of bytes through a
             // routine channel
             final BufferOutputStream outputStream =
-                    Channels.byteChannel(MAX_CHUNK_SIZE).passTo(result);
+                    ByteChannel.byteChannel(MAX_CHUNK_SIZE).passTo(result);
 
             try {
 

@@ -56,6 +56,37 @@ public class ByteChannelTest {
     }
 
     @Test
+    public void testBufferEquals() throws IOException {
+
+        final TransportChannel<ByteBuffer> channel = JRoutine.transport().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel().passTo(channel);
+        stream.write(new byte[]{31, 17, (byte) 155, 13});
+        stream.flush();
+        final ByteBuffer buffer1 = channel.next();
+        assertThat(buffer1).isEqualTo(buffer1);
+        assertThat(buffer1).isNotEqualTo("test");
+        stream.write(31);
+        stream.write(17);
+        stream.write(155);
+        stream.write(13);
+        stream.flush();
+        final ByteBuffer buffer2 = channel.next();
+        assertThat(buffer1).isNotSameAs(buffer2);
+        assertThat(buffer1.hashCode()).isEqualTo(buffer2.hashCode());
+        assertThat(buffer1).isEqualTo(buffer2);
+        assertThat(buffer2).isEqualTo(buffer1);
+        ByteChannel.inputStream(buffer2).close();
+        stream.write(new byte[]{31, 17, (byte) 155});
+        stream.flush();
+        final ByteBuffer buffer3 = channel.next();
+        assertThat(buffer2).isSameAs(buffer3);
+        assertThat(buffer1).isNotSameAs(buffer3);
+        assertThat(buffer1.hashCode()).isNotEqualTo(buffer3.hashCode());
+        assertThat(buffer1).isNotEqualTo(buffer3);
+        assertThat(buffer3).isNotEqualTo(buffer1);
+    }
+
+    @Test
     public void testChannelError() {
 
         try {

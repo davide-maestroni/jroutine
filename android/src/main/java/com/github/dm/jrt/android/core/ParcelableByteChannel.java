@@ -352,6 +352,31 @@ public class ParcelableByteChannel {
             }
         }
 
+        @Override
+        public boolean equals(final Object o) {
+
+            // AUTO-GENERATED CODE
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ParcelableByteBuffer)) {
+
+                return false;
+            }
+
+            final ParcelableByteBuffer that = (ParcelableByteBuffer) o;
+            return !(mBuffer != null ? !mBuffer.equals(that.mBuffer) : that.mBuffer != null);
+        }
+
+        @Override
+        public int hashCode() {
+
+            // AUTO-GENERATED CODE
+            return mBuffer != null ? mBuffer.hashCode() : 0;
+        }
+
         @Nullable
         private ByteBuffer getBuffer() {
 

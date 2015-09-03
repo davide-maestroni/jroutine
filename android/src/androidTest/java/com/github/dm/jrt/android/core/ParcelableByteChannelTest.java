@@ -73,6 +73,38 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         assertThat(inputStream.available()).isEqualTo(3);
     }
 
+    public void testBufferEquals() throws IOException {
+
+        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final OutputChannel<ParcelableByteBuffer> result =
+                JRoutine.on(serviceFrom(getActivity()), targetInvocation(PassingInvocation.class))
+                        .asyncCall(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().passTo(channel);
+        stream.write(new byte[]{31, 17, (byte) 155, 13});
+        stream.flush();
+        final ParcelableByteBuffer buffer1 = result.eventually().next();
+        assertThat(buffer1).isEqualTo(buffer1);
+        assertThat(buffer1).isNotEqualTo("test");
+        stream.write(31);
+        stream.write(17);
+        stream.write(155);
+        stream.write(13);
+        stream.flush();
+        final ParcelableByteBuffer buffer2 = result.eventually().next();
+        assertThat(buffer1).isNotSameAs(buffer2);
+        assertThat(buffer1.hashCode()).isEqualTo(buffer2.hashCode());
+        assertThat(buffer1).isEqualTo(buffer2);
+        assertThat(buffer2).isEqualTo(buffer1);
+        ParcelableByteChannel.inputStream(buffer2).close();
+        stream.write(new byte[]{31, 17, (byte) 155});
+        stream.flush();
+        final ParcelableByteBuffer buffer3 = result.eventually().next();
+        assertThat(buffer1).isNotSameAs(buffer3);
+        assertThat(buffer1.hashCode()).isNotEqualTo(buffer3.hashCode());
+        assertThat(buffer1).isNotEqualTo(buffer3);
+        assertThat(buffer3).isNotEqualTo(buffer1);
+    }
+
     public void testChannelError() {
 
         try {

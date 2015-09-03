@@ -668,7 +668,7 @@ public class ByteChannel {
         @Override
         public int hashCode() {
 
-            final int size = mSize;
+            final int size = getSize();
             final byte[] buffer = mBuffer;
             int result = size;
 
@@ -694,9 +694,9 @@ public class ByteChannel {
             }
 
             final ByteBuffer that = (ByteBuffer) o;
-            final int size = mSize;
+            final int size = getSize();
 
-            if (size != that.mSize) {
+            if (size != that.getSize()) {
 
                 return false;
             }

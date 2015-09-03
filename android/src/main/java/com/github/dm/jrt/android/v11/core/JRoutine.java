@@ -33,8 +33,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * deadlock.<br/>
  * Note that the configuration of the maximum number of concurrent invocations might not work as
  * expected. In fact, the number of running loaders cannot be computed.<br/>
- * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
- * prevent out of memory errors.
+ * Note also that the input data will be cached, and the results will be produced only after the
+ * invocation channel is closed, so be sure to avoid streaming inputs in order to prevent starvation
+ * or out of memory errors.
  * <p/>
  * The {@code equals()} and {@code hashCode()} methods of the input parameter objects and the
  * invocation factory, might be employed to check for clashing of invocation instances or compute

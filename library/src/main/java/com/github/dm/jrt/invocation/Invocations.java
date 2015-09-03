@@ -197,7 +197,7 @@ public class Invocations {
         public int hashCode() {
 
             // AUTO-GENERATED CODE
-            int result = Arrays.hashCode(mArgs);
+            int result = Arrays.deepHashCode(mArgs);
             result = 31 * result + mConstructor.hashCode();
             return result;
         }
@@ -217,7 +217,7 @@ public class Invocations {
             }
 
             final DefaultInvocationFactory<?, ?> that = (DefaultInvocationFactory<?, ?>) o;
-            return Arrays.equals(mArgs, that.mArgs) && mConstructor.equals(that.mConstructor);
+            return Arrays.deepEquals(mArgs, that.mArgs) && mConstructor.equals(that.mConstructor);
         }
 
         @Nonnull

@@ -69,7 +69,7 @@ public class ByteChannel {
      * @param corePoolSize   the maximum number of retained data buffers.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    ByteChannel(final int dataBufferSize, final int corePoolSize) {
+    protected ByteChannel(final int dataBufferSize, final int corePoolSize) {
 
         if (dataBufferSize < 1) {
 
@@ -169,7 +169,9 @@ public class ByteChannel {
     }
 
     /**
-     * Returns the output stream used to write bytes into the specified channel.
+     * Returns the output stream used to write bytes into the specified channel.<br/>
+     * Note that, if the method is called more than one time, passing the same input channel, it
+     * will return the same output stream.
      *
      * @param channel the input channel to which pass the data.
      * @return the output stream.
@@ -661,6 +663,56 @@ public class ByteChannel {
 
             mBuffer = new byte[bufferSize];
             mStream = new DefaultBufferInputStream(this);
+        }
+
+        @Override
+        public int hashCode() {
+
+            final int size = mSize;
+            final byte[] buffer = mBuffer;
+            int result = size;
+
+            for (int i = 0; i < size; i++) {
+
+                result = 31 * result + buffer[i];
+            }
+
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ByteBuffer)) {
+
+                return false;
+            }
+
+            final ByteBuffer that = (ByteBuffer) o;
+            final int size = mSize;
+
+            if (size != that.mSize) {
+
+                return false;
+            }
+
+            final byte[] thisBuffer = mBuffer;
+            final byte[] thatBuffer = that.mBuffer;
+
+            for (int i = 0; i < size; i++) {
+
+                if (thisBuffer[i] != thatBuffer[i]) {
+
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void changeState(@Nonnull final BufferState expected,

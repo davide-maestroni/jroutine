@@ -24,6 +24,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.github.dm.jrt.android.core.InvocationFactoryTarget;
+import com.github.dm.jrt.android.core.JRoutine;
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.ContextInvocations;
@@ -32,6 +33,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -456,6 +458,7 @@ public class RoutineService extends Service {
                     (isParallel) ? routineState.parallelInvoke() : routineState.asyncInvoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
+            routineInvocation.passTo(new ServiceOutputConsumer(routineInvocation, message.replyTo));
             invocations.put(invocationId, routineInvocation);
         }
     }
@@ -553,7 +556,7 @@ public class RoutineService extends Service {
                     case MSG_COMPLETE: {
 
                         final RoutineInvocation invocation = service.getInvocation(msg);
-                        invocation.result(new ServiceOutputConsumer(invocation, msg.replyTo));
+                        invocation.close();
                     }
 
                     break;
@@ -562,7 +565,7 @@ public class RoutineService extends Service {
 
                         final RoutineInvocation invocation = service.getInvocation(msg);
                         invocation.abort(getAbortError(msg));
-                        invocation.result(new ServiceOutputConsumer(invocation, msg.replyTo));
+                        invocation.close();
                     }
 
                     break;
@@ -690,7 +693,7 @@ public class RoutineService extends Service {
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-            return Arrays.equals(mFactoryArgs, that.mFactoryArgs) && mInvocationClass.equals(
+            return Arrays.deepEquals(mFactoryArgs, that.mFactoryArgs) && mInvocationClass.equals(
                     that.mInvocationClass) && !(mLogClass != null ? !mLogClass.equals(
                     that.mLogClass) : that.mLogClass != null) && mLogLevel == that.mLogLevel
                     && mOutputOrder == that.mOutputOrder && !(mRunnerClass != null
@@ -701,7 +704,7 @@ public class RoutineService extends Service {
         public int hashCode() {
 
             // AUTO-GENERATED CODE
-            int result = Arrays.hashCode(mFactoryArgs);
+            int result = Arrays.deepHashCode(mFactoryArgs);
             result = 31 * result + mInvocationClass.hashCode();
             result = 31 * result + (mLogClass != null ? mLogClass.hashCode() : 0);
             result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
@@ -852,6 +855,8 @@ public class RoutineService extends Service {
 
         private final RoutineState mRoutineState;
 
+        private final TransportChannel<Object> mTransport;
+
         /**
          * Constructor.
          *
@@ -868,6 +873,9 @@ public class RoutineService extends Service {
             mChannel = channel;
             mRoutineInfo = info;
             mRoutineState = state;
+            final TransportChannel<Object> transportChannel =
+                    (mTransport = JRoutine.transport().buildChannel());
+            channel.pass(transportChannel);
         }
 
         /**
@@ -877,7 +885,15 @@ public class RoutineService extends Service {
          */
         void abort(@Nullable final Throwable reason) {
 
-            mChannel.abort(reason);
+            mTransport.abort(reason);
+        }
+
+        /**
+         * Closes the channel.
+         */
+        void close() {
+
+            mTransport.close();
         }
 
         /**
@@ -889,7 +905,19 @@ public class RoutineService extends Service {
          */
         void pass(@Nullable final Object input) {
 
-            mChannel.pass(input);
+            mTransport.pass(input);
+        }
+
+        /**
+         * Bbinds the specified consumer to the output channel.
+         *
+         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException            if the channel is already closed or
+         *                                                    already bound to a consumer.
+         */
+        void passTo(@Nonnull final OutputConsumer<Object> consumer) {
+
+            mChannel.result().passTo(consumer);
         }
 
         /**
@@ -906,18 +934,6 @@ public class RoutineService extends Service {
                     mRoutines.remove(mRoutineInfo);
                 }
             }
-        }
-
-        /**
-         * Closes the input channel and binds the specified consumer to the output one.
-         *
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if the channel is already closed or
-         *                                                    already bound to a consumer.
-         */
-        void result(@Nonnull final OutputConsumer<Object> consumer) {
-
-            mChannel.result().passTo(consumer);
         }
     }
 }

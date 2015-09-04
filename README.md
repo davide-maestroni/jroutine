@@ -158,5 +158,5 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [javadoc proxy]:http://davide-maestroni.github.io/jroutine/javadoc/proxy
 [javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/android
 [javadoc androidproxy]:http://davide-maestroni.github.io/jroutine/javadoc/androidproxy
-[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/gh/bmd/jrt/routine/Routine.html
-[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/gh/bmd/jrt/runner/Runner.html
+[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/github/dm/jrt/routine/Routine.html
+[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/github/dm/jrt/runner/Runner.html

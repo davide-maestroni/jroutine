@@ -242,7 +242,7 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
 
             final DefaultInvocationFactoryTarget<?, ?> that =
                     (DefaultInvocationFactoryTarget<?, ?>) o;
-            return Arrays.equals(mFactoryArgs, that.mFactoryArgs) && mTargetClass.equals(
+            return Arrays.deepEquals(mFactoryArgs, that.mFactoryArgs) && mTargetClass.equals(
                     that.mTargetClass);
         }
 
@@ -250,7 +250,7 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
         public int hashCode() {
 
             // AUTO-GENERATED CODE
-            int result = Arrays.hashCode(mFactoryArgs);
+            int result = Arrays.deepHashCode(mFactoryArgs);
             result = 31 * result + mTargetClass.hashCode();
             return result;
         }

@@ -76,7 +76,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     @SuppressWarnings("StatementWithEmptyBody")
     public void onInput(final ByteBuffer buffer, @Nonnull final ResultChannel<Boolean> result) {
 
-        final BufferInputStream inputStream = ByteChannel.newStream(buffer);
+        final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
 
         try {
 

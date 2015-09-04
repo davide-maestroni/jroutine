@@ -258,14 +258,14 @@ public class RoutineTest {
         final TestRunner runner = new TestRunner();
         final Routine<Object, Object> routine1 = JRoutine.on(PassingInvocation.factoryOf())
                                                          .invocations()
-                                                         .withAsyncRunner(runner)
+                                                         .withRunner(runner)
                                                          .withPriority(
                                                                  AgingPriority.NORMAL_PRIORITY)
                                                          .set()
                                                          .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutine.on(PassingInvocation.factoryOf())
                                                          .invocations()
-                                                         .withAsyncRunner(runner)
+                                                         .withRunner(runner)
                                                          .withPriority(AgingPriority.HIGH_PRIORITY)
                                                          .set()
                                                          .buildRoutine();
@@ -1152,8 +1152,8 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(),
-                                                     Runners.sequentialRunner(), logger);
+                                                     new TestAbortHandler(), Runners.syncRunner(),
+                                                     logger);
 
             new DefaultExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
 
@@ -1167,8 +1167,8 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(),
-                                                     Runners.sequentialRunner(), logger);
+                                                     new TestAbortHandler(), Runners.syncRunner(),
+                                                     logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(), null, channel,
                                                  logger);
@@ -1194,8 +1194,8 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(),
-                                                     Runners.sequentialRunner(), logger);
+                                                     new TestAbortHandler(), Runners.syncRunner(),
+                                                     logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(),
                                                  new TestInputIterator(), channel, null);
@@ -2281,8 +2281,7 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
                            .invocations()
-                           .withSyncRunner(Runners.sequentialRunner())
-                           .withAsyncRunner(Runners.poolRunner())
+                           .withRunner(Runners.poolRunner())
                            .withCoreInstances(0)
                            .withMaxInstances(1)
                            .withInputMaxSize(2)
@@ -2296,8 +2295,7 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
                            .invocations()
-                           .withSyncRunner(Runners.queuedRunner())
-                           .withAsyncRunner(Runners.poolRunner())
+                           .withRunner(Runners.poolRunner())
                            .withCoreInstances(0)
                            .withMaxInstances(1)
                            .withInputMaxSize(2)

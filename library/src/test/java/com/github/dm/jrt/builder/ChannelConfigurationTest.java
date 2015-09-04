@@ -43,23 +43,23 @@ public class ChannelConfigurationTest {
     public void testAsyncRunnerEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
         assertThat(configuration).isNotEqualTo(
                 builder().withAsyncRunner(Runners.sharedRunner()).set());
         assertThat(configuration.builderFrom()
-                                .withAsyncRunner(Runners.queuedRunner())
+                                .withAsyncRunner(Runners.syncRunner())
                                 .set()).isNotEqualTo(
-                builder().withAsyncRunner(Runners.queuedRunner()).set());
+                builder().withAsyncRunner(Runners.syncRunner()).set());
     }
 
     @Test
     public void testBuildFrom() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -99,7 +99,7 @@ public class ChannelConfigurationTest {
     public void testBuilderFromEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .withLogLevel(LogLevel.SILENT)
@@ -120,7 +120,7 @@ public class ChannelConfigurationTest {
     public void testChannelOrderEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -135,7 +135,7 @@ public class ChannelConfigurationTest {
     public void testChannelSizeEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -163,7 +163,7 @@ public class ChannelConfigurationTest {
     public void testChannelTimeoutEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -204,7 +204,7 @@ public class ChannelConfigurationTest {
     public void testLogEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -217,7 +217,7 @@ public class ChannelConfigurationTest {
     public void testLogLevelEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -230,7 +230,7 @@ public class ChannelConfigurationTest {
     public void testPassTimeoutActionEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -246,7 +246,7 @@ public class ChannelConfigurationTest {
     public void testPassTimeoutEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
@@ -263,7 +263,7 @@ public class ChannelConfigurationTest {
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelMaxSize(100)
                                                             .withChannelTimeout(millis(33))
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withPassTimeout(millis(100))
                                                             .withPassTimeoutAction(
                                                                     TimeoutActionType.ABORT)
@@ -273,7 +273,7 @@ public class ChannelConfigurationTest {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
-                builder.withAsyncRunner(Runners.queuedRunner())
+                builder.withRunner(Runners.syncRunner())
                        .withExecutionTimeout(millis(100))
                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
@@ -291,7 +291,7 @@ public class ChannelConfigurationTest {
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelMaxSize(100)
                                                             .withChannelTimeout(millis(33))
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withPassTimeout(millis(100))
                                                             .withPassTimeoutAction(
                                                                     TimeoutActionType.ABORT)
@@ -301,7 +301,7 @@ public class ChannelConfigurationTest {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
-                builder.withAsyncRunner(Runners.queuedRunner())
+                builder.withRunner(Runners.syncRunner())
                        .withExecutionTimeout(millis(100))
                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
@@ -316,7 +316,7 @@ public class ChannelConfigurationTest {
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelMaxSize(100)
                                                             .withChannelTimeout(millis(33))
-                                                            .withAsyncRunner(Runners.queuedRunner())
+                                                            .withAsyncRunner(Runners.syncRunner())
                                                             .withPassTimeout(millis(100))
                                                             .withPassTimeoutAction(
                                                                     TimeoutActionType.ABORT)
@@ -326,7 +326,7 @@ public class ChannelConfigurationTest {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
-                builder.withAsyncRunner(Runners.queuedRunner())
+                builder.withRunner(Runners.syncRunner())
                        .withExecutionTimeout(millis(100))
                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())

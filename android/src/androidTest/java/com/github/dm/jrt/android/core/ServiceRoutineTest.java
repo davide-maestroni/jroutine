@@ -27,7 +27,6 @@ import com.github.dm.jrt.android.invocation.PassingContextInvocation;
 import com.github.dm.jrt.android.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.log.AndroidLog;
 import com.github.dm.jrt.android.runner.MainRunner;
-import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
@@ -184,7 +183,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final Routine<String, String> routine =
                 JRoutine.on(serviceFrom(getActivity()), targetInvocation)
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
                         .withInputOrder(OrderType.BY_CHANCE)
                         .withLogLevel(LogLevel.DEBUG)
                         .set()
@@ -263,7 +261,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final Routine<String, String> routine1 =
                 JRoutine.on(serviceFrom(getActivity()), targetInvocation)
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
                         .withInputOrder(OrderType.BY_CHANCE)
                         .withLogLevel(LogLevel.DEBUG)
                         .set()
@@ -288,7 +285,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final Routine<String, String> routine2 =
                 JRoutine.on(serviceFrom(getActivity()), targetInvocation(token))
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
                         .withOutputOrder(OrderType.BY_CHANCE)
                         .withLogLevel(LogLevel.DEBUG)
                         .set()

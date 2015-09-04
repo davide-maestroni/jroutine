@@ -155,7 +155,7 @@ public class Downloader {
                             // Since we want to limit the number of allocated chunks, we have to
                             // make the file writing happen in a dedicated runner, so that waiting
                             // for available space becomes allowed
-                            .withAsyncRunner(mWriteRunner)
+                            .withRunner(mWriteRunner)
                             .withInputMaxSize(32)
                             .withInputTimeout(seconds(30))
                             .set()

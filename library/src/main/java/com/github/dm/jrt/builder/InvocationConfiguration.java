@@ -32,17 +32,9 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
  * <p/>
- * The configuration has a synchronous and an asynchronous runner associated. The synchronous
- * implementation already included in the library are queued and sequential.<br/>
- * The queued one maintains an internal buffer of executions that are consumed only when the
- * last one completes, thus avoiding overflowing the call stack because of nested calls to other
- * routines.<br/>
- * The sequential one simply runs the executions as soon as they are invoked.<br/>
- * While the latter is less memory and CPU consuming, it might greatly increase the depth of the
- * call stack, and blocks execution of the calling thread during delayed executions.<br/>
- * In both cases the executions are run inside the calling thread.<br/>
- * The default asynchronous runner is shared among all the routines, but a custom one can be set
- * through the builder.
+ * The configuration has an asynchronous runner associated.<br/>
+ * The default runner is shared among all the routines, but a custom one can be set through the
+ * builder.
  * <p/>
  * A specific priority can be set. Every invocation will age each time an higher priority one takes
  * the precedence, so that older invocations slowly increases their priority. Such mechanism has
@@ -84,8 +76,6 @@ public final class InvocationConfiguration {
     public static final InvocationConfiguration DEFAULT_CONFIGURATION =
             builder().buildConfiguration();
 
-    private final Runner mAsyncRunner;
-
     private final int mCoreInstances;
 
     private final TimeDuration mExecutionTimeout;
@@ -110,15 +100,14 @@ public final class InvocationConfiguration {
 
     private final int mPriority;
 
-    private final Runner mSyncRunner;
+    private final Runner mRunner;
 
     private final TimeoutActionType mTimeoutActionType;
 
     /**
      * Constructor.
      *
-     * @param syncRunner       the runner used for synchronous invocations.
-     * @param asyncRunner      the runner used for asynchronous invocations.
+     * @param runner           the runner used for asynchronous invocations.
      * @param priority         the invocation priority.
      * @param maxInstances     the maximum number of parallel running invocations. Must be positive.
      * @param coreInstances    the maximum number of retained invocation instances. Must be 0 or a
@@ -137,17 +126,16 @@ public final class InvocationConfiguration {
      * @param log              the log instance.
      * @param logLevel         the log level.
      */
-    private InvocationConfiguration(@Nullable final Runner syncRunner,
-            @Nullable final Runner asyncRunner, final int priority, final int maxInstances,
-            final int coreInstances, @Nullable final TimeDuration executionTimeout,
+    private InvocationConfiguration(@Nullable final Runner runner, final int priority,
+            final int maxInstances, final int coreInstances,
+            @Nullable final TimeDuration executionTimeout,
             @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
             @Nullable final OrderType outputOrderType, final int outputMaxSize,
             @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
             @Nullable final LogLevel logLevel) {
 
-        mSyncRunner = syncRunner;
-        mAsyncRunner = asyncRunner;
+        mRunner = runner;
         mPriority = priority;
         mMaxInstances = maxInstances;
         mCoreInstances = coreInstances;
@@ -197,18 +185,6 @@ public final class InvocationConfiguration {
     public Builder<InvocationConfiguration> builderFrom() {
 
         return builderFrom(this);
-    }
-
-    /**
-     * Returns the runner used for asynchronous invocations (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the runner instance.
-     */
-    public Runner getAsyncRunnerOr(@Nullable final Runner valueIfNotSet) {
-
-        final Runner runner = mAsyncRunner;
-        return (runner != null) ? runner : valueIfNotSet;
     }
 
     /**
@@ -373,14 +349,14 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the runner used for synchronous invocations (null by default).
+     * Returns the runner used for asynchronous invocations (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the runner instance.
      */
-    public Runner getSyncRunnerOr(@Nullable final Runner valueIfNotSet) {
+    public Runner getRunnerOr(@Nullable final Runner valueIfNotSet) {
 
-        final Runner runner = mSyncRunner;
+        final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
     }
 
@@ -388,7 +364,7 @@ public final class InvocationConfiguration {
     public int hashCode() {
 
         // AUTO-GENERATED CODE
-        int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
+        int result = mRunner != null ? mRunner.hashCode() : 0;
         result = 31 * result + mCoreInstances;
         result = 31 * result + (mExecutionTimeout != null ? mExecutionTimeout.hashCode() : 0);
         result = 31 * result + mInputMaxSize;
@@ -401,7 +377,6 @@ public final class InvocationConfiguration {
         result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + mPriority;
-        result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
     }
@@ -448,8 +423,7 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mAsyncRunner != null ? !mAsyncRunner.equals(that.mAsyncRunner)
-                : that.mAsyncRunner != null) {
+        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
 
             return false;
         }
@@ -492,12 +466,6 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mSyncRunner != null ? !mSyncRunner.equals(that.mSyncRunner)
-                : that.mSyncRunner != null) {
-
-            return false;
-        }
-
         return mTimeoutActionType == that.mTimeoutActionType;
     }
 
@@ -506,7 +474,7 @@ public final class InvocationConfiguration {
 
         // AUTO-GENERATED CODE
         return "InvocationConfiguration{" +
-                "mAsyncRunner=" + mAsyncRunner +
+                "mRunner=" + mRunner +
                 ", mCoreInstances=" + mCoreInstances +
                 ", mExecutionTimeout=" + mExecutionTimeout +
                 ", mInputMaxSize=" + mInputMaxSize +
@@ -519,7 +487,6 @@ public final class InvocationConfiguration {
                 ", mOutputOrderType=" + mOutputOrderType +
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mPriority=" + mPriority +
-                ", mSyncRunner=" + mSyncRunner +
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
     }
@@ -678,8 +645,6 @@ public final class InvocationConfiguration {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private Runner mAsyncRunner;
-
         private int mCoreInstances;
 
         private TimeDuration mExecutionTimeout;
@@ -704,7 +669,7 @@ public final class InvocationConfiguration {
 
         private int mPriority;
 
-        private Runner mSyncRunner;
+        private Runner mRunner;
 
         private TimeoutActionType mTimeoutActionType;
 
@@ -779,20 +744,6 @@ public final class InvocationConfiguration {
             applyBaseConfiguration(configuration);
             applyChannelConfiguration(configuration);
             applyLogConfiguration(configuration);
-            return this;
-        }
-
-        /**
-         * Sets the asynchronous runner instance. A null value means that it is up to the specific
-         * implementation to choose a default one.
-         *
-         * @param runner the runner instance.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder<TYPE> withAsyncRunner(@Nullable final Runner runner) {
-
-            mAsyncRunner = runner;
             return this;
         }
 
@@ -1071,33 +1022,26 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the synchronous runner instance. A null value means that it is up to the specific
+         * Sets the asynchronous runner instance. A null value means that it is up to the specific
          * implementation to choose a default one.
          *
          * @param runner the runner instance.
          * @return this builder.
          */
         @Nonnull
-        public Builder<TYPE> withSyncRunner(@Nullable final Runner runner) {
+        public Builder<TYPE> withRunner(@Nullable final Runner runner) {
 
-            mSyncRunner = runner;
+            mRunner = runner;
             return this;
         }
 
         private void applyBaseConfiguration(@Nonnull final InvocationConfiguration configuration) {
 
-            final Runner syncRunner = configuration.mSyncRunner;
+            final Runner runner = configuration.mRunner;
 
-            if (syncRunner != null) {
+            if (runner != null) {
 
-                withSyncRunner(syncRunner);
-            }
-
-            final Runner asyncRunner = configuration.mAsyncRunner;
-
-            if (asyncRunner != null) {
-
-                withAsyncRunner(asyncRunner);
+                withRunner(runner);
             }
 
             final int priority = configuration.mPriority;
@@ -1202,17 +1146,16 @@ public final class InvocationConfiguration {
         @Nonnull
         private InvocationConfiguration buildConfiguration() {
 
-            return new InvocationConfiguration(mSyncRunner, mAsyncRunner, mPriority, mMaxInstances,
-                                               mCoreInstances, mExecutionTimeout,
-                                               mTimeoutActionType, mInputOrderType, mInputMaxSize,
-                                               mInputTimeout, mOutputOrderType, mOutputMaxSize,
-                                               mOutputTimeout, mLog, mLogLevel);
+            return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
+                                               mExecutionTimeout, mTimeoutActionType,
+                                               mInputOrderType, mInputMaxSize, mInputTimeout,
+                                               mOutputOrderType, mOutputMaxSize, mOutputTimeout,
+                                               mLog, mLogLevel);
         }
 
         private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {
 
-            mSyncRunner = configuration.mSyncRunner;
-            mAsyncRunner = configuration.mAsyncRunner;
+            mRunner = configuration.mRunner;
             mPriority = configuration.mPriority;
             mMaxInstances = configuration.mMaxInstances;
             mCoreInstances = configuration.mCoreInstances;

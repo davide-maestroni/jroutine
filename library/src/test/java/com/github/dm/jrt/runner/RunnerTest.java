@@ -94,8 +94,8 @@ public class RunnerTest {
 
         testRunner(Runners.priorityRunner(Runners.sharedRunner())
                           .getRunner(AgingPriority.NORMAL_PRIORITY));
-        testRunner(Runners.priorityRunner(Runners.queuedRunner())
-                          .getRunner(AgingPriority.LOW_PRIORITY));
+        testRunner(
+                Runners.priorityRunner(Runners.syncRunner()).getRunner(AgingPriority.LOW_PRIORITY));
         testRunner(new RunnerDecorator(Runners.priorityRunner(Runners.poolRunner())
                                               .getRunner(AgingPriority.LOWEST_PRIORITY)));
 
@@ -109,7 +109,7 @@ public class RunnerTest {
     public void testQueuedRunner() throws InterruptedException {
 
         testRunner(new QueuedRunner());
-        testRunner(Runners.queuedRunner());
+        testRunner(Runners.syncRunner());
         testRunner(new RunnerDecorator(new QueuedRunner()));
     }
 
@@ -194,7 +194,7 @@ public class RunnerTest {
     @SuppressWarnings("ConstantConditions")
     public void testSamePriorityRunner() {
 
-        final PriorityRunner priorityRunner = Runners.priorityRunner(Runners.queuedRunner());
+        final PriorityRunner priorityRunner = Runners.priorityRunner(Runners.syncRunner());
         assertThat(Runners.priorityRunner(priorityRunner.getRunner(3))).isSameAs(priorityRunner);
     }
 
@@ -233,14 +233,6 @@ public class RunnerTest {
     }
 
     @Test
-    public void testSequentialRunner() throws InterruptedException {
-
-        testRunner(new SequentialRunner());
-        testRunner(Runners.sequentialRunner());
-        testRunner(new RunnerDecorator(new SequentialRunner()));
-    }
-
-    @Test
     public void testThrottlingRunner() throws InterruptedException {
 
         testRunner(new ThrottlingRunner(Runners.sharedRunner(), 5));
@@ -253,7 +245,7 @@ public class RunnerTest {
     public void testThrottlingRunnerCancel() throws InterruptedException {
 
         final TestExecution execution = new TestExecution();
-        Runner runner = Runners.throttlingRunner(Runners.queuedRunner(), 1);
+        Runner runner = Runners.throttlingRunner(Runners.syncRunner(), 1);
         assertThat(runner.isExecutionThread()).isTrue();
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         assertThat(execution.isRun()).isTrue();

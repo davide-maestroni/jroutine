@@ -66,21 +66,10 @@ public class ByteChannel {
      * Constructor.
      *
      * @param dataBufferSize the data buffer size.
-     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
-     */
-    ByteChannel(final int dataBufferSize) {
-
-        this(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param dataBufferSize the data buffer size.
      * @param corePoolSize   the maximum number of retained data buffers.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    ByteChannel(final int dataBufferSize, final int corePoolSize) {
+    protected ByteChannel(final int dataBufferSize, final int corePoolSize) {
 
         if (dataBufferSize < 1) {
 
@@ -89,6 +78,47 @@ public class ByteChannel {
 
         mCorePoolSize = corePoolSize;
         mDataBufferSize = dataBufferSize;
+    }
+
+    /**
+     * Returns a new byte channel.
+     *
+     * @return the byte channel.
+     */
+    @Nonnull
+    public static ByteChannel byteChannel() {
+
+        return new ByteChannel(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
+    }
+
+    /**
+     * Returns a new byte channel.
+     *
+     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
+     *                       routine channels.
+     * @return the byte channel.
+     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
+     */
+    @Nonnull
+    public static ByteChannel byteChannel(final int dataBufferSize) {
+
+        return new ByteChannel(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
+    }
+
+    /**
+     * Returns a new byte channel.
+     *
+     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
+     *                       routine channels.
+     * @param corePoolSize   the maximum number of data retained in the pool. Additional data
+     *                       created to fulfill the bytes requirement will be discarded.
+     * @return the byte channel.
+     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
+     */
+    @Nonnull
+    public static ByteChannel byteChannel(final int dataBufferSize, final int corePoolSize) {
+
+        return new ByteChannel(dataBufferSize, corePoolSize);
     }
 
     /**
@@ -101,7 +131,7 @@ public class ByteChannel {
      *                                         specified buffer.
      */
     @Nonnull
-    public static BufferInputStream newStream(@Nonnull final ByteBuffer buffer) {
+    public static BufferInputStream inputStream(@Nonnull final ByteBuffer buffer) {
 
         return buffer.getStream();
     }
@@ -117,7 +147,7 @@ public class ByteChannel {
      *                                         of the specified buffers.
      */
     @Nonnull
-    public static BufferInputStream newStream(@Nonnull final ByteBuffer... buffers) {
+    public static BufferInputStream inputStream(@Nonnull final ByteBuffer... buffers) {
 
         return new MultiBufferInputStream(buffers);
     }
@@ -133,13 +163,15 @@ public class ByteChannel {
      *                                         of the specified buffers.
      */
     @Nonnull
-    public static BufferInputStream newStream(@Nonnull final List<ByteBuffer> buffers) {
+    public static BufferInputStream inputStream(@Nonnull final List<ByteBuffer> buffers) {
 
         return new MultiBufferInputStream(buffers);
     }
 
     /**
-     * Returns the output stream used to write bytes into the specified channel.
+     * Returns the output stream used to write bytes into the specified channel.<br/>
+     * Note that, if the method is called more than one time, passing the same input channel, it
+     * will return the same output stream.
      *
      * @param channel the input channel to which pass the data.
      * @return the output stream.
@@ -601,14 +633,14 @@ public class ByteChannel {
      * to minimize memory consumption. Byte buffers are automatically acquired by
      * <code>BufferOutputStream</code>s and passed to the underlying channel.<br/>
      * The data contained in a buffer can be read through the dedicated
-     * <code>BufferInputStream</code> returned by one of the <code>ByteChannel.newStream()</code>
+     * {@code BufferInputStream} returned by one of the {@code ByteChannel.inputStream()}
      * methods. Note that only one input stream can be created for each buffer, any further attempt
      * will generate an exception.<br/>
-     * Used buffers will be recycled as soon as the corresponding input stream is closed.
+     * Used buffers will be released as soon as the corresponding input stream is closed.
      *
-     * @see ByteChannel#newStream(ByteBuffer)
-     * @see ByteChannel#newStream(ByteBuffer...)
-     * @see ByteChannel#newStream(List)
+     * @see ByteChannel#inputStream(ByteBuffer)
+     * @see ByteChannel#inputStream(ByteBuffer...)
+     * @see ByteChannel#inputStream(List)
      */
     public class ByteBuffer {
 
@@ -631,6 +663,56 @@ public class ByteChannel {
 
             mBuffer = new byte[bufferSize];
             mStream = new DefaultBufferInputStream(this);
+        }
+
+        @Override
+        public int hashCode() {
+
+            final int size = getSize();
+            final byte[] buffer = mBuffer;
+            int result = size;
+
+            for (int i = 0; i < size; i++) {
+
+                result = 31 * result + buffer[i];
+            }
+
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ByteBuffer)) {
+
+                return false;
+            }
+
+            final ByteBuffer that = (ByteBuffer) o;
+            final int size = getSize();
+
+            if (size != that.getSize()) {
+
+                return false;
+            }
+
+            final byte[] thisBuffer = mBuffer;
+            final byte[] thatBuffer = that.mBuffer;
+
+            for (int i = 0; i < size; i++) {
+
+                if (thisBuffer[i] != thatBuffer[i]) {
+
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void changeState(@Nonnull final BufferState expected,

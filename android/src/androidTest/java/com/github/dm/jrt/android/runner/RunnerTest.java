@@ -157,7 +157,7 @@ public class RunnerTest extends AndroidTestCase {
     @SuppressWarnings("ConstantConditions")
     public void testLooperRunner() throws InterruptedException {
 
-        testRunner(new LooperRunner(Looper.myLooper(), Runners.queuedRunner()));
+        testRunner(new LooperRunner(Looper.myLooper(), Runners.syncRunner()));
         testRunner(Runners.myRunner());
 
         final TemplateInvocation<Object, Object> invocation =
@@ -171,7 +171,7 @@ public class RunnerTest extends AndroidTestCase {
                 };
         final OutputChannel<Object> channel = JRoutine.on(factoryOf(invocation, this))
                                                       .invocations()
-                                                      .withAsyncRunner(Runners.handlerRunner(
+                                                      .withRunner(Runners.handlerRunner(
                                                               new HandlerThread("test")))
                                                       .set()
                                                       .asyncCall();
@@ -188,9 +188,9 @@ public class RunnerTest extends AndroidTestCase {
         testRunner(new MainRunner());
         testRunner(Runners.looperRunner(Looper.getMainLooper()));
         testRunner(new RunnerDecorator(Runners.looperRunner(Looper.getMainLooper())));
-        testRunner(Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner()));
+        testRunner(Runners.looperRunner(Looper.getMainLooper(), Runners.syncRunner()));
         testRunner(new RunnerDecorator(
-                Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner())));
+                Runners.looperRunner(Looper.getMainLooper(), Runners.syncRunner())));
     }
 
     public void testTaskRunner() throws InterruptedException {

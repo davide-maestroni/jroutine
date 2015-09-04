@@ -79,8 +79,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Object, Object> routine =
                 JRoutine.on(serviceFrom(getActivity()), targetObject(TestClass.class))
                         .invocations()
-                        .withSyncRunner(Runners.sequentialRunner())
-                        .withAsyncRunner(Runners.poolRunner())
+                        .withRunner(Runners.poolRunner())
                         .withMaxInstances(1)
                         .withCoreInstances(1)
                         .withExecutionTimeoutAction(TimeoutActionType.EXIT)
@@ -487,8 +486,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Object, Object> routine2 =
                 JRoutine.on(serviceFrom(getActivity()), targetObject(TestClass.class))
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
-                        .withAsyncRunner(Runners.poolRunner())
+                        .withRunner(Runners.poolRunner())
                         .withMaxInstances(1)
                         .set()
                         .proxies()
@@ -505,8 +503,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Object, Object> routine1 =
                 JRoutine.on(serviceFrom(getActivity()), targetObject(TestClass.class))
                         .invocations()
-                        .withSyncRunner(Runners.queuedRunner())
-                        .withAsyncRunner(Runners.poolRunner())
+                        .withRunner(Runners.poolRunner())
                         .set()
                         .method("getLong");
 

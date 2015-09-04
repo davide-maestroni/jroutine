@@ -22,14 +22,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * The runner maintains an internal buffer of executions that are consumed only when the last one
  * completes, thus avoiding overflowing the call stack because of nested calls to other routines.
- * <br/>
- * While it is more memory and CPU consuming than the sequential implementation, it avoids overflows
- * of the call stack, and tries to prevent blocking the execution of the calling thread by
- * reordering delayed executions inside the queue.
  * <p/>
  * Created by davide-maestroni on 09/18/2014.
- *
- * @see com.github.dm.jrt.runner.SequentialRunner SequentialRunner
  */
 class QueuedRunner implements Runner {
 

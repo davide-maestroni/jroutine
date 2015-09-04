@@ -45,20 +45,20 @@ This paradigm is nothing but what any developer is already familiar to, that is,
 
 What the library has to offer is:
 
-* ***Flat learning curve***: a single paradigm to make everything: invoke the routine, pass the inputs, read the results
-* ***Extreme configurability***: each routine instance may have its own set of configurations, and its own source of concurrency
-* ***Ease of integration***: no need to modify existing code to make a method asynchronous
-* ***Memory optimization***: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption
-* ***Data streaming***: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution
-* ***Real processing abort***: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener
-* ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential array of operations
-* ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation
-* ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments
-* ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service
+* ***Flat learning curve***: a single paradigm to make everything: invoke the routine, pass the inputs, read the results.
+* ***Extreme configurability***: each routine instance may have its own set of configurations, and its own source of concurrency.
+* ***Ease of integration***: no need to modify existing code to make a method asynchronous.
+* ***Memory optimization***: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption.
+* ***Data streaming***: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution.
+* ***Real processing abort***: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener.
+* ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential array of operations.
+* ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation.
+* ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.
+* ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service.
 
 And more:
 
-* ***< 250KB Jar***
+* ***< 300KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
 * ***Nullability annotations***
 
@@ -83,7 +83,17 @@ Complete Javadoc with insights and examples is available for:
 * [JRoutine-Android][javadoc android]
 * [JRoutine-AndroidProxy][javadoc androidproxy]
 
-The project contains an additional [sample][sample] module showing how to implement a file downloader with just 4 classes.
+The project contains an additional [sample][sample] module showing how to implement a file downloader with just 3 classes.
+
+## Versioning Convention
+
+The library artifacts will follow a specific versioning convention. Each version will be identified by a major, a minor and a revision number.
+
+* ***Major Version***: the major version number will update when a stuctural change (more than some class renaming) takes place. All the dependent artifact major versions will be updated as well.
+* ***Minor Version***: the minor version number will update when backward compatibility is broken. All the dependent artifact minor versions will be updated as well.
+* ***Revision Number***: the revision number will update when non-breaking changes are made (typically bug fixing). The dependent artifacts will not be impacted.
+
+In terms of backward compatibility, it is hence safe to depend on a specific major and minor version, ignoring the revision number (like, for instance: *4.2.+*).
 
 ## Further development
 

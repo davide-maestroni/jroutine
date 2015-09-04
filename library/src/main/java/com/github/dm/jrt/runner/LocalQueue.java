@@ -36,7 +36,9 @@ class LocalQueue {
 
     private static final LocalQueueThreadLocal sQueue = new LocalQueueThreadLocal();
 
-    private TimeDuration[] mDelays;
+    private TimeUnit[] mDelayUnits;
+
+    private long[] mDelays;
 
     private long[] mExecutionTimeNs;
 
@@ -55,7 +57,8 @@ class LocalQueue {
 
         mExecutionTimeNs = new long[INITIAL_CAPACITY];
         mExecutions = new Execution[INITIAL_CAPACITY];
-        mDelays = new TimeDuration[INITIAL_CAPACITY];
+        mDelays = new long[INITIAL_CAPACITY];
+        mDelayUnits = new TimeUnit[INITIAL_CAPACITY];
     }
 
     /**
@@ -97,12 +100,14 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(@Nonnull final Execution execution, @Nonnull final TimeDuration delay) {
+    private void add(@Nonnull final Execution execution, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
 
         final int i = mLast;
         mExecutionTimeNs[i] = System.nanoTime();
         mExecutions[i] = execution;
         mDelays[i] = delay;
+        mDelayUnits[i] = timeUnit;
         final int newLast;
 
         if ((i >= (mExecutions.length - 1)) || (i == Integer.MAX_VALUE)) {
@@ -125,7 +130,7 @@ class LocalQueue {
     private void addExecution(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        add(execution, TimeDuration.fromUnit(delay, timeUnit));
+        add(execution, delay, timeUnit);
 
         if (!mIsRunning) {
 
@@ -160,11 +165,14 @@ class LocalQueue {
         resizeArray(mExecutionTimeNs, newExecutionTimeNs, first);
         final Execution[] newExecutions = new Execution[newSize];
         resizeArray(mExecutions, newExecutions, first);
-        final TimeDuration[] newDelays = new TimeDuration[newSize];
+        final long[] newDelays = new long[newSize];
         resizeArray(mDelays, newDelays, first);
+        final TimeUnit[] newDelayUnits = new TimeUnit[newSize];
+        resizeArray(mDelayUnits, newDelayUnits, first);
         mExecutionTimeNs = newExecutionTimeNs;
         mExecutions = newExecutions;
         mDelays = newDelays;
+        mDelayUnits = newDelayUnits;
         final int shift = newSize - size;
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;
@@ -182,7 +190,8 @@ class LocalQueue {
             if (executions[i] == execution) {
 
                 executions[i] = EMPTY_EXECUTION;
-                mDelays[i] = TimeDuration.ZERO;
+                mDelays[i] = 0;
+                mDelayUnits[i] = TimeUnit.NANOSECONDS;
             }
 
             if (++i >= length) {
@@ -204,12 +213,14 @@ class LocalQueue {
                 final int last = mLast;
                 final long[] executionTimeNs = mExecutionTimeNs;
                 final Execution[] executions = mExecutions;
-                final TimeDuration[] delays = mDelays;
+                final long[] delays = mDelays;
+                final TimeUnit[] delayUnits = mDelayUnits;
                 long timeNs = executionTimeNs[i];
                 Execution execution = executions[i];
-                TimeDuration delay = delays[i];
+                long delay = delays[i];
+                TimeUnit delayUnit = delayUnits[i];
                 final long currentTimeNs = System.nanoTime();
-                long delayNs = timeNs - currentTimeNs + delay.toNanos();
+                long delayNs = timeNs - currentTimeNs + delayUnit.toNanos(delay);
 
                 if (delayNs > 0) {
 
@@ -226,7 +237,8 @@ class LocalQueue {
                     while (j != last) {
 
                         final long nextDelayNs =
-                                executionTimeNs[j] - currentTimeNs + delays[j].toNanos();
+                                executionTimeNs[j] - currentTimeNs + delayUnits[j].toNanos(
+                                        delays[j]);
 
                         if (nextDelayNs <= 0) {
 
@@ -251,12 +263,14 @@ class LocalQueue {
                         timeNs = executionTimeNs[s];
                         execution = executions[s];
                         delay = delays[s];
+                        delayUnit = delayUnits[s];
                         executionTimeNs[s] = executionTimeNs[i];
                         executions[s] = executions[i];
                         delays[s] = delays[i];
+                        delayUnits[s] = delayUnits[i];
                     }
 
-                    delayNs = timeNs - System.nanoTime() + delay.toNanos();
+                    delayNs = timeNs - System.nanoTime() + delayUnit.toNanos(delay);
                 }
 
                 if (delayNs > 0) {
@@ -280,7 +294,8 @@ class LocalQueue {
                     // Note that the field values may have changed here
                     final int n = mFirst;
                     mExecutions[n] = null;
-                    mDelays[n] = null;
+                    mDelays[n] = 0;
+                    mDelayUnits[n] = TimeUnit.NANOSECONDS;
                     final int newFirst = n + 1;
                     mFirst = (newFirst < mExecutions.length) ? newFirst : 0;
                 }

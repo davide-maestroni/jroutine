@@ -90,13 +90,13 @@ public class TestService extends RoutineService implements FactoryContext {
             }
 
             final InstanceInfo that = (InstanceInfo) o;
-            return Arrays.equals(mArgs, that.mArgs) && mType.equals(that.mType);
+            return Arrays.deepEquals(mArgs, that.mArgs) && mType.equals(that.mType);
         }
 
         @Override
         public int hashCode() {
 
-            int result = Arrays.hashCode(mArgs);
+            int result = Arrays.deepHashCode(mArgs);
             result = 31 * result + mType.hashCode();
             return result;
         }

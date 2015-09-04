@@ -94,7 +94,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
                 return token.cast(instance);
             }
 
-            final Runner asyncRunner = invocationConfiguration.getAsyncRunnerOr(null);
+            final Runner asyncRunner = invocationConfiguration.getRunnerOr(null);
 
             if (asyncRunner != null) {
 

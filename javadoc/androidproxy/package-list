@@ -1,5 +1,5 @@
-com.gh.bmd.jrt.android.proxy.annotation
-com.gh.bmd.jrt.android.proxy.builder
-com.gh.bmd.jrt.android.proxy.core
-com.gh.bmd.jrt.android.proxy.v11.core
-com.gh.bmd.jrt.android.proxy.v4.core
+com.github.dm.jrt.android.proxy.annotation
+com.github.dm.jrt.android.proxy.builder
+com.github.dm.jrt.android.proxy.core
+com.github.dm.jrt.android.proxy.v11.core
+com.github.dm.jrt.android.proxy.v4.core

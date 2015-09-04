@@ -46,47 +46,6 @@ public class Channels {
     }
 
     /**
-     * Returns a new byte channel.
-     *
-     * @return the byte channel.
-     */
-    @Nonnull
-    public static ByteChannel byteChannel() {
-
-        return new ByteChannel(ByteChannel.DEFAULT_BUFFER_SIZE, ByteChannel.DEFAULT_POOL_SIZE);
-    }
-
-    /**
-     * Returns a new byte channel.
-     *
-     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
-     *                       routine channels.
-     * @return the byte channel.
-     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
-     */
-    @Nonnull
-    public static ByteChannel byteChannel(final int dataBufferSize) {
-
-        return new ByteChannel(dataBufferSize);
-    }
-
-    /**
-     * Returns a new byte channel.
-     *
-     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
-     *                       routine channels.
-     * @param corePoolSize   the maximum number of data retained in the pool. Additional data
-     *                       created to fulfill the bytes requirement will be discarded.
-     * @return the byte channel.
-     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
-     */
-    @Nonnull
-    public static ByteChannel byteChannel(final int dataBufferSize, final int corePoolSize) {
-
-        return new ByteChannel(dataBufferSize, corePoolSize);
-    }
-
-    /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
      * same as the list ones.<br/>
      * Note that the returned channel must be closed in order to ensure the completion of the

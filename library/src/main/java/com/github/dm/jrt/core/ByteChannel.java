@@ -636,7 +636,7 @@ public class ByteChannel {
      * {@code BufferInputStream} returned by one of the {@code ByteChannel.inputStream()}
      * methods. Note that only one input stream can be created for each buffer, any further attempt
      * will generate an exception.<br/>
-     * Used buffers will be recycled as soon as the corresponding input stream is closed.
+     * Used buffers will be released as soon as the corresponding input stream is closed.
      *
      * @see ByteChannel#inputStream(ByteBuffer)
      * @see ByteChannel#inputStream(ByteBuffer...)

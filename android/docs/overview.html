@@ -30,7 +30,8 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.on(RoutineContext.contextFrom(this), ClassToken.tokenOf(LoadBitmap.class))
+                    JRoutine.on(LoaderContext.contextFrom(this))
+                            .with(ContextInvocations.factoryOf(LoadBitmap.class))
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
@@ -108,7 +109,8 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.on(RoutineContext.contextFrom(this), ClassToken.tokenOf(LoadBitmapFromService.class))
+                    JRoutine.on(LoaderContext.contextFrom(this))
+                            .with(ContextInvocations.factoryOf(LoadBitmapFromService.class))
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
@@ -172,8 +174,8 @@
                 public void onContext(&commat;Nonnull final Context context) {
 
                     super.onContext(context);
-                    mRoutine = JRoutine.on(ServiceContext.serviceFrom(context, RoutineService.class),
-                                           ClassToken.tokenOf(LoadBitmap.class))
+                    mRoutine = JRoutine.on(ServiceContext.serviceFrom(context, RoutineService.class))
+                                       .with(InvocationFactoryTarget.targetFactory(LoadBitmap.class))
                                        .buildRoutine();
                 }
 

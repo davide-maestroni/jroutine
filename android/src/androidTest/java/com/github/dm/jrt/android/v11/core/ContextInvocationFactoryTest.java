@@ -65,7 +65,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                 PassingContextInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final LoaderRoutine<String, String> routine =
-                JRoutine.on(contextFrom(getActivity()), decoratedFactory).buildRoutine();
+                JRoutine.on(contextFrom(getActivity())).with(decoratedFactory).buildRoutine();
         assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
         routine.purge();
     }
@@ -81,7 +81,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                 PassingContextInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final LoaderRoutine<String, String> routine =
-                JRoutine.on(contextFrom(getActivity()), decoratedFactory).buildRoutine();
+                JRoutine.on(contextFrom(getActivity())).with(decoratedFactory).buildRoutine();
         assertThat(routine.asyncCall("test").eventually().all()).containsExactly("test");
         routine.purge();
     }

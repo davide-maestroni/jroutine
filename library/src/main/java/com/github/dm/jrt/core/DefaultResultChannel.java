@@ -336,6 +336,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
+    public boolean hasPendingInputs() {
+
+        synchronized (mMutex) {
+
+            return (mPendingOutputCount > 0);
+        }
+    }
+
     /**
      * Aborts immediately the execution.
      *

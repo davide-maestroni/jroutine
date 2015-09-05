@@ -57,11 +57,40 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
+    public static ContextBuilder on(@javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context) {
+
+        return new ContextBuilder(context);
+    }
+
+    @javax.annotation.Nonnull
     private static <OUT> com.github.dm.jrt.android.builder.ServiceRoutineBuilder<Object, OUT> getBuilder(
             @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context,
             @javax.annotation.Nonnull final com.github.dm.jrt.android.core.InvocationFactoryTarget<Object, OUT> target) {
 
-        return com.github.dm.jrt.android.core.JRoutine.on(context, target);
+        return com.github.dm.jrt.android.core.JRoutine.on(context).with(target);
+    }
+
+    public static class ContextBuilder {
+
+        private final com.github.dm.jrt.android.core.ServiceContext mContext;
+
+        @SuppressWarnings("ConstantConditions")
+        private ContextBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context) {
+
+            if (context == null) {
+
+                throw new NullPointerException("the context must not be null");
+            }
+
+            mContext = context;
+        }
+
+        @javax.annotation.Nonnull
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> with(
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+
+            return new ServiceProxyBuilder${genericTypes}(mContext, target);
+        }
     }
 
     private static class ServiceProxyBuilder${genericTypes} extends com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyBuilder<${interfaceFullName}> {

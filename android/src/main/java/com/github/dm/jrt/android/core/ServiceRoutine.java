@@ -352,6 +352,11 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             return mTransportOutput;
         }
 
+        public boolean hasPendingInputs() {
+
+            return mTransportInput.hasPendingInputs();
+        }
+
         private void bindService() {
 
             synchronized (mMutex) {

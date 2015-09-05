@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>JRoutine by davide-maestroni</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="javascripts/main.js"></script>
     <!--[if lt IE 9]>
@@ -39,7 +39,9 @@
         <ul></ul>
       </nav>
       <section>
-        <h2>
+        <p>Parallel programming on the go.</p>
+
+<h2>
 <a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h2>
 
 <p>Inspired by the Go routines, this library provides a powerful, flexible, yet familiar concurrency framework, designed to make multi-threads programming simple and funny.</p>
@@ -85,31 +87,31 @@ This paradigm is nothing but what any developer is already familiar to, that is,
 
 <ul>
 <li>
-<strong><em>Flat learning curve</em></strong>: a single paradigm to make everything: invoke the routine, pass the inputs, read the results</li>
+<strong><em>Flat learning curve</em></strong>: a single paradigm to make everything: invoke the routine, pass the inputs, read the results.</li>
 <li>
-<strong><em>Extreme configurability</em></strong>: each routine instance may have its own set of configurations, and its own source of concurrency</li>
+<strong><em>Extreme configurability</em></strong>: each routine instance may have its own set of configurations, and its own source of concurrency.</li>
 <li>
-<strong><em>Ease of integration</em></strong>: no need to modify existing code to make a method asynchronous</li>
+<strong><em>Ease of integration</em></strong>: no need to modify existing code to make a method asynchronous.</li>
 <li>
-<strong><em>Memory optimization</em></strong>: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption</li>
+<strong><em>Memory optimization</em></strong>: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption.</li>
 <li>
-<strong><em>Data streaming</em></strong>: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution</li>
+<strong><em>Data streaming</em></strong>: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution.</li>
 <li>
-<strong><em>Real processing abort</em></strong>: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener</li>
+<strong><em>Real processing abort</em></strong>: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener.</li>
 <li>
-<strong><em>Non-recursive calls</em></strong>: even during synchronous invocations, recursion is broken up in a sequential array of operations</li>
+<strong><em>Non-recursive calls</em></strong>: even during synchronous invocations, recursion is broken up in a sequential array of operations.</li>
 <li>
-<strong><em>Automatic code generation</em></strong>: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation</li>
+<strong><em>Automatic code generation</em></strong>: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation.</li>
 <li>
-<strong><em>Nice handling of Android configuration changes</em></strong>: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments</li>
+<strong><em>Nice handling of Android configuration changes</em></strong>: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.</li>
 <li>
-<strong><em>Seamlessly run in a remote Service</em></strong>: invocations can be easily configured to run in a dedicated Android service</li>
+<strong><em>Seamlessly run in a remote Service</em></strong>: invocations can be easily configured to run in a dedicated Android service.</li>
 </ul>
 
 <p>And more:</p>
 
 <ul>
-<li><strong><em>&lt; 200KB Jar</em></strong></li>
+<li><strong><em>&lt; 300KB Jar</em></strong></li>
 <li>
 <strong><em>Java 5+</em></strong>* <strong><em>and Android 1.6+</em></strong>
 </li>
@@ -142,12 +144,28 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/androidproxy">JRoutine-AndroidProxy</a></li>
 </ul>
 
-<p>The project contains an additional <a href="https://github.com/davide-maestroni/jroutine/tree/master/sample">sample</a> module showing how to implement a file downloader with just 4 classes.</p>
+<p>The project contains an additional <a href="https://github.com/davide-maestroni/jroutine/tree/master/sample">sample</a> module showing how to implement a file downloader with just 3 classes.</p>
+
+<h2>
+<a id="versioning-convention" class="anchor" href="#versioning-convention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Versioning Convention</h2>
+
+<p>The library artifacts will follow a specific versioning convention. Each version will be identified by a major, a minor and a revision number.</p>
+
+<ul>
+<li>
+<strong><em>Major Version</em></strong>: the major version number will update when a stuctural change (more than some class renaming) takes place. All the dependent artifact major versions will be updated as well.</li>
+<li>
+<strong><em>Minor Version</em></strong>: the minor version number will update when backward compatibility is broken. All the dependent artifact minor versions will be updated as well.</li>
+<li>
+<strong><em>Revision Number</em></strong>: the revision number will update when non-breaking changes are made (typically bug fixing). The dependent artifacts will not be impacted.</li>
+</ul>
+
+<p>In terms of backward compatibility, it is hence safe to depend on a specific major and minor version, ignoring the revision number (like, for instance: <em>4.2.+</em>).</p>
 
 <h2>
 <a id="further-development" class="anchor" href="#further-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further development</h2>
 
-<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/javadoc/library/com/gh/bmd/jrt/routine/Routine.html">Routine</a> or <a href="http://davide-maestroni.github.io/jroutine/javadoc/library/com/gh/bmd/jrt/runner/Runner.html">Runner</a> implementations, in order to support more platforms other than Android.</p>
+<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/javadoc/library/com/github/dm/jrt/routine/Routine.html">Routine</a> or <a href="http://davide-maestroni.github.io/jroutine/javadoc/library/com/github/dm/jrt/runner/Runner.html">Runner</a> implementations, in order to support more platforms other than Android.</p>
 
 <h2>
 <a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>

@@ -370,9 +370,9 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      */
     private static class OutputChannelDecorator<OUT> implements OutputChannel<OUT> {
 
-        private final InvocationChannel<?, OUT> mInvocationChannel;
+        private final InvocationChannel<?, OUT> mInputChannel;
 
-        private final OutputChannel<OUT> mResultChannel;
+        private final OutputChannel<OUT> mOutputChannel;
 
         /**
          * Constructor.
@@ -381,146 +381,146 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          */
         private OutputChannelDecorator(@Nonnull final InvocationChannel<?, OUT> channel) {
 
-            mInvocationChannel = channel;
-            mResultChannel = channel.result();
+            mInputChannel = channel;
+            mOutputChannel = channel.result();
         }
 
         @Nonnull
         public OutputChannel<OUT> afterMax(@Nonnull final TimeDuration timeout) {
 
-            if (!timeout.isZero() && mInvocationChannel.hasPendingInputs()) {
+            if (!timeout.isZero() && mInputChannel.hasPendingInputs()) {
 
                 throw new DeadlockException(
                         "cannot wait for outputs when inputs are still pending");
             }
 
-            mResultChannel.afterMax(timeout);
+            mOutputChannel.afterMax(timeout);
             return this;
         }
 
         @Nonnull
         public OutputChannel<OUT> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
-            if ((timeout > 0) && mInvocationChannel.hasPendingInputs()) {
+            if ((timeout > 0) && mInputChannel.hasPendingInputs()) {
 
                 throw new DeadlockException(
                         "cannot wait for outputs when inputs are still pending");
             }
 
-            mResultChannel.afterMax(timeout, timeUnit);
+            mOutputChannel.afterMax(timeout, timeUnit);
             return this;
         }
 
         @Nonnull
         public List<OUT> all() {
 
-            return mResultChannel.all();
+            return mOutputChannel.all();
         }
 
         @Nonnull
         public OutputChannel<OUT> allInto(@Nonnull final Collection<? super OUT> results) {
 
-            mResultChannel.allInto(results);
+            mOutputChannel.allInto(results);
             return this;
         }
 
         public boolean checkComplete() {
 
-            return mResultChannel.checkComplete();
+            return mOutputChannel.checkComplete();
         }
 
         @Nonnull
         public OutputChannel<OUT> eventually() {
 
-            if (mInvocationChannel.hasPendingInputs()) {
+            if (mInputChannel.hasPendingInputs()) {
 
                 throw new DeadlockException(
                         "cannot wait for outputs when inputs are still pending");
             }
 
-            mResultChannel.eventually();
+            mOutputChannel.eventually();
             return this;
         }
 
         @Nonnull
         public OutputChannel<OUT> eventuallyAbort() {
 
-            mResultChannel.eventuallyAbort();
+            mOutputChannel.eventuallyAbort();
             return this;
         }
 
         @Nonnull
         public OutputChannel<OUT> eventuallyExit() {
 
-            mResultChannel.eventuallyExit();
+            mOutputChannel.eventuallyExit();
             return this;
         }
 
         @Nonnull
         public OutputChannel<OUT> eventuallyThrow() {
 
-            mResultChannel.eventuallyThrow();
+            mOutputChannel.eventuallyThrow();
             return this;
         }
 
         public boolean hasNext() {
 
-            return mResultChannel.hasNext();
+            return mOutputChannel.hasNext();
         }
 
         public OUT next() {
 
-            return mResultChannel.next();
+            return mOutputChannel.next();
         }
 
         @Nonnull
         public OutputChannel<OUT> immediately() {
 
-            mResultChannel.immediately();
+            mOutputChannel.immediately();
             return this;
         }
 
         public boolean isBound() {
 
-            return mResultChannel.isBound();
+            return mOutputChannel.isBound();
         }
 
         @Nonnull
         public <IN extends InputChannel<? super OUT>> IN passTo(@Nonnull final IN channel) {
 
-            return mResultChannel.passTo(channel);
+            return mOutputChannel.passTo(channel);
         }
 
         @Nonnull
         public OutputChannel<OUT> passTo(@Nonnull final OutputConsumer<? super OUT> consumer) {
 
-            mResultChannel.passTo(consumer);
+            mOutputChannel.passTo(consumer);
             return this;
         }
 
         public Iterator<OUT> iterator() {
 
-            return mResultChannel.iterator();
+            return mOutputChannel.iterator();
         }
 
         public void remove() {
 
-            mResultChannel.remove();
+            mOutputChannel.remove();
         }
 
         public boolean abort() {
 
-            return mResultChannel.abort();
+            return mOutputChannel.abort();
         }
 
         public boolean abort(@Nullable final Throwable reason) {
 
-            return mResultChannel.abort(reason);
+            return mOutputChannel.abort(reason);
         }
 
         public boolean isOpen() {
 
-            return mResultChannel.isOpen();
+            return mOutputChannel.isOpen();
         }
     }
 

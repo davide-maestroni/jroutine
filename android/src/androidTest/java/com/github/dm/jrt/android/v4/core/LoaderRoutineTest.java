@@ -38,9 +38,11 @@ import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
+import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.Invocations;
@@ -1258,6 +1260,44 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);
+    }
+
+    public void testInputStreaming() {
+
+        OutputChannel<Object> result = JRoutine.on(contextFrom(getActivity()))
+                                               .with(PassingContextInvocation.factoryOf())
+                                               .asyncInvoke()
+                                               .after(seconds(2))
+                                               .pass("test")
+                                               .result();
+
+        try {
+
+            result.eventually().next();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+
+        final TransportChannel<Object> transportChannel = JRoutine.transport().buildChannel();
+        result = JRoutine.on(contextFrom(getActivity()))
+                         .with(PassingContextInvocation.factoryOf())
+                         .asyncInvoke()
+                         .after(seconds(2))
+                         .pass(transportChannel)
+                         .result();
+
+        try {
+
+            result.eventually().next();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
     }
 
     public void testInvocations() {

@@ -22,15 +22,23 @@ import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.channel.DeadlockException;
+import com.github.dm.jrt.channel.InputChannel;
+import com.github.dm.jrt.channel.InvocationChannel;
+import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
+import com.github.dm.jrt.util.TimeDuration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -90,6 +98,20 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         mLoaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mOrderType = invocationConfiguration.getOutputOrderTypeOr(null);
         getLogger().dbg("building context routine with configuration: %s", loaderConfiguration);
+    }
+
+    @Nonnull
+    @Override
+    public InvocationChannel<IN, OUT> asyncInvoke() {
+
+        return new InvocationChannelDecorator<IN, OUT>(super.asyncInvoke());
+    }
+
+    @Nonnull
+    @Override
+    public InvocationChannel<IN, OUT> parallelInvoke() {
+
+        return new InvocationChannelDecorator<IN, OUT>(super.parallelInvoke());
     }
 
     @Override
@@ -219,6 +241,286 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             final PurgeInputsExecution<IN> execution =
                     new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    /**
+     * Decorator of invocation channels used to detect deadlocks.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class InvocationChannelDecorator<IN, OUT> implements InvocationChannel<IN, OUT> {
+
+        private final InvocationChannel<IN, OUT> mChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped channel.
+         */
+        private InvocationChannelDecorator(@Nonnull final InvocationChannel<IN, OUT> wrapped) {
+
+            mChannel = wrapped;
+        }
+
+        public boolean abort() {
+
+            return mChannel.abort();
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> after(@Nonnull final TimeDuration delay) {
+
+            mChannel.after(delay);
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> after(final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mChannel.after(delay, timeUnit);
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> now() {
+
+            mChannel.now();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> orderByCall() {
+
+            mChannel.orderByCall();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> orderByChance() {
+
+            mChannel.orderByChance();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> orderByDelay() {
+
+            mChannel.orderByDelay();
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> pass(
+                @Nullable final OutputChannel<? extends IN> channel) {
+
+            mChannel.pass(channel);
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
+
+            mChannel.pass(inputs);
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> pass(@Nullable final IN input) {
+
+            mChannel.pass(input);
+            return this;
+        }
+
+        @Nonnull
+        public InvocationChannel<IN, OUT> pass(@Nullable final IN... inputs) {
+
+            mChannel.pass(inputs);
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> result() {
+
+            return new OutputChannelDecorator<OUT>(mChannel);
+        }
+
+        public boolean hasPendingInputs() {
+
+            return mChannel.hasPendingInputs();
+        }
+
+        public boolean abort(@Nullable final Throwable reason) {
+
+            return mChannel.abort(reason);
+        }
+
+        public boolean isOpen() {
+
+            return mChannel.isOpen();
+        }
+    }
+
+    /**
+     * Decorator of invocation channels used to detect deadlocks.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class OutputChannelDecorator<OUT> implements OutputChannel<OUT> {
+
+        private final InvocationChannel<?, OUT> mInputChannel;
+
+        private final OutputChannel<OUT> mOutputChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param channel the invocation channel.
+         */
+        private OutputChannelDecorator(@Nonnull final InvocationChannel<?, OUT> channel) {
+
+            mInputChannel = channel;
+            mOutputChannel = channel.result();
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> afterMax(@Nonnull final TimeDuration timeout) {
+
+            if (!timeout.isZero() && mInputChannel.hasPendingInputs()) {
+
+                throw new DeadlockException(
+                        "cannot wait for outputs when inputs are still pending");
+            }
+
+            mOutputChannel.afterMax(timeout);
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
+
+            if ((timeout > 0) && mInputChannel.hasPendingInputs()) {
+
+                throw new DeadlockException(
+                        "cannot wait for outputs when inputs are still pending");
+            }
+
+            mOutputChannel.afterMax(timeout, timeUnit);
+            return this;
+        }
+
+        @Nonnull
+        public List<OUT> all() {
+
+            return mOutputChannel.all();
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> allInto(@Nonnull final Collection<? super OUT> results) {
+
+            mOutputChannel.allInto(results);
+            return this;
+        }
+
+        public boolean checkComplete() {
+
+            return mOutputChannel.checkComplete();
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> eventually() {
+
+            if (mInputChannel.hasPendingInputs()) {
+
+                throw new DeadlockException(
+                        "cannot wait for outputs when inputs are still pending");
+            }
+
+            mOutputChannel.eventually();
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> eventuallyAbort() {
+
+            mOutputChannel.eventuallyAbort();
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> eventuallyExit() {
+
+            mOutputChannel.eventuallyExit();
+            return this;
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> eventuallyThrow() {
+
+            mOutputChannel.eventuallyThrow();
+            return this;
+        }
+
+        public boolean hasNext() {
+
+            return mOutputChannel.hasNext();
+        }
+
+        public OUT next() {
+
+            return mOutputChannel.next();
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> immediately() {
+
+            mOutputChannel.immediately();
+            return this;
+        }
+
+        public boolean isBound() {
+
+            return mOutputChannel.isBound();
+        }
+
+        @Nonnull
+        public <IN extends InputChannel<? super OUT>> IN passTo(@Nonnull final IN channel) {
+
+            return mOutputChannel.passTo(channel);
+        }
+
+        @Nonnull
+        public OutputChannel<OUT> passTo(@Nonnull final OutputConsumer<? super OUT> consumer) {
+
+            mOutputChannel.passTo(consumer);
+            return this;
+        }
+
+        public Iterator<OUT> iterator() {
+
+            return mOutputChannel.iterator();
+        }
+
+        public void remove() {
+
+            mOutputChannel.remove();
+        }
+
+        public boolean abort() {
+
+            return mOutputChannel.abort();
+        }
+
+        public boolean abort(@Nullable final Throwable reason) {
+
+            return mOutputChannel.abort(reason);
+        }
+
+        public boolean isOpen() {
+
+            return mOutputChannel.isOpen();
         }
     }
 

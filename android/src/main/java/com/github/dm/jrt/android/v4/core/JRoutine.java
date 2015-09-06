@@ -73,7 +73,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             } else {
  *
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutine.on(contextFrom(this), factoryOf(LoadResource.class))
+ *                         JRoutine.on(contextFrom(this))
+ *                                 .with(factoryOf(LoadResource.class))
  *                                 .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
  *                        .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -117,8 +118,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             public void onContext(&#64;Nonnull final Context context) {
  *
  *                 super.onContext(context);
- *                 mRoutine =
- *                      JRoutine.on(serviceFrom(context), targetInvocation(LoadResourceUri.class))
+ *                 mRoutine = JRoutine.on(serviceFrom(context))
+ *                                    .with(targetFactory(LoadResourceUri.class))
  *                                    .buildRoutine();
  *             }
  *
@@ -139,66 +140,99 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
 
     /**
-     * Returns a builder of an output channel bound to the loader identified by the ID specified in
-     * the loader configuration.<br/>
-     * If no invocation with the specified ID is running at the time of the channel creation, the
-     * output will be aborted with a
-     * {@link com.github.dm.jrt.android.invocation.MissingInvocationException
-     * MissingInvocationException}.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
+     * Returns a context based builder of loader routine builders.
      *
-     * @param context the routine context.
-     * @return the channel builder instance.
+     * @param context the service context.
+     * @return the context builder.
      */
     @Nonnull
-    public static LoaderChannelBuilder on(@Nonnull final LoaderContext context) {
+    public static ContextBuilder on(@Nonnull final LoaderContext context) {
 
-        return new DefaultLoaderChannelBuilder(context);
+        return new ContextBuilder(context);
     }
 
     /**
-     * Returns a builder of routines bound to the specified context.<br/>
-     * In order to prevent undesired leaks, the class of the specified factory must be static, and
-     * should never be a platform component (like Activity, Fragment, etc.).<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param context the routine context.
-     * @param factory the invocation factory.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
-     *                                            static.
+     * Context based builder of loader routine builders.
      */
-    @Nonnull
-    public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
+    public static class ContextBuilder {
 
-        return new DefaultLoaderRoutineBuilder<IN, OUT>(context, factory);
-    }
+        private final LoaderContext mContext;
 
-    /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified target
-     * object.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.builder.FactoryContext FactoryContext} as the application
-     * context.<br/>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param context the routine context.
-     * @param target  the invocation target.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static LoaderObjectRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationTarget target) {
+        /**
+         * Constructor.
+         *
+         * @param context the loader context.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private ContextBuilder(@Nonnull final LoaderContext context) {
 
-        return new DefaultLoaderObjectRoutineBuilder(context, target);
+            if (context == null) {
+
+                throw new NullPointerException("the context must not be null");
+            }
+
+            mContext = context;
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context.<br/>
+         * In order to prevent undesired leaks, the class of the specified factory must be static,
+         * and should never be a platform component (like Activity, Fragment, etc.).<br/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param factory the invocation factory.
+         * @param <IN>    the input data type.
+         * @param <OUT>   the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+         *                                            static.
+         */
+        @Nonnull
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
+                @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
+
+            return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified
+         * target object.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.builder.FactoryContext FactoryContext} as the
+         * application context.<br/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param target the invocation target.
+         * @return the routine builder instance.
+         */
+        @Nonnull
+        public LoaderObjectRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+
+            return new DefaultLoaderObjectRoutineBuilder(mContext, target);
+        }
+
+        /**
+         * Returns a builder of an output channel bound to the loader identified by the specified
+         * ID.<br/>
+         * If no invocation with the specified ID is running at the time of the channel creation,
+         * the output will be aborted with a
+         * {@link com.github.dm.jrt.android.invocation.MissingInvocationException
+         * MissingInvocationException}.<br/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param loaderId the loader ID.
+         * @return the channel builder instance.
+         */
+        @Nonnull
+        public LoaderChannelBuilder withId(final int loaderId) {
+
+            return new DefaultLoaderChannelBuilder(mContext).loaders().withId(loaderId).set();
+        }
     }
 }

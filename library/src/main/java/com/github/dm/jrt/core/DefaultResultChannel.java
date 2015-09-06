@@ -336,6 +336,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
+    public boolean hasPendingInputs() {
+
+        synchronized (mMutex) {
+
+            return (mPendingOutputCount > 0);
+        }
+    }
+
     /**
      * Aborts immediately the execution.
      *
@@ -373,6 +381,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
             mBoundChannels.clear();
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
+            mPendingOutputCount = 0;
 
             if (mAbortException == null) {
 
@@ -580,6 +589,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
         }
+    }
+
+    private void internalAbort(@Nullable final RoutineException abortException) {
+
+        mOutputQueue.clear();
+        mPendingOutputCount = 0;
+        mAbortException = abortException;
+        mState = new ExceptionChannelState();
     }
 
     private boolean isNextAvailable(@Nonnull final TimeDuration timeout,
@@ -870,9 +887,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
             mSubLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
-            mOutputQueue.clear();
-            mAbortException = abortException;
-            mState = new ExceptionChannelState();
+            internalAbort(abortException);
             return abortException;
         }
 
@@ -1751,9 +1766,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
             mSubLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
-            mOutputQueue.clear();
-            mAbortException = abortException;
-            mState = new ExceptionChannelState();
+            internalAbort(abortException);
             return abortException;
         }
 
@@ -1773,9 +1786,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             if (delay.isZero()) {
 
                 mSubLogger.dbg(reason, "aborting channel");
-                mOutputQueue.clear();
-                mAbortException = abortException;
-                mState = new ExceptionChannelState();
+                internalAbort(abortException);
             }
 
             return abortException;
@@ -1792,9 +1803,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
             mSubLogger.dbg(reason, "aborting output");
-            mOutputQueue.clear();
-            mAbortException = abortException;
-            mState = new ExceptionChannelState();
+            internalAbort(abortException);
             return abortException;
         }
 
@@ -1867,9 +1876,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         RoutineException delayedAbortInvocation(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg(reason, "aborting channel");
-            mOutputQueue.clear();
-            mAbortException = reason;
-            mState = new ExceptionChannelState();
+            internalAbort(reason);
             return reason;
         }
 
@@ -1959,9 +1966,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean onConsumerError(@Nullable final RoutineException error) {
 
             mSubLogger.dbg(error, "aborting output");
-            mOutputQueue.clear();
-            mAbortException = error;
-            mState = new ExceptionChannelState();
+            internalAbort(error);
             return true;
         }
 

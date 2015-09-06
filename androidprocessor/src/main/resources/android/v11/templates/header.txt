@@ -43,11 +43,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.v11.core.LoaderContext context,
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+    public static ContextBuilder on(@javax.annotation.Nonnull final com.github.dm.jrt.android.v11.core.LoaderContext context) {
 
-        return new LoaderProxyBuilder${genericTypes}(context, target);
+        return new ContextBuilder(context);
     }
 
     @javax.annotation.Nonnull
@@ -55,7 +53,30 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             @javax.annotation.Nonnull final com.github.dm.jrt.android.v11.core.LoaderContext context,
             @javax.annotation.Nonnull final com.github.dm.jrt.android.invocation.ContextInvocationFactory<Object, OUT> factory) {
 
-        return com.github.dm.jrt.android.v11.core.JRoutine.on(context, factory);
+        return com.github.dm.jrt.android.v11.core.JRoutine.on(context).with(factory);
+    }
+
+    public static class ContextBuilder {
+
+        private final com.github.dm.jrt.android.v11.core.LoaderContext mContext;
+
+        @SuppressWarnings("ConstantConditions")
+        private ContextBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.android.v11.core.LoaderContext context) {
+
+            if (context == null) {
+
+                throw new NullPointerException("the context must not be null");
+            }
+
+            mContext = context;
+        }
+
+        @javax.annotation.Nonnull
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> with(
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+
+            return new LoaderProxyBuilder${genericTypes}(mContext, target);
+        }
     }
 
     private static class LoaderProxyBuilder${genericTypes} extends com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyBuilder<${interfaceFullName}> {

@@ -62,22 +62,56 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
     }
 
     /**
-     * Returns a builder of routines bound to the specified context, wrapping the specified target
-     * object.<br/>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br/>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.builder.FactoryContext FactoryContext} as the application
-     * context.
+     * Returns a context based builder of loader proxy routine builders.
      *
-     * @param context the routine context.
-     * @param target  the invocation target.
-     * @return the routine builder instance.
+     * @param context the service context.
+     * @return the context builder.
      */
     @Nonnull
-    public static LoaderProxyRoutineBuilder on(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationTarget target) {
+    public static ContextBuilder on(@Nonnull final LoaderContext context) {
 
-        return new DefaultLoaderProxyRoutineBuilder(context, target);
+        return new ContextBuilder(context);
+    }
+
+    /**
+     * Context based builder of loader proxy routine builders.
+     */
+    public static class ContextBuilder {
+
+        private final LoaderContext mContext;
+
+        /**
+         * Constructor.
+         *
+         * @param context the loader context.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private ContextBuilder(@Nonnull final LoaderContext context) {
+
+            if (context == null) {
+
+                throw new NullPointerException("the context must not be null");
+            }
+
+            mContext = context;
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified target
+         * object.<br/>
+         * Note that it is responsibility of the caller to retain a strong reference to the target
+         * instance to prevent it from being garbage collected.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.builder.FactoryContext FactoryContext} as the
+         * application context.
+         *
+         * @param target the invocation target.
+         * @return the routine builder instance.
+         */
+        @Nonnull
+        public LoaderProxyRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+
+            return new DefaultLoaderProxyRoutineBuilder(mContext, target);
+        }
     }
 }

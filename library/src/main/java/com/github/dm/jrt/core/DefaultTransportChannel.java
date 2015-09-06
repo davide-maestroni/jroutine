@@ -266,6 +266,11 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mOutputChannel.passTo(channel);
     }
 
+    public boolean hasPendingInputs() {
+
+        return mInputChannel.hasPendingInputs();
+    }
+
     public Iterator<DATA> iterator() {
 
         return mOutputChannel.iterator();

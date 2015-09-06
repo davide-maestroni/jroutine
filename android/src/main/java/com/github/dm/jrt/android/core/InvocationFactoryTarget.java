@@ -53,10 +53,10 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @Nonnull
-    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetInvocation(
+    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetFactory(
             @Nonnull final Class<? extends ContextInvocation<IN, OUT>> targetClass) {
 
-        return targetInvocation(targetClass, (Object[]) null);
+        return targetFactory(targetClass, (Object[]) null);
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @Nonnull
-    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetInvocation(
+    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetFactory(
             @Nonnull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
             @Nullable final Object... factoryArgs) {
 
@@ -85,10 +85,10 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @Nonnull
-    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetInvocation(
+    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetFactory(
             @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken) {
 
-        return targetInvocation(targetToken.getRawClass());
+        return targetFactory(targetToken.getRawClass());
     }
 
     /**
@@ -101,11 +101,11 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @Nonnull
-    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetInvocation(
+    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetFactory(
             @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken,
             @Nullable final Object... factoryArgs) {
 
-        return targetInvocation(targetToken.getRawClass(), factoryArgs);
+        return targetFactory(targetToken.getRawClass(), factoryArgs);
     }
 
     /**
@@ -117,10 +117,10 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @Nonnull
-    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetInvocation(
+    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetFactory(
             @Nonnull final ContextInvocation<IN, OUT> targetInvocation) {
 
-        return targetInvocation(tokenOf(targetInvocation));
+        return targetFactory(tokenOf(targetInvocation));
     }
 
     /**
@@ -133,11 +133,11 @@ public abstract class InvocationFactoryTarget<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @Nonnull
-    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetInvocation(
+    public static <IN, OUT> InvocationFactoryTarget<IN, OUT> targetFactory(
             @Nonnull final ContextInvocation<IN, OUT> targetInvocation,
             @Nullable final Object... factoryArgs) {
 
-        return targetInvocation(tokenOf(targetInvocation), factoryArgs);
+        return targetFactory(tokenOf(targetInvocation), factoryArgs);
     }
 
     @Nonnull

@@ -524,6 +524,43 @@ public class TransportChannelTest {
     }
 
     @Test
+    public void testPendingInputs() throws InterruptedException {
+
+        final TransportChannel<Object> channel = JRoutine.transport().buildChannel();
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.hasPendingInputs()).isFalse();
+        channel.pass("test");
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.hasPendingInputs()).isFalse();
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.hasPendingInputs()).isTrue();
+        channel.close();
+        assertThat(channel.isOpen()).isFalse();
+        assertThat(channel.hasPendingInputs()).isTrue();
+        seconds(1).sleepAtLeast();
+        assertThat(channel.isOpen()).isFalse();
+        assertThat(channel.hasPendingInputs()).isFalse();
+    }
+
+    @Test
+    public void testPendingInputsAbort() throws InterruptedException {
+
+        final TransportChannel<Object> channel = JRoutine.transport().buildChannel();
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.hasPendingInputs()).isFalse();
+        channel.pass("test");
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.hasPendingInputs()).isFalse();
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.hasPendingInputs()).isTrue();
+        channel.now().abort();
+        assertThat(channel.isOpen()).isFalse();
+        assertThat(channel.hasPendingInputs()).isFalse();
+    }
+
+    @Test
     public void testReadFirst() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);

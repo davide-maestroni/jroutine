@@ -56,8 +56,8 @@ public class LoaderRoutineRotationTest
         }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine = JRoutine.on(contextFrom(getActivity()))
-                                                        .with(factoryOf(ToUpperCase.class))
+        final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
+                                                        .on(factoryOf(ToUpperCase.class))
                                                         .loaders()
                                                         .withId(0)
                                                         .withClashResolution(
@@ -81,8 +81,8 @@ public class LoaderRoutineRotationTest
         }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        JRoutine.on(contextFrom(getActivity()))
-                .with(factoryOf(ToUpperCase.class))
+        JRoutine.with(contextFrom(getActivity()))
+                .on(factoryOf(ToUpperCase.class))
                 .invocations()
                 .withOutputOrder(OrderType.BY_CALL)
                 .set()
@@ -94,7 +94,7 @@ public class LoaderRoutineRotationTest
         simulateRotation();
 
         final OutputChannel<String> channel =
-                JRoutine.on(contextFrom(getActivity())).withId(0).buildChannel();
+                JRoutine.with(contextFrom(getActivity())).onId(0).buildChannel();
 
         assertThat(channel.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
     }
@@ -107,16 +107,16 @@ public class LoaderRoutineRotationTest
         }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine1 = JRoutine.on(contextFrom(getActivity()))
-                                                         .with(factoryOf(ToUpperCase.class))
+        final Routine<String, String> routine1 = JRoutine.with(contextFrom(getActivity()))
+                                                         .on(factoryOf(ToUpperCase.class))
                                                          .buildRoutine();
         routine1.asyncCall("test1");
         routine1.asyncCall("test2");
 
         simulateRotation();
 
-        final Routine<String, String> routine2 = JRoutine.on(contextFrom(getActivity()))
-                                                         .with(factoryOf(ToUpperCase.class))
+        final Routine<String, String> routine2 = JRoutine.with(contextFrom(getActivity()))
+                                                         .on(factoryOf(ToUpperCase.class))
                                                          .buildRoutine();
         final OutputChannel<String> result1 = routine2.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine2.asyncCall("test2").afterMax(timeout);
@@ -135,14 +135,14 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine1 =
-                JRoutine.on(contextFrom(getActivity())).with(factoryOf(Delay.class)).buildRoutine();
+                JRoutine.with(contextFrom(getActivity())).on(factoryOf(Delay.class)).buildRoutine();
         routine1.asyncCall(data1);
         routine1.asyncCall(data1);
 
         simulateRotation();
 
         final Routine<Data, Data> routine2 =
-                JRoutine.on(contextFrom(getActivity())).with(factoryOf(Delay.class)).buildRoutine();
+                JRoutine.with(contextFrom(getActivity())).on(factoryOf(Delay.class)).buildRoutine();
         final OutputChannel<Data> result1 = routine2.asyncCall(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine2.asyncCall(data1).afterMax(timeout);
 
@@ -158,8 +158,8 @@ public class LoaderRoutineRotationTest
         }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine = JRoutine.on(contextFrom(getActivity()))
-                                                        .with(factoryOf(ToUpperCase.class))
+        final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
+                                                        .on(factoryOf(ToUpperCase.class))
                                                         .loaders()
                                                         .withId(0)
                                                         .withClashResolution(

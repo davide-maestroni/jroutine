@@ -170,8 +170,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 loaderConfigurationWithAnnotations(mLoaderConfiguration, targetMethod);
-        return JRoutine.on(mContext)
-                       .with(factory)
+        return JRoutine.with(mContext)
+                       .on(factory)
                        .invocations()
                        .with(invocationConfiguration)
                        .set()
@@ -221,8 +221,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mInvocationConfiguration, method);
         final LoaderConfiguration loaderConfiguration =
                 loaderConfigurationWithAnnotations(mLoaderConfiguration, method);
-        return JRoutine.on(mContext)
-                       .with(factory)
+        return JRoutine.with(mContext)
+                       .on(factory)
                        .invocations()
                        .with(invocationConfiguration)
                        .set()
@@ -692,8 +692,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(targetMethod, proxyConfiguration, target, inputMode,
                                                outputMode);
-            final LoaderRoutine<Object, Object> routine = JRoutine.on(mContext)
-                                                                  .with(factory)
+            final LoaderRoutine<Object, Object> routine = JRoutine.with(mContext)
+                                                                  .on(factory)
                                                                   .invocations()
                                                                   .with(invocationConfiguration)
                                                                   .set()

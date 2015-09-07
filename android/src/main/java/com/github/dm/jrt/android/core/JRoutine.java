@@ -57,8 +57,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             setContentView(R.layout.my_activity_layout);
  *
  *             final Routine&lt;URI, MyResource&gt; routine =
- *                     JRoutine.on(serviceFrom(this))
- *                             .with(targetFactory(LoadResourceUri.class))
+ *                     JRoutine.with(serviceFrom(this))
+ *                             .on(targetFactory(LoadResourceUri.class))
  *                             .buildRoutine();
  *             routine.asyncCall(RESOURCE_URI)
  *                    .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -92,7 +92,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
      * @return the context builder.
      */
     @Nonnull
-    public static ContextBuilder on(@Nonnull final ServiceContext context) {
+    public static ContextBuilder with(@Nonnull final ServiceContext context) {
 
         return new ContextBuilder(context);
     }
@@ -136,7 +136,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @return the routine builder instance.
          */
         @Nonnull
-        public ServiceObjectRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+        public ServiceObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
 
             return new DefaultServiceObjectRoutineBuilder(mContext, target);
         }
@@ -158,7 +158,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @return the routine builder instance.
          */
         @Nonnull
-        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
+        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(
                 @Nonnull final InvocationFactoryTarget<IN, OUT> target) {
 
             return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);

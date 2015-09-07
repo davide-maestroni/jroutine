@@ -336,7 +336,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    public boolean hasPendingInputs() {
+    public boolean hasDelays() {
 
         synchronized (mMutex) {
 
@@ -1339,6 +1339,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return false;
         }
 
+        public boolean isEmpty() {
+
+            synchronized (mMutex) {
+
+                return mOutputQueue.isEmpty();
+            }
+        }
+
         public boolean isOpen() {
 
             synchronized (mMutex) {
@@ -2338,6 +2346,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         return false;
+    }
+
+    public boolean isEmpty() {
+
+        synchronized (mMutex) {
+
+            return mOutputQueue.isEmpty();
+        }
     }
 
     public boolean isOpen() {

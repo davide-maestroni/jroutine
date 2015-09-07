@@ -277,9 +277,9 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
         final LoaderProxyBuilder<TestProxy> builder =
-                com.github.dm.jrt.android.proxy.V11Proxy_TestFragment.on(contextFrom(fragment))
-                                                                    .with(targetObject(
-                                                                                  TestClass.class));
+                com.github.dm.jrt.android.proxy.V11Proxy_TestFragment.with(contextFrom(fragment))
+                                                                     .on(targetObject(
+                                                                             TestClass.class));
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);

@@ -269,6 +269,29 @@ public class TransportChannelTest {
     }
 
     @Test
+    public void testEmpty() {
+
+        final TransportChannel<Object> transportChannel = JRoutine.transport().buildChannel();
+        assertThat(transportChannel.isEmpty()).isTrue();
+        assertThat(transportChannel.pass("test").isEmpty()).isFalse();
+        transportChannel.next();
+        assertThat(transportChannel.isEmpty()).isTrue();
+        assertThat(transportChannel.after(millis(100)).pass("test").isEmpty()).isTrue();
+        assertThat(transportChannel.close().eventually().checkComplete()).isTrue();
+        assertThat(transportChannel.isEmpty()).isFalse();
+    }
+
+    @Test
+    public void testEmptyAbort() {
+
+        final TransportChannel<Object> transportChannel = JRoutine.transport().buildChannel();
+        assertThat(transportChannel.isEmpty()).isTrue();
+        assertThat(transportChannel.pass("test").isEmpty()).isFalse();
+        assertThat(transportChannel.abort()).isTrue();
+        assertThat(transportChannel.isEmpty()).isFalse();
+    }
+
+    @Test
     public void testHasNextIteratorTimeout() {
 
         final TransportChannel<String> transportChannel = JRoutine.transport().buildChannel();
@@ -528,19 +551,19 @@ public class TransportChannelTest {
 
         final TransportChannel<Object> channel = JRoutine.transport().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         seconds(1).sleepAtLeast();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -548,16 +571,16 @@ public class TransportChannelTest {
 
         final TransportChannel<Object> channel = JRoutine.transport().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test

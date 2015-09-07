@@ -73,8 +73,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             } else {
  *
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutine.on(contextFrom(this))
- *                                 .with(factoryOf(LoadResource.class))
+ *                         JRoutine.with(contextFrom(this))
+ *                                 .on(factoryOf(LoadResource.class))
  *                                 .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
  *                        .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -118,8 +118,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             public void onContext(&#64;Nonnull final Context context) {
  *
  *                 super.onContext(context);
- *                 mRoutine = JRoutine.on(serviceFrom(context))
- *                                    .with(targetFactory(LoadResourceUri.class))
+ *                 mRoutine = JRoutine.with(serviceFrom(context))
+ *                                    .on(targetFactory(LoadResourceUri.class))
  *                                    .buildRoutine();
  *             }
  *
@@ -150,7 +150,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
      * @return the context builder.
      */
     @Nonnull
-    public static ContextBuilder on(@Nonnull final LoaderContext context) {
+    public static ContextBuilder with(@Nonnull final LoaderContext context) {
 
         return new ContextBuilder(context);
     }
@@ -194,7 +194,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          *                                            static.
          */
         @Nonnull
-        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
 
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
@@ -214,14 +214,14 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @return the routine builder instance.
          */
         @Nonnull
-        public LoaderObjectRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+        public LoaderObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
 
             return new DefaultLoaderObjectRoutineBuilder(mContext, target);
         }
 
         /**
-         * Returns a builder of an output channel bound to the loader identified by the specified
-         * ID.<br/>
+         * Returns a builder of output channels bound to the loader identified by the specified ID.
+         * <br/>
          * If no invocation with the specified ID is running at the time of the channel creation,
          * the output will be aborted with a
          * {@link com.github.dm.jrt.android.invocation.MissingInvocationException
@@ -234,7 +234,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @return the channel builder instance.
          */
         @Nonnull
-        public LoaderChannelBuilder withId(final int loaderId) {
+        public LoaderChannelBuilder onId(final int loaderId) {
 
             return new DefaultLoaderChannelBuilder(mContext).loaders().withId(loaderId).set();
         }

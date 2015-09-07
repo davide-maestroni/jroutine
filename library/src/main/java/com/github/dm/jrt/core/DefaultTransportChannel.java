@@ -77,6 +77,11 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mInputChannel.abort(reason) || mOutputChannel.abort(reason);
     }
 
+    public boolean isEmpty() {
+
+        return mInputChannel.isEmpty();
+    }
+
     public boolean isOpen() {
 
         return mInputChannel.isOpen();
@@ -266,9 +271,9 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mOutputChannel.passTo(channel);
     }
 
-    public boolean hasPendingInputs() {
+    public boolean hasDelays() {
 
-        return mInputChannel.hasPendingInputs();
+        return mInputChannel.hasDelays();
     }
 
     public Iterator<DATA> iterator() {

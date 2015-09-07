@@ -176,6 +176,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         return false;
     }
 
+    public boolean isEmpty() {
+
+        synchronized (mMutex) {
+
+            return mInputQueue.isEmpty();
+        }
+    }
+
     public boolean isOpen() {
 
         synchronized (mMutex) {
@@ -341,12 +349,20 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         return result;
     }
 
-    public boolean hasPendingInputs() {
+    public boolean hasDelays() {
 
         synchronized (mMutex) {
 
             return (mPendingInputCount > 0);
         }
+    }
+
+    private void internalAbort(@Nullable final RoutineException abortException) {
+
+        mInputQueue.clear();
+        mPendingInputCount = 0;
+        mAbortException = abortException;
+        mRunner.cancel(mExecution);
     }
 
     private void waitInputs(final int count) {
@@ -862,10 +878,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             if (mInputDelay.isZero()) {
 
                 mSubLogger.dbg(reason, "aborting channel");
-                mPendingInputCount = 0;
-                mAbortException = abortException;
+                internalAbort(abortException);
                 mState = new AbortedChannelState();
-                mRunner.cancel(mExecution);
                 return mExecution.abort();
             }
 
@@ -899,10 +913,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg(reason, "aborting channel");
-            mPendingInputCount = 0;
-            mAbortException = reason;
+            internalAbort(reason);
             mState = new AbortedChannelState();
-            mRunner.cancel(mExecution);
             return mExecution.abort();
         }
 
@@ -1062,10 +1074,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution onHandlerAbort(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg("aborting result channel");
-            mPendingInputCount = 0;
-            mAbortException = reason;
+            internalAbort(reason);
             mState = new ExceptionChannelState();
-            mRunner.cancel(mExecution);
             return mExecution.abort();
         }
 

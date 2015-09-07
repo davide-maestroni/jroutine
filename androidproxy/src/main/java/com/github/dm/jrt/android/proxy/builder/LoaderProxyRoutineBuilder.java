@@ -57,7 +57,7 @@ public interface LoaderProxyRoutineBuilder
      * {@link com.github.dm.jrt.android.proxy.annotation.V11Proxy V11Proxy}. The generated class
      * name and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *
@@ -93,7 +93,7 @@ public interface LoaderProxyRoutineBuilder
      * {@link com.github.dm.jrt.android.proxy.annotation.V11Proxy V11Proxy}. The generated class
      * name and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *

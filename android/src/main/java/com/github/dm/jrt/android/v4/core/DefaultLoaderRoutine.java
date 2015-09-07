@@ -347,14 +347,19 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return new OutputChannelDecorator<OUT>(mChannel);
         }
 
-        public boolean hasPendingInputs() {
+        public boolean hasDelays() {
 
-            return mChannel.hasPendingInputs();
+            return mChannel.hasDelays();
         }
 
         public boolean abort(@Nullable final Throwable reason) {
 
             return mChannel.abort(reason);
+        }
+
+        public boolean isEmpty() {
+
+            return mChannel.isEmpty();
         }
 
         public boolean isOpen() {
@@ -388,7 +393,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         @Nonnull
         public OutputChannel<OUT> afterMax(@Nonnull final TimeDuration timeout) {
 
-            if (!timeout.isZero() && mInputChannel.hasPendingInputs()) {
+            if (!timeout.isZero() && mInputChannel.hasDelays()) {
 
                 throw new DeadlockException(
                         "cannot wait for outputs when inputs are still pending");
@@ -401,7 +406,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         @Nonnull
         public OutputChannel<OUT> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
-            if ((timeout > 0) && mInputChannel.hasPendingInputs()) {
+            if ((timeout > 0) && mInputChannel.hasDelays()) {
 
                 throw new DeadlockException(
                         "cannot wait for outputs when inputs are still pending");
@@ -432,7 +437,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         @Nonnull
         public OutputChannel<OUT> eventually() {
 
-            if (mInputChannel.hasPendingInputs()) {
+            if (mInputChannel.hasDelays()) {
 
                 throw new DeadlockException(
                         "cannot wait for outputs when inputs are still pending");
@@ -516,6 +521,11 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         public boolean abort(@Nullable final Throwable reason) {
 
             return mOutputChannel.abort(reason);
+        }
+
+        public boolean isEmpty() {
+
+            return mOutputChannel.isEmpty();
         }
 
         public boolean isOpen() {

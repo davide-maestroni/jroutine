@@ -263,6 +263,11 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             return mTransportInput.abort(reason);
         }
 
+        public boolean isEmpty() {
+
+            return mTransportInput.isEmpty();
+        }
+
         public boolean isOpen() {
 
             return mTransportInput.isOpen();
@@ -352,9 +357,9 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             return mTransportOutput;
         }
 
-        public boolean hasPendingInputs() {
+        public boolean hasDelays() {
 
-            return mTransportInput.hasPendingInputs();
+            return mTransportInput.hasDelays();
         }
 
         private void bindService() {

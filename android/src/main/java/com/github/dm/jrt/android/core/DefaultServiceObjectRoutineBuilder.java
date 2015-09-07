@@ -169,9 +169,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name};
-        return JRoutine.on(mContext)
-                       .with(InvocationFactoryTarget.targetFactory(new MethodAliasToken<IN, OUT>(),
-                                                                   args))
+        return JRoutine.with(mContext)
+                       .on(InvocationFactoryTarget.targetFactory(new MethodAliasToken<IN, OUT>(),
+                                                                 args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
                        .set()
@@ -209,8 +209,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name, toNames(parameterTypes)};
-        return JRoutine.on(mContext)
-                       .with(InvocationFactoryTarget.targetFactory(
+        return JRoutine.with(mContext)
+                       .on(InvocationFactoryTarget.targetFactory(
                                new MethodSignatureToken<IN, OUT>(), args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
@@ -592,8 +592,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     InvocationFactoryTarget.targetFactory(PROXY_TOKEN, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
-            final Routine<Object, Object> routine = JRoutine.on(mContext)
-                                                            .with(targetFactory)
+            final Routine<Object, Object> routine = JRoutine.with(mContext)
+                                                            .on(targetFactory)
                                                             .invocations()
                                                             .with(invocationConfiguration)
                                                             .set()

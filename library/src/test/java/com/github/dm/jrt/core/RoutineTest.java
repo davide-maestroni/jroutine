@@ -1081,6 +1081,48 @@ public class RoutineTest {
     }
 
     @Test
+    public void testEmpty() {
+
+        final InvocationChannel<Object, Object> channel =
+                JRoutine.on(new SleepInvocation(millis(500)))
+                        .invocations()
+                        .withInputMaxSize(1)
+                        .withInputTimeout(seconds(3))
+                        .set()
+                        .asyncInvoke();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
+        final OutputChannel<Object> result = channel.result();
+        assertThat(result.isEmpty()).isTrue();
+        assertThat(result.eventually().checkComplete()).isTrue();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(result.isEmpty()).isFalse();
+    }
+
+    @Test
+    public void testEmptyAbort() {
+
+        final Routine<Object, Object> routine = JRoutine.on(new SleepInvocation(millis(500)))
+                                                        .invocations()
+                                                        .withInputMaxSize(1)
+                                                        .withInputTimeout(seconds(3))
+                                                        .set()
+                                                        .buildRoutine();
+        InvocationChannel<Object, Object> channel = routine.asyncInvoke();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(channel.pass("test1").abort()).isTrue();
+        assertThat(channel.isEmpty()).isTrue();
+        channel = routine.asyncInvoke();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
+        final OutputChannel<Object> result = channel.result();
+        assertThat(result.isEmpty()).isTrue();
+        assertThat(result.abort()).isTrue();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(result.isEmpty()).isTrue();
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -1679,7 +1721,7 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() throws InterruptedException {
 
-        final Routine<Void, Void> routine = JRoutine.on(new SleepInvocation())
+        final Routine<Void, Void> routine = JRoutine.on(new SleepProcedure())
                                                     .invocations()
                                                     .withMaxInstances(1)
                                                     .set()
@@ -1958,19 +2000,19 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         channel.result();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         seconds(1).sleepAtLeast();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -1979,16 +2021,16 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -3637,7 +3679,31 @@ public class RoutineTest {
         }
     }
 
-    private static class SleepInvocation extends ProcedureInvocation<Void> {
+    private static class SleepInvocation extends FilterInvocation<Object, Object> {
+
+        private final TimeDuration mSleepDuration;
+
+        private SleepInvocation(@Nonnull final TimeDuration sleepDuration) {
+
+            mSleepDuration = sleepDuration;
+        }
+
+        public void onInput(final Object input, @Nonnull final ResultChannel<Object> result) {
+
+            try {
+
+                mSleepDuration.sleepAtLeast();
+
+            } catch (final InterruptedException e) {
+
+                throw new InvocationInterruptedException(e);
+            }
+
+            result.pass(input);
+        }
+    }
+
+    private static class SleepProcedure extends ProcedureInvocation<Void> {
 
         public void onResult(@Nonnull final ResultChannel<Void> result) {
 

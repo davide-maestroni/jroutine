@@ -59,8 +59,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         outputs.add(new ParcelableSelectable<Object>("test21", Sort.STRING));
         outputs.add(new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine = JRoutine
-                .on(serviceFrom(getActivity()))
-                .with(targetFactory(Sort.class))
+                .with(serviceFrom(getActivity()))
+                .on(targetFactory(Sort.class))
                 .buildRoutine();
         SparseArrayCompat<TransportChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
@@ -84,8 +84,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testInputMapAbort() {
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine = JRoutine
-                .on(serviceFrom(getActivity()))
-                .with(targetFactory(Sort.class))
+                .with(serviceFrom(getActivity()))
+                .on(targetFactory(Sort.class))
                 .buildRoutine();
         SparseArrayCompat<TransportChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
@@ -139,8 +139,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.mapParcelable(0, 0, JRoutine.on(serviceFrom(getActivity()))
-                                                 .with(targetFactory(Sort.class))
+            Channels.mapParcelable(0, 0, JRoutine.with(serviceFrom(getActivity()))
+                                                 .on(targetFactory(Sort.class))
                                                  .asyncInvoke());
 
             fail();

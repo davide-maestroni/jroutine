@@ -33,15 +33,15 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on() {
+    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> onClass() {
 
-        return new ProxyBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.targetClass(${classErasure}.class));
+        return new ProxyBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.classOfType(${classErasure}.class));
     }
 
     @javax.annotation.Nonnull
     public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
 
-        return new ProxyBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.targetObject(wrapped));
+        return new ProxyBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.instance(wrapped));
     }
 
     private static class ProxyBuilder${genericTypes} extends com.github.dm.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {

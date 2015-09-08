@@ -36,7 +36,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import static com.github.dm.jrt.android.core.InvocationFactoryTarget.targetFactory;
+import static com.github.dm.jrt.android.core.InvocationFactoryTarget.invocationOf;
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,7 +66,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         outputs.add(new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine = JRoutine
                 .with(serviceFrom(getActivity()))
-                .on(targetFactory(Sort.class))
+                .on(invocationOf(Sort.class))
                 .buildRoutine();
         SparseArray<TransportChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
@@ -96,7 +96,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine = JRoutine
                 .with(serviceFrom(getActivity()))
-                .on(targetFactory(Sort.class))
+                .on(invocationOf(Sort.class))
                 .buildRoutine();
         SparseArray<TransportChannel<Object>> channelMap;
         InvocationChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
@@ -156,7 +156,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         try {
 
             Channels.mapParcelable(0, 0, JRoutine.with(serviceFrom(getActivity()))
-                                                 .on(targetFactory(Sort.class))
+                                                 .on(invocationOf(Sort.class))
                                                  .asyncInvoke());
 
             fail();

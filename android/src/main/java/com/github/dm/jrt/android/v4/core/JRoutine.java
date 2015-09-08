@@ -119,7 +119,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  *                 super.onContext(context);
  *                 mRoutine = JRoutine.with(serviceFrom(context))
- *                                    .on(targetFactory(LoadResourceUri.class))
+ *                                    .on(invocationOf(LoadResourceUri.class))
  *                                    .buildRoutine();
  *             }
  *

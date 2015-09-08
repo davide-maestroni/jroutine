@@ -51,22 +51,9 @@ public abstract class ContextInvocationTarget implements Parcelable {
      * @return the context invocation target.
      */
     @Nonnull
-    public static ContextInvocationTarget targetClass(@Nonnull final Class<?> targetClass) {
+    public static ContextInvocationTarget classOfType(@Nonnull final Class<?> targetClass) {
 
         return new ClassContextInvocationTarget(targetClass);
-    }
-
-    /**
-     * Returns a target based on the specified instance.<br/>
-     * No argument will be passed to the object factory.
-     *
-     * @param targetClass the target class.
-     * @return the context invocation target.
-     */
-    @Nonnull
-    public static ContextInvocationTarget targetObject(@Nonnull final Class<?> targetClass) {
-
-        return targetObject(targetClass, (Object[]) null);
     }
 
     /**
@@ -77,10 +64,23 @@ public abstract class ContextInvocationTarget implements Parcelable {
      * @return the context invocation target.
      */
     @Nonnull
-    public static ContextInvocationTarget targetObject(@Nonnull final Class<?> targetClass,
+    public static ContextInvocationTarget instanceOf(@Nonnull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
 
         return new ObjectContextInvocationTarget(targetClass, factoryArgs);
+    }
+
+    /**
+     * Returns a target based on the specified instance.<br/>
+     * No argument will be passed to the object factory.
+     *
+     * @param targetClass the target class.
+     * @return the context invocation target.
+     */
+    @Nonnull
+    public static ContextInvocationTarget instanceOf(@Nonnull final Class<?> targetClass) {
+
+        return instanceOf(targetClass, (Object[]) null);
     }
 
     /**
@@ -172,7 +172,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
         @Override
         public InvocationTarget getInvocationTarget(@Nonnull final Context context) {
 
-            return InvocationTarget.targetClass(mTargetClass);
+            return InvocationTarget.classOfType(mTargetClass);
         }
 
         @Override
@@ -308,7 +308,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
                         target + " is not an instance of " + targetClass.getName());
             }
 
-            return InvocationTarget.targetObject(target);
+            return InvocationTarget.instance(target);
         }
 
         @Nonnull

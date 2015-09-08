@@ -68,7 +68,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
      * @return the context builder.
      */
     @Nonnull
-    public static ContextBuilder on(@Nonnull final LoaderContext context) {
+    public static ContextBuilder with(@Nonnull final LoaderContext context) {
 
         return new ContextBuilder(context);
     }
@@ -109,7 +109,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
          * @return the routine builder instance.
          */
         @Nonnull
-        public LoaderProxyRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+        public LoaderProxyRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
 
             return new DefaultLoaderProxyRoutineBuilder(mContext, target);
         }

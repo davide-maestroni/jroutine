@@ -72,10 +72,22 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @javax.annotation.Nonnull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(
-                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> onClass() {
 
-            return new LoaderProxyBuilder${genericTypes}(mContext, target);
+            return new LoaderProxyBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType(${classErasure}.class));
+        }
+
+        @javax.annotation.Nonnull
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final Class<? extends ${classFullName}> targetClass) {
+
+            return new LoaderProxyBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf(targetClass));
+        }
+
+        @javax.annotation.Nonnull
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final Class<? extends ${classFullName}> targetClass,
+                @javax.annotation.Nullable final Object... factoryArgs) {
+
+            return new LoaderProxyBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
         }
     }
 

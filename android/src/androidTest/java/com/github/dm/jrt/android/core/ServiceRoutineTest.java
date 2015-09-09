@@ -181,10 +181,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testDecorator() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 invocationOf(new PassingWrapper<String>());
         final Routine<String, String> routine = JRoutine.with(serviceFrom(getActivity()))
-                                                        .on(targetFactory)
+                                                        .on(targetInvocation)
                                                         .invocations()
                                                         .withInputOrder(OrderType.BY_CHANCE)
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -262,10 +262,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 invocationOf(StringPassingInvocation.class);
         final Routine<String, String> routine1 = JRoutine.with(serviceFrom(getActivity()))
-                                                         .on(targetFactory)
+                                                         .on(targetInvocation)
                                                          .invocations()
                                                          .withInputOrder(OrderType.BY_CHANCE)
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -312,10 +312,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations3() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 invocationOf(StringFunctionInvocation.class);
         final Routine<String, String> routine3 = JRoutine.with(serviceFrom(getActivity()))
-                                                         .on(targetFactory)
+                                                         .on(targetInvocation)
                                                          .invocations()
                                                          .withInputOrder(OrderType.BY_CALL)
                                                          .withOutputOrder(OrderType.BY_CALL)
@@ -335,10 +335,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations4() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
+        final InvocationFactoryTarget<String, String> targetInvocation =
                 invocationOf(StringFunctionInvocation.class);
         final Routine<String, String> routine4 = JRoutine.with(serviceFrom(getActivity()))
-                                                         .on(targetFactory)
+                                                         .on(targetInvocation)
                                                          .invocations()
                                                          .withCoreInstances(0)
                                                          .withMaxInstances(2)

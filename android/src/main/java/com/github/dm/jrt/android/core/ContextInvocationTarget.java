@@ -57,6 +57,19 @@ public abstract class ContextInvocationTarget implements Parcelable {
     }
 
     /**
+     * Returns a target based on the specified instance.<br/>
+     * No argument will be passed to the object factory.
+     *
+     * @param targetClass the target class.
+     * @return the context invocation target.
+     */
+    @Nonnull
+    public static ContextInvocationTarget instanceOf(@Nonnull final Class<?> targetClass) {
+
+        return instanceOf(targetClass, (Object[]) null);
+    }
+
+    /**
      * Returns a target based on the specified instance.
      *
      * @param targetClass the target class.
@@ -68,19 +81,6 @@ public abstract class ContextInvocationTarget implements Parcelable {
             @Nullable final Object... factoryArgs) {
 
         return new ObjectContextInvocationTarget(targetClass, factoryArgs);
-    }
-
-    /**
-     * Returns a target based on the specified instance.<br/>
-     * No argument will be passed to the object factory.
-     *
-     * @param targetClass the target class.
-     * @return the context invocation target.
-     */
-    @Nonnull
-    public static ContextInvocationTarget instanceOf(@Nonnull final Class<?> targetClass) {
-
-        return instanceOf(targetClass, (Object[]) null);
     }
 
     /**

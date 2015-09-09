@@ -41,6 +41,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.github.dm.jrt.android.core.InvocationFactoryTarget.invocationOf;
 import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
 import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
 import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
@@ -170,8 +171,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name};
         return JRoutine.with(mContext)
-                       .on(InvocationFactoryTarget.invocationOf(new MethodAliasToken<IN, OUT>(),
-                                                                args))
+                       .on(invocationOf(new MethodAliasToken<IN, OUT>(), args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
                        .set()
@@ -210,8 +210,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name, toNames(parameterTypes)};
         return JRoutine.with(mContext)
-                       .on(InvocationFactoryTarget.invocationOf(new MethodSignatureToken<IN, OUT>(),
-                                                                args))
+                       .on(invocationOf(new MethodSignatureToken<IN, OUT>(), args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
                        .set()
@@ -589,7 +588,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                                       toNames(targetParameterTypes), inputMode,
                                                       outputMode};
             final InvocationFactoryTarget<Object, Object> targetInvocation =
-                    InvocationFactoryTarget.invocationOf(PROXY_TOKEN, factoryArgs);
+                    invocationOf(PROXY_TOKEN, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
             final Routine<Object, Object> routine = JRoutine.with(mContext)

@@ -28,7 +28,7 @@ import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.runner.Runners;
-import com.github.dm.jrt.android.service.RoutineService;
+import com.github.dm.jrt.android.service.InvocationService;
 import com.github.dm.jrt.android.service.ServiceDisconnectedException;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -56,13 +56,13 @@ import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
-import static com.github.dm.jrt.android.service.RoutineService.getAbortError;
-import static com.github.dm.jrt.android.service.RoutineService.getValue;
-import static com.github.dm.jrt.android.service.RoutineService.putAsyncInvocation;
-import static com.github.dm.jrt.android.service.RoutineService.putError;
-import static com.github.dm.jrt.android.service.RoutineService.putInvocationId;
-import static com.github.dm.jrt.android.service.RoutineService.putParallelInvocation;
-import static com.github.dm.jrt.android.service.RoutineService.putValue;
+import static com.github.dm.jrt.android.service.InvocationService.getAbortError;
+import static com.github.dm.jrt.android.service.InvocationService.getValue;
+import static com.github.dm.jrt.android.service.InvocationService.putAsyncInvocation;
+import static com.github.dm.jrt.android.service.InvocationService.putError;
+import static com.github.dm.jrt.android.service.InvocationService.putInvocationId;
+import static com.github.dm.jrt.android.service.InvocationService.putParallelInvocation;
+import static com.github.dm.jrt.android.service.InvocationService.putValue;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -77,8 +77,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
     private final ServiceContext mContext;
 
-    private final InvocationFactoryTarget<IN, OUT> mFactoryTarget;
-
     private final InvocationConfiguration mInvocationConfiguration;
 
     private final Logger mLogger;
@@ -86,6 +84,8 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
     private final Routine<IN, OUT> mRoutine;
 
     private final ServiceConfiguration mServiceConfiguration;
+
+    private final TargetInvocationFactory<IN, OUT> mTargetFactory;
 
     /**
      * Constructor.
@@ -97,7 +97,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      */
     ServiceRoutine(@Nonnull final ServiceContext context,
-            @Nonnull final InvocationFactoryTarget<IN, OUT> target,
+            @Nonnull final TargetInvocationFactory<IN, OUT> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nonnull final ServiceConfiguration serviceConfiguration) {
 
@@ -109,7 +109,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         }
 
         mContext = context;
-        mFactoryTarget = target;
+        mTargetFactory = target;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
         mLogger = invocationConfiguration.newLogger(this);
@@ -130,7 +130,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
     @Nonnull
     public InvocationChannel<IN, OUT> asyncInvoke() {
 
-        return new ServiceChannel<IN, OUT>(false, mContext, mFactoryTarget,
+        return new ServiceChannel<IN, OUT>(false, mContext, mTargetFactory,
                                            mInvocationConfiguration, mServiceConfiguration,
                                            mLogger);
     }
@@ -138,7 +138,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
     @Nonnull
     public InvocationChannel<IN, OUT> parallelInvoke() {
 
-        return new ServiceChannel<IN, OUT>(true, mContext, mFactoryTarget, mInvocationConfiguration,
+        return new ServiceChannel<IN, OUT>(true, mContext, mTargetFactory, mInvocationConfiguration,
                                            mServiceConfiguration, mLogger);
     }
 
@@ -164,8 +164,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
         private final ServiceContext mContext;
 
-        private final InvocationFactoryTarget<IN, OUT> mFactoryTarget;
-
         private final Messenger mInMessenger;
 
         private final InvocationConfiguration mInvocationConfiguration;
@@ -177,6 +175,8 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         private final Object mMutex = new Object();
 
         private final ServiceConfiguration mServiceConfiguration;
+
+        private final TargetInvocationFactory<IN, OUT> mTargetFactory;
 
         private final TransportChannel<IN> mTransportInput;
 
@@ -203,7 +203,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
          * @param logger                  the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final ServiceContext context,
-                @Nonnull final InvocationFactoryTarget<IN, OUT> target,
+                @Nonnull final TargetInvocationFactory<IN, OUT> target,
                 @Nonnull final InvocationConfiguration invocationConfiguration,
                 @Nonnull final ServiceConfiguration serviceConfiguration,
                 @Nonnull final Logger logger) {
@@ -213,7 +213,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             mContext = context;
             mInMessenger = new Messenger(new IncomingHandler(
                     serviceConfiguration.getResultLooperOr(Looper.getMainLooper())));
-            mFactoryTarget = target;
+            mTargetFactory = target;
             mInvocationConfiguration = invocationConfiguration;
             mServiceConfiguration = serviceConfiguration;
             mLogger = logger;
@@ -261,6 +261,11 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
             bindService();
             return mTransportInput.abort(reason);
+        }
+
+        public boolean isEmpty() {
+
+            return mTransportInput.isEmpty();
         }
 
         public boolean isOpen() {
@@ -352,9 +357,9 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             return mTransportOutput;
         }
 
-        public boolean hasPendingInputs() {
+        public boolean hasDelays() {
 
-            return mTransportInput.hasPendingInputs();
+            return mTransportInput.hasDelays();
         }
 
         private void bindService() {
@@ -433,7 +438,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
             public void onComplete() {
 
-                final Message message = Message.obtain(null, RoutineService.MSG_COMPLETE);
+                final Message message = Message.obtain(null, InvocationService.MSG_COMPLETE);
                 putInvocationId(message.getData(), mUUID);
                 message.replyTo = mInMessenger;
 
@@ -450,7 +455,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
             public void onError(@Nullable final RoutineException error) {
 
-                final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+                final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
                 putError(message.getData(), mUUID, error);
                 message.replyTo = mInMessenger;
 
@@ -467,7 +472,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
             public void onOutput(final IN input) {
 
-                final Message message = Message.obtain(null, RoutineService.MSG_DATA);
+                final Message message = Message.obtain(null, InvocationService.MSG_DATA);
                 putValue(message.getData(), mUUID, input);
                 message.replyTo = mInMessenger;
 
@@ -508,14 +513,14 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                     switch (msg.what) {
 
-                        case RoutineService.MSG_DATA: {
+                        case InvocationService.MSG_DATA: {
 
                             mTransportOutput.pass((OUT) getValue(msg));
                         }
 
                         break;
 
-                        case RoutineService.MSG_COMPLETE: {
+                        case InvocationService.MSG_COMPLETE: {
 
                             mTransportOutput.close();
                             unbindService();
@@ -523,7 +528,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                         break;
 
-                        case RoutineService.MSG_ABORT: {
+                        case InvocationService.MSG_ABORT: {
 
                             mTransportOutput.abort(
                                     InvocationException.wrapIfNeeded(getAbortError(msg)));
@@ -544,7 +549,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                     try {
 
-                        final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+                        final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
                         putError(message.getData(), mUUID, t);
                         mOutMessenger.send(message);
 
@@ -572,12 +577,12 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 logger.dbg("service connected: %s", name);
                 mOutMessenger = new Messenger(service);
                 final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-                final Message message = Message.obtain(null, RoutineService.MSG_INIT);
+                final Message message = Message.obtain(null, InvocationService.MSG_INIT);
 
                 if (mIsParallel) {
 
                     logger.dbg("sending parallel invocation message");
-                    putParallelInvocation(message.getData(), mUUID, mFactoryTarget,
+                    putParallelInvocation(message.getData(), mUUID, mTargetFactory,
                                           mInvocationConfiguration,
                                           serviceConfiguration.getRunnerClassOr(null),
                                           serviceConfiguration.getLogClassOr(null));
@@ -585,7 +590,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 } else {
 
                     logger.dbg("sending async invocation message");
-                    putAsyncInvocation(message.getData(), mUUID, mFactoryTarget,
+                    putAsyncInvocation(message.getData(), mUUID, mTargetFactory,
                                        mInvocationConfiguration,
                                        serviceConfiguration.getRunnerClassOr(null),
                                        serviceConfiguration.getLogClassOr(null));

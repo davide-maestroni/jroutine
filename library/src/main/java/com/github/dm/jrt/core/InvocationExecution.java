@@ -25,14 +25,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of an execution object.
+ * Default implementation of an invocation execution.
  * <p/>
  * Created by davide-maestroni on 09/24/2014.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT> {
+class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT> {
 
     private final Object mAbortMutex = new Object();
 
@@ -65,7 +65,7 @@ class DefaultExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT
      * @param logger  the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultExecution(@Nonnull final InvocationManager<IN, OUT> manager,
+    InvocationExecution(@Nonnull final InvocationManager<IN, OUT> manager,
             @Nonnull final InputIterator<IN> inputs,
             @Nonnull final DefaultResultChannel<OUT> result, @Nonnull final Logger logger) {
 
@@ -351,7 +351,7 @@ class DefaultExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT
 
                     if (mIsWaitingInvocation) {
 
-                        DefaultExecution.this.onCreate(invocation);
+                        InvocationExecution.this.onCreate(invocation);
                     }
                 }
             }

@@ -23,8 +23,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.github.dm.jrt.android.core.InvocationFactoryTarget;
 import com.github.dm.jrt.android.core.JRoutine;
+import com.github.dm.jrt.android.core.TargetInvocationFactory;
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.ContextInvocations;
@@ -57,7 +57,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
  * <p/>
  * Created by davide-maestroni on 01/09/2015.
  */
-public class RoutineService extends Service {
+public class InvocationService extends Service {
 
     public static final int MSG_ABORT = -1;
 
@@ -105,7 +105,7 @@ public class RoutineService extends Service {
      * Constructor.
      */
     @SuppressWarnings("unused")
-    public RoutineService() {
+    public InvocationService() {
 
         this(Logger.getDefaultLog(), Logger.getDefaultLogLevel());
     }
@@ -116,7 +116,7 @@ public class RoutineService extends Service {
      * @param log      the log instance.
      * @param logLevel the log level.
      */
-    public RoutineService(@Nullable final Log log, @Nullable final LogLevel logLevel) {
+    public InvocationService(@Nullable final Log log, @Nullable final LogLevel logLevel) {
 
         mLogger = Logger.newLogger(log, logLevel, this);
     }
@@ -137,7 +137,7 @@ public class RoutineService extends Service {
             return null;
         }
 
-        data.setClassLoader(RoutineService.class.getClassLoader());
+        data.setClassLoader(InvocationService.class.getClassLoader());
         return (Throwable) data.getSerializable(KEY_ABORT_EXCEPTION);
     }
 
@@ -157,7 +157,7 @@ public class RoutineService extends Service {
             return null;
         }
 
-        data.setClassLoader(RoutineService.class.getClassLoader());
+        data.setClassLoader(InvocationService.class.getClassLoader());
         final ParcelableValue parcelable = data.getParcelable(KEY_DATA_VALUE);
         return (parcelable == null) ? null : parcelable.getValue();
     }
@@ -173,7 +173,7 @@ public class RoutineService extends Service {
      * @param logClass                the invocation log class.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
-            @Nonnull final String invocationId, @Nonnull final InvocationFactoryTarget<?, ?> target,
+            @Nonnull final String invocationId, @Nonnull final TargetInvocationFactory<?, ?> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -219,7 +219,7 @@ public class RoutineService extends Service {
      * @param logClass                the invocation log class.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
-            @Nonnull final String invocationId, @Nonnull final InvocationFactoryTarget<?, ?> target,
+            @Nonnull final String invocationId, @Nonnull final TargetInvocationFactory<?, ?> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -249,7 +249,7 @@ public class RoutineService extends Service {
 
     @SuppressWarnings("ConstantConditions")
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
-            @Nonnull final String invocationId, @Nonnull final InvocationFactoryTarget<?, ?> target,
+            @Nonnull final String invocationId, @Nonnull final TargetInvocationFactory<?, ?> target,
             @Nonnull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -286,7 +286,7 @@ public class RoutineService extends Service {
      */
     @Nonnull
     public ContextInvocationFactory<?, ?> getInvocationFactory(
-            @Nonnull final InvocationFactoryTarget<?, ?> target) {
+            @Nonnull final TargetInvocationFactory<?, ?> target) {
 
         return ContextInvocations.factoryOf(target.getInvocationClass(), target.getFactoryArgs());
     }
@@ -375,7 +375,7 @@ public class RoutineService extends Service {
                     "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
-        final InvocationFactoryTarget<?, ?> factoryTarget = data.getParcelable(KEY_FACTORY_TARGET);
+        final TargetInvocationFactory<?, ?> factoryTarget = data.getParcelable(KEY_FACTORY_TARGET);
 
         if (factoryTarget == null) {
 
@@ -516,22 +516,22 @@ public class RoutineService extends Service {
      */
     private static class IncomingHandler extends Handler {
 
-        private final WeakReference<RoutineService> mService;
+        private final WeakReference<InvocationService> mService;
 
         /**
          * Constructor.
          *
          * @param service the service.
          */
-        private IncomingHandler(@Nonnull final RoutineService service) {
+        private IncomingHandler(@Nonnull final InvocationService service) {
 
-            mService = new WeakReference<RoutineService>(service);
+            mService = new WeakReference<InvocationService>(service);
         }
 
         @Override
         public void handleMessage(@Nonnull final Message msg) {
 
-            final RoutineService service = mService.get();
+            final InvocationService service = mService.get();
 
             if (service == null) {
 

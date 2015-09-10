@@ -45,8 +45,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} method annotations will be
-     * honored.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} method
+     * annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name  the name specified in the annotation.
@@ -71,7 +71,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -96,7 +97,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -121,8 +123,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} method annotations will be
-     * honored.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} method
+     * annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name           the method name.
@@ -149,8 +151,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} method annotations will be
-     * honored.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} method
+     * annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param method the method instance.

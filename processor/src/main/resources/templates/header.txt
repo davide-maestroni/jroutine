@@ -33,25 +33,25 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on() {
+    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> onClass() {
 
-        return new ProxyBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.targetClass(${classErasure}.class));
+        return new ProxyObjectBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.classOfType(${classErasure}.class));
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
+    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
 
-        return new ProxyBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.targetObject(wrapped));
+        return new ProxyObjectBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.instance(wrapped));
     }
 
-    private static class ProxyBuilder${genericTypes} extends com.github.dm.jrt.proxy.builder.AbstractProxyBuilder<${interfaceFullName}> {
+    private static class ProxyObjectBuilder${genericTypes} extends com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder<${interfaceFullName}> {
 
         private final com.github.dm.jrt.core.InvocationTarget mTarget;
 
         private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
-        private ProxyBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
+        private ProxyObjectBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
 
             mTarget = target;
         }

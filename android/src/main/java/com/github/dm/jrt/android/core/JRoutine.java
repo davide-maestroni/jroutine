@@ -57,8 +57,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             setContentView(R.layout.my_activity_layout);
  *
  *             final Routine&lt;URI, MyResource&gt; routine =
- *                     JRoutine.on(serviceFrom(this))
- *                             .with(targetFactory(LoadResourceUri.class))
+ *                     JRoutine.with(serviceFrom(this))
+ *                             .on(factoryOf(LoadResourceUri.class))
  *                             .buildRoutine();
  *             routine.asyncCall(RESOURCE_URI)
  *                    .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -92,7 +92,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
      * @return the context builder.
      */
     @Nonnull
-    public static ContextBuilder on(@Nonnull final ServiceContext context) {
+    public static ContextBuilder with(@Nonnull final ServiceContext context) {
 
         return new ContextBuilder(context);
     }
@@ -136,7 +136,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @return the routine builder instance.
          */
         @Nonnull
-        public ServiceObjectRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+        public ServiceObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
 
             return new DefaultServiceObjectRoutineBuilder(mContext, target);
         }
@@ -144,8 +144,8 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
         /**
          * Returns a builder of routines running in a service based on the builder context.<br/>
          * In order to customize the invocation creation, the caller must override the method
-         * {@link com.github.dm.jrt.android.service.RoutineService#getInvocationFactory
-         * getInvocationFactory(InvocationFactoryTarget)} of the routine service.
+         * {@link com.github.dm.jrt.android.service.InvocationService#getInvocationFactory
+         * getInvocationFactory(TargetInvocationFactory)} of the routine service.
          * <p/>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,
@@ -158,8 +158,8 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @return the routine builder instance.
          */
         @Nonnull
-        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
-                @Nonnull final InvocationFactoryTarget<IN, OUT> target) {
+        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(
+                @Nonnull final TargetInvocationFactory<IN, OUT> target) {
 
             return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);
         }

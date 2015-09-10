@@ -64,7 +64,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
      * @param logger the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationOutputConsumer(@Nonnull final RoutineLoader<?, OUT> loader,
+    InvocationOutputConsumer(@Nonnull final InvocationLoader<?, OUT> loader,
             @Nonnull final Logger logger) {
 
         if (loader == null) {

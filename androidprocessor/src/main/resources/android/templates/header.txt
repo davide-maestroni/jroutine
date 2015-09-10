@@ -49,15 +49,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> on(
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context,
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
-
-        return new ServiceProxyBuilder${genericTypes}(context, target);
-    }
-
-    @javax.annotation.Nonnull
-    public static ContextBuilder on(@javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context) {
+    public static ContextBuilder with(@javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context) {
 
         return new ContextBuilder(context);
     }
@@ -65,9 +57,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @javax.annotation.Nonnull
     private static <OUT> com.github.dm.jrt.android.builder.ServiceRoutineBuilder<Object, OUT> getBuilder(
             @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context,
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.InvocationFactoryTarget<Object, OUT> target) {
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, OUT> target) {
 
-        return com.github.dm.jrt.android.core.JRoutine.on(context).with(target);
+        return com.github.dm.jrt.android.core.JRoutine.with(context).on(target);
     }
 
     public static class ContextBuilder {
@@ -86,10 +78,22 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @javax.annotation.Nonnull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> with(
-                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> onClass() {
 
-            return new ServiceProxyBuilder${genericTypes}(mContext, target);
+            return new ServiceProxyBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType(${classErasure}.class));
+        }
+
+        @javax.annotation.Nonnull
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final Class<? extends ${classFullName}> targetClass) {
+
+            return new ServiceProxyBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf(targetClass));
+        }
+
+        @javax.annotation.Nonnull
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final Class<? extends ${classFullName}> targetClass,
+                @javax.annotation.Nullable final Object... factoryArgs) {
+
+            return new ServiceProxyBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
         }
     }
 

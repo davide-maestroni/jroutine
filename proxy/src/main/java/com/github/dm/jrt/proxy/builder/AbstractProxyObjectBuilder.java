@@ -31,9 +31,9 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractProxyBuilder<TYPE>
-        implements ProxyBuilder<TYPE>, InvocationConfiguration.Configurable<ProxyBuilder<TYPE>>,
-        ProxyConfiguration.Configurable<ProxyBuilder<TYPE>> {
+public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBuilder<TYPE>,
+        InvocationConfiguration.Configurable<ProxyObjectBuilder<TYPE>>,
+        ProxyConfiguration.Configurable<ProxyObjectBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sProxies =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
@@ -85,22 +85,23 @@ public abstract class AbstractProxyBuilder<TYPE>
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends ProxyBuilder<TYPE>> invocations() {
+    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> invocations() {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyBuilder<TYPE>>(this, configuration);
+        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, configuration);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends ProxyBuilder<TYPE>> proxies() {
+    public ProxyConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyBuilder<TYPE>>(this, configuration);
+        return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, configuration);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ProxyBuilder<TYPE> setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+    public ProxyObjectBuilder<TYPE> setConfiguration(
+            @Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -113,7 +114,7 @@ public abstract class AbstractProxyBuilder<TYPE>
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ProxyBuilder<TYPE> setConfiguration(
+    public ProxyObjectBuilder<TYPE> setConfiguration(
             @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {

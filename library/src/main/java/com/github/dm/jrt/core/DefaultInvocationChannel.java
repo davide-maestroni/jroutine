@@ -22,8 +22,8 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.core.DefaultExecution.InputIterator;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
+import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
@@ -58,7 +58,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
-    private final DefaultExecution<IN, OUT> mExecution;
+    private final InvocationExecution<IN, OUT> mExecution;
 
     private final Check mHasInputs;
 
@@ -146,8 +146,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
         }, runner, logger);
         mExecution =
-                new DefaultExecution<IN, OUT>(manager, new DefaultInputIterator(), mResultChanel,
-                                              logger);
+                new InvocationExecution<IN, OUT>(manager, new DefaultInputIterator(), mResultChanel,
+                                                 logger);
         mState = new InputChannelState();
     }
 
@@ -174,6 +174,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         }
 
         return false;
+    }
+
+    public boolean isEmpty() {
+
+        synchronized (mMutex) {
+
+            return mInputQueue.isEmpty();
+        }
     }
 
     public boolean isOpen() {
@@ -341,12 +349,20 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         return result;
     }
 
-    public boolean hasPendingInputs() {
+    public boolean hasDelays() {
 
         synchronized (mMutex) {
 
             return (mPendingInputCount > 0);
         }
+    }
+
+    private void internalAbort(@Nullable final RoutineException abortException) {
+
+        mInputQueue.clear();
+        mPendingInputCount = 0;
+        mAbortException = abortException;
+        mRunner.cancel(mExecution);
     }
 
     private void waitInputs(final int count) {
@@ -862,10 +878,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             if (mInputDelay.isZero()) {
 
                 mSubLogger.dbg(reason, "aborting channel");
-                mPendingInputCount = 0;
-                mAbortException = abortException;
+                internalAbort(abortException);
                 mState = new AbortedChannelState();
-                mRunner.cancel(mExecution);
                 return mExecution.abort();
             }
 
@@ -899,10 +913,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg(reason, "aborting channel");
-            mPendingInputCount = 0;
-            mAbortException = reason;
+            internalAbort(reason);
             mState = new AbortedChannelState();
-            mRunner.cancel(mExecution);
             return mExecution.abort();
         }
 
@@ -1062,10 +1074,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution onHandlerAbort(@Nullable final RoutineException reason) {
 
             mSubLogger.dbg("aborting result channel");
-            mPendingInputCount = 0;
-            mAbortException = reason;
+            internalAbort(reason);
             mState = new ExceptionChannelState();
-            mRunner.cancel(mExecution);
             return mExecution.abort();
         }
 

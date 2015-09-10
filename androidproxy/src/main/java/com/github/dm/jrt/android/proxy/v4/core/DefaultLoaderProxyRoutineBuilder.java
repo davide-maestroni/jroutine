@@ -16,7 +16,7 @@ package com.github.dm.jrt.android.proxy.v4.core;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.V4Proxy;
-import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyBuilder;
+import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContext;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -100,8 +100,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                             + itfClass.getName());
         }
 
-        final ObjectLoaderProxyBuilder<TYPE> builder =
-                new ObjectLoaderProxyBuilder<TYPE>(mContext, mTarget, itf);
+        final TargetLoaderProxyObjectBuilder<TYPE> builder =
+                new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
         return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
@@ -182,7 +182,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectLoaderProxyBuilder<TYPE> extends AbstractLoaderProxyBuilder<TYPE> {
+    private static class TargetLoaderProxyObjectBuilder<TYPE>
+            extends AbstractLoaderProxyObjectBuilder<TYPE> {
 
         private final LoaderContext mContext;
 
@@ -197,7 +198,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
          * @param target         the invocation target.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectLoaderProxyBuilder(@Nonnull final LoaderContext context,
+        private TargetLoaderProxyObjectBuilder(@Nonnull final LoaderContext context,
                 @Nonnull final ContextInvocationTarget target,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 

@@ -57,8 +57,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.github.dm.jrt.core.InvocationTarget.targetClass;
-import static com.github.dm.jrt.core.InvocationTarget.targetObject;
+import static com.github.dm.jrt.core.InvocationTarget.classOfType;
+import static com.github.dm.jrt.core.InvocationTarget.instance;
 import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,7 +76,7 @@ public class ObjectRoutineTest {
 
         final Pass pass = new Pass();
         final TestRunner runner = new TestRunner();
-        final PriorityPass priorityPass = JRoutine.on(targetObject(pass))
+        final PriorityPass priorityPass = JRoutine.on(instance(pass))
                                                   .invocations()
                                                   .withRunner(runner)
                                                   .set()
@@ -102,7 +102,7 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine = JRoutine.on(instance(test))
                                                         .invocations()
                                                         .withRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
@@ -121,7 +121,7 @@ public class ObjectRoutineTest {
     public void testAliasStaticMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine = JRoutine.on(classOfType(TestStatic.class))
                                                         .invocations()
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -137,7 +137,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetClass(TestStatic.class)).aliasMethod("test");
+            JRoutine.on(classOfType(TestStatic.class)).aliasMethod("test");
 
             fail();
 
@@ -151,7 +151,7 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Sum sum = new Sum();
-        final SumItf sumAsync = JRoutine.on(targetObject(sum))
+        final SumItf sumAsync = JRoutine.on(instance(sum))
                                         .invocations()
                                         .withExecutionTimeout(timeout)
                                         .set()
@@ -185,7 +185,7 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Count count = new Count();
-        final CountItf countAsync = JRoutine.on(targetObject(count))
+        final CountItf countAsync = JRoutine.on(instance(count))
                                             .invocations()
                                             .withExecutionTimeout(timeout)
                                             .set()
@@ -203,7 +203,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetClass(TestStatic.class)).setConfiguration(
+            new DefaultObjectRoutineBuilder(classOfType(TestStatic.class)).setConfiguration(
                     (InvocationConfiguration) null);
 
             fail();
@@ -214,7 +214,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            new DefaultObjectRoutineBuilder(targetClass(TestStatic.class)).setConfiguration(
+            new DefaultObjectRoutineBuilder(classOfType(TestStatic.class)).setConfiguration(
                     (ProxyConfiguration) null);
 
             fail();
@@ -229,8 +229,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(new DuplicateAnnotation()))
-                    .aliasMethod(DuplicateAnnotation.GET);
+            JRoutine.on(instance(new DuplicateAnnotation())).aliasMethod(DuplicateAnnotation.GET);
 
             fail();
 
@@ -240,7 +239,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetClass(DuplicateAnnotationStatic.class))
+            JRoutine.on(classOfType(DuplicateAnnotationStatic.class))
                     .aliasMethod(DuplicateAnnotationStatic.GET);
 
             fail();
@@ -256,7 +255,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine3 =
-                JRoutine.on(targetObject(test)).aliasMethod(TestClass.THROW);
+                JRoutine.on(instance(test)).aliasMethod(TestClass.THROW);
 
         try {
 
@@ -277,7 +276,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
 
         final Routine<Object, Object> routine3 =
-                JRoutine.on(targetClass(TestStatic.class)).aliasMethod(TestStatic.THROW);
+                JRoutine.on(classOfType(TestStatic.class)).aliasMethod(TestStatic.THROW);
 
         try {
 
@@ -297,7 +296,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetClass(TestItf.class));
+            JRoutine.on(classOfType(TestItf.class));
 
             fail();
 
@@ -313,7 +312,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute1();
+            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute1();
 
             fail();
 
@@ -323,7 +322,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute2();
+            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute2();
 
             fail();
 
@@ -333,7 +332,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute3();
+            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute3();
 
             fail();
 
@@ -343,7 +342,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute4();
+            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute4();
 
             fail();
 
@@ -353,7 +352,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute5();
+            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute5();
 
             fail();
 
@@ -363,7 +362,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute6();
+            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute6();
 
             fail();
 
@@ -373,7 +372,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError2.class).compute7(7);
+            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute7(7);
 
             fail();
 
@@ -389,7 +388,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test)).buildProxy(TestClass.class);
+            JRoutine.on(instance(test)).buildProxy(TestClass.class);
 
             fail();
 
@@ -399,7 +398,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test)).buildProxy(ClassToken.tokenOf(TestClass.class));
+            JRoutine.on(instance(test)).buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -415,7 +414,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute(1, new int[0]);
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(1, new int[0]);
 
             fail();
 
@@ -425,7 +424,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute(new String[0]);
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(new String[0]);
 
             fail();
 
@@ -435,7 +434,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute(new int[0]);
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(new int[0]);
 
             fail();
 
@@ -445,7 +444,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum))
+            JRoutine.on(instance(sum))
                     .buildProxy(SumError.class)
                     .compute(Collections.<Integer>emptyList());
 
@@ -459,7 +458,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute(channel);
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(channel);
 
             fail();
 
@@ -469,7 +468,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute(1, channel);
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(1, channel);
 
             fail();
 
@@ -479,7 +478,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute(new Object());
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(new Object());
 
             fail();
 
@@ -489,7 +488,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute(new Object[0]);
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(new Object[0]);
 
             fail();
 
@@ -499,7 +498,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(sum)).buildProxy(SumError.class).compute("test", new int[0]);
+            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute("test", new int[0]);
 
             fail();
 
@@ -515,7 +514,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test))
+            JRoutine.on(instance(test))
                     .invocations()
                     .withExecutionTimeout(INFINITY)
                     .set()
@@ -530,7 +529,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test))
+            JRoutine.on(instance(test))
                     .invocations()
                     .withExecutionTimeout(INFINITY)
                     .set()
@@ -545,7 +544,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test)).buildProxy(TestItf.class).throwException2(null);
+            JRoutine.on(instance(test)).buildProxy(TestItf.class).throwException2(null);
 
             fail();
 
@@ -561,7 +560,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).count(3);
+            JRoutine.on(instance(count)).buildProxy(CountError.class).count(3);
 
             fail();
 
@@ -571,7 +570,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).count1(3);
+            JRoutine.on(instance(count)).buildProxy(CountError.class).count1(3);
 
             fail();
 
@@ -581,7 +580,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).count2(3);
+            JRoutine.on(instance(count)).buildProxy(CountError.class).count2(3);
 
             fail();
 
@@ -591,7 +590,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).count3(3);
+            JRoutine.on(instance(count)).buildProxy(CountError.class).count3(3);
 
             fail();
 
@@ -601,7 +600,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).count4();
+            JRoutine.on(instance(count)).buildProxy(CountError.class).count4();
 
             fail();
 
@@ -611,7 +610,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).countList(3);
+            JRoutine.on(instance(count)).buildProxy(CountError.class).countList(3);
 
             fail();
 
@@ -621,7 +620,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).countList1(3);
+            JRoutine.on(instance(count)).buildProxy(CountError.class).countList1(3);
 
             fail();
 
@@ -631,7 +630,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(count)).buildProxy(CountError.class).countList2(3);
+            JRoutine.on(instance(count)).buildProxy(CountError.class).countList2(3);
 
             fail();
 
@@ -645,7 +644,7 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine2 = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine2 = JRoutine.on(instance(test))
                                                          .invocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
@@ -664,7 +663,7 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine1 = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine1 = JRoutine.on(instance(test))
                                                          .invocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .set()
@@ -680,7 +679,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test)).aliasMethod("test");
+            JRoutine.on(instance(test)).aliasMethod("test");
 
             fail();
 
@@ -696,7 +695,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test)).method("test");
+            JRoutine.on(instance(test)).method("test");
 
             fail();
 
@@ -721,7 +720,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(null));
+            JRoutine.on(instance(null));
 
             fail();
 
@@ -731,7 +730,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetClass(null));
+            JRoutine.on(classOfType(null));
 
             fail();
 
@@ -748,7 +747,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test)).buildProxy((Class<?>) null);
+            JRoutine.on(instance(test)).buildProxy((Class<?>) null);
 
             fail();
 
@@ -758,7 +757,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(test)).buildProxy((ClassToken<?>) null);
+            JRoutine.on(instance(test)).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -772,7 +771,7 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestStatic test = new TestStatic();
-        final Routine<Object, Object> routine = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine = JRoutine.on(instance(test))
                                                         .invocations()
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -788,7 +787,7 @@ public class ObjectRoutineTest {
     public void testProxyAnnotations() {
 
         final Impl impl = new Impl();
-        final Itf itf = JRoutine.on(targetObject(impl))
+        final Itf itf = JRoutine.on(instance(impl))
                                 .invocations()
                                 .withExecutionTimeout(INFINITY)
                                 .set()
@@ -1036,7 +1035,7 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Square square = new Square();
-        final SquareItf squareAsync = JRoutine.on(targetObject(square)).buildProxy(SquareItf.class);
+        final SquareItf squareAsync = JRoutine.on(instance(square)).buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.compute1(3)).containsExactly(9);
@@ -1067,7 +1066,7 @@ public class ObjectRoutineTest {
 
         final Inc inc = new Inc();
         final IncItf incItf =
-                JRoutine.on(targetObject(inc)).buildProxy(ClassToken.tokenOf(IncItf.class));
+                JRoutine.on(instance(inc)).buildProxy(ClassToken.tokenOf(IncItf.class));
         assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
         assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
     }
@@ -1077,7 +1076,7 @@ public class ObjectRoutineTest {
 
         final TestClass test = new TestClass();
         final NullLog nullLog = new NullLog();
-        final Routine<Object, Object> routine1 = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine1 = JRoutine.on(instance(test))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
@@ -1088,7 +1087,7 @@ public class ObjectRoutineTest {
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine2 = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine2 = JRoutine.on(instance(test))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
@@ -1100,7 +1099,7 @@ public class ObjectRoutineTest {
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
-        final Routine<Object, Object> routine3 = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine3 = JRoutine.on(instance(test))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
@@ -1113,7 +1112,7 @@ public class ObjectRoutineTest {
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
-        final Routine<Object, Object> routine4 = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine4 = JRoutine.on(instance(test))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
@@ -1125,7 +1124,7 @@ public class ObjectRoutineTest {
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
-        final Routine<Object, Object> routine5 = JRoutine.on(targetObject(test))
+        final Routine<Object, Object> routine5 = JRoutine.on(instance(test))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
@@ -1142,7 +1141,7 @@ public class ObjectRoutineTest {
     public void testRoutineCache2() {
 
         final NullLog nullLog = new NullLog();
-        final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine1 = JRoutine.on(classOfType(TestStatic.class))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
@@ -1153,7 +1152,7 @@ public class ObjectRoutineTest {
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine2 = JRoutine.on(classOfType(TestStatic.class))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
@@ -1165,7 +1164,7 @@ public class ObjectRoutineTest {
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
-        final Routine<Object, Object> routine3 = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine3 = JRoutine.on(classOfType(TestStatic.class))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
@@ -1178,7 +1177,7 @@ public class ObjectRoutineTest {
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
-        final Routine<Object, Object> routine4 = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine4 = JRoutine.on(classOfType(TestStatic.class))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
@@ -1190,7 +1189,7 @@ public class ObjectRoutineTest {
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
-        final Routine<Object, Object> routine5 = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine5 = JRoutine.on(classOfType(TestStatic.class))
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
@@ -1207,10 +1206,8 @@ public class ObjectRoutineTest {
     public void testShareGroup() throws NoSuchMethodException {
 
         final TestClass2 test2 = new TestClass2();
-        final ObjectRoutineBuilder builder = JRoutine.on(targetObject(test2))
-                                                     .invocations()
-                                                     .withExecutionTimeout(seconds(2))
-                                                     .set();
+        final ObjectRoutineBuilder builder =
+                JRoutine.on(instance(test2)).invocations().withExecutionTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 
@@ -1236,7 +1233,7 @@ public class ObjectRoutineTest {
     @Test
     public void testShareGroup2() throws NoSuchMethodException {
 
-        final ObjectRoutineBuilder builder = JRoutine.on(targetClass(TestStatic2.class))
+        final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
                                                      .invocations()
                                                      .withExecutionTimeout(seconds(2))
                                                      .set();
@@ -1266,7 +1263,7 @@ public class ObjectRoutineTest {
     public void testStaticMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine2 = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine2 = JRoutine.on(classOfType(TestStatic.class))
                                                          .invocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
@@ -1285,7 +1282,7 @@ public class ObjectRoutineTest {
     public void testStaticMethodBySignature() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine1 = JRoutine.on(targetClass(TestStatic.class))
+        final Routine<Object, Object> routine1 = JRoutine.on(classOfType(TestStatic.class))
                                                          .invocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
@@ -1301,7 +1298,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetClass(TestStatic.class)).method("test");
+            JRoutine.on(classOfType(TestStatic.class)).method("test");
 
             fail();
 
@@ -1314,7 +1311,7 @@ public class ObjectRoutineTest {
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
         final TestTimeout testTimeout = new TestTimeout();
-        assertThat(JRoutine.on(targetObject(testTimeout))
+        assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
                            .withExecutionTimeout(seconds(1))
                            .set()
@@ -1324,7 +1321,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(testTimeout))
+            JRoutine.on(instance(testTimeout))
                     .invocations()
                     .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
@@ -1338,7 +1335,7 @@ public class ObjectRoutineTest {
 
         }
 
-        assertThat(JRoutine.on(targetObject(testTimeout))
+        assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
                            .withExecutionTimeout(seconds(1))
                            .set()
@@ -1348,7 +1345,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(testTimeout))
+            JRoutine.on(instance(testTimeout))
                     .invocations()
                     .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
@@ -1362,7 +1359,7 @@ public class ObjectRoutineTest {
 
         }
 
-        assertThat(JRoutine.on(targetObject(testTimeout))
+        assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
                            .withExecutionTimeout(seconds(1))
                            .set()
@@ -1372,7 +1369,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(testTimeout))
+            JRoutine.on(instance(testTimeout))
                     .invocations()
                     .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()
@@ -1386,7 +1383,7 @@ public class ObjectRoutineTest {
 
         }
 
-        assertThat(JRoutine.on(targetObject(testTimeout))
+        assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
                            .withExecutionTimeout(seconds(1))
                            .set()
@@ -1395,7 +1392,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(targetObject(testTimeout))
+            JRoutine.on(instance(testTimeout))
                     .invocations()
                     .withExecutionTimeoutAction(TimeoutActionType.THROW)
                     .set()

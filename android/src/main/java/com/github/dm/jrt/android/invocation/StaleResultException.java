@@ -18,14 +18,14 @@ package com.github.dm.jrt.android.invocation;
  * <p/>
  * Created by davide-maestroni on 08/08/2015.
  */
-public class StaleResultsException extends InvocationClashException {
+public class StaleResultException extends InvocationClashException {
 
     /**
      * Constructor.
      *
      * @param id the loader ID.
      */
-    public StaleResultsException(final int id) {
+    public StaleResultException(final int id) {
 
         super(id);
     }

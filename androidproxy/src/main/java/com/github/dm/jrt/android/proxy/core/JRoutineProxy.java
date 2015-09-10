@@ -60,7 +60,7 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
      * @return the context builder.
      */
     @Nonnull
-    public static ContextBuilder on(@Nonnull final ServiceContext context) {
+    public static ContextBuilder with(@Nonnull final ServiceContext context) {
 
         return new ContextBuilder(context);
     }
@@ -104,7 +104,7 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
          * @return the routine builder instance.
          */
         @Nonnull
-        public ServiceProxyRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+        public ServiceProxyRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
 
             return new DefaultServiceProxyRoutineBuilder(mContext, target);
         }

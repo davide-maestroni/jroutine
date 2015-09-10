@@ -23,7 +23,7 @@
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
-        final com.github.dm.jrt.android.core.InvocationFactoryTarget<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.InvocationFactoryTarget.targetFactory(
+        final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf(
                 new com.github.dm.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${shareGroup}, target);
         return getBuilder(mContext, targetFactory).invocations()
                                                   .with(invocationConfiguration)

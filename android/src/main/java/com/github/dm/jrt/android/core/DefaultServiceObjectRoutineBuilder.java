@@ -41,6 +41,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
 import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
 import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
@@ -169,9 +170,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name};
-        return JRoutine.on(mContext)
-                       .with(InvocationFactoryTarget.targetFactory(new MethodAliasToken<IN, OUT>(),
-                                                                   args))
+        return JRoutine.with(mContext)
+                       .on(factoryOf(new MethodAliasToken<IN, OUT>(), args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
                        .set()
@@ -209,9 +209,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
         final String shareGroup = groupWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = new Object[]{shareGroup, target, name, toNames(parameterTypes)};
-        return JRoutine.on(mContext)
-                       .with(InvocationFactoryTarget.targetFactory(
-                               new MethodSignatureToken<IN, OUT>(), args))
+        return JRoutine.with(mContext)
+                       .on(factoryOf(new MethodSignatureToken<IN, OUT>(), args))
                        .invocations()
                        .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
                        .set()
@@ -588,12 +587,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final Object[] factoryArgs = new Object[]{shareGroup, target, targetMethod.getName(),
                                                       toNames(targetParameterTypes), inputMode,
                                                       outputMode};
-            final InvocationFactoryTarget<Object, Object> targetFactory =
-                    InvocationFactoryTarget.targetFactory(PROXY_TOKEN, factoryArgs);
+            final TargetInvocationFactory<Object, Object> targetFactory =
+                    factoryOf(PROXY_TOKEN, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
-            final Routine<Object, Object> routine = JRoutine.on(mContext)
-                                                            .with(targetFactory)
+            final Routine<Object, Object> routine = JRoutine.with(mContext)
+                                                            .on(targetFactory)
                                                             .invocations()
                                                             .with(invocationConfiguration)
                                                             .set()

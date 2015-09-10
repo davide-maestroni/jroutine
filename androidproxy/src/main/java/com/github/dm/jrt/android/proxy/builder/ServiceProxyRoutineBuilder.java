@@ -25,9 +25,6 @@ import javax.annotation.Nonnull;
  * Interface defining a builder of routines wrapping an object, whose methods are executed in a
  * dedicated service.
  * <p/>
- * Note that only instance methods can be asynchronously invoked through the routines created by
- * this builder.
- * <p/>
  * Created by davide-maestroni on 05/13/2015.
  */
 public interface ServiceProxyRoutineBuilder
@@ -51,7 +48,7 @@ public interface ServiceProxyRoutineBuilder
      * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}. The generated
      * class name and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> method.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *
@@ -82,7 +79,7 @@ public interface ServiceProxyRoutineBuilder
      * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}. The generated
      * class name and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> method.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *

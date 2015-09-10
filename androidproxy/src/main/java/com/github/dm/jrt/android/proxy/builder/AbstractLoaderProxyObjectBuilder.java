@@ -33,10 +33,11 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBuilder<TYPE>,
-        InvocationConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
-        ProxyConfiguration.Configurable<LoaderProxyBuilder<TYPE>>,
-        LoaderConfiguration.Configurable<LoaderProxyBuilder<TYPE>> {
+public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
+        implements LoaderProxyObjectBuilder<TYPE>,
+        InvocationConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>,
+        ProxyConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>,
+        LoaderConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
             sContextProxies =
@@ -118,29 +119,29 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
     }
 
     @Nonnull
-    public InvocationConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> invocations() {
+    public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
+        return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> proxies() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
+        return new ProxyConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
-    public LoaderConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> loaders() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderProxyBuilder<TYPE>>(this, config);
+        return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public LoaderProxyBuilder<TYPE> setConfiguration(
+    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
             @Nonnull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
@@ -154,7 +155,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public LoaderProxyBuilder<TYPE> setConfiguration(
+    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
             @Nonnull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
@@ -168,7 +169,7 @@ public abstract class AbstractLoaderProxyBuilder<TYPE> implements LoaderProxyBui
 
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public LoaderProxyBuilder<TYPE> setConfiguration(
+    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
             @Nonnull final ProxyConfiguration configuration) {
 
         if (configuration == null) {

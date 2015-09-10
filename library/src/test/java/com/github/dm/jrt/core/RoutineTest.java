@@ -34,10 +34,10 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.channel.TransportChannel;
-import com.github.dm.jrt.core.DefaultExecution.InputIterator;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
+import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.invocation.DelegatingInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -78,8 +78,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.InvocationTarget.targetClass;
-import static com.github.dm.jrt.core.InvocationTarget.targetObject;
+import static com.github.dm.jrt.core.InvocationTarget.classOfType;
+import static com.github.dm.jrt.core.InvocationTarget.instance;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.millis;
@@ -1081,6 +1081,48 @@ public class RoutineTest {
     }
 
     @Test
+    public void testEmpty() {
+
+        final InvocationChannel<Object, Object> channel =
+                JRoutine.on(new SleepInvocation(millis(500)))
+                        .invocations()
+                        .withInputMaxSize(1)
+                        .withInputTimeout(seconds(3))
+                        .set()
+                        .asyncInvoke();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
+        final OutputChannel<Object> result = channel.result();
+        assertThat(result.isEmpty()).isTrue();
+        assertThat(result.eventually().checkComplete()).isTrue();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(result.isEmpty()).isFalse();
+    }
+
+    @Test
+    public void testEmptyAbort() {
+
+        final Routine<Object, Object> routine = JRoutine.on(new SleepInvocation(millis(500)))
+                                                        .invocations()
+                                                        .withInputMaxSize(1)
+                                                        .withInputTimeout(seconds(3))
+                                                        .set()
+                                                        .buildRoutine();
+        InvocationChannel<Object, Object> channel = routine.asyncInvoke();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(channel.pass("test1").abort()).isTrue();
+        assertThat(channel.isEmpty()).isTrue();
+        channel = routine.asyncInvoke();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
+        final OutputChannel<Object> result = channel.result();
+        assertThat(result.isEmpty()).isTrue();
+        assertThat(result.abort()).isTrue();
+        assertThat(channel.isEmpty()).isTrue();
+        assertThat(result.isEmpty()).isTrue();
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -1155,7 +1197,7 @@ public class RoutineTest {
                                                      new TestAbortHandler(), Runners.syncRunner(),
                                                      logger);
 
-            new DefaultExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
+            new InvocationExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
 
             fail();
 
@@ -1170,8 +1212,8 @@ public class RoutineTest {
                                                      new TestAbortHandler(), Runners.syncRunner(),
                                                      logger);
 
-            new DefaultExecution<Object, Object>(new TestInvocationManager(), null, channel,
-                                                 logger);
+            new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
+                                                    logger);
 
             fail();
 
@@ -1181,8 +1223,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultExecution<Object, Object>(new TestInvocationManager(),
-                                                 new TestInputIterator(), null, logger);
+            new InvocationExecution<Object, Object>(new TestInvocationManager(),
+                                                    new TestInputIterator(), null, logger);
 
             fail();
 
@@ -1197,8 +1239,8 @@ public class RoutineTest {
                                                      new TestAbortHandler(), Runners.syncRunner(),
                                                      logger);
 
-            new DefaultExecution<Object, Object>(new TestInvocationManager(),
-                                                 new TestInputIterator(), channel, null);
+            new InvocationExecution<Object, Object>(new TestInvocationManager(),
+                                                    new TestInputIterator(), channel, null);
 
             fail();
 
@@ -1679,7 +1721,7 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() throws InterruptedException {
 
-        final Routine<Void, Void> routine = JRoutine.on(new SleepInvocation())
+        final Routine<Void, Void> routine = JRoutine.on(new SleepProcedure())
                                                     .invocations()
                                                     .withMaxInstances(1)
                                                     .set()
@@ -1704,42 +1746,43 @@ public class RoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        assertThat(JRoutine.on(targetObject(test))
+        assertThat(JRoutine.on(instance(test))
                            .method(TestClass.class.getMethod("getOne"))
                            .syncCall()
                            .afterMax(timeout)
                            .all()).containsExactly(1);
-        assertThat(
-                JRoutine.on(targetObject(test)).method("getOne").syncCall().afterMax(timeout).all())
-                .containsExactly(1);
-        assertThat(JRoutine.on(targetObject(test))
+        assertThat(JRoutine.on(instance(test))
+                           .method("getOne")
+                           .syncCall()
+                           .afterMax(timeout)
+                           .all()).containsExactly(1);
+        assertThat(JRoutine.on(instance(test))
                            .aliasMethod(TestClass.GET)
                            .syncCall()
                            .afterMax(timeout)
                            .all()).containsExactly(1);
-        assertThat(JRoutine.on(targetClass(TestClass.class))
+        assertThat(JRoutine.on(classOfType(TestClass.class))
                            .aliasMethod(TestClass.STATIC_GET)
                            .syncCall(3)
                            .afterMax(timeout)
                            .all()).containsExactly(3);
-        assertThat(JRoutine.on(targetClass(TestClass.class))
+        assertThat(JRoutine.on(classOfType(TestClass.class))
                            .aliasMethod("sget")
                            .asyncCall(-3)
                            .afterMax(timeout)
                            .all()).containsExactly(-3);
-        assertThat(JRoutine.on(targetClass(TestClass.class))
+        assertThat(JRoutine.on(classOfType(TestClass.class))
                            .method("get", int.class)
                            .parallelCall(17)
                            .afterMax(timeout)
                            .all()).containsExactly(17);
 
-        assertThat(JRoutine.on(targetObject(test))
-                           .buildProxy(TestInterface.class)
-                           .getInt(2)).isEqualTo(2);
+        assertThat(JRoutine.on(instance(test)).buildProxy(TestInterface.class).getInt(2)).isEqualTo(
+                2);
 
         try {
 
-            JRoutine.on(targetClass(TestClass.class))
+            JRoutine.on(classOfType(TestClass.class))
                     .aliasMethod("sget")
                     .asyncCall()
                     .afterMax(timeout)
@@ -1753,7 +1796,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(targetClass(TestClass.class)).aliasMethod("take");
+            JRoutine.on(classOfType(TestClass.class)).aliasMethod("take");
 
             fail();
 
@@ -1761,19 +1804,19 @@ public class RoutineTest {
 
         }
 
-        assertThat(JRoutine.on(targetObject(test))
+        assertThat(JRoutine.on(instance(test))
                            .invocations()
                            .withExecutionTimeout(timeout)
                            .set()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
-        assertThat(JRoutine.on(targetObject(test))
+        assertThat(JRoutine.on(instance(test))
                            .buildProxy(TestInterfaceAsync.class)
                            .getOne()
                            .afterMax(timeout)
                            .next()).isEqualTo(1);
 
-        final TestInterfaceAsync testInterfaceAsync = JRoutine.on(targetObject(test))
+        final TestInterfaceAsync testInterfaceAsync = JRoutine.on(instance(test))
                                                               .invocations()
                                                               .withExecutionTimeout(1,
                                                                                     TimeUnit.SECONDS)
@@ -1958,19 +2001,19 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         channel.result();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         seconds(1).sleepAtLeast();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -1979,16 +2022,16 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasPendingInputs()).isTrue();
+        assertThat(channel.hasDelays()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasPendingInputs()).isFalse();
+        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -3637,7 +3680,31 @@ public class RoutineTest {
         }
     }
 
-    private static class SleepInvocation extends ProcedureInvocation<Void> {
+    private static class SleepInvocation extends FilterInvocation<Object, Object> {
+
+        private final TimeDuration mSleepDuration;
+
+        private SleepInvocation(@Nonnull final TimeDuration sleepDuration) {
+
+            mSleepDuration = sleepDuration;
+        }
+
+        public void onInput(final Object input, @Nonnull final ResultChannel<Object> result) {
+
+            try {
+
+                mSleepDuration.sleepAtLeast();
+
+            } catch (final InterruptedException e) {
+
+                throw new InvocationInterruptedException(e);
+            }
+
+            result.pass(input);
+        }
+    }
+
+    private static class SleepProcedure extends ProcedureInvocation<Void> {
 
         public void onResult(@Nonnull final ResultChannel<Void> result) {
 

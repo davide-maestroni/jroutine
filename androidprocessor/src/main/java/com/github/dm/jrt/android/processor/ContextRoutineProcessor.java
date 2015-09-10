@@ -79,7 +79,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         mCacheAnnotationType =
                 getTypeFromName("com.github.dm.jrt.android.annotation.CacheStrategy").asType();
         mStaleTimeAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.StaleTime").asType();
+                getTypeFromName("com.github.dm.jrt.android.annotation.ResultStaleTime").asType();
     }
 
     @Nonnull

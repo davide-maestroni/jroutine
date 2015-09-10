@@ -36,7 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
  * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
  * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
- * @see com.github.dm.jrt.android.annotation.StaleTime StaleTime
+ * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
  * @see com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input
@@ -65,7 +65,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
      * @return the context builder.
      */
     @Nonnull
-    public static ContextBuilder on(@Nonnull final LoaderContext context) {
+    public static ContextBuilder with(@Nonnull final LoaderContext context) {
 
         return new ContextBuilder(context);
     }
@@ -106,7 +106,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
          * @return the routine builder instance.
          */
         @Nonnull
-        public LoaderProxyRoutineBuilder with(@Nonnull final ContextInvocationTarget target) {
+        public LoaderProxyRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
 
             return new DefaultLoaderProxyRoutineBuilder(mContext, target);
         }

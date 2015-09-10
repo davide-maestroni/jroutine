@@ -47,8 +47,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.github.dm.jrt.android.core.InvocationFactoryTarget.targetFactory;
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
+import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,8 +70,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data = new Data();
-        final OutputChannel<Data> channel = JRoutine.on(serviceFrom(getActivity()))
-                                                    .with(targetFactory(Delay.class))
+        final OutputChannel<Data> channel = JRoutine.with(serviceFrom(getActivity()))
+                                                    .on(factoryOf(Delay.class))
                                                     .service()
                                                     .withRunnerClass(MainRunner.class)
                                                     .set()
@@ -91,8 +91,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()))
-                    .with(targetFactory(Abort.class))
+            JRoutine.with(serviceFrom(getActivity()))
+                    .on(factoryOf(Abort.class))
                     .asyncCall()
                     .afterMax(timeout)
                     .next();
@@ -114,7 +114,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.on(context).with(targetFactory(classToken));
+            JRoutine.with(context).on(factoryOf(classToken));
 
             fail();
 
@@ -124,8 +124,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()))
-                    .with((InvocationFactoryTarget<Object, Object>) null);
+            JRoutine.with(serviceFrom(getActivity()))
+                    .on((TargetInvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -135,8 +135,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.on(serviceFrom(getActivity()))
-                    .with(targetFactory((ClassToken<PassingContextInvocation<String>>) null));
+            JRoutine.with(serviceFrom(getActivity()))
+                    .on(factoryOf((ClassToken<PassingContextInvocation<String>>) null));
 
             fail();
 
@@ -153,10 +153,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            new DefaultServiceRoutineBuilder<Object, Object>(serviceFrom(getActivity()),
-                                                             targetFactory(
-                                                                     classToken)).setConfiguration(
-                    (InvocationConfiguration) null);
+            new DefaultServiceRoutineBuilder<Object, Object>(serviceFrom(getActivity()), factoryOf(
+                    classToken)).setConfiguration((InvocationConfiguration) null);
 
             fail();
 
@@ -166,10 +164,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            new DefaultServiceRoutineBuilder<Object, Object>(serviceFrom(getActivity()),
-                                                             targetFactory(
-                                                                     classToken)).setConfiguration(
-                    (ServiceConfiguration) null);
+            new DefaultServiceRoutineBuilder<Object, Object>(serviceFrom(getActivity()), factoryOf(
+                    classToken)).setConfiguration((ServiceConfiguration) null);
 
             fail();
 
@@ -181,10 +177,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testDecorator() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
-                targetFactory(new PassingWrapper<String>());
-        final Routine<String, String> routine = JRoutine.on(serviceFrom(getActivity()))
-                                                        .with(targetFactory)
+        final TargetInvocationFactory<String, String> targetFactory =
+                factoryOf(new PassingWrapper<String>());
+        final Routine<String, String> routine = JRoutine.with(serviceFrom(getActivity()))
+                                                        .on(targetFactory)
                                                         .invocations()
                                                         .withInputOrder(OrderType.BY_CHANCE)
                                                         .withLogLevel(LogLevel.DEBUG)
@@ -199,8 +195,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
     public void testExecutionTimeout() {
 
-        final OutputChannel<String> channel = JRoutine.on(serviceFrom(getActivity()))
-                                                      .with(targetFactory(StringDelay.class))
+        final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
+                                                      .on(factoryOf(StringDelay.class))
                                                       .invocations()
                                                       .withExecutionTimeout(millis(10))
                                                       .withExecutionTimeoutAction(
@@ -213,8 +209,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
     public void testExecutionTimeout2() {
 
-        final OutputChannel<String> channel = JRoutine.on(serviceFrom(getActivity()))
-                                                      .with(targetFactory(StringDelay.class))
+        final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
+                                                      .on(factoryOf(StringDelay.class))
                                                       .invocations()
                                                       .withExecutionTimeout(millis(10))
                                                       .withExecutionTimeoutAction(
@@ -237,8 +233,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
     public void testExecutionTimeout3() {
 
-        final OutputChannel<String> channel = JRoutine.on(serviceFrom(getActivity()))
-                                                      .with(targetFactory(StringDelay.class))
+        final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
+                                                      .on(factoryOf(StringDelay.class))
                                                       .invocations()
                                                       .withExecutionTimeout(millis(10))
                                                       .withExecutionTimeoutAction(
@@ -262,10 +258,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
-                targetFactory(StringPassingInvocation.class);
-        final Routine<String, String> routine1 = JRoutine.on(serviceFrom(getActivity()))
-                                                         .with(targetFactory)
+        final TargetInvocationFactory<String, String> targetFactory =
+                factoryOf(StringPassingInvocation.class);
+        final Routine<String, String> routine1 = JRoutine.with(serviceFrom(getActivity()))
+                                                         .on(targetFactory)
                                                          .invocations()
                                                          .withInputOrder(OrderType.BY_CHANCE)
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -288,8 +284,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<StringFunctionInvocation> token = tokenOf(StringFunctionInvocation.class);
-        final Routine<String, String> routine2 = JRoutine.on(serviceFrom(getActivity()))
-                                                         .with(targetFactory(token))
+        final Routine<String, String> routine2 = JRoutine.with(serviceFrom(getActivity()))
+                                                         .on(factoryOf(token))
                                                          .invocations()
                                                          .withOutputOrder(OrderType.BY_CHANCE)
                                                          .withLogLevel(LogLevel.DEBUG)
@@ -312,10 +308,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations3() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
-                targetFactory(StringFunctionInvocation.class);
-        final Routine<String, String> routine3 = JRoutine.on(serviceFrom(getActivity()))
-                                                         .with(targetFactory)
+        final TargetInvocationFactory<String, String> targetFactory =
+                factoryOf(StringFunctionInvocation.class);
+        final Routine<String, String> routine3 = JRoutine.with(serviceFrom(getActivity()))
+                                                         .on(targetFactory)
                                                          .invocations()
                                                          .withInputOrder(OrderType.BY_CALL)
                                                          .withOutputOrder(OrderType.BY_CALL)
@@ -335,10 +331,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations4() throws InterruptedException {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final InvocationFactoryTarget<String, String> targetFactory =
-                targetFactory(StringFunctionInvocation.class);
-        final Routine<String, String> routine4 = JRoutine.on(serviceFrom(getActivity()))
-                                                         .with(targetFactory)
+        final TargetInvocationFactory<String, String> targetFactory =
+                factoryOf(StringFunctionInvocation.class);
+        final Routine<String, String> routine4 = JRoutine.with(serviceFrom(getActivity()))
+                                                         .on(targetFactory)
                                                          .invocations()
                                                          .withCoreInstances(0)
                                                          .withMaxInstances(2)
@@ -358,8 +354,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final MyParcelable p = new MyParcelable(33, -17);
-        assertThat(JRoutine.on(serviceFrom(getActivity()))
-                           .with(targetFactory(MyParcelableInvocation.class))
+        assertThat(JRoutine.with(serviceFrom(getActivity()))
+                           .on(factoryOf(MyParcelableInvocation.class))
                            .asyncCall(p)
                            .afterMax(timeout)
                            .next()).isEqualTo(p);
@@ -369,8 +365,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.on(serviceFrom(getActivity(), TestService.class))
-                        .with(targetFactory(StringPassingInvocation.class))
+                JRoutine.with(serviceFrom(getActivity(), TestService.class))
+                        .on(factoryOf(StringPassingInvocation.class))
                         .buildRoutine();
         assertThat(routine.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");

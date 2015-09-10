@@ -17,8 +17,8 @@ import com.github.dm.jrt.core.InvocationTarget;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.core.InvocationTarget.targetClass;
-import static com.github.dm.jrt.core.InvocationTarget.targetObject;
+import static com.github.dm.jrt.core.InvocationTarget.classOfType;
+import static com.github.dm.jrt.core.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -32,7 +32,7 @@ public class InvocationTargetTest {
     @Test
     public void testClassTarget() {
 
-        final InvocationTarget target = targetClass(TargetClass.class);
+        final InvocationTarget target = classOfType(TargetClass.class);
         assertThat(target.getTarget()).isSameAs(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
@@ -43,13 +43,13 @@ public class InvocationTargetTest {
     @Test
     public void testClassTargetEquals() {
 
-        final InvocationTarget target = targetClass(TargetClass.class);
+        final InvocationTarget target = classOfType(TargetClass.class);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo("");
-        assertThat(target.hashCode()).isEqualTo(targetClass(TargetClass.class).hashCode());
-        assertThat(target).isEqualTo(targetClass(TargetClass.class));
-        assertThat(target.hashCode()).isNotEqualTo(targetClass(TestClass.class).hashCode());
-        assertThat(target).isNotEqualTo(targetClass(TestClass.class));
+        assertThat(target.hashCode()).isEqualTo(classOfType(TargetClass.class).hashCode());
+        assertThat(target).isEqualTo(classOfType(TargetClass.class));
+        assertThat(target.hashCode()).isNotEqualTo(classOfType(TestClass.class).hashCode());
+        assertThat(target).isNotEqualTo(classOfType(TestClass.class));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class InvocationTargetTest {
 
         try {
 
-            targetClass(null);
+            classOfType(null);
 
             fail();
 
@@ -71,7 +71,7 @@ public class InvocationTargetTest {
     public void testObjectTarget() {
 
         final TargetClass t = new TargetClass();
-        final InvocationTarget target = targetObject(t);
+        final InvocationTarget target = instance(t);
         assertThat(target.getTarget()).isSameAs(t);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
@@ -83,13 +83,13 @@ public class InvocationTargetTest {
     public void testObjectTargetEquals() {
 
         final TargetClass t = new TargetClass();
-        final InvocationTarget target = targetObject(t);
+        final InvocationTarget target = instance(t);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo("");
-        assertThat(target.hashCode()).isEqualTo(targetObject(t).hashCode());
-        assertThat(target).isEqualTo(targetObject(t));
-        assertThat(target.hashCode()).isNotEqualTo(targetObject(new TestClass()).hashCode());
-        assertThat(target).isNotEqualTo(targetObject(new TestClass()));
+        assertThat(target.hashCode()).isEqualTo(instance(t).hashCode());
+        assertThat(target).isEqualTo(instance(t));
+        assertThat(target.hashCode()).isNotEqualTo(instance(new TestClass()).hashCode());
+        assertThat(target).isNotEqualTo(instance(new TestClass()));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class InvocationTargetTest {
 
         try {
 
-            targetObject(null);
+            instance(null);
 
             fail();
 

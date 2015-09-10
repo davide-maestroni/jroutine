@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         JRoutine.on(new MyClass()).aliasMethod(MyClass.METHOD_NAME).asyncCall();
+ *         JRoutine.on(instance(new MyClass())).aliasMethod(MyClass.METHOD_NAME).asyncCall();
  *     </code>
  * </pre>
  * <p/>

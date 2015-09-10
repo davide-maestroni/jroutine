@@ -39,7 +39,7 @@ public abstract class InvocationTarget {
      * @return the invocation target.
      */
     @Nonnull
-    public static InvocationTarget targetClass(@Nonnull final Class<?> targetClass) {
+    public static InvocationTarget classOfType(@Nonnull final Class<?> targetClass) {
 
         return new ClassInvocationTarget(targetClass);
     }
@@ -51,7 +51,7 @@ public abstract class InvocationTarget {
      * @return the invocation target.
      */
     @Nonnull
-    public static InvocationTarget targetObject(@Nonnull final Object target) {
+    public static InvocationTarget instance(@Nonnull final Object target) {
 
         return new ObjectInvocationTarget(target);
     }

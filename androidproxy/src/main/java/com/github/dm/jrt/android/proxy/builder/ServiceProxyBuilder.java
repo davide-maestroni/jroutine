@@ -16,7 +16,7 @@ package com.github.dm.jrt.android.proxy.builder;
 import com.github.dm.jrt.android.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
-import com.github.dm.jrt.proxy.builder.ProxyBuilder;
+import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * @param <TYPE> the interface type.
  */
 public interface ServiceProxyBuilder<TYPE>
-        extends ProxyBuilder<TYPE>, ServiceConfigurableBuilder<ServiceProxyBuilder<TYPE>> {
+        extends ProxyObjectBuilder<TYPE>, ServiceConfigurableBuilder<ServiceProxyBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

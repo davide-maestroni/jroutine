@@ -30,7 +30,7 @@ import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.InvocationClashException;
 import com.github.dm.jrt.android.invocation.InvocationTypeException;
-import com.github.dm.jrt.android.invocation.StaleResultsException;
+import com.github.dm.jrt.android.invocation.StaleResultException;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.OutputChannel;
@@ -171,7 +171,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 continue;
             }
 
-            final RoutineLoader<?, ?> loader = callbacks.mLoader;
+            final InvocationLoader<?, ?> loader = callbacks.mLoader;
 
             if ((loaderId == callbackArray.keyAt(i)) && (loader.getInvocationCount() == 0)) {
 
@@ -231,8 +231,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 continue;
             }
 
-            final RoutineLoader<Object, Object> loader =
-                    (RoutineLoader<Object, Object>) callbacks.mLoader;
+            final InvocationLoader<Object, Object> loader =
+                    (InvocationLoader<Object, Object>) callbacks.mLoader;
 
             if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
                     == 0)) {
@@ -298,8 +298,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 continue;
             }
 
-            final RoutineLoader<Object, Object> loader =
-                    (RoutineLoader<Object, Object>) callbacks.mLoader;
+            final InvocationLoader<Object, Object> loader =
+                    (InvocationLoader<Object, Object>) callbacks.mLoader;
 
             if ((loader.getInvocationCount() == 0) && (loaderId == callbackArray.keyAt(i)) && loader
                     .areSameInputs(inputs)) {
@@ -358,7 +358,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 continue;
             }
 
-            final RoutineLoader<?, ?> loader = callbacks.mLoader;
+            final InvocationLoader<?, ?> loader = callbacks.mLoader;
 
             if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
                     == 0)) {
@@ -462,34 +462,34 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         }
 
         final boolean isRoutineLoader =
-                (loader != null) && (loader.getClass() == RoutineLoader.class);
+                (loader != null) && (loader.getClass() == InvocationLoader.class);
         final boolean isStaleResult =
-                isRoutineLoader && ((RoutineLoader<?, OUT>) loader).isStaleResult(
+                isRoutineLoader && ((InvocationLoader<?, OUT>) loader).isStaleResult(
                         mResultStaleTimeMillis);
 
         if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_THAT)
                 || isStaleResult) {
 
-            final RoutineLoader<IN, OUT> routineLoader;
+            final InvocationLoader<IN, OUT> invocationLoader;
 
             if ((clashType == ClashType.NONE) && isRoutineLoader && !isStaleResult) {
 
-                routineLoader = (RoutineLoader<IN, OUT>) loader;
+                invocationLoader = (InvocationLoader<IN, OUT>) loader;
 
             } else {
 
-                routineLoader = null;
+                invocationLoader = null;
             }
 
             final RoutineLoaderCallbacks<OUT> newCallbacks =
-                    createCallbacks(loaderContext, loaderManager, routineLoader, inputs, loaderId);
+                    createCallbacks(loaderContext, loaderManager, invocationLoader, inputs, loaderId);
 
             if (callbacks != null) {
 
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
                 callbacks.reset(((clashType == ClashType.ABORT_THAT) || !isStaleResult)
                                         ? new InvocationClashException(loaderId)
-                                        : new StaleResultsException(loaderId));
+                                        : new StaleResultException(loaderId));
             }
 
             callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(newCallbacks));
@@ -516,12 +516,12 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
     @Nonnull
     private RoutineLoaderCallbacks<OUT> createCallbacks(@Nonnull final Context loaderContext,
             @Nonnull final LoaderManager loaderManager,
-            @Nullable final RoutineLoader<IN, OUT> loader, @Nonnull final List<? extends IN> inputs,
+            @Nullable final InvocationLoader<IN, OUT> loader, @Nonnull final List<? extends IN> inputs,
             final int loaderId) {
 
         final Logger logger = mLogger;
-        final RoutineLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
-                : new RoutineLoader<IN, OUT>(loaderContext, createInvocation(loaderId), mFactory,
+        final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
+                : new InvocationLoader<IN, OUT>(loaderContext, createInvocation(loaderId), mFactory,
                                              inputs, mOrderType, logger);
         return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
     }
@@ -561,25 +561,25 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
         final Logger logger = mLogger;
 
-        if (loader.getClass() != RoutineLoader.class) {
+        if (loader.getClass() != InvocationLoader.class) {
 
             logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
             throw new InvocationTypeException(loaderId);
         }
 
         final ContextInvocationFactory<IN, OUT> factory = mFactory;
-        final RoutineLoader<IN, OUT> routineLoader = (RoutineLoader<IN, OUT>) loader;
+        final InvocationLoader<IN, OUT> invocationLoader = (InvocationLoader<IN, OUT>) loader;
 
-        if (!(factory instanceof MissingLoaderInvocation) && !routineLoader.getInvocationFactory()
+        if (!(factory instanceof MissingLoaderInvocation) && !invocationLoader.getInvocationFactory()
                                                                            .equals(factory)) {
 
             logger.wrn("clashing loader ID [%d]: %s", loaderId,
-                       routineLoader.getInvocationFactory());
+                       invocationLoader.getInvocationFactory());
             throw new InvocationTypeException(loaderId);
         }
 
         final ClashResolutionType resolution =
-                routineLoader.areSameInputs(inputs) ? mInputClashResolutionType
+                invocationLoader.areSameInputs(inputs) ? mInputClashResolutionType
                         : mClashResolutionType;
 
         if (resolution == ClashResolutionType.JOIN) {
@@ -666,7 +666,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         private final ArrayList<TransportChannel<OUT>> mChannels =
                 new ArrayList<TransportChannel<OUT>>();
 
-        private final RoutineLoader<?, OUT> mLoader;
+        private final InvocationLoader<?, OUT> mLoader;
 
         private final LoaderManager mLoaderManager;
 
@@ -687,7 +687,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
          * @param logger        the logger instance.
          */
         private RoutineLoaderCallbacks(@Nonnull final LoaderManager loaderManager,
-                @Nonnull final RoutineLoader<?, OUT> loader, @Nonnull final Logger logger) {
+                @Nonnull final InvocationLoader<?, OUT> loader, @Nonnull final Logger logger) {
 
             mLoaderManager = loaderManager;
             mLoader = loader;
@@ -704,7 +704,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 final InvocationResult<OUT> data) {
 
             final Logger logger = mLogger;
-            final RoutineLoader<?, OUT> internalLoader = mLoader;
+            final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<TransportChannel<OUT>> channels = mChannels;
             final ArrayList<TransportChannel<OUT>> newChannels = mNewChannels;
             final ArrayList<TransportChannel<OUT>> abortedChannels = mAbortedChannels;
@@ -778,7 +778,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
-            final RoutineLoader<?, OUT> internalLoader = mLoader;
+            final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<TransportChannel<OUT>> channels = mNewChannels;
             final TransportChannel<OUT> channel = JRoutine.transport()
                                                           .channels()

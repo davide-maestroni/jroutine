@@ -22,8 +22,8 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.core.DefaultExecution.InputIterator;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
+import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
@@ -58,7 +58,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
-    private final DefaultExecution<IN, OUT> mExecution;
+    private final InvocationExecution<IN, OUT> mExecution;
 
     private final Check mHasInputs;
 
@@ -146,8 +146,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
         }, runner, logger);
         mExecution =
-                new DefaultExecution<IN, OUT>(manager, new DefaultInputIterator(), mResultChanel,
-                                              logger);
+                new InvocationExecution<IN, OUT>(manager, new DefaultInputIterator(), mResultChanel,
+                                                 logger);
         mState = new InputChannelState();
     }
 

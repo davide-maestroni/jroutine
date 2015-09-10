@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.annotation.StaleTime *;
+ *              &#64;com.github.dm.jrt.android.annotation.ResultStaleTime *;
  *         }
  *     </code>
  * </pre>
@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StaleTime {
+public @interface ResultStaleTime {
 
     /**
      * The time unit of the time after which a loader invocation result is considered to be stale.

@@ -25,8 +25,8 @@ import javax.annotation.Nonnull;
  *
  * @param <TYPE> the interface type.
  */
-public interface ProxyBuilder<TYPE> extends ConfigurableBuilder<ProxyBuilder<TYPE>>,
-        ProxyConfigurableBuilder<ProxyBuilder<TYPE>> {
+public interface ProxyObjectBuilder<TYPE> extends ConfigurableBuilder<ProxyObjectBuilder<TYPE>>,
+        ProxyConfigurableBuilder<ProxyObjectBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

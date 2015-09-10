@@ -14,7 +14,7 @@
 package com.github.dm.jrt.android.proxy.core;
 
 import com.github.dm.jrt.android.builder.FactoryContext;
-import com.github.dm.jrt.android.service.RoutineService;
+import com.github.dm.jrt.android.service.InvocationService;
 import com.github.dm.jrt.invocation.InvocationException;
 
 import java.util.Arrays;
@@ -30,7 +30,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
  * <p/>
  * Created by davide-maestroni on 01/16/2015.
  */
-public class TestService extends RoutineService implements FactoryContext {
+public class TestService extends InvocationService implements FactoryContext {
 
     private static final HashMap<InstanceInfo, Object> sInstances =
             new HashMap<InstanceInfo, Object>();

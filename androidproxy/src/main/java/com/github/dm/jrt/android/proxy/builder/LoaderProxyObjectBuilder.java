@@ -16,7 +16,7 @@ package com.github.dm.jrt.android.proxy.builder;
 import com.github.dm.jrt.android.builder.LoaderConfigurableBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
-import com.github.dm.jrt.proxy.builder.ProxyBuilder;
+import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -27,8 +27,8 @@ import javax.annotation.Nonnull;
  *
  * @param <TYPE> the interface type.
  */
-public interface LoaderProxyBuilder<TYPE>
-        extends ProxyBuilder<TYPE>, LoaderConfigurableBuilder<LoaderProxyBuilder<TYPE>> {
+public interface LoaderProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>,
+        LoaderConfigurableBuilder<LoaderProxyObjectBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -46,7 +46,8 @@ public interface LoaderProxyBuilder<TYPE>
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
@@ -66,11 +67,11 @@ public interface LoaderProxyBuilder<TYPE>
      * @return the invocation configuration builder.
      */
     @Nonnull
-    InvocationConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> invocations();
+    InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> invocations();
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ProxyConfiguration.Builder<? extends LoaderProxyBuilder<TYPE>> proxies();
+    ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> proxies();
 }

@@ -39,8 +39,8 @@ import java.lang.annotation.Target;
  * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
  * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
  * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
- * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} annotations defined for each
- * interface method.
+ * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations defined
+ * for each interface method.
  * <p/>
  * See {@link com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy} for support of API levels
  * less than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.

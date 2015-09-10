@@ -35,7 +35,7 @@ import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.proxy.annotation.Proxy;
-import com.github.dm.jrt.proxy.builder.ProxyBuilder;
+import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Execution;
@@ -245,7 +245,7 @@ public class ProxyRoutineTest {
         final TestClass test = new TestClass();
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
-        final ProxyBuilder<TestProxy> builder = com.github.dm.jrt.proxy.Proxy_Test.on(test);
+        final ProxyObjectBuilder<TestProxy> builder = com.github.dm.jrt.proxy.Proxy_Test.on(test);
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);

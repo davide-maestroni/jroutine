@@ -11,10 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.android.v4.core;
+package com.github.dm.jrt.android.v11.core;
 
+import android.annotation.TargetApi;
+import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
+import android.os.Build.VERSION_CODES;
 
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
@@ -37,7 +39,8 @@ import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactor
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class RoutineLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
+@TargetApi(VERSION_CODES.HONEYCOMB)
+class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
     private final List<? extends IN> mInputs;
 
@@ -64,7 +67,7 @@ class RoutineLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @param logger            the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    RoutineLoader(@Nonnull final Context context,
+    InvocationLoader(@Nonnull final Context context,
             @Nonnull final ContextInvocation<IN, OUT> invocation,
             @Nonnull final ContextInvocationFactory<IN, OUT> invocationFactory,
             @Nonnull final List<? extends IN> inputs, @Nullable final OrderType order,

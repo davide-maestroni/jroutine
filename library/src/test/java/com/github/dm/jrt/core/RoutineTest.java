@@ -34,10 +34,10 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.channel.TransportChannel;
-import com.github.dm.jrt.core.DefaultExecution.InputIterator;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
+import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.invocation.DelegatingInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -1197,7 +1197,7 @@ public class RoutineTest {
                                                      new TestAbortHandler(), Runners.syncRunner(),
                                                      logger);
 
-            new DefaultExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
+            new InvocationExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
 
             fail();
 
@@ -1212,8 +1212,8 @@ public class RoutineTest {
                                                      new TestAbortHandler(), Runners.syncRunner(),
                                                      logger);
 
-            new DefaultExecution<Object, Object>(new TestInvocationManager(), null, channel,
-                                                 logger);
+            new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
+                                                    logger);
 
             fail();
 
@@ -1223,8 +1223,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultExecution<Object, Object>(new TestInvocationManager(),
-                                                 new TestInputIterator(), null, logger);
+            new InvocationExecution<Object, Object>(new TestInvocationManager(),
+                                                    new TestInputIterator(), null, logger);
 
             fail();
 
@@ -1239,7 +1239,7 @@ public class RoutineTest {
                                                      new TestAbortHandler(), Runners.syncRunner(),
                                                      logger);
 
-            new DefaultExecution<Object, Object>(new TestInvocationManager(),
+            new InvocationExecution<Object, Object>(new TestInvocationManager(),
                                                  new TestInputIterator(), channel, null);
 
             fail();

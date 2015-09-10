@@ -25,9 +25,6 @@ import javax.annotation.Nonnull;
  * Interface defining a builder of routines wrapping an object, whose methods are executed in a
  * dedicated service.
  * <p/>
- * Note that only instance methods can be asynchronously invoked through the routines created by
- * this builder.
- * <p/>
  * Created by davide-maestroni on 05/13/2015.
  */
 public interface ServiceProxyRoutineBuilder

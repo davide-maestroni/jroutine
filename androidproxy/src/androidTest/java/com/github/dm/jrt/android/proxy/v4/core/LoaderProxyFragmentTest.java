@@ -19,7 +19,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.proxy.R;
 import com.github.dm.jrt.android.proxy.annotation.V4Proxy;
-import com.github.dm.jrt.android.proxy.builder.LoaderProxyBuilder;
+import com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutine;
 import com.github.dm.jrt.annotation.Alias;
@@ -240,7 +240,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final Runner runner = Runners.poolRunner();
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
-        final LoaderProxyBuilder<TestProxy> builder =
+        final LoaderProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.V4Proxy_TestFragment.with(contextFrom(fragment))
                                                                     .on(TestClass.class);
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();

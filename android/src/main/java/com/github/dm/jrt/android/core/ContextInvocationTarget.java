@@ -211,7 +211,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
 
                         return new ObjectContextInvocationTarget(
                                 (Class<?>) source.readSerializable(),
-                                source.readArray(InvocationFactoryTarget.class.getClassLoader()));
+                                source.readArray(ContextInvocationTarget.class.getClassLoader()));
                     }
 
                     @Nonnull

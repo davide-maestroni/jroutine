@@ -16,7 +16,7 @@ package com.github.dm.jrt.android.core;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.dm.jrt.android.service.RoutineService;
+import com.github.dm.jrt.android.service.InvocationService;
 
 import java.lang.ref.WeakReference;
 
@@ -42,9 +42,8 @@ public abstract class ServiceContext {
 
     /**
      * Returns a context based on the specified instance.<br/>
-     * The default {@link com.github.dm.jrt.android.service.RoutineService RoutineService} class
-     * will
-     * be employed.
+     * The default {@link com.github.dm.jrt.android.service.InvocationService InvocationService}
+     * class will be employed.
      *
      * @param context the context.
      * @return the service context.
@@ -52,7 +51,7 @@ public abstract class ServiceContext {
     @Nonnull
     public static ServiceContext serviceFrom(@Nonnull final Context context) {
 
-        return serviceFrom(context, RoutineService.class);
+        return serviceFrom(context, InvocationService.class);
     }
 
     /**
@@ -65,7 +64,7 @@ public abstract class ServiceContext {
      */
     @Nonnull
     public static ServiceContext serviceFrom(@Nonnull final Context context,
-            @Nonnull final Class<? extends RoutineService> serviceClass) {
+            @Nonnull final Class<? extends InvocationService> serviceClass) {
 
         return serviceFrom(context, new Intent(context, serviceClass));
     }

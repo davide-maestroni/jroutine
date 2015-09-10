@@ -47,7 +47,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
 
     private final ServiceContext mContext;
 
-    private final InvocationFactoryTarget<IN, OUT> mFactoryTarget;
+    private final TargetInvocationFactory<IN, OUT> mTargetFactory;
 
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
@@ -59,7 +59,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final InvocationFactoryTarget<IN, OUT> target) {
+            @Nonnull final TargetInvocationFactory<IN, OUT> target) {
 
         if (context == null) {
 
@@ -72,13 +72,13 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
         }
 
         mContext = context;
-        mFactoryTarget = target;
+        mTargetFactory = target;
     }
 
     @Nonnull
     public Routine<IN, OUT> buildRoutine() {
 
-        return new ServiceRoutine<IN, OUT>(mContext, mFactoryTarget, getConfiguration(),
+        return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
                                            mServiceConfiguration);
     }
 

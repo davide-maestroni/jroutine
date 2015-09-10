@@ -17,7 +17,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.core.InvocationTarget;
 import com.github.dm.jrt.proxy.annotation.Proxy;
-import com.github.dm.jrt.proxy.builder.AbstractProxyBuilder;
+import com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.util.ClassToken;
 
@@ -84,7 +84,8 @@ class DefaultProxyRoutineBuilder
                             + itfClass.getName());
         }
 
-        final ObjectProxyBuilder<TYPE> builder = new ObjectProxyBuilder<TYPE>(mTarget, itf);
+        final TargetProxyObjectBuilder<TYPE> builder =
+                new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
         return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
@@ -140,7 +141,7 @@ class DefaultProxyRoutineBuilder
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectProxyBuilder<TYPE> extends AbstractProxyBuilder<TYPE> {
+    private static class TargetProxyObjectBuilder<TYPE> extends AbstractProxyObjectBuilder<TYPE> {
 
         private final ClassToken<TYPE> mInterfaceToken;
 
@@ -152,7 +153,7 @@ class DefaultProxyRoutineBuilder
          * @param target         the invocation target.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectProxyBuilder(@Nonnull final InvocationTarget target,
+        private TargetProxyObjectBuilder(@Nonnull final InvocationTarget target,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mTarget = target;

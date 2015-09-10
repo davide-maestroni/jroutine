@@ -19,7 +19,7 @@ import com.github.dm.jrt.android.annotation.CacheStrategy;
 import com.github.dm.jrt.android.annotation.ClashResolution;
 import com.github.dm.jrt.android.annotation.InputClashResolution;
 import com.github.dm.jrt.android.annotation.LoaderId;
-import com.github.dm.jrt.android.annotation.StaleTime;
+import com.github.dm.jrt.android.annotation.ResultStaleTime;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
@@ -138,7 +138,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             builder.withCacheStrategy(cacheAnnotation.value());
         }
 
-        final StaleTime staleTimeAnnotation = method.getAnnotation(StaleTime.class);
+        final ResultStaleTime staleTimeAnnotation = method.getAnnotation(ResultStaleTime.class);
 
         if (staleTimeAnnotation != null) {
 

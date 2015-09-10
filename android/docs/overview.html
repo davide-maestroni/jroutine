@@ -174,8 +174,8 @@
                 public void onContext(&commat;Nonnull final Context context) {
 
                     super.onContext(context);
-                    mRoutine = JRoutine.with(serviceFrom(context, RoutineService.class))
-                                       .on(invocationOf(LoadBitmap.class))
+                    mRoutine = JRoutine.with(serviceFrom(context))
+                                       .on(factoryOf(LoadBitmap.class))
                                        .buildRoutine();
                 }
 

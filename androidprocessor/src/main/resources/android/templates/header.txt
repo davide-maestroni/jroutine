@@ -57,7 +57,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @javax.annotation.Nonnull
     private static <OUT> com.github.dm.jrt.android.builder.ServiceRoutineBuilder<Object, OUT> getBuilder(
             @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ServiceContext context,
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.InvocationFactoryTarget<Object, OUT> target) {
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, OUT> target) {
 
         return com.github.dm.jrt.android.core.JRoutine.with(context).on(target);
     }

@@ -14,7 +14,7 @@
 package com.github.dm.jrt.android.core;
 
 import com.github.dm.jrt.android.builder.FactoryContext;
-import com.github.dm.jrt.android.service.RoutineService;
+import com.github.dm.jrt.android.service.InvocationService;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.InvocationException;
 
@@ -31,7 +31,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
  * <p/>
  * Created by davide-maestroni on 01/16/2015.
  */
-public class TestService extends RoutineService implements FactoryContext {
+public class TestService extends InvocationService implements FactoryContext {
 
     private final HashMap<InstanceInfo, Object> mInstances = new HashMap<InstanceInfo, Object>();
 

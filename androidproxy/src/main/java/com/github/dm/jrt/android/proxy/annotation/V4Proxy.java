@@ -39,8 +39,8 @@ import java.lang.annotation.Target;
  * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
  * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
  * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
- * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} annotations defined for each
- * interface method.
+ * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations defined
+ * for each interface method.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

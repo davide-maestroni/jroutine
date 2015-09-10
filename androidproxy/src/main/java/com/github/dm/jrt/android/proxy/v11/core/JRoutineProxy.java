@@ -39,7 +39,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
  * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
  * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
- * @see com.github.dm.jrt.android.annotation.StaleTime StaleTime
+ * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
  * @see com.github.dm.jrt.android.proxy.annotation.V11Proxy V11Proxy
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input

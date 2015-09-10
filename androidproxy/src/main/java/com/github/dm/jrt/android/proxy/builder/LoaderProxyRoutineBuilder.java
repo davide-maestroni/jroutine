@@ -25,9 +25,6 @@ import javax.annotation.Nonnull;
  * Interface defining a builder of routines wrapping an object methods, bound to a context
  * lifecycle.
  * <p/>
- * Note that only instance methods can be asynchronously invoked through the routines created by
- * this builder.
- * <p/>
  * Created by davide-maestroni on 05/06/2015.
  */
 public interface LoaderProxyRoutineBuilder
@@ -49,7 +46,8 @@ public interface LoaderProxyRoutineBuilder
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
@@ -85,7 +83,8 @@ public interface LoaderProxyRoutineBuilder
      * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
      * {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy} and
      * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.StaleTime StaleTime} annotations.<br/>
+     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with

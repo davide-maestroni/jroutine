@@ -77,8 +77,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
     private final ServiceContext mContext;
 
-    private final TargetInvocationFactory<IN, OUT> mTargetFactory;
-
     private final InvocationConfiguration mInvocationConfiguration;
 
     private final Logger mLogger;
@@ -86,6 +84,8 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
     private final Routine<IN, OUT> mRoutine;
 
     private final ServiceConfiguration mServiceConfiguration;
+
+    private final TargetInvocationFactory<IN, OUT> mTargetFactory;
 
     /**
      * Constructor.

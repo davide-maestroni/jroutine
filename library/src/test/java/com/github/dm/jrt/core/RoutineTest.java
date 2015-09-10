@@ -1240,7 +1240,7 @@ public class RoutineTest {
                                                      logger);
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
-                                                 new TestInputIterator(), channel, null);
+                                                    new TestInputIterator(), channel, null);
 
             fail();
 

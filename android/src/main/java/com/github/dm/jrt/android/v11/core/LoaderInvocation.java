@@ -482,7 +482,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             }
 
             final RoutineLoaderCallbacks<OUT> newCallbacks =
-                    createCallbacks(loaderContext, loaderManager, invocationLoader, inputs, loaderId);
+                    createCallbacks(loaderContext, loaderManager, invocationLoader, inputs,
+                                    loaderId);
 
             if (callbacks != null) {
 
@@ -516,13 +517,13 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
     @Nonnull
     private RoutineLoaderCallbacks<OUT> createCallbacks(@Nonnull final Context loaderContext,
             @Nonnull final LoaderManager loaderManager,
-            @Nullable final InvocationLoader<IN, OUT> loader, @Nonnull final List<? extends IN> inputs,
-            final int loaderId) {
+            @Nullable final InvocationLoader<IN, OUT> loader,
+            @Nonnull final List<? extends IN> inputs, final int loaderId) {
 
         final Logger logger = mLogger;
         final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
                 : new InvocationLoader<IN, OUT>(loaderContext, createInvocation(loaderId), mFactory,
-                                             inputs, mOrderType, logger);
+                                                inputs, mOrderType, logger);
         return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
     }
 
@@ -570,8 +571,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final ContextInvocationFactory<IN, OUT> factory = mFactory;
         final InvocationLoader<IN, OUT> invocationLoader = (InvocationLoader<IN, OUT>) loader;
 
-        if (!(factory instanceof MissingLoaderInvocation) && !invocationLoader.getInvocationFactory()
-                                                                           .equals(factory)) {
+        if (!(factory instanceof MissingLoaderInvocation)
+                && !invocationLoader.getInvocationFactory().equals(factory)) {
 
             logger.wrn("clashing loader ID [%d]: %s", loaderId,
                        invocationLoader.getInvocationFactory());

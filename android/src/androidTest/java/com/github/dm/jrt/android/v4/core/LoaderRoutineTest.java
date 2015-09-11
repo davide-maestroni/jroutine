@@ -68,6 +68,7 @@ import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
+import static com.github.dm.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;

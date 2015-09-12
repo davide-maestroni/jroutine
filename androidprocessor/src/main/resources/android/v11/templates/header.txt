@@ -38,6 +38,21 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
                     "${classFullName}");
         }
 
+        if (invocationConfiguration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        if (proxyConfiguration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        if (loaderConfiguration == null) {
+
+            throw new NullPointerException("the loader configuration must not be null");
+        }
+
         mContext = context;
         ${routineFieldsInit}
     }
@@ -72,7 +87,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @javax.annotation.Nonnull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on() {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> onClass() {
 
             return new LoaderProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType(${classErasure}.class));
         }

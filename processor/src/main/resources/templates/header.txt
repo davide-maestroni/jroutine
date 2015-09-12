@@ -18,7 +18,7 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    @SuppressWarnings({"ConstantConditions", "EqualsBetweenInconvertibleTypes"})
+    @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
@@ -27,6 +27,16 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
+        }
+
+        if (invocationConfiguration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        if (proxyConfiguration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
         }
 
         ${routineFieldsInit}
@@ -50,7 +60,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
 
-        @SuppressWarnings("ConstantConditions")
         private ProxyObjectBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
 
             mTarget = target;

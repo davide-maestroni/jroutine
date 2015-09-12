@@ -44,6 +44,21 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
                     "${classFullName}");
         }
 
+        if (invocationConfiguration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        if (proxyConfiguration == null) {
+
+            throw new NullPointerException("the proxy configuration must not be null");
+        }
+
+        if (serviceConfiguration == null) {
+
+            throw new NullPointerException("the service configuration must not be null");
+        }
+
         mContext = context;
         ${routineFieldsInit}
     }

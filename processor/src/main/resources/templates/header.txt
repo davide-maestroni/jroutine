@@ -18,7 +18,6 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    @SuppressWarnings({"ConstantConditions", "EqualsBetweenInconvertibleTypes"})
     public ${generatedClassName}(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
@@ -50,7 +49,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
 
-        @SuppressWarnings("ConstantConditions")
         private ProxyObjectBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
 
             mTarget = target;

@@ -72,7 +72,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @javax.annotation.Nonnull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on() {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> onClass() {
 
             return new LoaderProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType(${classErasure}.class));
         }

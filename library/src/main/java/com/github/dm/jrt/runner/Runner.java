@@ -48,8 +48,8 @@ public interface Runner {
      * with the consequence that the {@link Execution#run()} method will never be called.
      * <p/>
      * The implementation of this method is optional, still, it may greatly increase the performance
-     * by avoiding to start invocations which are already canceled. The specific implementation can
-     * safely ignore all that executions whose method {@link Execution#mayBeCanceled()} returns
+     * by avoiding to start invocations which are already aborted. The runner implementation can
+     * safely ignore all those executions whose method {@link Execution#mayBeCanceled()} returns
      * false.
      *
      * @param execution the execution.
@@ -57,7 +57,7 @@ public interface Runner {
     void cancel(@Nonnull Execution execution);
 
     /**
-     * Checks if the calling thread belongs to the ones employed by the object to run executions.
+     * Checks if the calling thread belongs to the ones employed by the runner implementation.
      * <p/>
      * The implementation of this method is not strictly mandatory, even if, the classes always
      * returning false effectively prevent the correct detection of possible deadlocks.<br/>

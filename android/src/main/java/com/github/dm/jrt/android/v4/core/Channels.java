@@ -19,8 +19,6 @@ import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.TransportChannel;
 
-import java.util.Collection;
-
 import javax.annotation.Nonnull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,7 +46,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * invocation lifecycle.
      *
      * @param channel the selectable channel.
-     * @param indexes the collection of indexes.
+     * @param indexes the iterable returning the channel indexes.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
@@ -56,11 +54,10 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     @Nonnull
     public static <DATA, IN extends DATA> SparseArrayCompat<TransportChannel<IN>> mapParcelable(
             @Nonnull final InputChannel<? super ParcelableSelectable<DATA>> channel,
-            @Nonnull final Collection<Integer> indexes) {
+            @Nonnull final Iterable<Integer> indexes) {
 
-        final int size = indexes.size();
         final SparseArrayCompat<TransportChannel<IN>> channelMap =
-                new SparseArrayCompat<TransportChannel<IN>>(size);
+                new SparseArrayCompat<TransportChannel<IN>>();
 
         for (final Integer index : indexes) {
 

@@ -20,7 +20,6 @@ import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TransportChannel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -340,7 +339,7 @@ public class Channels {
      * invocation lifecycle.
      *
      * @param channel the selectable channel.
-     * @param indexes the collection of indexes.
+     * @param indexes the iterable returning the channel indexes.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
@@ -348,11 +347,10 @@ public class Channels {
     @Nonnull
     public static <DATA, IN extends DATA> Map<Integer, TransportChannel<IN>> map(
             @Nonnull final InputChannel<? super Selectable<DATA>> channel,
-            @Nonnull final Collection<Integer> indexes) {
+            @Nonnull final Iterable<Integer> indexes) {
 
-        final int size = indexes.size();
         final HashMap<Integer, TransportChannel<IN>> channelMap =
-                new HashMap<Integer, TransportChannel<IN>>(size);
+                new HashMap<Integer, TransportChannel<IN>>();
 
         for (final Integer index : indexes) {
 
@@ -471,20 +469,19 @@ public class Channels {
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
-     * @param indexes the list of indexes.
+     * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the channel map.
      */
     @Nonnull
     public static <OUT> Map<Integer, OutputChannel<OUT>> map(
             @Nonnull final OutputChannel<? extends Selectable<? extends OUT>> channel,
-            @Nonnull final Collection<Integer> indexes) {
+            @Nonnull final Iterable<Integer> indexes) {
 
-        final int size = indexes.size();
         final HashMap<Integer, TransportChannel<OUT>> inputMap =
-                new HashMap<Integer, TransportChannel<OUT>>(size);
+                new HashMap<Integer, TransportChannel<OUT>>();
         final HashMap<Integer, OutputChannel<OUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUT>>(size);
+                new HashMap<Integer, OutputChannel<OUT>>();
 
         for (final Integer index : indexes) {
 

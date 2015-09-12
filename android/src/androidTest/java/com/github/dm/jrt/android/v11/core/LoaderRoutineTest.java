@@ -71,6 +71,7 @@ import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
+import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -96,7 +97,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
                                                         .loaders()
@@ -128,7 +129,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
                                                         .loaders()
@@ -234,7 +235,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(contextFrom(getActivity()))
                                                     .on(factoryFrom(
@@ -291,7 +292,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(contextFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
@@ -378,7 +379,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 = JRoutine.with(contextFrom(getActivity()))
                                                          .on(PassingContextInvocation.factoryOf())
                                                          .buildRoutine();
@@ -411,7 +412,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
                                                         .buildRoutine();
@@ -465,7 +466,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
                                                         .loaders()
@@ -488,7 +489,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final OutputChannel<String> channel =
                 JRoutine.with(contextFrom(getActivity())).onId(0).buildChannel();
 
@@ -590,7 +591,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
                                                         .loaders()
@@ -622,7 +623,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(contextFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
                                                         .loaders()
@@ -654,7 +655,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(contextFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
@@ -802,7 +803,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine =
                 JRoutine.with(contextFrom(getActivity())).on(factoryOf(Delay.class)).buildRoutine();
@@ -855,7 +856,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(contextFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
@@ -934,7 +935,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1043,7 +1044,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1071,7 +1072,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = seconds(1);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1107,7 +1108,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1167,7 +1168,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1193,7 +1194,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1302,7 +1303,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1337,7 +1338,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1444,7 +1445,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Data data1 = new Data();
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
@@ -1508,7 +1509,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine1 = JRoutine.with(contextFrom(getActivity()))
                                                          .on(PassingContextInvocation
                                                                      .<String>factoryOf())
@@ -1774,7 +1775,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
 
-            result.after(TimeDuration.millis(500)).pass(d);
+            result.after(millis(500)).pass(d);
         }
     }
 
@@ -1836,7 +1837,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-            result.after(TimeDuration.millis(500)).pass(s.toUpperCase());
+            result.after(millis(500)).pass(s.toUpperCase());
         }
     }
 }

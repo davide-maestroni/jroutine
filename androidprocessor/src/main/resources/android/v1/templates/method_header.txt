@@ -20,10 +20,10 @@
 
         private final String mShareGroup;
 
-        private final com.github.dm.jrt.android.core.ContextInvocationTarget mTarget;
+        private final com.github.dm.jrt.android.core.ContextInvocationTarget<?> mTarget;
 
         private ContextInvocationFactory${methodCount}(@javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
             mShareGroup = shareGroup;
             mTarget = target;
@@ -39,7 +39,7 @@
 
     @javax.annotation.Nonnull
     private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {

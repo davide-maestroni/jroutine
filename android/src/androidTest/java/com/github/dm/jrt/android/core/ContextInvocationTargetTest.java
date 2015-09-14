@@ -11,30 +11,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.android.core;
 
-import com.github.dm.jrt.core.InvocationTarget.ClassInvocationTarget;
-import com.github.dm.jrt.core.InvocationTarget.InstanceInvocationTarget;
+import android.test.AndroidTestCase;
 
-import org.junit.Test;
+import com.github.dm.jrt.android.core.ContextInvocationTarget.ClassContextInvocationTarget;
+import com.github.dm.jrt.android.core.ContextInvocationTarget.ObjectContextInvocationTarget;
 
-import static com.github.dm.jrt.core.InvocationTarget.classOfType;
-import static com.github.dm.jrt.core.InvocationTarget.instance;
+import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 /**
- * Invocation target unit test.
+ * Context invocation target unit test.
  * <p/>
- * Created by davide-maestroni on 08/22/2015.
+ * Created by davide-maestroni on 09/14/2015.
  */
-public class InvocationTargetTest {
+public class ContextInvocationTargetTest extends AndroidTestCase {
 
-    @Test
     public void testClassTarget() {
 
-        final ClassInvocationTarget<TargetClass> target = classOfType(TargetClass.class);
-        assertThat(target.getTarget()).isSameAs(TargetClass.class);
+        final ClassContextInvocationTarget<TargetClass> target = classOfType(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
         assertThat(target.isSameTypeOf(TargetClass.class)).isTrue();
@@ -44,10 +41,9 @@ public class InvocationTargetTest {
         assertThat(target.isSameTypeOf(String.class)).isFalse();
     }
 
-    @Test
     public void testClassTargetEquals() {
 
-        final ClassInvocationTarget<TargetClass> target = classOfType(TargetClass.class);
+        final ClassContextInvocationTarget<TargetClass> target = classOfType(TargetClass.class);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo("");
         assertThat(target.hashCode()).isEqualTo(classOfType(TargetClass.class).hashCode());
@@ -56,7 +52,6 @@ public class InvocationTargetTest {
         assertThat(target).isNotEqualTo(classOfType(TestClass.class));
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testClassTargetError() {
 
@@ -71,12 +66,9 @@ public class InvocationTargetTest {
         }
     }
 
-    @Test
-    public void testInstanceTarget() {
+    public void testObjectTarget() {
 
-        final TargetClass t = new TargetClass();
-        final InstanceInvocationTarget<TargetClass> target = instance(t);
-        assertThat(target.getTarget()).isSameAs(t);
+        final ObjectContextInvocationTarget<TargetClass> target = instanceOf(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
         assertThat(target.isSameTypeOf(TargetClass.class)).isTrue();
@@ -86,26 +78,23 @@ public class InvocationTargetTest {
         assertThat(target.isSameTypeOf(String.class)).isFalse();
     }
 
-    @Test
-    public void testInstanceTargetEquals() {
+    public void testObjectTargetEquals() {
 
-        final TargetClass t = new TargetClass();
-        final InstanceInvocationTarget<TargetClass> target = instance(t);
+        final ObjectContextInvocationTarget<TargetClass> target = instanceOf(TargetClass.class);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo("");
-        assertThat(target.hashCode()).isEqualTo(instance(t).hashCode());
-        assertThat(target).isEqualTo(instance(t));
-        assertThat(target.hashCode()).isNotEqualTo(instance(new TestClass()).hashCode());
-        assertThat(target).isNotEqualTo(instance(new TestClass()));
+        assertThat(target.hashCode()).isEqualTo(instanceOf(TargetClass.class).hashCode());
+        assertThat(target).isEqualTo(instanceOf(TargetClass.class));
+        assertThat(target.hashCode()).isNotEqualTo(instanceOf(TestClass.class).hashCode());
+        assertThat(target).isNotEqualTo(instanceOf(TestClass.class));
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
-    public void testInstanceTargetError() {
+    public void testObjectTargetError() {
 
         try {
 
-            instance(null);
+            instanceOf(null);
 
             fail();
 

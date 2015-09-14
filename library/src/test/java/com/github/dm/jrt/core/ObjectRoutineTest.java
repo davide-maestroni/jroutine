@@ -710,7 +710,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on((InvocationTarget) null);
+            JRoutine.on((InvocationTarget<?>) null);
 
             fail();
 

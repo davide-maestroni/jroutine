@@ -22,7 +22,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@javax.annotation.Nonnull final com.github.dm.jrt.android.v4.core.LoaderContext context,
-            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target,
+            @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
@@ -32,7 +32,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             throw new NullPointerException("the routine context must not be null");
         }
 
-        if (!${classErasure}.class.isAssignableFrom(target.getTargetClass())) {
+        if (!target.isSameTypeOf(${classErasure}.class)) {
 
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
@@ -87,22 +87,15 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @javax.annotation.Nonnull
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget.ObjectContextInvocationTarget<? extends ${classFullName}> target) {
+
+            return new LoaderProxyObjectBuilder${genericTypes}(mContext, target);
+        }
+
+        @javax.annotation.Nonnull
         public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> onClass() {
 
             return new LoaderProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType(${classErasure}.class));
-        }
-
-        @javax.annotation.Nonnull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final Class<? extends ${classFullName}> targetClass) {
-
-            return new LoaderProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf(targetClass));
-        }
-
-        @javax.annotation.Nonnull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final Class<? extends ${classFullName}> targetClass,
-                @javax.annotation.Nullable final Object... factoryArgs) {
-
-            return new LoaderProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
         }
     }
 
@@ -110,13 +103,13 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.android.v4.core.LoaderContext mContext;
 
-        private final com.github.dm.jrt.android.core.ContextInvocationTarget mTarget;
+        private final com.github.dm.jrt.android.core.ContextInvocationTarget<?> mTarget;
 
         private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
 
         @SuppressWarnings("ConstantConditions")
         private LoaderProxyObjectBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.android.v4.core.LoaderContext context,
-                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
             if (context == null) {
 

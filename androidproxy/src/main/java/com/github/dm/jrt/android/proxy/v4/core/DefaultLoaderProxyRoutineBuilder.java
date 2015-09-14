@@ -43,7 +43,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
     private final LoaderContext mContext;
 
-    private final ContextInvocationTarget mTarget;
+    private final ContextInvocationTarget<?> mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -60,7 +60,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderProxyRoutineBuilder(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationTarget target) {
+            @Nonnull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
 
@@ -189,7 +189,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         private final ClassToken<TYPE> mInterfaceToken;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -199,7 +199,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
          * @param interfaceToken the proxy interface token.
          */
         private TargetLoaderProxyObjectBuilder(@Nonnull final LoaderContext context,
-                @Nonnull final ContextInvocationTarget target,
+                @Nonnull final ContextInvocationTarget<?> target,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mContext = context;
@@ -237,7 +237,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
             try {
 
                 final LoaderContext context = mContext;
-                final ContextInvocationTarget target = mTarget;
+                final ContextInvocationTarget<?> target = mTarget;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final V4Proxy annotation = interfaceClass.getAnnotation(V4Proxy.class);
                 String packageName = annotation.classPackage();

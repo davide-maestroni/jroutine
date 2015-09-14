@@ -18,6 +18,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.JRoutine;
+import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyBuilder;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
@@ -222,9 +223,10 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final NullLog log = new NullLog();
         final InvocationConfiguration configuration =
                 builder().withLogLevel(LogLevel.DEBUG).withLog(log).set();
+        final ServiceContext serviceContext = serviceFrom(getActivity(), TestService.class);
         final ServiceProxyBuilder<TestProxy> builder =
-                com.github.dm.jrt.android.proxy.ServiceProxy_Test.with(
-                        serviceFrom(getActivity(), TestService.class)).on(TestClass.class);
+                com.github.dm.jrt.android.proxy.ServiceProxy_Test.with(serviceContext)
+                                                                 .on(instanceOf(TestClass.class));
         final TestProxy testProxy = builder.invocations()
                                            .with(configuration)
                                            .set()

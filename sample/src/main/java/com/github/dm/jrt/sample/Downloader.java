@@ -17,7 +17,6 @@ import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
-import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.Runners;
@@ -30,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 
 /**
@@ -151,10 +151,10 @@ public class Downloader {
             // the specific routine
             // That's why we store the routine output channel in an internal map
             final Routine<ByteBuffer, Boolean> writeFile =
-                    JRoutine.on(Invocations.factoryOf(WriteFile.class, dstFile)).invocations()
+                    JRoutine.on(factoryOf(WriteFile.class, dstFile)).invocations()
                             // Since we want to limit the number of allocated chunks, we have to
-                            // make the file writing happen in a dedicated runner, so that waiting
-                            // for available space becomes allowed
+                            // make the writing happen in a dedicated runner, so that waiting for
+                            // available space becomes allowed
                             .withRunner(mWriteRunner)
                             .withInputMaxSize(32)
                             .withInputTimeout(seconds(30))
@@ -208,16 +208,8 @@ public class Downloader {
 
                     // If completed, remove the resource from the download map
                     downloads.remove(uri);
-
-                    // Read the result
-                    if (channel.next()) {
-
-                        // If successful, add the resource to the downloaded set
-                        mDownloaded.add(uri);
-                        return true;
-                    }
-
-                    return false;
+                    // Read the result and, if successful, add the resource to the downloaded set
+                    return channel.next() && mDownloaded.add(uri);
                 }
 
             } catch (final InvocationException ignored) {

@@ -61,6 +61,7 @@ import javax.annotation.Nullable;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
+import static com.github.dm.jrt.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,7 +157,7 @@ public class ProxyRoutineTest {
     public void testInterface() {
 
         final TestClass test = new TestClass();
-        final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
+        final ClassToken<TestInterfaceProxy> token = tokenOf(TestInterfaceProxy.class);
         final TestInterfaceProxy testProxy = JRoutineProxy.on(instance(test)).buildProxy(token);
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -217,7 +218,7 @@ public class ProxyRoutineTest {
                                                  .withLogLevel(LogLevel.DEBUG)
                                                  .withLog(log)
                                                  .set()
-                                                 .buildProxy(ClassToken.tokenOf(TestProxy.class));
+                                                 .buildProxy(tokenOf(TestProxy.class));
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
         assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
@@ -245,7 +246,8 @@ public class ProxyRoutineTest {
         final TestClass test = new TestClass();
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
-        final ProxyObjectBuilder<TestProxy> builder = com.github.dm.jrt.proxy.Proxy_Test.on(test);
+        final ProxyObjectBuilder<TestProxy> builder =
+                com.github.dm.jrt.proxy.Proxy_Test.on(instance(test));
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -269,8 +271,7 @@ public class ProxyRoutineTest {
                                 .invocations()
                                 .with(configuration)
                                 .set()
-                                .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
-                testProxy);
+                                .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
     }
 
     @Test
@@ -285,14 +286,13 @@ public class ProxyRoutineTest {
                                                  .invocations()
                                                  .with(configuration)
                                                  .set()
-                                                 .buildProxy(ClassToken.tokenOf(TestProxy.class));
+                                                 .buildProxy(tokenOf(TestProxy.class));
 
         assertThat(JRoutineProxy.on(instance(test))
                                 .invocations()
                                 .with(configuration)
                                 .set()
-                                .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
-                testProxy);
+                                .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
     }
 
     @Test
@@ -312,7 +312,7 @@ public class ProxyRoutineTest {
 
         try {
 
-            JRoutineProxy.on(instance(test)).buildProxy(ClassToken.tokenOf(TestClass.class));
+            JRoutineProxy.on(instance(test)).buildProxy(tokenOf(TestClass.class));
 
             fail();
 

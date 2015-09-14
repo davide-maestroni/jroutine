@@ -256,7 +256,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                 builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
         final LoaderProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.V11Proxy_TestActivity.with(
-                        contextFrom(getActivity())).on(TestClass.class);
+                        contextFrom(getActivity())).on(instanceOf(TestClass.class));
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);

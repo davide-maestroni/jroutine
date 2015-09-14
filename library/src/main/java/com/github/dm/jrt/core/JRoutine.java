@@ -177,7 +177,7 @@ public class JRoutine {
      *                                            interface.
      */
     @Nonnull
-    public static ObjectRoutineBuilder on(@Nonnull final InvocationTarget target) {
+    public static ObjectRoutineBuilder on(@Nonnull final InvocationTarget<?> target) {
 
         return new DefaultObjectRoutineBuilder(target);
     }

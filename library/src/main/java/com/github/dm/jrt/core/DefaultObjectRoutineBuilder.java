@@ -59,7 +59,7 @@ class DefaultObjectRoutineBuilder
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutines = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
 
-    private final InvocationTarget mTarget;
+    private final InvocationTarget<?> mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -73,7 +73,7 @@ class DefaultObjectRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the class of specified target represents an
      *                                            interface.
      */
-    DefaultObjectRoutineBuilder(@Nonnull final InvocationTarget target) {
+    DefaultObjectRoutineBuilder(@Nonnull final InvocationTarget<?> target) {
 
         final Class<?> targetClass = target.getTargetClass();
 
@@ -183,7 +183,7 @@ class DefaultObjectRoutineBuilder
             @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-        final InvocationTarget target = mTarget;
+        final InvocationTarget<?> target = mTarget;
         final Object targetInstance = target.getTarget();
 
         if (targetInstance == null) {
@@ -234,7 +234,7 @@ class DefaultObjectRoutineBuilder
 
         private final OutputMode mOutputMode;
 
-        private final InvocationTarget mTarget;
+        private final InvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -246,7 +246,7 @@ class DefaultObjectRoutineBuilder
          * @param outputMode         the output transfer mode.
          */
         private MethodFunctionInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final InvocationTarget target, @Nonnull final Method method,
+                @Nonnull final InvocationTarget<?> target, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             final Object mutexTarget =
@@ -297,7 +297,7 @@ class DefaultObjectRoutineBuilder
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final InvocationTarget mTarget;
+        private final InvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -309,7 +309,7 @@ class DefaultObjectRoutineBuilder
          * @param outputMode         the output transfer mode.
          */
         private MethodInvocationFactory(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final InvocationTarget target, @Nonnull final Method method,
+                @Nonnull final InvocationTarget<?> target, @Nonnull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mProxyConfiguration = proxyConfiguration;

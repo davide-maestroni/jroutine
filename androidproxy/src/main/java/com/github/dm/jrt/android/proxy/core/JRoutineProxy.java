@@ -104,7 +104,7 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
          * @return the routine builder instance.
          */
         @Nonnull
-        public ServiceProxyRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
+        public ServiceProxyRoutineBuilder on(@Nonnull final ContextInvocationTarget<?> target) {
 
             return new DefaultServiceProxyRoutineBuilder(mContext, target);
         }

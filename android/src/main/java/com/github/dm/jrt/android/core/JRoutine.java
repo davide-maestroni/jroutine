@@ -136,7 +136,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @return the routine builder instance.
          */
         @Nonnull
-        public ServiceObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
+        public ServiceObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget<?> target) {
 
             return new DefaultServiceObjectRoutineBuilder(mContext, target);
         }

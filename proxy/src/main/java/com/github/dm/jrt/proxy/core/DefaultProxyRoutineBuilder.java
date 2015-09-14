@@ -37,7 +37,7 @@ class DefaultProxyRoutineBuilder
         implements ProxyRoutineBuilder, InvocationConfiguration.Configurable<ProxyRoutineBuilder>,
         ProxyConfiguration.Configurable<ProxyRoutineBuilder> {
 
-    private final InvocationTarget mTarget;
+    private final InvocationTarget<?> mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -50,7 +50,7 @@ class DefaultProxyRoutineBuilder
      * @param target the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultProxyRoutineBuilder(@Nonnull final InvocationTarget target) {
+    DefaultProxyRoutineBuilder(@Nonnull final InvocationTarget<?> target) {
 
         if (target == null) {
 
@@ -145,7 +145,7 @@ class DefaultProxyRoutineBuilder
 
         private final ClassToken<TYPE> mInterfaceToken;
 
-        private final InvocationTarget mTarget;
+        private final InvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -153,7 +153,7 @@ class DefaultProxyRoutineBuilder
          * @param target         the invocation target.
          * @param interfaceToken the proxy interface token.
          */
-        private TargetProxyObjectBuilder(@Nonnull final InvocationTarget target,
+        private TargetProxyObjectBuilder(@Nonnull final InvocationTarget<?> target,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mTarget = target;

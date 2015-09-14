@@ -20,11 +20,11 @@
 
         private final com.github.dm.jrt.builder.ProxyConfiguration mProxyConfiguration;
 
-        private final com.github.dm.jrt.core.InvocationTarget mTarget;
+        private final com.github.dm.jrt.core.InvocationTarget<?> mTarget;
 
         private InvocationFactory${methodCount}(
                 @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
-                @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget<?> target) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -40,7 +40,7 @@
 
     @javax.annotation.Nonnull
     private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target,
+            @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget<?> target,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
 

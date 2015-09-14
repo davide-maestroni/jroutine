@@ -210,7 +210,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @return the routine builder instance.
          */
         @Nonnull
-        public LoaderObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget target) {
+        public LoaderObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget<?> target) {
 
             return new DefaultLoaderObjectRoutineBuilder(mContext, target);
         }

@@ -16,7 +16,7 @@
 
     private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
 
-        private final  com.github.dm.jrt.android.core.ContextInvocationTarget mContextTarget;
+        private final  com.github.dm.jrt.android.core.ContextInvocationTarget<?> mContextTarget;
 
         private final String mShareGroup;
 
@@ -29,7 +29,7 @@
         private com.github.dm.jrt.core.InvocationTarget mTarget;
 
         private ContextInvocation${methodCount}(@javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget target) {
+                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
             mShareGroup = shareGroup;
             mContextTarget = target;
@@ -43,7 +43,7 @@
 
             try {
 
-                final com.github.dm.jrt.core.InvocationTarget target = mContextTarget.getInvocationTarget(context);
+                final com.github.dm.jrt.core.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
                 final Object mutexTarget = ${mutexTarget};
                 final String shareGroup = mShareGroup;
 

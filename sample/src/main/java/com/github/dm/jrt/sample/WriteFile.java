@@ -77,10 +77,11 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     public void onInput(final ByteBuffer buffer, @Nonnull final ResultChannel<Boolean> result) {
 
         final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
+        final BufferedOutputStream outputStream = mOutputStream;
 
         try {
 
-            while (inputStream.read(mOutputStream) > 0) {
+            while (inputStream.read(outputStream) > 0) {
 
                 // Keep looping...
             }

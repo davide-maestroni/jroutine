@@ -57,7 +57,7 @@ public class JRoutineProxy {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static ProxyRoutineBuilder on(@Nonnull final InvocationTarget target) {
+    public static ProxyRoutineBuilder on(@Nonnull final InvocationTarget<?> target) {
 
         return new DefaultProxyRoutineBuilder(target);
     }

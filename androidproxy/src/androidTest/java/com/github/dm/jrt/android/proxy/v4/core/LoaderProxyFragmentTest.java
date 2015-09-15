@@ -242,7 +242,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
         final LoaderProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.V4Proxy_TestFragment.with(contextFrom(fragment))
-                                                                    .on(TestClass.class);
+                                                                    .on(instanceOf(
+                                                                            TestClass.class));
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);

@@ -69,7 +69,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     private final LoaderContext mContext;
 
-    private final ContextInvocationTarget mTarget;
+    private final ContextInvocationTarget<?> mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -86,7 +86,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderObjectRoutineBuilder(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationTarget target) {
+            @Nonnull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
 
@@ -152,7 +152,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@Nonnull final String name) {
 
-        final ContextInvocationTarget target = mTarget;
+        final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
 
         if (targetMethod == null) {
@@ -308,7 +308,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         private Object mInstance;
 
@@ -323,7 +323,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         @SuppressWarnings("unchecked")
         private AliasContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget target, @Nonnull final String name) {
+                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final String name) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -337,7 +337,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final InvocationTarget target = mTarget.getInvocationTarget(context);
+                final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
                                    .proxies()
@@ -379,7 +379,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -391,7 +391,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         private AliasContextInvocationFactory(@Nonnull final Method targetMethod,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget target, @Nonnull final String name) {
+                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final String name) {
 
             super(targetMethod, proxyConfiguration, target, name);
             mProxyConfiguration = proxyConfiguration;
@@ -419,7 +419,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         private Object mInstance;
 
@@ -434,7 +434,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         @SuppressWarnings("unchecked")
         private MethodContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget target, @Nonnull final Method method) {
+                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final Method method) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -462,7 +462,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final InvocationTarget target = mTarget.getInvocationTarget(context);
+                final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
                                    .proxies()
@@ -490,7 +490,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -502,7 +502,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         private MethodContextInvocationFactory(@Nonnull final Method targetMethod,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget target, @Nonnull final Method method) {
+                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final Method method) {
 
             super(targetMethod, proxyConfiguration, target, method);
             mProxyConfiguration = proxyConfiguration;
@@ -522,13 +522,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
 
-        private final ContextInvocationTarget mContextTarget;
-
         private final InputMode mInputMode;
 
         private final OutputMode mOutputMode;
 
         private final ProxyConfiguration mProxyConfiguration;
+
+        private final ContextInvocationTarget<?> mTarget;
 
         private final Method mTargetMethod;
 
@@ -547,12 +547,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         private ProxyInvocation(@Nonnull final Method targetMethod,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget target, @Nullable final InputMode inputMode,
-                @Nullable final OutputMode outputMode) {
+                @Nonnull final ContextInvocationTarget<?> target,
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mTargetMethod = targetMethod;
             mProxyConfiguration = proxyConfiguration;
-            mContextTarget = target;
+            mTarget = target;
             mInputMode = inputMode;
             mOutputMode = outputMode;
             mMutex = this;
@@ -580,7 +580,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
             try {
 
-                final InvocationTarget target = mContextTarget.getInvocationTarget(context);
+                final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 final Object mutexTarget =
                         (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
                                 : target.getTarget();
@@ -612,7 +612,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         private final Method mTargetMethod;
 
@@ -627,8 +627,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         private ProxyInvocationFactory(@Nonnull final Method targetMethod,
                 @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget target, @Nullable final InputMode inputMode,
-                @Nullable final OutputMode outputMode) {
+                @Nonnull final ContextInvocationTarget<?> target,
+                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             super(targetMethod, proxyConfiguration, target, inputMode, outputMode);
             mTargetMethod = targetMethod;
@@ -659,7 +659,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ProxyConfiguration mProxyConfiguration;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -678,7 +678,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final ContextInvocationTarget target = mTarget;
+            final ContextInvocationTarget<?> target = mTarget;
             final MethodInfo methodInfo = getTargetMethodInfo(method, target.getTargetClass());
             final Method targetMethod = methodInfo.method;
             final InputMode inputMode = methodInfo.inputMode;

@@ -19,11 +19,11 @@ ${generatedPackage}
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
     @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target,
+    public ${generatedClassName}(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget<?> target,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-        if (!target.isAssignableTo(${classErasure}.class)) {
+        if (!target.isSameTypeOf(${classErasure}.class)) {
 
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
@@ -43,24 +43,24 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @javax.annotation.Nonnull
+    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget.InstanceInvocationTarget<? extends ${classFullName}> target) {
+
+        return new ProxyObjectBuilder${genericTypes}(target);
+    }
+
+    @javax.annotation.Nonnull
     public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> onClass() {
 
         return new ProxyObjectBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.classOfType(${classErasure}.class));
     }
 
-    @javax.annotation.Nonnull
-    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final ${classFullName} wrapped) {
-
-        return new ProxyObjectBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.instance(wrapped));
-    }
-
     private static class ProxyObjectBuilder${genericTypes} extends com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder<${interfaceFullName}> {
 
-        private final com.github.dm.jrt.core.InvocationTarget mTarget;
+        private final com.github.dm.jrt.core.InvocationTarget<?> mTarget;
 
         private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
 
-        private ProxyObjectBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
+        private ProxyObjectBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget<?> target) {
 
             mTarget = target;
         }

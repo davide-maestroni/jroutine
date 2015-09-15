@@ -22,8 +22,10 @@ import javax.annotation.Nullable;
  * Class representing an invocation target.
  * <p/>
  * Created by davide-maestroni on 08/20/2015.
+ *
+ * @param <TYPE> the target object type.
  */
-public abstract class InvocationTarget {
+public abstract class InvocationTarget<TYPE> {
 
     /**
      * Avoid direct instantiation.
@@ -36,24 +38,27 @@ public abstract class InvocationTarget {
      * Returns a target based on the specified class.
      *
      * @param targetClass the target class.
+     * @param <TYPE>      the target object type.
      * @return the invocation target.
      */
     @Nonnull
-    public static InvocationTarget classOfType(@Nonnull final Class<?> targetClass) {
+    public static <TYPE> ClassInvocationTarget<TYPE> classOfType(
+            @Nonnull final Class<TYPE> targetClass) {
 
-        return new ClassInvocationTarget(targetClass);
+        return new ClassInvocationTarget<TYPE>(targetClass);
     }
 
     /**
      * Returns a target based on the specified instance.
      *
      * @param target the target instance.
+     * @param <TYPE> the target object type.
      * @return the invocation target.
      */
     @Nonnull
-    public static InvocationTarget instance(@Nonnull final Object target) {
+    public static <TYPE> InstanceInvocationTarget<TYPE> instance(@Nonnull final TYPE target) {
 
-        return new ObjectInvocationTarget(target);
+        return new InstanceInvocationTarget<TYPE>(target);
     }
 
     /**
@@ -70,22 +75,32 @@ public abstract class InvocationTarget {
      * @return the target class.
      */
     @Nonnull
-    public abstract Class<?> getTargetClass();
+    public abstract Class<? extends TYPE> getTargetClass();
 
     /**
      * Checks if this invocation target is assignable to the specified class.
      *
-     * @param targetClass the target class.
+     * @param otherClass the other class.
      * @return whether the invocation target is assignable to the class.
      */
-    public abstract boolean isAssignableTo(@Nonnull Class<?> targetClass);
+    public abstract boolean isAssignableTo(@Nonnull Class<?> otherClass);
+
+    /**
+     * Checks if this invocation target is of the specified type.
+     *
+     * @param type the type class.
+     * @return whether the invocation target is of the specified type.
+     */
+    public abstract boolean isSameTypeOf(@Nonnull Class<?> type);
 
     /**
      * Invocation target wrapping a class.
+     *
+     * @param <TYPE> the target object type.
      */
-    private static class ClassInvocationTarget extends InvocationTarget {
+    public static class ClassInvocationTarget<TYPE> extends InvocationTarget<TYPE> {
 
-        private final Class<?> mTargetClass;
+        private final Class<TYPE> mTargetClass;
 
         /**
          * Constructor.
@@ -93,7 +108,7 @@ public abstract class InvocationTarget {
          * @param targetClass the target class.
          */
         @SuppressWarnings("ConstantConditions")
-        private ClassInvocationTarget(@Nonnull final Class<?> targetClass) {
+        private ClassInvocationTarget(@Nonnull final Class<TYPE> targetClass) {
 
             if (targetClass == null) {
 
@@ -113,14 +128,18 @@ public abstract class InvocationTarget {
         @Override
         public int hashCode() {
 
-            // AUTO-GENERATED CODE
             return mTargetClass.hashCode();
+        }
+
+        @Override
+        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+
+            return (mTargetClass == type);
         }
 
         @Override
         public boolean equals(final Object o) {
 
-            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;
@@ -137,36 +156,45 @@ public abstract class InvocationTarget {
 
         @Nonnull
         @Override
-        public Class<?> getTargetClass() {
+        public Class<? extends TYPE> getTargetClass() {
 
             return mTargetClass;
         }
 
         @Override
-        public boolean isAssignableTo(@Nonnull final Class<?> targetClass) {
+        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
 
-            return targetClass.isAssignableFrom(mTargetClass);
+            return otherClass.isAssignableFrom(mTargetClass);
         }
     }
 
     /**
      * Invocation target wrapping an object instance.
+     *
+     * @param <TYPE> the target object type.
      */
-    private static class ObjectInvocationTarget extends InvocationTarget {
+    public static class InstanceInvocationTarget<TYPE> extends InvocationTarget<TYPE> {
 
-        private final WeakReference<Object> mTarget;
+        private final WeakReference<TYPE> mTarget;
 
-        private final Class<?> mTargetClass;
+        private final Class<? extends TYPE> mTargetClass;
 
         /**
          * Constructor.
          *
          * @param target the target instance.
          */
-        private ObjectInvocationTarget(@Nonnull final Object target) {
+        @SuppressWarnings("unchecked")
+        private InstanceInvocationTarget(@Nonnull final TYPE target) {
 
-            mTarget = new WeakReference<Object>(target);
-            mTargetClass = target.getClass();
+            mTarget = new WeakReference<TYPE>(target);
+            mTargetClass = (Class<? extends TYPE>) target.getClass();
+        }
+
+        @Override
+        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+
+            return type.isInstance(mTarget.get());
         }
 
         @Override
@@ -177,12 +205,12 @@ public abstract class InvocationTarget {
                 return true;
             }
 
-            if (!(o instanceof ObjectInvocationTarget)) {
+            if (!(o instanceof InstanceInvocationTarget)) {
 
                 return false;
             }
 
-            final ObjectInvocationTarget that = (ObjectInvocationTarget) o;
+            final InstanceInvocationTarget that = (InstanceInvocationTarget) o;
             final Object referent = mTarget.get();
             return (referent != null) && referent.equals(that.mTarget.get()) && mTargetClass.equals(
                     that.mTargetClass);
@@ -206,15 +234,15 @@ public abstract class InvocationTarget {
 
         @Nonnull
         @Override
-        public Class<?> getTargetClass() {
+        public Class<? extends TYPE> getTargetClass() {
 
             return mTargetClass;
         }
 
         @Override
-        public boolean isAssignableTo(@Nonnull final Class<?> targetClass) {
+        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
 
-            return targetClass.isInstance(mTarget.get());
+            return otherClass.isInstance(mTarget.get());
         }
     }
 }

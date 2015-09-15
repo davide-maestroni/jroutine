@@ -45,7 +45,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
     private final ServiceContext mContext;
 
-    private final ContextInvocationTarget mTarget;
+    private final ContextInvocationTarget<?> mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -62,7 +62,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      */
     @SuppressWarnings("ConstantConditions")
     DefaultServiceProxyRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final ContextInvocationTarget target) {
+            @Nonnull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
 
@@ -190,7 +190,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         private final ClassToken<TYPE> mInterfaceToken;
 
-        private final ContextInvocationTarget mTarget;
+        private final ContextInvocationTarget<?> mTarget;
 
         /**
          * Constructor.
@@ -200,7 +200,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
          * @param interfaceToken the proxy interface token.
          */
         private ObjectServiceProxyBuilder(@Nonnull final ServiceContext context,
-                @Nonnull final ContextInvocationTarget target,
+                @Nonnull final ContextInvocationTarget<?> target,
                 @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mContext = context;
@@ -238,7 +238,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             try {
 
                 final ServiceContext context = mContext;
-                final ContextInvocationTarget target = mTarget;
+                final ContextInvocationTarget<?> target = mTarget;
                 final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
                 final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
                 String packageName = annotation.classPackage();

@@ -19,11 +19,11 @@
         private final Object mMutex;
 
         @SuppressWarnings("unused")
-        private final com.github.dm.jrt.core.InvocationTarget mTarget;
+        private final com.github.dm.jrt.core.InvocationTarget<?> mTarget;
 
         @SuppressWarnings("ConstantConditions")
         private Invocation${methodCount}(@javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
-                 @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget target) {
+                 @javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget<?> target) {
 
             final Object mutexTarget = ${mutexTarget};
             final String shareGroup = ${shareGroup};

@@ -34,8 +34,10 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
  * Class representing a context invocation target.
  * <p/>
  * Created by davide-maestroni on 08/21/2015.
+ *
+ * @param <TYPE> the target object type.
  */
-public abstract class ContextInvocationTarget implements Parcelable {
+public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
 
     /**
      * Avoid direct instantiation.
@@ -48,12 +50,14 @@ public abstract class ContextInvocationTarget implements Parcelable {
      * Returns a target based on the specified class.
      *
      * @param targetClass the target class.
+     * @param <TYPE>      the target object type.
      * @return the context invocation target.
      */
     @Nonnull
-    public static ContextInvocationTarget classOfType(@Nonnull final Class<?> targetClass) {
+    public static <TYPE> ClassContextInvocationTarget<TYPE> classOfType(
+            @Nonnull final Class<TYPE> targetClass) {
 
-        return new ClassContextInvocationTarget(targetClass);
+        return new ClassContextInvocationTarget<TYPE>(targetClass);
     }
 
     /**
@@ -61,10 +65,12 @@ public abstract class ContextInvocationTarget implements Parcelable {
      * No argument will be passed to the object factory.
      *
      * @param targetClass the target class.
+     * @param <TYPE>      the target object type.
      * @return the context invocation target.
      */
     @Nonnull
-    public static ContextInvocationTarget instanceOf(@Nonnull final Class<?> targetClass) {
+    public static <TYPE> ObjectContextInvocationTarget<TYPE> instanceOf(
+            @Nonnull final Class<TYPE> targetClass) {
 
         return instanceOf(targetClass, (Object[]) null);
     }
@@ -74,13 +80,14 @@ public abstract class ContextInvocationTarget implements Parcelable {
      *
      * @param targetClass the target class.
      * @param factoryArgs the object factory arguments.
+     * @param <TYPE>      the target object type.
      * @return the context invocation target.
      */
     @Nonnull
-    public static ContextInvocationTarget instanceOf(@Nonnull final Class<?> targetClass,
-            @Nullable final Object... factoryArgs) {
+    public static <TYPE> ObjectContextInvocationTarget<TYPE> instanceOf(
+            @Nonnull final Class<TYPE> targetClass, @Nullable final Object... factoryArgs) {
 
-        return new ObjectContextInvocationTarget(targetClass, factoryArgs);
+        return new ObjectContextInvocationTarget<TYPE>(targetClass, factoryArgs);
     }
 
     /**
@@ -91,7 +98,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
      * @return the invocation target.
      */
     @Nonnull
-    public abstract InvocationTarget getInvocationTarget(@Nonnull Context context);
+    public abstract InvocationTarget<TYPE> getInvocationTarget(@Nonnull Context context);
 
     /**
      * Returns the target class.
@@ -99,12 +106,30 @@ public abstract class ContextInvocationTarget implements Parcelable {
      * @return the target class.
      */
     @Nonnull
-    public abstract Class<?> getTargetClass();
+    public abstract Class<? extends TYPE> getTargetClass();
+
+    /**
+     * Checks if this invocation target is assignable to the specified class.
+     *
+     * @param otherClass the other class.
+     * @return whether the invocation target is assignable to the class.
+     */
+    public abstract boolean isAssignableTo(@Nonnull Class<?> otherClass);
+
+    /**
+     * Checks if this invocation target is of the specified type.
+     *
+     * @param type the type class.
+     * @return whether the invocation target is of the specified type.
+     */
+    public abstract boolean isSameTypeOf(@Nonnull Class<?> type);
 
     /**
      * Context invocation target wrapping a class.
+     *
+     * @param <TYPE> the target object type.
      */
-    private static class ClassContextInvocationTarget extends ContextInvocationTarget {
+    public static class ClassContextInvocationTarget<TYPE> extends ContextInvocationTarget<TYPE> {
 
         /**
          * Creator instance needed by the parcelable protocol.
@@ -112,6 +137,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
         public static final Creator<ClassContextInvocationTarget> CREATOR =
                 new Creator<ClassContextInvocationTarget>() {
 
+                    @SuppressWarnings("unchecked")
                     public ClassContextInvocationTarget createFromParcel(
                             @Nonnull final Parcel source) {
 
@@ -126,7 +152,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
                     }
                 };
 
-        private final Class<?> mTargetClass;
+        private final Class<TYPE> mTargetClass;
 
         /**
          * Constructor.
@@ -134,7 +160,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
          * @param targetClass the target class.
          */
         @SuppressWarnings("ConstantConditions")
-        private ClassContextInvocationTarget(@Nonnull final Class<?> targetClass) {
+        private ClassContextInvocationTarget(@Nonnull final Class<TYPE> targetClass) {
 
             if (targetClass.isPrimitive()) {
 
@@ -153,7 +179,6 @@ public abstract class ContextInvocationTarget implements Parcelable {
         @Override
         public boolean equals(final Object o) {
 
-            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;
@@ -164,13 +189,13 @@ public abstract class ContextInvocationTarget implements Parcelable {
                 return false;
             }
 
-            final ClassContextInvocationTarget that = (ClassContextInvocationTarget) o;
+            final ClassContextInvocationTarget<?> that = (ClassContextInvocationTarget<?>) o;
             return mTargetClass.equals(that.mTargetClass);
         }
 
         @Nonnull
         @Override
-        public InvocationTarget getInvocationTarget(@Nonnull final Context context) {
+        public InvocationTarget<TYPE> getInvocationTarget(@Nonnull final Context context) {
 
             return InvocationTarget.classOfType(mTargetClass);
         }
@@ -178,15 +203,26 @@ public abstract class ContextInvocationTarget implements Parcelable {
         @Override
         public int hashCode() {
 
-            // AUTO-GENERATED CODE
             return mTargetClass.hashCode();
         }
 
         @Nonnull
         @Override
-        public Class<?> getTargetClass() {
+        public Class<? extends TYPE> getTargetClass() {
 
             return mTargetClass;
+        }
+
+        @Override
+        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
+
+            return otherClass.isAssignableFrom(mTargetClass);
+        }
+
+        @Override
+        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+
+            return (mTargetClass == type);
         }
 
         public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
@@ -197,8 +233,10 @@ public abstract class ContextInvocationTarget implements Parcelable {
 
     /**
      * Context invocation target wrapping an object instance.
+     *
+     * @param <TYPE> the target object type.
      */
-    private static class ObjectContextInvocationTarget extends ContextInvocationTarget {
+    public static class ObjectContextInvocationTarget<TYPE> extends ContextInvocationTarget<TYPE> {
 
         /**
          * Creator instance needed by the parcelable protocol.
@@ -206,6 +244,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
         public static final Creator<ObjectContextInvocationTarget> CREATOR =
                 new Creator<ObjectContextInvocationTarget>() {
 
+                    @SuppressWarnings("unchecked")
                     public ObjectContextInvocationTarget createFromParcel(
                             @Nonnull final Parcel source) {
 
@@ -223,7 +262,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
 
         private final Object[] mFactoryArgs;
 
-        private final Class<?> mTargetClass;
+        private final Class<TYPE> mTargetClass;
 
         /**
          * Constructor.
@@ -232,7 +271,7 @@ public abstract class ContextInvocationTarget implements Parcelable {
          * @param factoryArgs the object factory arguments.
          */
         @SuppressWarnings("ConstantConditions")
-        private ObjectContextInvocationTarget(@Nonnull final Class<?> targetClass,
+        private ObjectContextInvocationTarget(@Nonnull final Class<TYPE> targetClass,
                 @Nullable final Object[] factoryArgs) {
 
             if (targetClass.isPrimitive()) {
@@ -248,7 +287,6 @@ public abstract class ContextInvocationTarget implements Parcelable {
         @Override
         public boolean equals(final Object o) {
 
-            // AUTO-GENERATED CODE
             if (this == o) {
 
                 return true;
@@ -267,7 +305,6 @@ public abstract class ContextInvocationTarget implements Parcelable {
         @Override
         public int hashCode() {
 
-            // AUTO-GENERATED CODE
             int result = Arrays.deepHashCode(mFactoryArgs);
             result = 31 * result + mTargetClass.hashCode();
             return result;
@@ -276,10 +313,10 @@ public abstract class ContextInvocationTarget implements Parcelable {
         @Nonnull
         @Override
         @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-        public InvocationTarget getInvocationTarget(@Nonnull final Context context) {
+        public InvocationTarget<TYPE> getInvocationTarget(@Nonnull final Context context) {
 
-            Object target = null;
-            final Class<?> targetClass = mTargetClass;
+            TYPE target = null;
+            final Class<TYPE> targetClass = mTargetClass;
             final Object[] factoryArgs = mFactoryArgs;
 
             if (context instanceof FactoryContext) {
@@ -313,9 +350,21 @@ public abstract class ContextInvocationTarget implements Parcelable {
 
         @Nonnull
         @Override
-        public Class<?> getTargetClass() {
+        public Class<? extends TYPE> getTargetClass() {
 
             return mTargetClass;
+        }
+
+        @Override
+        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
+
+            return otherClass.isAssignableFrom(mTargetClass);
+        }
+
+        @Override
+        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+
+            return isAssignableTo(type);
         }
 
         public int describeContents() {

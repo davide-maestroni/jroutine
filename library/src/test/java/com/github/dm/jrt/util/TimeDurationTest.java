@@ -543,26 +543,27 @@ public class TimeDurationTest {
     public void testSinceMillis() throws InterruptedException {
 
         final long past = System.currentTimeMillis() - 180000;
-        assertThat(TimeDuration.sinceMillis(past)).isEqualTo(TimeDuration.minutes(3));
-        assertThat(TimeDuration.sinceMillis(System.currentTimeMillis())).isEqualTo(
+        assertThat(TimeDuration.timeSinceMillis(past)).isEqualTo(TimeDuration.minutes(3));
+        assertThat(TimeDuration.timeSinceMillis(System.currentTimeMillis())).isEqualTo(
                 TimeDuration.ZERO);
         final long future = System.currentTimeMillis() + 177777;
-        assertThat(TimeDuration.sinceMillis(future)).isEqualTo(TimeDuration.ZERO);
+        assertThat(TimeDuration.timeSinceMillis(future)).isEqualTo(TimeDuration.ZERO);
         TimeDuration.seconds(1).sleepAtLeast();
-        assertThat(TimeDuration.sinceMillis(past).toSeconds()).isGreaterThanOrEqualTo(181);
+        assertThat(TimeDuration.timeSinceMillis(past).toSeconds()).isGreaterThanOrEqualTo(181);
     }
 
     @Test
     public void testSinceNanos() throws InterruptedException {
 
         final long past = System.nanoTime() - 180000000000l;
-        assertThat(TimeDuration.sinceNanos(past).millisTime()).isEqualTo(TimeDuration.minutes(3));
-        assertThat(TimeDuration.sinceNanos(System.nanoTime()).millisTime()).isEqualTo(
+        assertThat(TimeDuration.timeSinceNanos(past).millisTime()).isEqualTo(
+                TimeDuration.minutes(3));
+        assertThat(TimeDuration.timeSinceNanos(System.nanoTime()).millisTime()).isEqualTo(
                 TimeDuration.ZERO);
         final long future = System.nanoTime() + 177777777777l;
-        assertThat(TimeDuration.sinceNanos(future)).isEqualTo(TimeDuration.ZERO);
+        assertThat(TimeDuration.timeSinceNanos(future)).isEqualTo(TimeDuration.ZERO);
         TimeDuration.seconds(1).sleepAtLeast();
-        assertThat(TimeDuration.sinceNanos(past).toSeconds()).isGreaterThanOrEqualTo(181);
+        assertThat(TimeDuration.timeSinceNanos(past).toSeconds()).isGreaterThanOrEqualTo(181);
     }
 
     @Test
@@ -681,26 +682,27 @@ public class TimeDurationTest {
     public void testUntilMillis() throws InterruptedException {
 
         final long future = System.currentTimeMillis() + 180000;
-        assertThat(TimeDuration.untilMillis(future)).isEqualTo(TimeDuration.minutes(3));
-        assertThat(TimeDuration.untilMillis(System.currentTimeMillis())).isEqualTo(
+        assertThat(TimeDuration.timeUntilMillis(future)).isEqualTo(TimeDuration.minutes(3));
+        assertThat(TimeDuration.timeUntilMillis(System.currentTimeMillis())).isEqualTo(
                 TimeDuration.ZERO);
         final long past = System.currentTimeMillis() - 177777;
-        assertThat(TimeDuration.untilMillis(past)).isEqualTo(TimeDuration.ZERO);
+        assertThat(TimeDuration.timeUntilMillis(past)).isEqualTo(TimeDuration.ZERO);
         TimeDuration.seconds(1).sleepAtLeast();
-        assertThat(TimeDuration.untilMillis(future).toSeconds()).isLessThanOrEqualTo(179);
+        assertThat(TimeDuration.timeUntilMillis(future).toSeconds()).isLessThanOrEqualTo(179);
     }
 
     @Test
     public void testUntilNanos() throws InterruptedException {
 
         final long future = System.nanoTime() + 180000999999l;
-        assertThat(TimeDuration.untilNanos(future).millisTime()).isEqualTo(TimeDuration.minutes(3));
-        assertThat(TimeDuration.untilNanos(System.nanoTime()).millisTime()).isEqualTo(
+        assertThat(TimeDuration.timeUntilNanos(future).millisTime()).isEqualTo(
+                TimeDuration.minutes(3));
+        assertThat(TimeDuration.timeUntilNanos(System.nanoTime()).millisTime()).isEqualTo(
                 TimeDuration.ZERO);
         final long past = System.nanoTime() - 177777777777l;
-        assertThat(TimeDuration.untilNanos(past)).isEqualTo(TimeDuration.ZERO);
+        assertThat(TimeDuration.timeUntilNanos(past)).isEqualTo(TimeDuration.ZERO);
         TimeDuration.seconds(1).sleepAtLeast();
-        assertThat(TimeDuration.untilNanos(future).toSeconds()).isLessThanOrEqualTo(179);
+        assertThat(TimeDuration.timeUntilNanos(future).toSeconds()).isLessThanOrEqualTo(179);
     }
 
     @Test

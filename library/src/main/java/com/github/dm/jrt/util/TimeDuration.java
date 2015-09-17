@@ -196,7 +196,7 @@ public class TimeDuration extends Time {
      * @see java.lang.System#currentTimeMillis()
      */
     @Nonnull
-    public static TimeDuration sinceMillis(final long milliTime) {
+    public static TimeDuration timeSinceMillis(final long milliTime) {
 
         final long millis = System.currentTimeMillis() - milliTime;
         return (millis > 0) ? millis(millis) : ZERO;
@@ -212,7 +212,7 @@ public class TimeDuration extends Time {
      * @see java.lang.System#nanoTime()
      */
     @Nonnull
-    public static TimeDuration sinceNanos(final long nanoTime) {
+    public static TimeDuration timeSinceNanos(final long nanoTime) {
 
         final long nanos = System.nanoTime() - nanoTime;
         return (nanos > 0) ? nanos(nanos) : ZERO;
@@ -228,7 +228,7 @@ public class TimeDuration extends Time {
      * @see java.lang.System#currentTimeMillis()
      */
     @Nonnull
-    public static TimeDuration untilMillis(final long milliTime) {
+    public static TimeDuration timeUntilMillis(final long milliTime) {
 
         final long millis = milliTime - System.currentTimeMillis();
         return (millis > 0) ? millis(millis) : ZERO;
@@ -244,7 +244,7 @@ public class TimeDuration extends Time {
      * @see java.lang.System#nanoTime()
      */
     @Nonnull
-    public static TimeDuration untilNanos(final long nanoTime) {
+    public static TimeDuration timeUntilNanos(final long nanoTime) {
 
         final long nanos = nanoTime - System.nanoTime();
         return (nanos > 0) ? nanos(nanos) : ZERO;

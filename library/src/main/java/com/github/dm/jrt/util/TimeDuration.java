@@ -187,11 +187,76 @@ public class TimeDuration extends Time {
     }
 
     /**
+     * Creates and returns an object representing the time range between now and a time in the past.
+     * <br/>
+     * If the specified is in the future, a {@code ZERO} duration will be returned.
+     *
+     * @param milliTime the system time in milliseconds.
+     * @return the time duration instance.
+     * @see java.lang.System#currentTimeMillis()
+     */
+    @Nonnull
+    public static TimeDuration sinceMillis(final long milliTime) {
+
+        final long millis = System.currentTimeMillis() - milliTime;
+        return (millis > 0) ? millis(millis) : ZERO;
+    }
+
+    /**
+     * Creates and returns an object representing the time range between now and a time in the past.
+     * <br/>
+     * If the specified is in the future, a {@code ZERO} duration will be returned.
+     *
+     * @param nanoTime the high precision system time in nanoseconds.
+     * @return the time duration instance.
+     * @see java.lang.System#nanoTime()
+     */
+    @Nonnull
+    public static TimeDuration sinceNanos(final long nanoTime) {
+
+        final long nanos = System.nanoTime() - nanoTime;
+        return (nanos > 0) ? nanos(nanos) : ZERO;
+    }
+
+    /**
+     * Creates and returns an object representing the time range between now and a time in the
+     * future.<br/>
+     * If the specified is in the past, a {@code ZERO} duration will be returned.
+     *
+     * @param milliTime the system time in milliseconds.
+     * @return the time duration instance.
+     * @see java.lang.System#currentTimeMillis()
+     */
+    @Nonnull
+    public static TimeDuration untilMillis(final long milliTime) {
+
+        final long millis = milliTime - System.currentTimeMillis();
+        return (millis > 0) ? millis(millis) : ZERO;
+    }
+
+    /**
+     * Creates and returns an object representing the time range between now and a time in the
+     * future.<br/>
+     * If the specified is in the past, a {@code ZERO} duration will be returned.
+     *
+     * @param nanoTime the high precision system time in nanoseconds.
+     * @return the time duration instance.
+     * @see java.lang.System#nanoTime()
+     */
+    @Nonnull
+    public static TimeDuration untilNanos(final long nanoTime) {
+
+        final long nanos = nanoTime - System.nanoTime();
+        return (nanos > 0) ? nanos(nanos) : ZERO;
+    }
+
+    /**
      * Converts this duration in days.
      *
      * @return the time duration instance.
      */
     @Nonnull
+    @Override
     public TimeDuration daysTime() {
 
         return days(toDays());
@@ -203,6 +268,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      */
     @Nonnull
+    @Override
     public TimeDuration hoursTime() {
 
         return hours(toHours());
@@ -214,6 +280,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      */
     @Nonnull
+    @Override
     public TimeDuration microsTime() {
 
         return micros(toMicros());
@@ -225,9 +292,24 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      */
     @Nonnull
+    @Override
     public TimeDuration millisTime() {
 
         return millis(toMillis());
+    }
+
+    /**
+     * Returns a new instance whose time value is decremented by the specified one.<br/>
+     * Note that, if the resulting time is negative, the value will be clipped to 0.
+     *
+     * @param time the time to subtract.
+     * @return the time duration instance.
+     */
+    @Nonnull
+    @Override
+    public TimeDuration minus(@Nonnull final Time time) {
+
+        return fromUnit(Math.max(0, this.time - unit.convert(time.time, time.unit)), unit);
     }
 
     /**
@@ -236,6 +318,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      */
     @Nonnull
+    @Override
     public TimeDuration minutesTime() {
 
         return minutes(toMinutes());
@@ -247,9 +330,24 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      */
     @Nonnull
+    @Override
     public TimeDuration nanosTime() {
 
         return nanos(toNanos());
+    }
+
+    /**
+     * Returns a new instance whose time value is incremented by the specified one.<br/>
+     * Note that, if the resulting time is negative, the value will be clipped to 0.
+     *
+     * @param time the time to add.
+     * @return the time duration instance.
+     */
+    @Nonnull
+    @Override
+    public TimeDuration plus(@Nonnull final Time time) {
+
+        return fromUnit(Math.max(0, this.time + unit.convert(time.time, time.unit)), unit);
     }
 
     /**
@@ -258,6 +356,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      */
     @Nonnull
+    @Override
     public TimeDuration secondsTime() {
 
         return seconds(toSeconds());

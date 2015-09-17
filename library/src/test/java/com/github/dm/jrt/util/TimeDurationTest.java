@@ -372,6 +372,21 @@ public class TimeDurationTest {
     }
 
     @Test
+    public void testMinus() {
+
+        final TimeDuration duration = TimeDuration.days(1);
+        assertThat(duration.minus(Time.hours(2).minus(Time.minutes(11)))).isNotEqualTo(
+                duration.minus(Time.hours(2)).minus(Time.minutes(11)));
+        assertThat(duration.minus(Time.hours(2).minus(Time.minutes(11))).toMillis()).isEqualTo(
+                duration.toMillis() - Time.hours(2).toMillis() + Time.minutes(11).toMillis());
+        assertThat(duration.minus(Time.hours(2)).minus(Time.minutes(11)).toMillis()).isEqualTo(
+                duration.toMillis() - Time.hours(2).toMillis() - Time.minutes(11).toMillis());
+        assertThat(TimeDuration.minutes(2).minus(TimeDuration.seconds((191)))).isEqualTo(
+                TimeDuration.ZERO);
+        assertThat(TimeDuration.ZERO.minus(Time.seconds(-2))).isEqualTo(TimeDuration.seconds(2));
+    }
+
+    @Test
     public void testMinuteConversions() throws InvocationTargetException, IllegalAccessException {
 
         testConversions(TimeDuration.minutes(sRandom.nextInt(MAX_DURATION)), true);
@@ -469,6 +484,19 @@ public class TimeDurationTest {
     }
 
     @Test
+    public void testPlus() {
+
+        final TimeDuration duration = TimeDuration.minutes(2);
+        assertThat(duration.plus(Time.hours(2).plus(Time.minutes(11)))).isEqualTo(
+                duration.plus(Time.hours(2)).plus(Time.minutes(11)));
+        assertThat(duration.plus(Time.hours(2)).plus(Time.minutes(11)).toMillis()).isEqualTo(
+                duration.toMillis() + Time.hours(2).toMillis() + Time.minutes(11).toMillis());
+        assertThat(TimeDuration.minutes(2).plus(Time.seconds(-191))).isEqualTo(TimeDuration.ZERO);
+        assertThat(TimeDuration.ZERO.plus(TimeDuration.seconds(3))).isEqualTo(Time.seconds(3));
+        assertThat(TimeDuration.ZERO.plus(Time.seconds(-3))).isEqualTo(TimeDuration.ZERO);
+    }
+
+    @Test
     public void testSecondConversions() throws InvocationTargetException, IllegalAccessException {
 
         testConversions(TimeDuration.seconds(sRandom.nextInt(MAX_DURATION)), true);
@@ -509,6 +537,32 @@ public class TimeDurationTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testSinceMillis() throws InterruptedException {
+
+        final long past = System.currentTimeMillis() - 180000;
+        assertThat(TimeDuration.sinceMillis(past)).isEqualTo(TimeDuration.minutes(3));
+        assertThat(TimeDuration.sinceMillis(System.currentTimeMillis())).isEqualTo(
+                TimeDuration.ZERO);
+        final long future = System.currentTimeMillis() + 177777;
+        assertThat(TimeDuration.sinceMillis(future)).isEqualTo(TimeDuration.ZERO);
+        TimeDuration.seconds(1).sleepAtLeast();
+        assertThat(TimeDuration.sinceMillis(past).toSeconds()).isGreaterThanOrEqualTo(181);
+    }
+
+    @Test
+    public void testSinceNanos() throws InterruptedException {
+
+        final long past = System.nanoTime() - 180000000000l;
+        assertThat(TimeDuration.sinceNanos(past).millisTime()).isEqualTo(TimeDuration.minutes(3));
+        assertThat(TimeDuration.sinceNanos(System.nanoTime()).millisTime()).isEqualTo(
+                TimeDuration.ZERO);
+        final long future = System.nanoTime() + 177777777777l;
+        assertThat(TimeDuration.sinceNanos(future)).isEqualTo(TimeDuration.ZERO);
+        TimeDuration.seconds(1).sleepAtLeast();
+        assertThat(TimeDuration.sinceNanos(past).toSeconds()).isGreaterThanOrEqualTo(181);
     }
 
     @Test
@@ -621,6 +675,32 @@ public class TimeDurationTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testUntilMillis() throws InterruptedException {
+
+        final long future = System.currentTimeMillis() + 180000;
+        assertThat(TimeDuration.untilMillis(future)).isEqualTo(TimeDuration.minutes(3));
+        assertThat(TimeDuration.untilMillis(System.currentTimeMillis())).isEqualTo(
+                TimeDuration.ZERO);
+        final long past = System.currentTimeMillis() - 177777;
+        assertThat(TimeDuration.untilMillis(past)).isEqualTo(TimeDuration.ZERO);
+        TimeDuration.seconds(1).sleepAtLeast();
+        assertThat(TimeDuration.untilMillis(future).toSeconds()).isLessThanOrEqualTo(179);
+    }
+
+    @Test
+    public void testUntilNanos() throws InterruptedException {
+
+        final long future = System.nanoTime() + 180000999999l;
+        assertThat(TimeDuration.untilNanos(future).millisTime()).isEqualTo(TimeDuration.minutes(3));
+        assertThat(TimeDuration.untilNanos(System.nanoTime()).millisTime()).isEqualTo(
+                TimeDuration.ZERO);
+        final long past = System.nanoTime() - 177777777777l;
+        assertThat(TimeDuration.untilNanos(past)).isEqualTo(TimeDuration.ZERO);
+        TimeDuration.seconds(1).sleepAtLeast();
+        assertThat(TimeDuration.untilNanos(future).toSeconds()).isLessThanOrEqualTo(179);
     }
 
     @Test

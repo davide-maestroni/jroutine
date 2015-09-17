@@ -143,7 +143,7 @@ public class Time {
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public static Time fromUnit(final long time, @Nonnull TimeUnit unit) {
+    public static Time fromUnit(final long time, @Nonnull final TimeUnit unit) {
 
         if (unit == null) {
 
@@ -327,6 +327,18 @@ public class Time {
     }
 
     /**
+     * Returns a new instance whose time value is decremented by the specified one.
+     *
+     * @param time the time to subtract.
+     * @return the time instance.
+     */
+    @Nonnull
+    public Time minus(@Nonnull final Time time) {
+
+        return fromUnit(this.time - unit.convert(time.time, time.unit), unit);
+    }
+
+    /**
      * Converts this time in minutes.
      *
      * @return the time instance.
@@ -346,6 +358,18 @@ public class Time {
     public Time nanosTime() {
 
         return nanos(toNanos());
+    }
+
+    /**
+     * Returns a new instance whose time value is incremented by the specified one.
+     *
+     * @param time the time to add.
+     * @return the time instance.
+     */
+    @Nonnull
+    public Time plus(@Nonnull final Time time) {
+
+        return fromUnit(this.time + unit.convert(time.time, time.unit), unit);
     }
 
     /**

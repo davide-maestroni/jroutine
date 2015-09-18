@@ -200,6 +200,7 @@ public class TimeTest {
         assertThat(current.minus(Time.hours(2)).minus(Time.minutes(11)).toMillis()).isEqualTo(
                 current.toMillis() - Time.hours(2).toMillis() - Time.minutes(11).toMillis());
         assertThat(Time.minutes(-2).minus(Time.seconds(31))).isEqualTo(Time.millis(-151000));
+        assertThat(Time.seconds(1).minus(Time.millis(700))).isEqualTo(Time.millis(300));
     }
 
     @Test
@@ -254,6 +255,7 @@ public class TimeTest {
         assertThat(current.plus(Time.hours(2)).plus(Time.minutes(11)).toMillis()).isEqualTo(
                 current.toMillis() + Time.hours(2).toMillis() + Time.minutes(11).toMillis());
         assertThat(Time.minutes(-2).plus(Time.seconds(31))).isEqualTo(Time.millis(-89000));
+        assertThat(Time.seconds(1).plus(Time.millis(-700))).isEqualTo(Time.millis(300));
     }
 
     @Test

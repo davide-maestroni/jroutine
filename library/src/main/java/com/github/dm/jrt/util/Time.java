@@ -327,13 +327,19 @@ public class Time {
     }
 
     /**
-     * Returns a new instance whose time value is decremented by the specified one.
+     * Returns a new instance whose time value is decremented by the specified one.<br/>
+     * Note that the unit of the returned time will match the one with the highest precision.
      *
      * @param time the time to subtract.
      * @return the time instance.
      */
     @Nonnull
     public Time minus(@Nonnull final Time time) {
+
+        if (unit.compareTo(time.unit) > 0) {
+
+            return fromUnit(time.unit.convert(this.time, unit) - time.time, time.unit);
+        }
 
         return fromUnit(this.time - unit.convert(time.time, time.unit), unit);
     }
@@ -361,13 +367,19 @@ public class Time {
     }
 
     /**
-     * Returns a new instance whose time value is incremented by the specified one.
+     * Returns a new instance whose time value is incremented by the specified one.<br/>
+     * Note that the unit of the returned time will match the one with the highest precision.
      *
      * @param time the time to add.
      * @return the time instance.
      */
     @Nonnull
     public Time plus(@Nonnull final Time time) {
+
+        if (unit.compareTo(time.unit) > 0) {
+
+            return fromUnit(time.unit.convert(this.time, unit) + time.time, time.unit);
+        }
 
         return fromUnit(this.time + unit.convert(time.time, time.unit), unit);
     }

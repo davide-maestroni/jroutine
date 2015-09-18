@@ -384,6 +384,8 @@ public class TimeDurationTest {
         assertThat(TimeDuration.minutes(2).minus(TimeDuration.seconds((191)))).isEqualTo(
                 TimeDuration.ZERO);
         assertThat(TimeDuration.ZERO.minus(Time.seconds(-2))).isEqualTo(TimeDuration.seconds(2));
+        assertThat(TimeDuration.seconds(1).minus(TimeDuration.millis(700))).isEqualTo(
+                TimeDuration.millis(300));
     }
 
     @Test
@@ -492,8 +494,11 @@ public class TimeDurationTest {
         assertThat(duration.plus(Time.hours(2)).plus(Time.minutes(11)).toMillis()).isEqualTo(
                 duration.toMillis() + Time.hours(2).toMillis() + Time.minutes(11).toMillis());
         assertThat(TimeDuration.minutes(2).plus(Time.seconds(-191))).isEqualTo(TimeDuration.ZERO);
-        assertThat(TimeDuration.ZERO.plus(TimeDuration.seconds(3))).isEqualTo(Time.seconds(3));
+        assertThat(TimeDuration.ZERO.plus(TimeDuration.seconds(3))).isEqualTo(
+                TimeDuration.seconds(3));
         assertThat(TimeDuration.ZERO.plus(Time.seconds(-3))).isEqualTo(TimeDuration.ZERO);
+        assertThat(TimeDuration.seconds(1).plus(Time.millis(-700))).isEqualTo(
+                TimeDuration.millis(300));
     }
 
     @Test

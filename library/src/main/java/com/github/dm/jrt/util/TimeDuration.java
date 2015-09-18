@@ -300,7 +300,8 @@ public class TimeDuration extends Time {
 
     /**
      * Returns a new instance whose time value is decremented by the specified one.<br/>
-     * Note that, if the resulting time is negative, the value will be clipped to 0.
+     * Note that the unit of the returned time will match the one with the highest precision.<br/>
+     * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *
      * @param time the time to subtract.
      * @return the time duration instance.
@@ -308,6 +309,11 @@ public class TimeDuration extends Time {
     @Nonnull
     @Override
     public TimeDuration minus(@Nonnull final Time time) {
+
+        if (unit.compareTo(time.unit) > 0) {
+
+            return fromUnit(Math.max(0, time.unit.convert(this.time, unit) - time.time), time.unit);
+        }
 
         return fromUnit(Math.max(0, this.time - unit.convert(time.time, time.unit)), unit);
     }
@@ -338,7 +344,8 @@ public class TimeDuration extends Time {
 
     /**
      * Returns a new instance whose time value is incremented by the specified one.<br/>
-     * Note that, if the resulting time is negative, the value will be clipped to 0.
+     * Note that the unit of the returned time will match the one with the highest precision.<br/>
+     * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *
      * @param time the time to add.
      * @return the time duration instance.
@@ -346,6 +353,11 @@ public class TimeDuration extends Time {
     @Nonnull
     @Override
     public TimeDuration plus(@Nonnull final Time time) {
+
+        if (unit.compareTo(time.unit) > 0) {
+
+            return fromUnit(Math.max(0, time.unit.convert(this.time, unit) + time.time), time.unit);
+        }
 
         return fromUnit(Math.max(0, this.time + unit.convert(time.time, time.unit)), unit);
     }

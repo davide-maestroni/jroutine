@@ -190,6 +190,20 @@ public class TimeTest {
     }
 
     @Test
+    public void testMinus() {
+
+        final Time current = Time.current();
+        assertThat(current.minus(Time.hours(2).minus(Time.minutes(11)))).isNotEqualTo(
+                current.minus(Time.hours(2)).minus(Time.minutes(11)));
+        assertThat(current.minus(Time.hours(2).minus(Time.minutes(11))).toMillis()).isEqualTo(
+                current.toMillis() - Time.hours(2).toMillis() + Time.minutes(11).toMillis());
+        assertThat(current.minus(Time.hours(2)).minus(Time.minutes(11)).toMillis()).isEqualTo(
+                current.toMillis() - Time.hours(2).toMillis() - Time.minutes(11).toMillis());
+        assertThat(Time.minutes(-2).minus(Time.seconds(31))).isEqualTo(Time.millis(-151000));
+        assertThat(Time.seconds(1).minus(Time.millis(700))).isEqualTo(Time.millis(300));
+    }
+
+    @Test
     public void testMinuteConversions() throws InvocationTargetException, IllegalAccessException {
 
         testConversions(Time.minutes(clip(sRandom.nextInt())), true);
@@ -230,6 +244,18 @@ public class TimeTest {
 
         testConversions(Time.nanos(clip(sRandom.nextInt())), true);
         testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.NANOSECONDS), true);
+    }
+
+    @Test
+    public void testPlus() {
+
+        final Time current = Time.current();
+        assertThat(current.plus(Time.hours(2).plus(Time.minutes(11)))).isEqualTo(
+                current.plus(Time.hours(2)).plus(Time.minutes(11)));
+        assertThat(current.plus(Time.hours(2)).plus(Time.minutes(11)).toMillis()).isEqualTo(
+                current.toMillis() + Time.hours(2).toMillis() + Time.minutes(11).toMillis());
+        assertThat(Time.minutes(-2).plus(Time.seconds(31))).isEqualTo(Time.millis(-89000));
+        assertThat(Time.seconds(1).plus(Time.millis(-700))).isEqualTo(Time.millis(300));
     }
 
     @Test

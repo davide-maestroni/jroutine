@@ -60,7 +60,7 @@ And more:
 
 * ***< 300KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
-* ***Nullability annotations***
+* ***Nullity annotations***
 
 (*) for older Java versions please have a look at [Retrotranslator][retrotranslator].
 

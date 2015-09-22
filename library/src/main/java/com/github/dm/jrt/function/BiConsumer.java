@@ -18,5 +18,5 @@ package com.github.dm.jrt.function;
  */
 public interface BiConsumer<IN1, IN2> {
 
-    void accept(IN1 input1, IN2 input2);
+    void accept(IN1 in1, IN2 in2);
 }

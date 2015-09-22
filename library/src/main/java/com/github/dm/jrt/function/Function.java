@@ -18,5 +18,5 @@ package com.github.dm.jrt.function;
  */
 public interface Function<IN, OUT> {
 
-    OUT apply(IN input);
+    OUT apply(IN in);
 }

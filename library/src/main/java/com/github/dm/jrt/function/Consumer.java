@@ -18,5 +18,5 @@ package com.github.dm.jrt.function;
  */
 public interface Consumer<IN> {
 
-    void accept(IN input);
+    void accept(IN in);
 }

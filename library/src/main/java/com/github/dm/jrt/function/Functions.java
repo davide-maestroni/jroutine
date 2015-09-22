@@ -15,11 +15,11 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 /**
  * Utility class supporting functional programming.
@@ -34,7 +34,7 @@ public class Functions {
     private static final BiConsumer<?, ?> sBiSink =
             biConsumer(new com.github.dm.jrt.function.BiConsumer<Object, Object>() {
 
-                public void accept(final Object input1, final Object input2) {
+                public void accept(final Object in1, final Object in2) {
 
                 }
             });
@@ -42,16 +42,16 @@ public class Functions {
     private static final Function<?, ?> sIdentity =
             function(new com.github.dm.jrt.function.Function<Object, Object>() {
 
-                public Object apply(final Object input) {
+                public Object apply(final Object in) {
 
-                    return input;
+                    return in;
                 }
             });
 
     private static final Consumer<?> sSink =
             consumer(new com.github.dm.jrt.function.Consumer<Object>() {
 
-                public void accept(final Object input) {
+                public void accept(final Object in) {
 
                 }
             });
@@ -64,18 +64,18 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified consumer function so to provide additional features.<br/>
+     * Wraps the specified bi-consumer instance so to provide additional features.<br/>
      * The returned object will support concatenation and synchronization.
      *
-     * @param consumer the consumer instance.
+     * @param consumer the bi-consumer instance.
      * @param <IN1>    the first input data type.
      * @param <IN2>    the second input data type.
-     * @return the wrapped consumer.
+     * @return the wrapped bi-consumer.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public static <IN1, IN2> BiConsumer<IN1, IN2> biConsumer(
-            @Nonnull final com.github.dm.jrt.function.BiConsumer<IN1, IN2> consumer) {
+            @NotNull final com.github.dm.jrt.function.BiConsumer<IN1, IN2> consumer) {
 
         if (consumer == null) {
 
@@ -87,14 +87,14 @@ public class Functions {
     }
 
     /**
-     * Returns a consumer just discarding the passed inputs.<br/>
+     * Returns a bi-consumer just discarding the passed inputs.<br/>
      * The returned object will support concatenation and synchronization.
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the consumer.
+     * @return the wrapped bi-consumer.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <IN1, IN2> BiConsumer<IN1, IN2> biSink() {
 
@@ -102,17 +102,17 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified consumer function so to provide additional features.<br/>
+     * Wraps the specified consumer instance so to provide additional features.<br/>
      * The returned object will support concatenation and synchronization.
      *
      * @param consumer the consumer instance.
      * @param <IN>     the input data type.
      * @return the wrapped consumer.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public static <IN> Consumer<IN> consumer(
-            @Nonnull final com.github.dm.jrt.function.Consumer<IN> consumer) {
+            @NotNull final com.github.dm.jrt.function.Consumer<IN> consumer) {
 
         if (consumer == null) {
 
@@ -124,7 +124,7 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified function so to provide additional features.<br/>
+     * Wraps the specified function instance so to provide additional features.<br/>
      * The returned object will support concatenation and synchronization.
      *
      * @param function the function instance.
@@ -132,10 +132,10 @@ public class Functions {
      * @param <OUT>    the output data type.
      * @return the wrapped function.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public static <IN, OUT> Function<IN, OUT> function(
-            @Nonnull final com.github.dm.jrt.function.Function<IN, OUT> function) {
+            @NotNull final com.github.dm.jrt.function.Function<IN, OUT> function) {
 
         if (function == null) {
 
@@ -147,13 +147,13 @@ public class Functions {
     }
 
     /**
-     * Returns a function returning the very same input as output.<br/>
+     * Returns the identity function.<br/>
      * The returned object will support concatenation and synchronization.
      *
      * @param <IN> the input data type.
      * @return the wrapped function.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> Function<IN, ? super IN> identity() {
 
@@ -165,17 +165,17 @@ public class Functions {
      * The returned object will support concatenation and synchronization.
      *
      * @param <IN> the input data type.
-     * @return the consumer.
+     * @return the wrapped consumer.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> Consumer<IN> sink() {
 
         return (Consumer<IN>) sSink;
     }
 
-    @Nonnull
-    private static Object getMutex(@Nonnull final Object function) {
+    @NotNull
+    private static Object getMutex(@NotNull final Object function) {
 
         synchronized (mMutexes) {
 
@@ -192,21 +192,39 @@ public class Functions {
         }
     }
 
+    /**
+     * Class wrapping a bi-consumer instance.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     */
     public static class BiConsumer<IN1, IN2>
             implements com.github.dm.jrt.function.BiConsumer<IN1, IN2> {
 
         private final List<com.github.dm.jrt.function.BiConsumer<?, ?>> mConsumers;
 
+        /**
+         * Constructor.
+         *
+         * @param consumers the list of wrapped consumers.
+         */
         private BiConsumer(
-                @Nonnull final List<com.github.dm.jrt.function.BiConsumer<?, ?>> consumers) {
+                @NotNull final List<com.github.dm.jrt.function.BiConsumer<?, ?>> consumers) {
 
             mConsumers = consumers;
         }
 
-        @Nonnull
+        /**
+         * Returns a composed bi-consumer that performs, in sequence, this operation followed by the
+         * after operation.
+         *
+         * @param after the operation to perform after this operation.
+         * @return the composed bi-consumer.
+         */
+        @NotNull
         @SuppressWarnings("ConstantConditions")
         public BiConsumer<IN1, IN2> andThen(
-                @Nonnull final com.github.dm.jrt.function.BiConsumer<? super IN1, ? super IN2>
+                @NotNull final com.github.dm.jrt.function.BiConsumer<? super IN1, ? super IN2>
                         after) {
 
             if (after == null) {
@@ -223,8 +241,14 @@ public class Functions {
             return new BiConsumer<IN1, IN2>(newConsumers);
         }
 
+        /**
+         * Performs this operation on the given arguments.
+         *
+         * @param in1 the first input argument.
+         * @param in2 the second input argument.
+         */
         @SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
-        public void accept(final IN1 input1, final IN2 input2) {
+        public void accept(final IN1 in1, final IN2 in2) {
 
             for (final com.github.dm.jrt.function.BiConsumer<?, ?> consumer : mConsumers) {
 
@@ -232,26 +256,43 @@ public class Functions {
 
                 synchronized (mutex) {
 
-                    ((com.github.dm.jrt.function.BiConsumer<Object, Object>) consumer).accept(
-                            input1, input2);
+                    ((com.github.dm.jrt.function.BiConsumer<Object, Object>) consumer).accept(in1,
+                                                                                              in2);
                 }
             }
         }
     }
 
+    /**
+     * Class wrapping a consumer instance.
+     *
+     * @param <IN> the input data type.
+     */
     public static class Consumer<IN> implements com.github.dm.jrt.function.Consumer<IN> {
 
         private final List<com.github.dm.jrt.function.Consumer<?>> mConsumers;
 
-        private Consumer(@Nonnull final List<com.github.dm.jrt.function.Consumer<?>> consumers) {
+        /**
+         * Constructor.
+         *
+         * @param consumers the list of wrapped consumers.
+         */
+        private Consumer(@NotNull final List<com.github.dm.jrt.function.Consumer<?>> consumers) {
 
             mConsumers = consumers;
         }
 
-        @Nonnull
+        /**
+         * Returns a composed consumer that performs, in sequence, this operation followed by the
+         * after operation.
+         *
+         * @param after the operation to perform after this operation.
+         * @return the composed consumer.
+         */
+        @NotNull
         @SuppressWarnings("ConstantConditions")
         public Consumer<IN> andThen(
-                @Nonnull final com.github.dm.jrt.function.Consumer<? super IN> after) {
+                @NotNull final com.github.dm.jrt.function.Consumer<? super IN> after) {
 
             if (after == null) {
 
@@ -266,8 +307,13 @@ public class Functions {
             return new Consumer<IN>(newConsumers);
         }
 
+        /**
+         * Performs this operation on the given argument.
+         *
+         * @param in the input argument.
+         */
         @SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
-        public void accept(final IN input) {
+        public void accept(final IN in) {
 
             for (final com.github.dm.jrt.function.Consumer<?> consumer : mConsumers) {
 
@@ -275,25 +321,44 @@ public class Functions {
 
                 synchronized (mutex) {
 
-                    ((com.github.dm.jrt.function.Consumer<Object>) consumer).accept(input);
+                    ((com.github.dm.jrt.function.Consumer<Object>) consumer).accept(in);
                 }
             }
         }
     }
 
+    /**
+     * Class wrapping a function instance.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
     public static class Function<IN, OUT> implements com.github.dm.jrt.function.Function<IN, OUT> {
 
         private final List<com.github.dm.jrt.function.Function<?, ?>> mFunctions;
 
-        private Function(@Nonnull final List<com.github.dm.jrt.function.Function<?, ?>> functions) {
+        /**
+         * Constructor.
+         *
+         * @param functions the list of wrapped functions.
+         */
+        private Function(@NotNull final List<com.github.dm.jrt.function.Function<?, ?>> functions) {
 
             mFunctions = functions;
         }
 
-        @Nonnull
+        /**
+         * Returns a composed function that first applies this function to its input, and then
+         * applies the after function to the result.
+         *
+         * @param after   the function to apply after this function is applied.
+         * @param <AFTER> the type of output of the after function.
+         * @return the composed function.
+         */
+        @NotNull
         @SuppressWarnings("ConstantConditions")
         public <AFTER> Function<IN, AFTER> andThen(
-                @Nonnull final com.github.dm.jrt.function.Function<? super OUT, AFTER> after) {
+                @NotNull final com.github.dm.jrt.function.Function<? super OUT, AFTER> after) {
 
             if (after == null) {
 
@@ -308,10 +373,18 @@ public class Functions {
             return new Function<IN, AFTER>(newFunctions);
         }
 
-        @Nonnull
+        /**
+         * Returns a composed function that first applies this function to its input, and then
+         * applies the after function to the result.
+         *
+         * @param before   the function to apply before this function is applied.
+         * @param <BEFORE> the type of input to the before function.
+         * @return the composed function.
+         */
+        @NotNull
         @SuppressWarnings("ConstantConditions")
         public <BEFORE> Function<BEFORE, OUT> compose(
-                @Nonnull final com.github.dm.jrt.function.Function<BEFORE, ? extends IN> before) {
+                @NotNull final com.github.dm.jrt.function.Function<BEFORE, ? extends IN> before) {
 
             if (before == null) {
 
@@ -326,10 +399,16 @@ public class Functions {
             return new Function<BEFORE, OUT>(newFunctions);
         }
 
+        /**
+         * Applies this function to the given argument.
+         *
+         * @param in the input argument.
+         * @return the function result.
+         */
         @SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
-        public OUT apply(final IN input) {
+        public OUT apply(final IN in) {
 
-            Object result = input;
+            Object result = in;
 
             for (final com.github.dm.jrt.function.Function<?, ?> function : mFunctions) {
 

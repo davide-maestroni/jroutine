@@ -19,9 +19,9 @@ import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.util.ClassToken;
 
-import java.lang.reflect.Method;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.lang.reflect.Method;
 
 /**
  * Interface defining a builder of routines wrapping an object methods.
@@ -55,8 +55,8 @@ public interface LoaderObjectRoutineBuilder
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
-    @Nonnull
-    <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@Nonnull String name);
+    @NotNull
+    <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull String name);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -81,8 +81,8 @@ public interface LoaderObjectRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
      */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -107,8 +107,8 @@ public interface LoaderObjectRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
     /**
      * Returns a routine used to call the specified method.
@@ -134,9 +134,9 @@ public interface LoaderObjectRoutineBuilder
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
      */
-    @Nonnull
-    <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull String name,
-            @Nonnull Class<?>... parameterTypes);
+    @NotNull
+    <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name,
+            @NotNull Class<?>... parameterTypes);
 
     /**
      * Returns a routine used to call the specified method.
@@ -160,20 +160,20 @@ public interface LoaderObjectRoutineBuilder
      * @param <OUT>  the output data type.
      * @return the routine.
      */
-    @Nonnull
-    <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull Method method);
+    @NotNull
+    <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull Method method);
 
     /**
      * Note that the configured asynchronous runner will be ignored.
      *
      * @return the invocation configuration builder.
      */
-    @Nonnull
+    @NotNull
     InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxies();
 }

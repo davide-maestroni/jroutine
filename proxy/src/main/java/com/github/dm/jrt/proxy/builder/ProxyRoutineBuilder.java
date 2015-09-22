@@ -17,7 +17,7 @@ import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.builder.ProxyConfigurableBuilder;
 import com.github.dm.jrt.util.ClassToken;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routines wrapping an object methods.
@@ -55,8 +55,8 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -86,6 +86,6 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 }

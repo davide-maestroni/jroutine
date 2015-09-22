@@ -16,8 +16,8 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.InvocationException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Helper class handling routine exceptions so that they can be transferred through the routine
@@ -60,7 +60,7 @@ class RoutineExceptionWrapper {
      * @param t the throwable to wrap.
      * @return the new wrapper instance.
      */
-    @Nonnull
+    @NotNull
     static RoutineExceptionWrapper wrap(@Nullable final Throwable t) {
 
         return new RoutineExceptionWrapper(t);
@@ -71,7 +71,7 @@ class RoutineExceptionWrapper {
      *
      * @return the routine exception.
      */
-    @Nonnull
+    @NotNull
     RoutineException raise() {
 
         return InvocationException.wrapIfNeeded(mCause);

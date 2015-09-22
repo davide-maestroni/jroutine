@@ -13,12 +13,12 @@
  */
 package com.github.dm.jrt.core;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.NoSuchElementException;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Minimal implementation of a light-weight queue storing elements into dynamically increasing
@@ -36,7 +36,7 @@ class SimpleQueue<E> {
 
     private Object[] mQueue = new Object[8];
 
-    private static void resizeArray(@Nonnull final Object[] src, @Nonnull final Object[] dst,
+    private static void resizeArray(@NotNull final Object[] src, @NotNull final Object[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -72,7 +72,7 @@ class SimpleQueue<E> {
      *
      * @param elements the element iterable.
      */
-    public void addAll(@Nonnull final Iterable<? extends E> elements) {
+    public void addAll(@NotNull final Iterable<? extends E> elements) {
 
         for (final E element : elements) {
 
@@ -95,7 +95,7 @@ class SimpleQueue<E> {
      *
      * @param collection the collection to fill.
      */
-    public void drainTo(@Nonnull final Collection<? super E> collection) {
+    public void drainTo(@NotNull final Collection<? super E> collection) {
 
         while (!isEmpty()) {
 

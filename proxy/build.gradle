@@ -37,7 +37,7 @@ jacocoTestReport {
 }
 
 findbugs {
-    toolVersion '3.0.0'
+    toolVersion '3.0.1'
 }
 
 javadoc {

@@ -29,6 +29,7 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -37,8 +38,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
@@ -1329,7 +1328,7 @@ public class ChannelsTest {
 
         @Override
         public void onInput(final Selectable<DATA> input,
-                @Nonnull final ResultChannel<DATA> result) {
+                @NotNull final ResultChannel<DATA> result) {
 
             if (mFirstIndex == NO_INDEX) {
 
@@ -1345,7 +1344,7 @@ public class ChannelsTest {
 
     private static class CharAt extends FilterInvocation<List<?>, Character> {
 
-        public void onInput(final List<?> objects, @Nonnull final ResultChannel<Character> result) {
+        public void onInput(final List<?> objects, @NotNull final ResultChannel<Character> result) {
 
             final String text = (String) objects.get(0);
             final int index = ((Integer) objects.get(1));
@@ -1360,7 +1359,7 @@ public class ChannelsTest {
         private static final int STRING = 0;
 
         public void onInput(final Selectable<Object> selectable,
-                @Nonnull final ResultChannel<Selectable<Object>> result) {
+                @NotNull final ResultChannel<Selectable<Object>> result) {
 
             switch (selectable.index) {
 

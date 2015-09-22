@@ -15,14 +15,14 @@ package com.github.dm.jrt.runner;
 
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 /**
  * Class implementing a runner employing an executor service.
@@ -45,7 +45,7 @@ class ScheduledRunner implements Runner {
      * @param service the executor service.
      */
     @SuppressWarnings("ConstantConditions")
-    ScheduledRunner(@Nonnull final ScheduledExecutorService service) {
+    ScheduledRunner(@NotNull final ScheduledExecutorService service) {
 
         if (service == null) {
 
@@ -55,7 +55,7 @@ class ScheduledRunner implements Runner {
         mService = service;
     }
 
-    public void cancel(@Nonnull final Execution execution) {
+    public void cancel(@NotNull final Execution execution) {
 
         synchronized (mFutures) {
 
@@ -77,8 +77,8 @@ class ScheduledRunner implements Runner {
         return mThreads.containsKey(Thread.currentThread());
     }
 
-    public void run(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public void run(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         final ScheduledFuture<?> future =
                 mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
@@ -119,8 +119,8 @@ class ScheduledRunner implements Runner {
          * @param wrapped the wrapped execution.
          * @param threads the map of runner threads.
          */
-        private ExecutionWrapper(@Nonnull final Execution wrapped,
-                @Nonnull final Map<Thread, Void> threads) {
+        private ExecutionWrapper(@NotNull final Execution wrapped,
+                @NotNull final Map<Thread, Void> threads) {
 
             mExecution = wrapped;
             mThreads = threads;

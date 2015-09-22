@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.invocation;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Invocation factory interface.
@@ -33,6 +33,6 @@ public abstract class InvocationFactory<IN, OUT> {
      *
      * @return the invocation instance.
      */
-    @Nonnull
+    @NotNull
     public abstract Invocation<IN, OUT> newInvocation();
 }

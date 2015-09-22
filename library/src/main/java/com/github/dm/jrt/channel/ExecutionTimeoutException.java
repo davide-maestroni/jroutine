@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.channel;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that no result became available before the specific timeout elapsed.

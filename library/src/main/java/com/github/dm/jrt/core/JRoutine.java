@@ -18,7 +18,7 @@ import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.builder.TransportChannelBuilder;
 import com.github.dm.jrt.invocation.InvocationFactory;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This utility class represents the entry point to the library by acting as a factory of routine
@@ -159,9 +159,9 @@ public class JRoutine {
      * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
      *                                            static.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @Nonnull final InvocationFactory<IN, OUT> factory) {
+            @NotNull final InvocationFactory<IN, OUT> factory) {
 
         return new DefaultRoutineBuilder<IN, OUT>(factory);
     }
@@ -176,8 +176,8 @@ public class JRoutine {
      * @throws java.lang.IllegalArgumentException if the specified object class represents an
      *                                            interface.
      */
-    @Nonnull
-    public static ObjectRoutineBuilder on(@Nonnull final InvocationTarget<?> target) {
+    @NotNull
+    public static ObjectRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
 
         return new DefaultObjectRoutineBuilder(target);
     }
@@ -187,7 +187,7 @@ public class JRoutine {
      *
      * @return the transport channel builder instance.
      */
-    @Nonnull
+    @NotNull
     public static TransportChannelBuilder transport() {
 
         return new DefaultTransportChannelBuilder();

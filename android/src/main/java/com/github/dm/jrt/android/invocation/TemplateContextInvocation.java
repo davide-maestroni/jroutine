@@ -17,7 +17,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.invocation.TemplateInvocation;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of a context invocation.
@@ -34,7 +34,7 @@ public abstract class TemplateContextInvocation<IN, OUT> extends TemplateInvocat
 
     private Context mContext;
 
-    public void onContext(@Nonnull final Context context) {
+    public void onContext(@NotNull final Context context) {
 
         mContext = context;
     }

@@ -26,6 +26,8 @@ import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,8 +35,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
@@ -1095,7 +1095,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
             extends FilterContextInvocation<ParcelableByteBuffer, ParcelableByteBuffer> {
 
         public void onInput(final ParcelableByteBuffer input,
-                @Nonnull final ResultChannel<ParcelableByteBuffer> result) {
+                @NotNull final ResultChannel<ParcelableByteBuffer> result) {
 
             result.pass(input);
         }

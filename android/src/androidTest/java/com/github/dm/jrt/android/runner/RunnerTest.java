@@ -30,13 +30,13 @@ import com.github.dm.jrt.runner.RunnerDecorator;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
@@ -164,7 +164,7 @@ public class RunnerTest extends AndroidTestCase {
                 new TemplateInvocation<Object, Object>() {
 
                     @Override
-                    public void onResult(@Nonnull final ResultChannel<Object> result) {
+                    public void onResult(@NotNull final ResultChannel<Object> result) {
 
                         result.pass(Looper.myLooper()).pass(Runners.myRunner());
                     }
@@ -208,15 +208,15 @@ public class RunnerTest extends AndroidTestCase {
 
     private static class LooperInvocationFactory extends InvocationFactory<Object, Object> {
 
-        @Nonnull
+        @NotNull
         @Override
         public Invocation<Object, Object> newInvocation() {
 
             return new FunctionInvocation<Object, Object>() {
 
                 @Override
-                protected void onCall(@Nonnull final List<?> objects,
-                        @Nonnull final ResultChannel<Object> result) {
+                protected void onCall(@NotNull final List<?> objects,
+                        @NotNull final ResultChannel<Object> result) {
 
                     try {
 

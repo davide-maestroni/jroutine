@@ -28,8 +28,8 @@
         @SuppressWarnings("unused")
         private com.github.dm.jrt.core.InvocationTarget mTarget;
 
-        private ContextInvocation${methodCount}(@javax.annotation.Nullable final String shareGroup,
-                @javax.annotation.Nonnull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
+        private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final String shareGroup,
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
             mShareGroup = shareGroup;
             mContextTarget = target;
@@ -37,7 +37,7 @@
 
         @Override
         @SuppressWarnings({"unchecked", "ConstantConditions"})
-        public void onContext(@javax.annotation.Nonnull final android.content.Context context) {
+        public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) {
 
             super.onContext(context);
 

@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.routine;
 
 import com.github.dm.jrt.routine.Routine;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a routine that can purge specific invocation instances, identifying them by

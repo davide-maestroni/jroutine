@@ -13,9 +13,9 @@
  */
 package com.github.dm.jrt.runner;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The runner interface defines an object responsible for executing routine invocations inside
@@ -54,7 +54,7 @@ public interface Runner {
      *
      * @param execution the execution.
      */
-    void cancel(@Nonnull Execution execution);
+    void cancel(@NotNull Execution execution);
 
     /**
      * Checks if the calling thread belongs to the ones employed by the runner implementation.
@@ -75,5 +75,5 @@ public interface Runner {
      * @param delay     the execution delay.
      * @param timeUnit  the delay time unit.
      */
-    void run(@Nonnull Execution execution, long delay, @Nonnull TimeUnit timeUnit);
+    void run(@NotNull Execution execution, long delay, @NotNull TimeUnit timeUnit);
 }

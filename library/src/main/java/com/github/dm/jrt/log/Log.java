@@ -13,10 +13,10 @@
  */
 package com.github.dm.jrt.log;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Interface defining a log object responsible for formatting and writing the log messages.
@@ -54,7 +54,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    void dbg(@Nonnull List<Object> contexts, @Nullable String message,
+    void dbg(@NotNull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
@@ -64,7 +64,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    void err(@Nonnull List<Object> contexts, @Nullable String message,
+    void err(@NotNull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
@@ -74,7 +74,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    void wrn(@Nonnull List<Object> contexts, @Nullable String message,
+    void wrn(@NotNull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**

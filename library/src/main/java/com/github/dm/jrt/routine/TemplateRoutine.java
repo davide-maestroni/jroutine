@@ -15,8 +15,8 @@ package com.github.dm.jrt.routine;
 
 import com.github.dm.jrt.channel.OutputChannel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Empty abstract implementation of a routine.
@@ -31,61 +31,61 @@ import javax.annotation.Nullable;
  */
 public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall() {
 
         return asyncInvoke().result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final IN input) {
 
         return asyncInvoke().pass(input).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final IN... inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall() {
 
         return parallelInvoke().result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final IN input) {
 
         return parallelInvoke().pass(input).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final IN... inputs) {
 
         return parallelInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return parallelInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return parallelInvoke().pass(inputs).result();
@@ -95,31 +95,31 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall() {
 
         return syncInvoke().result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final IN input) {
 
         return syncInvoke().pass(input).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final IN... inputs) {
 
         return syncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return syncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return syncInvoke().pass(inputs).result();

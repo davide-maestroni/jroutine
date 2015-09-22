@@ -13,8 +13,8 @@
  */
 package com.github.dm.jrt.builder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Class storing the proxy configuration.
@@ -56,7 +56,7 @@ public final class ProxyConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<ProxyConfiguration> builder() {
 
         return new Builder<ProxyConfiguration>(sDefaultConfigurable);
@@ -68,7 +68,7 @@ public final class ProxyConfiguration {
      * @param initialConfiguration the initial proxy configuration.
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<ProxyConfiguration> builderFrom(
             @Nullable final ProxyConfiguration initialConfiguration) {
 
@@ -81,7 +81,7 @@ public final class ProxyConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public Builder<ProxyConfiguration> builderFrom() {
 
         return builderFrom(this);
@@ -147,8 +147,8 @@ public final class ProxyConfiguration {
          * @param configuration the configuration.
          * @return the configurable instance.
          */
-        @Nonnull
-        TYPE setConfiguration(@Nonnull ProxyConfiguration configuration);
+        @NotNull
+        TYPE setConfiguration(@NotNull ProxyConfiguration configuration);
     }
 
     /**
@@ -168,7 +168,7 @@ public final class ProxyConfiguration {
          * @param configurable the configurable instance.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
 
@@ -185,8 +185,8 @@ public final class ProxyConfiguration {
          * @param initialConfiguration the initial proxy configuration.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final ProxyConfiguration initialConfiguration) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+                @NotNull final ProxyConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -202,7 +202,7 @@ public final class ProxyConfiguration {
          *
          * @return the configurable object.
          */
-        @Nonnull
+        @NotNull
         public TYPE set() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
@@ -216,7 +216,7 @@ public final class ProxyConfiguration {
          * @param configuration the proxy configuration.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> with(@Nullable final ProxyConfiguration configuration) {
 
             if (configuration == null) {
@@ -242,20 +242,20 @@ public final class ProxyConfiguration {
          * @param groupName the group name.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withShareGroup(@Nullable final String groupName) {
 
             mGroupName = groupName;
             return this;
         }
 
-        @Nonnull
+        @NotNull
         private ProxyConfiguration buildConfiguration() {
 
             return new ProxyConfiguration(mGroupName);
         }
 
-        private void setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+        private void setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
             mGroupName = configuration.mGroupName;
         }
@@ -266,9 +266,9 @@ public final class ProxyConfiguration {
      */
     private static class DefaultConfigurable implements Configurable<ProxyConfiguration> {
 
-        @Nonnull
+        @NotNull
         public ProxyConfiguration setConfiguration(
-                @Nonnull final ProxyConfiguration configuration) {
+                @NotNull final ProxyConfiguration configuration) {
 
             return configuration;
         }

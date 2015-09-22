@@ -26,14 +26,14 @@ import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Utility class focused on the optimization of the transfer of byte chunks through routine
@@ -95,7 +95,7 @@ public class ParcelableByteChannel {
      *
      * @return the byte channel.
      */
-    @Nonnull
+    @NotNull
     public static ParcelableByteChannel byteChannel() {
 
         return new ParcelableByteChannel();
@@ -112,7 +112,7 @@ public class ParcelableByteChannel {
      * @return the byte channel.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    @Nonnull
+    @NotNull
     public static ParcelableByteChannel byteChannel(final int dataBufferSize) {
 
         return new ParcelableByteChannel(dataBufferSize);
@@ -131,7 +131,7 @@ public class ParcelableByteChannel {
      * @return the byte channel.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    @Nonnull
+    @NotNull
     public static ParcelableByteChannel byteChannel(final int dataBufferSize,
             final int corePoolSize) {
 
@@ -147,8 +147,8 @@ public class ParcelableByteChannel {
      * @throws java.lang.IllegalStateException if an input stream has been already created for the
      *                                         specified buffer.
      */
-    @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final ParcelableByteBuffer buffer) {
+    @NotNull
+    public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer buffer) {
 
         final ByteBuffer byteBuffer = buffer.getBuffer();
 
@@ -170,8 +170,8 @@ public class ParcelableByteChannel {
      * @throws java.lang.IllegalStateException if an input stream has been already created for one
      *                                         of the specified buffers.
      */
-    @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final ParcelableByteBuffer... buffers) {
+    @NotNull
+    public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer... buffers) {
 
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.length);
 
@@ -198,8 +198,8 @@ public class ParcelableByteChannel {
      * @throws java.lang.IllegalStateException if an input stream has been already created for one
      *                                         of the specified buffers.
      */
-    @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final List<ParcelableByteBuffer> buffers) {
+    @NotNull
+    public static BufferInputStream inputStream(@NotNull final List<ParcelableByteBuffer> buffers) {
 
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.size());
 
@@ -224,9 +224,9 @@ public class ParcelableByteChannel {
      * @param channel the input channel to which to pass the data.
      * @return the output stream.
      */
-    @Nonnull
+    @NotNull
     public BufferOutputStream passTo(
-            @Nonnull final InputChannel<? super ParcelableByteBuffer> channel) {
+            @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
 
         TransportChannel<ByteBuffer> transportChannel;
 
@@ -272,7 +272,7 @@ public class ParcelableByteChannel {
         public static final Creator<ParcelableByteBuffer> CREATOR =
                 new Creator<ParcelableByteBuffer>() {
 
-                    public ParcelableByteBuffer createFromParcel(@Nonnull final Parcel in) {
+                    public ParcelableByteBuffer createFromParcel(@NotNull final Parcel in) {
 
                         final byte[] data = in.createByteArray();
 
@@ -324,7 +324,7 @@ public class ParcelableByteChannel {
         }
 
         @SuppressWarnings({"ResultOfMethodCallIgnored", "StatementWithEmptyBody"})
-        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
             final ByteBuffer buffer = mBuffer;
 
@@ -400,7 +400,7 @@ public class ParcelableByteChannel {
          */
         @SuppressWarnings("ConstantConditions")
         private BufferOutputConsumer(
-                @Nonnull final InputChannel<? super ParcelableByteBuffer> channel) {
+                @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
 
             if (channel == null) {
 
@@ -429,7 +429,7 @@ public class ParcelableByteChannel {
     private static class EmptyBufferInputStream extends BufferInputStream {
 
         @Override
-        public int read(@Nonnull final OutputStream out) throws IOException {
+        public int read(@NotNull final OutputStream out) throws IOException {
 
             return -1;
         }
@@ -441,13 +441,13 @@ public class ParcelableByteChannel {
         }
 
         @Override
-        public int read(@Nonnull final byte[] b) {
+        public int read(@NotNull final byte[] b) {
 
             return -1;
         }
 
         @Override
-        public int read(@Nonnull final byte[] b, final int off, final int len) {
+        public int read(@NotNull final byte[] b, final int off, final int len) {
 
             return -1;
         }
@@ -495,7 +495,7 @@ public class ParcelableByteChannel {
             super(size);
         }
 
-        private void writeToParcel(@Nonnull final Parcel dest) {
+        private void writeToParcel(@NotNull final Parcel dest) {
 
             dest.writeByteArray(buf, 0, count);
         }

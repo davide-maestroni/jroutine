@@ -15,7 +15,7 @@ package com.github.dm.jrt.builder;
 
 import com.github.dm.jrt.builder.ProxyConfiguration.Builder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a configurable builder of proxy routines.
@@ -35,6 +35,6 @@ public interface ProxyConfigurableBuilder<TYPE> {
      *
      * @return the proxy configuration builder.
      */
-    @Nonnull
+    @NotNull
     Builder<? extends TYPE> proxies();
 }

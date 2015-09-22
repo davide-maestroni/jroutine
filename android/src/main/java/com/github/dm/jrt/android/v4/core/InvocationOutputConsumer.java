@@ -23,12 +23,12 @@ import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.TemplateExecution;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Class consuming the invocation loader results.
@@ -64,8 +64,8 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
      * @param logger the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationOutputConsumer(@Nonnull final InvocationLoader<?, OUT> loader,
-            @Nonnull final Logger logger) {
+    InvocationOutputConsumer(@NotNull final InvocationLoader<?, OUT> loader,
+            @NotNull final Logger logger) {
 
         if (loader == null) {
 
@@ -207,9 +207,9 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
             }
         }
 
-        public boolean passTo(@Nonnull final Collection<TransportChannel<OUT>> newChannels,
-                @Nonnull final Collection<TransportChannel<OUT>> oldChannels,
-                @Nonnull final Collection<TransportChannel<OUT>> abortedChannels) {
+        public boolean passTo(@NotNull final Collection<TransportChannel<OUT>> newChannels,
+                @NotNull final Collection<TransportChannel<OUT>> oldChannels,
+                @NotNull final Collection<TransportChannel<OUT>> abortedChannels) {
 
             synchronized (mMutex) {
 

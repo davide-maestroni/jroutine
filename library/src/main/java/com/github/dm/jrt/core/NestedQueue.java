@@ -13,10 +13,10 @@
  */
 package com.github.dm.jrt.core;
 
-import java.util.Collection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  * Implementation of a nested queue ensuring that data are returned in the same order as they are
@@ -50,7 +50,7 @@ class NestedQueue<E> {
      * @return the first element or {@link #EMPTY_ELEMENT}.
      */
     @Nullable
-    private static Object prune(@Nonnull final NestedQueue<?> queue) {
+    private static Object prune(@NotNull final NestedQueue<?> queue) {
 
         final SimpleQueue<Object> simpleQueue = queue.mQueue;
 
@@ -105,7 +105,7 @@ class NestedQueue<E> {
      * @param elements the element iterable.
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
-    public void addAll(@Nonnull final Iterable<? extends E> elements) {
+    public void addAll(@NotNull final Iterable<? extends E> elements) {
 
         checkOpen();
         mQueue.addAll(elements);
@@ -117,7 +117,7 @@ class NestedQueue<E> {
      * @return the newly added nested queue.
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
-    @Nonnull
+    @NotNull
     public NestedQueue<E> addNested() {
 
         checkOpen();
@@ -150,7 +150,7 @@ class NestedQueue<E> {
      * @param collection the collection to fill.
      */
     @SuppressWarnings("unchecked")
-    public void drainTo(@Nonnull final Collection<? super E> collection) {
+    public void drainTo(@NotNull final Collection<? super E> collection) {
 
         if (prune(this) == EMPTY_ELEMENT) {
 

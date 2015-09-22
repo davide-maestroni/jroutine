@@ -40,14 +40,14 @@ import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
 import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
@@ -85,8 +85,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderObjectRoutineBuilder(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationTarget<?> target) {
+    DefaultLoaderObjectRoutineBuilder(@NotNull final LoaderContext context,
+            @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
 
@@ -102,9 +102,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         mTarget = target;
     }
 
-    @Nonnull
+    @NotNull
     private static LoaderConfiguration loaderConfigurationWithAnnotations(
-            @Nonnull final LoaderConfiguration configuration, @Nonnull final Method method) {
+            @NotNull final LoaderConfiguration configuration, @NotNull final Method method) {
 
         final LoaderConfiguration.Builder<LoaderConfiguration> builder =
                 configuration.builderFrom();
@@ -148,9 +148,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         return builder.set();
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
-    public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@Nonnull final String name) {
+    public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
@@ -181,14 +181,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                        .buildRoutine();
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
 
@@ -201,16 +201,16 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         return itf.cast(proxy);
     }
 
-    @Nonnull
-    public <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull final String name,
-            @Nonnull final Class<?>... parameterTypes) {
+    @NotNull
+    public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name,
+            @NotNull final Class<?>... parameterTypes) {
 
         return method(findMethod(mTarget.getTargetClass(), name, parameterTypes));
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
-    public <IN, OUT> LoaderRoutine<IN, OUT> method(@Nonnull final Method method) {
+    public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
 
         final ProxyConfiguration proxyConfiguration =
                 configurationWithAnnotations(mProxyConfiguration, method);
@@ -232,31 +232,31 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                        .buildRoutine();
     }
 
-    @Nonnull
+    @NotNull
     public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderObjectRoutineBuilder setConfiguration(
-            @Nonnull final LoaderConfiguration configuration) {
+            @NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -267,10 +267,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderObjectRoutineBuilder setConfiguration(
-            @Nonnull final ProxyConfiguration configuration) {
+            @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -281,10 +281,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderObjectRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -322,8 +322,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param name               the alias name.
          */
         @SuppressWarnings("unchecked")
-        private AliasContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final String name) {
+        private AliasContextInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -331,7 +331,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@Nonnull final Context context) {
+        public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
 
@@ -352,8 +352,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends IN> inputs,
-                @Nonnull final ResultChannel<OUT> result) {
+        protected void onCall(@NotNull final List<? extends IN> inputs,
+                @NotNull final ResultChannel<OUT> result) {
 
             final Routine<IN, OUT> routine = mRoutine;
 
@@ -389,9 +389,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target             the invocation target.
          * @param name               the alias name.
          */
-        private AliasContextInvocationFactory(@Nonnull final Method targetMethod,
-                @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final String name) {
+        private AliasContextInvocationFactory(@NotNull final Method targetMethod,
+                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
 
             super(targetMethod, proxyConfiguration, target, name);
             mProxyConfiguration = proxyConfiguration;
@@ -399,7 +399,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mName = name;
         }
 
-        @Nonnull
+        @NotNull
         public ContextInvocation<IN, OUT> newInvocation() {
 
             return new AliasContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mName);
@@ -433,8 +433,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param method             the method.
          */
         @SuppressWarnings("unchecked")
-        private MethodContextInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final Method method) {
+        private MethodContextInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -442,8 +442,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends IN> inputs,
-                @Nonnull final ResultChannel<OUT> result) {
+        protected void onCall(@NotNull final List<? extends IN> inputs,
+                @NotNull final ResultChannel<OUT> result) {
 
             final Routine<IN, OUT> routine = mRoutine;
 
@@ -456,7 +456,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@Nonnull final Context context) {
+        public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
 
@@ -500,9 +500,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target             the invocation target.
          * @param method             the method.
          */
-        private MethodContextInvocationFactory(@Nonnull final Method targetMethod,
-                @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final Method method) {
+        private MethodContextInvocationFactory(@NotNull final Method targetMethod,
+                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
 
             super(targetMethod, proxyConfiguration, target, method);
             mProxyConfiguration = proxyConfiguration;
@@ -510,7 +510,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mMethod = method;
         }
 
-        @Nonnull
+        @NotNull
         public ContextInvocation<IN, OUT> newInvocation() {
 
             return new MethodContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mMethod);
@@ -545,9 +545,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        private ProxyInvocation(@Nonnull final Method targetMethod,
-                @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget<?> target,
+        private ProxyInvocation(@NotNull final Method targetMethod,
+                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ContextInvocationTarget<?> target,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mTargetMethod = targetMethod;
@@ -559,8 +559,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<?> objects,
-                @Nonnull final ResultChannel<Object> result) {
+        protected void onCall(@NotNull final List<?> objects,
+                @NotNull final ResultChannel<Object> result) {
 
             final Object targetInstance = mInstance;
 
@@ -574,7 +574,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@Nonnull final Context context) {
+        public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
 
@@ -625,9 +625,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        private ProxyInvocationFactory(@Nonnull final Method targetMethod,
-                @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ContextInvocationTarget<?> target,
+        private ProxyInvocationFactory(@NotNull final Method targetMethod,
+                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ContextInvocationTarget<?> target,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             super(targetMethod, proxyConfiguration, target, inputMode, outputMode);
@@ -638,7 +638,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mOutputMode = outputMode;
         }
 
-        @Nonnull
+        @NotNull
         public ContextInvocation<Object, Object> newInvocation() {
 
             return new ProxyInvocation(mTargetMethod, mProxyConfiguration, mTarget, mInputMode,
@@ -666,7 +666,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          *
          * @param builder the builder instance.
          */
-        private ProxyInvocationHandler(@Nonnull final DefaultLoaderObjectRoutineBuilder builder) {
+        private ProxyInvocationHandler(@NotNull final DefaultLoaderObjectRoutineBuilder builder) {
 
             mContext = builder.mContext;
             mTarget = builder.mTarget;

@@ -19,9 +19,8 @@ import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-
-import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -53,7 +52,7 @@ public class InvocationTest {
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
 
-            @Nonnull
+            @NotNull
             @Override
             public Invocation<Object, Object> newInvocation() {
 
@@ -190,7 +189,7 @@ public class InvocationTest {
 
     private static class TestInvocation extends FilterInvocation<Object, Object> {
 
-        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+        public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
         }
     }

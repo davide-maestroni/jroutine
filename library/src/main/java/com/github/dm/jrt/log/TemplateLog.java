@@ -13,13 +13,13 @@
  */
 package com.github.dm.jrt.log;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Abstract implementation of a log.
@@ -40,8 +40,8 @@ public abstract class TemplateLog implements Log {
 
     private static final String LOG_FORMAT = "%s\t%s\t%s\t%s> %s";
 
-    private static String format(@Nonnull final LogLevel level,
-            @Nonnull final List<Object> contexts, @Nullable final String message) {
+    private static String format(@NotNull final LogLevel level,
+            @NotNull final List<Object> contexts, @Nullable final String message) {
 
         return String.format(LOG_FORMAT,
                              new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(
@@ -49,19 +49,19 @@ public abstract class TemplateLog implements Log {
                              contexts.toString(), level, message);
     }
 
-    public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+    public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.DEBUG, contexts, message, throwable);
     }
 
-    public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+    public void err(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.ERROR, contexts, message, throwable);
     }
 
-    public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+    public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.WARNING, contexts, message, throwable);
@@ -75,7 +75,7 @@ public abstract class TemplateLog implements Log {
      * @param message   the log message.
      * @param throwable the related exception.
      */
-    protected void log(@Nonnull final LogLevel level, @Nonnull final List<Object> contexts,
+    protected void log(@NotNull final LogLevel level, @NotNull final List<Object> contexts,
             @Nullable final String message, @Nullable final Throwable throwable) {
 
         String formatted = format(level, contexts, message);
@@ -93,7 +93,7 @@ public abstract class TemplateLog implements Log {
      *
      * @param message the message.
      */
-    protected void log(@Nonnull final String message) {
+    protected void log(@NotNull final String message) {
 
     }
 }

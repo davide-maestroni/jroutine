@@ -60,7 +60,7 @@
             private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
+                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
 
                     try {
 
@@ -139,7 +139,7 @@
             private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
+                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
 
                     try {
 
@@ -171,7 +171,7 @@
                 private Routine&lt;URI, Bitmap&gt; mRoutine;
 
                 &commat;Override
-                public void onContext(&commat;Nonnull final Context context) {
+                public void onContext(&commat;NotNull final Context context) {
 
                     super.onContext(context);
                     mRoutine = JRoutine.with(serviceFrom(context))
@@ -180,7 +180,7 @@
                 }
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
+                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
 
                     result.pass(mRoutine.asyncCall(uri));
                 }

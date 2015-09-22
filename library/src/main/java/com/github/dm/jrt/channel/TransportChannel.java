@@ -15,11 +15,11 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Interface defining a transport channel.
@@ -38,123 +38,123 @@ public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChanne
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> after(@Nonnull TimeDuration delay);
+    @NotNull
+    TransportChannel<DATA> after(@NotNull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> after(long delay, @Nonnull TimeUnit timeUnit);
+    @NotNull
+    TransportChannel<DATA> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> now();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> orderByCall();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> orderByChance();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> pass(@Nullable OutputChannel<? extends DATA> channel);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> pass(@Nullable Iterable<? extends DATA> inputs);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> pass(@Nullable DATA input);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> pass(@Nullable DATA... inputs);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> afterMax(@Nonnull TimeDuration timeout);
+    @NotNull
+    TransportChannel<DATA> afterMax(@NotNull TimeDuration timeout);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+    @NotNull
+    TransportChannel<DATA> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> allInto(@Nonnull Collection<? super DATA> results);
+    @NotNull
+    TransportChannel<DATA> allInto(@NotNull Collection<? super DATA> results);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> eventually();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> immediately();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> passTo(@Nonnull OutputConsumer<? super DATA> consumer);
+    @NotNull
+    TransportChannel<DATA> passTo(@NotNull OutputConsumer<? super DATA> consumer);
 
     /**
      * Returns this channel as an input one.
      *
      * @return this channel.
      */
-    @Nonnull
+    @NotNull
     InputChannel<DATA> asInput();
 
     /**
@@ -162,7 +162,7 @@ public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChanne
      *
      * @return this channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<DATA> asOutput();
 
     /**
@@ -173,6 +173,6 @@ public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChanne
      *
      * @return this channel.
      */
-    @Nonnull
+    @NotNull
     TransportChannel<DATA> close();
 }

@@ -23,10 +23,10 @@ import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.JRoutine;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -57,10 +57,10 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> mergeParcelable(
             final int startIndex,
-            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
 
@@ -89,9 +89,9 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
+    @NotNull
     public static OutputChannel<? extends ParcelableSelectable<?>> mergeParcelable(
-            final int startIndex, @Nonnull final OutputChannel<?>... channels) {
+            final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
 
@@ -120,9 +120,9 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> mergeParcelable(
-            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return mergeParcelable(0, channels);
     }
@@ -136,9 +136,9 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
+    @NotNull
     public static OutputChannel<? extends ParcelableSelectable<?>> mergeParcelable(
-            @Nonnull final OutputChannel<?>... channels) {
+            @NotNull final OutputChannel<?>... channels) {
 
         return mergeParcelable(0, channels);
     }
@@ -154,7 +154,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param <IN>    the input data type.
      * @return the input channel.
      */
-    @Nonnull
+    @NotNull
     public static <DATA, IN extends DATA> TransportChannel<IN> selectParcelable(
             @Nullable final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
@@ -183,7 +183,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param <OUT>   the output data type.
      * @return the selectable output channel.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> toSelectable(
             @Nullable final OutputChannel<? extends OUT> channel, final int index) {
 
@@ -211,7 +211,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
         public static final Creator<ParcelableSelectable> CREATOR =
                 new Creator<ParcelableSelectable>() {
 
-                    public ParcelableSelectable createFromParcel(@Nonnull final Parcel source) {
+                    public ParcelableSelectable createFromParcel(@NotNull final Parcel source) {
 
                         return new ParcelableSelectable(source);
                     }
@@ -239,7 +239,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
          * @param source the source parcel.
          */
         @SuppressWarnings("unchecked")
-        protected ParcelableSelectable(@Nonnull final Parcel source) {
+        protected ParcelableSelectable(@NotNull final Parcel source) {
 
             super((DATA) source.readValue(ParcelableSelectable.class.getClassLoader()),
                   source.readInt());
@@ -250,7 +250,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             return 0;
         }
 
-        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
             dest.writeValue(data);
             dest.writeInt(index);
@@ -277,7 +277,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
          * @param index   the selectable index.
          */
         private SelectableInputConsumer(
-                @Nonnull final TransportChannel<? super ParcelableSelectable<DATA>> channel,
+                @NotNull final TransportChannel<? super ParcelableSelectable<DATA>> channel,
                 final int index) {
 
             mChannel = channel;
@@ -318,7 +318,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
          * @param index   the selectable index.
          */
         private SelectableOutputConsumer(
-                @Nonnull final TransportChannel<ParcelableSelectable<OUT>> channel,
+                @NotNull final TransportChannel<ParcelableSelectable<OUT>> channel,
                 final int index) {
 
             mChannel = channel;

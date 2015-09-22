@@ -33,13 +33,13 @@ import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
@@ -1278,7 +1278,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         @Override
         public void onInput(final ParcelableSelectable<DATA> input,
-                @Nonnull final ResultChannel<DATA> result) {
+                @NotNull final ResultChannel<DATA> result) {
 
             if (mFirstIndex == NO_INDEX) {
 
@@ -1294,7 +1294,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     private static class CharAt extends FilterContextInvocation<List<?>, Character> {
 
-        public void onInput(final List<?> objects, @Nonnull final ResultChannel<Character> result) {
+        public void onInput(final List<?> objects, @NotNull final ResultChannel<Character> result) {
 
             final String text = (String) objects.get(0);
             final int index = ((Integer) objects.get(1));
@@ -1304,7 +1304,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     private static class PassingInteger extends FilterContextInvocation<Integer, Integer> {
 
-        public void onInput(final Integer i, @Nonnull final ResultChannel<Integer> result) {
+        public void onInput(final Integer i, @NotNull final ResultChannel<Integer> result) {
 
             result.pass(i);
         }
@@ -1312,7 +1312,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     private static class PassingString extends FilterContextInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.pass(s);
         }
@@ -1326,7 +1326,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         private static final int STRING = 0;
 
         public void onInput(final ParcelableSelectable<Object> selectable,
-                @Nonnull final ResultChannel<ParcelableSelectable<Object>> result) {
+                @NotNull final ResultChannel<ParcelableSelectable<Object>> result) {
 
             switch (selectable.index) {
 

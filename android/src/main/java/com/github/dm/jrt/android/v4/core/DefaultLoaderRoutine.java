@@ -35,15 +35,15 @@ import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Routine implementation delegating to Android loaders the asynchronous processing.
@@ -75,10 +75,10 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      * @param loaderConfiguration     the loader configuration.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderRoutine(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationFactory<IN, OUT> factory,
-            @Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final LoaderConfiguration loaderConfiguration) {
+    DefaultLoaderRoutine(@NotNull final LoaderContext context,
+            @NotNull final ContextInvocationFactory<IN, OUT> factory,
+            @NotNull final InvocationConfiguration invocationConfiguration,
+            @NotNull final LoaderConfiguration loaderConfiguration) {
 
         super(invocationConfiguration);
 
@@ -100,14 +100,14 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         getLogger().dbg("building context routine with configuration: %s", loaderConfiguration);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public InvocationChannel<IN, OUT> asyncInvoke() {
 
         return new InvocationChannelDecorator<IN, OUT>(super.asyncInvoke());
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public InvocationChannel<IN, OUT> parallelInvoke() {
 
@@ -127,10 +127,10 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         }
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected Invocation<IN, OUT> convertInvocation(@Nonnull final Invocation<IN, OUT> invocation,
-            @Nonnull final InvocationType type) {
+    protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
+            @NotNull final InvocationType type) {
 
         try {
 
@@ -145,9 +145,9 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         return newInvocation(type);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation(@Nonnull final InvocationType type) {
+    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
         final Logger logger = getLogger();
 
@@ -259,7 +259,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          *
          * @param wrapped the wrapped channel.
          */
-        private InvocationChannelDecorator(@Nonnull final InvocationChannel<IN, OUT> wrapped) {
+        private InvocationChannelDecorator(@NotNull final InvocationChannel<IN, OUT> wrapped) {
 
             mChannel = wrapped;
         }
@@ -269,50 +269,50 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return mChannel.abort();
         }
 
-        @Nonnull
-        public InvocationChannel<IN, OUT> after(@Nonnull final TimeDuration delay) {
+        @NotNull
+        public InvocationChannel<IN, OUT> after(@NotNull final TimeDuration delay) {
 
             mChannel.after(delay);
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> after(final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             mChannel.after(delay, timeUnit);
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> now() {
 
             mChannel.now();
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> orderByCall() {
 
             mChannel.orderByCall();
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> orderByChance() {
 
             mChannel.orderByChance();
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> orderByDelay() {
 
             mChannel.orderByDelay();
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> pass(
                 @Nullable final OutputChannel<? extends IN> channel) {
 
@@ -320,28 +320,28 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
 
             mChannel.pass(inputs);
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> pass(@Nullable final IN input) {
 
             mChannel.pass(input);
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public InvocationChannel<IN, OUT> pass(@Nullable final IN... inputs) {
 
             mChannel.pass(inputs);
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> result() {
 
             return new OutputChannelDecorator<OUT>(mChannel);
@@ -384,14 +384,14 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          *
          * @param channel the invocation channel.
          */
-        private OutputChannelDecorator(@Nonnull final InvocationChannel<?, OUT> channel) {
+        private OutputChannelDecorator(@NotNull final InvocationChannel<?, OUT> channel) {
 
             mInputChannel = channel;
             mOutputChannel = channel.result();
         }
 
-        @Nonnull
-        public OutputChannel<OUT> afterMax(@Nonnull final TimeDuration timeout) {
+        @NotNull
+        public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
             if (!timeout.isZero() && mInputChannel.hasDelays()) {
 
@@ -403,8 +403,8 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return this;
         }
 
-        @Nonnull
-        public OutputChannel<OUT> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        @NotNull
+        public OutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
             if ((timeout > 0) && mInputChannel.hasDelays()) {
 
@@ -416,14 +416,14 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public List<OUT> all() {
 
             return mOutputChannel.all();
         }
 
-        @Nonnull
-        public OutputChannel<OUT> allInto(@Nonnull final Collection<? super OUT> results) {
+        @NotNull
+        public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
             mOutputChannel.allInto(results);
             return this;
@@ -434,7 +434,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return mOutputChannel.checkComplete();
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventually() {
 
             if (mInputChannel.hasDelays()) {
@@ -447,21 +447,21 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventuallyAbort() {
 
             mOutputChannel.eventuallyAbort();
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventuallyExit() {
 
             mOutputChannel.eventuallyExit();
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventuallyThrow() {
 
             mOutputChannel.eventuallyThrow();
@@ -478,7 +478,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return mOutputChannel.next();
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> immediately() {
 
             mOutputChannel.immediately();
@@ -490,14 +490,14 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return mOutputChannel.isBound();
         }
 
-        @Nonnull
-        public <IN extends InputChannel<? super OUT>> IN passTo(@Nonnull final IN channel) {
+        @NotNull
+        public <IN extends InputChannel<? super OUT>> IN passTo(@NotNull final IN channel) {
 
             return mOutputChannel.passTo(channel);
         }
 
-        @Nonnull
-        public OutputChannel<OUT> passTo(@Nonnull final OutputConsumer<? super OUT> consumer) {
+        @NotNull
+        public OutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
             mOutputChannel.passTo(consumer);
             return this;
@@ -552,8 +552,8 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param factory  the invocation factory.
          * @param loaderId the loader ID.
          */
-        private PurgeExecution(@Nonnull final LoaderContext context,
-                @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
+        private PurgeExecution(@NotNull final LoaderContext context,
+                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
 
             mContext = context;
             mFactory = factory;
@@ -589,9 +589,9 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param loaderId the loader ID.
          * @param inputs   the list of inputs.
          */
-        private PurgeInputsExecution(@Nonnull final LoaderContext context,
-                @Nonnull final ContextInvocationFactory<?, ?> factory, final int loaderId,
-                @Nonnull final List<IN> inputs) {
+        private PurgeInputsExecution(@NotNull final LoaderContext context,
+                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
+                @NotNull final List<IN> inputs) {
 
             mContext = context;
             mFactory = factory;

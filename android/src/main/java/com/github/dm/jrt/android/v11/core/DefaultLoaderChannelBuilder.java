@@ -27,13 +27,13 @@ import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Default implementation of a loader channel builder.
@@ -56,7 +56,7 @@ class DefaultLoaderChannelBuilder
      * @param context the context instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderChannelBuilder(@Nonnull final LoaderContext context) {
+    DefaultLoaderChannelBuilder(@NotNull final LoaderContext context) {
 
         if (context == null) {
 
@@ -66,7 +66,7 @@ class DefaultLoaderChannelBuilder
         mContext = context;
     }
 
-    @Nonnull
+    @NotNull
     public <OUT> OutputChannel<OUT> buildChannel() {
 
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
@@ -128,7 +128,7 @@ class DefaultLoaderChannelBuilder
                       .asyncCall();
     }
 
-    @Nonnull
+    @NotNull
     public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
@@ -212,16 +212,16 @@ class DefaultLoaderChannelBuilder
         }
     }
 
-    @Nonnull
+    @NotNull
     public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channels() {
 
         final ChannelConfiguration config = mChannelConfiguration;
         return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
-    public LoaderChannelBuilder setConfiguration(@Nonnull final LoaderConfiguration configuration) {
+    public LoaderChannelBuilder setConfiguration(@NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -232,10 +232,10 @@ class DefaultLoaderChannelBuilder
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderChannelBuilder setConfiguration(
-            @Nonnull final ChannelConfiguration configuration) {
+            @NotNull final ChannelConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -261,7 +261,7 @@ class DefaultLoaderChannelBuilder
          * @param context  the context instance.
          * @param loaderId the loader ID.
          */
-        private PurgeExecution(@Nonnull final LoaderContext context, final int loaderId) {
+        private PurgeExecution(@NotNull final LoaderContext context, final int loaderId) {
 
             mContext = context;
             mLoaderId = loaderId;
@@ -291,8 +291,8 @@ class DefaultLoaderChannelBuilder
          * @param loaderId the loader ID.
          * @param inputs   the list of inputs.
          */
-        private PurgeInputsExecution(@Nonnull final LoaderContext context, final int loaderId,
-                @Nonnull final List<Object> inputs) {
+        private PurgeInputsExecution(@NotNull final LoaderContext context, final int loaderId,
+                @NotNull final List<Object> inputs) {
 
             mContext = context;
             mLoaderId = loaderId;

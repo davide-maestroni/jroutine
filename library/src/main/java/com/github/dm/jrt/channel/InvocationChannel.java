@@ -15,10 +15,10 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining an invocation input channel, that is the channel used to pass input data to
@@ -34,61 +34,61 @@ public interface InvocationChannel<IN, OUT> extends InputChannel<IN> {
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    InvocationChannel<IN, OUT> after(@Nonnull TimeDuration delay);
+    @NotNull
+    InvocationChannel<IN, OUT> after(@NotNull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    InvocationChannel<IN, OUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    @NotNull
+    InvocationChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> now();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> orderByCall();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> orderByChance();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> pass(@Nullable OutputChannel<? extends IN> channel);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> pass(@Nullable IN input);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
@@ -97,6 +97,6 @@ public interface InvocationChannel<IN, OUT> extends InputChannel<IN> {
      * @return the routine output channel.
      * @throws java.lang.IllegalStateException if this method has been already called.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> result();
 }

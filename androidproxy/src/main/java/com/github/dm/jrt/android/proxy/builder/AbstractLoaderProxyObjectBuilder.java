@@ -20,11 +20,11 @@ import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Type;
 import java.util.HashMap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Abstract implementation of a builder of async proxy objects, bound to a context lifecycle.
@@ -50,7 +50,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
-    @Nonnull
+    @NotNull
     public TYPE buildProxy() {
 
         synchronized (sContextProxies) {
@@ -118,31 +118,31 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         }
     }
 
-    @Nonnull
+    @NotNull
     public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @Nonnull final LoaderConfiguration configuration) {
+            @NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -153,10 +153,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -167,10 +167,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @Nonnull final ProxyConfiguration configuration) {
+            @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -186,7 +186,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      *
      * @return the proxy class token.
      */
-    @Nonnull
+    @NotNull
     protected abstract ClassToken<TYPE> getInterfaceToken();
 
     /**
@@ -204,7 +204,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      *
      * @return the target class.
      */
-    @Nonnull
+    @NotNull
     protected abstract Class<?> getTargetClass();
 
     /**
@@ -215,10 +215,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      * @param loaderConfiguration     the loader configuration.
      * @return the proxy instance.
      */
-    @Nonnull
-    protected abstract TYPE newProxy(@Nonnull InvocationConfiguration invocationConfiguration,
-            @Nonnull ProxyConfiguration proxyConfiguration,
-            @Nonnull LoaderConfiguration loaderConfiguration);
+    @NotNull
+    protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
+            @NotNull ProxyConfiguration proxyConfiguration,
+            @NotNull LoaderConfiguration loaderConfiguration);
 
     /**
      * Class used as key to identify a specific proxy instance.
@@ -241,10 +241,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
          * @param proxyConfiguration      the proxy configuration.
          * @param loaderConfiguration     the loader configuration.
          */
-        private ProxyInfo(@Nonnull final ClassToken<?> token,
-                @Nonnull final InvocationConfiguration invocationConfiguration,
-                @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final LoaderConfiguration loaderConfiguration) {
+        private ProxyInfo(@NotNull final ClassToken<?> token,
+                @NotNull final InvocationConfiguration invocationConfiguration,
+                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final LoaderConfiguration loaderConfiguration) {
 
             mType = token.getRawClass();
             mInvocationConfiguration = invocationConfiguration;

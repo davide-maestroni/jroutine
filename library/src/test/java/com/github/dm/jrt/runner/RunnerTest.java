@@ -18,6 +18,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.NotAgingPriority;
 import com.github.dm.jrt.util.Time;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -25,8 +26,6 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.util.Time.current;
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
@@ -549,7 +548,7 @@ public class RunnerTest {
 
         private Thread mThread;
 
-        public void cancel(@Nonnull final Execution execution) {
+        public void cancel(@NotNull final Execution execution) {
 
             mLastCancelExecution = execution;
         }
@@ -564,8 +563,8 @@ public class RunnerTest {
             mThread = thread;
         }
 
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+        public void run(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
 
             mLastExecution = execution;
         }

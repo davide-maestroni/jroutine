@@ -13,10 +13,10 @@
  */
 package com.github.dm.jrt.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import javax.annotation.Nonnull;
 
 /**
  * Utility abstract class used to work around Java type erasure.
@@ -44,9 +44,9 @@ public abstract class ClassToken<TYPE> {
      * @param <TYPE>   the class type.
      * @return the newly created token.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
-    public static <TYPE> ClassToken<TYPE> tokenOf(@Nonnull final Class<TYPE> rawClass) {
+    public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final Class<TYPE> rawClass) {
 
         if (rawClass == null) {
 
@@ -66,9 +66,9 @@ public abstract class ClassToken<TYPE> {
      * @param <TYPE> the class type.
      * @return the newly created token.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
-    public static <TYPE> ClassToken<TYPE> tokenOf(@Nonnull final TYPE object) {
+    public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final TYPE object) {
 
         return tokenOf((Class<TYPE>) object.getClass());
     }
@@ -94,7 +94,7 @@ public abstract class ClassToken<TYPE> {
      * @throws java.lang.IllegalStateException if this class does not correctly extend a class
      *                                         token.
      */
-    @Nonnull
+    @NotNull
     public final Type getGenericType() {
 
         if (mGenericType == null) {
@@ -133,7 +133,7 @@ public abstract class ClassToken<TYPE> {
      * @throws java.lang.IllegalStateException if this class does not correctly extend a class
      *                                         token.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public final Class<TYPE> getRawClass() {
 
@@ -191,7 +191,7 @@ public abstract class ClassToken<TYPE> {
      * @throws java.lang.IllegalStateException if this class does not correctly extend a class
      *                                         token.
      */
-    public final boolean isAssignableFrom(@Nonnull final ClassToken<?> other) {
+    public final boolean isAssignableFrom(@NotNull final ClassToken<?> other) {
 
         return getRawClass().isAssignableFrom(other.getRawClass());
     }

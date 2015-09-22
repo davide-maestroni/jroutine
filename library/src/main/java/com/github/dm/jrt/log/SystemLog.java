@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.log;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Simple log implementation writing messages to the system output.
@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 public class SystemLog extends TemplateLog {
 
     @Override
-    public void log(@Nonnull final String message) {
+    public void log(@NotNull final String message) {
 
         System.out.println(message);
     }

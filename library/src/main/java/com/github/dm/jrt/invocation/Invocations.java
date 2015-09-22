@@ -20,11 +20,11 @@ import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Utility class for creating invocation factory objects.
@@ -49,9 +49,9 @@ public class Invocations {
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factory(
-            @Nonnull final Supplier<Invocation<IN, OUT>> supplier) {
+            @NotNull final Supplier<Invocation<IN, OUT>> supplier) {
 
         return new SupplierInvocationFactory<IN, OUT>(supplier);
     }
@@ -65,9 +65,9 @@ public class Invocations {
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Class<? extends Invocation<IN, OUT>> invocationClass) {
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
 
         return factoryOf(invocationClass, (Object[]) null);
     }
@@ -90,9 +90,9 @@ public class Invocations {
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Class<? extends Invocation<IN, OUT>> invocationClass,
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
         return new DefaultInvocationFactory<IN, OUT>(invocationClass, args);
@@ -107,9 +107,9 @@ public class Invocations {
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
     }
@@ -132,9 +132,9 @@ public class Invocations {
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
         return factoryOf(invocationToken.getRawClass(), args);
@@ -149,10 +149,10 @@ public class Invocations {
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Invocation<IN, OUT> invocation) {
+            @NotNull final Invocation<IN, OUT> invocation) {
 
         return factoryOf((Class<? extends Invocation<IN, OUT>>) invocation.getClass());
     }
@@ -175,10 +175,10 @@ public class Invocations {
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
+            @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
 
         return factoryOf((Class<? extends Invocation<IN, OUT>>) invocation.getClass(), args);
     }
@@ -192,9 +192,9 @@ public class Invocations {
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> FilterInvocation<IN, OUT> filter(
-            @Nonnull final BiConsumer<IN, ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumer<IN, ResultChannel<OUT>> consumer) {
 
         return new ConsumerFilterInvocation<IN, OUT>(consumer);
     }
@@ -207,9 +207,9 @@ public class Invocations {
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> ProcedureInvocation<OUT> procedure(
-            @Nonnull final Consumer<ResultChannel<OUT>> consumer) {
+            @NotNull final Consumer<ResultChannel<OUT>> consumer) {
 
         return new ConsumerProcedureInvocation<OUT>(consumer);
     }
@@ -230,7 +230,7 @@ public class Invocations {
          * @param consumer the consumer instance.
          */
         private ConsumerFilterInvocation(
-                @Nonnull final BiConsumer<IN, ResultChannel<OUT>> consumer) {
+                @NotNull final BiConsumer<IN, ResultChannel<OUT>> consumer) {
 
             final Class<? extends BiConsumer> consumerClass = consumer.getClass();
 
@@ -249,7 +249,7 @@ public class Invocations {
             return mConsumer.hashCode();
         }
 
-        public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
             mConsumer.accept(input, result);
         }
@@ -322,7 +322,7 @@ public class Invocations {
             return mConsumer.equals(that.mConsumer);
         }
 
-        public void onResult(@Nonnull final ResultChannel<OUT> result) {
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             mConsumer.accept(result);
         }
@@ -350,7 +350,7 @@ public class Invocations {
          */
         @SuppressWarnings("ConstantConditions")
         private DefaultInvocationFactory(
-                @Nonnull final Class<? extends Invocation<IN, OUT>> invocationClass,
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
             final Object[] invocationArgs =
@@ -358,7 +358,7 @@ public class Invocations {
             mConstructor = Reflection.findConstructor(invocationClass, invocationArgs);
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
@@ -413,7 +413,7 @@ public class Invocations {
          *
          * @param supplier the supplier function.
          */
-        private SupplierInvocationFactory(@Nonnull final Supplier<Invocation<IN, OUT>> supplier) {
+        private SupplierInvocationFactory(@NotNull final Supplier<Invocation<IN, OUT>> supplier) {
 
             final Class<? extends Supplier> supplierClass = supplier.getClass();
 
@@ -426,7 +426,7 @@ public class Invocations {
             mSupplier = supplier;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 

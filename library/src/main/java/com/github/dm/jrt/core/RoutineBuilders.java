@@ -34,6 +34,9 @@ import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -42,9 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -84,9 +84,9 @@ public class RoutineBuilders {
      * @throws com.github.dm.jrt.channel.RoutineException in case of errors.
      */
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    public static void callFromInvocation(@Nonnull final Method targetMethod,
-            @Nonnull final Object mutex, @Nonnull final Object target,
-            @Nonnull final List<?> objects, @Nonnull final ResultChannel<Object> result,
+    public static void callFromInvocation(@NotNull final Method targetMethod,
+            @NotNull final Object mutex, @NotNull final Object target,
+            @NotNull final List<?> objects, @NotNull final ResultChannel<Object> result,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
         Reflection.makeAccessible(targetMethod);
@@ -183,9 +183,9 @@ public class RoutineBuilders {
      * @see com.github.dm.jrt.annotation.Timeout Timeout
      * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
-    @Nonnull
+    @NotNull
     public static InvocationConfiguration configurationWithAnnotations(
-            @Nullable final InvocationConfiguration configuration, @Nonnull final Method method) {
+            @Nullable final InvocationConfiguration configuration, @NotNull final Method method) {
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
@@ -222,9 +222,9 @@ public class RoutineBuilders {
      * @return the modified configuration.
      * @see com.github.dm.jrt.annotation.ShareGroup ShareGroup
      */
-    @Nonnull
+    @NotNull
     public static ProxyConfiguration configurationWithAnnotations(
-            @Nullable final ProxyConfiguration configuration, @Nonnull final Method method) {
+            @Nullable final ProxyConfiguration configuration, @NotNull final Method method) {
 
         final ProxyConfiguration.Builder<ProxyConfiguration> builder =
                 ProxyConfiguration.builderFrom(configuration);
@@ -248,8 +248,8 @@ public class RoutineBuilders {
      *                                            found.
      */
     @Nullable
-    public static Method getAnnotatedMethod(@Nonnull final String name,
-            @Nonnull final Class<?> targetClass) {
+    public static Method getAnnotatedMethod(@NotNull final String name,
+            @NotNull final Class<?> targetClass) {
 
         synchronized (sAliasMethods) {
 
@@ -292,7 +292,7 @@ public class RoutineBuilders {
      * @see com.github.dm.jrt.annotation.Input Input
      */
     @Nullable
-    public static InputMode getInputMode(@Nonnull final Method method, final int index) {
+    public static InputMode getInputMode(@NotNull final Method method, final int index) {
 
         Input inputAnnotation = null;
         final Annotation[][] annotations = method.getParameterAnnotations();
@@ -402,7 +402,7 @@ public class RoutineBuilders {
      * @see com.github.dm.jrt.annotation.Inputs Inputs
      */
     @Nullable
-    public static InputMode getInputsMode(@Nonnull final Method method) {
+    public static InputMode getInputsMode(@NotNull final Method method) {
 
         final Inputs methodAnnotation = method.getAnnotation(Inputs.class);
 
@@ -476,8 +476,8 @@ public class RoutineBuilders {
      * @see com.github.dm.jrt.annotation.Output Output
      */
     @Nullable
-    public static OutputMode getOutputMode(@Nonnull final Method method,
-            @Nonnull final Class<?> targetReturnType) {
+    public static OutputMode getOutputMode(@NotNull final Method method,
+            @NotNull final Class<?> targetReturnType) {
 
         final Output outputAnnotation = method.getAnnotation(Output.class);
 
@@ -549,8 +549,8 @@ public class RoutineBuilders {
      * @param shareGroup the share group name.
      * @return the cached mutex.
      */
-    @Nonnull
-    public static Object getSharedMutex(@Nonnull final Object target,
+    @NotNull
+    public static Object getSharedMutex(@NotNull final Object target,
             @Nullable final String shareGroup) {
 
         synchronized (sMutexes) {
@@ -585,9 +585,9 @@ public class RoutineBuilders {
      * @return the method info.
      * @throws java.lang.IllegalArgumentException if no target method was found.
      */
-    @Nonnull
-    public static MethodInfo getTargetMethodInfo(@Nonnull final Method proxyMethod,
-            @Nonnull final Class<?> targetClass) {
+    @NotNull
+    public static MethodInfo getTargetMethodInfo(@NotNull final Method proxyMethod,
+            @NotNull final Class<?> targetClass) {
 
         MethodInfo methodInfo;
 
@@ -693,8 +693,8 @@ public class RoutineBuilders {
      */
     @Nullable
     @SuppressWarnings("unchecked")
-    public static Object invokeRoutine(@Nonnull final Routine<Object, Object> routine,
-            @Nonnull final Method method, @Nonnull final Object[] args,
+    public static Object invokeRoutine(@NotNull final Routine<Object, Object> routine,
+            @NotNull final Method method, @NotNull final Object[] args,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
         if (method.isAnnotationPresent(Inputs.class)) {
@@ -817,8 +817,8 @@ public class RoutineBuilders {
         return null;
     }
 
-    private static void fillMap(@Nonnull final Map<String, Method> map,
-            @Nonnull final Method[] methods) {
+    private static void fillMap(@NotNull final Map<String, Method> map,
+            @NotNull final Method[] methods) {
 
         for (final Method method : methods) {
 
@@ -840,9 +840,9 @@ public class RoutineBuilders {
         }
     }
 
-    @Nonnull
-    private static Method getTargetMethod(@Nonnull final Method method,
-            @Nonnull final Class<?> targetClass, @Nonnull final Class<?>[] targetParameterTypes) {
+    @NotNull
+    private static Method getTargetMethod(@NotNull final Method method,
+            @NotNull final Class<?> targetClass, @NotNull final Class<?>[] targetParameterTypes) {
 
         String name = null;
         Method targetMethod = null;
@@ -896,7 +896,7 @@ public class RoutineBuilders {
          * @param inputMode  the input mode.
          * @param outputMode the output mode.
          */
-        private MethodInfo(@Nonnull final Method method, @Nullable final InputMode inputMode,
+        private MethodInfo(@NotNull final Method method, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
 
             this.method = method;

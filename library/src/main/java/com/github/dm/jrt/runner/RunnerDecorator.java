@@ -13,9 +13,9 @@
  */
 package com.github.dm.jrt.runner;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of a decorator of a runner object.
@@ -32,7 +32,7 @@ public class RunnerDecorator implements Runner {
      * @param wrapped the wrapped instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public RunnerDecorator(@Nonnull final Runner wrapped) {
+    public RunnerDecorator(@NotNull final Runner wrapped) {
 
         if (wrapped == null) {
 
@@ -42,7 +42,7 @@ public class RunnerDecorator implements Runner {
         mRunner = wrapped;
     }
 
-    public void cancel(@Nonnull final Execution execution) {
+    public void cancel(@NotNull final Execution execution) {
 
         mRunner.cancel(execution);
     }
@@ -52,8 +52,8 @@ public class RunnerDecorator implements Runner {
         return mRunner.isExecutionThread();
     }
 
-    public void run(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public void run(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         mRunner.run(execution, delay, timeUnit);
     }

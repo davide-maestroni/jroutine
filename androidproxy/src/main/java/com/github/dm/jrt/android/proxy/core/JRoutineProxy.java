@@ -17,7 +17,7 @@ import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -59,8 +59,8 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
      * @param context the service context.
      * @return the context builder.
      */
-    @Nonnull
-    public static ContextBuilder with(@Nonnull final ServiceContext context) {
+    @NotNull
+    public static ContextBuilder with(@NotNull final ServiceContext context) {
 
         return new ContextBuilder(context);
     }
@@ -78,7 +78,7 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
          * @param context the service context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@Nonnull final ServiceContext context) {
+        private ContextBuilder(@NotNull final ServiceContext context) {
 
             if (context == null) {
 
@@ -103,8 +103,8 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
          * @param target the invocation target.
          * @return the routine builder instance.
          */
-        @Nonnull
-        public ServiceProxyRoutineBuilder on(@Nonnull final ContextInvocationTarget<?> target) {
+        @NotNull
+        public ServiceProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
             return new DefaultServiceProxyRoutineBuilder(mContext, target);
         }

@@ -19,14 +19,14 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TransportChannel;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -54,9 +54,9 @@ public class Channels {
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
+    @NotNull
     public static TransportChannel<Selectable<?>> combine(
-            @Nonnull final InputChannel<?>... channels) {
+            @NotNull final InputChannel<?>... channels) {
 
         return combine(0, channels);
     }
@@ -71,10 +71,10 @@ public class Channels {
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static TransportChannel<Selectable<?>> combine(final int startIndex,
-            @Nonnull final InputChannel<?>... channels) {
+            @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -109,10 +109,10 @@ public class Channels {
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static TransportChannel<Selectable<?>> combine(final int startIndex,
-            @Nonnull final List<? extends InputChannel<?>> channels) {
+            @NotNull final List<? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
 
@@ -145,9 +145,9 @@ public class Channels {
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static TransportChannel<Selectable<?>> combine(
-            @Nonnull final List<? extends InputChannel<?>> channels) {
+            @NotNull final List<? extends InputChannel<?>> channels) {
 
         return combine(0, channels);
     }
@@ -161,10 +161,10 @@ public class Channels {
      * @return the selectable input channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     public static TransportChannel<Selectable<?>> combine(
-            @Nonnull final Map<Integer, ? extends InputChannel<?>> channels) {
+            @NotNull final Map<Integer, ? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
 
@@ -197,8 +197,8 @@ public class Channels {
      * @return the input channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
-    public static TransportChannel<List<?>> distribute(@Nonnull final InputChannel<?>... channels) {
+    @NotNull
+    public static TransportChannel<List<?>> distribute(@NotNull final InputChannel<?>... channels) {
 
         return distribute(false, channels);
     }
@@ -213,9 +213,9 @@ public class Channels {
      * @return the input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static TransportChannel<List<?>> distribute(
-            @Nonnull final List<? extends InputChannel<?>> channels) {
+            @NotNull final List<? extends InputChannel<?>> channels) {
 
         return distribute(false, channels);
     }
@@ -232,9 +232,9 @@ public class Channels {
      * @return the input channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
+    @NotNull
     public static TransportChannel<List<?>> distributeAndFlush(
-            @Nonnull final InputChannel<?>... channels) {
+            @NotNull final InputChannel<?>... channels) {
 
         return distribute(true, channels);
     }
@@ -251,9 +251,9 @@ public class Channels {
      * @return the input channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static TransportChannel<List<?>> distributeAndFlush(
-            @Nonnull final List<? extends InputChannel<?>> channels) {
+            @NotNull final List<? extends InputChannel<?>> channels) {
 
         return distribute(true, channels);
     }
@@ -269,9 +269,9 @@ public class Channels {
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<List<OUT>> join(
-            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(false, channels);
     }
@@ -286,8 +286,8 @@ public class Channels {
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
-    public static OutputChannel<List<?>> join(@Nonnull final OutputChannel<?>... channels) {
+    @NotNull
+    public static OutputChannel<List<?>> join(@NotNull final OutputChannel<?>... channels) {
 
         return join(false, channels);
     }
@@ -306,9 +306,9 @@ public class Channels {
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<List<OUT>> joinAndFlush(
-            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(true, channels);
     }
@@ -326,8 +326,8 @@ public class Channels {
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
-    public static OutputChannel<List<?>> joinAndFlush(@Nonnull final OutputChannel<?>... channels) {
+    @NotNull
+    public static OutputChannel<List<?>> joinAndFlush(@NotNull final OutputChannel<?>... channels) {
 
         return join(true, channels);
     }
@@ -344,10 +344,10 @@ public class Channels {
      * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
      */
-    @Nonnull
+    @NotNull
     public static <DATA, IN extends DATA> Map<Integer, TransportChannel<IN>> map(
-            @Nonnull final InputChannel<? super Selectable<DATA>> channel,
-            @Nonnull final Iterable<Integer> indexes) {
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final Iterable<Integer> indexes) {
 
         final HashMap<Integer, TransportChannel<IN>> channelMap =
                 new HashMap<Integer, TransportChannel<IN>>();
@@ -372,10 +372,10 @@ public class Channels {
      * @param <IN>    the input data type.
      * @return the map of indexes and output channels.
      */
-    @Nonnull
+    @NotNull
     public static <DATA, IN extends DATA> Map<Integer, TransportChannel<IN>> map(
-            @Nonnull final InputChannel<? super Selectable<DATA>> channel,
-            @Nonnull final int... indexes) {
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final int... indexes) {
 
         final int size = indexes.length;
         final HashMap<Integer, TransportChannel<IN>> channelMap =
@@ -403,10 +403,10 @@ public class Channels {
      * @return the map of indexes and output channels.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
-    @Nonnull
+    @NotNull
     public static <DATA, IN extends DATA> Map<Integer, TransportChannel<IN>> map(
             final int startIndex, final int rangeSize,
-            @Nonnull final InputChannel<? super Selectable<DATA>> channel) {
+            @NotNull final InputChannel<? super Selectable<DATA>> channel) {
 
         if (rangeSize <= 0) {
 
@@ -436,10 +436,10 @@ public class Channels {
      * @return the map of indexes and output channels.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> Map<Integer, OutputChannel<OUT>> map(final int startIndex,
             final int rangeSize,
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
+            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
         if (rangeSize <= 0) {
 
@@ -473,10 +473,10 @@ public class Channels {
      * @param <OUT>   the output data type.
      * @return the channel map.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> Map<Integer, OutputChannel<OUT>> map(
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUT>> channel,
-            @Nonnull final Iterable<Integer> indexes) {
+            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
+            @NotNull final Iterable<Integer> indexes) {
 
         final HashMap<Integer, TransportChannel<OUT>> inputMap =
                 new HashMap<Integer, TransportChannel<OUT>>();
@@ -504,10 +504,10 @@ public class Channels {
      * @param <OUT>   the output data type.
      * @return the channel map.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> Map<Integer, OutputChannel<OUT>> map(
-            @Nonnull final OutputChannel<? extends Selectable<? extends OUT>> channel,
-            @Nonnull final int... indexes) {
+            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
+            @NotNull final int... indexes) {
 
         final int size = indexes.length;
         final HashMap<Integer, TransportChannel<OUT>> inputMap =
@@ -537,9 +537,9 @@ public class Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
-            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
 
@@ -568,9 +568,9 @@ public class Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
+    @NotNull
     public static OutputChannel<? extends Selectable<?>> merge(final int startIndex,
-            @Nonnull final OutputChannel<?>... channels) {
+            @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
 
@@ -599,9 +599,9 @@ public class Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
-            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return merge(0, channels);
     }
@@ -616,9 +616,9 @@ public class Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
-            @Nonnull final Map<Integer, ? extends OutputChannel<? extends OUT>> channelMap) {
+            @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channelMap) {
 
         if (channelMap.isEmpty()) {
 
@@ -646,9 +646,9 @@ public class Channels {
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
-    @Nonnull
+    @NotNull
     public static OutputChannel<? extends Selectable<?>> merge(
-            @Nonnull final OutputChannel<?>... channels) {
+            @NotNull final OutputChannel<?>... channels) {
 
         return merge(0, channels);
     }
@@ -664,7 +664,7 @@ public class Channels {
      * @param <IN>    the input data type.
      * @return the input channel.
      */
-    @Nonnull
+    @NotNull
     public static <DATA, IN extends DATA> TransportChannel<IN> select(
             @Nullable final InputChannel<? super Selectable<DATA>> channel, final int index) {
 
@@ -691,7 +691,7 @@ public class Channels {
      * @param <OUT>   the output data type.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<OUT> select(
             @Nullable final OutputChannel<? extends Selectable<? extends OUT>> channel,
             final int index) {
@@ -717,7 +717,7 @@ public class Channels {
      * @param <IN>    the input data type.
      * @return the selectable input channel.
      */
-    @Nonnull
+    @NotNull
     public static <IN> TransportChannel<Selectable<IN>> toSelectable(
             @Nullable final InputChannel<? super IN> channel, final int index) {
 
@@ -744,7 +744,7 @@ public class Channels {
      * @param <OUT>   the output data type.
      * @return the selectable output channel.
      */
-    @Nonnull
+    @NotNull
     public static <OUT> OutputChannel<? extends Selectable<OUT>> toSelectable(
             @Nullable final OutputChannel<? extends OUT> channel, final int index) {
 
@@ -759,10 +759,10 @@ public class Channels {
         return transportChannel;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     private static TransportChannel<List<?>> distribute(final boolean isFlush,
-            @Nonnull final InputChannel<?>... channels) {
+            @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -785,10 +785,10 @@ public class Channels {
         return transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     private static TransportChannel<List<?>> distribute(final boolean isFlush,
-            @Nonnull final List<? extends InputChannel<?>> channels) {
+            @NotNull final List<? extends InputChannel<?>> channels) {
 
         if (channels.isEmpty()) {
 
@@ -809,9 +809,9 @@ public class Channels {
         return transportChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
     }
 
-    @Nonnull
+    @NotNull
     private static <OUT> OutputChannel<List<OUT>> join(final boolean isFlush,
-            @Nonnull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         final int size = channels.size();
 
@@ -827,10 +827,10 @@ public class Channels {
         return transportChannel;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     private static OutputChannel<List<?>> join(final boolean isFlush,
-            @Nonnull final OutputChannel<?>... channels) {
+            @NotNull final OutputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -944,7 +944,7 @@ public class Channels {
          * @param channels the list of channels.
          */
         private DistributeInputConsumer(final boolean isFlush,
-                @Nonnull final ArrayList<TransportChannel<?>> channels) {
+                @NotNull final ArrayList<TransportChannel<?>> channels) {
 
             mChannels = channels;
             mIsFlush = isFlush;
@@ -1013,7 +1013,7 @@ public class Channels {
          * @param channel the input channel to feed.
          * @param index   the index to filter.
          */
-        private FilterInputConsumer(@Nonnull final TransportChannel<? super IN> channel,
+        private FilterInputConsumer(@NotNull final TransportChannel<? super IN> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1057,7 +1057,7 @@ public class Channels {
          * @param channel the transport channel.
          * @param index   the index to filter.
          */
-        private FilterOutputConsumer(@Nonnull final TransportChannel<OUT> channel,
+        private FilterOutputConsumer(@NotNull final TransportChannel<OUT> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1104,7 +1104,7 @@ public class Channels {
          * @param isFlush whether the inputs have to be flushed.
          */
         @SuppressWarnings("unchecked")
-        private JoinOutputConsumer(@Nonnull final TransportChannel<List<OUT>> channel,
+        private JoinOutputConsumer(@NotNull final TransportChannel<List<OUT>> channel,
                 final int size, final boolean isFlush) {
 
             final SimpleQueue<OUT>[] queues = (mQueues = new SimpleQueue[size]);
@@ -1222,7 +1222,7 @@ public class Channels {
          * @param index   the selectable index.
          */
         private SelectableInputConsumer(
-                @Nonnull final TransportChannel<? super Selectable<DATA>> channel,
+                @NotNull final TransportChannel<? super Selectable<DATA>> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1262,7 +1262,7 @@ public class Channels {
          * @param channel the transport channel.
          * @param index   the selectable index.
          */
-        private SelectableOutputConsumer(@Nonnull final TransportChannel<Selectable<OUT>> channel,
+        private SelectableOutputConsumer(@NotNull final TransportChannel<Selectable<OUT>> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1303,7 +1303,7 @@ public class Channels {
          * @param channels   the list of channels.
          */
         private SortingInputConsumer(final int startIndex,
-                @Nonnull final ArrayList<TransportChannel<?>> channels) {
+                @NotNull final ArrayList<TransportChannel<?>> channels) {
 
             mStartIndex = startIndex;
             mChannelList = channels;
@@ -1359,7 +1359,7 @@ public class Channels {
          * @param channels the map of indexes and input channels.
          */
         private SortingInputMapConsumer(
-                @Nonnull final HashMap<Integer, TransportChannel<?>> channels) {
+                @NotNull final HashMap<Integer, TransportChannel<?>> channels) {
 
             mChannels = channels;
         }
@@ -1409,7 +1409,7 @@ public class Channels {
          * @param channels the map of indexes and transport channels.
          */
         private SortingOutputConsumer(
-                @Nonnull final HashMap<Integer, TransportChannel<OUT>> channels) {
+                @NotNull final HashMap<Integer, TransportChannel<OUT>> channels) {
 
             mChannels = channels;
         }

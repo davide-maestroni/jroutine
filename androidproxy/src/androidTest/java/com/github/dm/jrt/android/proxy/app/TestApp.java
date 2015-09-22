@@ -18,11 +18,11 @@ import android.app.Application;
 import com.github.dm.jrt.android.builder.FactoryContext;
 import com.github.dm.jrt.invocation.InvocationException;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.HashMap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.util.Reflection.findConstructor;
 
@@ -39,8 +39,8 @@ public class TestApp extends Application implements FactoryContext {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
-            @Nonnull final Object[] args) {
+    public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
+            @NotNull final Object[] args) {
 
         final HashMap<InstanceInfo, Object> instances = sInstances;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
@@ -68,7 +68,7 @@ public class TestApp extends Application implements FactoryContext {
 
         private final Class<?> mType;
 
-        private InstanceInfo(@Nonnull final Class<?> type, @Nonnull final Object[] args) {
+        private InstanceInfo(@NotNull final Class<?> type, @NotNull final Object[] args) {
 
             mType = type;
             mArgs = args;

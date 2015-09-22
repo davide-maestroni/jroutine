@@ -16,7 +16,7 @@ package com.github.dm.jrt.proxy.builder;
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.builder.ProxyConfigurableBuilder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of async proxy objects.
@@ -47,6 +47,6 @@ public interface ProxyObjectBuilder<TYPE> extends ConfigurableBuilder<ProxyObjec
      *
      * @return the proxy object.
      */
-    @Nonnull
+    @NotNull
     TYPE buildProxy();
 }

@@ -15,10 +15,10 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining a result channel, that is the channel used by the routine invocation to
@@ -33,60 +33,60 @@ public interface ResultChannel<OUT> extends InputChannel<OUT> {
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    ResultChannel<OUT> after(@Nonnull TimeDuration delay);
+    @NotNull
+    ResultChannel<OUT> after(@NotNull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    ResultChannel<OUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    @NotNull
+    ResultChannel<OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> now();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> orderByCall();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> orderByChance();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> pass(@Nullable OutputChannel<? extends OUT> channel);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> pass(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> pass(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ResultChannel<OUT> pass(@Nullable OUT... outputs);
 }

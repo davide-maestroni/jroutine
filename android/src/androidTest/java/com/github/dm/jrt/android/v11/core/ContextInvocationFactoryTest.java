@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.invocation.DecoratingContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.PassingContextInvocation;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.util.TimeDuration.millis;
@@ -94,7 +94,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
          *
          * @param wrapped the wrapped invocation instance.
          */
-        public TestInvocationDecorator(@Nonnull final ContextInvocation<String, String> wrapped) {
+        public TestInvocationDecorator(@NotNull final ContextInvocation<String, String> wrapped) {
 
             super(wrapped);
         }
@@ -109,15 +109,15 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
          * @param wrapped the wrapped factory instance.
          */
         public TestInvocationFactory(
-                @Nonnull final ContextInvocationFactory<String, String> wrapped) {
+                @NotNull final ContextInvocationFactory<String, String> wrapped) {
 
             super(wrapped);
         }
 
-        @Nonnull
+        @NotNull
         @Override
         protected ContextInvocation<String, String> decorate(
-                @Nonnull final ContextInvocation<String, String> invocation) {
+                @NotNull final ContextInvocation<String, String> invocation) {
 
             return new TestInvocationDecorator(invocation);
         }

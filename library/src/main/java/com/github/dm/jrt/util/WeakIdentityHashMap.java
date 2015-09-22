@@ -13,6 +13,8 @@
  */
 package com.github.dm.jrt.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.AbstractSet;
@@ -21,8 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.Nonnull;
 
 /**
  * Map implementation combining the features of {@link java.util.IdentityHashMap} and
@@ -59,7 +59,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
      * @param map the initial content.
      * @see java.util.HashMap#HashMap(java.util.Map)
      */
-    public WeakIdentityHashMap(@Nonnull final Map<? extends K, ? extends V> map) {
+    public WeakIdentityHashMap(@NotNull final Map<? extends K, ? extends V> map) {
 
         mMap = new HashMap<IdentityWeakReference, V>(map.size());
         putAll(map);
@@ -136,7 +136,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         return mMap.remove(new IdentityWeakReference(o));
     }
 
-    public void putAll(@Nonnull final Map<? extends K, ? extends V> map) {
+    public void putAll(@NotNull final Map<? extends K, ? extends V> map) {
 
         cleanUp();
         final ReferenceQueue<Object> queue = mQueue;
@@ -153,14 +153,14 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         mMap.clear();
     }
 
-    @Nonnull
+    @NotNull
     public Set<K> keySet() {
 
         if (mKeySet == null) {
 
             mKeySet = new AbstractSet<K>() {
 
-                @Nonnull
+                @NotNull
                 @Override
                 public Iterator<K> iterator() {
 
@@ -178,20 +178,20 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         return mKeySet;
     }
 
-    @Nonnull
+    @NotNull
     public Collection<V> values() {
 
         return mMap.values();
     }
 
-    @Nonnull
+    @NotNull
     public Set<Entry<K, V>> entrySet() {
 
         if (mEntrySet == null) {
 
             mEntrySet = new AbstractSet<Entry<K, V>>() {
 
-                @Nonnull
+                @NotNull
                 @Override
                 public Iterator<Entry<K, V>> iterator() {
 
@@ -346,7 +346,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
          *
          * @param key the key reference.
          */
-        private WeakEntry(@Nonnull final IdentityWeakReference key) {
+        private WeakEntry(@NotNull final IdentityWeakReference key) {
 
             mReference = key;
         }

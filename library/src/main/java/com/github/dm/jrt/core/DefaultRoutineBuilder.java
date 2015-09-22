@@ -18,7 +18,7 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.Reflection;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class implementing a builder of routine objects based on an invocation factory.
@@ -40,7 +40,7 @@ class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
      *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultRoutineBuilder(@Nonnull final InvocationFactory<IN, OUT> factory) {
+    DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
 
         final Class<? extends InvocationFactory> factoryClass = factory.getClass();
 
@@ -53,7 +53,7 @@ class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
         mFactory = factory;
     }
 
-    @Nonnull
+    @NotNull
     public Routine<IN, OUT> buildRoutine() {
 
         return new DefaultRoutine<IN, OUT>(getConfiguration(), mFactory);

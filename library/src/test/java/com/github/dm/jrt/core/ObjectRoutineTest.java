@@ -44,6 +44,8 @@ import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -53,9 +55,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
@@ -2138,19 +2137,19 @@ public class ObjectRoutineTest {
 
         private int mWrnCount;
 
-        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void err(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mWrnCount;
@@ -2316,7 +2315,7 @@ public class ObjectRoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        public void cancel(@Nonnull final Execution execution) {
+        public void cancel(@NotNull final Execution execution) {
 
         }
 
@@ -2325,8 +2324,8 @@ public class ObjectRoutineTest {
             return false;
         }
 
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+        public void run(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
 
             mExecutions.add(execution);
         }

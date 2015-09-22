@@ -16,8 +16,8 @@ package com.github.dm.jrt.invocation;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base invocation decorator implementation.
@@ -37,7 +37,7 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
      * @param wrapped the wrapped invocation instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public InvocationDecorator(@Nonnull final Invocation<IN, OUT> wrapped) {
+    public InvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -62,12 +62,12 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
         mInvocation.onInitialize();
     }
 
-    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         mInvocation.onResult(result);
     }

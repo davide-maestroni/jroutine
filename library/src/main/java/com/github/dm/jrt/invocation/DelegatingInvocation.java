@@ -18,8 +18,8 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.routine.Routine;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Invocation implementation delegating the execution to another routine.
@@ -44,8 +44,8 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
      * @param delegationType the type of routine invocation.
      */
     @SuppressWarnings("ConstantConditions")
-    public DelegatingInvocation(@Nonnull final Routine<IN, OUT> routine,
-            @Nonnull final DelegationType delegationType) {
+    public DelegatingInvocation(@NotNull final Routine<IN, OUT> routine,
+            @NotNull final DelegationType delegationType) {
 
         if (routine == null) {
 
@@ -70,10 +70,10 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
      * @param <OUT>          the output data type.
      * @return the factory.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryFrom(
-            @Nonnull final Routine<IN, OUT> routine, @Nonnull final DelegationType delegationType) {
+            @NotNull final Routine<IN, OUT> routine, @NotNull final DelegationType delegationType) {
 
         return new DelegatingInvocationFactory<IN, OUT>(routine, delegationType);
     }
@@ -96,12 +96,12 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
                         : mRoutine.parallelInvoke();
     }
 
-    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         mChannel.pass(input);
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         result.pass(mChannel.result());
     }
@@ -149,8 +149,8 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
          * @param delegationType the type of routine invocation.
          */
         @SuppressWarnings("ConstantConditions")
-        private DelegatingInvocationFactory(@Nonnull final Routine<IN, OUT> routine,
-                @Nonnull final DelegationType delegationType) {
+        private DelegatingInvocationFactory(@NotNull final Routine<IN, OUT> routine,
+                @NotNull final DelegationType delegationType) {
 
             if (routine == null) {
 
@@ -166,7 +166,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
             mDelegationType = delegationType;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 

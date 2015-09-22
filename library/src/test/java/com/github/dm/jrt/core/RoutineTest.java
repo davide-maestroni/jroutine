@@ -60,6 +60,8 @@ import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -73,9 +75,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
@@ -419,8 +418,8 @@ public class RoutineTest {
                 new FunctionInvocation<Integer, Integer>() {
 
                     @Override
-                    protected void onCall(@Nonnull final List<? extends Integer> integers,
-                            @Nonnull final ResultChannel<Integer> result) {
+                    protected void onCall(@NotNull final List<? extends Integer> integers,
+                            @NotNull final ResultChannel<Integer> result) {
 
                         int sum = 0;
 
@@ -459,8 +458,8 @@ public class RoutineTest {
                 new FunctionInvocation<Integer, Integer>() {
 
                     @Override
-                    protected void onCall(@Nonnull final List<? extends Integer> integers,
-                            @Nonnull final ResultChannel<Integer> result) {
+                    protected void onCall(@NotNull final List<? extends Integer> integers,
+                            @NotNull final ResultChannel<Integer> result) {
 
                         int sum = 0;
 
@@ -497,13 +496,13 @@ public class RoutineTest {
 
                     @Override
                     public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> result) {
+                            @NotNull final ResultChannel<Integer> result) {
 
                         squareRoutine.asyncCall(integer).passTo(mChannel);
                     }
 
                     @Override
-                    public void onResult(@Nonnull final ResultChannel<Integer> result) {
+                    public void onResult(@NotNull final ResultChannel<Integer> result) {
 
                         result.pass(mChannel.result());
                     }
@@ -1145,10 +1144,10 @@ public class RoutineTest {
 
             new AbstractRoutine<Object, Object>(null) {
 
-                @Nonnull
+                @NotNull
                 @Override
                 protected Invocation<Object, Object> newInvocation(
-                        @Nonnull final InvocationType type) {
+                        @NotNull final InvocationType type) {
 
                     return new ConstructorException();
                 }
@@ -1164,7 +1163,7 @@ public class RoutineTest {
 
             new DefaultRoutine<Object, Object>(null, new InvocationFactory<Object, Object>() {
 
-                @Nonnull
+                @NotNull
                 @Override
                 public Invocation<Object, Object> newInvocation() {
 
@@ -1314,7 +1313,7 @@ public class RoutineTest {
 
                     @Override
                     public void onInput(final String s,
-                            @Nonnull final ResultChannel<String> result) {
+                            @NotNull final ResultChannel<String> result) {
 
                         throw new NullPointerException(s);
                     }
@@ -1339,7 +1338,7 @@ public class RoutineTest {
                 new TemplateInvocation<String, String>() {
 
                     @Override
-                    public void onResult(@Nonnull final ResultChannel<String> result) {
+                    public void onResult(@NotNull final ResultChannel<String> result) {
 
                         throw new NullPointerException("test3");
                     }
@@ -1366,7 +1365,7 @@ public class RoutineTest {
                     new FilterInvocation<Object, Object>() {
 
                         public void onInput(final Object o,
-                                @Nonnull final ResultChannel<Object> result) {
+                                @NotNull final ResultChannel<Object> result) {
 
                         }
                     };
@@ -1832,8 +1831,8 @@ public class RoutineTest {
                 JRoutine.on(factoryOf(new FunctionInvocation<String, String>() {
 
                     @Override
-                    protected void onCall(@Nonnull final List<? extends String> strings,
-                            @Nonnull final ResultChannel<String> result) {
+                    protected void onCall(@NotNull final List<? extends String> strings,
+                            @NotNull final ResultChannel<String> result) {
 
                         result.pass(strings);
                     }
@@ -1858,8 +1857,8 @@ public class RoutineTest {
                 JRoutine.on(factoryOf(new FunctionInvocation<String, String>() {
 
                     @Override
-                    protected void onCall(@Nonnull final List<? extends String> strings,
-                            @Nonnull final ResultChannel<String> result) {
+                    protected void onCall(@NotNull final List<? extends String> strings,
+                            @NotNull final ResultChannel<String> result) {
 
                         result.pass(strings.toArray(new String[strings.size()]));
                     }
@@ -1983,7 +1982,7 @@ public class RoutineTest {
 
                     @Override
                     public void onInput(final String s,
-                            @Nonnull final ResultChannel<String> result) {
+                            @NotNull final ResultChannel<String> result) {
 
                         result.now().pass(s).after(seconds(2)).abort();
                     }
@@ -2334,7 +2333,7 @@ public class RoutineTest {
 
                     @Override
                     public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> result) {
+                            @NotNull final ResultChannel<Integer> result) {
 
                         final int input = integer;
 
@@ -2413,8 +2412,8 @@ public class RoutineTest {
                 new FunctionInvocation<Integer, Integer>() {
 
                     @Override
-                    protected void onCall(@Nonnull final List<? extends Integer> integers,
-                            @Nonnull final ResultChannel<Integer> result) {
+                    protected void onCall(@NotNull final List<? extends Integer> integers,
+                            @NotNull final ResultChannel<Integer> result) {
 
                         int sum = 0;
 
@@ -3230,7 +3229,7 @@ public class RoutineTest {
 
     private static class AbortInvocation extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.orderByCall().orderByDelay().orderByChance();
             assertThat(result.isOpen()).isTrue();
@@ -3302,7 +3301,7 @@ public class RoutineTest {
 
     private static class AbortInvocation2 extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             assertThat(result.abort()).isTrue();
             assertThat(result.abort(new IllegalArgumentException(s))).isFalse();
@@ -3311,7 +3310,7 @@ public class RoutineTest {
 
     private static class AllInvocation extends FilterInvocation<Object, Object> {
 
-        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+        public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
@@ -3322,7 +3321,7 @@ public class RoutineTest {
 
     private static class CheckCompleteInvocation extends FilterInvocation<Object, Object> {
 
-        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+        public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
@@ -3337,14 +3336,14 @@ public class RoutineTest {
 
         private final Semaphore mSemaphore;
 
-        private CloseInvocation(@Nonnull final Semaphore semaphore,
-                @Nonnull final AtomicBoolean isFailed) {
+        private CloseInvocation(@NotNull final Semaphore semaphore,
+                @NotNull final AtomicBoolean isFailed) {
 
             mSemaphore = semaphore;
             mIsFailed = isFailed;
         }
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             new Thread() {
 
@@ -3396,7 +3395,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.now().pass(s).after(mDelay).abort();
         }
@@ -3418,7 +3417,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             if (mFlag) {
 
@@ -3447,7 +3446,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             if (mFlag) {
 
@@ -3482,7 +3481,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             final ArrayList<String> list = mList;
             list.add(s);
@@ -3508,7 +3507,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onResult(@Nonnull final ResultChannel<String> result) {
+        public void onResult(@NotNull final ResultChannel<String> result) {
 
             final ArrayList<String> list = mList;
             result.after(mDelay).pass(list);
@@ -3518,14 +3517,14 @@ public class RoutineTest {
 
     private static class ExceptionRoutine extends AbstractRoutine<Object, Object> {
 
-        protected ExceptionRoutine(@Nonnull final InvocationConfiguration configuration) {
+        protected ExceptionRoutine(@NotNull final InvocationConfiguration configuration) {
 
             super(configuration);
         }
 
-        @Nonnull
+        @NotNull
         @Override
-        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
+        protected Invocation<Object, Object> newInvocation(@NotNull final InvocationType type) {
 
             throw new IllegalStateException();
         }
@@ -3533,7 +3532,7 @@ public class RoutineTest {
 
     private static class HasNextInvocation extends FilterInvocation<Object, Object> {
 
-        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+        public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
@@ -3545,7 +3544,7 @@ public class RoutineTest {
 
     private static class InputArrayRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             JRoutine.on(PassingInvocation.<String>factoryOf())
                     .invocations()
@@ -3564,7 +3563,7 @@ public class RoutineTest {
 
     private static class InputConsumerRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             final TransportChannel<String> channel = JRoutine.transport().buildChannel();
             result.pass(JRoutine.on(PassingInvocation.<String>factoryOf())
@@ -3582,7 +3581,7 @@ public class RoutineTest {
 
     private static class InputListRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             JRoutine.on(PassingInvocation.<String>factoryOf())
                     .invocations()
@@ -3601,7 +3600,7 @@ public class RoutineTest {
 
     private static class InputRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             JRoutine.on(PassingInvocation.<String>factoryOf())
                     .invocations()
@@ -3620,7 +3619,7 @@ public class RoutineTest {
 
     private static class NextInvocation extends FilterInvocation<Object, Object> {
 
-        public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
+        public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
@@ -3632,15 +3631,15 @@ public class RoutineTest {
 
     private static class NullRoutine extends AbstractRoutine<Object, Object> {
 
-        protected NullRoutine(@Nonnull final InvocationConfiguration configuration) {
+        protected NullRoutine(@NotNull final InvocationConfiguration configuration) {
 
             super(configuration);
         }
 
-        @Nonnull
+        @NotNull
         @Override
         @SuppressWarnings("ConstantConditions")
-        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
+        protected Invocation<Object, Object> newInvocation(@NotNull final InvocationType type) {
 
             return null;
         }
@@ -3648,7 +3647,7 @@ public class RoutineTest {
 
     private static class ResultArrayRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s).after(millis(100)).pass(new String[]{s});
         }
@@ -3656,7 +3655,7 @@ public class RoutineTest {
 
     private static class ResultConsumerRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             final TransportChannel<String> channel = JRoutine.transport().buildChannel();
             result.after(millis(500)).pass(channel);
@@ -3666,7 +3665,7 @@ public class RoutineTest {
 
     private static class ResultListRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s).after(millis(100)).pass(Collections.singletonList(s));
         }
@@ -3674,7 +3673,7 @@ public class RoutineTest {
 
     private static class ResultRunnerDeadlock extends FilterInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s).after(millis(100)).pass(s);
         }
@@ -3684,12 +3683,12 @@ public class RoutineTest {
 
         private final TimeDuration mSleepDuration;
 
-        private SleepInvocation(@Nonnull final TimeDuration sleepDuration) {
+        private SleepInvocation(@NotNull final TimeDuration sleepDuration) {
 
             mSleepDuration = sleepDuration;
         }
 
-        public void onInput(final Object input, @Nonnull final ResultChannel<Object> result) {
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
 
             try {
 
@@ -3706,7 +3705,7 @@ public class RoutineTest {
 
     private static class SleepProcedure extends ProcedureInvocation<Void> {
 
-        public void onResult(@Nonnull final ResultChannel<Void> result) {
+        public void onResult(@NotNull final ResultChannel<Void> result) {
 
             try {
 
@@ -3721,7 +3720,7 @@ public class RoutineTest {
 
     private static class SquareInvocation extends FilterInvocation<Integer, Integer> {
 
-        public void onInput(final Integer integer, @Nonnull final ResultChannel<Integer> result) {
+        public void onInput(final Integer integer, @NotNull final ResultChannel<Integer> result) {
 
             final int input = integer;
             result.pass(input * input);
@@ -3731,7 +3730,7 @@ public class RoutineTest {
     private static class TestAbortHandler implements AbortHandler {
 
         public void onAbort(@Nullable final RoutineException reason, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
         }
     }
@@ -3776,7 +3775,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(100)).pass(input);
         }
@@ -3882,16 +3881,16 @@ public class RoutineTest {
 
     private static class TestInvocationManager implements InvocationManager<Object, Object> {
 
-        public void create(@Nonnull final InvocationObserver<Object, Object> observer) {
+        public void create(@NotNull final InvocationObserver<Object, Object> observer) {
 
             observer.onCreate(new TemplateInvocation<Object, Object>() {});
         }
 
-        public void discard(@Nonnull final Invocation<Object, Object> invocation) {
+        public void discard(@NotNull final Invocation<Object, Object> invocation) {
 
         }
 
-        public void recycle(@Nonnull final Invocation<Object, Object> invocation) {
+        public void recycle(@NotNull final Invocation<Object, Object> invocation) {
 
         }
     }
@@ -3903,7 +3902,7 @@ public class RoutineTest {
         private static boolean sIsError;
 
         @Override
-        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(1000)).pass(input);
         }
@@ -3958,7 +3957,7 @@ public class RoutineTest {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
-        public void cancel(@Nonnull final Execution execution) {
+        public void cancel(@NotNull final Execution execution) {
 
         }
 
@@ -3967,8 +3966,8 @@ public class RoutineTest {
             return false;
         }
 
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+        public void run(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
 
             mExecutions.add(execution);
         }

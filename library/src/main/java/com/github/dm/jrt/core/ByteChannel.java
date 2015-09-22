@@ -16,14 +16,14 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 /**
  * Utility class focused on the optimization of the transfer of byte chunks through routine
@@ -85,7 +85,7 @@ public class ByteChannel {
      *
      * @return the byte channel.
      */
-    @Nonnull
+    @NotNull
     public static ByteChannel byteChannel() {
 
         return new ByteChannel(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
@@ -99,7 +99,7 @@ public class ByteChannel {
      * @return the byte channel.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    @Nonnull
+    @NotNull
     public static ByteChannel byteChannel(final int dataBufferSize) {
 
         return new ByteChannel(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
@@ -115,7 +115,7 @@ public class ByteChannel {
      * @return the byte channel.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    @Nonnull
+    @NotNull
     public static ByteChannel byteChannel(final int dataBufferSize, final int corePoolSize) {
 
         return new ByteChannel(dataBufferSize, corePoolSize);
@@ -130,8 +130,8 @@ public class ByteChannel {
      * @throws java.lang.IllegalStateException if an input stream has been already created for the
      *                                         specified buffer.
      */
-    @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final ByteBuffer buffer) {
+    @NotNull
+    public static BufferInputStream inputStream(@NotNull final ByteBuffer buffer) {
 
         return buffer.getStream();
     }
@@ -146,8 +146,8 @@ public class ByteChannel {
      * @throws java.lang.IllegalStateException if an input stream has been already created for one
      *                                         of the specified buffers.
      */
-    @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final ByteBuffer... buffers) {
+    @NotNull
+    public static BufferInputStream inputStream(@NotNull final ByteBuffer... buffers) {
 
         return new MultiBufferInputStream(buffers);
     }
@@ -162,8 +162,8 @@ public class ByteChannel {
      * @throws java.lang.IllegalStateException if an input stream has been already created for one
      *                                         of the specified buffers.
      */
-    @Nonnull
-    public static BufferInputStream inputStream(@Nonnull final List<ByteBuffer> buffers) {
+    @NotNull
+    public static BufferInputStream inputStream(@NotNull final List<ByteBuffer> buffers) {
 
         return new MultiBufferInputStream(buffers);
     }
@@ -176,8 +176,8 @@ public class ByteChannel {
      * @param channel the input channel to which pass the data.
      * @return the output stream.
      */
-    @Nonnull
-    public BufferOutputStream passTo(@Nonnull final InputChannel<? super ByteBuffer> channel) {
+    @NotNull
+    public BufferOutputStream passTo(@NotNull final InputChannel<? super ByteBuffer> channel) {
 
         BufferOutputStream stream;
 
@@ -197,7 +197,7 @@ public class ByteChannel {
         return stream;
     }
 
-    @Nonnull
+    @NotNull
     private ByteBuffer acquire() {
 
         ByteBuffer buffer = null;
@@ -220,7 +220,7 @@ public class ByteChannel {
         return new ByteBuffer(mDataBufferSize);
     }
 
-    private void release(@Nonnull final ByteBuffer buffer) {
+    private void release(@NotNull final ByteBuffer buffer) {
 
         synchronized (mBufferPool) {
 
@@ -258,16 +258,16 @@ public class ByteChannel {
          * @throws IOException if an I/O error occurs. In particular, an <code>IOException</code>
          *                     may be thrown if the output stream has been closed.
          */
-        public abstract int read(@Nonnull OutputStream out) throws IOException;
+        public abstract int read(@NotNull OutputStream out) throws IOException;
 
         @Override
         public abstract int read();
 
         @Override
-        public abstract int read(@Nonnull byte[] b);
+        public abstract int read(@NotNull byte[] b);
 
         @Override
-        public abstract int read(@Nonnull byte[] b, int off, int len);
+        public abstract int read(@NotNull byte[] b, int off, int len);
 
         @Override
         public abstract long skip(long n);
@@ -300,7 +300,7 @@ public class ByteChannel {
          *                     file, or if the input stream has been closed, or if some other I/O
          *                     error occurs.
          */
-        public abstract int write(@Nonnull InputStream in) throws IOException;
+        public abstract int write(@NotNull InputStream in) throws IOException;
 
         @Override
         public abstract void flush();
@@ -327,7 +327,7 @@ public class ByteChannel {
          *
          * @param buffers the array of input streams whose data have to be concatenated.
          */
-        private MultiBufferInputStream(@Nonnull final ByteBuffer[] buffers) {
+        private MultiBufferInputStream(@NotNull final ByteBuffer[] buffers) {
 
             final ArrayList<BufferInputStream> streams =
                     (mStreams = new ArrayList<BufferInputStream>(buffers.length));
@@ -343,7 +343,7 @@ public class ByteChannel {
          *
          * @param buffers the list of input streams whose data have to be concatenated.
          */
-        private MultiBufferInputStream(@Nonnull final List<ByteBuffer> buffers) {
+        private MultiBufferInputStream(@NotNull final List<ByteBuffer> buffers) {
 
             final ArrayList<BufferInputStream> streams =
                     (mStreams = new ArrayList<BufferInputStream>(buffers.size()));
@@ -363,7 +363,7 @@ public class ByteChannel {
          * @throws IOException if an I/O error occurs. In particular, an <code>IOException</code>
          *                     may be thrown if the output stream has been closed.
          */
-        public int read(@Nonnull final OutputStream out) throws IOException {
+        public int read(@NotNull final OutputStream out) throws IOException {
 
             synchronized (mMutex) {
 
@@ -421,7 +421,7 @@ public class ByteChannel {
         }
 
         @Override
-        public int read(@Nonnull final byte[] b) {
+        public int read(@NotNull final byte[] b) {
 
             final int len = b.length;
 
@@ -469,7 +469,7 @@ public class ByteChannel {
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public int read(@Nonnull final byte[] b, final int off, final int len) {
+        public int read(@NotNull final byte[] b, final int off, final int len) {
 
             if (b == null) {
 
@@ -715,8 +715,8 @@ public class ByteChannel {
             return true;
         }
 
-        private void changeState(@Nonnull final BufferState expected,
-                @Nonnull final BufferState updated, @Nonnull final String errorMessage) {
+        private void changeState(@NotNull final BufferState expected,
+                @NotNull final BufferState updated, @NotNull final String errorMessage) {
 
             if (mState != expected) {
 
@@ -734,7 +734,7 @@ public class ByteChannel {
             }
         }
 
-        @Nonnull
+        @NotNull
         private BufferInputStream getStream() {
 
             synchronized (mMutex) {
@@ -745,7 +745,7 @@ public class ByteChannel {
             }
         }
 
-        @Nonnull
+        @NotNull
         private ByteBuffer lock(final int size) {
 
             synchronized (mMutex) {
@@ -758,7 +758,7 @@ public class ByteChannel {
             return this;
         }
 
-        @Nonnull
+        @NotNull
         private byte[] readBuffer() {
 
             synchronized (mMutex) {
@@ -787,7 +787,7 @@ public class ByteChannel {
             release(this);
         }
 
-        @Nonnull
+        @NotNull
         private ByteBuffer unlock() {
 
             synchronized (mMutex) {
@@ -799,7 +799,7 @@ public class ByteChannel {
             return this;
         }
 
-        @Nonnull
+        @NotNull
         private byte[] writeBuffer() {
 
             synchronized (mMutex) {
@@ -837,13 +837,13 @@ public class ByteChannel {
          *
          * @param buffer the internal buffer.
          */
-        private DefaultBufferInputStream(@Nonnull final ByteBuffer buffer) {
+        private DefaultBufferInputStream(@NotNull final ByteBuffer buffer) {
 
             mBuffer = buffer;
         }
 
         @Override
-        public int read(@Nonnull final OutputStream out) throws IOException {
+        public int read(@NotNull final OutputStream out) throws IOException {
 
             synchronized (mMutex) {
 
@@ -864,7 +864,7 @@ public class ByteChannel {
         }
 
         @Override
-        public int read(@Nonnull final byte[] b) {
+        public int read(@NotNull final byte[] b) {
 
             final int len = b.length;
 
@@ -893,7 +893,7 @@ public class ByteChannel {
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public int read(@Nonnull final byte[] b, final int off, final int len) {
+        public int read(@NotNull final byte[] b, final int off, final int len) {
 
             if (b == null) {
 
@@ -1030,7 +1030,7 @@ public class ByteChannel {
          * @param channel the input channel to which pass the data.
          */
         @SuppressWarnings("ConstantConditions")
-        private DefaultBufferOutputStream(@Nonnull final InputChannel<? super ByteBuffer> channel) {
+        private DefaultBufferOutputStream(@NotNull final InputChannel<? super ByteBuffer> channel) {
 
             if (channel == null) {
 
@@ -1050,7 +1050,7 @@ public class ByteChannel {
          *                     file, or if the input stream has been closed, or if some other I/O
          *                     error occurs.
          */
-        public int write(@Nonnull final InputStream in) throws IOException {
+        public int write(@NotNull final InputStream in) throws IOException {
 
             final int read;
             final boolean isPass;
@@ -1161,7 +1161,7 @@ public class ByteChannel {
         }
 
         @Override
-        public void write(@Nonnull final byte[] b) throws IOException {
+        public void write(@NotNull final byte[] b) throws IOException {
 
             final int len = b.length;
 
@@ -1213,7 +1213,7 @@ public class ByteChannel {
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void write(@Nonnull final byte[] b, final int off, final int len) throws
+        public void write(@NotNull final byte[] b, final int off, final int len) throws
                 IOException {
 
             if (b == null) {
@@ -1270,7 +1270,7 @@ public class ByteChannel {
             } while (written < len);
         }
 
-        @Nonnull
+        @NotNull
         private ByteBuffer getBuffer() {
 
             final ByteBuffer byteBuffer = mBuffer;

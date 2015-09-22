@@ -15,7 +15,7 @@ package com.github.dm.jrt.builder;
 
 import com.github.dm.jrt.channel.TransportChannel;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of transport channel objects.
@@ -31,6 +31,6 @@ public interface TransportChannelBuilder
      * @param <DATA> the data type.
      * @return the newly created channel.
      */
-    @Nonnull
+    @NotNull
     <DATA> TransportChannel<DATA> buildChannel();
 }

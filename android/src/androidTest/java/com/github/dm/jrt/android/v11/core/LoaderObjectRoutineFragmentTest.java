@@ -50,15 +50,15 @@ import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.contextFrom;
@@ -1978,19 +1978,19 @@ public class LoaderObjectRoutineFragmentTest
 
         private int mWrnCount;
 
-        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void err(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mWrnCount;
@@ -2055,14 +2055,14 @@ public class LoaderObjectRoutineFragmentTest
          *
          * @param base the base context.
          */
-        public StringContext(@Nonnull final Context base) {
+        public StringContext(@NotNull final Context base) {
 
             super(base);
         }
 
         @Nullable
-        public <TYPE> TYPE geInstance(@Nonnull final Class<? extends TYPE> type,
-                @Nonnull final Object... args) {
+        public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
+                @NotNull final Object... args) {
 
             return type.cast("test1");
         }

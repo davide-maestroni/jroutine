@@ -15,10 +15,10 @@ package com.github.dm.jrt.android.log;
 
 import android.util.Log;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Android specific log implementation.
@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  */
 public class AndroidLog implements com.github.dm.jrt.log.Log {
 
-    public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+    public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {
@@ -40,7 +40,7 @@ public class AndroidLog implements com.github.dm.jrt.log.Log {
         }
     }
 
-    public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+    public void err(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {
@@ -53,7 +53,7 @@ public class AndroidLog implements com.github.dm.jrt.log.Log {
         }
     }
 
-    public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+    public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {

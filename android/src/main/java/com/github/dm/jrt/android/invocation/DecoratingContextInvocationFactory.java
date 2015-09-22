@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.android.invocation;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class decorating the invocations produced by a context invocation factory.
@@ -35,7 +35,7 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
      */
     @SuppressWarnings("ConstantConditions")
     public DecoratingContextInvocationFactory(
-            @Nonnull final ContextInvocationFactory<IN, OUT> wrapped) {
+            @NotNull final ContextInvocationFactory<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -45,7 +45,7 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
         mFactory = wrapped;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public final ContextInvocation<IN, OUT> newInvocation() {
 
@@ -58,7 +58,7 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
      * @param invocation the context invocation instance to decorate.
      * @return the decorated context invocation.
      */
-    @Nonnull
+    @NotNull
     protected abstract ContextInvocation<IN, OUT> decorate(
-            @Nonnull ContextInvocation<IN, OUT> invocation);
+            @NotNull ContextInvocation<IN, OUT> invocation);
 }

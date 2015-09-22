@@ -13,6 +13,9 @@
  */
 package com.github.dm.jrt.util;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,9 +23,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Reflection utility class.
@@ -54,8 +54,8 @@ public class Reflection {
      * @param type the primitive type.
      * @return the boxing class.
      */
-    @Nonnull
-    public static Class<?> boxingClass(@Nonnull final Class<?> type) {
+    @NotNull
+    public static Class<?> boxingClass(@NotNull final Class<?> type) {
 
         if (!type.isPrimitive()) {
 
@@ -78,10 +78,10 @@ public class Reflection {
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
-    public static <TYPE> Constructor<TYPE> findConstructor(@Nonnull final Class<TYPE> type,
-            @Nonnull final Object... args) {
+    public static <TYPE> Constructor<TYPE> findConstructor(@NotNull final Class<TYPE> type,
+            @NotNull final Object... args) {
 
         Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), args);
 
@@ -111,9 +111,9 @@ public class Reflection {
      * @throws java.lang.IllegalArgumentException if no method matching the specified parameters was
      *                                            found.
      */
-    @Nonnull
-    public static Method findMethod(@Nonnull final Class<?> type, @Nonnull final String name,
-            @Nonnull final Class<?>... parameterTypes) {
+    @NotNull
+    public static Method findMethod(@NotNull final Class<?> type, @NotNull final String name,
+            @NotNull final Class<?>... parameterTypes) {
 
         Method method;
 
@@ -142,7 +142,7 @@ public class Reflection {
      * @param type the class.
      * @return whether the class has a static context.
      */
-    public static boolean hasStaticContext(@Nonnull final Class<?> type) {
+    public static boolean hasStaticContext(@NotNull final Class<?> type) {
 
         return ((type.getEnclosingClass() == null) || Modifier.isStatic(type.getModifiers()));
     }
@@ -153,8 +153,8 @@ public class Reflection {
      * @param constructor the constructor instance.
      * @return the constructor.
      */
-    @Nonnull
-    public static Constructor<?> makeAccessible(@Nonnull final Constructor<?> constructor) {
+    @NotNull
+    public static Constructor<?> makeAccessible(@NotNull final Constructor<?> constructor) {
 
         if (!constructor.isAccessible()) {
 
@@ -170,8 +170,8 @@ public class Reflection {
      * @param method the method instance.
      * @return the method.
      */
-    @Nonnull
-    public static Method makeAccessible(@Nonnull final Method method) {
+    @NotNull
+    public static Method makeAccessible(@NotNull final Method method) {
 
         if (!method.isAccessible()) {
 
@@ -183,7 +183,7 @@ public class Reflection {
 
     @Nullable
     private static Constructor<?> findBestMatchingConstructor(
-            @Nonnull final Constructor<?>[] constructors, @Nonnull final Object[] args) {
+            @NotNull final Constructor<?>[] constructors, @NotNull final Object[] args) {
 
         final int argsLength = args.length;
         Constructor<?> bestMatch = null;
@@ -262,7 +262,7 @@ public class Reflection {
          *
          * @param constructor the constructor instance.
          */
-        private SetAccessibleConstructorAction(@Nonnull final Constructor<?> constructor) {
+        private SetAccessibleConstructorAction(@NotNull final Constructor<?> constructor) {
 
             mmConstructor = constructor;
         }
@@ -286,7 +286,7 @@ public class Reflection {
          *
          * @param method the method instance.
          */
-        private SetAccessibleMethodAction(@Nonnull final Method method) {
+        private SetAccessibleMethodAction(@NotNull final Method method) {
 
             mMethod = method;
         }

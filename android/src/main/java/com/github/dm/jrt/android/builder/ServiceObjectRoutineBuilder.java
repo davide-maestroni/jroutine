@@ -17,7 +17,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routines wrapping an object methods.
@@ -33,12 +33,12 @@ public interface ServiceObjectRoutineBuilder
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxies();
 }

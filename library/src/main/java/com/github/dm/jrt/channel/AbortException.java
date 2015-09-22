@@ -13,8 +13,8 @@
  */
 package com.github.dm.jrt.channel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that an invocation has been explicitly aborted.
@@ -40,7 +40,7 @@ public class AbortException extends RoutineException {
      * @param cause the throwable to wrap.
      * @return the throwable or an abort exception wrapping it.
      */
-    @Nonnull
+    @NotNull
     public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
 
         return (cause instanceof RoutineException) ? (RoutineException) cause

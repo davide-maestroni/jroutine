@@ -31,10 +31,10 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.routine.Routine;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
@@ -228,7 +228,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         private static final int STRING = 0;
 
         public void onInput(final ParcelableSelectable<Object> selectable,
-                @Nonnull final ResultChannel<ParcelableSelectable<Object>> result) {
+                @NotNull final ResultChannel<ParcelableSelectable<Object>> result) {
 
             switch (selectable.index) {
 

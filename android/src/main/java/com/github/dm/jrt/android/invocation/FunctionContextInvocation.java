@@ -17,7 +17,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.invocation.FunctionInvocation;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This is a special abstract implementation that centralizes the routine invocation inside a
@@ -36,7 +36,7 @@ public abstract class FunctionContextInvocation<IN, OUT> extends FunctionInvocat
 
     private Context mContext;
 
-    public void onContext(@Nonnull final Context context) {
+    public void onContext(@NotNull final Context context) {
 
         mContext = context;
     }

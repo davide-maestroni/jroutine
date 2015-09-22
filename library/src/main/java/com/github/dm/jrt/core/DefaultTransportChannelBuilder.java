@@ -19,7 +19,7 @@ import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.builder.TransportChannelBuilder;
 import com.github.dm.jrt.channel.TransportChannel;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class implementing a builder of transport channel objects.
@@ -38,22 +38,22 @@ class DefaultTransportChannelBuilder
 
     }
 
-    @Nonnull
+    @NotNull
     public <DATA> TransportChannel<DATA> buildChannel() {
 
         return new DefaultTransportChannel<DATA>(mConfiguration);
     }
 
-    @Nonnull
+    @NotNull
     public Builder<? extends TransportChannelBuilder> channels() {
 
         return new Builder<TransportChannelBuilder>(this, mConfiguration);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public TransportChannelBuilder setConfiguration(
-            @Nonnull final ChannelConfiguration configuration) {
+            @NotNull final ChannelConfiguration configuration) {
 
         if (configuration == null) {
 

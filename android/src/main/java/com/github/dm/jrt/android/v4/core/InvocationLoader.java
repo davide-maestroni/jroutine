@@ -22,10 +22,10 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
 
@@ -64,11 +64,11 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @param logger            the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationLoader(@Nonnull final Context context,
-            @Nonnull final ContextInvocation<IN, OUT> invocation,
-            @Nonnull final ContextInvocationFactory<IN, OUT> invocationFactory,
-            @Nonnull final List<? extends IN> inputs, @Nullable final OrderType order,
-            @Nonnull final Logger logger) {
+    InvocationLoader(@NotNull final Context context,
+            @NotNull final ContextInvocation<IN, OUT> invocation,
+            @NotNull final ContextInvocationFactory<IN, OUT> invocationFactory,
+            @NotNull final List<? extends IN> inputs, @Nullable final OrderType order,
+            @NotNull final Logger logger) {
 
         super(context);
 
@@ -230,12 +230,12 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
          * @param invocation the loader invocation instance.
          */
         private LoaderContextInvocationFactory(
-                @Nonnull final ContextInvocation<IN, OUT> invocation) {
+                @NotNull final ContextInvocation<IN, OUT> invocation) {
 
             mInvocation = invocation;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() {
 

@@ -55,13 +55,13 @@ import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
@@ -1487,7 +1487,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     private static class Abort extends TemplateInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
 
             try {
 
@@ -1511,19 +1511,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         private int mWrnCount;
 
-        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void err(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mWrnCount;
@@ -1552,7 +1552,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
 
             result.after(millis(500)).pass(d);
         }
@@ -1570,7 +1570,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             extends TemplateContextInvocation<DATA, Context> {
 
         @Override
-        public void onResult(@Nonnull final ResultChannel<Context> result) {
+        public void onResult(@NotNull final ResultChannel<Context> result) {
 
             result.pass(getContext());
         }
@@ -1594,7 +1594,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.pass(s);
         }
@@ -1604,8 +1604,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             extends FunctionContextInvocation<String, String> {
 
         @Override
-        protected void onCall(@Nonnull final List<? extends String> strings,
-                @Nonnull final ResultChannel<String> result) {
+        protected void onCall(@NotNull final List<? extends String> strings,
+                @NotNull final ResultChannel<String> result) {
 
             result.pass(strings);
         }
@@ -1614,7 +1614,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     private static class ToUpperCase extends TemplateContextInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s.toUpperCase());
         }

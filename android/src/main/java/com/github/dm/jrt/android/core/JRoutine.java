@@ -18,7 +18,7 @@ import com.github.dm.jrt.android.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.log.Logs;
 import com.github.dm.jrt.log.Logger;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -91,8 +91,8 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
      * @param context the service context.
      * @return the context builder.
      */
-    @Nonnull
-    public static ContextBuilder with(@Nonnull final ServiceContext context) {
+    @NotNull
+    public static ContextBuilder with(@NotNull final ServiceContext context) {
 
         return new ContextBuilder(context);
     }
@@ -110,7 +110,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @param context the service context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@Nonnull final ServiceContext context) {
+        private ContextBuilder(@NotNull final ServiceContext context) {
 
             if (context == null) {
 
@@ -135,8 +135,8 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @param target the invocation target.
          * @return the routine builder instance.
          */
-        @Nonnull
-        public ServiceObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget<?> target) {
+        @NotNull
+        public ServiceObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
             return new DefaultServiceObjectRoutineBuilder(mContext, target);
         }
@@ -157,9 +157,9 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @param <OUT>  the output data type.
          * @return the routine builder instance.
          */
-        @Nonnull
+        @NotNull
         public <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(
-                @Nonnull final TargetInvocationFactory<IN, OUT> target) {
+                @NotNull final TargetInvocationFactory<IN, OUT> target) {
 
             return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);
         }

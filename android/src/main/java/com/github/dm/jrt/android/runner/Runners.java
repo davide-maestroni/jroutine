@@ -18,10 +18,10 @@ import android.os.Looper;
 
 import com.github.dm.jrt.runner.Runner;
 
-import java.util.concurrent.Executor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.concurrent.Executor;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -42,8 +42,8 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      * @param thread the thread.
      * @return the runner instance.
      */
-    @Nonnull
-    public static Runner handlerRunner(@Nonnull final HandlerThread thread) {
+    @NotNull
+    public static Runner handlerRunner(@NotNull final HandlerThread thread) {
 
         if (!thread.isAlive()) {
 
@@ -62,8 +62,8 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      * @param looper the looper instance.
      * @return the runner instance.
      */
-    @Nonnull
-    public static Runner looperRunner(@Nonnull final Looper looper) {
+    @NotNull
+    public static Runner looperRunner(@NotNull final Looper looper) {
 
         return new LooperRunner(looper);
     }
@@ -79,8 +79,8 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      *                         thread. If null, the invocation will be posted on the same looper.
      * @return the runner instance.
      */
-    @Nonnull
-    public static Runner looperRunner(@Nonnull final Looper looper,
+    @NotNull
+    public static Runner looperRunner(@NotNull final Looper looper,
             @Nullable final Runner sameThreadRunner) {
 
         return new LooperRunner(looper, sameThreadRunner);
@@ -94,7 +94,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      *
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public static Runner mainRunner() {
 
         return sMainRunner;
@@ -105,7 +105,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      *
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public static Runner myRunner() {
 
@@ -121,7 +121,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      *
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public static Runner taskRunner() {
 
         return taskRunner(null);
@@ -140,7 +140,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      * @param executor the executor.
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public static Runner taskRunner(@Nullable final Executor executor) {
 
         return new AsyncTaskRunner(executor);

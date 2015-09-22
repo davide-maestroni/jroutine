@@ -30,15 +30,15 @@ import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
 import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
@@ -73,7 +73,7 @@ class DefaultObjectRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the class of specified target represents an
      *                                            interface.
      */
-    DefaultObjectRoutineBuilder(@Nonnull final InvocationTarget<?> target) {
+    DefaultObjectRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
         final Class<?> targetClass = target.getTargetClass();
 
@@ -86,8 +86,8 @@ class DefaultObjectRoutineBuilder
         mTarget = target;
     }
 
-    @Nonnull
-    public <IN, OUT> Routine<IN, OUT> aliasMethod(@Nonnull final String name) {
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final Method method = getAnnotatedMethod(name, mTarget.getTargetClass());
 
@@ -100,14 +100,14 @@ class DefaultObjectRoutineBuilder
         return method(method);
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
 
@@ -120,38 +120,38 @@ class DefaultObjectRoutineBuilder
         return itf.cast(proxy);
     }
 
-    @Nonnull
-    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final String name,
-            @Nonnull final Class<?>... parameterTypes) {
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
+            @NotNull final Class<?>... parameterTypes) {
 
         return method(Reflection.findMethod(mTarget.getTargetClass(), name, parameterTypes));
     }
 
-    @Nonnull
-    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final Method method) {
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
                           configurationWithAnnotations(mProxyConfiguration, method), method, null,
                           null);
     }
 
-    @Nonnull
+    @NotNull
     public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> invocations() {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
     }
 
-    @Nonnull
+    @NotNull
     public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxies() {
 
         final ProxyConfiguration configuration = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
-    public ObjectRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+    public ObjectRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -162,10 +162,10 @@ class DefaultObjectRoutineBuilder
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ObjectRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -176,11 +176,11 @@ class DefaultObjectRoutineBuilder
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     private <IN, OUT> Routine<IN, OUT> getRoutine(
-            @Nonnull final InvocationConfiguration invocationConfiguration,
-            @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
+            @NotNull final InvocationConfiguration invocationConfiguration,
+            @NotNull final ProxyConfiguration proxyConfiguration, @NotNull final Method method,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
         final InvocationTarget<?> target = mTarget;
@@ -245,8 +245,8 @@ class DefaultObjectRoutineBuilder
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        private MethodFunctionInvocation(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final InvocationTarget<?> target, @Nonnull final Method method,
+        private MethodFunctionInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             final Object mutexTarget =
@@ -270,8 +270,8 @@ class DefaultObjectRoutineBuilder
         }
 
         @Override
-        protected void onCall(@Nonnull final List<?> objects,
-                @Nonnull final ResultChannel<Object> result) {
+        protected void onCall(@NotNull final List<?> objects,
+                @NotNull final ResultChannel<Object> result) {
 
             final Object target = mTarget.getTarget();
 
@@ -308,8 +308,8 @@ class DefaultObjectRoutineBuilder
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        private MethodInvocationFactory(@Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final InvocationTarget<?> target, @Nonnull final Method method,
+        private MethodInvocationFactory(@NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mProxyConfiguration = proxyConfiguration;
@@ -319,7 +319,7 @@ class DefaultObjectRoutineBuilder
             mOutputMode = outputMode;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Invocation<Object, Object> newInvocation() {
 
@@ -352,8 +352,8 @@ class DefaultObjectRoutineBuilder
          * @param inputMode               the input transfer mode.
          * @param outputMode              the output transfer mode.
          */
-        private RoutineInfo(@Nonnull final InvocationConfiguration invocationConfiguration,
-                @Nonnull final ProxyConfiguration proxyConfiguration, @Nonnull final Method method,
+        private RoutineInfo(@NotNull final InvocationConfiguration invocationConfiguration,
+                @NotNull final ProxyConfiguration proxyConfiguration, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             mInvocationConfiguration = invocationConfiguration;

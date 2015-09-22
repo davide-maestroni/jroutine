@@ -17,8 +17,8 @@ import com.github.dm.jrt.android.builder.LoaderConfiguration.Builder;
 import com.github.dm.jrt.builder.ConfigurableChannelBuilder;
 import com.github.dm.jrt.channel.OutputChannel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a builder of output channels bound to loader invocations.<br/>
@@ -39,7 +39,7 @@ public interface LoaderChannelBuilder extends ConfigurableChannelBuilder<LoaderC
      * @return the newly created output channel.
      * @throws java.lang.IllegalArgumentException if the configured loader ID is equal to AUTO.
      */
-    @Nonnull
+    @NotNull
     <OUT> OutputChannel<OUT> buildChannel();
 
     /**
@@ -47,7 +47,7 @@ public interface LoaderChannelBuilder extends ConfigurableChannelBuilder<LoaderC
      *
      * @return the loader configuration builder.
      */
-    @Nonnull
+    @NotNull
     Builder<? extends LoaderChannelBuilder> loaders();
 
     /**

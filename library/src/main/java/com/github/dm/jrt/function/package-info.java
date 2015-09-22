@@ -11,23 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.log;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 /**
- * Log implementation simply discarding all messages.
+ * Functional interfaces and utility classes.
  * <p/>
- * Created by davide-maestroni on 10/04/2014.
+ * Created by davide-maestroni on 09/22/2015.
  */
-public class NullLog extends TemplateLog {
-
-    @Override
-    protected void log(@NotNull final LogLevel level, @NotNull final List<Object> contexts,
-            @Nullable final String message, @Nullable final Throwable throwable) {
-
-    }
-}
+package com.github.dm.jrt.function;

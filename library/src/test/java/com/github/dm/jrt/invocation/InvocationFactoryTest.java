@@ -16,9 +16,8 @@ package com.github.dm.jrt.invocation;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.routine.Routine;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,7 +66,7 @@ public class InvocationFactoryTest {
          *
          * @param wrapped the wrapped invocation instance.
          */
-        public TestInvocationDecorator(@Nonnull final Invocation<String, String> wrapped) {
+        public TestInvocationDecorator(@NotNull final Invocation<String, String> wrapped) {
 
             super(wrapped);
         }
@@ -80,15 +79,15 @@ public class InvocationFactoryTest {
          *
          * @param wrapped the wrapped factory instance.
          */
-        public TestInvocationFactory(@Nonnull final InvocationFactory<String, String> wrapped) {
+        public TestInvocationFactory(@NotNull final InvocationFactory<String, String> wrapped) {
 
             super(wrapped);
         }
 
-        @Nonnull
+        @NotNull
         @Override
         protected Invocation<String, String> decorate(
-                @Nonnull final Invocation<String, String> invocation) {
+                @NotNull final Invocation<String, String> invocation) {
 
             return new TestInvocationDecorator(invocation);
         }

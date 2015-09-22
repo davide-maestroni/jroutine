@@ -18,7 +18,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of async proxy objects, whose methods are executed in a dedicated
@@ -52,18 +52,18 @@ public interface ServiceProxyBuilder<TYPE>
      *
      * @return the proxy object.
      */
-    @Nonnull
+    @NotNull
     TYPE buildProxy();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> invocations();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> proxies();
 }

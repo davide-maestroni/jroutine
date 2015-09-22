@@ -19,9 +19,9 @@ ${generatedPackage}
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
     @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget<?> target,
-            @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
+    public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
         if (!target.isSameTypeOf(${classErasure}.class)) {
 
@@ -42,13 +42,13 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         ${routineFieldsInit}
     }
 
-    @javax.annotation.Nonnull
-    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget.InstanceInvocationTarget<? extends ${classFullName}> target) {
+    @org.jetbrains.annotations.NotNull
+    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget.InstanceInvocationTarget<? extends ${classFullName}> target) {
 
         return new ProxyObjectBuilder${genericTypes}(target);
     }
 
-    @javax.annotation.Nonnull
+    @org.jetbrains.annotations.NotNull
     public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> onClass() {
 
         return new ProxyObjectBuilder${genericTypes}(com.github.dm.jrt.core.InvocationTarget.classOfType(${classErasure}.class));
@@ -60,30 +60,30 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
 
-        private ProxyObjectBuilder(@javax.annotation.Nonnull final com.github.dm.jrt.core.InvocationTarget<?> target) {
+        private ProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget<?> target) {
 
             mTarget = target;
         }
 
         @Override
-        @javax.annotation.Nonnull
+        @org.jetbrains.annotations.NotNull
         protected com.github.dm.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
             return mToken;
         }
 
         @Override
-        @javax.annotation.Nullable
+        @org.jetbrains.annotations.Nullable
         protected Object getTarget() {
 
             return mTarget.getTarget();
         }
 
         @Override
-        @javax.annotation.Nonnull
+        @org.jetbrains.annotations.NotNull
         protected ${interfaceFullName} newProxy(
-                @javax.annotation.Nonnull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
-                @javax.annotation.Nonnull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
             return new ${generatedClassName}${genericTypes}(mTarget, invocationConfiguration, proxyConfiguration);
         }

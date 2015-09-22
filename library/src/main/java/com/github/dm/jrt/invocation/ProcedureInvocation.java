@@ -16,8 +16,8 @@ package com.github.dm.jrt.invocation;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation performing a procedure (that is, no input is required)
@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
 public abstract class ProcedureInvocation<OUT> extends InvocationFactory<Void, OUT>
         implements Invocation<Void, OUT> {
 
-    @Nonnull
+    @NotNull
     @Override
     public final Invocation<Void, OUT> newInvocation() {
 
@@ -51,7 +51,7 @@ public abstract class ProcedureInvocation<OUT> extends InvocationFactory<Void, O
 
     }
 
-    public final void onInput(final Void input, @Nonnull final ResultChannel<OUT> result) {
+    public final void onInput(final Void input, @NotNull final ResultChannel<OUT> result) {
 
     }
 

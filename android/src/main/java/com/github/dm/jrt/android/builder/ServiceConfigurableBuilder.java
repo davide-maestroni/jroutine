@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.builder;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration.Builder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a configurable builder of service routines.
@@ -35,6 +35,6 @@ public interface ServiceConfigurableBuilder<TYPE> {
      *
      * @return the service configuration builder.
      */
-    @Nonnull
+    @NotNull
     Builder<? extends TYPE> service();
 }

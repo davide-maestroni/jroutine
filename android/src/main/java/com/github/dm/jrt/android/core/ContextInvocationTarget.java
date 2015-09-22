@@ -23,10 +23,10 @@ import com.github.dm.jrt.core.InvocationTarget;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.util.Reflection;
 
-import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Arrays;
 
 import static com.github.dm.jrt.util.Reflection.findConstructor;
 
@@ -53,9 +53,9 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @param <TYPE>      the target object type.
      * @return the context invocation target.
      */
-    @Nonnull
+    @NotNull
     public static <TYPE> ClassContextInvocationTarget<TYPE> classOfType(
-            @Nonnull final Class<TYPE> targetClass) {
+            @NotNull final Class<TYPE> targetClass) {
 
         return new ClassContextInvocationTarget<TYPE>(targetClass);
     }
@@ -68,9 +68,9 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @param <TYPE>      the target object type.
      * @return the context invocation target.
      */
-    @Nonnull
+    @NotNull
     public static <TYPE> ObjectContextInvocationTarget<TYPE> instanceOf(
-            @Nonnull final Class<TYPE> targetClass) {
+            @NotNull final Class<TYPE> targetClass) {
 
         return instanceOf(targetClass, (Object[]) null);
     }
@@ -83,9 +83,9 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @param <TYPE>      the target object type.
      * @return the context invocation target.
      */
-    @Nonnull
+    @NotNull
     public static <TYPE> ObjectContextInvocationTarget<TYPE> instanceOf(
-            @Nonnull final Class<TYPE> targetClass, @Nullable final Object... factoryArgs) {
+            @NotNull final Class<TYPE> targetClass, @Nullable final Object... factoryArgs) {
 
         return new ObjectContextInvocationTarget<TYPE>(targetClass, factoryArgs);
     }
@@ -97,15 +97,15 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @param context the target context.
      * @return the invocation target.
      */
-    @Nonnull
-    public abstract InvocationTarget<TYPE> getInvocationTarget(@Nonnull Context context);
+    @NotNull
+    public abstract InvocationTarget<TYPE> getInvocationTarget(@NotNull Context context);
 
     /**
      * Returns the target class.
      *
      * @return the target class.
      */
-    @Nonnull
+    @NotNull
     public abstract Class<? extends TYPE> getTargetClass();
 
     /**
@@ -114,7 +114,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @param otherClass the other class.
      * @return whether the invocation target is assignable to the class.
      */
-    public abstract boolean isAssignableTo(@Nonnull Class<?> otherClass);
+    public abstract boolean isAssignableTo(@NotNull Class<?> otherClass);
 
     /**
      * Checks if this invocation target is of the specified type.
@@ -122,7 +122,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @param type the type class.
      * @return whether the invocation target is of the specified type.
      */
-    public abstract boolean isSameTypeOf(@Nonnull Class<?> type);
+    public abstract boolean isSameTypeOf(@NotNull Class<?> type);
 
     /**
      * Context invocation target wrapping a class.
@@ -139,13 +139,13 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
 
                     @SuppressWarnings("unchecked")
                     public ClassContextInvocationTarget createFromParcel(
-                            @Nonnull final Parcel source) {
+                            @NotNull final Parcel source) {
 
                         return new ClassContextInvocationTarget(
                                 (Class<?>) source.readSerializable());
                     }
 
-                    @Nonnull
+                    @NotNull
                     public ClassContextInvocationTarget[] newArray(final int size) {
 
                         return new ClassContextInvocationTarget[size];
@@ -160,7 +160,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
          * @param targetClass the target class.
          */
         @SuppressWarnings("ConstantConditions")
-        private ClassContextInvocationTarget(@Nonnull final Class<TYPE> targetClass) {
+        private ClassContextInvocationTarget(@NotNull final Class<TYPE> targetClass) {
 
             if (targetClass.isPrimitive()) {
 
@@ -193,9 +193,9 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return mTargetClass.equals(that.mTargetClass);
         }
 
-        @Nonnull
+        @NotNull
         @Override
-        public InvocationTarget<TYPE> getInvocationTarget(@Nonnull final Context context) {
+        public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) {
 
             return InvocationTarget.classOfType(mTargetClass);
         }
@@ -206,7 +206,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return mTargetClass.hashCode();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
 
@@ -214,18 +214,18 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         }
 
         @Override
-        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
+        public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
 
             return otherClass.isAssignableFrom(mTargetClass);
         }
 
         @Override
-        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+        public boolean isSameTypeOf(@NotNull final Class<?> type) {
 
             return (mTargetClass == type);
         }
 
-        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
         }
@@ -246,14 +246,14 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
 
                     @SuppressWarnings("unchecked")
                     public ObjectContextInvocationTarget createFromParcel(
-                            @Nonnull final Parcel source) {
+                            @NotNull final Parcel source) {
 
                         return new ObjectContextInvocationTarget(
                                 (Class<?>) source.readSerializable(),
                                 source.readArray(ContextInvocationTarget.class.getClassLoader()));
                     }
 
-                    @Nonnull
+                    @NotNull
                     public ObjectContextInvocationTarget[] newArray(final int size) {
 
                         return new ObjectContextInvocationTarget[size];
@@ -271,7 +271,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
          * @param factoryArgs the object factory arguments.
          */
         @SuppressWarnings("ConstantConditions")
-        private ObjectContextInvocationTarget(@Nonnull final Class<TYPE> targetClass,
+        private ObjectContextInvocationTarget(@NotNull final Class<TYPE> targetClass,
                 @Nullable final Object[] factoryArgs) {
 
             if (targetClass.isPrimitive()) {
@@ -310,10 +310,10 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return result;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-        public InvocationTarget<TYPE> getInvocationTarget(@Nonnull final Context context) {
+        public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) {
 
             TYPE target = null;
             final Class<TYPE> targetClass = mTargetClass;
@@ -348,7 +348,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return InvocationTarget.instance(target);
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
 
@@ -356,13 +356,13 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         }
 
         @Override
-        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
+        public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
 
             return otherClass.isAssignableFrom(mTargetClass);
         }
 
         @Override
-        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+        public boolean isSameTypeOf(@NotNull final Class<?> type) {
 
             return isAssignableTo(type);
         }
@@ -372,7 +372,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return 0;
         }
 
-        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);

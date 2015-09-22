@@ -18,7 +18,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.routine.TemplateRoutine;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of a routine builder.
@@ -36,34 +36,34 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    @Nonnull
+    @NotNull
     public InvocationChannel<IN, OUT> asyncInvoke() {
 
         return buildRoutine().asyncInvoke();
     }
 
-    @Nonnull
+    @NotNull
     public InvocationChannel<IN, OUT> parallelInvoke() {
 
         return buildRoutine().parallelInvoke();
     }
 
-    @Nonnull
+    @NotNull
     public InvocationChannel<IN, OUT> syncInvoke() {
 
         return buildRoutine().syncInvoke();
     }
 
-    @Nonnull
+    @NotNull
     public Builder<? extends RoutineBuilder<IN, OUT>> invocations() {
 
         return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public RoutineBuilder<IN, OUT> setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -79,7 +79,7 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
      *
      * @return the configuration.
      */
-    @Nonnull
+    @NotNull
     protected InvocationConfiguration getConfiguration() {
 
         return mConfiguration;

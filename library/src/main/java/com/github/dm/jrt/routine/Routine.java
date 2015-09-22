@@ -16,8 +16,8 @@ package com.github.dm.jrt.routine;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This interface defines the main component of the library architecture.
@@ -87,7 +87,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall();
 
     /**
@@ -96,7 +96,7 @@ public interface Routine<IN, OUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable IN input);
 
     /**
@@ -105,7 +105,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable IN... inputs);
 
     /**
@@ -114,7 +114,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
@@ -123,7 +123,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
@@ -131,7 +131,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the invocation channel.
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> asyncInvoke();
 
     /**
@@ -142,7 +142,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall();
 
     /**
@@ -154,7 +154,7 @@ public interface Routine<IN, OUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable IN input);
 
     /**
@@ -163,7 +163,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable IN... inputs);
 
     /**
@@ -172,7 +172,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
@@ -181,7 +181,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
@@ -189,7 +189,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the invocation channel.
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> parallelInvoke();
 
     /**
@@ -207,7 +207,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall();
 
     /**
@@ -216,7 +216,7 @@ public interface Routine<IN, OUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable IN input);
 
     /**
@@ -225,7 +225,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable IN... inputs);
 
     /**
@@ -234,7 +234,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
@@ -243,7 +243,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
@@ -251,6 +251,6 @@ public interface Routine<IN, OUT> {
      *
      * @return the invocation channel.
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> syncInvoke();
 }

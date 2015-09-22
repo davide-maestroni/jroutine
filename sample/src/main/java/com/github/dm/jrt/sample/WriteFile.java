@@ -21,14 +21,14 @@ import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Invocation writing the downloaded data into the output file.
@@ -46,7 +46,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
      *
      * @param file the output file.
      */
-    public WriteFile(@Nonnull final File file) {
+    public WriteFile(@NotNull final File file) {
 
         mFile = file;
     }
@@ -74,7 +74,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
     @Override
     @SuppressWarnings("StatementWithEmptyBody")
-    public void onInput(final ByteBuffer buffer, @Nonnull final ResultChannel<Boolean> result) {
+    public void onInput(final ByteBuffer buffer, @NotNull final ResultChannel<Boolean> result) {
 
         final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
         final BufferedOutputStream outputStream = mOutputStream;
@@ -97,7 +97,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     }
 
     @Override
-    public void onResult(@Nonnull final ResultChannel<Boolean> result) {
+    public void onResult(@NotNull final ResultChannel<Boolean> result) {
 
         closeStream();
         result.pass(true);

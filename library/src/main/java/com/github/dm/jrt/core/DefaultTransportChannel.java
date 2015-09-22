@@ -25,13 +25,13 @@ import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Default implementation of a transport channel.
@@ -51,7 +51,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
      *
      * @param configuration the channel configuration.
      */
-    DefaultTransportChannel(@Nonnull final ChannelConfiguration configuration) {
+    DefaultTransportChannel(@NotNull final ChannelConfiguration configuration) {
 
         final InvocationConfiguration invocationConfiguration =
                 configuration.toOutputChannelConfiguration();
@@ -87,159 +87,159 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mInputChannel.isOpen();
     }
 
-    @Nonnull
-    public TransportChannel<DATA> after(@Nonnull final TimeDuration delay) {
+    @NotNull
+    public TransportChannel<DATA> after(@NotNull final TimeDuration delay) {
 
         mInputChannel.after(delay);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+    @NotNull
+    public TransportChannel<DATA> after(final long delay, @NotNull final TimeUnit timeUnit) {
 
         mInputChannel.after(delay, timeUnit);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> now() {
 
         mInputChannel.now();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> orderByCall() {
 
         mInputChannel.orderByCall();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> orderByChance() {
 
         mInputChannel.orderByChance();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> orderByDelay() {
 
         mInputChannel.orderByDelay();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> pass(@Nullable final OutputChannel<? extends DATA> channel) {
 
         mInputChannel.pass(channel);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> pass(@Nullable final Iterable<? extends DATA> inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> pass(@Nullable final DATA input) {
 
         mInputChannel.pass(input);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> pass(@Nullable final DATA... inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> afterMax(@Nonnull final TimeDuration timeout) {
+    @NotNull
+    public TransportChannel<DATA> afterMax(@NotNull final TimeDuration timeout) {
 
         mOutputChannel.afterMax(timeout);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
+    @NotNull
+    public TransportChannel<DATA> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
         mOutputChannel.afterMax(timeout, timeUnit);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> allInto(@Nonnull final Collection<? super DATA> results) {
+    @NotNull
+    public TransportChannel<DATA> allInto(@NotNull final Collection<? super DATA> results) {
 
         mOutputChannel.allInto(results);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> eventually() {
 
         mOutputChannel.eventually();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> eventuallyExit() {
 
         mOutputChannel.eventuallyExit();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> eventuallyThrow() {
 
         mOutputChannel.eventuallyThrow();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> immediately() {
 
         mOutputChannel.immediately();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> passTo(@Nonnull final OutputConsumer<? super DATA> consumer) {
+    @NotNull
+    public TransportChannel<DATA> passTo(@NotNull final OutputConsumer<? super DATA> consumer) {
 
         mOutputChannel.passTo(consumer);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public InputChannel<DATA> asInput() {
 
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<DATA> asOutput() {
 
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public TransportChannel<DATA> close() {
 
         mInputChannel.close();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public List<DATA> all() {
 
         return mOutputChannel.all();
@@ -265,8 +265,8 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mOutputChannel.isBound();
     }
 
-    @Nonnull
-    public <IN extends InputChannel<? super DATA>> IN passTo(@Nonnull final IN channel) {
+    @NotNull
+    public <IN extends InputChannel<? super DATA>> IN passTo(@NotNull final IN channel) {
 
         return mOutputChannel.passTo(channel);
     }
@@ -294,12 +294,12 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         private DefaultResultChannel<?> mChannel;
 
         public void onAbort(@Nullable final RoutineException reason, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             mChannel.close(reason);
         }
 
-        private void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
+        private void setChannel(@NotNull final DefaultResultChannel<?> channel) {
 
             mChannel = channel;
         }

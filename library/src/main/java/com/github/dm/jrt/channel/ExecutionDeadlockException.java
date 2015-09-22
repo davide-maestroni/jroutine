@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.channel;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating a possible deadlock while waiting for results to become available.

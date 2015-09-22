@@ -31,15 +31,15 @@ import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
@@ -84,8 +84,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceObjectRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final ContextInvocationTarget<?> target) {
+    DefaultServiceObjectRoutineBuilder(@NotNull final ServiceContext context,
+            @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
 
@@ -101,8 +101,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         mTarget = target;
     }
 
-    @Nonnull
-    private static Class<?>[] forNames(@Nonnull final String[] names) throws
+    @NotNull
+    private static Class<?>[] forNames(@NotNull final String[] names) throws
             ClassNotFoundException {
 
         // The forName() of primitive classes is broken...
@@ -129,8 +129,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nullable
-    private static String groupWithShareAnnotation(@Nonnull final ProxyConfiguration configuration,
-            @Nonnull final Method method) {
+    private static String groupWithShareAnnotation(@NotNull final ProxyConfiguration configuration,
+            @NotNull final Method method) {
 
         final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
 
@@ -142,8 +142,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return configuration.getShareGroupOr(null);
     }
 
-    @Nonnull
-    private static String[] toNames(@Nonnull final Class<?>[] classes) {
+    @NotNull
+    private static String[] toNames(@NotNull final Class<?>[] classes) {
 
         final int length = classes.length;
         final String[] names = new String[length];
@@ -156,8 +156,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return names;
     }
 
-    @Nonnull
-    public <IN, OUT> Routine<IN, OUT> aliasMethod(@Nonnull final String name) {
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
@@ -181,14 +181,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .buildRoutine();
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
 
@@ -201,9 +201,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return itf.cast(proxy);
     }
 
-    @Nonnull
-    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final String name,
-            @Nonnull final Class<?>... parameterTypes) {
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
+            @NotNull final Class<?>... parameterTypes) {
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
@@ -220,37 +220,37 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                        .buildRoutine();
     }
 
-    @Nonnull
-    public <IN, OUT> Routine<IN, OUT> method(@Nonnull final Method method) {
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return method(method.getName(), method.getParameterTypes());
     }
 
-    @Nonnull
+    @NotNull
     public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ServiceObjectRoutineBuilder setConfiguration(
-            @Nonnull final ProxyConfiguration configuration) {
+            @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -261,10 +261,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ServiceObjectRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -275,10 +275,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ServiceObjectRoutineBuilder setConfiguration(
-            @Nonnull final ServiceConfiguration configuration) {
+            @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -315,7 +315,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param name       the alias name.
          */
         private MethodAliasInvocation(@Nullable final String shareGroup,
-                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final String name) {
+                @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
 
             mShareGroup = shareGroup;
             mTarget = target;
@@ -323,7 +323,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@Nonnull final Context context) {
+        public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
 
@@ -344,8 +344,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends IN> inputs,
-                @Nonnull final ResultChannel<OUT> result) {
+        protected void onCall(@NotNull final List<? extends IN> inputs,
+                @NotNull final ResultChannel<OUT> result) {
 
             final Routine<IN, OUT> routine = mRoutine;
 
@@ -400,8 +400,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
         private MethodSignatureInvocation(@Nullable final String shareGroup,
-                @Nonnull final ContextInvocationTarget<?> target, @Nonnull final String name,
-                @Nonnull final String[] parameterTypes) throws ClassNotFoundException {
+                @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
+                @NotNull final String[] parameterTypes) throws ClassNotFoundException {
 
             mShareGroup = shareGroup;
             mTarget = target;
@@ -410,8 +410,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<? extends IN> inputs,
-                @Nonnull final ResultChannel<OUT> result) {
+        protected void onCall(@NotNull final List<? extends IN> inputs,
+                @NotNull final ResultChannel<OUT> result) {
 
             final Routine<IN, OUT> routine = mRoutine;
 
@@ -424,7 +424,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@Nonnull final Context context) {
+        public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
 
@@ -488,9 +488,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
         private ProxyInvocation(@Nullable final String shareGroup,
-                @Nonnull final ContextInvocationTarget<?> target,
-                @Nonnull final String targetMethodName,
-                @Nonnull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
+                @NotNull final ContextInvocationTarget<?> target,
+                @NotNull final String targetMethodName,
+                @NotNull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) throws ClassNotFoundException,
                 NoSuchMethodException {
 
@@ -504,8 +504,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@Nonnull final List<?> objects,
-                @Nonnull final ResultChannel<Object> result) {
+        protected void onCall(@NotNull final List<?> objects,
+                @NotNull final ResultChannel<Object> result) {
 
             final Object targetInstance = mInstance;
 
@@ -519,7 +519,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@Nonnull final Context context) {
+        public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
 
@@ -565,7 +565,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          *
          * @param builder the builder instance.
          */
-        private ProxyInvocationHandler(@Nonnull final DefaultServiceObjectRoutineBuilder builder) {
+        private ProxyInvocationHandler(@NotNull final DefaultServiceObjectRoutineBuilder builder) {
 
             mContext = builder.mContext;
             mTarget = builder.mTarget;

@@ -16,10 +16,10 @@ package com.github.dm.jrt.android.v4.core;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TransportChannel;
 
-import java.util.Collection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  * Interface defining a loader invocation result.
@@ -67,7 +67,7 @@ interface InvocationResult<OUT> {
      *                        aborted while passing the results.
      * @return whether the invocation is complete.
      */
-    boolean passTo(@Nonnull Collection<TransportChannel<OUT>> newChannels,
-            @Nonnull Collection<TransportChannel<OUT>> oldChannels,
-            @Nonnull Collection<TransportChannel<OUT>> abortedChannels);
+    boolean passTo(@NotNull Collection<TransportChannel<OUT>> newChannels,
+            @NotNull Collection<TransportChannel<OUT>> oldChannels,
+            @NotNull Collection<TransportChannel<OUT>> abortedChannels);
 }

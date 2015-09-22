@@ -15,9 +15,9 @@ package com.github.dm.jrt.android.invocation;
 
 import com.github.dm.jrt.util.Reflection;
 
-import java.util.Arrays;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
+import java.util.Arrays;
 
 /**
  * Abstract implementation of a context invocation factory.

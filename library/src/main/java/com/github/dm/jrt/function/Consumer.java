@@ -14,9 +14,16 @@
 package com.github.dm.jrt.function;
 
 /**
+ * Interface representing an operation that accepts an input argument and returns no result.
+ * <p/>
  * Created by davide-maestroni on 09/21/2015.
  */
 public interface Consumer<IN> {
 
+    /**
+     * Performs this operation on the given argument.
+     *
+     * @param in the input argument.
+     */
     void accept(IN in);
 }

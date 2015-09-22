@@ -45,12 +45,12 @@ import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.TimeDuration;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -103,10 +103,10 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    LoaderInvocation(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationFactory<IN, OUT> factory,
-            @Nonnull final LoaderConfiguration configuration, @Nullable final OrderType order,
-            @Nonnull final Logger logger) {
+    LoaderInvocation(@NotNull final LoaderContext context,
+            @NotNull final ContextInvocationFactory<IN, OUT> factory,
+            @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
+            @NotNull final Logger logger) {
 
         if (context == null) {
 
@@ -139,7 +139,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param context  the context instance.
      * @param loaderId the loader ID.
      */
-    static void purgeLoader(@Nonnull final LoaderContext context, final int loaderId) {
+    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -198,8 +198,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final LoaderContext context, final int loaderId,
-            @Nonnull final ContextInvocationFactory<?, ?> factory, @Nonnull final List<?> inputs) {
+    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
+            @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -265,8 +265,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final LoaderContext context, final int loaderId,
-            @Nonnull final List<?> inputs) {
+    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
+            @NotNull final List<?> inputs) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -325,8 +325,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      * @param factory  the invocation factory.
      */
-    static void purgeLoaders(@Nonnull final LoaderContext context, final int loaderId,
-            @Nonnull final ContextInvocationFactory<?, ?> factory) {
+    static void purgeLoaders(@NotNull final LoaderContext context, final int loaderId,
+            @NotNull final ContextInvocationFactory<?, ?> factory) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -407,8 +407,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
     @SuppressWarnings("unchecked")
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
             justification = "class comparison with == is done")
-    protected void onCall(@Nonnull final List<? extends IN> inputs,
-            @Nonnull final ResultChannel<OUT> result) {
+    protected void onCall(@NotNull final List<? extends IN> inputs,
+            @NotNull final ResultChannel<OUT> result) {
 
         final LoaderContext context = mContext;
         final Object component = context.getComponent();
@@ -514,11 +514,11 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         }
     }
 
-    @Nonnull
-    private RoutineLoaderCallbacks<OUT> createCallbacks(@Nonnull final Context loaderContext,
-            @Nonnull final LoaderManager loaderManager,
+    @NotNull
+    private RoutineLoaderCallbacks<OUT> createCallbacks(@NotNull final Context loaderContext,
+            @NotNull final LoaderManager loaderManager,
             @Nullable final InvocationLoader<IN, OUT> loader,
-            @Nonnull final List<? extends IN> inputs, final int loaderId) {
+            @NotNull final List<? extends IN> inputs, final int loaderId) {
 
         final Logger logger = mLogger;
         final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
@@ -527,7 +527,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
     }
 
-    @Nonnull
+    @NotNull
     private ContextInvocation<IN, OUT> createInvocation(final int loaderId) {
 
         final Logger logger = mLogger;
@@ -548,12 +548,12 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         return invocation;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("unchecked")
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
     private ClashType getClashType(@Nullable final Loader<InvocationResult<OUT>> loader,
-            final int loaderId, @Nonnull final List<? extends IN> inputs) {
+            final int loaderId, @NotNull final List<? extends IN> inputs) {
 
         if (loader == null) {
 
@@ -636,14 +636,14 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
          * @param invocation the loader invocation instance.
          * @param loaderId   the loader ID.
          */
-        private LoaderContextInvocationFactory(@Nonnull final LoaderInvocation<IN, OUT> invocation,
+        private LoaderContextInvocationFactory(@NotNull final LoaderInvocation<IN, OUT> invocation,
                 final int loaderId) {
 
             mInvocation = invocation;
             mLoaderId = loaderId;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() {
 
@@ -687,8 +687,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
          * @param loader        the loader instance.
          * @param logger        the logger instance.
          */
-        private RoutineLoaderCallbacks(@Nonnull final LoaderManager loaderManager,
-                @Nonnull final InvocationLoader<?, OUT> loader, @Nonnull final Logger logger) {
+        private RoutineLoaderCallbacks(@NotNull final LoaderManager loaderManager,
+                @NotNull final InvocationLoader<?, OUT> loader, @NotNull final Logger logger) {
 
             mLoaderManager = loaderManager;
             mLoader = loader;
@@ -774,7 +774,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             reset(new InvocationClashException(mLoader.getId()));
         }
 
-        @Nonnull
+        @NotNull
         private OutputChannel<OUT> newChannel(@Nullable final Looper looper) {
 
             final Logger logger = mLogger;
@@ -834,7 +834,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             mAbortedChannels.clear();
         }
 
-        private void setCacheStrategy(@Nonnull final CacheStrategyType strategyType) {
+        private void setCacheStrategy(@NotNull final CacheStrategyType strategyType) {
 
             mLogger.dbg("setting cache type: %s", strategyType);
             mCacheStrategyType = strategyType;

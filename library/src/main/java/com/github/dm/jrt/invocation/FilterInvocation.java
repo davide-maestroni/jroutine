@@ -16,8 +16,8 @@ package com.github.dm.jrt.invocation;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation filtering each input and transforming it in output data.
@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
 public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
         implements Invocation<IN, OUT> {
 
-    @Nonnull
+    @NotNull
     @Override
     public final Invocation<IN, OUT> newInvocation() {
 
@@ -51,7 +51,7 @@ public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OU
 
     }
 
-    public final void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public final void onResult(@NotNull final ResultChannel<OUT> result) {
 
     }
 

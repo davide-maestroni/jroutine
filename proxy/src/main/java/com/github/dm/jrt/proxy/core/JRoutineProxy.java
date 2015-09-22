@@ -16,7 +16,7 @@ package com.github.dm.jrt.proxy.core;
 import com.github.dm.jrt.core.InvocationTarget;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
@@ -56,8 +56,8 @@ public class JRoutineProxy {
      * @param target the invocation target.
      * @return the routine builder instance.
      */
-    @Nonnull
-    public static ProxyRoutineBuilder on(@Nonnull final InvocationTarget<?> target) {
+    @NotNull
+    public static ProxyRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
 
         return new DefaultProxyRoutineBuilder(target);
     }

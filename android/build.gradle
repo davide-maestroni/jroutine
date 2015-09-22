@@ -51,16 +51,16 @@ android {
 }
 
 dependencies {
+    androidTestCompile 'org.assertj:assertj-core:1.7.1'
     // Travis does not support an higher version
     compile 'com.android.support:support-v4:21.0.3'
-    androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }
 conditionalDependencies {
     compile name: 'library', artifact: { it.parent.name }
 }
 
 findbugs {
-    toolVersion '3.0.0'
+    toolVersion '3.0.1'
 }
 
 tasks.withType(Javadoc) {

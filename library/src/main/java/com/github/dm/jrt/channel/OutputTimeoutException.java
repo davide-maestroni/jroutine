@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.channel;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that no room in the output channel buffer became available before the

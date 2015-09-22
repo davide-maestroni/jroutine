@@ -16,7 +16,7 @@ package com.github.dm.jrt.android.service;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Parcelable implementation wrapping a generic value.<br/>
@@ -32,12 +32,12 @@ class ParcelableValue implements Parcelable {
      */
     public static final Creator<ParcelableValue> CREATOR = new Creator<ParcelableValue>() {
 
-        public ParcelableValue createFromParcel(@Nonnull final Parcel source) {
+        public ParcelableValue createFromParcel(@NotNull final Parcel source) {
 
             return new ParcelableValue(source.readValue(ParcelableValue.class.getClassLoader()));
         }
 
-        @Nonnull
+        @NotNull
         public ParcelableValue[] newArray(final int size) {
 
             return new ParcelableValue[size];
@@ -61,7 +61,7 @@ class ParcelableValue implements Parcelable {
         return 0;
     }
 
-    public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+    public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
         dest.writeValue(mValue);
     }

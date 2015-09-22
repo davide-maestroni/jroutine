@@ -19,10 +19,10 @@ import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 
@@ -156,7 +156,7 @@ public final class InvocationConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<InvocationConfiguration> builder() {
 
         return new Builder<InvocationConfiguration>(sDefaultConfigurable);
@@ -168,7 +168,7 @@ public final class InvocationConfiguration {
      * @param initialConfiguration the initial configuration.
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<InvocationConfiguration> builderFrom(
             @Nullable final InvocationConfiguration initialConfiguration) {
 
@@ -181,7 +181,7 @@ public final class InvocationConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public Builder<InvocationConfiguration> builderFrom() {
 
         return builderFrom(this);
@@ -497,8 +497,8 @@ public final class InvocationConfiguration {
      * @param context the context.
      * @return the new logger.
      */
-    @Nonnull
-    public Logger newLogger(@Nonnull final Object context) {
+    @NotNull
+    public Logger newLogger(@NotNull final Object context) {
 
         return Logger.newLogger(getLogOr(null), getLogLevelOr(null), context);
     }
@@ -598,8 +598,8 @@ public final class InvocationConfiguration {
          * @param configuration the configuration.
          * @return the configurable instance.
          */
-        @Nonnull
-        TYPE setConfiguration(@Nonnull InvocationConfiguration configuration);
+        @NotNull
+        TYPE setConfiguration(@NotNull InvocationConfiguration configuration);
     }
 
     /**
@@ -679,7 +679,7 @@ public final class InvocationConfiguration {
          * @param configurable the configurable instance.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
 
@@ -701,8 +701,8 @@ public final class InvocationConfiguration {
          * @param initialConfiguration the initial configuration.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final InvocationConfiguration initialConfiguration) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+                @NotNull final InvocationConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -718,7 +718,7 @@ public final class InvocationConfiguration {
          *
          * @return the configurable object.
          */
-        @Nonnull
+        @NotNull
         public TYPE set() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
@@ -732,7 +732,7 @@ public final class InvocationConfiguration {
          * @param configuration the invocation configuration.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
 
             if (configuration == null) {
@@ -756,7 +756,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is negative.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withCoreInstances(final int coreInstances) {
 
             if ((coreInstances != DEFAULT) && (coreInstances < 0)) {
@@ -780,9 +780,9 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withExecutionTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             return withExecutionTimeout(fromUnit(timeout, timeUnit));
         }
@@ -796,7 +796,7 @@ public final class InvocationConfiguration {
          * @param timeout the timeout.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withExecutionTimeout(@Nullable final TimeDuration timeout) {
 
             mExecutionTimeout = timeout;
@@ -813,7 +813,7 @@ public final class InvocationConfiguration {
          * @param actionType the action type.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withExecutionTimeoutAction(
                 @Nullable final TimeoutActionType actionType) {
 
@@ -830,7 +830,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withInputMaxSize(final int inputMaxSize) {
 
             if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
@@ -852,7 +852,7 @@ public final class InvocationConfiguration {
          * @param orderType the order type.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withInputOrder(@Nullable final OrderType orderType) {
 
             mInputOrderType = orderType;
@@ -867,9 +867,9 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withInputTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             return withInputTimeout(fromUnit(timeout, timeUnit));
         }
@@ -881,7 +881,7 @@ public final class InvocationConfiguration {
          * @param timeout the timeout.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withInputTimeout(@Nullable final TimeDuration timeout) {
 
             mInputTimeout = timeout;
@@ -895,7 +895,7 @@ public final class InvocationConfiguration {
          * @param log the log instance.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withLog(@Nullable final Log log) {
 
             mLog = log;
@@ -909,7 +909,7 @@ public final class InvocationConfiguration {
          * @param level the log level.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withLogLevel(@Nullable final LogLevel level) {
 
             mLogLevel = level;
@@ -925,7 +925,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withMaxInstances(final int maxInstances) {
 
             if ((maxInstances != DEFAULT) && (maxInstances < 1)) {
@@ -948,7 +948,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withOutputMaxSize(final int outputMaxSize) {
 
             if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
@@ -970,7 +970,7 @@ public final class InvocationConfiguration {
          * @param orderType the order type.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withOutputOrder(@Nullable final OrderType orderType) {
 
             mOutputOrderType = orderType;
@@ -985,9 +985,9 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withOutputTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             return withOutputTimeout(fromUnit(timeout, timeUnit));
         }
@@ -999,7 +999,7 @@ public final class InvocationConfiguration {
          * @param timeout the timeout.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withOutputTimeout(@Nullable final TimeDuration timeout) {
 
             mOutputTimeout = timeout;
@@ -1014,7 +1014,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @see com.github.dm.jrt.runner.PriorityRunner PriorityRunner
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withPriority(final int priority) {
 
             mPriority = priority;
@@ -1028,14 +1028,14 @@ public final class InvocationConfiguration {
          * @param runner the runner instance.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withRunner(@Nullable final Runner runner) {
 
             mRunner = runner;
             return this;
         }
 
-        private void applyBaseConfiguration(@Nonnull final InvocationConfiguration configuration) {
+        private void applyBaseConfiguration(@NotNull final InvocationConfiguration configuration) {
 
             final Runner runner = configuration.mRunner;
 
@@ -1081,7 +1081,7 @@ public final class InvocationConfiguration {
         }
 
         private void applyChannelConfiguration(
-                @Nonnull final InvocationConfiguration configuration) {
+                @NotNull final InvocationConfiguration configuration) {
 
             final OrderType inputOrderType = configuration.mInputOrderType;
 
@@ -1126,7 +1126,7 @@ public final class InvocationConfiguration {
             }
         }
 
-        private void applyLogConfiguration(@Nonnull final InvocationConfiguration configuration) {
+        private void applyLogConfiguration(@NotNull final InvocationConfiguration configuration) {
 
             final Log log = configuration.mLog;
 
@@ -1143,7 +1143,7 @@ public final class InvocationConfiguration {
             }
         }
 
-        @Nonnull
+        @NotNull
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
@@ -1153,7 +1153,7 @@ public final class InvocationConfiguration {
                                                mLog, mLogLevel);
         }
 
-        private void setConfiguration(@Nonnull final InvocationConfiguration configuration) {
+        private void setConfiguration(@NotNull final InvocationConfiguration configuration) {
 
             mRunner = configuration.mRunner;
             mPriority = configuration.mPriority;
@@ -1177,9 +1177,9 @@ public final class InvocationConfiguration {
      */
     private static class DefaultConfigurable implements Configurable<InvocationConfiguration> {
 
-        @Nonnull
+        @NotNull
         public InvocationConfiguration setConfiguration(
-                @Nonnull final InvocationConfiguration configuration) {
+                @NotNull final InvocationConfiguration configuration) {
 
             return configuration;
         }

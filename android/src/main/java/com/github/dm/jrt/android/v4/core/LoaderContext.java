@@ -286,7 +286,7 @@ public abstract class LoaderContext {
 
             final Class<? extends Context> contextClass = context.getClass();
 
-            if (!Reflection.isStaticClass(contextClass)) {
+            if (!Reflection.hasStaticContext(contextClass)) {
 
                 throw new IllegalArgumentException(
                         "the context class must be static: " + contextClass.getName());
@@ -356,7 +356,7 @@ public abstract class LoaderContext {
 
             final Class<? extends Context> contextClass = context.getClass();
 
-            if (!Reflection.isStaticClass(contextClass)) {
+            if (!Reflection.hasStaticContext(contextClass)) {
 
                 throw new IllegalArgumentException(
                         "the context class must be static: " + contextClass.getName());

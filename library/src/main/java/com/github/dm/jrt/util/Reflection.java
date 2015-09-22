@@ -140,9 +140,9 @@ public class Reflection {
      * Checks if the specified class is static or is a top level class.
      *
      * @param type the class.
-     * @return whether the class is static or a top level class.
+     * @return whether the class has a static context.
      */
-    public static boolean isStaticClass(@Nonnull final Class<?> type) {
+    public static boolean hasStaticContext(@Nonnull final Class<?> type) {
 
         return ((type.getEnclosingClass() == null) || Modifier.isStatic(type.getModifiers()));
     }

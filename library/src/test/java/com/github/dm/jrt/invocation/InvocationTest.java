@@ -15,7 +15,12 @@ package com.github.dm.jrt.invocation;
 
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
@@ -31,6 +36,168 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 02/16/2015.
  */
 public class InvocationTest {
+
+    private static final Supplier<Invocation<Object, Object>> sSupplier =
+            new Supplier<Invocation<Object, Object>>() {
+
+                public Invocation<Object, Object> get() {
+
+                    return PassingInvocation.factoryOf().newInvocation();
+                }
+            };
+
+    private static InvocationFactory<Object, String> createFactory() {
+
+        return Invocations.factory(new Supplier<Invocation<Object, String>>() {
+
+            public Invocation<Object, String> get() {
+
+                return new FilterInvocation<Object, String>() {
+
+                    public void onInput(final Object input,
+                            @NotNull final ResultChannel<String> result) {
+
+                        result.pass(input.toString());
+                    }
+                };
+            }
+        });
+    }
+
+    private static FilterInvocation<Object, String> createFilter() {
+
+        return Invocations.filter(new BiConsumer<Object, ResultChannel<String>>() {
+
+            public void accept(final Object o, final ResultChannel<String> result) {
+
+                result.pass(o.toString());
+            }
+        });
+    }
+
+    private static ProcedureInvocation<String> createProcedure() {
+
+        return Invocations.procedure(new Consumer<ResultChannel<String>>() {
+
+            public void accept(final ResultChannel<String> result) {
+
+                result.pass("test");
+            }
+        });
+    }
+
+    @Test
+    public void testFactory() {
+
+        final Routine<Object, String> routine = JRoutine.on(createFactory()).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test", "1");
+    }
+
+    @Test
+    public void testFactoryEquals() {
+
+        final InvocationFactory<Object, String> factory = createFactory();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo(createFilter());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(factory.hashCode()).isNotEqualTo(createFactory().hashCode());
+        final Supplier<Invocation<Object, Object>> supplier = sSupplier;
+        assertThat(Invocations.factory(supplier)).isEqualTo(Invocations.factory(supplier));
+        assertThat(Invocations.factory(supplier).hashCode()).isEqualTo(
+                Invocations.factory(supplier).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testFactoryError() {
+
+        try {
+
+            Invocations.factory(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(Invocations.factory(new Supplier<Invocation<Object, String>>() {
+
+                public Invocation<Object, String> get() {
+
+                    return new FilterInvocation<Object, String>() {
+
+                        public void onInput(final Object input,
+                                @NotNull final ResultChannel<String> result) {
+
+                            result.pass(input.toString());
+                        }
+                    };
+                }
+            })).buildRoutine();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testFilter() {
+
+        final Routine<Object, String> routine = JRoutine.on(createFilter()).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test", "1");
+    }
+
+    @Test
+    public void testFilterEquals() {
+
+        final InvocationFactory<Object, String> factory = createFilter();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createFilter());
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(factory.hashCode()).isNotEqualTo(createFilter().hashCode());
+        final Functions.BiConsumer<Object, ResultChannel<String>> sink = Functions.biSink();
+        assertThat(Invocations.filter(sink)).isEqualTo(Invocations.filter(sink));
+        assertThat(Invocations.filter(sink).hashCode()).isEqualTo(
+                Invocations.filter(sink).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testFilterError() {
+
+        try {
+
+            Invocations.filter(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(Invocations.filter(new BiConsumer<Object, ResultChannel<String>>() {
+
+                public void accept(final Object o, final ResultChannel<String> result) {
+
+                    result.pass(o.toString());
+                }
+            })).buildRoutine();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
 
     @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
@@ -183,6 +350,59 @@ public class InvocationTest {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testProcedure() {
+
+        final Routine<Void, String> routine = JRoutine.on(createProcedure()).buildRoutine();
+        assertThat(routine.asyncCall().eventually().all()).containsOnly("test");
+    }
+
+    @Test
+    public void testProcedureEquals() {
+
+        final InvocationFactory<Void, String> factory = createProcedure();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createProcedure());
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(factory.hashCode()).isNotEqualTo(createProcedure().hashCode());
+        final Functions.Consumer<ResultChannel<String>> sink = Functions.sink();
+        assertThat(Invocations.procedure(sink)).isEqualTo(Invocations.procedure(sink));
+        assertThat(Invocations.procedure(sink).hashCode()).isEqualTo(
+                Invocations.procedure(sink).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testProcedureError() {
+
+        try {
+
+            Invocations.procedure(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(Invocations.procedure(new Consumer<ResultChannel<String>>() {
+
+                public void accept(final ResultChannel<String> result) {
+
+                    result.pass("test");
+                }
+            })).buildRoutine();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }

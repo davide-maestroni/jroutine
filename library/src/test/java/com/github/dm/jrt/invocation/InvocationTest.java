@@ -17,6 +17,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
@@ -75,6 +76,17 @@ public class InvocationTest {
         });
     }
 
+    private static FilterInvocation<Object, String> createFilter2() {
+
+        return Invocations.filter(new Function<Object, String>() {
+
+            public String apply(final Object o) {
+
+                return o.toString();
+            }
+        });
+    }
+
     private static ProcedureInvocation<String> createProcedure() {
 
         return Invocations.procedure(new Consumer<ResultChannel<String>>() {
@@ -82,6 +94,17 @@ public class InvocationTest {
             public void accept(final ResultChannel<String> result) {
 
                 result.pass("test");
+            }
+        });
+    }
+
+    private static ProcedureInvocation<String> createProcedure2() {
+
+        return Invocations.procedure(new Supplier<String>() {
+
+            public String get() {
+
+                return "test";
             }
         });
     }
@@ -154,6 +177,59 @@ public class InvocationTest {
     }
 
     @Test
+    public void testFilter2() {
+
+        final Routine<Object, String> routine = JRoutine.on(createFilter2()).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test", "1");
+    }
+
+    @Test
+    public void testFilter2Equals() {
+
+        final InvocationFactory<Object, String> factory = createFilter2();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createFilter2());
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(factory.hashCode()).isNotEqualTo(createFilter2().hashCode());
+        final Functions.Function<Object, ? super Object> identity = Functions.identity();
+        assertThat(Invocations.filter(identity)).isEqualTo(Invocations.filter(identity));
+        assertThat(Invocations.filter(identity).hashCode()).isEqualTo(
+                Invocations.filter(identity).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testFilter2Error() {
+
+        try {
+
+            Invocations.filter((Function<Object, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(Invocations.filter(new Function<Object, Object>() {
+
+                public Object apply(final Object o) {
+
+                    return o.toString();
+                }
+            })).buildRoutine();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testFilterEquals() {
 
         final InvocationFactory<Object, String> factory = createFilter();
@@ -174,7 +250,7 @@ public class InvocationTest {
 
         try {
 
-            Invocations.filter(null);
+            Invocations.filter((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -362,6 +438,59 @@ public class InvocationTest {
     }
 
     @Test
+    public void testProcedure2() {
+
+        final Routine<Void, String> routine = JRoutine.on(createProcedure2()).buildRoutine();
+        assertThat(routine.asyncCall().eventually().all()).containsOnly("test");
+    }
+
+    @Test
+    public void testProcedure2Equals() {
+
+        final InvocationFactory<Void, String> factory = createProcedure2();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createProcedure2());
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(factory.hashCode()).isNotEqualTo(createProcedure2().hashCode());
+        final Functions.Supplier<String> constant = Functions.constant("test");
+        assertThat(Invocations.procedure(constant)).isEqualTo(Invocations.procedure(constant));
+        assertThat(Invocations.procedure(constant).hashCode()).isEqualTo(
+                Invocations.procedure(constant).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testProcedure2Error() {
+
+        try {
+
+            Invocations.procedure((Supplier<Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(Invocations.procedure(new Supplier<Object>() {
+
+                public Object get() {
+
+                    return "test";
+                }
+            })).buildRoutine();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testProcedureEquals() {
 
         final InvocationFactory<Void, String> factory = createProcedure();
@@ -382,7 +511,7 @@ public class InvocationTest {
 
         try {
 
-            Invocations.procedure(null);
+            Invocations.procedure((Consumer<ResultChannel<Object>>) null);
 
             fail();
 

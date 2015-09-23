@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -102,6 +103,25 @@ public class Functions {
     }
 
     /**
+     * Returns a supplier always returning the same result.<br/>
+     * The returned object will support concatenation and synchronization.
+     *
+     * @param result the result.
+     * @param <OUT>  the output data type.
+     * @return the wrapped supplier.
+     */
+    public static <OUT> Supplier<OUT> constant(final OUT result) {
+
+        return supplier(new com.github.dm.jrt.function.Supplier<OUT>() {
+
+            public OUT get() {
+
+                return result;
+            }
+        });
+    }
+
+    /**
      * Wraps the specified consumer instance so to provide additional features.<br/>
      * The returned object will support concatenation and synchronization.
      *
@@ -174,6 +194,22 @@ public class Functions {
         return (Consumer<IN>) sSink;
     }
 
+    /**
+     * Wraps the specified supplier instance so to provide additional features.<br/>
+     * The returned object will support concatenation and synchronization.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the wrapped supplier.
+     */
+    public static <OUT> Supplier<OUT> supplier(
+            @NotNull final com.github.dm.jrt.function.Supplier<OUT> supplier) {
+
+        return new Supplier<OUT>(supplier,
+                                 Collections.<com.github.dm.jrt.function.Function<?, ?>>emptyList
+                                         ());
+    }
+
     @NotNull
     private static Object getMutex(@NotNull final Object function) {
 
@@ -242,19 +278,48 @@ public class Functions {
         }
 
         /**
+         * Checks if this bi-consumer instance has a static context.
+         *
+         * @return whether this instance has a static context.
+         */
+        public boolean hasStaticContext() {
+
+            for (final com.github.dm.jrt.function.BiConsumer<?, ?> consumer : mConsumers) {
+
+                final boolean isStaticContext;
+                final Class<? extends com.github.dm.jrt.function.BiConsumer> consumerClass =
+                        consumer.getClass();
+
+                if (consumerClass == BiConsumer.class) {
+
+                    isStaticContext = ((BiConsumer) consumer).hasStaticContext();
+
+                } else {
+
+                    isStaticContext = Reflection.hasStaticContext(consumerClass);
+                }
+
+                if (!isStaticContext) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
          * Performs this operation on the given arguments.
          *
          * @param in1 the first input argument.
          * @param in2 the second input argument.
          */
-        @SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
+        @SuppressWarnings("unchecked")
         public void accept(final IN1 in1, final IN2 in2) {
 
             for (final com.github.dm.jrt.function.BiConsumer<?, ?> consumer : mConsumers) {
 
-                final Object mutex = getMutex(consumer);
-
-                synchronized (mutex) {
+                synchronized (getMutex(consumer)) {
 
                     ((com.github.dm.jrt.function.BiConsumer<Object, Object>) consumer).accept(in1,
                                                                                               in2);
@@ -308,18 +373,47 @@ public class Functions {
         }
 
         /**
+         * Checks if this consumer instance has a static context.
+         *
+         * @return whether this instance has a static context.
+         */
+        public boolean hasStaticContext() {
+
+            for (final com.github.dm.jrt.function.Consumer<?> consumer : mConsumers) {
+
+                final boolean isStaticContext;
+                final Class<? extends com.github.dm.jrt.function.Consumer> consumerClass =
+                        consumer.getClass();
+
+                if (consumerClass == Consumer.class) {
+
+                    isStaticContext = ((Consumer) consumer).hasStaticContext();
+
+                } else {
+
+                    isStaticContext = Reflection.hasStaticContext(consumerClass);
+                }
+
+                if (!isStaticContext) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
          * Performs this operation on the given argument.
          *
          * @param in the input argument.
          */
-        @SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
+        @SuppressWarnings("unchecked")
         public void accept(final IN in) {
 
             for (final com.github.dm.jrt.function.Consumer<?> consumer : mConsumers) {
 
-                final Object mutex = getMutex(consumer);
-
-                synchronized (mutex) {
+                synchronized (getMutex(consumer)) {
 
                     ((com.github.dm.jrt.function.Consumer<Object>) consumer).accept(in);
                 }
@@ -374,8 +468,8 @@ public class Functions {
         }
 
         /**
-         * Returns a composed function that first applies this function to its input, and then
-         * applies the after function to the result.
+         * Returns a composed function that first applies the before function to its input, and then
+         * applies this function to the result.
          *
          * @param before   the function to apply before this function is applied.
          * @param <BEFORE> the type of input to the before function.
@@ -400,21 +494,170 @@ public class Functions {
         }
 
         /**
+         * Checks if this function instance has a static context.
+         *
+         * @return whether this instance has a static context.
+         */
+        public boolean hasStaticContext() {
+
+            for (final com.github.dm.jrt.function.Function<?, ?> function : mFunctions) {
+
+                final boolean isStaticContext;
+                final Class<? extends com.github.dm.jrt.function.Function> functionClass =
+                        function.getClass();
+
+                if (functionClass == Function.class) {
+
+                    isStaticContext = ((Function) function).hasStaticContext();
+
+                } else {
+
+                    isStaticContext = Reflection.hasStaticContext(functionClass);
+                }
+
+                if (!isStaticContext) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
          * Applies this function to the given argument.
          *
          * @param in the input argument.
          * @return the function result.
          */
-        @SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
+        @SuppressWarnings("unchecked")
         public OUT apply(final IN in) {
 
             Object result = in;
 
             for (final com.github.dm.jrt.function.Function<?, ?> function : mFunctions) {
 
-                final Object mutex = getMutex(function);
+                synchronized (getMutex(function)) {
 
-                synchronized (mutex) {
+                    result = ((com.github.dm.jrt.function.Function<Object, Object>) function).apply(
+                            result);
+                }
+            }
+
+            return (OUT) result;
+        }
+    }
+
+    /**
+     * Class wrapping a supplier instance.
+     *
+     * @param <OUT> the output data type.
+     */
+    public static class Supplier<OUT> implements com.github.dm.jrt.function.Supplier<OUT> {
+
+        private final List<com.github.dm.jrt.function.Function<?, ?>> mFunctions;
+
+        private final com.github.dm.jrt.function.Supplier<?> mSupplier;
+
+        /**
+         * Constructor.
+         *
+         * @param supplier  the initial wrapped supplier.
+         * @param functions the list of wrapped functions.
+         */
+        private Supplier(@NotNull final com.github.dm.jrt.function.Supplier<?> supplier,
+                @NotNull final List<com.github.dm.jrt.function.Function<?, ?>> functions) {
+
+            mSupplier = supplier;
+            mFunctions = functions;
+        }
+
+        /**
+         * Returns a composed supplier that first gets this supplier result, and then
+         * applies the after function to it.
+         *
+         * @param after   the function to apply after this function is applied.
+         * @param <AFTER> the type of output of the after function.
+         * @return the composed function.
+         */
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public <AFTER> Supplier<AFTER> andThen(
+                @NotNull final com.github.dm.jrt.function.Function<? super OUT, AFTER> after) {
+
+            if (after == null) {
+
+                throw new NullPointerException("the after function must not be null");
+            }
+
+            final List<com.github.dm.jrt.function.Function<?, ?>> functions = mFunctions;
+            final ArrayList<com.github.dm.jrt.function.Function<?, ?>> newFunctions =
+                    new ArrayList<com.github.dm.jrt.function.Function<?, ?>>(functions.size() + 1);
+            newFunctions.addAll(functions);
+            newFunctions.add(after);
+            return new Supplier<AFTER>(mSupplier, newFunctions);
+        }
+
+        /**
+         * Checks if this supplier instance has a static context.
+         *
+         * @return whether this instance has a static context.
+         */
+        public boolean hasStaticContext() {
+
+            final com.github.dm.jrt.function.Supplier<?> supplier = mSupplier;
+            final Class<? extends com.github.dm.jrt.function.Supplier> supplierClass =
+                    supplier.getClass();
+
+            if (((supplierClass == Supplier.class) && !((Supplier) supplier).hasStaticContext())
+                    || !Reflection.hasStaticContext(supplierClass)) {
+
+                return false;
+            }
+
+            for (final com.github.dm.jrt.function.Function<?, ?> function : mFunctions) {
+
+                final boolean isStaticContext;
+                final Class<? extends com.github.dm.jrt.function.Function> functionClass =
+                        function.getClass();
+
+                if (functionClass == Function.class) {
+
+                    isStaticContext = ((Function) function).hasStaticContext();
+
+                } else {
+
+                    isStaticContext = Reflection.hasStaticContext(functionClass);
+                }
+
+                if (!isStaticContext) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
+         * Gets a result.
+         *
+         * @return a result.
+         */
+        @SuppressWarnings("unchecked")
+        public OUT get() {
+
+            Object result;
+            final com.github.dm.jrt.function.Supplier<?> supplier = mSupplier;
+
+            synchronized (getMutex(supplier)) {
+
+                result = supplier.get();
+            }
+
+            for (final com.github.dm.jrt.function.Function<?, ?> function : mFunctions) {
+
+                synchronized (getMutex(function)) {
 
                     result = ((com.github.dm.jrt.function.Function<Object, Object>) function).apply(
                             result);

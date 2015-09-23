@@ -150,7 +150,8 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified invocation factory.<br/>
-     * In order to prevent undesired leaks, the class of the specified factory must be static.
+     * In order to prevent undesired leaks, the class of the specified factory must have a
+     * static context.
      *
      * @param factory the invocation factory.
      * @param <IN>    the input data type.

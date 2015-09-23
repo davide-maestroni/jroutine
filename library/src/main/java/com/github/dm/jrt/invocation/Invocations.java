@@ -28,6 +28,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Utility class for creating invocation factory objects.
  * <p/>
@@ -267,6 +269,8 @@ public class Invocations {
          *
          * @param consumer the consumer instance.
          */
+        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+                justification = "class comparison with == is done")
         private ConsumerFilterInvocation(
                 @NotNull final BiConsumer<IN, ResultChannel<OUT>> consumer) {
 
@@ -325,6 +329,8 @@ public class Invocations {
          *
          * @param consumer the consumer instance.
          */
+        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+                justification = "class comparison with == is done")
         public ConsumerProcedureInvocation(final Consumer<ResultChannel<OUT>> consumer) {
 
             final Class<? extends Consumer> consumerClass = consumer.getClass();
@@ -454,6 +460,8 @@ public class Invocations {
          *
          * @param function the function instance.
          */
+        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+                justification = "class comparison with == is done")
         private FunctionFilterInvocation(@NotNull final Function<IN, ? extends OUT> function) {
 
             final Class<? extends Function> functionClass = function.getClass();
@@ -513,6 +521,8 @@ public class Invocations {
          *
          * @param supplier the supplier function.
          */
+        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+                justification = "class comparison with == is done")
         private SupplierInvocationFactory(
                 @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
 
@@ -574,6 +584,8 @@ public class Invocations {
          *
          * @param supplier the supplier instance.
          */
+        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+                justification = "class comparison with == is done")
         public SupplierProcedureInvocation(final Supplier<? extends OUT> supplier) {
 
             final Class<? extends Supplier> supplierClass = supplier.getClass();

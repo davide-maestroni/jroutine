@@ -47,7 +47,7 @@ class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
         if (!Reflection.hasStaticContext(factoryClass)) {
 
             throw new IllegalArgumentException(
-                    "the factory class must be static: " + factoryClass.getName());
+                    "the factory class must have a static context: " + factoryClass.getName());
         }
 
         mFactory = factory;

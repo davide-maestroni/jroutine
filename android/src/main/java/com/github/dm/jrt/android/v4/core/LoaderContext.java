@@ -289,7 +289,7 @@ public abstract class LoaderContext {
             if (!Reflection.hasStaticContext(contextClass)) {
 
                 throw new IllegalArgumentException(
-                        "the context class must be static: " + contextClass.getName());
+                        "the context class must have a static context: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);
@@ -359,7 +359,7 @@ public abstract class LoaderContext {
             if (!Reflection.hasStaticContext(contextClass)) {
 
                 throw new IllegalArgumentException(
-                        "the context class must be static: " + contextClass.getName());
+                        "the context class must have a static context: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);

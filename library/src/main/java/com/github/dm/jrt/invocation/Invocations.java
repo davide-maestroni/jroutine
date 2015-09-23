@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -55,7 +56,7 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> factory(
+    public static <IN, OUT> InvocationFactory<IN, OUT> factoryFrom(
             @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
 
         return new SupplierInvocationFactory<IN, OUT>(supplier);
@@ -199,8 +200,8 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FilterInvocation<IN, OUT> filter(
-            @NotNull final BiConsumer<IN, ResultChannel<OUT>> consumer) {
+    public static <IN, OUT> FilterInvocation<IN, OUT> filterFrom(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
         return new ConsumerFilterInvocation<IN, OUT>(consumer);
     }
@@ -216,10 +217,47 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FilterInvocation<IN, OUT> filter(
-            @NotNull final Function<IN, ? extends OUT> function) {
+    public static <IN, OUT> FilterInvocation<IN, OUT> filterFrom(
+            @NotNull final Function<? super IN, ? extends OUT> function) {
 
         return new FunctionFilterInvocation<IN, OUT>(function);
+    }
+
+    /**
+     * Builds and returns a new function invocation factory based on the specified bi-consumer
+     * instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
+     * static context.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> functionFrom(
+            @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
+                    consumer) {
+
+        return new ConsumerInvocationFactory<IN, OUT>(consumer);
+    }
+
+    /**
+     * Builds and returns a new function invocation factory based on the specified function
+     * instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * context.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> functionFrom(
+            @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
+
+        return new FunctionInvocationFactory<IN, OUT>(function);
     }
 
     /**
@@ -232,8 +270,8 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <OUT> ProcedureInvocation<OUT> procedure(
-            @NotNull final Consumer<ResultChannel<OUT>> consumer) {
+    public static <OUT> ProcedureInvocation<OUT> procedureFrom(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return new ConsumerProcedureInvocation<OUT>(consumer);
     }
@@ -248,7 +286,7 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <OUT> ProcedureInvocation<OUT> procedure(
+    public static <OUT> ProcedureInvocation<OUT> procedureFrom(
             @NotNull final Supplier<? extends OUT> supplier) {
 
         return new SupplierProcedureInvocation<OUT>(supplier);
@@ -262,7 +300,7 @@ public class Invocations {
      */
     private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final BiConsumer<IN, ResultChannel<OUT>> mConsumer;
+        private final BiConsumer<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
@@ -272,7 +310,7 @@ public class Invocations {
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
         private ConsumerFilterInvocation(
-                @NotNull final BiConsumer<IN, ResultChannel<OUT>> consumer) {
+                @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
             final Class<? extends BiConsumer> consumerClass = consumer.getClass();
 
@@ -280,7 +318,7 @@ public class Invocations {
                     .hasStaticContext()) || !Reflection.hasStaticContext(consumerClass)) {
 
                 throw new IllegalArgumentException(
-                        "the bi-consumer class must be static: " + consumerClass);
+                        "the bi-consumer class must have a static context: " + consumerClass);
             }
 
             mConsumer = consumer;
@@ -316,13 +354,14 @@ public class Invocations {
     }
 
     /**
-     * Procedure invocation based on a consumer instance.
+     * Factory of function invocations based on a bi-consumer instance.
      *
+     * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class ConsumerProcedureInvocation<OUT> extends ProcedureInvocation<OUT> {
+    private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final Consumer<ResultChannel<OUT>> mConsumer;
+        private final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
@@ -331,7 +370,78 @@ public class Invocations {
          */
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
-        public ConsumerProcedureInvocation(final Consumer<ResultChannel<OUT>> consumer) {
+        private ConsumerInvocationFactory(
+                @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
+                        consumer) {
+
+            final Class<? extends BiConsumer> consumerClass = consumer.getClass();
+
+            if (((consumerClass == Functions.BiConsumer.class) && !((Functions.BiConsumer) consumer)
+                    .hasStaticContext()) || !Reflection.hasStaticContext(consumerClass)) {
+
+                throw new IllegalArgumentException(
+                        "the bi-consumer class must have a static context: " + consumerClass);
+            }
+
+            mConsumer = consumer;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return new FunctionInvocation<IN, OUT>() {
+
+                @Override
+                protected void onCall(@NotNull final List<? extends IN> inputs,
+                        @NotNull final ResultChannel<OUT> result) {
+
+                    mConsumer.accept(inputs, result);
+                }
+            };
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mConsumer.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ConsumerInvocationFactory)) {
+
+                return false;
+            }
+
+            final ConsumerInvocationFactory<?, ?> that = (ConsumerInvocationFactory<?, ?>) o;
+            return mConsumer.equals(that.mConsumer);
+        }
+    }
+
+    /**
+     * Procedure invocation based on a consumer instance.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class ConsumerProcedureInvocation<OUT> extends ProcedureInvocation<OUT> {
+
+        private final Consumer<? super ResultChannel<OUT>> mConsumer;
+
+        /**
+         * Constructor.
+         *
+         * @param consumer the consumer instance.
+         */
+        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+                justification = "class comparison with == is done")
+        public ConsumerProcedureInvocation(final Consumer<? super ResultChannel<OUT>> consumer) {
 
             final Class<? extends Consumer> consumerClass = consumer.getClass();
 
@@ -340,7 +450,7 @@ public class Invocations {
                     || !Reflection.hasStaticContext(consumerClass)) {
 
                 throw new IllegalArgumentException(
-                        "the consumer class must be static: " + consumerClass);
+                        "the consumer class must have a static context: " + consumerClass);
             }
 
             mConsumer = consumer;
@@ -453,7 +563,7 @@ public class Invocations {
      */
     private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final Function<IN, ? extends OUT> mFunction;
+        private final Function<? super IN, ? extends OUT> mFunction;
 
         /**
          * Constructor.
@@ -462,7 +572,8 @@ public class Invocations {
          */
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
-        private FunctionFilterInvocation(@NotNull final Function<IN, ? extends OUT> function) {
+        private FunctionFilterInvocation(
+                @NotNull final Function<? super IN, ? extends OUT> function) {
 
             final Class<? extends Function> functionClass = function.getClass();
 
@@ -471,7 +582,7 @@ public class Invocations {
                     || !Reflection.hasStaticContext(functionClass)) {
 
                 throw new IllegalArgumentException(
-                        "the function class must be static: " + functionClass);
+                        "the function class must have a static context: " + functionClass);
             }
 
             mFunction = function;
@@ -507,6 +618,76 @@ public class Invocations {
     }
 
     /**
+     * Factory of function invocations based on a function instance.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
+        private final Function<? super List<? extends IN>, ? extends OUT> mFunction;
+
+        /**
+         * Constructor.
+         *
+         * @param function the function instance.
+         */
+        private FunctionInvocationFactory(
+                @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
+
+            final Class<? extends Function> functionClass = function.getClass();
+
+            if (((functionClass == Functions.Function.class)
+                    && !((Functions.Function) function).hasStaticContext())
+                    || !Reflection.hasStaticContext(functionClass)) {
+
+                throw new IllegalArgumentException(
+                        "the function class must have a static context: " + functionClass);
+            }
+
+            mFunction = function;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return new FunctionInvocation<IN, OUT>() {
+
+                @Override
+                protected void onCall(@NotNull final List<? extends IN> inputs,
+                        @NotNull final ResultChannel<OUT> result) {
+
+                    result.pass(mFunction.apply(inputs));
+                }
+            };
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mFunction.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof FunctionInvocationFactory)) {
+
+                return false;
+            }
+
+            final FunctionInvocationFactory<?, ?> that = (FunctionInvocationFactory<?, ?>) o;
+            return mFunction.equals(that.mFunction);
+        }
+    }
+
+    /**
      * Implementation of an invocation factory based on a supplier function.
      *
      * @param <IN>  the input data type.
@@ -533,7 +714,7 @@ public class Invocations {
                     || !Reflection.hasStaticContext(supplierClass)) {
 
                 throw new IllegalArgumentException(
-                        "the supplier class must be static: " + supplierClass);
+                        "the supplier class must have a static context: " + supplierClass);
             }
 
             mSupplier = supplier;
@@ -595,7 +776,7 @@ public class Invocations {
                     || !Reflection.hasStaticContext(supplierClass)) {
 
                 throw new IllegalArgumentException(
-                        "the supplier class must be static: " + supplierClass);
+                        "the supplier class must have a static context: " + supplierClass);
             }
 
             mSupplier = supplier;

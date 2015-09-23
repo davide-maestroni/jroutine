@@ -11,6 +11,10 @@ android:
     # The SDK version
     - android-22
 
+    # Extras
+    - extra-android-support
+    - extra-android-m2repository
+
 # Env configuration
 env:
   matrix:

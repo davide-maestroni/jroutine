@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 21 // Travis does not support an higher version
+        targetSdkVersion 22 // Travis does not support an higher version
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
@@ -59,7 +59,7 @@ dependencies {
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
     apt project(':androidprocessor')
     // Travis does not support an higher version
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:22.2.1'
 }
 conditionalDependencies {
     compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }

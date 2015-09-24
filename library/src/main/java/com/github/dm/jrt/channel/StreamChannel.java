@@ -22,136 +22,130 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Interface defining a transport channel.
- * <p/>
- * A transport channel is useful to make other asynchronous tasks communicate with a routine.<br/>
- * The channel output can be passed to a routine input channel in order to feed it with data coming
- * asynchronously from other sources. Note however that, in any case, the {@code close()} method
- * must be called in order to correctly terminate the invocation lifecycle.
- * <p/>
- * Created by davide-maestroni on 10/25/2014.
- *
- * @param <DATA> the data type.
+ * Created by davide-maestroni on 09/24/2015.
  */
-public interface TransportChannel<DATA> extends IOChannel<DATA, DATA> {
+public interface StreamChannel<IN, OUT> extends IOChannel<IN, OUT> {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> after(@NotNull TimeDuration delay);
+    StreamChannel<IN, OUT> after(@NotNull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> after(long delay, @NotNull TimeUnit timeUnit);
+    StreamChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> now();
+    StreamChannel<IN, OUT> now();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> orderByCall();
+    StreamChannel<IN, OUT> orderByCall();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> orderByChance();
+    StreamChannel<IN, OUT> orderByChance();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> orderByDelay();
+    StreamChannel<IN, OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> pass(@Nullable OutputChannel<? extends DATA> channel);
+    StreamChannel<IN, OUT> pass(@Nullable OutputChannel<? extends IN> channel);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> pass(@Nullable Iterable<? extends DATA> inputs);
+    StreamChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> pass(@Nullable DATA input);
+    StreamChannel<IN, OUT> pass(@Nullable IN input);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> pass(@Nullable DATA... inputs);
+    StreamChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> afterMax(@NotNull TimeDuration timeout);
+    StreamChannel<IN, OUT> afterMax(@NotNull TimeDuration timeout);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> afterMax(long timeout, @NotNull TimeUnit timeUnit);
+    StreamChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> allInto(@NotNull Collection<? super DATA> results);
+    StreamChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> eventually();
+    StreamChannel<IN, OUT> eventually();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> eventuallyAbort();
+    StreamChannel<IN, OUT> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> eventuallyExit();
+    StreamChannel<IN, OUT> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> eventuallyThrow();
+    StreamChannel<IN, OUT> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> immediately();
+    StreamChannel<IN, OUT> immediately();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> passTo(@NotNull OutputConsumer<? super DATA> consumer);
+    StreamChannel<IN, OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    TransportChannel<DATA> close();
+    StreamChannel<IN, OUT> close();
+
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> concat(@NotNull StreamChannel<? super OUT, AFTER> after);
 }

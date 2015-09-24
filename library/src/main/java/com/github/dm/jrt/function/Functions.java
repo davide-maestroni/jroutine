@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Utility class supporting functional programming.
  * <p/>
@@ -33,7 +35,7 @@ public class Functions {
             new WeakIdentityHashMap<Object, Object>();
 
     private static final BiConsumer<?, ?> sBiSink =
-            biConsumer(new com.github.dm.jrt.function.BiConsumer<Object, Object>() {
+            newBiConsumer(new com.github.dm.jrt.function.BiConsumer<Object, Object>() {
 
                 public void accept(final Object in1, final Object in2) {
 
@@ -41,7 +43,7 @@ public class Functions {
             });
 
     private static final Function<?, ?> sIdentity =
-            function(new com.github.dm.jrt.function.Function<Object, Object>() {
+            newFunction(new com.github.dm.jrt.function.Function<Object, Object>() {
 
                 public Object apply(final Object in) {
 
@@ -50,7 +52,7 @@ public class Functions {
             });
 
     private static final Consumer<?> sSink =
-            consumer(new com.github.dm.jrt.function.Consumer<Object>() {
+            newConsumer(new com.github.dm.jrt.function.Consumer<Object>() {
 
                 public void accept(final Object in) {
 
@@ -62,29 +64,6 @@ public class Functions {
      */
     protected Functions() {
 
-    }
-
-    /**
-     * Wraps the specified bi-consumer instance so to provide additional features.<br/>
-     * The returned object will support concatenation and synchronization.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN1>    the first input data type.
-     * @param <IN2>    the second input data type.
-     * @return the wrapped bi-consumer.
-     */
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public static <IN1, IN2> BiConsumer<IN1, IN2> biConsumer(
-            @NotNull final com.github.dm.jrt.function.BiConsumer<IN1, IN2> consumer) {
-
-        if (consumer == null) {
-
-            throw new NullPointerException("the consumer instance must not be null");
-        }
-
-        return new BiConsumer<IN1, IN2>(
-                Collections.<com.github.dm.jrt.function.BiConsumer<?, ?>>singletonList(consumer));
     }
 
     /**
@@ -110,60 +89,16 @@ public class Functions {
      * @param <OUT>  the output data type.
      * @return the wrapped supplier.
      */
+    @NotNull
     public static <OUT> Supplier<OUT> constant(final OUT result) {
 
-        return supplier(new com.github.dm.jrt.function.Supplier<OUT>() {
+        return newSupplier(new com.github.dm.jrt.function.Supplier<OUT>() {
 
             public OUT get() {
 
                 return result;
             }
         });
-    }
-
-    /**
-     * Wraps the specified consumer instance so to provide additional features.<br/>
-     * The returned object will support concatenation and synchronization.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @return the wrapped consumer.
-     */
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public static <IN> Consumer<IN> consumer(
-            @NotNull final com.github.dm.jrt.function.Consumer<IN> consumer) {
-
-        if (consumer == null) {
-
-            throw new NullPointerException("the consumer instance must not be null");
-        }
-
-        return new Consumer<IN>(
-                Collections.<com.github.dm.jrt.function.Consumer<?>>singletonList(consumer));
-    }
-
-    /**
-     * Wraps the specified function instance so to provide additional features.<br/>
-     * The returned object will support concatenation and synchronization.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the wrapped function.
-     */
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public static <IN, OUT> Function<IN, OUT> function(
-            @NotNull final com.github.dm.jrt.function.Function<IN, OUT> function) {
-
-        if (function == null) {
-
-            throw new NullPointerException("the function instance must not be null");
-        }
-
-        return new Function<IN, OUT>(
-                Collections.<com.github.dm.jrt.function.Function<?, ?>>singletonList(function));
     }
 
     /**
@@ -181,6 +116,101 @@ public class Functions {
     }
 
     /**
+     * Wraps the specified bi-consumer instance so to provide additional features.<br/>
+     * The returned object will support concatenation and synchronization.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN1>    the first input data type.
+     * @param <IN2>    the second input data type.
+     * @return the wrapped bi-consumer.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN1, IN2> BiConsumer<IN1, IN2> newBiConsumer(
+            @NotNull final com.github.dm.jrt.function.BiConsumer<IN1, IN2> consumer) {
+
+        if (consumer.getClass() == BiConsumer.class) {
+
+            return (BiConsumer<IN1, IN2>) consumer;
+        }
+
+        return new BiConsumer<IN1, IN2>(
+                Collections.<com.github.dm.jrt.function.BiConsumer<?, ?>>singletonList(consumer));
+    }
+
+    /**
+     * Wraps the specified consumer instance so to provide additional features.<br/>
+     * The returned object will support concatenation and synchronization.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @return the wrapped consumer.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN> Consumer<IN> newConsumer(
+            @NotNull final com.github.dm.jrt.function.Consumer<IN> consumer) {
+
+        if (consumer.getClass() == Consumer.class) {
+
+            return (Consumer<IN>) consumer;
+        }
+
+        return new Consumer<IN>(
+                Collections.<com.github.dm.jrt.function.Consumer<?>>singletonList(consumer));
+    }
+
+    /**
+     * Wraps the specified function instance so to provide additional features.<br/>
+     * The returned object will support concatenation and synchronization.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the wrapped function.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN, OUT> Function<IN, OUT> newFunction(
+            @NotNull final com.github.dm.jrt.function.Function<IN, OUT> function) {
+
+        if (function.getClass() == Function.class) {
+
+            return (Function<IN, OUT>) function;
+        }
+
+        return new Function<IN, OUT>(
+                Collections.<com.github.dm.jrt.function.Function<?, ?>>singletonList(function));
+    }
+
+    /**
+     * Wraps the specified supplier instance so to provide additional features.<br/>
+     * The returned object will support concatenation and synchronization.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the wrapped supplier.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <OUT> Supplier<OUT> newSupplier(
+            @NotNull final com.github.dm.jrt.function.Supplier<OUT> supplier) {
+
+        if (supplier.getClass() == Supplier.class) {
+
+            return (Supplier<OUT>) supplier;
+        }
+
+        return new Supplier<OUT>(supplier,
+                                 Collections.<com.github.dm.jrt.function.Function<?, ?>>emptyList
+                                         ());
+    }
+
+    /**
      * Returns a consumer just discarding the passed inputs.<br/>
      * The returned object will support concatenation and synchronization.
      *
@@ -192,22 +222,6 @@ public class Functions {
     public static <IN> Consumer<IN> sink() {
 
         return (Consumer<IN>) sSink;
-    }
-
-    /**
-     * Wraps the specified supplier instance so to provide additional features.<br/>
-     * The returned object will support concatenation and synchronization.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the wrapped supplier.
-     */
-    public static <OUT> Supplier<OUT> supplier(
-            @NotNull final com.github.dm.jrt.function.Supplier<OUT> supplier) {
-
-        return new Supplier<OUT>(supplier,
-                                 Collections.<com.github.dm.jrt.function.Function<?, ?>>emptyList
-                                         ());
     }
 
     @NotNull
@@ -308,6 +322,104 @@ public class Functions {
             return true;
         }
 
+        @Override
+        public int hashCode() {
+
+            int result = 0;
+
+            for (final com.github.dm.jrt.function.BiConsumer<?, ?> consumer : mConsumers) {
+
+                final Class<? extends com.github.dm.jrt.function.BiConsumer> consumerClass =
+                        consumer.getClass();
+
+                if (consumerClass == BiConsumer.class) {
+
+                    result = 31 * result + consumer.hashCode();
+
+                } else {
+
+                    result = 31 * result + consumerClass.hashCode();
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT",
+                justification = "comparing class of the internal list objects")
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final BiConsumer<?, ?> that = (BiConsumer<?, ?>) o;
+            final List<com.github.dm.jrt.function.BiConsumer<?, ?>> thisConsumers = mConsumers;
+            final List<com.github.dm.jrt.function.BiConsumer<?, ?>> thatConsumers = that.mConsumers;
+            final int size = thisConsumers.size();
+
+            if (size != thatConsumers.size()) {
+
+                return false;
+            }
+
+            for (int i = 0; i < size; i++) {
+
+                final com.github.dm.jrt.function.BiConsumer<?, ?> thisConsumer =
+                        thisConsumers.get(i);
+                final com.github.dm.jrt.function.BiConsumer<?, ?> thatConsumer =
+                        thatConsumers.get(i);
+                final Class<? extends com.github.dm.jrt.function.BiConsumer> thisClass =
+                        thisConsumer.getClass();
+                final Class<? extends com.github.dm.jrt.function.BiConsumer> thatClass =
+                        thatConsumer.getClass();
+
+                if (thisClass == BiConsumer.class) {
+
+                    if (thatClass == BiConsumer.class) {
+
+                        if (!thisConsumer.equals(thatConsumer)) {
+
+                            return false;
+                        }
+
+                    } else {
+
+                        final BiConsumer<?, ?> thisInstance = (BiConsumer<?, ?>) thisConsumer;
+
+                        if ((thisInstance.mConsumers.size() != 1) || (
+                                thisInstance.mConsumers.get(0).getClass() != thatClass)) {
+
+                            return false;
+                        }
+                    }
+
+                } else if (thatClass == BiConsumer.class) {
+
+                    final BiConsumer<?, ?> thatInstance = (BiConsumer<?, ?>) thatConsumer;
+
+                    if ((thatInstance.mConsumers.size() != 1) || (
+                            thatInstance.mConsumers.get(0).getClass() != thisClass)) {
+
+                        return false;
+                    }
+
+                } else if (thisClass != thatClass) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         /**
          * Performs this operation on the given arguments.
          *
@@ -395,6 +507,102 @@ public class Functions {
                 }
 
                 if (!isStaticContext) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = 0;
+
+            for (final com.github.dm.jrt.function.Consumer<?> consumer : mConsumers) {
+
+                final Class<? extends com.github.dm.jrt.function.Consumer> consumerClass =
+                        consumer.getClass();
+
+                if (consumerClass == Consumer.class) {
+
+                    result = 31 * result + consumer.hashCode();
+
+                } else {
+
+                    result = 31 * result + consumerClass.hashCode();
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT",
+                justification = "comparing class of the internal list objects")
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final Consumer<?> that = (Consumer<?>) o;
+            final List<com.github.dm.jrt.function.Consumer<?>> thisConsumers = mConsumers;
+            final List<com.github.dm.jrt.function.Consumer<?>> thatConsumers = that.mConsumers;
+            final int size = thisConsumers.size();
+
+            if (size != thatConsumers.size()) {
+
+                return false;
+            }
+
+            for (int i = 0; i < size; i++) {
+
+                final com.github.dm.jrt.function.Consumer<?> thisConsumer = thisConsumers.get(i);
+                final com.github.dm.jrt.function.Consumer<?> thatConsumer = thatConsumers.get(i);
+                final Class<? extends com.github.dm.jrt.function.Consumer> thisClass =
+                        thisConsumer.getClass();
+                final Class<? extends com.github.dm.jrt.function.Consumer> thatClass =
+                        thatConsumer.getClass();
+
+                if (thisClass == Consumer.class) {
+
+                    if (thatClass == Consumer.class) {
+
+                        if (!thisConsumer.equals(thatConsumer)) {
+
+                            return false;
+                        }
+
+                    } else {
+
+                        final Consumer<?> thisInstance = (Consumer<?>) thisConsumer;
+
+                        if ((thisInstance.mConsumers.size() != 1) || (
+                                thisInstance.mConsumers.get(0).getClass() != thatClass)) {
+
+                            return false;
+                        }
+                    }
+
+                } else if (thatClass == Consumer.class) {
+
+                    final Consumer<?> thatInstance = (Consumer<?>) thatConsumer;
+
+                    if ((thatInstance.mConsumers.size() != 1) || (
+                            thatInstance.mConsumers.get(0).getClass() != thisClass)) {
+
+                        return false;
+                    }
+
+                } else if (thisClass != thatClass) {
 
                     return false;
                 }
@@ -524,6 +732,102 @@ public class Functions {
             return true;
         }
 
+        @Override
+        public int hashCode() {
+
+            int result = 0;
+
+            for (final com.github.dm.jrt.function.Function<?, ?> function : mFunctions) {
+
+                final Class<? extends com.github.dm.jrt.function.Function> functionClass =
+                        function.getClass();
+
+                if (functionClass == Function.class) {
+
+                    result = 31 * result + function.hashCode();
+
+                } else {
+
+                    result = 31 * result + functionClass.hashCode();
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT",
+                justification = "comparing class of the internal list objects")
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final Function<?, ?> that = (Function<?, ?>) o;
+            final List<com.github.dm.jrt.function.Function<?, ?>> thisFunctions = mFunctions;
+            final List<com.github.dm.jrt.function.Function<?, ?>> thatFunctions = that.mFunctions;
+            final int size = thisFunctions.size();
+
+            if (size != thatFunctions.size()) {
+
+                return false;
+            }
+
+            for (int i = 0; i < size; i++) {
+
+                final com.github.dm.jrt.function.Function<?, ?> thisFunction = thisFunctions.get(i);
+                final com.github.dm.jrt.function.Function<?, ?> thatFunction = thatFunctions.get(i);
+                final Class<? extends com.github.dm.jrt.function.Function> thisClass =
+                        thisFunction.getClass();
+                final Class<? extends com.github.dm.jrt.function.Function> thatClass =
+                        thatFunction.getClass();
+
+                if (thisClass == Function.class) {
+
+                    if (thatClass == Function.class) {
+
+                        if (!thisFunction.equals(thatFunction)) {
+
+                            return false;
+                        }
+
+                    } else {
+
+                        final Function<?, ?> thisInstance = (Function<?, ?>) thisFunction;
+
+                        if ((thisInstance.mFunctions.size() != 1) || (
+                                thisInstance.mFunctions.get(0).getClass() != thatClass)) {
+
+                            return false;
+                        }
+                    }
+
+                } else if (thatClass == Function.class) {
+
+                    final Function<?, ?> thatInstance = (Function<?, ?>) thatFunction;
+
+                    if ((thatInstance.mFunctions.size() != 1) || (
+                            thatInstance.mFunctions.get(0).getClass() != thisClass)) {
+
+                        return false;
+                    }
+
+                } else if (thisClass != thatClass) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         /**
          * Applies this function to the given argument.
          *
@@ -631,6 +935,106 @@ public class Functions {
                 }
 
                 if (!isStaticContext) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = mSupplier.getClass().hashCode();
+
+            for (final com.github.dm.jrt.function.Function<?, ?> function : mFunctions) {
+
+                final Class<? extends com.github.dm.jrt.function.Function> functionClass =
+                        function.getClass();
+
+                if (functionClass == Function.class) {
+
+                    result = 31 * result + function.hashCode();
+
+                } else {
+
+                    result = 31 * result + functionClass.hashCode();
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final Supplier<?> that = (Supplier<?>) o;
+
+            if (mSupplier.getClass() != that.mSupplier.getClass()) {
+
+                return false;
+            }
+
+            final List<com.github.dm.jrt.function.Function<?, ?>> thisFunctions = mFunctions;
+            final List<com.github.dm.jrt.function.Function<?, ?>> thatFunctions = that.mFunctions;
+            final int size = thisFunctions.size();
+
+            if (size != thatFunctions.size()) {
+
+                return false;
+            }
+
+            for (int i = 0; i < size; i++) {
+
+                final com.github.dm.jrt.function.Function<?, ?> thisFunction = thisFunctions.get(i);
+                final com.github.dm.jrt.function.Function<?, ?> thatFunction = thatFunctions.get(i);
+                final Class<? extends com.github.dm.jrt.function.Function> thisClass =
+                        thisFunction.getClass();
+                final Class<? extends com.github.dm.jrt.function.Function> thatClass =
+                        thatFunction.getClass();
+
+                if (thisClass == Function.class) {
+
+                    if (thatClass == Function.class) {
+
+                        if (!thisFunction.equals(thatFunction)) {
+
+                            return false;
+                        }
+
+                    } else {
+
+                        final Function<?, ?> thisInstance = (Function<?, ?>) thisFunction;
+
+                        if ((thisInstance.mFunctions.size() != 1) || (
+                                thisInstance.mFunctions.get(0).getClass() != thatClass)) {
+
+                            return false;
+                        }
+                    }
+
+                } else if (thatClass == Function.class) {
+
+                    final Function<?, ?> thatInstance = (Function<?, ?>) thatFunction;
+
+                    if ((thatInstance.mFunctions.size() != 1) || (
+                            thatInstance.mFunctions.get(0).getClass() != thisClass)) {
+
+                        return false;
+                    }
+
+                } else if (thisClass != thatClass) {
 
                     return false;
                 }

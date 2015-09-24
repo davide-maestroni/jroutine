@@ -15,11 +15,6 @@ package com.github.dm.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
@@ -28,8 +23,6 @@ import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Utility class for creating context invocation factory objects.
@@ -58,24 +51,6 @@ public class ContextInvocations {
             @NotNull final InvocationFactory<IN, OUT> factory) {
 
         return new DecoratingContextInvocationFactory<IN, OUT>(factory);
-    }
-
-    /**
-     * Builds and returns a new context invocation factory based on the specified supplier instance.
-     * <br/>
-     * In order to prevent undesired leaks, the class of the specified supplier must have a static
-     * context.
-     *
-     * @param supplier the supplier instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
-            @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
-
-        return factoryFrom(Invocations.factoryFrom(supplier));
     }
 
     /**
@@ -171,42 +146,6 @@ public class ContextInvocations {
     }
 
     /**
-     * Builds and returns a new context invocation factory based on the specified bi-consumer
-     * instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
-     * static context.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> ContextInvocationFactory<IN, OUT> filterFrom(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-
-        return factoryFrom(Invocations.filterFrom(consumer));
-    }
-
-    /**
-     * Builds and returns a new context invocation factory based on the specified function instance.
-     * <br/>
-     * In order to prevent undesired leaks, the class of the specified function must have a static
-     * context.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> ContextInvocationFactory<IN, OUT> filterFrom(
-            @NotNull final Function<? super IN, ? extends OUT> function) {
-
-        return factoryFrom(Invocations.filterFrom(function));
-    }
-
-    /**
      * Converts the specified context invocation factory into a factory of invocations.
      *
      * @param context the routine context.
@@ -220,77 +159,6 @@ public class ContextInvocations {
             @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
         return new AdaptingContextInvocationFactory<IN, OUT>(context, factory);
-    }
-
-    /**
-     * Builds and returns a new context invocation factory based on the specified bi-consumer
-     * instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
-     * static context.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> ContextInvocationFactory<IN, OUT> functionFrom(
-            @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
-                    consumer) {
-
-        return factoryFrom(Invocations.functionFrom(consumer));
-    }
-
-    /**
-     * Builds and returns a new context invocation factory based on the specified function
-     * instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified function must have a static
-     * context.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> ContextInvocationFactory<IN, OUT> functionFrom(
-            @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
-
-        return factoryFrom(Invocations.functionFrom(function));
-    }
-
-    /**
-     * Builds and returns a new context invocation factory based on the specified consumer instance.
-     * <br/>
-     * In order to prevent undesired leaks, the class of the specified consumer must have a static
-     * context.
-     *
-     * @param consumer the consumer instance.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <OUT> ContextInvocationFactory<Void, OUT> procedureFrom(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-        return factoryFrom(Invocations.procedureFrom(consumer));
-    }
-
-    /**
-     * Builds and returns a new context invocation factory based on the specified supplier instance.
-     * <br/>
-     * In order to prevent undesired leaks, the class of the specified supplier must have a static
-     * context.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <OUT> ContextInvocationFactory<Void, OUT> procedureFrom(
-            @NotNull final Supplier<? extends OUT> supplier) {
-
-        return factoryFrom(Invocations.procedureFrom(supplier));
     }
 
     /**

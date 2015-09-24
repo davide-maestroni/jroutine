@@ -22,7 +22,12 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * // TODO: 24/09/15 javadoc
+ * <p/>
  * Created by davide-maestroni on 09/24/2015.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 public interface StreamChannel<IN, OUT> extends IOChannel<IN, OUT> {
 
@@ -146,6 +151,14 @@ public interface StreamChannel<IN, OUT> extends IOChannel<IN, OUT> {
     @NotNull
     StreamChannel<IN, OUT> close();
 
+    /**
+     * Creates a new stream channel which is the concatenation of this channel and the specified
+     * one.
+     *
+     * @param after   thw channel to concatenate after this one.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated channel.
+     */
     @NotNull
-    <AFTER> StreamChannel<IN, AFTER> concat(@NotNull StreamChannel<? super OUT, AFTER> after);
+    <AFTER> StreamChannel<IN, AFTER> concat(@NotNull IOChannel<? super OUT, AFTER> after);
 }

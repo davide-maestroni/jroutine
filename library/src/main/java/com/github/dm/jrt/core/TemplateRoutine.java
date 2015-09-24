@@ -11,12 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.routine;
+package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.builder.ChannelConfiguration;
+import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.StreamChannel;
+import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.builder.ChannelConfiguration.DEFAULT;
+import static com.github.dm.jrt.builder.ChannelConfiguration.builder;
 
 /**
  * Empty abstract implementation of a routine.
@@ -62,6 +69,14 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> asyncStream() {
+
+        final DefaultTransportChannel<IN> transportChannel =
+                new DefaultTransportChannel<IN>(buildConfiguration());
+        return new DefaultStreamChannel<IN, OUT>(transportChannel, asyncCall(transportChannel));
+    }
+
+    @NotNull
     public OutputChannel<OUT> parallelCall() {
 
         return parallelInvoke().result();
@@ -89,6 +104,14 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     public OutputChannel<OUT> parallelCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return parallelInvoke().pass(inputs).result();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> parallelStream() {
+
+        final DefaultTransportChannel<IN> transportChannel =
+                new DefaultTransportChannel<IN>(buildConfiguration());
+        return new DefaultStreamChannel<IN, OUT>(transportChannel, parallelCall(transportChannel));
     }
 
     public void purge() {
@@ -123,5 +146,36 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     public OutputChannel<OUT> syncCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return syncInvoke().pass(inputs).result();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> syncStream() {
+
+        final DefaultTransportChannel<IN> transportChannel =
+                new DefaultTransportChannel<IN>(buildConfiguration());
+        return new DefaultStreamChannel<IN, OUT>(transportChannel, syncCall(transportChannel));
+    }
+
+    /**
+     * Returns the invocation configuration.
+     *
+     * @return the configuration.
+     */
+    @NotNull
+    protected abstract InvocationConfiguration getConfiguration();
+
+    @NotNull
+    private ChannelConfiguration buildConfiguration() {
+
+        final InvocationConfiguration configuration = getConfiguration();
+        return builder().withAsyncRunner(configuration.getRunnerOr(null))
+                        .withChannelMaxSize(configuration.getInputMaxSizeOr(DEFAULT))
+                        .withChannelOrder(configuration.getInputOrderTypeOr(null))
+                        .withChannelTimeout(configuration.getInputTimeoutOr(null))
+                        .withPassTimeout(configuration.getExecutionTimeoutOr(null))
+                        .withPassTimeoutAction(configuration.getExecutionTimeoutActionOr(null))
+                        .withLog(configuration.getLogOr(null))
+                        .withLogLevel(configuration.getLogLevelOr(null))
+                        .set();
     }
 }

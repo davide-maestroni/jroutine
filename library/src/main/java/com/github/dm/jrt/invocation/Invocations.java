@@ -17,7 +17,10 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Functions.BiConsumerObject;
+import com.github.dm.jrt.function.Functions.ConsumerObject;
+import com.github.dm.jrt.function.Functions.FunctionObject;
+import com.github.dm.jrt.function.Functions.SupplierObject;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
@@ -51,6 +54,11 @@ public class Invocations {
     /**
      * Builds and returns a new invocation factory based on the specified supplier instance.<br/>
      * In order to prevent undesired leaks, the class of the specified supplier must have a static
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      * context.
      *
      * @param supplier the supplier instance.
@@ -196,6 +204,11 @@ public class Invocations {
      * Builds and returns a new filter invocation based on the specified bi-consumer instance.<br/>
      * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
      * static context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
@@ -213,6 +226,11 @@ public class Invocations {
      * Builds and returns a new filter invocation based on the specified function instance.<br/>
      * In order to prevent undesired leaks, the class of the specified function must have a static
      * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
      * @param function the function instance.
      * @param <IN>     the input data type.
@@ -231,6 +249,11 @@ public class Invocations {
      * instance.<br/>
      * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
      * static context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
@@ -250,6 +273,11 @@ public class Invocations {
      * instance.<br/>
      * In order to prevent undesired leaks, the class of the specified function must have a static
      * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
      * @param function the function instance.
      * @param <IN>     the input data type.
@@ -267,6 +295,11 @@ public class Invocations {
      * Builds and returns a new procedure invocation based on the specified consumer instance.<br/>
      * In order to prevent undesired leaks, the class of the specified consumer must have a static
      * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
      * @param consumer the consumer instance.
      * @param <OUT>    the output data type.
@@ -283,6 +316,11 @@ public class Invocations {
      * Builds and returns a new procedure invocation based on the specified supplier instance.<br/>
      * In order to prevent undesired leaks, the class of the specified supplier must have a static
      * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
      * @param supplier the supplier instance.
      * @param <OUT>    the output data type.
@@ -303,7 +341,7 @@ public class Invocations {
      */
     private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final Functions.BiConsumer<? super IN, ? super ResultChannel<OUT>> mConsumer;
+        private final BiConsumerObject<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
@@ -311,7 +349,7 @@ public class Invocations {
          * @param consumer the consumer instance.
          */
         private ConsumerFilterInvocation(
-                @NotNull final Functions.BiConsumer<? super IN, ? super ResultChannel<OUT>>
+                @NotNull final BiConsumerObject<? super IN, ? super ResultChannel<OUT>>
                         consumer) {
 
             if (!consumer.hasStaticContext()) {
@@ -360,7 +398,7 @@ public class Invocations {
      */
     private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final Functions.BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
+        private final BiConsumerObject<? super List<? extends IN>, ? super ResultChannel<OUT>>
                 mConsumer;
 
         /**
@@ -369,8 +407,8 @@ public class Invocations {
          * @param consumer the consumer instance.
          */
         private ConsumerInvocationFactory(
-                @NotNull final Functions.BiConsumer<? super List<? extends IN>, ? super
-                        ResultChannel<OUT>> consumer) {
+                @NotNull final BiConsumerObject<? super List<? extends IN>, ? super
+                                        ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
 
@@ -427,7 +465,7 @@ public class Invocations {
      */
     private static class ConsumerProcedureInvocation<OUT> extends ProcedureInvocation<OUT> {
 
-        private final Functions.Consumer<? super ResultChannel<OUT>> mConsumer;
+        private final ConsumerObject<? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
@@ -435,7 +473,7 @@ public class Invocations {
          * @param consumer the consumer instance.
          */
         public ConsumerProcedureInvocation(
-                final Functions.Consumer<? super ResultChannel<OUT>> consumer) {
+                final ConsumerObject<? super ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
 
@@ -553,7 +591,7 @@ public class Invocations {
      */
     private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final Functions.Function<? super IN, ? extends OUT> mFunction;
+        private final FunctionObject<? super IN, ? extends OUT> mFunction;
 
         /**
          * Constructor.
@@ -561,7 +599,7 @@ public class Invocations {
          * @param function the function instance.
          */
         private FunctionFilterInvocation(
-                @NotNull final Functions.Function<? super IN, ? extends OUT> function) {
+                @NotNull final FunctionObject<? super IN, ? extends OUT> function) {
 
             if (!function.hasStaticContext()) {
 
@@ -609,7 +647,7 @@ public class Invocations {
      */
     private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final Functions.Function<? super List<? extends IN>, ? extends OUT> mFunction;
+        private final FunctionObject<? super List<? extends IN>, ? extends OUT> mFunction;
 
         /**
          * Constructor.
@@ -617,7 +655,7 @@ public class Invocations {
          * @param function the function instance.
          */
         private FunctionInvocationFactory(
-                @NotNull final Functions.Function<? super List<? extends IN>, ? extends OUT>
+                @NotNull final FunctionObject<? super List<? extends IN>, ? extends OUT>
                         function) {
 
             if (!function.hasStaticContext()) {
@@ -676,7 +714,7 @@ public class Invocations {
      */
     private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final Functions.Supplier<? extends Invocation<IN, OUT>> mSupplier;
+        private final SupplierObject<? extends Invocation<IN, OUT>> mSupplier;
 
         /**
          * Constructor.
@@ -684,7 +722,7 @@ public class Invocations {
          * @param supplier the supplier function.
          */
         private SupplierInvocationFactory(
-                @NotNull final Functions.Supplier<? extends Invocation<IN, OUT>> supplier) {
+                @NotNull final SupplierObject<? extends Invocation<IN, OUT>> supplier) {
 
             if (!supplier.hasStaticContext()) {
 
@@ -733,14 +771,14 @@ public class Invocations {
      */
     private static class SupplierProcedureInvocation<OUT> extends ProcedureInvocation<OUT> {
 
-        private final Functions.Supplier<? extends OUT> mSupplier;
+        private final SupplierObject<? extends OUT> mSupplier;
 
         /**
          * Constructor.
          *
          * @param supplier the supplier instance.
          */
-        public SupplierProcedureInvocation(final Functions.Supplier<? extends OUT> supplier) {
+        public SupplierProcedureInvocation(final SupplierObject<? extends OUT> supplier) {
 
             if (!supplier.hasStaticContext()) {
 

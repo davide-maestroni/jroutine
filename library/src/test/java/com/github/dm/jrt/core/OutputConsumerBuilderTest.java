@@ -339,17 +339,9 @@ public class OutputConsumerBuilderTest {
 
         private boolean mIsCalled;
 
-        private OUT mOut;
-
         public void accept(final OUT out) {
 
             mIsCalled = true;
-            mOut = out;
-        }
-
-        public OUT getOut() {
-
-            return mOut;
         }
 
         public boolean isCalled() {

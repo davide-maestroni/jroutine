@@ -248,13 +248,13 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * only to the specified input channel. Attempting to read through the dedicated methods will
      * cause an {@link java.lang.IllegalStateException} to be thrown.
      *
-     * @param channel the input channel
-     * @param <IN>    the input channel type.
+     * @param channel   the input channel
+     * @param <CHANNEL> the input channel type.
      * @return this channel.
      * @throws java.lang.IllegalStateException if this channel is already bound.
      */
     @NotNull
-    <IN extends InputChannel<? super OUT>> IN passTo(@NotNull IN channel);
+    <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(@NotNull CHANNEL channel);
 
     /**
      * Binds this channel to the specified consumer. After the call, all the output will be passed

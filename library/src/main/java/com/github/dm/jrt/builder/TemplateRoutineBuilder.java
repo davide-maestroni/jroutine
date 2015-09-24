@@ -16,7 +16,7 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.InvocationChannel;
-import com.github.dm.jrt.routine.TemplateRoutine;
+import com.github.dm.jrt.core.TemplateRoutine;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -74,12 +74,8 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
         return this;
     }
 
-    /**
-     * Returns the invocation configuration.
-     *
-     * @return the configuration.
-     */
     @NotNull
+    @Override
     protected InvocationConfiguration getConfiguration() {
 
         return mConfiguration;

@@ -19,6 +19,10 @@ import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Functions.BiConsumerObject;
+import com.github.dm.jrt.function.Functions.ConsumerObject;
+import com.github.dm.jrt.function.Functions.FunctionObject;
+import com.github.dm.jrt.function.Functions.SupplierObject;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.routine.Routine;
@@ -217,7 +221,7 @@ public class InvocationTest {
     @Test
     public void testFilter2Equals() {
 
-        final Functions.Function<Object, ? super Object> identity = Functions.identity();
+        final FunctionObject<Object, ? super Object> identity = Functions.identity();
         final InvocationFactory<Object, String> factory = createFilter2();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFilter2());
@@ -264,7 +268,7 @@ public class InvocationTest {
     public void testFilterEquals() {
 
         final InvocationFactory<Object, String> factory = createFilter();
-        final Functions.BiConsumer<Object, ResultChannel<String>> sink = Functions.biSink();
+        final BiConsumerObject<Object, ResultChannel<String>> sink = Functions.biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFilter());
         assertThat(factory).isNotEqualTo(filterFrom(sink));
@@ -324,7 +328,7 @@ public class InvocationTest {
     public void testFunction2Equals() {
 
         final InvocationFactory<?, String> factory = createFunction2();
-        final Functions.Function<List<?>, ? super List<?>> identity = Functions.identity();
+        final FunctionObject<List<?>, ? super List<?>> identity = Functions.identity();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFunction2());
         assertThat(factory).isNotEqualTo(functionFrom(identity));
@@ -377,7 +381,7 @@ public class InvocationTest {
     public void testFunctionEquals() {
 
         final InvocationFactory<?, String> factory = createFunction();
-        final Functions.BiConsumer<List<?>, ResultChannel<Object>> sink = Functions.biSink();
+        final BiConsumerObject<List<?>, ResultChannel<Object>> sink = Functions.biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFunction());
         assertThat(factory).isNotEqualTo(functionFrom(sink));
@@ -589,7 +593,7 @@ public class InvocationTest {
     public void testProcedure2Equals() {
 
         final InvocationFactory<Void, String> factory = createProcedure2();
-        final Functions.Supplier<String> constant = Functions.constant("test");
+        final SupplierObject<String> constant = Functions.constant("test");
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createProcedure2());
         assertThat(factory).isNotEqualTo(procedureFrom(constant));
@@ -636,7 +640,7 @@ public class InvocationTest {
     public void testProcedureEquals() {
 
         final InvocationFactory<Void, String> factory = createProcedure();
-        final Functions.Consumer<ResultChannel<String>> sink = Functions.sink();
+        final ConsumerObject<ResultChannel<String>> sink = Functions.sink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createProcedure());
         assertThat(factory).isNotEqualTo(procedureFrom(sink));

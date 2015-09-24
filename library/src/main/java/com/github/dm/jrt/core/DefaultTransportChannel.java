@@ -79,7 +79,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
 
     public boolean isEmpty() {
 
-        return mInputChannel.isEmpty();
+        return mInputChannel.isEmpty() && mOutputChannel.isEmpty();
     }
 
     public boolean isOpen() {
@@ -221,18 +221,6 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     }
 
     @NotNull
-    public InputChannel<DATA> asInput() {
-
-        return this;
-    }
-
-    @NotNull
-    public OutputChannel<DATA> asOutput() {
-
-        return this;
-    }
-
-    @NotNull
     public TransportChannel<DATA> close() {
 
         mInputChannel.close();
@@ -269,6 +257,18 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
     public <IN extends InputChannel<? super DATA>> IN passTo(@NotNull final IN channel) {
 
         return mOutputChannel.passTo(channel);
+    }
+
+    @NotNull
+    public InputChannel<DATA> asInput() {
+
+        return this;
+    }
+
+    @NotNull
+    public OutputChannel<DATA> asOutput() {
+
+        return this;
     }
 
     public boolean hasDelays() {

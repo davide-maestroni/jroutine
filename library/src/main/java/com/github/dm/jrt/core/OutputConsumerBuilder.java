@@ -17,6 +17,7 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Functions.ConsumerObject;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,11 +33,11 @@ import static com.github.dm.jrt.function.Functions.newConsumer;
  */
 public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
 
-    private final Functions.Consumer<Void> mOnComplete;
+    private final ConsumerObject<Void> mOnComplete;
 
-    private final Functions.Consumer<RoutineException> mOnError;
+    private final ConsumerObject<RoutineException> mOnError;
 
-    private final Functions.Consumer<OUT> mOnOutput;
+    private final ConsumerObject<OUT> mOnOutput;
 
     /**
      * Constructor.
@@ -45,9 +46,9 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @param onError    the error consumer.
      * @param onComplete the complete consumer.
      */
-    private OutputConsumerBuilder(@NotNull final Functions.Consumer<OUT> onOutput,
-            @NotNull final Functions.Consumer<RoutineException> onError,
-            @NotNull final Functions.Consumer<Void> onComplete) {
+    private OutputConsumerBuilder(@NotNull final ConsumerObject<OUT> onOutput,
+            @NotNull final ConsumerObject<RoutineException> onError,
+            @NotNull final ConsumerObject<Void> onComplete) {
 
         mOnOutput = onOutput;
         mOnError = onError;

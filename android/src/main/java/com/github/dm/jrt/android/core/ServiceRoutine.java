@@ -39,13 +39,13 @@ import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TransportChannel;
+import com.github.dm.jrt.core.TemplateRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.routine.TemplateRoutine;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
 
@@ -152,6 +152,13 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
     public void purge() {
 
         mRoutine.purge();
+    }
+
+    @NotNull
+    @Override
+    protected InvocationConfiguration getConfiguration() {
+
+        return mInvocationConfiguration;
     }
 
     /**

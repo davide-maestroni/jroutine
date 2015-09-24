@@ -25,6 +25,9 @@ import java.util.concurrent.TimeUnit;
  * Interface defining a channel which is both an input and an output.
  * <p/>
  * Created by davide-maestroni on 09/24/2015.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT> {
 

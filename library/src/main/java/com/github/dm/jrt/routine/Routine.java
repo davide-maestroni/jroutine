@@ -74,7 +74,7 @@ import org.jetbrains.annotations.Nullable;
  * <p/>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
  * the implementation honors the specific contracts, it is possible to seamlessly combine different
- * routine implementations, even the ones coming from third party libraries.
+ * routine instances, even the ones coming from third party libraries.
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *
@@ -135,7 +135,11 @@ public interface Routine<IN, OUT> {
     @NotNull
     InvocationChannel<IN, OUT> asyncInvoke();
 
-    // TODO: 24/09/15 javadoc
+    /**
+     * Creates a streaming channel by invoking this routine in asynchronous mode.
+     *
+     * @return the streaming channel.
+     */
     @NotNull
     StreamingChannel<IN, OUT> asyncStream();
 
@@ -197,7 +201,11 @@ public interface Routine<IN, OUT> {
     @NotNull
     InvocationChannel<IN, OUT> parallelInvoke();
 
-    // TODO: 24/09/15 javadoc
+    /**
+     * Creates a streaming channel by invoking this routine in parallel mode.
+     *
+     * @return the streaming channel.
+     */
     @NotNull
     StreamingChannel<IN, OUT> parallelStream();
 
@@ -263,7 +271,11 @@ public interface Routine<IN, OUT> {
     @NotNull
     InvocationChannel<IN, OUT> syncInvoke();
 
-    // TODO: 24/09/15 javadoc
+    /**
+     * Creates a streaming channel by invoking this routine in synchronous mode.
+     *
+     * @return the streaming channel.
+     */
     @NotNull
     StreamingChannel<IN, OUT> syncStream();
 }

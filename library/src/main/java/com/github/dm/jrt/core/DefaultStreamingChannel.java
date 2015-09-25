@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * // TODO: 25/09/15 javadoc
+ * Default implementation of a streaming channel.
  * <p/>
  * Created by davide-maestroni on 09/24/2015.
  *

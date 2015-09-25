@@ -702,20 +702,18 @@ public class RoutineBuilders {
 
         if (method.isAnnotationPresent(Inputs.class)) {
 
-            if (returnType.isAssignableFrom(Routine.class)) {
+            if (returnType.isAssignableFrom(InvocationChannel.class)) {
 
-                return routine;
-            }
+                return (inputMode == InputMode.PARALLEL) ? routine.parallelInvoke()
+                        : routine.asyncInvoke();
 
-            if (returnType.isAssignableFrom(StreamingChannel.class) && !returnType.isAssignableFrom(
-                    InvocationChannel.class)) {
+            } else if (returnType.isAssignableFrom(StreamingChannel.class)) {
 
                 return (inputMode == InputMode.PARALLEL) ? routine.parallelStream()
                         : routine.asyncStream();
             }
 
-            return (inputMode == InputMode.PARALLEL) ? routine.parallelInvoke()
-                    : routine.asyncInvoke();
+            return routine;
         }
 
         final OutputChannel<Object> outputChannel;

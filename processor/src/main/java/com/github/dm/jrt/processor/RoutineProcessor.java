@@ -26,6 +26,7 @@ import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -96,6 +97,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     protected TypeMirror routineType;
 
+    protected TypeMirror streamingChannelType;
+
     private String mFooter;
 
     private String mHeader;
@@ -115,6 +118,8 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodInputsChannel;
 
     private String mMethodInputsRoutine;
+
+    private String mMethodInputsStream;
 
     private String mMethodInvocation;
 
@@ -190,6 +195,7 @@ public class RoutineProcessor extends AbstractProcessor {
         routineType = getTypeFromName(Routine.class.getCanonicalName()).asType();
         invocationChannelType =
                 getTypeFromName(InvocationChannel.class.getCanonicalName()).asType();
+        streamingChannelType = getTypeFromName(StreamingChannel.class.getCanonicalName()).asType();
         outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
         iterableType = getTypeFromName(Iterable.class.getCanonicalName()).asType();
         listType = getTypeFromName(List.class.getCanonicalName()).asType();
@@ -910,7 +916,8 @@ public class RoutineProcessor extends AbstractProcessor {
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror returnType = methodElement.getReturnType();
 
-        if (!typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
+        if (!typeUtils.isAssignable(streamingChannelType, typeUtils.erasure(returnType))
+                && !typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
                 && !typeUtils.isAssignable(routineType, typeUtils.erasure(returnType))) {
 
             throw new IllegalArgumentException(
@@ -1136,6 +1143,27 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return mMethodInputsRoutine;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @NotNull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodInputsStreamTemplate(@NotNull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodInputsStream == null) {
+
+            mMethodInputsStream = parseTemplate("/templates/method_inputs_stream.txt");
+        }
+
+        return mMethodInputsStream;
     }
 
     /**
@@ -1901,6 +1929,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 method = getMethodInputsChannelTemplate(methodElement, count);
 
+            } else if (typeUtils.isAssignable(streamingChannelType,
+                                              typeUtils.erasure(returnType))) {
+
+                method = getMethodInputsStreamTemplate(methodElement, count);
+
             } else {
 
                 method = getMethodInputsRoutineTemplate(methodElement, count);
@@ -2016,6 +2049,9 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${invokeMethod}",
                                 (inputMode == InputMode.PARALLEL) ? "parallelInvoke"
                                         : "asyncInvoke");
+        method = method.replace("${streamMethod}",
+                                (inputMode == InputMode.PARALLEL) ? "parallelStream"
+                                        : "asyncStream");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader = getMethodInvocationHeaderTemplate(methodElement, count);

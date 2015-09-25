@@ -29,6 +29,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.Reflection;
@@ -420,8 +421,8 @@ public class RoutineBuilders {
 
         final Class<?> returnType = method.getReturnType();
 
-        if (!returnType.isAssignableFrom(InvocationChannel.class) && !returnType.isAssignableFrom(
-                Routine.class)) {
+        if (!returnType.isAssignableFrom(StreamingChannel.class) && !returnType.isAssignableFrom(
+                InvocationChannel.class) && !returnType.isAssignableFrom(Routine.class)) {
 
             throw new IllegalArgumentException(
                     "the proxy method has incompatible return type: " + method);
@@ -697,18 +698,26 @@ public class RoutineBuilders {
             @NotNull final Method method, @NotNull final Object[] args,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
+        final Class<?> returnType = method.getReturnType();
+
         if (method.isAnnotationPresent(Inputs.class)) {
 
-            if (method.getReturnType().isAssignableFrom(Routine.class)) {
+            if (returnType.isAssignableFrom(Routine.class)) {
 
                 return routine;
+            }
+
+            if (returnType.isAssignableFrom(StreamingChannel.class) && !returnType.isAssignableFrom(
+                    InvocationChannel.class)) {
+
+                return (inputMode == InputMode.PARALLEL) ? routine.parallelStream()
+                        : routine.asyncStream();
             }
 
             return (inputMode == InputMode.PARALLEL) ? routine.parallelInvoke()
                     : routine.asyncInvoke();
         }
 
-        final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
         if (inputMode == InputMode.PARALLEL) {

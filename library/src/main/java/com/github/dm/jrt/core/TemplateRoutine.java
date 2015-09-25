@@ -16,7 +16,7 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.StreamChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -69,11 +69,11 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> asyncStream() {
+    public StreamingChannel<IN, OUT> asyncStream() {
 
         final DefaultTransportChannel<IN> transportChannel =
-                new DefaultTransportChannel<IN>(buildConfiguration());
-        return new DefaultStreamChannel<IN, OUT>(transportChannel, asyncCall(transportChannel));
+                new DefaultTransportChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(transportChannel, asyncCall(transportChannel));
     }
 
     @NotNull
@@ -107,11 +107,12 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> parallelStream() {
+    public StreamingChannel<IN, OUT> parallelStream() {
 
         final DefaultTransportChannel<IN> transportChannel =
-                new DefaultTransportChannel<IN>(buildConfiguration());
-        return new DefaultStreamChannel<IN, OUT>(transportChannel, parallelCall(transportChannel));
+                new DefaultTransportChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(transportChannel,
+                                                    parallelCall(transportChannel));
     }
 
     public void purge() {
@@ -149,11 +150,11 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> syncStream() {
+    public StreamingChannel<IN, OUT> syncStream() {
 
         final DefaultTransportChannel<IN> transportChannel =
-                new DefaultTransportChannel<IN>(buildConfiguration());
-        return new DefaultStreamChannel<IN, OUT>(transportChannel, syncCall(transportChannel));
+                new DefaultTransportChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(transportChannel, syncCall(transportChannel));
     }
 
     /**
@@ -165,7 +166,7 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     protected abstract InvocationConfiguration getConfiguration();
 
     @NotNull
-    private ChannelConfiguration buildConfiguration() {
+    private ChannelConfiguration buildChannelConfiguration() {
 
         final InvocationConfiguration configuration = getConfiguration();
         return builder().withAsyncRunner(configuration.getRunnerOr(null))

@@ -32,6 +32,7 @@ import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
@@ -166,9 +167,9 @@ public class ObjectRoutineTest {
         final TransportChannel<int[]> channel5 = JRoutine.transport().buildChannel();
         channel5.pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5)).isEqualTo(10);
-
         assertThat(sumAsync.compute2().pass(1, 2, 3, 4).result().next()).isEqualTo(10);
         assertThat(sumAsync.compute3().pass(17).result().next()).isEqualTo(17);
+        assertThat(sumAsync.compute4().pass(17).close().next()).isEqualTo(17);
 
         final TransportChannel<Integer> channel6 = JRoutine.transport().buildChannel();
         channel6.pass(1, 2, 3, 4).close();
@@ -809,9 +810,12 @@ public class ObjectRoutineTest {
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
-        assertThat(itf.add8().asyncCall('d').all()).containsOnly((int) 'd');
-        assertThat(itf.add9().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
+        assertThat(itf.add8().pass('d').close().all()).containsOnly((int) 'd');
+        assertThat(itf.add9().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
                                                                               (int) 'f');
+        assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
+        assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
+                                                                               (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
         channel5.pass(new char[]{'a', 'z'}).close();
@@ -877,9 +881,18 @@ public class ObjectRoutineTest {
                                            new int[]{'f', 'z'});
         assertThat(itf.addA22().pass('d', 'e', 'f').result().all()).containsOnly(
                 new int[]{'d', 'e', 'f'});
-        assertThat(itf.addA23().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
+        assertThat(itf.addA23().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA24()
+                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .close()
+                      .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                           new int[]{'f', 'z'});
+        assertThat(itf.addA25().pass('d', 'e', 'f').close().all()).containsOnly(
+                new int[]{'d', 'e', 'f'});
+        assertThat(itf.addA26().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
+                new int[]{'c', 'z'});
+        assertThat(itf.addA27()
                       .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
                                     new char[]{'f', 'z'})
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
@@ -967,9 +980,20 @@ public class ObjectRoutineTest {
                                            Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL22().pass('d', 'e', 'f').result().all()).containsOnly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        assertThat(itf.addL23().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
+        assertThat(itf.addL23().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL24()
+                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                            Arrays.asList('f', 'z'))
+                      .close()
+                      .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                           Arrays.asList((int) 'e', (int) 'z'),
+                                           Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL25().pass('d', 'e', 'f').close().all()).containsOnly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
+        assertThat(itf.addL26().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        assertThat(itf.addL27()
                       .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                                     Arrays.asList('f', 'z'))
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
@@ -978,19 +1002,22 @@ public class ObjectRoutineTest {
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().result().all()).containsExactly(31);
-        assertThat(itf.get3().asyncCall().all()).containsExactly(31);
+        assertThat(itf.get3().close().all()).containsExactly(31);
+        assertThat(itf.get4().asyncCall().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().result().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA5().asyncCall().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA5().close().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA6().asyncCall().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().result().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL5().asyncCall().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL5().close().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL6().asyncCall().all()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
         channel35.pass(-17).close();
@@ -999,7 +1026,8 @@ public class ObjectRoutineTest {
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).result().checkComplete();
-        itf.set4().asyncCall(-17).checkComplete();
+        itf.set4().pass(-17).close().checkComplete();
+        itf.set5().asyncCall(-17).checkComplete();
         itf.setA0(new int[]{1, 2, 3});
         final TransportChannel<int[]> channel37 = JRoutine.transport().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
@@ -1012,7 +1040,9 @@ public class ObjectRoutineTest {
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
         itf.setA5().pass(1, 2, 3).result().checkComplete();
-        itf.setA6().asyncCall(new int[]{1, 2, 3}).checkComplete();
+        itf.setA6().pass(new int[]{1, 2, 3}).close().checkComplete();
+        itf.setA7().pass(1, 2, 3).close().checkComplete();
+        itf.setA8().asyncCall(new int[]{1, 2, 3}).checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final TransportChannel<List<Integer>> channel40 = JRoutine.transport().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -1025,7 +1055,9 @@ public class ObjectRoutineTest {
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
         itf.setL5().pass(1, 2, 3).result().checkComplete();
-        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
+        itf.setL6().pass(Arrays.asList(1, 2, 3)).close().checkComplete();
+        itf.setL7().pass(1, 2, 3).close().checkComplete();
+        itf.setL8().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
     }
 
     @Test
@@ -1414,6 +1446,14 @@ public class ObjectRoutineTest {
         int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.VALUE)
+        Routine<Character, Integer> add10();
+
+        @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.PARALLEL)
+        Routine<Character, Integer> add11();
+
+        @Alias("a")
         int add2(@Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
@@ -1440,11 +1480,11 @@ public class ObjectRoutineTest {
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.VALUE)
-        Routine<Character, Integer> add8();
+        StreamingChannel<Character, Integer> add8();
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.PARALLEL)
-        Routine<Character, Integer> add9();
+        StreamingChannel<Character, Integer> add9();
 
         @Alias("aa")
         int[] addA00(char[] c);
@@ -1551,11 +1591,23 @@ public class ObjectRoutineTest {
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.VALUE)
-        Routine<char[], int[]> addA23();
+        StreamingChannel<char[], int[]> addA23();
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.PARALLEL)
-        Routine<char[], int[]> addA24();
+        StreamingChannel<char[], int[]> addA24();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.COLLECTION)
+        StreamingChannel<Character, int[]> addA25();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.VALUE)
+        Routine<char[], int[]> addA26();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
+        Routine<char[], int[]> addA27();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
@@ -1662,11 +1714,23 @@ public class ObjectRoutineTest {
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.VALUE)
-        Routine<List<Character>, List<Integer>> addL23();
+        StreamingChannel<List<Character>, List<Integer>> addL23();
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.PARALLEL)
-        Routine<List<Character>, List<Integer>> addL24();
+        StreamingChannel<List<Character>, List<Integer>> addL24();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        StreamingChannel<Character, List<Integer>> addL25();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        Routine<List<Character>, List<Integer>> addL26();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.PARALLEL)
+        Routine<List<Character>, List<Integer>> addL27();
 
         @Alias("g")
         int get0();
@@ -1690,7 +1754,11 @@ public class ObjectRoutineTest {
 
         @Alias("g")
         @Inputs({})
-        Routine<Void, Integer> get3();
+        StreamingChannel<Void, Integer> get3();
+
+        @Alias("g")
+        @Inputs({})
+        Routine<Void, Integer> get4();
 
         @Alias("ga")
         int[] getA0();
@@ -1726,7 +1794,11 @@ public class ObjectRoutineTest {
 
         @Alias("ga")
         @Inputs({})
-        Routine<Void, int[]> getA5();
+        StreamingChannel<Void, int[]> getA5();
+
+        @Alias("ga")
+        @Inputs({})
+        Routine<Void, int[]> getA6();
 
         @Alias("gl")
         List<Integer> getL0();
@@ -1764,7 +1836,11 @@ public class ObjectRoutineTest {
 
         @Alias("gl")
         @Inputs({})
-        Routine<Void, List<Integer>> getL5();
+        StreamingChannel<Void, List<Integer>> getL5();
+
+        @Alias("gl")
+        @Inputs({})
+        Routine<Void, List<Integer>> getL6();
 
         @Alias("s")
         @Inputs(value = int.class, mode = InputMode.VALUE)
@@ -1772,7 +1848,11 @@ public class ObjectRoutineTest {
 
         @Alias("s")
         @Inputs(value = int.class, mode = InputMode.VALUE)
-        Routine<Integer, Void> set4();
+        StreamingChannel<Integer, Void> set4();
+
+        @Alias("s")
+        @Inputs(value = int.class, mode = InputMode.VALUE)
+        Routine<Integer, Void> set5();
 
         @Alias("sa")
         @Inputs(value = int[].class, mode = InputMode.VALUE)
@@ -1784,7 +1864,15 @@ public class ObjectRoutineTest {
 
         @Alias("sa")
         @Inputs(value = int[].class, mode = InputMode.VALUE)
-        Routine<int[], Void> setA6();
+        StreamingChannel<int[], Void> setA6();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.COLLECTION)
+        StreamingChannel<Integer, Void> setA7();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.VALUE)
+        Routine<int[], Void> setA8();
 
         @Alias("sl")
         @Inputs(value = List.class, mode = InputMode.VALUE)
@@ -1796,7 +1884,15 @@ public class ObjectRoutineTest {
 
         @Alias("sl")
         @Inputs(value = List.class, mode = InputMode.VALUE)
-        Routine<List<Integer>, Void> setL6();
+        StreamingChannel<List<Integer>, Void> setL6();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        StreamingChannel<Integer, Void> setL7();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        Routine<List<Integer>, Void> setL8();
     }
 
     public interface SumError2 {
@@ -1994,6 +2090,10 @@ public class ObjectRoutineTest {
         @Alias("compute")
         @Inputs(int.class)
         InvocationChannel<Integer, Integer> compute3();
+
+        @Alias("compute")
+        @Inputs(int.class)
+        StreamingChannel<Integer, Integer> compute4();
 
         @Alias("compute")
         int computeList(@Input(value = List.class,

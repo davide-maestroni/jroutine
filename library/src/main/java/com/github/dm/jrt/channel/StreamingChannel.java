@@ -29,136 +29,140 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StreamChannel<IN, OUT> extends IOChannel<IN, OUT> {
+public interface StreamingChannel<IN, OUT> extends IOChannel<IN, OUT> {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> after(@NotNull TimeDuration delay);
+    StreamingChannel<IN, OUT> after(@NotNull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
+    StreamingChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> now();
+    StreamingChannel<IN, OUT> now();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> orderByCall();
+    StreamingChannel<IN, OUT> orderByCall();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> orderByChance();
+    StreamingChannel<IN, OUT> orderByChance();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> orderByDelay();
+    StreamingChannel<IN, OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable OutputChannel<? extends IN> channel);
+    StreamingChannel<IN, OUT> pass(@Nullable OutputChannel<? extends IN> channel);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
+    StreamingChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable IN input);
+    StreamingChannel<IN, OUT> pass(@Nullable IN input);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable IN... inputs);
+    StreamingChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> afterMax(@NotNull TimeDuration timeout);
+    StreamingChannel<IN, OUT> afterMax(@NotNull TimeDuration timeout);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
+    StreamingChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
+    StreamingChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> eventually();
+    StreamingChannel<IN, OUT> eventually();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> eventuallyAbort();
+    StreamingChannel<IN, OUT> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> eventuallyExit();
+    StreamingChannel<IN, OUT> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> eventuallyThrow();
+    StreamingChannel<IN, OUT> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> immediately();
+    StreamingChannel<IN, OUT> immediately();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
+    StreamingChannel<IN, OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<IN, OUT> close();
+    StreamingChannel<IN, OUT> close();
 
     /**
      * Creates a new stream channel which is the concatenation of this channel and the specified
      * one.
      *
-     * @param after   thw channel to concatenate after this one.
+     * @param channel the channel to concatenate after this one.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated channel.
      */
     @NotNull
-    <AFTER> StreamChannel<IN, AFTER> concat(@NotNull IOChannel<? super OUT, AFTER> after);
+    <AFTER> StreamingChannel<IN, AFTER> append(@NotNull IOChannel<? super OUT, AFTER> channel);
+
+    @NotNull
+    <BEFORE> StreamingChannel<BEFORE, OUT> prepend(
+            @NotNull IOChannel<BEFORE, ? extends IN> channel);
 }

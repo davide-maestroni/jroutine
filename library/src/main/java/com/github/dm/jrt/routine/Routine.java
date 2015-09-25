@@ -15,7 +15,7 @@ package com.github.dm.jrt.routine;
 
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.StreamChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -137,7 +137,7 @@ public interface Routine<IN, OUT> {
 
     // TODO: 24/09/15 javadoc
     @NotNull
-    StreamChannel<IN, OUT> asyncStream();
+    StreamingChannel<IN, OUT> asyncStream();
 
     /**
      * Short for {@code parallelInvoke().result()}.
@@ -199,7 +199,7 @@ public interface Routine<IN, OUT> {
 
     // TODO: 24/09/15 javadoc
     @NotNull
-    StreamChannel<IN, OUT> parallelStream();
+    StreamingChannel<IN, OUT> parallelStream();
 
     /**
      * Makes the routine destroy all the cached invocation instances.
@@ -265,5 +265,5 @@ public interface Routine<IN, OUT> {
 
     // TODO: 24/09/15 javadoc
     @NotNull
-    StreamChannel<IN, OUT> syncStream();
+    StreamingChannel<IN, OUT> syncStream();
 }

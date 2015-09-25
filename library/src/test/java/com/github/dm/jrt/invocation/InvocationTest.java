@@ -34,11 +34,14 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.github.dm.jrt.invocation.Invocations.factoryFrom;
+import static com.github.dm.jrt.invocation.Invocations.factoryConsumer;
+import static com.github.dm.jrt.invocation.Invocations.factoryFunction;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
-import static com.github.dm.jrt.invocation.Invocations.filterFrom;
-import static com.github.dm.jrt.invocation.Invocations.functionFrom;
-import static com.github.dm.jrt.invocation.Invocations.procedureFrom;
+import static com.github.dm.jrt.invocation.Invocations.factorySupplier;
+import static com.github.dm.jrt.invocation.Invocations.filterConsumer;
+import static com.github.dm.jrt.invocation.Invocations.filterFunction;
+import static com.github.dm.jrt.invocation.Invocations.procedureConsumer;
+import static com.github.dm.jrt.invocation.Invocations.procedureSupplier;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -51,7 +54,7 @@ public class InvocationTest {
 
     private static InvocationFactory<Object, String> createFactory() {
 
-        return factoryFrom(new Supplier<Invocation<Object, String>>() {
+        return factorySupplier(new Supplier<Invocation<Object, String>>() {
 
             public Invocation<Object, String> get() {
 
@@ -69,7 +72,7 @@ public class InvocationTest {
 
     private static FilterInvocation<Object, String> createFilter() {
 
-        return filterFrom(new BiConsumer<Object, ResultChannel<String>>() {
+        return filterConsumer(new BiConsumer<Object, ResultChannel<String>>() {
 
             public void accept(final Object o, final ResultChannel<String> result) {
 
@@ -80,7 +83,7 @@ public class InvocationTest {
 
     private static FilterInvocation<Object, String> createFilter2() {
 
-        return filterFrom(new Function<Object, String>() {
+        return filterFunction(new Function<Object, String>() {
 
             public String apply(final Object o) {
 
@@ -91,7 +94,7 @@ public class InvocationTest {
 
     private static InvocationFactory<?, String> createFunction() {
 
-        return functionFrom(new BiConsumer<List<?>, ResultChannel<String>>() {
+        return factoryConsumer(new BiConsumer<List<?>, ResultChannel<String>>() {
 
             public void accept(final List<?> objects, final ResultChannel<String> result) {
 
@@ -105,7 +108,7 @@ public class InvocationTest {
 
     private static InvocationFactory<?, String> createFunction2() {
 
-        return functionFrom(new Function<List<?>, String>() {
+        return factoryFunction(new Function<List<?>, String>() {
 
             public String apply(final List<?> objects) {
 
@@ -123,7 +126,7 @@ public class InvocationTest {
 
     private static ProcedureInvocation<String> createProcedure() {
 
-        return procedureFrom(new Consumer<ResultChannel<String>>() {
+        return procedureConsumer(new Consumer<ResultChannel<String>>() {
 
             public void accept(final ResultChannel<String> result) {
 
@@ -134,7 +137,7 @@ public class InvocationTest {
 
     private static ProcedureInvocation<String> createProcedure2() {
 
-        return procedureFrom(new Supplier<String>() {
+        return procedureSupplier(new Supplier<String>() {
 
             public String get() {
 
@@ -158,12 +161,13 @@ public class InvocationTest {
         final InvocationFactory<Object, String> factory = createFactory();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFactory());
-        assertThat(factory).isNotEqualTo(factoryFrom(supplier));
+        assertThat(factory).isNotEqualTo(factorySupplier(supplier));
         assertThat(factory).isNotEqualTo(createFilter());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFactory().hashCode());
-        assertThat(factoryFrom(supplier)).isEqualTo(factoryFrom(supplier));
-        assertThat(factoryFrom(supplier).hashCode()).isEqualTo(factoryFrom(supplier).hashCode());
+        assertThat(factorySupplier(supplier)).isEqualTo(factorySupplier(supplier));
+        assertThat(factorySupplier(supplier).hashCode()).isEqualTo(
+                factorySupplier(supplier).hashCode());
     }
 
     @Test
@@ -172,7 +176,7 @@ public class InvocationTest {
 
         try {
 
-            factoryFrom(null);
+            factorySupplier(null);
 
             fail();
 
@@ -182,7 +186,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(factoryFrom(new Supplier<Invocation<Object, String>>() {
+            JRoutine.on(factorySupplier(new Supplier<Invocation<Object, String>>() {
 
                 public Invocation<Object, String> get() {
 
@@ -225,12 +229,13 @@ public class InvocationTest {
         final InvocationFactory<Object, String> factory = createFilter2();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFilter2());
-        assertThat(factory).isNotEqualTo(filterFrom(identity));
+        assertThat(factory).isNotEqualTo(filterFunction(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFilter2().hashCode());
-        assertThat(filterFrom(identity)).isEqualTo(filterFrom(identity));
-        assertThat(filterFrom(identity).hashCode()).isEqualTo(filterFrom(identity).hashCode());
+        assertThat(filterFunction(identity)).isEqualTo(filterFunction(identity));
+        assertThat(filterFunction(identity).hashCode()).isEqualTo(
+                filterFunction(identity).hashCode());
     }
 
     @Test
@@ -239,7 +244,7 @@ public class InvocationTest {
 
         try {
 
-            filterFrom((Function<Object, ResultChannel<Object>>) null);
+            filterFunction((Function<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -249,7 +254,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(filterFrom(new Function<Object, Object>() {
+            JRoutine.on(filterFunction(new Function<Object, Object>() {
 
                 public Object apply(final Object o) {
 
@@ -271,12 +276,12 @@ public class InvocationTest {
         final BiConsumerObject<Object, ResultChannel<String>> sink = Functions.biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFilter());
-        assertThat(factory).isNotEqualTo(filterFrom(sink));
+        assertThat(factory).isNotEqualTo(filterConsumer(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFilter().hashCode());
-        assertThat(filterFrom(sink)).isEqualTo(filterFrom(sink));
-        assertThat(filterFrom(sink).hashCode()).isEqualTo(filterFrom(sink).hashCode());
+        assertThat(filterConsumer(sink)).isEqualTo(filterConsumer(sink));
+        assertThat(filterConsumer(sink).hashCode()).isEqualTo(filterConsumer(sink).hashCode());
     }
 
     @Test
@@ -285,7 +290,7 @@ public class InvocationTest {
 
         try {
 
-            filterFrom((BiConsumer<Object, ResultChannel<Object>>) null);
+            filterConsumer(null);
 
             fail();
 
@@ -295,7 +300,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(filterFrom(new BiConsumer<Object, ResultChannel<String>>() {
+            JRoutine.on(filterConsumer(new BiConsumer<Object, ResultChannel<String>>() {
 
                 public void accept(final Object o, final ResultChannel<String> result) {
 
@@ -331,12 +336,13 @@ public class InvocationTest {
         final FunctionObject<List<?>, ? super List<?>> identity = Functions.identity();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFunction2());
-        assertThat(factory).isNotEqualTo(functionFrom(identity));
+        assertThat(factory).isNotEqualTo(factoryFunction(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFunction2().hashCode());
-        assertThat(functionFrom(identity)).isEqualTo(functionFrom(identity));
-        assertThat(functionFrom(identity).hashCode()).isEqualTo(functionFrom(identity).hashCode());
+        assertThat(factoryFunction(identity)).isEqualTo(factoryFunction(identity));
+        assertThat(factoryFunction(identity).hashCode()).isEqualTo(
+                factoryFunction(identity).hashCode());
     }
 
     @Test
@@ -345,7 +351,7 @@ public class InvocationTest {
 
         try {
 
-            functionFrom((Function<List<?>, Object>) null);
+            factoryFunction(null);
 
             fail();
 
@@ -355,7 +361,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(functionFrom(new Function<List<?>, String>() {
+            JRoutine.on(factoryFunction(new Function<List<?>, String>() {
 
                 public String apply(final List<?> objects) {
 
@@ -384,12 +390,12 @@ public class InvocationTest {
         final BiConsumerObject<List<?>, ResultChannel<Object>> sink = Functions.biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFunction());
-        assertThat(factory).isNotEqualTo(functionFrom(sink));
+        assertThat(factory).isNotEqualTo(factoryConsumer(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFunction().hashCode());
-        assertThat(functionFrom(sink)).isEqualTo(functionFrom(sink));
-        assertThat(functionFrom(sink).hashCode()).isEqualTo(functionFrom(sink).hashCode());
+        assertThat(factoryConsumer(sink)).isEqualTo(factoryConsumer(sink));
+        assertThat(factoryConsumer(sink).hashCode()).isEqualTo(factoryConsumer(sink).hashCode());
     }
 
     @Test
@@ -398,7 +404,7 @@ public class InvocationTest {
 
         try {
 
-            functionFrom((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            factoryConsumer(null);
 
             fail();
 
@@ -408,7 +414,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(functionFrom(new BiConsumer<List<?>, ResultChannel<String>>() {
+            JRoutine.on(factoryConsumer(new BiConsumer<List<?>, ResultChannel<String>>() {
 
                 public void accept(final List<?> objects, final ResultChannel<String> result) {
 
@@ -596,13 +602,13 @@ public class InvocationTest {
         final SupplierObject<String> constant = Functions.constant("test");
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createProcedure2());
-        assertThat(factory).isNotEqualTo(procedureFrom(constant));
+        assertThat(factory).isNotEqualTo(procedureSupplier(constant));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createProcedure2().hashCode());
-        assertThat(procedureFrom(constant)).isEqualTo(procedureFrom(constant));
-        assertThat(procedureFrom(constant).hashCode()).isEqualTo(
-                procedureFrom(constant).hashCode());
+        assertThat(procedureSupplier(constant)).isEqualTo(procedureSupplier(constant));
+        assertThat(procedureSupplier(constant).hashCode()).isEqualTo(
+                procedureSupplier(constant).hashCode());
     }
 
     @Test
@@ -611,7 +617,7 @@ public class InvocationTest {
 
         try {
 
-            procedureFrom((Supplier<Object>) null);
+            procedureSupplier(null);
 
             fail();
 
@@ -621,7 +627,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(procedureFrom(new Supplier<Object>() {
+            JRoutine.on(procedureSupplier(new Supplier<Object>() {
 
                 public Object get() {
 
@@ -643,12 +649,13 @@ public class InvocationTest {
         final ConsumerObject<ResultChannel<String>> sink = Functions.sink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createProcedure());
-        assertThat(factory).isNotEqualTo(procedureFrom(sink));
+        assertThat(factory).isNotEqualTo(procedureConsumer(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createProcedure().hashCode());
-        assertThat(procedureFrom(sink)).isEqualTo(procedureFrom(sink));
-        assertThat(procedureFrom(sink).hashCode()).isEqualTo(procedureFrom(sink).hashCode());
+        assertThat(procedureConsumer(sink)).isEqualTo(procedureConsumer(sink));
+        assertThat(procedureConsumer(sink).hashCode()).isEqualTo(
+                procedureConsumer(sink).hashCode());
     }
 
     @Test
@@ -657,7 +664,7 @@ public class InvocationTest {
 
         try {
 
-            procedureFrom((Consumer<ResultChannel<Object>>) null);
+            procedureConsumer(null);
 
             fail();
 
@@ -667,7 +674,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(procedureFrom(new Consumer<ResultChannel<String>>() {
+            JRoutine.on(procedureConsumer(new Consumer<ResultChannel<String>>() {
 
                 public void accept(final ResultChannel<String> result) {
 

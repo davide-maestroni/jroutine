@@ -51,13 +51,12 @@ public class Channels {
      * invocation lifecycle.
      *
      * @param channels the array of input channels.
-     * @param <IN>     the input data type.
      * @return the selectable I/O channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <IN> IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> combine(
-            @NotNull final InputChannel<? extends IN>... channels) {
+    public static IOChannel<Selectable<?>, Selectable<?>> combine(
+            @NotNull final InputChannel<?>... channels) {
 
         return combine(0, channels);
     }
@@ -69,14 +68,13 @@ public class Channels {
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of input channels.
-     * @param <IN>       the input data type.
      * @return the selectable I/O channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> combine(
-            final int startIndex, @NotNull final InputChannel<? extends IN>... channels) {
+    public static IOChannel<Selectable<?>, Selectable<?>> combine(final int startIndex,
+            @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -94,8 +92,7 @@ public class Channels {
             channelList.add(ioChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<?>, Selectable<?>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(new SortingInputConsumer(startIndex, channelList));
         return ioChannel;
     }
@@ -199,13 +196,12 @@ public class Channels {
      * invocation lifecycle.
      *
      * @param channels the array of channels.
-     * @param <IN>     the input data type.
      * @return the I/O channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distribute(
-            @NotNull final InputChannel<? extends IN>... channels) {
+    public static IOChannel<List<?>, List<?>> distribute(
+            @NotNull final InputChannel<?>... channels) {
 
         return distribute(false, channels);
     }
@@ -237,13 +233,12 @@ public class Channels {
      * invocation lifecycle.
      *
      * @param channels the array of channels.
-     * @param <IN>     the input data type.
      * @return the I/O channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distributeAndFlush(
-            @NotNull final InputChannel<? extends IN>... channels) {
+    public static IOChannel<List<?>, List<?>> distributeAndFlush(
+            @NotNull final InputChannel<?>... channels) {
 
         return distribute(true, channels);
     }
@@ -293,13 +288,11 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
-     * @param <OUT>    the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> join(
-            @NotNull final OutputChannel<? extends OUT>... channels) {
+    public static OutputChannel<List<?>> join(@NotNull final OutputChannel<?>... channels) {
 
         return join(false, channels);
     }
@@ -335,13 +328,11 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
-     * @param <OUT>    the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> joinAndFlush(
-            @NotNull final OutputChannel<? extends OUT>... channels) {
+    public static OutputChannel<List<?>> joinAndFlush(@NotNull final OutputChannel<?>... channels) {
 
         return join(true, channels);
     }
@@ -577,23 +568,22 @@ public class Channels {
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
-     * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
-            @NotNull final OutputChannel<? extends OUT>... channels) {
+    public static OutputChannel<? extends Selectable<?>> merge(final int startIndex,
+            @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
 
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<Selectable<OUT>, Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<?>, Selectable<?>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
 
-        for (final OutputChannel<? extends OUT> channel : channels) {
+        for (final OutputChannel<?> channel : channels) {
 
             ioChannel.pass(toSelectable(channel, i++));
         }
@@ -654,13 +644,12 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
-     * @param <OUT>    the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
-            @NotNull final OutputChannel<? extends OUT>... channels) {
+    public static OutputChannel<? extends Selectable<?>> merge(
+            @NotNull final OutputChannel<?>... channels) {
 
         return merge(0, channels);
     }
@@ -772,8 +761,8 @@ public class Channels {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distribute(
-            final boolean isFlush, @NotNull final InputChannel<? extends IN>... channels) {
+    private static IOChannel<List<?>, List<?>> distribute(final boolean isFlush,
+            @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -791,8 +780,7 @@ public class Channels {
             channelList.add(ioChannel);
         }
 
-        final IOChannel<List<? extends IN>, List<? extends IN>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<List<?>, List<?>> ioChannel = JRoutine.io().buildChannel();
         return ioChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
     }
 
@@ -843,8 +831,8 @@ public class Channels {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static <OUT> OutputChannel<List<? extends OUT>> join(final boolean isFlush,
-            @NotNull final OutputChannel<? extends OUT>... channels) {
+    private static OutputChannel<List<?>> join(final boolean isFlush,
+            @NotNull final OutputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -853,8 +841,7 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<List<? extends OUT>, List<? extends OUT>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<List<?>, List<?>> ioChannel = JRoutine.io().buildChannel();
         final JoinOutputConsumer consumer = new JoinOutputConsumer(ioChannel, length, isFlush);
         merge(channels).passTo(consumer);
         return ioChannel;

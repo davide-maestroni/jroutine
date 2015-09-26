@@ -59,7 +59,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         super(TestActivity.class);
     }
 
-    @SuppressWarnings("unchecked")
     public void testCombine() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -101,7 +100,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         assertThat(channel2.result().eventually().all()).containsExactly(1, 2, 3, 4, 5);
     }
 
-    @SuppressWarnings("unchecked")
     public void testCombineAbort() {
 
         InvocationChannel<String, String> channel1;
@@ -314,7 +312,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -328,7 +325,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                                                                    .asyncInvoke()
                                                                    .orderByCall();
         Channels.distribute(channel1, channel2).pass(Arrays.asList("test1-1", "test1-2")).close();
-        Channels.distribute(Arrays.asList(channel1, channel2))
+        Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
                 .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
         Channels.distribute(channel1, channel2).pass(Collections.singletonList("test3-1")).close();
@@ -337,7 +334,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2");
     }
 
-    @SuppressWarnings("unchecked")
     public void testDistributeAbort() {
 
         InvocationChannel<String, String> channel1;
@@ -403,7 +399,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void testDistributeAndFlush() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -419,7 +414,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         Channels.distributeAndFlush(channel1, channel2)
                 .pass(Arrays.asList("test1-1", "test1-2"))
                 .close();
-        Channels.distributeAndFlush(Arrays.asList(channel1, channel2))
+        Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2))
                 .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
         Channels.distributeAndFlush(channel1, channel2)
@@ -431,7 +426,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                                                                          null);
     }
 
-    @SuppressWarnings("unchecked")
     public void testDistributeAndFlushAbort() {
 
         InvocationChannel<String, String> channel1;
@@ -497,7 +491,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void testDistributeAndFlushError() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -538,7 +531,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void testDistributeError() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -640,7 +632,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void testJoin() {
 
         final IOChannelBuilder builder = JRoutine.io();
@@ -678,7 +669,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                           .all()).containsExactly('s', '2');
     }
 
-    @SuppressWarnings("unchecked")
     public void testJoinAbort() {
 
         final IOChannelBuilder builder = JRoutine.io();
@@ -720,7 +710,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void testJoinAndFlush() {
 
         final IOChannelBuilder builder = JRoutine.io();
@@ -765,7 +754,6 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void testJoinAndFlushAbort() {
 
         final IOChannelBuilder builder = JRoutine.io();

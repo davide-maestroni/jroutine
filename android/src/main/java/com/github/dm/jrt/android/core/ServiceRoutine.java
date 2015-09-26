@@ -430,8 +430,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                         } catch (final Throwable t) {
 
                             InvocationInterruptedException.ignoreIfPossible(t);
-                            mLogger.wrn(t, "unbinding failed (maybe the connection was "
-                                    + "leaked...)");
+                            mLogger.wrn(t, "unbinding failed (maybe the connection was leaked...)");
                         }
                     }
                 }

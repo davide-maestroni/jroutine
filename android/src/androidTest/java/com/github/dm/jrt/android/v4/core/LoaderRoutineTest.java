@@ -22,6 +22,7 @@ import com.github.dm.jrt.android.R;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.DelegatingContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
@@ -39,10 +40,11 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.DeadlockException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.TransportChannel;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.Invocations;
@@ -68,6 +70,7 @@ import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
+import static com.github.dm.jrt.android.invocation.ContextInvocations.supplierFactory;
 import static com.github.dm.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.util.TimeDuration.millis;
@@ -87,6 +90,17 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public LoaderRoutineTest() {
 
         super(TestActivity.class);
+    }
+
+    private static ContextInvocationFactory<String, String> createFactory() {
+
+        return supplierFactory(new Supplier<ContextInvocation<String, String>>() {
+
+            public ContextInvocation<String, String> get() {
+
+                return new StringFunctionInvocation();
+            }
+        });
     }
 
     public void testActivityAbort() {
@@ -1282,12 +1296,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         }
 
-        final TransportChannel<Object> transportChannel = JRoutine.transport().buildChannel();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
         result = JRoutine.with(contextFrom(getActivity()))
                          .on(PassingContextInvocation.factoryOf())
                          .asyncInvoke()
                          .after(seconds(2))
-                         .pass(transportChannel)
+                         .pass(ioChannel)
                          .result();
 
         try {
@@ -1482,6 +1496,15 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testSupplierFactory() {
+
+        assertThat(JRoutine.with(contextFrom(getActivity()))
+                           .on(createFactory())
+                           .asyncCall("test")
+                           .eventually()
+                           .all()).containsExactly("test");
     }
 
     private static class Abort extends TemplateInvocation<Data, Data> {

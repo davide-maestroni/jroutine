@@ -16,10 +16,10 @@ package com.github.dm.jrt.android.core;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.ByteChannel;
 import com.github.dm.jrt.core.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
@@ -51,10 +51,10 @@ public class ParcelableByteChannel {
     private final ByteChannel mByteChannel;
 
     private final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
-            TransportChannel<ByteBuffer>>
+            IOChannel<ByteBuffer, ByteBuffer>>
             mStreams =
             new WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
-                    TransportChannel<ByteBuffer>>();
+                    IOChannel<ByteBuffer, ByteBuffer>>();
 
     /**
      * Constructor.
@@ -228,24 +228,24 @@ public class ParcelableByteChannel {
     public BufferOutputStream passTo(
             @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
 
-        TransportChannel<ByteBuffer> transportChannel;
+        IOChannel<ByteBuffer, ByteBuffer> ioChannel;
 
         synchronized (mStreams) {
 
             final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
-                    TransportChannel<ByteBuffer>>
+                    IOChannel<ByteBuffer, ByteBuffer>>
                     streams = mStreams;
-            transportChannel = streams.get(channel);
+            ioChannel = streams.get(channel);
 
-            if (transportChannel == null) {
+            if (ioChannel == null) {
 
-                transportChannel = JRoutine.transport().buildChannel();
-                transportChannel.passTo(new BufferOutputConsumer(channel));
-                streams.put(channel, transportChannel);
+                ioChannel = JRoutine.io().buildChannel();
+                ioChannel.passTo(new BufferOutputConsumer(channel));
+                streams.put(channel, ioChannel);
             }
         }
 
-        return mByteChannel.passTo(transportChannel);
+        return mByteChannel.passTo(ioChannel);
     }
 
     /**
@@ -278,16 +278,16 @@ public class ParcelableByteChannel {
 
                         if (data.length > 0) {
 
-                            final TransportChannel<ByteBuffer> transportChannel =
-                                    JRoutine.transport().buildChannel();
+                            final IOChannel<ByteBuffer, ByteBuffer> ioChannel =
+                                    JRoutine.io().buildChannel();
                             final BufferOutputStream outputStream =
-                                    ByteChannel.byteChannel(data.length).passTo(transportChannel);
+                                    ByteChannel.byteChannel(data.length).passTo(ioChannel);
 
                             try {
 
                                 outputStream.write(data);
                                 outputStream.close();
-                                return new ParcelableByteBuffer(transportChannel.next());
+                                return new ParcelableByteBuffer(ioChannel.next());
 
                             } catch (final IOException ignored) {
 

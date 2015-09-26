@@ -17,10 +17,10 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.StreamingChannel;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
@@ -432,7 +432,7 @@ public class StreamingChannelTest {
 
         try {
 
-            new DefaultStreamingChannel<Object, Object>(null, JRoutine.transport().buildChannel());
+            new DefaultStreamingChannel<Object, Object>(null, JRoutine.io().buildChannel());
 
             fail();
 
@@ -442,7 +442,7 @@ public class StreamingChannelTest {
 
         try {
 
-            new DefaultStreamingChannel<Object, Object>(JRoutine.transport().buildChannel(), null);
+            new DefaultStreamingChannel<Object, Object>(JRoutine.io().buildChannel(), null);
 
             fail();
 
@@ -469,14 +469,14 @@ public class StreamingChannelTest {
         channel.pass(-77L);
         assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
 
-        final TransportChannel<Object> transportChannel1 = JRoutine.transport().buildChannel();
-        transportChannel1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(transportChannel1.afterMax(timeout).all()).containsOnly(23, -77L);
+        final IOChannel<Object, Object> ioChannel1 = JRoutine.io().buildChannel();
+        ioChannel1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(ioChannel1.afterMax(timeout).all()).containsOnly(23, -77L);
 
-        final TransportChannel<Object> transportChannel2 = JRoutine.transport().buildChannel();
-        transportChannel2.orderByDelay().orderByDelay().orderByCall();
-        transportChannel2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(transportChannel2.afterMax(timeout).all()).containsExactly(23, -77L);
+        final IOChannel<Object, Object> ioChannel2 = JRoutine.io().buildChannel();
+        ioChannel2.orderByDelay().orderByDelay().orderByCall();
+        ioChannel2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(ioChannel2.afterMax(timeout).all()).containsExactly(23, -77L);
     }
 
     @Test
@@ -668,9 +668,9 @@ public class StreamingChannelTest {
 
         private final WeakReference<StreamingChannel<String, String>> mChannelRef;
 
-        public WeakThread(final StreamingChannel<String, String> transportChannel) {
+        public WeakThread(final StreamingChannel<String, String> ioChannel) {
 
-            mChannelRef = new WeakReference<StreamingChannel<String, String>>(transportChannel);
+            mChannelRef = new WeakReference<StreamingChannel<String, String>>(ioChannel);
         }
 
         @Override

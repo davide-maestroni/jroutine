@@ -37,9 +37,10 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.AbortException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.TransportChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
@@ -127,23 +128,23 @@ public class LoaderObjectRoutineFragmentTest
                                         .withExecutionTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
-        final TransportChannel<Integer> channel3 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel3 = JRoutine.io().buildChannel();
         channel3.pass(7).close();
         assertThat(sumAsync.compute(3, channel3)).isEqualTo(10);
 
-        final TransportChannel<Integer> channel4 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel4 = JRoutine.io().buildChannel();
         channel4.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.compute(channel4)).isEqualTo(10);
 
-        final TransportChannel<int[]> channel5 = JRoutine.transport().buildChannel();
+        final IOChannel<int[], int[]> channel5 = JRoutine.io().buildChannel();
         channel5.pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5)).isEqualTo(10);
 
-        final TransportChannel<Integer> channel6 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel6 = JRoutine.io().buildChannel();
         channel6.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList(channel6)).isEqualTo(10);
 
-        final TransportChannel<Integer> channel7 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel7 = JRoutine.io().buildChannel();
         channel7.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList1(channel7)).isEqualTo(10);
     }
@@ -396,7 +397,7 @@ public class LoaderObjectRoutineFragmentTest
 
         }
 
-        final TransportChannel<Integer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel = JRoutine.io().buildChannel();
 
         try {
 
@@ -751,78 +752,81 @@ public class LoaderObjectRoutineFragmentTest
                                 .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
-        final TransportChannel<Character> channel1 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel1 = JRoutine.io().buildChannel();
         channel1.pass('a').close();
         assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
-        final TransportChannel<Character> channel2 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel2 = JRoutine.io().buildChannel();
         channel2.pass('d', 'e', 'f').close();
         assertThat(itf.add2(channel2)).isIn((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-        final TransportChannel<Character> channel3 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel3 = JRoutine.io().buildChannel();
         channel3.pass('a').close();
         assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
-        final TransportChannel<Character> channel4 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel4 = JRoutine.io().buildChannel();
         channel4.pass('d', 'e', 'f').close();
         assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
-        assertThat(itf.add8().asyncCall('d').all()).containsOnly((int) 'd');
-        assertThat(itf.add9().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
+        assertThat(itf.add8().pass('d').close().all()).containsOnly((int) 'd');
+        assertThat(itf.add9().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
                                                                               (int) 'f');
+        assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
+        assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
+                                                                               (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-        final TransportChannel<char[]> channel5 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel5 = JRoutine.io().buildChannel();
         channel5.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-        final TransportChannel<Character> channel6 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel6 = JRoutine.io().buildChannel();
         channel6.pass('d', 'e', 'f').close();
         assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
-        final TransportChannel<char[]> channel7 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel7 = JRoutine.io().buildChannel();
         channel7.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA03(channel7)).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                               new int[]{'f', 'z'});
         assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
-        final TransportChannel<char[]> channel8 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel8 = JRoutine.io().buildChannel();
         channel8.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-        final TransportChannel<Character> channel9 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel9 = JRoutine.io().buildChannel();
         channel9.pass('d', 'e', 'f').close();
         assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
-        final TransportChannel<char[]> channel10 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel10 = JRoutine.io().buildChannel();
         channel10.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA07(channel10).all()).containsOnly(new int[]{'d', 'z'},
                                                              new int[]{'e', 'z'},
                                                              new int[]{'f', 'z'});
         assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
-        final TransportChannel<char[]> channel11 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel11 = JRoutine.io().buildChannel();
         channel11.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-        final TransportChannel<Character> channel12 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel12 = JRoutine.io().buildChannel();
         channel12.pass('d', 'e', 'f').close();
         assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-        final TransportChannel<char[]> channel13 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel13 = JRoutine.io().buildChannel();
         channel13.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA11(channel13).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
                                                              (int) 'z');
         assertThat(itf.addA12(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
-        final TransportChannel<char[]> channel14 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel14 = JRoutine.io().buildChannel();
         channel14.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA13(channel14)).containsExactly(new int[]{'a', 'z'});
-        final TransportChannel<Character> channel15 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel15 = JRoutine.io().buildChannel();
         channel15.pass('d', 'e', 'f').close();
         assertThat(itf.addA14(channel15)).containsExactly(new int[]{'d', 'e', 'f'});
-        final TransportChannel<char[]> channel16 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel16 = JRoutine.io().buildChannel();
         channel16.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA15(channel16)).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                                        new int[]{'f', 'z'});
         assertThat(itf.addA16(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
-        final TransportChannel<char[]> channel17 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel17 = JRoutine.io().buildChannel();
         channel17.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA17(channel17)).containsExactly(new int[]{'a', 'z'});
-        final TransportChannel<Character> channel18 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel18 = JRoutine.io().buildChannel();
         channel18.pass('d', 'e', 'f').close();
         assertThat(itf.addA18(channel18)).containsExactly(new int[]{'d', 'e', 'f'});
-        final TransportChannel<char[]> channel19 = JRoutine.transport().buildChannel();
+        final IOChannel<char[], char[]> channel19 = JRoutine.io().buildChannel();
         channel19.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA19(channel19)).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                                        new int[]{'f', 'z'});
@@ -835,22 +839,31 @@ public class LoaderObjectRoutineFragmentTest
                                            new int[]{'f', 'z'});
         assertThat(itf.addA22().pass('d', 'e', 'f').result().all()).containsOnly(
                 new int[]{'d', 'e', 'f'});
-        assertThat(itf.addA23().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
+        assertThat(itf.addA23().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA24()
+                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .close()
+                      .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                           new int[]{'f', 'z'});
+        assertThat(itf.addA25().pass('d', 'e', 'f').close().all()).containsOnly(
+                new int[]{'d', 'e', 'f'});
+        assertThat(itf.addA26().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
+                new int[]{'c', 'z'});
+        assertThat(itf.addA27()
                       .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
                                     new char[]{'f', 'z'})
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                            new int[]{'f', 'z'});
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final TransportChannel<List<Character>> channel20 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel20 = JRoutine.io().buildChannel();
         channel20.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-        final TransportChannel<Character> channel21 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel21 = JRoutine.io().buildChannel();
         channel21.pass('d', 'e', 'f').close();
         assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final TransportChannel<List<Character>> channel22 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel22 = JRoutine.io().buildChannel();
         channel22.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL03(channel22)).isIn(Arrays.asList((int) 'd', (int) 'z'),
@@ -858,42 +871,42 @@ public class LoaderObjectRoutineFragmentTest
                                                Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final TransportChannel<List<Character>> channel23 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel23 = JRoutine.io().buildChannel();
         channel23.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL05(channel23).all()).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
-        final TransportChannel<Character> channel24 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel24 = JRoutine.io().buildChannel();
         channel24.pass('d', 'e', 'f').close();
         assertThat(itf.addL06(channel24).all()).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final TransportChannel<List<Character>> channel25 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel25 = JRoutine.io().buildChannel();
         channel25.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL07(channel25).all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                                              Arrays.asList((int) 'e', (int) 'z'),
                                                              Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
-        final TransportChannel<List<Character>> channel26 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel26 = JRoutine.io().buildChannel();
         channel26.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-        final TransportChannel<Character> channel27 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel27 = JRoutine.io().buildChannel();
         channel27.pass('d', 'e', 'f').close();
         assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-        final TransportChannel<List<Character>> channel28 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel28 = JRoutine.io().buildChannel();
         channel28.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL11(channel28).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
                                                              (int) 'z');
         assertThat(itf.addL12(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final TransportChannel<List<Character>> channel29 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel29 = JRoutine.io().buildChannel();
         channel29.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL13(channel29)).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
-        final TransportChannel<Character> channel30 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel30 = JRoutine.io().buildChannel();
         channel30.pass('d', 'e', 'f').close();
         assertThat(itf.addL14(channel30)).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final TransportChannel<List<Character>> channel31 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel31 = JRoutine.io().buildChannel();
         channel31.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL15(channel31)).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
@@ -901,14 +914,14 @@ public class LoaderObjectRoutineFragmentTest
                                                        Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL16(Arrays.asList('c', 'z'))).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final TransportChannel<List<Character>> channel32 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel32 = JRoutine.io().buildChannel();
         channel32.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL17(channel32)).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
-        final TransportChannel<Character> channel33 = JRoutine.transport().buildChannel();
+        final IOChannel<Character, Character> channel33 = JRoutine.io().buildChannel();
         channel33.pass('d', 'e', 'f').close();
         assertThat(itf.addL18(channel33)).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final TransportChannel<List<Character>> channel34 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Character>, List<Character>> channel34 = JRoutine.io().buildChannel();
         channel34.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL19(channel34)).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
@@ -925,9 +938,20 @@ public class LoaderObjectRoutineFragmentTest
                                            Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL22().pass('d', 'e', 'f').result().all()).containsOnly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        assertThat(itf.addL23().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
+        assertThat(itf.addL23().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL24()
+                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                            Arrays.asList('f', 'z'))
+                      .close()
+                      .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                           Arrays.asList((int) 'e', (int) 'z'),
+                                           Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL25().pass('d', 'e', 'f').close().all()).containsOnly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
+        assertThat(itf.addL26().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        assertThat(itf.addL27()
                       .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                                     Arrays.asList('f', 'z'))
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
@@ -936,54 +960,62 @@ public class LoaderObjectRoutineFragmentTest
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().result().all()).containsExactly(31);
-        assertThat(itf.get3().asyncCall().all()).containsExactly(31);
+        assertThat(itf.get3().close().all()).containsExactly(31);
+        assertThat(itf.get4().asyncCall().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().result().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA5().asyncCall().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA5().close().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA6().asyncCall().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().result().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL5().asyncCall().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL5().close().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL6().asyncCall().all()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
-        final TransportChannel<Integer> channel35 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel35 = JRoutine.io().buildChannel();
         channel35.pass(-17).close();
         itf.set1(channel35);
-        final TransportChannel<Integer> channel36 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel36 = JRoutine.io().buildChannel();
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).result().checkComplete();
-        itf.set4().asyncCall(-17).checkComplete();
+        itf.set4().pass(-17).close().checkComplete();
+        itf.set5().asyncCall(-17).checkComplete();
         itf.setA0(new int[]{1, 2, 3});
-        final TransportChannel<int[]> channel37 = JRoutine.transport().buildChannel();
+        final IOChannel<int[], int[]> channel37 = JRoutine.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
         itf.setA1(channel37);
-        final TransportChannel<Integer> channel38 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel38 = JRoutine.io().buildChannel();
         channel38.pass(1, 2, 3).close();
         itf.setA2(channel38);
-        final TransportChannel<int[]> channel39 = JRoutine.transport().buildChannel();
+        final IOChannel<int[], int[]> channel39 = JRoutine.io().buildChannel();
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
         itf.setA5().pass(1, 2, 3).result().checkComplete();
-        itf.setA6().asyncCall(new int[]{1, 2, 3}).checkComplete();
+        itf.setA6().pass(new int[]{1, 2, 3}).close().checkComplete();
+        itf.setA7().pass(1, 2, 3).close().checkComplete();
+        itf.setA8().asyncCall(new int[]{1, 2, 3}).checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
-        final TransportChannel<List<Integer>> channel40 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Integer>, List<Integer>> channel40 = JRoutine.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL1(channel40);
-        final TransportChannel<Integer> channel41 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel41 = JRoutine.io().buildChannel();
         channel41.pass(1, 2, 3).close();
         itf.setL2(channel41);
-        final TransportChannel<List<Integer>> channel42 = JRoutine.transport().buildChannel();
+        final IOChannel<List<Integer>, List<Integer>> channel42 = JRoutine.io().buildChannel();
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
         itf.setL5().pass(1, 2, 3).result().checkComplete();
-        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
+        itf.setL6().pass(Arrays.asList(1, 2, 3)).close().checkComplete();
+        itf.setL7().pass(1, 2, 3).close().checkComplete();
+        itf.setL8().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
     }
 
     @SuppressWarnings("NullArgumentToVariableArgMethod")
@@ -1015,11 +1047,11 @@ public class LoaderObjectRoutineFragmentTest
                               .all()).isEmpty();
         assertThat(squareAsync.computeParallel3(null).afterMax(timeout).all()).isEmpty();
 
-        final TransportChannel<Integer> channel1 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel1 = JRoutine.io().buildChannel();
         channel1.pass(4).close();
         assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
 
-        final TransportChannel<Integer> channel2 = JRoutine.transport().buildChannel();
+        final IOChannel<Integer, Integer> channel2 = JRoutine.io().buildChannel();
         channel2.pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel4(channel2).afterMax(timeout).all()).contains(1, 4,
                                                                                             9);
@@ -1204,6 +1236,14 @@ public class LoaderObjectRoutineFragmentTest
         int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.VALUE)
+        Routine<Character, Integer> add10();
+
+        @Alias("a")
+        @Inputs(value = char.class, mode = InputMode.PARALLEL)
+        Routine<Character, Integer> add11();
+
+        @Alias("a")
         int add2(@Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
 
         @Alias("a")
@@ -1230,11 +1270,11 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.VALUE)
-        Routine<Character, Integer> add8();
+        StreamingChannel<Character, Integer> add8();
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.PARALLEL)
-        Routine<Character, Integer> add9();
+        StreamingChannel<Character, Integer> add9();
 
         @Alias("aa")
         int[] addA00(char[] c);
@@ -1341,11 +1381,23 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.VALUE)
-        Routine<char[], int[]> addA23();
+        StreamingChannel<char[], int[]> addA23();
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.PARALLEL)
-        Routine<char[], int[]> addA24();
+        StreamingChannel<char[], int[]> addA24();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.COLLECTION)
+        StreamingChannel<Character, int[]> addA25();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.VALUE)
+        Routine<char[], int[]> addA26();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
+        Routine<char[], int[]> addA27();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
@@ -1452,11 +1504,23 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.VALUE)
-        Routine<List<Character>, List<Integer>> addL23();
+        StreamingChannel<List<Character>, List<Integer>> addL23();
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.PARALLEL)
-        Routine<List<Character>, List<Integer>> addL24();
+        StreamingChannel<List<Character>, List<Integer>> addL24();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        StreamingChannel<Character, List<Integer>> addL25();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        Routine<List<Character>, List<Integer>> addL26();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = InputMode.PARALLEL)
+        Routine<List<Character>, List<Integer>> addL27();
 
         @Alias("g")
         int get0();
@@ -1480,7 +1544,11 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("g")
         @Inputs({})
-        Routine<Void, Integer> get3();
+        StreamingChannel<Void, Integer> get3();
+
+        @Alias("g")
+        @Inputs({})
+        Routine<Void, Integer> get4();
 
         @Alias("ga")
         int[] getA0();
@@ -1516,7 +1584,11 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("ga")
         @Inputs({})
-        Routine<Void, int[]> getA5();
+        StreamingChannel<Void, int[]> getA5();
+
+        @Alias("ga")
+        @Inputs({})
+        Routine<Void, int[]> getA6();
 
         @Alias("gl")
         List<Integer> getL0();
@@ -1554,7 +1626,11 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("gl")
         @Inputs({})
-        Routine<Void, List<Integer>> getL5();
+        StreamingChannel<Void, List<Integer>> getL5();
+
+        @Alias("gl")
+        @Inputs({})
+        Routine<Void, List<Integer>> getL6();
 
         @Alias("s")
         @Inputs(value = int.class, mode = InputMode.VALUE)
@@ -1562,7 +1638,11 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("s")
         @Inputs(value = int.class, mode = InputMode.VALUE)
-        Routine<Integer, Void> set4();
+        StreamingChannel<Integer, Void> set4();
+
+        @Alias("s")
+        @Inputs(value = int.class, mode = InputMode.VALUE)
+        Routine<Integer, Void> set5();
 
         @Alias("sa")
         @Inputs(value = int[].class, mode = InputMode.VALUE)
@@ -1574,7 +1654,15 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("sa")
         @Inputs(value = int[].class, mode = InputMode.VALUE)
-        Routine<int[], Void> setA6();
+        StreamingChannel<int[], Void> setA6();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.COLLECTION)
+        StreamingChannel<Integer, Void> setA7();
+
+        @Alias("sa")
+        @Inputs(value = int[].class, mode = InputMode.VALUE)
+        Routine<int[], Void> setA8();
 
         @Alias("sl")
         @Inputs(value = List.class, mode = InputMode.VALUE)
@@ -1586,7 +1674,15 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("sl")
         @Inputs(value = List.class, mode = InputMode.VALUE)
-        Routine<List<Integer>, Void> setL6();
+        StreamingChannel<List<Integer>, Void> setL6();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.COLLECTION)
+        StreamingChannel<Integer, Void> setL7();
+
+        @Alias("sl")
+        @Inputs(value = List.class, mode = InputMode.VALUE)
+        Routine<List<Integer>, Void> setL8();
     }
 
     private interface CountError {

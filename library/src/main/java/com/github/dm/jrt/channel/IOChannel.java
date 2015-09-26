@@ -24,6 +24,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Interface defining a channel which is both an input and an output.
  * <p/>
+ * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br/>
+ * The channel output can be passed to a routine input channel in order to feed it with data coming
+ * asynchronously from other sources. Note however that, in any case, the {@code close()} method
+ * must be called in order to correctly terminate the invocation lifecycle.
+ * <p/>
  * Created by davide-maestroni on 09/24/2015.
  *
  * @param <IN>  the input data type.

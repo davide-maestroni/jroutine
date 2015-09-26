@@ -20,14 +20,14 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FilterContextInvocation;
 import com.github.dm.jrt.android.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.builder.TransportChannelBuilder;
 import com.github.dm.jrt.channel.AbortException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
@@ -59,6 +59,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         super(TestActivity.class);
     }
 
+    @SuppressWarnings("unchecked")
     public void testCombine() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -100,6 +101,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         assertThat(channel2.result().eventually().all()).containsExactly(1, 2, 3, 4, 5);
     }
 
+    @SuppressWarnings("unchecked")
     public void testCombineAbort() {
 
         InvocationChannel<String, String> channel1;
@@ -312,6 +314,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -324,20 +327,17 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                                                                            PassingString.class))
                                                                    .asyncInvoke()
                                                                    .orderByCall();
-        Channels.distribute(channel1, channel2)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+        Channels.distribute(channel1, channel2).pass(Arrays.asList("test1-1", "test1-2")).close();
+        Channels.distribute(Arrays.asList(channel1, channel2))
+                .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
-        Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
-                .close();
-        Channels.distribute(channel1, channel2)
-                .pass(Collections.<Object>singletonList("test3-1"))
-                .close();
+        Channels.distribute(channel1, channel2).pass(Collections.singletonList("test3-1")).close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
         assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2");
     }
 
+    @SuppressWarnings("unchecked")
     public void testDistributeAbort() {
 
         InvocationChannel<String, String> channel1;
@@ -403,6 +403,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testDistributeAndFlush() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -416,13 +417,13 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                                                                    .asyncInvoke()
                                                                    .orderByCall();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .pass(Arrays.asList("test1-1", "test1-2"))
                 .close();
-        Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
+        Channels.distributeAndFlush(Arrays.asList(channel1, channel2))
+                .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Collections.<Object>singletonList("test3-1"))
+                .pass(Collections.singletonList("test3-1"))
                 .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
@@ -430,6 +431,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                                                                          null);
     }
 
+    @SuppressWarnings("unchecked")
     public void testDistributeAndFlushAbort() {
 
         InvocationChannel<String, String> channel1;
@@ -495,6 +497,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testDistributeAndFlushError() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -502,9 +505,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                                                                            PassingString.class))
                                                                    .asyncInvoke()
                                                                    .orderByCall();
-        Channels.distributeAndFlush(channel1)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
-                .close();
+        Channels.distributeAndFlush(channel1).pass(Arrays.asList("test1-1", "test1-2")).close();
 
         try {
 
@@ -537,6 +538,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testDistributeError() {
 
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
@@ -544,7 +546,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                                                                            PassingString.class))
                                                                    .asyncInvoke()
                                                                    .orderByCall();
-        Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2")).close();
+        Channels.distribute(channel1).pass(Arrays.asList("test1-1", "test1-2")).close();
 
         try {
 
@@ -580,8 +582,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testInputSelect() {
 
-        final TransportChannel<ParcelableSelectable<String>> channel =
-                JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
+                JRoutine.io().buildChannel();
         Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3").close();
         channel.close();
         assertThat(channel.all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
@@ -591,8 +593,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testInputSelectAbort() {
 
-        final TransportChannel<ParcelableSelectable<String>> channel =
-                JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
+                JRoutine.io().buildChannel();
         Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3").abort();
         channel.close();
 
@@ -610,7 +612,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testInputToSelectable() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33)
                 .pass(new ParcelableSelectable<String>("test1", 33),
                       new ParcelableSelectable<String>("test2", -33),
@@ -623,7 +625,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testInputToSelectableAbort() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33).abort();
         channel.close();
 
@@ -638,14 +640,15 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testJoin() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -675,14 +678,15 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                           .all()).containsExactly('s', '2');
     }
 
+    @SuppressWarnings("unchecked")
     public void testJoinAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -716,14 +720,15 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testJoinAndFlush() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -760,14 +765,15 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testJoinAndFlushAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -850,13 +856,13 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testMap() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final TransportChannel<String> channel1 = builder.buildChannel();
-        final TransportChannel<Integer> channel2 = builder.buildChannel();
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        final IOChannel<String, String> channel1 = builder.buildChannel();
+        final IOChannel<Integer, Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends ParcelableSelectable<Object>> channel =
-                Channels.mergeParcelable(Arrays.<TransportChannel<?>>asList(channel1, channel2));
+                Channels.merge(Arrays.<IOChannel<?, ?>>asList(channel1, channel2));
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutine.with(serviceFrom(getActivity()))
                         .on(factoryOf(Sort.class))
@@ -885,14 +891,14 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testMerge() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(-7, channel1, channel2);
+        outputChannel = Channels.merge(-7, channel1, channel2);
         channel1.pass("test1").close();
         channel2.pass(13).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
@@ -900,7 +906,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 new ParcelableSelectable<Integer>(13, -6));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(11, Arrays.asList(channel1, channel2));
+        outputChannel = Channels.merge(11, Arrays.asList(channel1, channel2));
         channel2.pass(13).close();
         channel1.pass("test1").close();
         assertThat(outputChannel.eventually().all()).containsOnly(
@@ -908,7 +914,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 new ParcelableSelectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(channel1, channel2);
+        outputChannel = Channels.merge(channel1, channel2);
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
@@ -916,7 +922,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 new ParcelableSelectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(Arrays.asList(channel1, channel2));
+        outputChannel = Channels.merge(Arrays.asList(channel1, channel2));
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
@@ -927,17 +933,17 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final TransportChannel<String> channel1 = builder.buildChannel();
-        final TransportChannel<String> channel2 = builder.buildChannel();
-        final TransportChannel<String> channel3 = builder.buildChannel();
-        final TransportChannel<String> channel4 = builder.buildChannel();
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        final IOChannel<String, String> channel1 = builder.buildChannel();
+        final IOChannel<String, String> channel2 = builder.buildChannel();
+        final IOChannel<String, String> channel3 = builder.buildChannel();
+        final IOChannel<String, String> channel4 = builder.buildChannel();
 
         final Routine<ParcelableSelectable<String>, String> routine =
                 JRoutine.on(Invocations.factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
         final OutputChannel<String> outputChannel = routine.asyncCall(
-                Channels.mergeParcelable(Arrays.asList(channel1, channel2, channel3, channel4)));
+                Channels.merge(Arrays.asList(channel1, channel2, channel3, channel4)));
 
         for (int i = 0; i < 4; i++) {
 
@@ -959,14 +965,14 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testMergeAbort() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(-7, channel1, channel2);
+        outputChannel = Channels.merge(-7, channel1, channel2);
         channel1.pass("test1").close();
         channel2.abort();
 
@@ -982,7 +988,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(11, Arrays.asList(channel1, channel2));
+        outputChannel = Channels.merge(11, Arrays.asList(channel1, channel2));
         channel2.abort();
         channel1.pass("test1").close();
 
@@ -998,7 +1004,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(channel1, channel2);
+        outputChannel = Channels.merge(channel1, channel2);
         channel1.abort();
         channel2.pass(-17).close();
 
@@ -1014,7 +1020,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.mergeParcelable(Arrays.asList(channel1, channel2));
+        outputChannel = Channels.merge(Arrays.asList(channel1, channel2));
         channel1.pass("test2").close();
         channel2.abort();
 
@@ -1033,7 +1039,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.mergeParcelable(0, Collections.<OutputChannel<Object>>emptyList());
+            Channels.merge(0, Collections.<OutputChannel<Object>>emptyList());
 
             fail();
 
@@ -1043,7 +1049,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.mergeParcelable(0);
+            Channels.merge(0);
 
             fail();
 
@@ -1053,7 +1059,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.mergeParcelable(Collections.<OutputChannel<Object>>emptyList());
+            Channels.merge(Collections.<OutputChannel<Object>>emptyList());
 
             fail();
 
@@ -1063,7 +1069,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.mergeParcelable();
+            Channels.merge();
 
             fail();
 
@@ -1206,8 +1212,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputSelect() {
 
-        final TransportChannel<ParcelableSelectable<String>> channel =
-                JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel, 33);
         channel.pass(new ParcelableSelectable<String>("test1", 33),
                      new ParcelableSelectable<String>("test2", -33),
@@ -1219,8 +1225,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testOutputSelectAbort() {
 
-        final TransportChannel<ParcelableSelectable<String>> channel =
-                JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel, 33);
         channel.abort();
 
@@ -1238,7 +1244,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputToSelectable() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(
                 Channels.toSelectable(channel.asOutput(), 33).eventually().all()).containsExactly(
@@ -1249,7 +1255,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testOutputToSelectableAbort() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").abort();
 
         try {

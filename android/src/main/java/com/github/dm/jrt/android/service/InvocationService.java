@@ -30,10 +30,10 @@ import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.ContextInvocations;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -851,11 +851,11 @@ public class InvocationService extends Service {
 
         private final String mId;
 
+        private final IOChannel<Object, Object> mIoChannel;
+
         private final RoutineInfo mRoutineInfo;
 
         private final RoutineState mRoutineState;
-
-        private final TransportChannel<Object> mTransport;
 
         /**
          * Constructor.
@@ -873,9 +873,8 @@ public class InvocationService extends Service {
             mChannel = channel;
             mRoutineInfo = info;
             mRoutineState = state;
-            final TransportChannel<Object> transportChannel =
-                    (mTransport = JRoutine.transport().buildChannel());
-            channel.pass(transportChannel);
+            final IOChannel<Object, Object> ioChannel = (mIoChannel = JRoutine.io().buildChannel());
+            channel.pass(ioChannel);
         }
 
         /**
@@ -885,7 +884,7 @@ public class InvocationService extends Service {
          */
         void abort(@Nullable final Throwable reason) {
 
-            mTransport.abort(reason);
+            mIoChannel.abort(reason);
         }
 
         /**
@@ -893,7 +892,7 @@ public class InvocationService extends Service {
          */
         void close() {
 
-            mTransport.close();
+            mIoChannel.close();
         }
 
         /**
@@ -905,7 +904,7 @@ public class InvocationService extends Service {
          */
         void pass(@Nullable final Object input) {
 
-            mTransport.pass(input);
+            mIoChannel.pass(input);
         }
 
         /**

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Class storing the transport channel configuration.
+ * Class storing the channel configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.

@@ -16,44 +16,42 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
-import com.github.dm.jrt.builder.TransportChannelBuilder;
-import com.github.dm.jrt.channel.TransportChannel;
+import com.github.dm.jrt.builder.IOChannelBuilder;
+import com.github.dm.jrt.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Class implementing a builder of transport channel objects.
+ * Class implementing a builder of I/O channel objects.
  * <p/>
  * Created by davide-maestroni on 10/25/2014.
  */
-class DefaultTransportChannelBuilder
-        implements TransportChannelBuilder, Configurable<TransportChannelBuilder> {
+class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChannelBuilder> {
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
     /**
      * Avoid direct instantiation.
      */
-    DefaultTransportChannelBuilder() {
+    DefaultIOChannelBuilder() {
 
     }
 
     @NotNull
-    public <DATA> TransportChannel<DATA> buildChannel() {
+    public <DATA> IOChannel<DATA, DATA> buildChannel() {
 
-        return new DefaultTransportChannel<DATA>(mConfiguration);
+        return new DefaultIOChannel<DATA>(mConfiguration);
     }
 
     @NotNull
-    public Builder<? extends TransportChannelBuilder> channels() {
+    public Builder<? extends IOChannelBuilder> channels() {
 
-        return new Builder<TransportChannelBuilder>(this, mConfiguration);
+        return new Builder<IOChannelBuilder>(this, mConfiguration);
     }
 
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public TransportChannelBuilder setConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
+    public IOChannelBuilder setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
         if (configuration == null) {
 

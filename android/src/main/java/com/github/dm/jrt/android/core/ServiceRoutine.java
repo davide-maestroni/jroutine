@@ -34,11 +34,11 @@ import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.TemplateRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
@@ -173,6 +173,8 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
         private final Messenger mInMessenger;
 
+        private final IOChannel<IN, IN> mInput;
+
         private final InvocationConfiguration mInvocationConfiguration;
 
         private final boolean mIsParallel;
@@ -181,13 +183,11 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
         private final Object mMutex = new Object();
 
+        private final IOChannel<OUT, OUT> mOutput;
+
         private final ServiceConfiguration mServiceConfiguration;
 
         private final TargetInvocationFactory<IN, OUT> mTargetFactory;
-
-        private final TransportChannel<IN> mTransportInput;
-
-        private final TransportChannel<OUT> mTransportOutput;
 
         private final String mUUID;
 
@@ -230,15 +230,15 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final int inputMaxSize =
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration inputTimeout = invocationConfiguration.getInputTimeoutOr(null);
-            mTransportInput = JRoutine.transport()
-                                      .channels()
-                                      .withChannelOrder(inputOrderType)
-                                      .withChannelMaxSize(inputMaxSize)
-                                      .withChannelTimeout(inputTimeout)
-                                      .withLog(log)
-                                      .withLogLevel(logLevel)
-                                      .set()
-                                      .buildChannel();
+            mInput = JRoutine.io()
+                             .channels()
+                             .withChannelOrder(inputOrderType)
+                             .withChannelMaxSize(inputMaxSize)
+                             .withChannelTimeout(inputTimeout)
+                             .withLog(log)
+                             .withLogLevel(logLevel)
+                             .set()
+                             .buildChannel();
             final int outputMaxSize =
                     invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
@@ -246,44 +246,44 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                     invocationConfiguration.getExecutionTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getExecutionTimeoutActionOr(null);
-            mTransportOutput = JRoutine.transport()
-                                       .channels()
-                                       .withChannelMaxSize(outputMaxSize)
-                                       .withChannelTimeout(outputTimeout)
-                                       .withPassTimeout(executionTimeout)
-                                       .withPassTimeoutAction(timeoutActionType)
-                                       .withLog(log)
-                                       .withLogLevel(logLevel)
-                                       .set()
-                                       .buildChannel();
+            mOutput = JRoutine.io()
+                              .channels()
+                              .withChannelMaxSize(outputMaxSize)
+                              .withChannelTimeout(outputTimeout)
+                              .withPassTimeout(executionTimeout)
+                              .withPassTimeoutAction(timeoutActionType)
+                              .withLog(log)
+                              .withLogLevel(logLevel)
+                              .set()
+                              .buildChannel();
         }
 
         public boolean abort() {
 
             bindService();
-            return mTransportInput.abort();
+            return mInput.abort();
         }
 
         public boolean abort(@Nullable final Throwable reason) {
 
             bindService();
-            return mTransportInput.abort(reason);
+            return mInput.abort(reason);
         }
 
         public boolean isEmpty() {
 
-            return mTransportInput.isEmpty();
+            return mInput.isEmpty();
         }
 
         public boolean isOpen() {
 
-            return mTransportInput.isOpen();
+            return mInput.isOpen();
         }
 
         @NotNull
         public InvocationChannel<IN, OUT> after(@NotNull final TimeDuration delay) {
 
-            mTransportInput.after(delay);
+            mInput.after(delay);
             return this;
         }
 
@@ -291,35 +291,35 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         public InvocationChannel<IN, OUT> after(final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
-            mTransportInput.after(delay, timeUnit);
+            mInput.after(delay, timeUnit);
             return this;
         }
 
         @NotNull
         public InvocationChannel<IN, OUT> now() {
 
-            mTransportInput.now();
+            mInput.now();
             return this;
         }
 
         @NotNull
         public InvocationChannel<IN, OUT> orderByCall() {
 
-            mTransportInput.orderByCall();
+            mInput.orderByCall();
             return this;
         }
 
         @NotNull
         public InvocationChannel<IN, OUT> orderByChance() {
 
-            mTransportInput.orderByChance();
+            mInput.orderByChance();
             return this;
         }
 
         @NotNull
         public InvocationChannel<IN, OUT> orderByDelay() {
 
-            mTransportInput.orderByDelay();
+            mInput.orderByDelay();
             return this;
         }
 
@@ -328,7 +328,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 @Nullable final OutputChannel<? extends IN> channel) {
 
             bindService();
-            mTransportInput.pass(channel);
+            mInput.pass(channel);
             return this;
         }
 
@@ -336,7 +336,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         public InvocationChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
 
             bindService();
-            mTransportInput.pass(inputs);
+            mInput.pass(inputs);
             return this;
         }
 
@@ -344,7 +344,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         public InvocationChannel<IN, OUT> pass(@Nullable final IN input) {
 
             bindService();
-            mTransportInput.pass(input);
+            mInput.pass(input);
             return this;
         }
 
@@ -352,7 +352,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         public InvocationChannel<IN, OUT> pass(@Nullable final IN... inputs) {
 
             bindService();
-            mTransportInput.pass(inputs);
+            mInput.pass(inputs);
             return this;
         }
 
@@ -360,13 +360,13 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         public OutputChannel<OUT> result() {
 
             bindService();
-            mTransportInput.close();
-            return mTransportOutput;
+            mInput.close();
+            return mOutput;
         }
 
         public boolean hasDelays() {
 
-            return mTransportInput.hasDelays();
+            return mInput.hasDelays();
         }
 
         private void bindService() {
@@ -522,14 +522,14 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                         case InvocationService.MSG_DATA: {
 
-                            mTransportOutput.pass((OUT) getValue(msg));
+                            mOutput.pass((OUT) getValue(msg));
                         }
 
                         break;
 
                         case InvocationService.MSG_COMPLETE: {
 
-                            mTransportOutput.close();
+                            mOutput.close();
                             unbindService();
                         }
 
@@ -537,8 +537,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                         case InvocationService.MSG_ABORT: {
 
-                            mTransportOutput.abort(
-                                    InvocationException.wrapIfNeeded(getAbortError(msg)));
+                            mOutput.abort(InvocationException.wrapIfNeeded(getAbortError(msg)));
                             unbindService();
                         }
 
@@ -565,7 +564,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                         logger.err(ignored, "error while sending service abort message");
                     }
 
-                    mTransportOutput.abort(t);
+                    mOutput.abort(t);
                     unbindService();
                 }
             }
@@ -609,12 +608,12 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
-                    mTransportInput.passTo(mConsumer);
+                    mInput.passTo(mConsumer);
 
                 } catch (final RemoteException e) {
 
                     logger.err(e, "error while sending service invocation message");
-                    mTransportOutput.abort(e);
+                    mOutput.abort(e);
                     unbindService();
                 }
             }
@@ -622,7 +621,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);
-                mTransportInput.abort(new ServiceDisconnectedException(name));
+                mInput.abort(new ServiceDisconnectedException(name));
             }
         }
     }

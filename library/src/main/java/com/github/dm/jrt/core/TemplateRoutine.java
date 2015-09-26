@@ -71,9 +71,9 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     @NotNull
     public StreamingChannel<IN, OUT> asyncStream() {
 
-        final DefaultTransportChannel<IN> transportChannel =
-                new DefaultTransportChannel<IN>(buildChannelConfiguration());
-        return new DefaultStreamingChannel<IN, OUT>(transportChannel, asyncCall(transportChannel));
+        final DefaultIOChannel<IN> ioChannel =
+                new DefaultIOChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, asyncCall(ioChannel));
     }
 
     @NotNull
@@ -109,10 +109,9 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     @NotNull
     public StreamingChannel<IN, OUT> parallelStream() {
 
-        final DefaultTransportChannel<IN> transportChannel =
-                new DefaultTransportChannel<IN>(buildChannelConfiguration());
-        return new DefaultStreamingChannel<IN, OUT>(transportChannel,
-                                                    parallelCall(transportChannel));
+        final DefaultIOChannel<IN> ioChannel =
+                new DefaultIOChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, parallelCall(ioChannel));
     }
 
     public void purge() {
@@ -152,9 +151,9 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     @NotNull
     public StreamingChannel<IN, OUT> syncStream() {
 
-        final DefaultTransportChannel<IN> transportChannel =
-                new DefaultTransportChannel<IN>(buildChannelConfiguration());
-        return new DefaultStreamingChannel<IN, OUT>(transportChannel, syncCall(transportChannel));
+        final DefaultIOChannel<IN> ioChannel =
+                new DefaultIOChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, syncCall(ioChannel));
     }
 
     /**

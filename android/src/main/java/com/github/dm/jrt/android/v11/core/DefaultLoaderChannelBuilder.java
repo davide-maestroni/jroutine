@@ -21,8 +21,8 @@ import com.github.dm.jrt.android.invocation.MissingInvocationException;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
@@ -82,9 +82,9 @@ class DefaultLoaderChannelBuilder
 
         if (component == null) {
 
-            final TransportChannel<OUT> transportChannel = JRoutine.transport().buildChannel();
-            transportChannel.abort(new MissingInvocationException(loaderId));
-            return transportChannel.close();
+            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            ioChannel.abort(new MissingInvocationException(loaderId));
+            return ioChannel.close();
         }
 
         final LoaderRoutineBuilder<Void, OUT> builder =

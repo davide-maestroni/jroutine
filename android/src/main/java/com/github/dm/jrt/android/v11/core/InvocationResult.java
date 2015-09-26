@@ -13,8 +13,8 @@
  */
 package com.github.dm.jrt.android.v11.core;
 
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.TransportChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +67,7 @@ interface InvocationResult<OUT> {
      *                        aborted while passing the results.
      * @return whether the invocation is complete.
      */
-    boolean passTo(@NotNull Collection<TransportChannel<OUT>> newChannels,
-            @NotNull Collection<TransportChannel<OUT>> oldChannels,
-            @NotNull Collection<TransportChannel<OUT>> abortedChannels);
+    boolean passTo(@NotNull Collection<IOChannel<OUT, OUT>> newChannels,
+            @NotNull Collection<IOChannel<OUT, OUT>> oldChannels,
+            @NotNull Collection<IOChannel<OUT, OUT>> abortedChannels);
 }

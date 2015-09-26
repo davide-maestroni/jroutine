@@ -68,7 +68,7 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> factoryConsumer(
+    public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
             @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
                     consumer) {
 
@@ -76,9 +76,30 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new function invocation factory based on the specified function
-     * instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * Builds and returns a new filter invocation based on the specified bi-consumer instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
+     * static context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> FilterInvocation<IN, OUT> consumerFilter(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+        return new ConsumerFilterInvocation<IN, OUT>(newBiConsumer(consumer));
+    }
+
+    /**
+     * Builds and returns a new procedure invocation based on the specified consumer instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified consumer must have a static
      * context.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
@@ -86,16 +107,15 @@ public class Invocations {
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
+     * @param consumer the consumer instance.
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> factoryFunction(
-            @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
+    public static <OUT> ProcedureInvocation<OUT> consumerProcedure(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return new FunctionInvocationFactory<IN, OUT>(newFunction(function));
+        return new ConsumerProcedureInvocation<OUT>(newConsumer(consumer));
     }
 
     /**
@@ -226,47 +246,26 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new invocation factory based on the specified supplier instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified supplier must have a static
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
+     * Builds and returns a new function invocation factory based on the specified function
+     * instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
      * context.
-     *
-     * @param supplier the supplier instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> factorySupplier(
-            @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
-
-        return new SupplierInvocationFactory<IN, OUT>(newSupplier(supplier));
-    }
-
-    /**
-     * Builds and returns a new filter invocation based on the specified bi-consumer instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
-     * static context.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
-     * @param consumer the bi-consumer instance.
+     * @param function the function instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FilterInvocation<IN, OUT> filterConsumer(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
+            @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
 
-        return new ConsumerFilterInvocation<IN, OUT>(newBiConsumer(consumer));
+        return new FunctionInvocationFactory<IN, OUT>(newFunction(function));
     }
 
     /**
@@ -285,15 +284,15 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FilterInvocation<IN, OUT> filterFunction(
+    public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
             @NotNull final Function<? super IN, ? extends OUT> function) {
 
         return new FunctionFilterInvocation<IN, OUT>(newFunction(function));
     }
 
     /**
-     * Builds and returns a new procedure invocation based on the specified consumer instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified consumer must have a static
+     * Builds and returns a new invocation factory based on the specified supplier instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified supplier must have a static
      * context.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
@@ -301,15 +300,16 @@ public class Invocations {
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
-     * @param consumer the consumer instance.
+     * @param supplier the supplier instance.
+     * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
     @NotNull
-    public static <OUT> ProcedureInvocation<OUT> procedureConsumer(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+    public static <IN, OUT> InvocationFactory<IN, OUT> supplierFactory(
+            @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
 
-        return new ConsumerProcedureInvocation<OUT>(newConsumer(consumer));
+        return new SupplierInvocationFactory<IN, OUT>(newSupplier(supplier));
     }
 
     /**
@@ -327,7 +327,7 @@ public class Invocations {
      * @return the invocation factory.
      */
     @NotNull
-    public static <OUT> ProcedureInvocation<OUT> procedureSupplier(
+    public static <OUT> ProcedureInvocation<OUT> supplierProcedure(
             @NotNull final Supplier<? extends OUT> supplier) {
 
         return new SupplierProcedureInvocation<OUT>(newSupplier(supplier));

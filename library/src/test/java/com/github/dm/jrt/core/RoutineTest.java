@@ -24,6 +24,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InputTimeoutException;
 import com.github.dm.jrt.channel.InvocationChannel;
@@ -33,7 +34,6 @@ import com.github.dm.jrt.channel.OutputTimeoutException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
@@ -1570,7 +1570,7 @@ public class RoutineTest {
                            .eventually()
                            .all()).containsExactly("test1", "test2");
 
-        final TransportChannel<Object> channel = JRoutine.transport().buildChannel();
+        final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
         channel.pass("test2").close();
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .invocations()
@@ -1903,12 +1903,12 @@ public class RoutineTest {
 
         }
 
-        final TransportChannel<String> channel1 = JRoutine.transport()
-                                                          .channels()
-                                                          .withChannelMaxSize(1)
-                                                          .withChannelTimeout(millis(1000))
-                                                          .set()
-                                                          .buildChannel();
+        final IOChannel<String, String> channel1 = JRoutine.io()
+                                                           .channels()
+                                                           .withChannelMaxSize(1)
+                                                           .withChannelTimeout(millis(1000))
+                                                           .set()
+                                                           .buildChannel();
         new Thread() {
 
             @Override
@@ -1920,12 +1920,12 @@ public class RoutineTest {
         millis(100).sleepAtLeast();
         assertThat(channel1.eventually().all()).containsOnly("test1", "test2");
 
-        final TransportChannel<String> channel2 = JRoutine.transport()
-                                                          .channels()
-                                                          .withChannelMaxSize(1)
-                                                          .withChannelTimeout(millis(1000))
-                                                          .set()
-                                                          .buildChannel();
+        final IOChannel<String, String> channel2 = JRoutine.io()
+                                                           .channels()
+                                                           .withChannelMaxSize(1)
+                                                           .withChannelTimeout(millis(1000))
+                                                           .set()
+                                                           .buildChannel();
         new Thread() {
 
             @Override
@@ -1937,12 +1937,12 @@ public class RoutineTest {
         millis(100).sleepAtLeast();
         assertThat(channel2.eventually().all()).containsOnly("test1", "test2");
 
-        final TransportChannel<String> channel3 = JRoutine.transport()
-                                                          .channels()
-                                                          .withChannelMaxSize(1)
-                                                          .withChannelTimeout(millis(1000))
-                                                          .set()
-                                                          .buildChannel();
+        final IOChannel<String, String> channel3 = JRoutine.io()
+                                                           .channels()
+                                                           .withChannelMaxSize(1)
+                                                           .withChannelTimeout(millis(1000))
+                                                           .set()
+                                                           .buildChannel();
         new Thread() {
 
             @Override
@@ -1954,18 +1954,18 @@ public class RoutineTest {
         millis(100).sleepAtLeast();
         assertThat(channel3.eventually().all()).containsOnly("test1", "test2");
 
-        final TransportChannel<String> channel4 = JRoutine.transport()
-                                                          .channels()
-                                                          .withChannelMaxSize(1)
-                                                          .withChannelTimeout(millis(1000))
-                                                          .set()
-                                                          .buildChannel();
+        final IOChannel<String, String> channel4 = JRoutine.io()
+                                                           .channels()
+                                                           .withChannelMaxSize(1)
+                                                           .withChannelTimeout(millis(1000))
+                                                           .set()
+                                                           .buildChannel();
         new Thread() {
 
             @Override
             public void run() {
 
-                final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+                final IOChannel<String, String> channel = JRoutine.io().buildChannel();
                 channel.pass("test1", "test2").close();
                 channel4.pass(channel).close();
             }
@@ -3565,7 +3565,7 @@ public class RoutineTest {
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
-            final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+            final IOChannel<String, String> channel = JRoutine.io().buildChannel();
             result.pass(JRoutine.on(PassingInvocation.<String>factoryOf())
                                 .invocations()
                                 .withInputMaxSize(1)
@@ -3657,7 +3657,7 @@ public class RoutineTest {
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
-            final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+            final IOChannel<String, String> channel = JRoutine.io().buildChannel();
             result.after(millis(500)).pass(channel);
             channel.pass(s, s).close();
         }

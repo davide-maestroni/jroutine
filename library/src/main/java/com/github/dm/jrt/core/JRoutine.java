@@ -13,9 +13,9 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.RoutineBuilder;
-import com.github.dm.jrt.builder.TransportChannelBuilder;
 import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,8 +48,8 @@ import org.jetbrains.annotations.NotNull;
  * processing of annotations, it is simply necessary to include the proxy artifact or module in the
  * project dependencies.
  * <p/>
- * This class provides also a way to build transport channel instances, which can be used to pass
- * data without the need to start a routine invocation.
+ * This class provides also a way to build I/O channel instances, which can be used to pass data
+ * without the need to start a routine invocation.
  * <p/>
  * <b>Some usage examples</b>
  * <p/>
@@ -57,7 +57,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final TransportChannel&lt;Result&gt; channel = JRoutine.transport().buildChannel();
+ *         final IOChannel&lt;Result, Result&gt; channel = JRoutine.io().buildChannel();
  *         channel.pass(doSomething1.asyncCall())
  *                .pass(doSomething2.asyncCall())
  *                .close();
@@ -109,7 +109,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final TransportChannel&lt;Result&gt; channel = JRoutine.transport().buildChannel();
+ *         final IOChannel&lt;Result, Result&gt; channel = JRoutine.io().buildChannel();
  *
  *         new Thread() {
  *
@@ -149,22 +149,14 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified invocation factory.<br/>
-     * In order to prevent undesired leaks, the class of the specified factory must have a
-     * static context.
+     * Returns an I/O channel builder.
      *
-     * @param factory the invocation factory.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
-     *                                            static.
+     * @return the channel builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final InvocationFactory<IN, OUT> factory) {
+    public static IOChannelBuilder io() {
 
-        return new DefaultRoutineBuilder<IN, OUT>(factory);
+        return new DefaultIOChannelBuilder();
     }
 
     /**
@@ -184,13 +176,21 @@ public class JRoutine {
     }
 
     /**
-     * Returns a transport channel builder.
+     * Returns a routine builder based on the specified invocation factory.<br/>
+     * In order to prevent undesired leaks, the class of the specified factory must have a
+     * static context.
      *
-     * @return the transport channel builder instance.
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
+     *                                            static.
      */
     @NotNull
-    public static TransportChannelBuilder transport() {
+    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+            @NotNull final InvocationFactory<IN, OUT> factory) {
 
-        return new DefaultTransportChannelBuilder();
+        return new DefaultRoutineBuilder<IN, OUT>(factory);
     }
 }

@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
+class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
 
     private final IOChannel<IN, ?> mInputChannel;
 

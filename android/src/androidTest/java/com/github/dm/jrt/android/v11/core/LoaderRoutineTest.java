@@ -1721,6 +1721,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testSupplierFactory() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         assertThat(JRoutine.with(contextFrom(getActivity()))
                            .on(createFactory())
                            .asyncCall("test")

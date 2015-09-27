@@ -59,6 +59,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         mRoutine = routine;
         mDelegationType = delegation;
+        mChannel = null;
     }
 
     /**

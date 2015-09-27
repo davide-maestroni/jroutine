@@ -63,6 +63,11 @@ findbugs {
     toolVersion '3.0.1'
 }
 
+tasks.withType(FindBugs) {
+    // Too many false positives...
+    excludeFilter = file('findbugs.xml')
+}
+
 tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',

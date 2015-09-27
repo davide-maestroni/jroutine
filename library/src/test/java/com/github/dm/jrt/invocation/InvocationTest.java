@@ -511,7 +511,7 @@ public class InvocationTest {
 
         try {
 
-            new DelegatingInvocation<Object, Object>(null, DelegationType.ASYNCHRONOUS);
+            new DelegatingInvocation<Object, Object>(null, DelegationType.ASYNC);
 
             fail();
 

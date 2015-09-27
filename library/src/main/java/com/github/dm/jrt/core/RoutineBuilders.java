@@ -17,6 +17,8 @@ import com.github.dm.jrt.annotation.Alias;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.Inputs;
+import com.github.dm.jrt.annotation.Invoke;
+import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Priority;
@@ -354,14 +356,14 @@ public class RoutineBuilders {
                                 + " input parameters");
             }
 
-        } else { // InputMode.PARALLEL
+        } else { // InputMode.ELEMENT
 
             final boolean isArray = parameterType.isArray();
 
             if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.PARALLEL
+                        "[" + method + "] an async input with mode " + InputMode.ELEMENT
                                 + " must be an array or implement an "
                                 + Iterable.class.getCanonicalName());
             }
@@ -373,7 +375,7 @@ public class RoutineBuilders {
                                               parameterType.getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] the async input array with mode " + InputMode.PARALLEL
+                        "[" + method + "] the async input array with mode " + InputMode.ELEMENT
                                 + " does not match the bound type: "
                                 + paramClass.getCanonicalName());
             }
@@ -383,7 +385,7 @@ public class RoutineBuilders {
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.PARALLEL
+                        "[" + method + "] an async input with mode " + InputMode.ELEMENT
                                 + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
@@ -394,7 +396,8 @@ public class RoutineBuilders {
 
     /**
      * Gets the inputs transfer mode associated to the specified method, while also
-     * validating the use of the {@link com.github.dm.jrt.annotation.Inputs Inputs} annotation.<br/>
+     * validating the use of the {@link com.github.dm.jrt.annotation.Inputs Inputs}
+     * annotation.<br/>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
@@ -451,18 +454,51 @@ public class RoutineBuilders {
                                 + " input parameters");
             }
 
-        } else if (inputMode == InputMode.PARALLEL) {
+        } else if (inputMode == InputMode.ELEMENT) {
 
             if (parameterTypes.length > 1) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.PARALLEL +
+                        "[" + method + "] an async input with mode " + InputMode.ELEMENT +
                                 " cannot be applied to a method taking " + parameterTypes.length
                                 + " input parameters");
             }
         }
 
         return inputMode;
+    }
+
+    /**
+     * Gets the routine invocation mode associated to the specified method, while also validating
+     * the use of the {@link com.github.dm.jrt.annotation.Invoke Invoke} annotation.<br/>
+     * In case no annotation is present, the function will return with null.
+     *
+     * @param method the proxy method.
+     * @return the input mode.
+     * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
+     * @see com.github.dm.jrt.annotation.Invoke Invoke
+     */
+    @Nullable
+    public static InvocationMode getInvocationMode(@NotNull final Method method) {
+
+        final Invoke methodAnnotation = method.getAnnotation(Invoke.class);
+
+        if (methodAnnotation == null) {
+
+            return null;
+        }
+
+        final InvocationMode invocationMode = methodAnnotation.value();
+
+        if ((invocationMode == InvocationMode.PARALLEL) && (method.getParameterTypes().length
+                > 1)) {
+
+            throw new IllegalArgumentException(
+                    "methods annotated with invocation mode " + InvocationMode.PARALLEL
+                            + " must have at maximum one input parameter: " + method);
+        }
+
+        return invocationMode;
     }
 
     /**
@@ -607,6 +643,7 @@ public class RoutineBuilders {
 
             if (methodInfo == null) {
 
+                final InvocationMode invocationMode = getInvocationMode(proxyMethod);
                 InputMode inputMode = null;
                 OutputMode outputMode = null;
                 final Class<?>[] targetParameterTypes;
@@ -673,7 +710,7 @@ public class RoutineBuilders {
                             "the proxy method has incompatible return type: " + proxyMethod);
                 }
 
-                methodInfo = new MethodInfo(targetMethod, inputMode, outputMode);
+                methodInfo = new MethodInfo(targetMethod, invocationMode, inputMode, outputMode);
                 methodMap.put(proxyMethod, methodInfo);
             }
         }
@@ -684,11 +721,12 @@ public class RoutineBuilders {
     /**
      * Invokes the routine wrapping the specified method.
      *
-     * @param routine    the routine to be called.
-     * @param method     the target method.
-     * @param args       the method arguments.
-     * @param inputMode  the input transfer mode.
-     * @param outputMode the output transfer mode.
+     * @param routine        the routine to be called.
+     * @param method         the target method.
+     * @param args           the method arguments.
+     * @param invocationMode the routine invocation mode.
+     * @param inputMode      the input transfer mode.
+     * @param outputMode     the output transfer mode.
      * @return the invocation output.
      * @throws com.github.dm.jrt.channel.RoutineException in case of errors.
      */
@@ -696,7 +734,8 @@ public class RoutineBuilders {
     @SuppressWarnings("unchecked")
     public static Object invokeRoutine(@NotNull final Routine<Object, Object> routine,
             @NotNull final Method method, @NotNull final Object[] args,
-            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+            @Nullable final InvocationMode invocationMode, @Nullable final InputMode inputMode,
+            @Nullable final OutputMode outputMode) {
 
         final Class<?> returnType = method.getReturnType();
 
@@ -704,23 +743,28 @@ public class RoutineBuilders {
 
             if (returnType.isAssignableFrom(InvocationChannel.class)) {
 
-                return (inputMode == InputMode.PARALLEL) ? routine.parallelInvoke()
-                        : routine.asyncInvoke();
+                return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
+                        : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
+                                : routine.asyncInvoke();
 
             } else if (returnType.isAssignableFrom(StreamingChannel.class)) {
 
-                return (inputMode == InputMode.PARALLEL) ? routine.parallelStream()
-                        : routine.asyncStream();
+                return (invocationMode == InvocationMode.SYNC) ? routine.syncStream()
+                        : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelStream()
+                                : routine.asyncStream();
             }
 
             return routine;
         }
 
         final OutputChannel<Object> outputChannel;
+        final InvocationChannel<Object, Object> invocationChannel =
+                (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
+                        : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
+                                : routine.asyncInvoke();
 
-        if (inputMode == InputMode.PARALLEL) {
+        if (inputMode == InputMode.ELEMENT) {
 
-            final InvocationChannel<Object, Object> invocationChannel = routine.parallelInvoke();
             final Class<?> parameterType = method.getParameterTypes()[0];
             final Object arg = args[0];
 
@@ -755,8 +799,7 @@ public class RoutineBuilders {
 
         } else if (inputMode == InputMode.VALUE) {
 
-            final InvocationChannel<Object, Object> invocationChannel =
-                    routine.asyncInvoke().orderByCall();
+            invocationChannel.orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
 
@@ -887,6 +930,11 @@ public class RoutineBuilders {
         public final InputMode inputMode;
 
         /**
+         * The routine invocation mode.
+         */
+        public final InvocationMode invocationMode;
+
+        /**
          * The target method.
          */
         public final Method method;
@@ -899,14 +947,17 @@ public class RoutineBuilders {
         /**
          * Constructor.
          *
-         * @param method     the target method.
-         * @param inputMode  the input mode.
-         * @param outputMode the output mode.
+         * @param method         the target method.
+         * @param invocationMode the invocation mode.
+         * @param inputMode      the input mode.
+         * @param outputMode     the output mode.
          */
-        private MethodInfo(@NotNull final Method method, @Nullable final InputMode inputMode,
+        private MethodInfo(@NotNull final Method method,
+                @Nullable final InvocationMode invocationMode, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
 
             this.method = method;
+            this.invocationMode = invocationMode;
             this.inputMode = inputMode;
             this.outputMode = outputMode;
         }

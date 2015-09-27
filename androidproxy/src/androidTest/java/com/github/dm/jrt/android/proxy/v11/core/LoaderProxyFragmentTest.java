@@ -27,6 +27,8 @@ import com.github.dm.jrt.annotation.Alias;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.Inputs;
+import com.github.dm.jrt.annotation.Invoke;
+import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Timeout;
@@ -754,11 +756,13 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         Routine<Character, Integer> add10();
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char.class, mode = InputMode.ELEMENT)
         Routine<Character, Integer> add11();
 
         @Alias("a")
-        int add2(@Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
+        @Invoke(InvocationMode.PARALLEL)
+        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("a")
         @Output(OutputMode.VALUE)
@@ -770,16 +774,18 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 @Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.VALUE)
         OutputChannel<Integer> add5(
-                @Input(value = char.class, mode = InputMode.PARALLEL) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("a")
         @Inputs(value = char.class, mode = InputMode.VALUE)
         InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char.class, mode = InputMode.ELEMENT)
         InvocationChannel<Character, Integer> add7();
 
         @Alias("a")
@@ -787,7 +793,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         StreamingChannel<Character, Integer> add8();
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char.class, mode = InputMode.ELEMENT)
         StreamingChannel<Character, Integer> add9();
 
         @Alias("aa")
@@ -802,8 +809,9 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
+        @Invoke(InvocationMode.PARALLEL)
         int[] addA03(@Input(value = char[].class,
-                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.VALUE)
@@ -820,9 +828,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
-                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -839,9 +848,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@Input(value = char[].class,
-                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -858,9 +868,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<int[]> addA15(@Input(value = char[].class,
-                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -877,16 +888,18 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
-                mode = InputMode.PARALLEL) OutputChannel<char[]> c);
+                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Inputs(value = char[].class, mode = InputMode.VALUE)
         InvocationChannel<char[], int[]> addA20();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
         InvocationChannel<char[], int[]> addA21();
 
         @Alias("aa")
@@ -898,7 +911,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         StreamingChannel<char[], int[]> addA23();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
         StreamingChannel<char[], int[]> addA24();
 
         @Alias("aa")
@@ -910,7 +924,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         Routine<char[], int[]> addA26();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
         Routine<char[], int[]> addA27();
 
         @Alias("al")
@@ -925,8 +940,9 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
+        @Invoke(InvocationMode.PARALLEL)
         List<Integer> addL03(@Input(value = List.class,
-                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.VALUE)
@@ -943,9 +959,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
-                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.ELEMENT)
@@ -962,9 +979,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@Input(value = List.class,
-                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -981,9 +999,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL15(@Input(value = List.class,
-                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1000,16 +1019,18 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List[] addL19(@Input(value = List.class,
-                mode = InputMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Inputs(value = List.class, mode = InputMode.VALUE)
         InvocationChannel<List<Character>, List<Integer>> addL20();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = List.class, mode = InputMode.ELEMENT)
         InvocationChannel<List<Character>, List<Integer>> addL21();
 
         @Alias("al")
@@ -1021,7 +1042,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         StreamingChannel<List<Character>, List<Integer>> addL23();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = List.class, mode = InputMode.ELEMENT)
         StreamingChannel<List<Character>, List<Integer>> addL24();
 
         @Alias("al")
@@ -1033,7 +1055,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         Routine<List<Character>, List<Integer>> addL26();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = List.class, mode = InputMode.ELEMENT)
         Routine<List<Character>, List<Integer>> addL27();
 
         @Alias("g")
@@ -1054,7 +1077,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         InvocationChannel<Void, Integer> get2();
 
         @Alias("s")
-        void set2(@Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel<Integer> i);
+        @Invoke(InvocationMode.PARALLEL)
+        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
 
         @Alias("g")
         @Inputs({})
@@ -1090,7 +1114,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         int[][] getA3();
 
         @Alias("sa")
-        void setA3(@Input(value = int[].class, mode = InputMode.PARALLEL) OutputChannel<int[]> i);
+        @Invoke(InvocationMode.PARALLEL)
+        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Inputs({})
@@ -1131,8 +1156,9 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         List[] getL3();
 
         @Alias("sl")
+        @Invoke(InvocationMode.PARALLEL)
         void setL3(@Input(value = List.class,
-                mode = InputMode.PARALLEL) OutputChannel<List<Integer>> i);
+                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Inputs({})
@@ -1244,36 +1270,42 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     public interface TestProxy {
 
         @Timeout(3000)
+        @Invoke(InvocationMode.PARALLEL)
         @Output
         Iterable<Iterable> getList(@Input(value = List.class,
-                mode = InputMode.PARALLEL) List<? extends List<String>> i);
+                mode = InputMode.ELEMENT) List<? extends List<String>> i);
 
         @Timeout(3000)
         @Output
         OutputChannel<Integer> getOne();
 
         @Timeout(3000)
-        String getString(@Input(value = int.class, mode = InputMode.PARALLEL) int... i);
+        @Invoke(InvocationMode.PARALLEL)
+        String getString(@Input(value = int.class, mode = InputMode.ELEMENT) int... i);
 
         @Timeout(3000)
+        @Invoke(InvocationMode.PARALLEL)
         @Output
         OutputChannel<String> getString(
-                @Input(value = int.class, mode = InputMode.PARALLEL) HashSet<Integer> i);
+                @Input(value = int.class, mode = InputMode.ELEMENT) HashSet<Integer> i);
 
         @Timeout(3000)
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<String> getString(
-                @Input(value = int.class, mode = InputMode.PARALLEL) List<Integer> i);
+                @Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
 
         @Timeout(3000)
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         Iterable<String> getString(
-                @Input(value = int.class, mode = InputMode.PARALLEL) Iterable<Integer> i);
+                @Input(value = int.class, mode = InputMode.ELEMENT) Iterable<Integer> i);
 
         @Timeout(3000)
+        @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         String[] getString(
-                @Input(value = int.class, mode = InputMode.PARALLEL) Collection<Integer> i);
+                @Input(value = int.class, mode = InputMode.ELEMENT) Collection<Integer> i);
 
         @Timeout(3000)
         String getString(@Input(int.class) OutputChannel<Integer> i);

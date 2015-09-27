@@ -15,24 +15,15 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
     @SuppressWarnings({"unchecked", "RedundantCast"})
-    public ${resultType} ${methodName}(${paramVars}) {
+    public void ${methodName}(${paramVars}) {
 
         final com.github.dm.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        final com.github.dm.jrt.channel.InvocationChannel<Object, ${resultClassName}> $$channel = $$routine.parallelInvoke()${inputOptions};
+        final com.github.dm.jrt.channel.InvocationChannel<Object, ${resultClassName}> $$channel = $$routine.${invokeMethod}()${inputOptions};
 
         for (final Object $$object: ${params}) {
 
             $$channel.pass($$object);
         }
 
-        final java.util.List<${resultClassName}> $$list = $$channel.result()${outputOptions}.all();
-        final int $$size = $$list.size();
-        final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
-
-        for (int $$i = 0; $$i < $$size; ++$$i) {
-
-            $$array[$$i] = $$list.get($$i);
-        }
-
-        return $$array;
+        $$channel.result().checkComplete();
     }

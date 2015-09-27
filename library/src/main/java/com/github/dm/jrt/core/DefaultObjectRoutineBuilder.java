@@ -426,7 +426,7 @@ class DefaultObjectRoutineBuilder
                                configurationWithAnnotations(mProxyConfiguration, method),
                                methodInfo.method, inputMode, outputMode);
             return invokeRoutine(routine, method, (args != null) ? args : Reflection.NO_ARGS,
-                                 inputMode, outputMode);
+                                 methodInfo.invocationMode, inputMode, outputMode);
         }
     }
 }

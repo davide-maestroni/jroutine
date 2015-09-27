@@ -17,6 +17,8 @@ import com.github.dm.jrt.annotation.Alias;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.Inputs;
+import com.github.dm.jrt.annotation.Invoke;
+import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Priority;
@@ -113,6 +115,16 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodAsync;
 
+    private String mMethodElementArray;
+
+    private String mMethodElementAsync;
+
+    private String mMethodElementList;
+
+    private String mMethodElementResult;
+
+    private String mMethodElementVoid;
+
     private String mMethodHeader;
 
     private String mMethodInputsChannel;
@@ -132,16 +144,6 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodInvocationVoid;
 
     private String mMethodList;
-
-    private String mMethodParallelArray;
-
-    private String mMethodParallelAsync;
-
-    private String mMethodParallelList;
-
-    private String mMethodParallelResult;
-
-    private String mMethodParallelVoid;
 
     private String mMethodResult;
 
@@ -860,14 +862,14 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + " input parameters");
             }
 
-        } else { // InputMode.PARALLEL
+        } else { // InputMode.ELEMENT
 
             if ((targetType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(
                     targetTypeErasure, iterableType)) {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async input with mode " + InputMode.PARALLEL
+                                + "] an async input with mode " + InputMode.ELEMENT
                                 + " must be an array or implement an " + iterableType);
             }
 
@@ -877,7 +879,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] the async input array with mode " + InputMode.PARALLEL
+                                + "] the async input array with mode " + InputMode.ELEMENT
                                 + " does not match the bound type: " + targetMirror);
             }
 
@@ -885,7 +887,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async input with mode " + InputMode.PARALLEL
+                                + "] an async input with mode " + InputMode.ELEMENT
                                 + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
@@ -960,19 +962,43 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + " input parameters");
             }
 
-        } else if (inputMode == InputMode.PARALLEL) {
+        } else if (inputMode == InputMode.ELEMENT) {
 
             if (targetMirrors.size() > 1) {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async input with mode " + InputMode.PARALLEL +
+                                + "] an async input with mode " + InputMode.ELEMENT +
                                 " cannot be applied to a method taking " + targetMirrors.size()
                                 + " input parameters");
             }
         }
 
         return inputMode;
+    }
+
+    /**
+     * Gets the routine invocation mode.
+     *
+     * @param methodElement the method element.
+     * @param annotation    the method annotation.
+     * @return the invocation mode.
+     */
+    @NotNull
+    protected InvocationMode getInvocationMode(@NotNull final ExecutableElement methodElement,
+            @NotNull final Invoke annotation) {
+
+        final InvocationMode invocationMode = annotation.value();
+
+        if ((invocationMode == InvocationMode.PARALLEL) && (methodElement.getParameters().size()
+                > 1)) {
+
+            throw new IllegalArgumentException(
+                    "methods annotated with invocation mode " + InvocationMode.PARALLEL
+                            + " must have at maximum one input parameter: " + methodElement);
+        }
+
+        return invocationMode;
     }
 
     /**
@@ -1080,6 +1106,111 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return mMethodAsync;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @NotNull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodElementArrayTemplate(@NotNull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodElementArray == null) {
+
+            mMethodElementArray = parseTemplate("/templates/method_element_array.txt");
+        }
+
+        return mMethodElementArray;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @NotNull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodElementAsyncTemplate(@NotNull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodElementAsync == null) {
+
+            mMethodElementAsync = parseTemplate("/templates/method_element_async.txt");
+        }
+
+        return mMethodElementAsync;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @NotNull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodElementListTemplate(@NotNull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodElementList == null) {
+
+            mMethodElementList = parseTemplate("/templates/method_element_list.txt");
+        }
+
+        return mMethodElementList;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @NotNull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodElementResultTemplate(@NotNull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodElementResult == null) {
+
+            mMethodElementResult = parseTemplate("/templates/method_element_result.txt");
+        }
+
+        return mMethodElementResult;
+    }
+
+    /**
+     * Returns the specified template as a string.
+     *
+     * @param methodElement the method element.
+     * @param count         the method count.
+     * @return the template.
+     * @throws java.io.IOException if an I/O error occurred.
+     */
+    @NotNull
+    @SuppressWarnings("UnusedParameters")
+    protected String getMethodElementVoidTemplate(@NotNull final ExecutableElement methodElement,
+            final int count) throws IOException {
+
+        if (mMethodElementVoid == null) {
+
+            mMethodElementVoid = parseTemplate("/templates/method_element_void.txt");
+        }
+
+        return mMethodElementVoid;
     }
 
     /**
@@ -1291,111 +1422,6 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return mMethodList;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param methodElement the method element.
-     * @param count         the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodParallelArrayTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodParallelArray == null) {
-
-            mMethodParallelArray = parseTemplate("/templates/method_parallel_array.txt");
-        }
-
-        return mMethodParallelArray;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param methodElement the method element.
-     * @param count         the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodParallelAsyncTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodParallelAsync == null) {
-
-            mMethodParallelAsync = parseTemplate("/templates/method_parallel_async.txt");
-        }
-
-        return mMethodParallelAsync;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param methodElement the method element.
-     * @param count         the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodParallelListTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodParallelList == null) {
-
-            mMethodParallelList = parseTemplate("/templates/method_parallel_list.txt");
-        }
-
-        return mMethodParallelList;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param methodElement the method element.
-     * @param count         the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodParallelResultTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodParallelResult == null) {
-
-            mMethodParallelResult = parseTemplate("/templates/method_parallel_result.txt");
-        }
-
-        return mMethodParallelResult;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param methodElement the method element.
-     * @param count         the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodParallelVoidTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodParallelVoid == null) {
-
-            mMethodParallelVoid = parseTemplate("/templates/method_parallel_void.txt");
-        }
-
-        return mMethodParallelVoid;
     }
 
     /**
@@ -1893,8 +1919,12 @@ public class RoutineProcessor extends AbstractProcessor {
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
+        final Invoke invocationAnnotation = methodElement.getAnnotation(Invoke.class);
         final Inputs inputsAnnotation = methodElement.getAnnotation(Inputs.class);
         final Output outputAnnotation = methodElement.getAnnotation(Output.class);
+        final InvocationMode invocationMode =
+                (invocationAnnotation != null) ? getInvocationMode(methodElement,
+                                                                   invocationAnnotation) : null;
         InputMode inputMode = null;
         OutputMode outputMode = null;
 
@@ -1948,9 +1978,9 @@ public class RoutineProcessor extends AbstractProcessor {
             if (returnType.getKind() == TypeKind.ARRAY) {
 
                 targetReturnType = ((ArrayType) returnType).getComponentType();
-                method = ((inputMode == InputMode.PARALLEL) && !typeUtils.isAssignable(
+                method = ((inputMode == InputMode.ELEMENT) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(), outputChannelType))
-                        ? getMethodParallelArrayTemplate(methodElement, count)
+                        ? getMethodElementArrayTemplate(methodElement, count)
                         : getMethodArrayTemplate(methodElement, count);
 
             } else if (typeUtils.isAssignable(listType, returnTypeErasure)) {
@@ -1967,9 +1997,9 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = ((inputMode == InputMode.PARALLEL) && !typeUtils.isAssignable(
+                method = ((inputMode == InputMode.ELEMENT) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(), outputChannelType))
-                        ? getMethodParallelListTemplate(methodElement, count)
+                        ? getMethodElementListTemplate(methodElement, count)
                         : getMethodListTemplate(methodElement, count);
 
             } else if (typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
@@ -1986,9 +2016,9 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = ((inputMode == InputMode.PARALLEL) && !typeUtils.isAssignable(
+                method = ((inputMode == InputMode.ELEMENT) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(), outputChannelType))
-                        ? getMethodParallelAsyncTemplate(methodElement, count)
+                        ? getMethodElementAsyncTemplate(methodElement, count)
                         : getMethodAsyncTemplate(methodElement, count);
 
             } else {
@@ -1998,17 +2028,17 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else if (isVoid) {
 
-            method = ((inputMode == InputMode.PARALLEL) && !typeUtils.isAssignable(
+            method = ((inputMode == InputMode.ELEMENT) && !typeUtils.isAssignable(
                     methodElement.getParameters().get(0).asType(), outputChannelType))
-                    ? getMethodParallelVoidTemplate(methodElement, count)
+                    ? getMethodElementVoidTemplate(methodElement, count)
                     : getMethodVoidTemplate(methodElement, count);
 
         } else {
 
             targetReturnType = methodElement.getReturnType();
-            method = ((inputMode == InputMode.PARALLEL) && !typeUtils.isAssignable(
+            method = ((inputMode == InputMode.ELEMENT) && !typeUtils.isAssignable(
                     methodElement.getParameters().get(0).asType(), outputChannelType))
-                    ? getMethodParallelResultTemplate(methodElement, count)
+                    ? getMethodElementResultTemplate(methodElement, count)
                     : getMethodResultTemplate(methodElement, count);
         }
 
@@ -2047,11 +2077,13 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${inputParams}", buildInputParams(methodElement));
         method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
         method = method.replace("${invokeMethod}",
-                                (inputMode == InputMode.PARALLEL) ? "parallelInvoke"
-                                        : "asyncInvoke");
+                                (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
+                                        : (invocationMode == InvocationMode.PARALLEL)
+                                                ? "parallelInvoke" : "asyncInvoke");
         method = method.replace("${streamMethod}",
-                                (inputMode == InputMode.PARALLEL) ? "parallelStream"
-                                        : "asyncStream");
+                                (invocationMode == InvocationMode.SYNC) ? "syncStream"
+                                        : (invocationMode == InvocationMode.PARALLEL)
+                                                ? "parallelStream" : "asyncStream");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader = getMethodInvocationHeaderTemplate(methodElement, count);

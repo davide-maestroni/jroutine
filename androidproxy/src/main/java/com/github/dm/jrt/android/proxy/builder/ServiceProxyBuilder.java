@@ -38,6 +38,7 @@ public interface ServiceProxyBuilder<TYPE>
      * optional {@link com.github.dm.jrt.annotation.Alias Alias},
      * {@link com.github.dm.jrt.annotation.Input Input},
      * {@link com.github.dm.jrt.annotation.Inputs Inputs},
+     * {@link com.github.dm.jrt.annotation.Invoke Invoke},
      * {@link com.github.dm.jrt.annotation.Output Output},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
      * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},

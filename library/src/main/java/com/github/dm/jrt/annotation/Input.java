@@ -110,12 +110,12 @@ public @interface Input {
          */
         COLLECTION,
         /**
-         * Parallel mode.<br/>
-         * Each input is passed to a different parallel invocation of the wrapped method.
+         * Element mode.<br/>
+         * Each element of the input collection or array is passed separately to the wrapped method.
          * <p/>
          * The annotated parameter must be an array or implement an {@link java.lang.Iterable} and
          * must be the only parameter accepted by the method.
          */
-        PARALLEL
+        ELEMENT
     }
 }

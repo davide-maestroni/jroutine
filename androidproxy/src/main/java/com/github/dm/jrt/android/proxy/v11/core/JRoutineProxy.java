@@ -44,6 +44,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input
  * @see com.github.dm.jrt.annotation.Inputs Inputs
+ * @see com.github.dm.jrt.annotation.Invoke Invoke
  * @see com.github.dm.jrt.annotation.Output Output
  * @see com.github.dm.jrt.annotation.Priority Priority
  * @see com.github.dm.jrt.annotation.ShareGroup ShareGroup

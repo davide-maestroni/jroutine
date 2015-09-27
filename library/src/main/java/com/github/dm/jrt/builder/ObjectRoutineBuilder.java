@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
  * @see com.github.dm.jrt.annotation.Alias Alias
  * @see com.github.dm.jrt.annotation.Input Input
  * @see com.github.dm.jrt.annotation.Inputs Inputs
+ * @see com.github.dm.jrt.annotation.Invoke Invoke
  * @see com.github.dm.jrt.annotation.Output Output
  * @see com.github.dm.jrt.annotation.Priority Priority
  * @see com.github.dm.jrt.annotation.ShareGroup ShareGroup
@@ -75,7 +76,8 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
      * {@link com.github.dm.jrt.annotation.Input Input},
-     * {@link com.github.dm.jrt.annotation.Inputs Inputs} and
+     * {@link com.github.dm.jrt.annotation.Inputs Inputs},
+     * {@link com.github.dm.jrt.annotation.Invoke Invoke} and
      * {@link com.github.dm.jrt.annotation.Output Output} annotations will be honored.
      *
      * @param itf    the token of the interface implemented by the returned object.
@@ -103,7 +105,8 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
      * {@link com.github.dm.jrt.annotation.Input Input},
-     * {@link com.github.dm.jrt.annotation.Inputs Inputs} and
+     * {@link com.github.dm.jrt.annotation.Inputs Inputs},
+     * {@link com.github.dm.jrt.annotation.Invoke Invoke} and
      * {@link com.github.dm.jrt.annotation.Output Output} annotations will be honored.
      *
      * @param itf    the interface implemented by the returned object.

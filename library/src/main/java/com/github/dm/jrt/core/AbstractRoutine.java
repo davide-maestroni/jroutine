@@ -308,6 +308,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
         private final Routine<IN, OUT> mRoutine;
 
+        private boolean mHasInputs;
+
         /**
          * Constructor.
          *
@@ -319,9 +321,25 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
 
         @Override
+        public void onInitialize() {
+
+            mHasInputs = false;
+        }
+
+        @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
+            mHasInputs = true;
             result.pass(mRoutine.asyncCall(input));
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            if (!mHasInputs) {
+
+                result.pass(mRoutine.asyncCall());
+            }
         }
     }
 

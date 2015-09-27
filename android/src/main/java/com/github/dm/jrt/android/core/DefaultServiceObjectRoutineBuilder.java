@@ -601,7 +601,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                                             .set()
                                                             .buildRoutine();
             return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
-                                 inputMode, outputMode);
+                                 methodInfo.invocationMode, inputMode, outputMode);
         }
     }
 

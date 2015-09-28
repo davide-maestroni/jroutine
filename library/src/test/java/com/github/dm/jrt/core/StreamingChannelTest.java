@@ -20,11 +20,14 @@ import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.log.NullLog;
+import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -196,6 +199,22 @@ public class StreamingChannelTest {
         }
 
         assertThat(streamingChannel.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testAppend() {
+
+        final Routine<String, String> doubleString = JRoutine.on(new DoubleString()).buildRoutine();
+        assertThat(doubleString.asyncStream().pass("test").eventually().next()).isEqualTo(
+                "testtest");
+        final Routine<String, Integer> stringLength =
+                JRoutine.on(new StringLength()).buildRoutine();
+        assertThat(stringLength.asyncStream().pass("test").eventually().next()).isEqualTo(4);
+        assertThat(doubleString.asyncStream()
+                               .append(stringLength.asyncStream())
+                               .pass("test")
+                               .eventually()
+                               .next()).isEqualTo(8);
     }
 
     @Test
@@ -608,6 +627,22 @@ public class StreamingChannelTest {
     }
 
     @Test
+    public void testPrepend() {
+
+        final Routine<String, String> doubleString = JRoutine.on(new DoubleString()).buildRoutine();
+        assertThat(doubleString.asyncStream().pass("test").eventually().next()).isEqualTo(
+                "testtest");
+        final Routine<String, Integer> stringLength =
+                JRoutine.on(new StringLength()).buildRoutine();
+        assertThat(stringLength.asyncStream().pass("test").eventually().next()).isEqualTo(4);
+        assertThat(stringLength.asyncStream()
+                               .prepend(doubleString.asyncStream())
+                               .pass("test")
+                               .eventually()
+                               .next()).isEqualTo(8);
+    }
+
+    @Test
     public void testReadFirst() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
@@ -661,6 +696,22 @@ public class StreamingChannelTest {
         public int getWrnCount() {
 
             return mWrnCount;
+        }
+    }
+
+    private static class DoubleString extends FilterInvocation<String, String> {
+
+        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
+
+            result.pass(input + input);
+        }
+    }
+
+    private static class StringLength extends FilterInvocation<String, Integer> {
+
+        public void onInput(final String input, @NotNull final ResultChannel<Integer> result) {
+
+            result.pass(input.length());
         }
     }
 

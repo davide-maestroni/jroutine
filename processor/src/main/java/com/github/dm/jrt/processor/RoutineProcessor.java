@@ -1870,9 +1870,24 @@ public class RoutineProcessor extends AbstractProcessor {
                 getOutputMode(methodElement, targetMethod);
             }
 
+            if (!methodElement.getParameters().isEmpty()) {
+
+                throw new IllegalArgumentException(
+                        "methods annotated with " + Inputs.class.getSimpleName()
+                                + " must have no input parameters: " + methodElement);
+            }
+
+            final TypeMirror returnType = methodElement.getReturnType();
+
+            if (!typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
+                    && !typeUtils.isAssignable(routineType, typeUtils.erasure(returnType))) {
+
+                throw new IllegalArgumentException(
+                        "the proxy method has incompatible return type: " + methodElement);
+            }
+
             inputMode = InputMode.CHANNEL;
             outputMode = OutputMode.CHANNEL;
-            final TypeMirror returnType = methodElement.getReturnType();
 
             if (typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))) {
 
@@ -1959,6 +1974,14 @@ public class RoutineProcessor extends AbstractProcessor {
                     methodElement.getParameters().get(0).asType(), outputChannelType))
                     ? getMethodElementResultTemplate(methodElement, count)
                     : getMethodResultTemplate(methodElement, count);
+        }
+
+        if ((invocationMode == InvocationMode.PARALLEL) && (targetMethod.getParameters().size()
+                > 1)) {
+
+            throw new IllegalArgumentException(
+                    "methods annotated with invocation mode " + InvocationMode.PARALLEL
+                            + " must have no input parameters: " + methodElement);
         }
 
         final String resultClassName = getBoxedType(targetReturnType).toString();

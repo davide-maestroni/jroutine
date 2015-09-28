@@ -447,7 +447,7 @@ public class IOChannelTest {
         assertThat(ioChannel1.afterMax(timeout).all()).containsOnly(23, -77L);
 
         final IOChannel<Object, Object> ioChannel2 = JRoutine.io().buildChannel();
-        ioChannel2.orderByDelay().orderByDelay().orderByCall();
+        ioChannel2.orderByChance().orderByDelay().orderByCall();
         ioChannel2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(ioChannel2.afterMax(timeout).all()).containsExactly(23, -77L);
     }

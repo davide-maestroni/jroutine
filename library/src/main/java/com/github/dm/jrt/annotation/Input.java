@@ -50,7 +50,7 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link Input.InputMode#VALUE VALUE} by default).
+ * (it's {@link Input.InputMode#CHANNEL CHANNEL} by default).
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -77,7 +77,7 @@ public @interface Input {
      *
      * @return the mode.
      */
-    InputMode mode() default InputMode.VALUE;
+    InputMode mode() default InputMode.CHANNEL;
 
     /**
      * The parameter class.
@@ -93,13 +93,13 @@ public @interface Input {
     enum InputMode {
 
         /**
-         * Value mode.<br/>
+         * Channel mode.<br/>
          * The variable is just read from an output channel.
          * <p/>
          * The annotated parameters must extend an {@link com.github.dm.jrt.channel.OutputChannel
          * OutputChannel}.
          */
-        VALUE,
+        CHANNEL,
         /**
          * Element mode.<br/>
          * Each element of the input collection or array is passed separately to the wrapped method.

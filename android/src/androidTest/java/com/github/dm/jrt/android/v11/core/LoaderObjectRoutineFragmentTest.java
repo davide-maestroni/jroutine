@@ -940,20 +940,16 @@ public class LoaderObjectRoutineFragmentTest
                       .result()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                            new int[]{'f', 'z'});
-        assertThat(itf.addA22().pass('d', 'e', 'f').result().all()).containsOnly(
-                new int[]{'d', 'e', 'f'});
-        assertThat(itf.addA23().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
+        assertThat(itf.addA22().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
                 new int[]{'c', 'z'});
-        assertThat(itf.addA24()
+        assertThat(itf.addA23()
                       .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                       .close()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                            new int[]{'f', 'z'});
-        assertThat(itf.addA25().pass('d', 'e', 'f').close().all()).containsOnly(
-                new int[]{'d', 'e', 'f'});
-        assertThat(itf.addA26().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
+        assertThat(itf.addA24().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
                 new int[]{'c', 'z'});
-        assertThat(itf.addA27()
+        assertThat(itf.addA25()
                       .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
                                     new char[]{'f', 'z'})
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
@@ -1039,22 +1035,18 @@ public class LoaderObjectRoutineFragmentTest
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                            Arrays.asList((int) 'e', (int) 'z'),
                                            Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL22().pass('d', 'e', 'f').result().all()).containsOnly(
-                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        assertThat(itf.addL23().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
+        assertThat(itf.addL22().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        assertThat(itf.addL24()
+        assertThat(itf.addL23()
                       .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                             Arrays.asList('f', 'z'))
                       .close()
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                            Arrays.asList((int) 'e', (int) 'z'),
                                            Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL25().pass('d', 'e', 'f').close().all()).containsOnly(
-                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        assertThat(itf.addL26().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
+        assertThat(itf.addL24().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        assertThat(itf.addL27()
+        assertThat(itf.addL25()
                       .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                                     Arrays.asList('f', 'z'))
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
@@ -1100,10 +1092,8 @@ public class LoaderObjectRoutineFragmentTest
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
-        itf.setA5().pass(1, 2, 3).result().checkComplete();
-        itf.setA6().pass(new int[]{1, 2, 3}).close().checkComplete();
-        itf.setA7().pass(1, 2, 3).close().checkComplete();
-        itf.setA8().asyncCall(new int[]{1, 2, 3}).checkComplete();
+        itf.setA5().pass(new int[]{1, 2, 3}).close().checkComplete();
+        itf.setA6().asyncCall(new int[]{1, 2, 3}).checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final IOChannel<List<Integer>, List<Integer>> channel40 = JRoutine.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -1115,10 +1105,8 @@ public class LoaderObjectRoutineFragmentTest
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
-        itf.setL5().pass(1, 2, 3).result().checkComplete();
-        itf.setL6().pass(Arrays.asList(1, 2, 3)).close().checkComplete();
-        itf.setL7().pass(1, 2, 3).close().checkComplete();
-        itf.setL8().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
+        itf.setL5().pass(Arrays.asList(1, 2, 3)).close().checkComplete();
+        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
     }
 
     @SuppressWarnings("NullArgumentToVariableArgMethod")
@@ -1345,15 +1333,15 @@ public class LoaderObjectRoutineFragmentTest
         int add0(char c);
 
         @Alias("a")
-        int add1(@Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
+        int add1(@Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.VALUE)
+        @Inputs(char.class)
         Routine<Character, Integer> add10();
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        @Inputs(char.class)
         Routine<Character, Integer> add11();
 
         @Alias("a")
@@ -1361,36 +1349,36 @@ public class LoaderObjectRoutineFragmentTest
         int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("a")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<Integer> add3(char c);
 
         @Alias("a")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<Integer> add4(
-                @Input(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<Integer> add5(
                 @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.VALUE)
+        @Inputs(char.class)
         InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        @Inputs(char.class)
         InvocationChannel<Character, Integer> add7();
 
         @Alias("a")
-        @Inputs(value = char.class, mode = InputMode.VALUE)
+        @Inputs(char.class)
         StreamingChannel<Character, Integer> add8();
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char.class, mode = InputMode.ELEMENT)
+        @Inputs(char.class)
         StreamingChannel<Character, Integer> add9();
 
         @Alias("aa")
@@ -1398,7 +1386,7 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("aa")
         int[] addA01(@Input(value = char[].class,
-                mode = InputMode.VALUE) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         int[] addA02(@Input(value = char[].class,
@@ -1410,22 +1398,22 @@ public class LoaderObjectRoutineFragmentTest
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<int[]> addA04(char[] c);
 
         @Alias("aa")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<int[]> addA05(
-                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<int[]> addA06(@Input(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
@@ -1436,7 +1424,7 @@ public class LoaderObjectRoutineFragmentTest
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA09(
-                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -1456,7 +1444,7 @@ public class LoaderObjectRoutineFragmentTest
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         List<int[]> addA13(
-                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1476,7 +1464,7 @@ public class LoaderObjectRoutineFragmentTest
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
         int[][] addA17(
-                @Input(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
+                @Input(value = char[].class, mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1490,46 +1478,38 @@ public class LoaderObjectRoutineFragmentTest
                 mode = InputMode.ELEMENT) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.VALUE)
+        @Inputs(char[].class)
         InvocationChannel<char[], int[]> addA20();
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
+        @Inputs(char[].class)
         InvocationChannel<char[], int[]> addA21();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.COLLECTION)
-        InvocationChannel<Character, int[]> addA22();
+        @Inputs(char[].class)
+        StreamingChannel<char[], int[]> addA22();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.VALUE)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(char[].class)
         StreamingChannel<char[], int[]> addA23();
 
         @Alias("aa")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
-        StreamingChannel<char[], int[]> addA24();
-
-        @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.COLLECTION)
-        StreamingChannel<Character, int[]> addA25();
-
-        @Alias("aa")
-        @Inputs(value = char[].class, mode = InputMode.VALUE)
-        Routine<char[], int[]> addA26();
+        @Inputs(char[].class)
+        Routine<char[], int[]> addA24();
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char[].class, mode = InputMode.ELEMENT)
-        Routine<char[], int[]> addA27();
+        @Inputs(char[].class)
+        Routine<char[], int[]> addA25();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
 
         @Alias("al")
         List<Integer> addL01(@Input(value = List.class,
-                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         List<Integer> addL02(@Input(value = List.class,
@@ -1541,22 +1521,22 @@ public class LoaderObjectRoutineFragmentTest
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<List<Integer>> addL04(List<Character> c);
 
         @Alias("al")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<List<Integer>> addL05(@Input(value = List.class,
-                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<List<Integer>> addL06(@Input(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
@@ -1567,7 +1547,7 @@ public class LoaderObjectRoutineFragmentTest
         @Alias("al")
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL09(@Input(value = List.class,
-                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.ELEMENT)
@@ -1587,7 +1567,7 @@ public class LoaderObjectRoutineFragmentTest
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL13(@Input(value = List.class,
-                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1607,7 +1587,7 @@ public class LoaderObjectRoutineFragmentTest
         @Alias("al")
         @Output(OutputMode.COLLECTION)
         List[] addL17(@Input(value = List.class,
-                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1621,39 +1601,31 @@ public class LoaderObjectRoutineFragmentTest
                 mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.VALUE)
+        @Inputs(List.class)
         InvocationChannel<List<Character>, List<Integer>> addL20();
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = List.class, mode = InputMode.ELEMENT)
+        @Inputs(List.class)
         InvocationChannel<List<Character>, List<Integer>> addL21();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.COLLECTION)
-        InvocationChannel<Character, List<Integer>> addL22();
+        @Inputs(List.class)
+        StreamingChannel<List<Character>, List<Integer>> addL22();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.VALUE)
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(List.class)
         StreamingChannel<List<Character>, List<Integer>> addL23();
 
         @Alias("al")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = List.class, mode = InputMode.ELEMENT)
-        StreamingChannel<List<Character>, List<Integer>> addL24();
-
-        @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.COLLECTION)
-        StreamingChannel<Character, List<Integer>> addL25();
-
-        @Alias("al")
-        @Inputs(value = List.class, mode = InputMode.VALUE)
-        Routine<List<Character>, List<Integer>> addL26();
+        @Inputs(List.class)
+        Routine<List<Character>, List<Integer>> addL24();
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = List.class, mode = InputMode.ELEMENT)
-        Routine<List<Character>, List<Integer>> addL27();
+        @Inputs(List.class)
+        Routine<List<Character>, List<Integer>> addL25();
 
         @Alias("g")
         int get0();
@@ -1662,11 +1634,11 @@ public class LoaderObjectRoutineFragmentTest
         void set0(int i);
 
         @Alias("g")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<Integer> get1();
 
         @Alias("s")
-        void set1(@Input(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
+        void set1(@Input(value = int.class, mode = InputMode.CHANNEL) OutputChannel<Integer> i);
 
         @Alias("g")
         @Inputs({})
@@ -1695,7 +1667,7 @@ public class LoaderObjectRoutineFragmentTest
         OutputChannel<Integer> getA1();
 
         @Alias("sa")
-        void setA1(@Input(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> i);
+        void setA1(@Input(value = int[].class, mode = InputMode.CHANNEL) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Output(OutputMode.COLLECTION)
@@ -1737,7 +1709,7 @@ public class LoaderObjectRoutineFragmentTest
 
         @Alias("sl")
         void setL1(@Input(value = List.class,
-                mode = InputMode.VALUE) OutputChannel<List<Integer>> i);
+                mode = InputMode.CHANNEL) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Output(OutputMode.COLLECTION)
@@ -1769,56 +1741,40 @@ public class LoaderObjectRoutineFragmentTest
         Routine<Void, List<Integer>> getL6();
 
         @Alias("s")
-        @Inputs(value = int.class, mode = InputMode.VALUE)
+        @Inputs(int.class)
         InvocationChannel<Integer, Void> set3();
 
         @Alias("s")
-        @Inputs(value = int.class, mode = InputMode.VALUE)
+        @Inputs(int.class)
         StreamingChannel<Integer, Void> set4();
 
         @Alias("s")
-        @Inputs(value = int.class, mode = InputMode.VALUE)
+        @Inputs(int.class)
         Routine<Integer, Void> set5();
 
         @Alias("sa")
-        @Inputs(value = int[].class, mode = InputMode.VALUE)
+        @Inputs(int[].class)
         InvocationChannel<int[], Void> setA4();
 
         @Alias("sa")
-        @Inputs(value = int[].class, mode = InputMode.COLLECTION)
-        InvocationChannel<Integer, Void> setA5();
+        @Inputs(int[].class)
+        StreamingChannel<int[], Void> setA5();
 
         @Alias("sa")
-        @Inputs(value = int[].class, mode = InputMode.VALUE)
-        StreamingChannel<int[], Void> setA6();
-
-        @Alias("sa")
-        @Inputs(value = int[].class, mode = InputMode.COLLECTION)
-        StreamingChannel<Integer, Void> setA7();
-
-        @Alias("sa")
-        @Inputs(value = int[].class, mode = InputMode.VALUE)
-        Routine<int[], Void> setA8();
+        @Inputs(int[].class)
+        Routine<int[], Void> setA6();
 
         @Alias("sl")
-        @Inputs(value = List.class, mode = InputMode.VALUE)
+        @Inputs(List.class)
         InvocationChannel<List<Integer>, Void> setL4();
 
         @Alias("sl")
-        @Inputs(value = List.class, mode = InputMode.COLLECTION)
-        InvocationChannel<Integer, Void> setL5();
+        @Inputs(List.class)
+        StreamingChannel<List<Integer>, Void> setL5();
 
         @Alias("sl")
-        @Inputs(value = List.class, mode = InputMode.VALUE)
-        StreamingChannel<List<Integer>, Void> setL6();
-
-        @Alias("sl")
-        @Inputs(value = List.class, mode = InputMode.COLLECTION)
-        StreamingChannel<Integer, Void> setL7();
-
-        @Alias("sl")
-        @Inputs(value = List.class, mode = InputMode.VALUE)
-        Routine<List<Integer>, Void> setL8();
+        @Inputs(List.class)
+        Routine<List<Integer>, Void> setL6();
     }
 
     private interface CountError {
@@ -1834,7 +1790,7 @@ public class LoaderObjectRoutineFragmentTest
         @Output(OutputMode.ELEMENT)
         String[] count2(int length);
 
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         List<Integer> countList(int length);
 
         @Alias("countList")
@@ -1852,7 +1808,7 @@ public class LoaderObjectRoutineFragmentTest
         OutputChannel<Integer> count(int length);
 
         @Alias("count")
-        @Output(OutputMode.VALUE)
+        @Output(OutputMode.CHANNEL)
         OutputChannel<int[]> count1(int length);
 
         @Alias("count")
@@ -1934,7 +1890,7 @@ public class LoaderObjectRoutineFragmentTest
 
         int compute(@Input(int.class) String[] ints);
 
-        int compute(@Input(value = int.class, mode = InputMode.VALUE) int[] ints);
+        int compute(@Input(value = int.class, mode = InputMode.CHANNEL) int[] ints);
 
         int compute(@Input(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
 

@@ -314,7 +314,7 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String buildInputOptions(final ExecutableElement methodElement,
             final InputMode inputMode) {
 
-        return ((inputMode == InputMode.VALUE) || (inputMode == InputMode.COLLECTION))
+        return ((inputMode == InputMode.CHANNEL) || (inputMode == InputMode.COLLECTION))
                 ? ".orderByCall()" : "";
     }
 
@@ -824,13 +824,13 @@ public class RoutineProcessor extends AbstractProcessor {
                 (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
         InputMode inputMode = annotation.mode();
 
-        if (inputMode == InputMode.VALUE) {
+        if (inputMode == InputMode.CHANNEL) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async input with mode " + InputMode.VALUE
+                                + "] an async input with mode " + InputMode.CHANNEL
                                 + " must implement an " + outputChannelType);
             }
 
@@ -889,87 +889,6 @@ public class RoutineProcessor extends AbstractProcessor {
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
                                 + "] an async input with mode " + InputMode.ELEMENT
                                 + " cannot be applied to a method taking " + length
-                                + " input parameters");
-            }
-        }
-
-        return inputMode;
-    }
-
-    /**
-     * Gets the input transfer mode.
-     *
-     * @param methodElement the method element.
-     * @param annotation    the method annotation.
-     * @return the input mode.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    protected InputMode getInputsMode(@NotNull final ExecutableElement methodElement,
-            @NotNull final Inputs annotation) {
-
-        if (!methodElement.getParameters().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "methods annotated with " + Inputs.class.getSimpleName()
-                            + " must have no input parameters: " + methodElement);
-        }
-
-        final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeMirror returnType = methodElement.getReturnType();
-
-        if (!typeUtils.isAssignable(streamingChannelType, typeUtils.erasure(returnType))
-                && !typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
-                && !typeUtils.isAssignable(routineType, typeUtils.erasure(returnType))) {
-
-            throw new IllegalArgumentException(
-                    "the proxy method has incompatible return type: " + methodElement);
-        }
-
-        final TypeElement annotationElement = getTypeFromName(Inputs.class.getCanonicalName());
-        final TypeMirror annotationType = annotationElement.asType();
-        final List<AnnotationValue> targetMirrors =
-                (List<AnnotationValue>) getAnnotationValue(methodElement, annotationType, "value");
-
-        if (targetMirrors == null) {
-
-            // It should never happen
-            throw new NullPointerException(
-                    Inputs.class.getSimpleName() + " annotation value must not be null");
-        }
-
-        InputMode inputMode = annotation.mode();
-
-        if (inputMode == InputMode.COLLECTION) {
-
-            final TypeMirror targetType = (TypeMirror) targetMirrors.get(0).getValue();
-
-            if ((targetType != null) && ((targetType.getKind() != TypeKind.ARRAY)
-                    && !typeUtils.isAssignable(listType, typeUtils.erasure(targetType)))) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async input with mode " + InputMode.COLLECTION
-                                + " must be bound to an array or a superclass of " + listType);
-            }
-
-            if (targetMirrors.size() > 1) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async input with mode " + InputMode.COLLECTION +
-                                " cannot be applied to a method taking " + targetMirrors.size()
-                                + " input parameters");
-            }
-
-        } else if (inputMode == InputMode.ELEMENT) {
-
-            if (targetMirrors.size() > 1) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async input with mode " + InputMode.ELEMENT +
-                                " cannot be applied to a method taking " + targetMirrors.size()
                                 + " input parameters");
             }
         }
@@ -1484,13 +1403,13 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror targetMirror = typeUtils.erasure(targetMethodElement.getReturnType());
         OutputMode outputMode = methodElement.getAnnotation(Output.class).value();
 
-        if (outputMode == OutputMode.VALUE) {
+        if (outputMode == OutputMode.CHANNEL) {
 
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async output with mode " + OutputMode.VALUE
+                                + "] an async output with mode " + OutputMode.CHANNEL
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1500,7 +1419,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async output with mode " + OutputMode.VALUE
+                                + "] an async output with mode " + OutputMode.CHANNEL
                                 + " must be a superclass of " + outputChannelType);
             }
 
@@ -1951,8 +1870,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 getOutputMode(methodElement, targetMethod);
             }
 
-            inputMode = getInputsMode(methodElement, inputsAnnotation);
-            outputMode = OutputMode.VALUE;
+            inputMode = InputMode.CHANNEL;
+            outputMode = OutputMode.CHANNEL;
             final TypeMirror returnType = methodElement.getReturnType();
 
             if (typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))) {

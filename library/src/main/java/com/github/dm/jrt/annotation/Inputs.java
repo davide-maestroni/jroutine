@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.annotation;
 
-import com.github.dm.jrt.annotation.Input.InputMode;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -51,9 +49,6 @@ import java.lang.annotation.Target;
  *         public InvocationChannel&lt;Integer, Integer&gt; sum();
  *     </code>
  * </pre>
- * <p/>
- * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link Input.InputMode#VALUE VALUE} by default).
  * The proxying method can also return the routine wrapping the target one, as:
  * <p/>
  * <pre>
@@ -85,13 +80,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Inputs {
-
-    /**
-     * The inputs transfer mode.
-     *
-     * @return the mode.
-     */
-    InputMode mode() default InputMode.VALUE;
 
     /**
      * The array of parameter types.

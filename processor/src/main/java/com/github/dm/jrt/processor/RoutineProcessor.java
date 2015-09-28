@@ -1879,7 +1879,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final TypeMirror returnType = methodElement.getReturnType();
 
-            if (!typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
+            if (!typeUtils.isAssignable(streamingChannelType, typeUtils.erasure(returnType))
+                    && !typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
                     && !typeUtils.isAssignable(routineType, typeUtils.erasure(returnType))) {
 
                 throw new IllegalArgumentException(

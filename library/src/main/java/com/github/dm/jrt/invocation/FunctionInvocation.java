@@ -15,10 +15,10 @@ package com.github.dm.jrt.invocation;
 
 import com.github.dm.jrt.channel.ResultChannel;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 /**
  * Special abstract implementation that centralizes the routine invocation inside a single method,
@@ -37,7 +37,7 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
     private ArrayList<IN> mInputs;
 
     @Override
-    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         if (mInputs == null) {
 
@@ -48,7 +48,7 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
     }
 
     @Override
-    public void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         final ArrayList<IN> inputs = mInputs;
         final ArrayList<IN> clone;
@@ -82,6 +82,6 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
      * @param inputs the input list.
      * @param result the result channel.
      */
-    protected abstract void onCall(@Nonnull List<? extends IN> inputs,
-            @Nonnull ResultChannel<OUT> result);
+    protected abstract void onCall(@NotNull List<? extends IN> inputs,
+            @NotNull ResultChannel<OUT> result);
 }

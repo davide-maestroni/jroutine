@@ -15,7 +15,7 @@ package com.github.dm.jrt.invocation;
 
 import com.github.dm.jrt.channel.DeadlockException;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating a possible deadlock while waiting for an invocation instance to become

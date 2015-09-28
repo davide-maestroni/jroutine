@@ -18,7 +18,7 @@ import android.content.ContextWrapper;
 
 import com.github.dm.jrt.android.builder.FactoryContext;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract implementation of a context wrapper implementing a factory context.<br/>
@@ -33,7 +33,7 @@ public abstract class FactoryContextWrapper extends ContextWrapper implements Fa
      *
      * @param base the base context.
      */
-    public FactoryContextWrapper(@Nonnull final Context base) {
+    public FactoryContextWrapper(@NotNull final Context base) {
 
         super(base.getApplicationContext());
     }

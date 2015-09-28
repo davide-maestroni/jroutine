@@ -16,9 +16,9 @@ package com.github.dm.jrt.runner;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class maintaining a queue of executions which is local to the calling thread.
@@ -66,7 +66,7 @@ class LocalQueue {
      *
      * @param execution the execution.
      */
-    public static void cancel(@Nonnull final Execution execution) {
+    public static void cancel(@NotNull final Execution execution) {
 
         sQueue.get().removeExecution(execution);
     }
@@ -78,13 +78,13 @@ class LocalQueue {
      * @param delay     the execution delay.
      * @param timeUnit  the delay time unit.
      */
-    public static void run(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public static void run(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         sQueue.get().addExecution(execution, delay, timeUnit);
     }
 
-    private static void resizeArray(@Nonnull final long[] src, @Nonnull final long[] dst,
+    private static void resizeArray(@NotNull final long[] src, @NotNull final long[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -92,7 +92,7 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
+    private static <T> void resizeArray(@NotNull final T[] src, @NotNull final T[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -100,8 +100,8 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    private void add(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         final int i = mLast;
         mExecutionTimeNs[i] = System.nanoTime();
@@ -127,8 +127,8 @@ class LocalQueue {
         mLast = newLast;
     }
 
-    private void addExecution(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    private void addExecution(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         add(execution, delay, timeUnit);
 

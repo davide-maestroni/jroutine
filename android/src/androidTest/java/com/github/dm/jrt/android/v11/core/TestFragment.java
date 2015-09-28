@@ -22,7 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Test fragment.
@@ -34,7 +34,7 @@ public class TestFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@Nonnull final LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(@NotNull final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
 
         return new View(getActivity());

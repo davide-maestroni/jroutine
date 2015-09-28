@@ -13,11 +13,11 @@
  */
 package com.github.dm.jrt.runner;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 /**
  * Utility class for creating and sharing runner instances.
@@ -53,9 +53,9 @@ public class Runners {
      * @param keepAliveUnit   the time unit for the keep alive time.
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public static Runner dynamicPoolRunner(final int corePoolSize, final int maximumPoolSize,
-            final long keepAliveTime, @Nonnull final TimeUnit keepAliveUnit) {
+            final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
 
         return scheduledRunner(
                 new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
@@ -67,7 +67,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public static Runner poolRunner() {
 
         return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
@@ -80,7 +80,7 @@ public class Runners {
      * @return the runner instance.
      * @throws java.lang.IllegalArgumentException if the pool size is less than 1.
      */
-    @Nonnull
+    @NotNull
     public static Runner poolRunner(final int poolSize) {
 
         return scheduledRunner(Executors.newScheduledThreadPool(poolSize));
@@ -92,8 +92,8 @@ public class Runners {
      * @param wrapped the wrapped runner instance.
      * @return the runner instance.
      */
-    @Nonnull
-    public static PriorityRunner priorityRunner(@Nonnull final Runner wrapped) {
+    @NotNull
+    public static PriorityRunner priorityRunner(@NotNull final Runner wrapped) {
 
         return PriorityRunner.getInstance(wrapped);
     }
@@ -104,8 +104,8 @@ public class Runners {
      * @param service the executor service.
      * @return the runner instance.
      */
-    @Nonnull
-    public static Runner scheduledRunner(@Nonnull final ScheduledExecutorService service) {
+    @NotNull
+    public static Runner scheduledRunner(@NotNull final ScheduledExecutorService service) {
 
         return new ScheduledRunner(service);
     }
@@ -115,7 +115,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public static Runner sharedRunner() {
 
         synchronized (sMutex) {
@@ -136,7 +136,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public static Runner syncRunner() {
 
         return sQueuedRunner;
@@ -151,8 +151,8 @@ public class Runners {
      * @return the runner instance.
      * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
      */
-    @Nonnull
-    public static Runner throttlingRunner(@Nonnull final Runner wrapped, final int maxExecutions) {
+    @NotNull
+    public static Runner throttlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
 
         return new ThrottlingRunner(wrapped, maxExecutions);
     }

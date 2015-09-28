@@ -15,11 +15,10 @@ package com.github.dm.jrt.log;
 
 import com.github.dm.jrt.log.Log.LogLevel;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -853,7 +852,7 @@ public class LoggerTest {
         }
 
         @Override
-        protected void log(@Nonnull final LogLevel level, @Nonnull final List<Object> contexts,
+        protected void log(@NotNull final LogLevel level, @NotNull final List<Object> contexts,
                 final String message, final Throwable throwable) {
 
             mLevel = level;
@@ -862,7 +861,7 @@ public class LoggerTest {
         }
 
         @Override
-        protected void log(@Nonnull final String message) {
+        protected void log(@NotNull final String message) {
 
             mMessage = message;
         }

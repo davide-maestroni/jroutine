@@ -23,6 +23,7 @@ import com.github.dm.jrt.android.R;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.DelegatingContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
@@ -40,10 +41,11 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.DeadlockException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.TransportChannel;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.Invocations;
@@ -56,19 +58,20 @@ import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryFrom;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
+import static com.github.dm.jrt.android.invocation.ContextInvocations.supplierFactory;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.util.TimeDuration.millis;
@@ -88,6 +91,17 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public LoaderRoutineTest() {
 
         super(TestActivity.class);
+    }
+
+    private static ContextInvocationFactory<String, String> createFactory() {
+
+        return supplierFactory(new Supplier<ContextInvocation<String, String>>() {
+
+            public ContextInvocation<String, String> get() {
+
+                return new StringFunctionInvocation();
+            }
+        });
     }
 
     public void testActivityAbort() {
@@ -385,7 +399,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                          .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
                 DelegatingContextInvocation.factoryFrom(routine1, TEST_ROUTINE_ID,
-                                                        DelegationType.SYNCHRONOUS);
+                                                        DelegationType.SYNC);
         final Routine<Object, Object> routine2 =
                 JRoutine.with(contextFrom(getActivity())).on(factory).buildRoutine();
 
@@ -1081,7 +1095,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                          .buildRoutine();
         final ContextInvocationFactory<Object, Object> factory =
                 DelegatingContextInvocation.factoryFrom(routine1, TEST_ROUTINE_ID,
-                                                        DelegationType.ASYNCHRONOUS);
+                                                        DelegationType.ASYNC);
         final Routine<Object, Object> routine2 =
                 JRoutine.with(contextFrom(fragment)).on(factory).buildRoutine();
 
@@ -1483,12 +1497,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         }
 
-        final TransportChannel<Object> transportChannel = JRoutine.transport().buildChannel();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
         result = JRoutine.with(contextFrom(getActivity()))
                          .on(PassingContextInvocation.factoryOf())
                          .asyncInvoke()
                          .after(seconds(2))
-                         .pass(transportChannel)
+                         .pass(ioChannel)
                          .result();
 
         try {
@@ -1705,10 +1719,24 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
+    public void testSupplierFactory() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        assertThat(JRoutine.with(contextFrom(getActivity()))
+                           .on(createFactory())
+                           .asyncCall("test")
+                           .eventually()
+                           .all()).containsExactly("test");
+    }
+
     private static class Abort extends TemplateInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
 
             try {
 
@@ -1732,19 +1760,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         private int mWrnCount;
 
-        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void err(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mWrnCount;
@@ -1773,7 +1801,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
 
             result.after(millis(500)).pass(d);
         }
@@ -1791,7 +1819,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             extends TemplateContextInvocation<DATA, Context> {
 
         @Override
-        public void onResult(@Nonnull final ResultChannel<Context> result) {
+        public void onResult(@NotNull final ResultChannel<Context> result) {
 
             result.pass(getContext());
         }
@@ -1815,7 +1843,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.pass(s);
         }
@@ -1825,8 +1853,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             extends FunctionContextInvocation<String, String> {
 
         @Override
-        protected void onCall(@Nonnull final List<? extends String> strings,
-                @Nonnull final ResultChannel<String> result) {
+        protected void onCall(@NotNull final List<? extends String> strings,
+                @NotNull final ResultChannel<String> result) {
 
             result.pass(strings);
         }
@@ -1835,7 +1863,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     private static class ToUpperCase extends TemplateContextInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s.toUpperCase());
         }

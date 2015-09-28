@@ -20,13 +20,13 @@ import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLConnection;
-
-import javax.annotation.Nonnull;
 
 /**
  * Invocation reading data from the URL connection.
@@ -38,7 +38,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
     private static final int MAX_CHUNK_SIZE = 2048;
 
     @SuppressWarnings("StatementWithEmptyBody")
-    public void onInput(final URI uri, @Nonnull final ResultChannel<ByteBuffer> result) {
+    public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) {
 
         try {
 

@@ -13,14 +13,14 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.builder.TransportChannelBuilder;
 import com.github.dm.jrt.channel.AbortException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -29,6 +29,7 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -37,8 +38,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
@@ -59,11 +58,11 @@ public class ChannelsTest {
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<Integer, Integer> channel2 =
                 JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.combine(channel1, channel2)
+        Channels.<Object>combine(channel1, channel2)
                 .pass(new Selectable<String>("test1", 0))
                 .pass(new Selectable<Integer>(1, 1))
                 .close();
-        Channels.combine(3, channel1, channel2)
+        Channels.<Object>combine(3, channel1, channel2)
                 .pass(new Selectable<String>("test2", 3))
                 .pass(new Selectable<Integer>(2, 4))
                 .close();
@@ -95,7 +94,7 @@ public class ChannelsTest {
         InvocationChannel<Integer, Integer> channel2;
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.combine(channel1, channel2).abort();
+        Channels.<Object>combine(channel1, channel2).abort();
 
         try {
 
@@ -119,7 +118,7 @@ public class ChannelsTest {
 
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.combine(3, channel1, channel2).abort();
+        Channels.<Object>combine(3, channel1, channel2).abort();
 
         try {
 
@@ -279,15 +278,11 @@ public class ChannelsTest {
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<String, String> channel2 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distribute(channel1, channel2)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
-                .close();
+        Channels.distribute(channel1, channel2).pass(Arrays.asList("test1-1", "test1-2")).close();
         Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
+                .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
-        Channels.distribute(channel1, channel2)
-                .pass(Collections.<Object>singletonList("test3-1"))
-                .close();
+        Channels.distribute(channel1, channel2).pass(Collections.singletonList("test3-1")).close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
         assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2");
@@ -355,13 +350,13 @@ public class ChannelsTest {
         final InvocationChannel<String, String> channel2 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
+                .pass(Arrays.asList("test1-1", "test1-2"))
                 .close();
         Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.<Object>asList("test2-1", "test2-2"))
+                .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
         Channels.distributeAndFlush(channel1, channel2)
-                .pass(Collections.<Object>singletonList("test3-1"))
+                .pass(Collections.singletonList("test3-1"))
                 .close();
         assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
@@ -428,9 +423,7 @@ public class ChannelsTest {
 
         final InvocationChannel<String, String> channel1 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(channel1)
-                .pass(Arrays.<Object>asList("test1-1", "test1-2"))
-                .close();
+        Channels.distributeAndFlush(channel1).pass(Arrays.asList("test1-1", "test1-2")).close();
 
         try {
 
@@ -468,7 +461,7 @@ public class ChannelsTest {
 
         final InvocationChannel<String, String> channel1 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distribute(channel1).pass(Arrays.<Object>asList("test1-1", "test1-2")).close();
+        Channels.distribute(channel1).pass(Arrays.asList("test1-1", "test1-2")).close();
 
         try {
 
@@ -509,7 +502,7 @@ public class ChannelsTest {
         outputs.add(new Selectable<Object>(-11, Sort.INTEGER));
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        Map<Integer, TransportChannel<Object>> channelMap;
+        Map<Integer, IOChannel<Object, Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
@@ -533,7 +526,7 @@ public class ChannelsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        Map<Integer, TransportChannel<Object>> channelMap;
+        Map<Integer, IOChannel<Object, Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
@@ -599,7 +592,8 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testInputSelect() {
 
-        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        final IOChannel<Selectable<String>, Selectable<String>> channel =
+                JRoutine.io().buildChannel();
         Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3").close();
         assertThat(channel.close().all()).containsExactly(new Selectable<String>("test1", 33),
                                                           new Selectable<String>("test2", 33),
@@ -609,7 +603,8 @@ public class ChannelsTest {
     @Test
     public void testInputSelectAbort() {
 
-        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        final IOChannel<Selectable<String>, Selectable<String>> channel =
+                JRoutine.io().buildChannel();
         Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3").abort();
 
         try {
@@ -627,7 +622,7 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testInputToSelectable() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33)
                 .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                       new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
@@ -638,7 +633,7 @@ public class ChannelsTest {
     @Test
     public void testInputToSelectableAbort() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33).abort();
 
         try {
@@ -655,15 +650,15 @@ public class ChannelsTest {
     @Test
     public void testJoin() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.join(channel1, channel2))
+        assertThat(routine.asyncCall(Channels.<Object>join(channel1, channel2))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -683,7 +678,7 @@ public class ChannelsTest {
                 .pass("test3")
                 .close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.join(channel1, channel2))
+        assertThat(routine.asyncCall(Channels.<Object>join(channel1, channel2))
                           .eventually()
                           .all()).containsExactly('s', '2');
     }
@@ -691,10 +686,10 @@ public class ChannelsTest {
     @Test
     public void testJoinAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -702,7 +697,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.join(channel1, channel2)).eventually().all();
+            routine.asyncCall(Channels.<Object>join(channel1, channel2)).eventually().all();
 
             fail();
 
@@ -731,15 +726,15 @@ public class ChannelsTest {
     @Test
     public void testJoinAndFlush() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.joinAndFlush(channel1, channel2))
+        assertThat(routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2))
                           .eventually()
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -762,7 +757,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.joinAndFlush(channel1, channel2)).eventually().all();
+            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2)).eventually().all();
 
             fail();
 
@@ -774,10 +769,10 @@ public class ChannelsTest {
     @Test
     public void testJoinAndFlushAbort() {
 
-        final TransportChannelBuilder builder = JRoutine.transport();
+        final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -785,7 +780,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.joinAndFlush(channel1, channel2)).eventually().all();
+            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2)).eventually().all();
 
             fail();
 
@@ -863,10 +858,10 @@ public class ChannelsTest {
     @Test
     public void testMap() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final TransportChannel<String> channel1 = builder.buildChannel();
-        final TransportChannel<Integer> channel2 = builder.buildChannel();
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        final IOChannel<String, String> channel1 = builder.buildChannel();
+        final IOChannel<Integer, Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends Selectable<Object>> channel =
                 Channels.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
@@ -894,38 +889,38 @@ public class ChannelsTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testMerge() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(-7, channel1, channel2);
+        outputChannel = Channels.<Object>merge(-7, channel1, channel2);
         channel1.pass("test1").close();
         channel2.pass(13).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new Selectable<String>("test1", -7), new Selectable<Integer>(13, -6));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(11, Arrays.asList(channel1, channel2));
+        outputChannel =
+                Channels.<Object>merge(11, Arrays.<OutputChannel<?>>asList(channel1, channel2));
         channel2.pass(13).close();
         channel1.pass("test1").close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new Selectable<String>("test1", 11), new Selectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(channel1, channel2);
+        outputChannel = Channels.<Object>merge(channel1, channel2);
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
                 new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(Arrays.asList(channel1, channel2));
+        outputChannel = Channels.<Object>merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
@@ -936,7 +931,7 @@ public class ChannelsTest {
                 new HashMap<Integer, OutputChannel<?>>(2);
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
-        outputChannel = Channels.merge(channelMap);
+        outputChannel = Channels.<Object>merge(channelMap);
         channel1.pass("test3").close();
         channel2.pass(111).close();
         assertThat(outputChannel.eventually().all()).containsOnly(
@@ -947,12 +942,12 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final TransportChannel<String> channel1 = builder.buildChannel();
-        final TransportChannel<String> channel2 = builder.buildChannel();
-        final TransportChannel<String> channel3 = builder.buildChannel();
-        final TransportChannel<String> channel4 = builder.buildChannel();
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        final IOChannel<String, String> channel1 = builder.buildChannel();
+        final IOChannel<String, String> channel2 = builder.buildChannel();
+        final IOChannel<String, String> channel3 = builder.buildChannel();
+        final IOChannel<String, String> channel4 = builder.buildChannel();
 
         final Routine<Selectable<String>, String> routine =
                 JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
@@ -977,17 +972,16 @@ public class ChannelsTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testMergeAbort() {
 
-        final TransportChannelBuilder builder =
-                JRoutine.transport().channels().withChannelOrder(OrderType.BY_CALL).set();
-        TransportChannel<String> channel1;
-        TransportChannel<Integer> channel2;
+        final IOChannelBuilder builder =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+        IOChannel<String, String> channel1;
+        IOChannel<Integer, Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(-7, channel1, channel2);
+        outputChannel = Channels.<Object>merge(-7, channel1, channel2);
         channel1.pass("test1").close();
         channel2.abort();
 
@@ -1003,7 +997,8 @@ public class ChannelsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(11, Arrays.asList(channel1, channel2));
+        outputChannel =
+                Channels.<Object>merge(11, Arrays.<OutputChannel<?>>asList(channel1, channel2));
         channel2.abort();
         channel1.pass("test1").close();
 
@@ -1019,7 +1014,7 @@ public class ChannelsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(channel1, channel2);
+        outputChannel = Channels.<Object>merge(channel1, channel2);
         channel1.abort();
         channel2.pass(-17).close();
 
@@ -1035,7 +1030,7 @@ public class ChannelsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Channels.merge(Arrays.asList(channel1, channel2));
+        outputChannel = Channels.<Object>merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
         channel1.pass("test2").close();
         channel2.abort();
 
@@ -1055,7 +1050,7 @@ public class ChannelsTest {
                 new HashMap<Integer, OutputChannel<?>>(2);
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
-        outputChannel = Channels.merge(channelMap);
+        outputChannel = Channels.<Object>merge(channelMap);
         channel1.abort();
         channel2.pass(111).close();
 
@@ -1260,7 +1255,8 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testOutputSelect() {
 
-        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        final IOChannel<Selectable<String>, Selectable<String>> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel.asOutput(), 33);
         channel.pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                      new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
@@ -1271,7 +1267,8 @@ public class ChannelsTest {
     @Test
     public void testOutputSelectAbort() {
 
-        final TransportChannel<Selectable<String>> channel = JRoutine.transport().buildChannel();
+        final IOChannel<Selectable<String>, Selectable<String>> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel.asOutput(), 33);
         channel.abort();
 
@@ -1290,7 +1287,7 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testOutputToSelectable() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(
                 Channels.toSelectable(channel.asOutput(), 33).eventually().all()).containsExactly(
@@ -1301,7 +1298,7 @@ public class ChannelsTest {
     @Test
     public void testOutputToSelectableAbort() {
 
-        final TransportChannel<String> channel = JRoutine.transport().buildChannel();
+        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").abort();
 
         try {
@@ -1329,7 +1326,7 @@ public class ChannelsTest {
 
         @Override
         public void onInput(final Selectable<DATA> input,
-                @Nonnull final ResultChannel<DATA> result) {
+                @NotNull final ResultChannel<DATA> result) {
 
             if (mFirstIndex == NO_INDEX) {
 
@@ -1345,7 +1342,7 @@ public class ChannelsTest {
 
     private static class CharAt extends FilterInvocation<List<?>, Character> {
 
-        public void onInput(final List<?> objects, @Nonnull final ResultChannel<Character> result) {
+        public void onInput(final List<?> objects, @NotNull final ResultChannel<Character> result) {
 
             final String text = (String) objects.get(0);
             final int index = ((Integer) objects.get(1));
@@ -1360,7 +1357,7 @@ public class ChannelsTest {
         private static final int STRING = 0;
 
         public void onInput(final Selectable<Object> selectable,
-                @Nonnull final ResultChannel<Selectable<Object>> result) {
+                @NotNull final ResultChannel<Selectable<Object>> result) {
 
             switch (selectable.index) {
 

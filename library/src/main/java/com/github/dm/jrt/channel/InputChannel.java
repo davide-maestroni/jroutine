@@ -15,10 +15,10 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining an input channel.
@@ -41,8 +41,8 @@ public interface InputChannel<IN> extends Channel {
      * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
-    @Nonnull
-    InputChannel<IN> after(@Nonnull TimeDuration delay);
+    @NotNull
+    InputChannel<IN> after(@NotNull TimeDuration delay);
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
@@ -56,8 +56,8 @@ public interface InputChannel<IN> extends Channel {
      * @throws java.lang.IllegalArgumentException         if the specified delay is negative.
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
-    @Nonnull
-    InputChannel<IN> after(long delay, @Nonnull TimeUnit timeUnit);
+    @NotNull
+    InputChannel<IN> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * Checks if the channel has any delayed input, either because passed with an explicit delay or
@@ -74,7 +74,7 @@ public interface InputChannel<IN> extends Channel {
      * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> now();
 
     /**
@@ -89,7 +89,7 @@ public interface InputChannel<IN> extends Channel {
      * @see #orderByChance()
      * @see #orderByDelay()
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> orderByCall();
 
     /**
@@ -103,7 +103,7 @@ public interface InputChannel<IN> extends Channel {
      * @see #orderByCall()
      * @see #orderByDelay()
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> orderByChance();
 
     /**
@@ -120,7 +120,7 @@ public interface InputChannel<IN> extends Channel {
      * @see #orderByCall()
      * @see #orderByChance()
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> orderByDelay();
 
     /**
@@ -135,7 +135,7 @@ public interface InputChannel<IN> extends Channel {
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      * @see com.github.dm.jrt.channel.OutputChannel#passTo(InputChannel)
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> pass(@Nullable OutputChannel<? extends IN> channel);
 
     /**
@@ -146,7 +146,7 @@ public interface InputChannel<IN> extends Channel {
      * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
@@ -157,7 +157,7 @@ public interface InputChannel<IN> extends Channel {
      * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> pass(@Nullable IN input);
 
     /**
@@ -168,6 +168,6 @@ public interface InputChannel<IN> extends Channel {
      * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException            if this channel is already closed.
      */
-    @Nonnull
+    @NotNull
     InputChannel<IN> pass(@Nullable IN... inputs);
 }

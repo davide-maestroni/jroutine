@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.android.log;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -33,7 +33,7 @@ public class Logs extends com.github.dm.jrt.log.Logs {
      *
      * @return the shared instance.
      */
-    @Nonnull
+    @NotNull
     public static AndroidLog androidLog() {
 
         return sAndroidLog;

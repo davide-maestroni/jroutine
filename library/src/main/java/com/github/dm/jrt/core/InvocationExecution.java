@@ -21,8 +21,8 @@ import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.TemplateExecution;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Default implementation of an invocation execution.
@@ -65,9 +65,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      * @param logger  the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationExecution(@Nonnull final InvocationManager<IN, OUT> manager,
-            @Nonnull final InputIterator<IN> inputs,
-            @Nonnull final DefaultResultChannel<OUT> result, @Nonnull final Logger logger) {
+    InvocationExecution(@NotNull final InvocationManager<IN, OUT> manager,
+            @NotNull final InputIterator<IN> inputs,
+            @NotNull final DefaultResultChannel<OUT> result, @NotNull final Logger logger) {
 
         if (manager == null) {
 
@@ -95,7 +95,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      *
      * @return the execution.
      */
-    @Nonnull
+    @NotNull
     public Execution abort() {
 
         synchronized (mAbortMutex) {
@@ -114,7 +114,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         return true;
     }
 
-    public void onCreate(@Nonnull final Invocation<IN, OUT> invocation) {
+    public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
 
         synchronized (mMutex) {
 
@@ -300,7 +300,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
         private int mAbortExecutionCount = 1;
 
-        public void onCreate(@Nonnull final Invocation<IN, OUT> invocation) {
+        public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
 
             synchronized (mMutex) {
 
@@ -357,7 +357,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             }
         }
 
-        public void onError(@Nonnull final Throwable error) {
+        public void onError(@NotNull final Throwable error) {
 
             synchronized (mMutex) {
 
@@ -405,7 +405,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         }
     }
 
-    public void onError(@Nonnull final Throwable error) {
+    public void onError(@NotNull final Throwable error) {
 
         synchronized (mMutex) {
 

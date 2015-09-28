@@ -17,7 +17,7 @@ import android.content.ComponentName;
 
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that the routine service has unexpectedly disconnected.

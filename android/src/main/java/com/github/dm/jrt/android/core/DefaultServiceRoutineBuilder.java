@@ -19,7 +19,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.routine.Routine;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class implementing a builder of routine objects executed in a dedicated service.
@@ -37,9 +37,9 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
             mConfigurable =
             new InvocationConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>>() {
 
-                @Nonnull
+                @NotNull
                 public ServiceRoutineBuilder<IN, OUT> setConfiguration(
-                        @Nonnull final InvocationConfiguration configuration) {
+                        @NotNull final InvocationConfiguration configuration) {
 
                     return DefaultServiceRoutineBuilder.this.setConfiguration(configuration);
                 }
@@ -58,8 +58,8 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
      * @param target  the invocation factory target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final TargetInvocationFactory<IN, OUT> target) {
+    DefaultServiceRoutineBuilder(@NotNull final ServiceContext context,
+            @NotNull final TargetInvocationFactory<IN, OUT> target) {
 
         if (context == null) {
 
@@ -75,14 +75,14 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
         mTargetFactory = target;
     }
 
-    @Nonnull
+    @NotNull
     public Routine<IN, OUT> buildRoutine() {
 
         return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
                                            mServiceConfiguration);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocations() {
 
@@ -91,26 +91,26 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
                                                                                    config);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public ServiceRoutineBuilder<IN, OUT> setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         super.setConfiguration(configuration);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ServiceRoutineBuilder<IN, OUT> setConfiguration(
-            @Nonnull final ServiceConfiguration configuration) {
+            @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
 

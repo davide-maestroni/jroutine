@@ -21,10 +21,10 @@ import com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.util.ClassToken;
 
-import java.lang.reflect.Constructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
 
 import static com.github.dm.jrt.util.Reflection.findConstructor;
 
@@ -50,7 +50,7 @@ class DefaultProxyRoutineBuilder
      * @param target the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultProxyRoutineBuilder(@Nonnull final InvocationTarget<?> target) {
+    DefaultProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
         if (target == null) {
 
@@ -60,14 +60,14 @@ class DefaultProxyRoutineBuilder
         mTarget = target;
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         return buildProxy(ClassToken.tokenOf(itf));
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         final Class<TYPE> itfClass = itf.getRawClass();
 
@@ -95,23 +95,23 @@ class DefaultProxyRoutineBuilder
                       .buildProxy();
     }
 
-    @Nonnull
+    @NotNull
     public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocations() {
 
         final InvocationConfiguration configuration = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
-    @Nonnull
+    @NotNull
     public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration configuration = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
-    public ProxyRoutineBuilder setConfiguration(@Nonnull final ProxyConfiguration configuration) {
+    public ProxyRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -122,10 +122,10 @@ class DefaultProxyRoutineBuilder
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ProxyRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -153,14 +153,14 @@ class DefaultProxyRoutineBuilder
          * @param target         the invocation target.
          * @param interfaceToken the proxy interface token.
          */
-        private TargetProxyObjectBuilder(@Nonnull final InvocationTarget<?> target,
-                @Nonnull final ClassToken<TYPE> interfaceToken) {
+        private TargetProxyObjectBuilder(@NotNull final InvocationTarget<?> target,
+                @NotNull final ClassToken<TYPE> interfaceToken) {
 
             mTarget = target;
             mInterfaceToken = interfaceToken;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         protected ClassToken<TYPE> getInterfaceToken() {
 
@@ -174,10 +174,10 @@ class DefaultProxyRoutineBuilder
             return mTarget.getTarget();
         }
 
-        @Nonnull
+        @NotNull
         @Override
-        protected TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
-                @Nonnull final ProxyConfiguration proxyConfiguration) {
+        protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
+                @NotNull final ProxyConfiguration proxyConfiguration) {
 
             try {
 

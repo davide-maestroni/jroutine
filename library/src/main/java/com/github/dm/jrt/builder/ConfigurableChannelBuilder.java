@@ -15,7 +15,7 @@ package com.github.dm.jrt.builder;
 
 import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a configurable builder of routines.
@@ -33,6 +33,6 @@ public interface ConfigurableChannelBuilder<TYPE> {
      *
      * @return the invocation configuration builder.
      */
-    @Nonnull
+    @NotNull
     Builder<? extends TYPE> channels();
 }

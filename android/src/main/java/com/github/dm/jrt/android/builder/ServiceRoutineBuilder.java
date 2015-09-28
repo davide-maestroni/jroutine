@@ -16,7 +16,7 @@ package com.github.dm.jrt.android.builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.RoutineBuilder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routine objects executed in a dedicated service.<br/>
@@ -40,6 +40,6 @@ public interface ServiceRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>,
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocations();
 }

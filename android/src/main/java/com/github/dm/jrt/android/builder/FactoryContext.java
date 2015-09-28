@@ -13,8 +13,8 @@
  */
 package com.github.dm.jrt.android.builder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a factory providing object instances, whose methods are to be called inside
@@ -35,5 +35,5 @@ public interface FactoryContext {
      * @return the object instance.
      */
     @Nullable
-    <TYPE> TYPE geInstance(@Nonnull Class<? extends TYPE> type, @Nonnull Object... args);
+    <TYPE> TYPE geInstance(@NotNull Class<? extends TYPE> type, @NotNull Object... args);
 }

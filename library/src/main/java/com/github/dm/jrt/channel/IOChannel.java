@@ -15,155 +15,156 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
- * Interface defining a transport channel.
+ * Interface defining a channel which is both an input and an output.
  * <p/>
- * A transport channel is useful to make other asynchronous tasks communicate with a routine.<br/>
+ * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br/>
  * The channel output can be passed to a routine input channel in order to feed it with data coming
  * asynchronously from other sources. Note however that, in any case, the {@code close()} method
  * must be called in order to correctly terminate the invocation lifecycle.
  * <p/>
- * Created by davide-maestroni on 10/25/2014.
+ * Created by davide-maestroni on 09/24/2015.
  *
- * @param <DATA> the data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA> {
+public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT> {
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> after(@Nonnull TimeDuration delay);
+    @NotNull
+    IOChannel<IN, OUT> after(@NotNull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> after(long delay, @Nonnull TimeUnit timeUnit);
+    @NotNull
+    IOChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> now();
+    @NotNull
+    IOChannel<IN, OUT> now();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> orderByCall();
+    @NotNull
+    IOChannel<IN, OUT> orderByCall();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> orderByChance();
+    @NotNull
+    IOChannel<IN, OUT> orderByChance();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> orderByDelay();
+    @NotNull
+    IOChannel<IN, OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> pass(@Nullable OutputChannel<? extends DATA> channel);
+    @NotNull
+    IOChannel<IN, OUT> pass(@Nullable OutputChannel<? extends IN> channel);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> pass(@Nullable Iterable<? extends DATA> inputs);
+    @NotNull
+    IOChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> pass(@Nullable DATA input);
+    @NotNull
+    IOChannel<IN, OUT> pass(@Nullable IN input);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> pass(@Nullable DATA... inputs);
+    @NotNull
+    IOChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> afterMax(@Nonnull TimeDuration timeout);
+    @NotNull
+    IOChannel<IN, OUT> afterMax(@NotNull TimeDuration timeout);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+    @NotNull
+    IOChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> allInto(@Nonnull Collection<? super DATA> results);
+    @NotNull
+    IOChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> eventually();
+    @NotNull
+    IOChannel<IN, OUT> eventually();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> eventuallyAbort();
+    @NotNull
+    IOChannel<IN, OUT> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> eventuallyExit();
+    @NotNull
+    IOChannel<IN, OUT> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> eventuallyThrow();
+    @NotNull
+    IOChannel<IN, OUT> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> immediately();
+    @NotNull
+    IOChannel<IN, OUT> immediately();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
-    TransportChannel<DATA> passTo(@Nonnull OutputConsumer<? super DATA> consumer);
+    @NotNull
+    IOChannel<IN, OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * Returns this channel as an input one.
      *
      * @return this channel.
      */
-    @Nonnull
-    InputChannel<DATA> asInput();
+    @NotNull
+    InputChannel<IN> asInput();
 
     /**
      * Returns this channel as an output one.
      *
      * @return this channel.
      */
-    @Nonnull
-    OutputChannel<DATA> asOutput();
+    @NotNull
+    OutputChannel<OUT> asOutput();
 
     /**
      * Closes the channel input.<br/>
@@ -173,6 +174,6 @@ public interface TransportChannel<DATA> extends InputChannel<DATA>, OutputChanne
      *
      * @return this channel.
      */
-    @Nonnull
-    TransportChannel<DATA> close();
+    @NotNull
+    IOChannel<IN, OUT> close();
 }

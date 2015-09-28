@@ -34,7 +34,7 @@
             private static class Parse extends TemplateInvocation&lt;String, Integer&gt; {
 
                 &commat;Override
-                public void onInput(final String s, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
+                public void onInput(final String s, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
 
                     result.pass(Integer.parseInt(s));
                 }
@@ -43,7 +43,7 @@
             private static class Square extends TemplateInvocation&lt;Integer, Integer&gt; {
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
 
                     final int input = integer;
                     result.pass(input * input);
@@ -64,14 +64,14 @@
                 }
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Double&gt; result) {
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Double&gt; result) {
 
                     ++mCount;
                     mSum += integer;
                 }
 
                 &commat;Override
-                public void onResult(&commat;Nonnull final ResultChannel&lt;Double&gt; result) {
+                public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
 
                     if (mCount > 0) {
 
@@ -110,7 +110,7 @@
 
             private static class Parse extends FilterInvocation&lt;String, Integer&gt; {
 
-                public void onInput(final String s, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
+                public void onInput(final String s, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
 
                     result.pass(Integer.parseInt(s));
                 }
@@ -118,7 +118,7 @@
 
             private static class Square extends FilterInvocation&lt;Integer, Integer&gt; {
 
-                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
 
                     final int input = integer;
                     result.pass(input * input);
@@ -139,14 +139,14 @@
                 }
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Double&gt; result) {
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Double&gt; result) {
 
                     ++mCount;
                     mSum += integer;
                 }
 
                 &commat;Override
-                public void onResult(&commat;Nonnull final ResultChannel&lt;Double&gt; result) {
+                public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
 
                     if (mCount > 0) {
 
@@ -161,7 +161,7 @@
 
             private static class SquareRootMeanFactory extends InvocationFactory&lt;Integer, Double&gt; {
 
-                &commat;Nonnull
+                &commat;NotNull
                 public Invocation&lt;Integer, Double&gt; newInvocation() {
 
                    return new SquareRootMean();
@@ -288,13 +288,15 @@
 
             private interface AsyncMain {
 
+                &commat;Invoke(InvocationMode.PARALLEL)
                 &commat;Output
                 OutputChannel&lt;Integer&gt; parseArg(
-                        &commat;Input(value = String.class, mode = InputMode.PARALLEL) String[] args);
+                        &commat;Input(value = String.class, mode = InputMode.ELEMENT) String[] args);
 
+                &commat;Invoke(InvocationMode.PARALLEL)
                 &commat;Output
                 OutputChannel&lt;Integer&gt; square(
-                        &commat;Input(value = int.class, mode = InputMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
+                        &commat;Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(
                         &commat;Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);

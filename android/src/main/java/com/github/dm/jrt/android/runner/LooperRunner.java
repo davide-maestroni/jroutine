@@ -19,10 +19,10 @@ import android.os.Looper;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of a runner employing the Android {@link android.os.Looper} queue to execute the
@@ -46,7 +46,7 @@ class LooperRunner implements Runner {
      *
      * @param looper the looper to employ.
      */
-    LooperRunner(@Nonnull final Looper looper) {
+    LooperRunner(@NotNull final Looper looper) {
 
         this(looper, new LooperThreadRunner(looper));
     }
@@ -58,15 +58,15 @@ class LooperRunner implements Runner {
      * @param sameThreadRunner the runner to be used when this one is called on its own thread.
      *                         If null, the invocation will be posted on the very same looper.
      */
-    LooperRunner(@Nonnull final Looper looper, @Nullable final Runner sameThreadRunner) {
+    LooperRunner(@NotNull final Looper looper, @Nullable final Runner sameThreadRunner) {
 
         mThread = looper.getThread();
         mHandler = new Handler(looper);
         mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new PostRunner(this);
     }
 
-    private void internalRun(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    private void internalRun(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         if (delay > 0) {
 
@@ -92,12 +92,12 @@ class LooperRunner implements Runner {
          *
          * @param looper the looper instance.
          */
-        private LooperThreadRunner(@Nonnull final Looper looper) {
+        private LooperThreadRunner(@NotNull final Looper looper) {
 
             mLooperRunner = new LooperRunner(looper, null);
         }
 
-        public void cancel(@Nonnull final Execution execution) {
+        public void cancel(@NotNull final Execution execution) {
 
             mQueuedRunner.cancel(execution);
             mLooperRunner.cancel(execution);
@@ -108,8 +108,8 @@ class LooperRunner implements Runner {
             return true;
         }
 
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+        public void run(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
 
             if (delay == 0) {
 
@@ -134,12 +134,12 @@ class LooperRunner implements Runner {
          *
          * @param runner the looper runner.
          */
-        private PostRunner(@Nonnull final LooperRunner runner) {
+        private PostRunner(@NotNull final LooperRunner runner) {
 
             mLooperRunner = runner;
         }
 
-        public void cancel(@Nonnull final Execution execution) {
+        public void cancel(@NotNull final Execution execution) {
 
         }
 
@@ -148,14 +148,14 @@ class LooperRunner implements Runner {
             return true;
         }
 
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+        public void run(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
 
             mLooperRunner.internalRun(execution, delay, timeUnit);
         }
     }
 
-    public void cancel(@Nonnull final Execution execution) {
+    public void cancel(@NotNull final Execution execution) {
 
         mHandler.removeCallbacks(execution);
         mSameThreadRunner.cancel(execution);
@@ -166,8 +166,8 @@ class LooperRunner implements Runner {
         return (Thread.currentThread() == mThread) && mSameThreadRunner.isExecutionThread();
     }
 
-    public void run(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public void run(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         if (Thread.currentThread() == mThread) {
 

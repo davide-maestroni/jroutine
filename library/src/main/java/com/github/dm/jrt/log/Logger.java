@@ -15,14 +15,14 @@ package com.github.dm.jrt.log;
 
 import com.github.dm.jrt.log.Log.LogLevel;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Utility class used for logging messages.
@@ -59,7 +59,7 @@ public class Logger {
      * @param log      the log instance.
      * @param level    the log level.
      */
-    private Logger(@Nonnull final Object[] contexts, @Nullable final Log log,
+    private Logger(@NotNull final Object[] contexts, @Nullable final Log log,
             @Nullable final LogLevel level) {
 
         mContexts = contexts.clone();
@@ -74,7 +74,7 @@ public class Logger {
      *
      * @return the log instance.
      */
-    @Nonnull
+    @NotNull
     public static Log getDefaultLog() {
 
         return sLog.get();
@@ -86,7 +86,7 @@ public class Logger {
      * @param log the log instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public static void setDefaultLog(@Nonnull final Log log) {
+    public static void setDefaultLog(@NotNull final Log log) {
 
         if (log == null) {
 
@@ -101,7 +101,7 @@ public class Logger {
      *
      * @return the log level.
      */
-    @Nonnull
+    @NotNull
     public static LogLevel getDefaultLogLevel() {
 
         return sLogLevel.get();
@@ -113,7 +113,7 @@ public class Logger {
      * @param level the log level.
      */
     @SuppressWarnings("ConstantConditions")
-    public static void setDefaultLogLevel(@Nonnull final LogLevel level) {
+    public static void setDefaultLogLevel(@NotNull final LogLevel level) {
 
         if (level == null) {
 
@@ -131,10 +131,10 @@ public class Logger {
      * @param context the context.
      * @return the new logger.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public static Logger newLogger(@Nullable final Log log, @Nullable final LogLevel level,
-            @Nonnull final Object context) {
+            @NotNull final Object context) {
 
         if (context == null) {
 
@@ -150,8 +150,8 @@ public class Logger {
      * @param throwable the throwable instance.
      * @return the printed stack trace.
      */
-    @Nonnull
-    public static String printStackTrace(@Nonnull final Throwable throwable) {
+    @NotNull
+    public static String printStackTrace(@NotNull final Throwable throwable) {
 
         final StringWriter writer = new StringWriter();
         throwable.printStackTrace(new PrintWriter(writer));
@@ -177,7 +177,7 @@ public class Logger {
      * @param format the message format.
      * @param arg1   the first format argument.
      */
-    public void dbg(@Nonnull final String format, @Nullable final Object arg1) {
+    public void dbg(@NotNull final String format, @Nullable final Object arg1) {
 
         if (mLevel <= DEBUG_LEVEL) {
 
@@ -192,7 +192,7 @@ public class Logger {
      * @param arg1   the first format argument.
      * @param arg2   the second format argument.
      */
-    public void dbg(@Nonnull final String format, @Nullable final Object arg1,
+    public void dbg(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -209,7 +209,7 @@ public class Logger {
      * @param arg2   the second format argument.
      * @param arg3   the third format argument.
      */
-    public void dbg(@Nonnull final String format, @Nullable final Object arg1,
+    public void dbg(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -227,7 +227,7 @@ public class Logger {
      * @param arg3   the third format argument.
      * @param arg4   the fourth format argument.
      */
-    public void dbg(@Nonnull final String format, @Nullable final Object arg1,
+    public void dbg(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -242,7 +242,7 @@ public class Logger {
      * @param format the message format.
      * @param args   the format arguments.
      */
-    public void dbg(@Nonnull final String format, @Nullable final Object... args) {
+    public void dbg(@NotNull final String format, @Nullable final Object... args) {
 
         if (mLevel <= DEBUG_LEVEL) {
 
@@ -284,7 +284,7 @@ public class Logger {
      * @param format    the message format.
      * @param arg1      the first format argument.
      */
-    public void dbg(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -301,7 +301,7 @@ public class Logger {
      * @param arg1      the first format argument.
      * @param arg2      the second format argument.
      */
-    public void dbg(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -319,7 +319,7 @@ public class Logger {
      * @param arg2      the second format argument.
      * @param arg3      the third format argument.
      */
-    public void dbg(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -338,7 +338,7 @@ public class Logger {
      * @param arg3      the third format argument.
      * @param arg4      the fourth format argument.
      */
-    public void dbg(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
             @Nullable final Object arg4) {
 
@@ -355,7 +355,7 @@ public class Logger {
      * @param format    the message format.
      * @param args      the format arguments.
      */
-    public void dbg(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object... args) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -383,7 +383,7 @@ public class Logger {
      * @param format the message format.
      * @param arg1   the first format argument.
      */
-    public void err(@Nonnull final String format, @Nullable final Object arg1) {
+    public void err(@NotNull final String format, @Nullable final Object arg1) {
 
         if (mLevel <= ERROR_LEVEL) {
 
@@ -398,7 +398,7 @@ public class Logger {
      * @param arg1   the first format argument.
      * @param arg2   the second format argument.
      */
-    public void err(@Nonnull final String format, @Nullable final Object arg1,
+    public void err(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -415,7 +415,7 @@ public class Logger {
      * @param arg2   the second format argument.
      * @param arg3   the third format argument.
      */
-    public void err(@Nonnull final String format, @Nullable final Object arg1,
+    public void err(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -433,7 +433,7 @@ public class Logger {
      * @param arg3   the third format argument.
      * @param arg4   the fourth format argument.
      */
-    public void err(@Nonnull final String format, @Nullable final Object arg1,
+    public void err(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -448,7 +448,7 @@ public class Logger {
      * @param format the message format.
      * @param args   the format arguments.
      */
-    public void err(@Nonnull final String format, @Nullable final Object... args) {
+    public void err(@NotNull final String format, @Nullable final Object... args) {
 
         if (mLevel <= ERROR_LEVEL) {
 
@@ -461,7 +461,7 @@ public class Logger {
      *
      * @param throwable the related throwable.
      */
-    public void err(@Nonnull final Throwable throwable) {
+    public void err(@NotNull final Throwable throwable) {
 
         if (mLevel <= ERROR_LEVEL) {
 
@@ -475,7 +475,7 @@ public class Logger {
      * @param throwable the related throwable.
      * @param message   the message.
      */
-    public void err(@Nonnull final Throwable throwable, @Nullable final String message) {
+    public void err(@NotNull final Throwable throwable, @Nullable final String message) {
 
         if (mLevel <= ERROR_LEVEL) {
 
@@ -490,7 +490,7 @@ public class Logger {
      * @param format    the message format.
      * @param arg1      the first format argument.
      */
-    public void err(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void err(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -507,7 +507,7 @@ public class Logger {
      * @param arg1      the first format argument.
      * @param arg2      the second format argument.
      */
-    public void err(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void err(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -525,7 +525,7 @@ public class Logger {
      * @param arg2      the second format argument.
      * @param arg3      the third format argument.
      */
-    public void err(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void err(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -544,7 +544,7 @@ public class Logger {
      * @param arg3      the third format argument.
      * @param arg4      the fourth format argument.
      */
-    public void err(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void err(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
             @Nullable final Object arg4) {
 
@@ -561,7 +561,7 @@ public class Logger {
      * @param format    the message format.
      * @param args      the format arguments.
      */
-    public void err(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void err(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object... args) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -575,7 +575,7 @@ public class Logger {
      *
      * @return the list of contexts.
      */
-    @Nonnull
+    @NotNull
     public List<Object> getContextList() {
 
         return mContextList;
@@ -586,7 +586,7 @@ public class Logger {
      *
      * @return the log instance.
      */
-    @Nonnull
+    @NotNull
     public Log getLog() {
 
         return mLog;
@@ -597,7 +597,7 @@ public class Logger {
      *
      * @return the log level.
      */
-    @Nonnull
+    @NotNull
     public LogLevel getLogLevel() {
 
         return mLogLevel;
@@ -610,9 +610,9 @@ public class Logger {
      * @param context the context.
      * @return the new logger.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
-    public Logger subContextLogger(@Nonnull final Object context) {
+    public Logger subContextLogger(@NotNull final Object context) {
 
         if (context == null) {
 
@@ -646,7 +646,7 @@ public class Logger {
      * @param format the message format.
      * @param arg1   the first format argument.
      */
-    public void wrn(@Nonnull final String format, @Nullable final Object arg1) {
+    public void wrn(@NotNull final String format, @Nullable final Object arg1) {
 
         if (mLevel <= WARNING_LEVEL) {
 
@@ -661,7 +661,7 @@ public class Logger {
      * @param arg1   the first format argument.
      * @param arg2   the second format argument.
      */
-    public void wrn(@Nonnull final String format, @Nullable final Object arg1,
+    public void wrn(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -678,7 +678,7 @@ public class Logger {
      * @param arg2   the second format argument.
      * @param arg3   the third format argument.
      */
-    public void wrn(@Nonnull final String format, @Nullable final Object arg1,
+    public void wrn(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -696,7 +696,7 @@ public class Logger {
      * @param arg3   the third format argument.
      * @param arg4   the fourth format argument.
      */
-    public void wrn(@Nonnull final String format, @Nullable final Object arg1,
+    public void wrn(@NotNull final String format, @Nullable final Object arg1,
             @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -711,7 +711,7 @@ public class Logger {
      * @param format the message format.
      * @param args   the format arguments.
      */
-    public void wrn(@Nonnull final String format, @Nullable final Object... args) {
+    public void wrn(@NotNull final String format, @Nullable final Object... args) {
 
         if (mLevel <= WARNING_LEVEL) {
 
@@ -724,7 +724,7 @@ public class Logger {
      *
      * @param throwable the related throwable.
      */
-    public void wrn(@Nonnull final Throwable throwable) {
+    public void wrn(@NotNull final Throwable throwable) {
 
         if (mLevel <= WARNING_LEVEL) {
 
@@ -738,7 +738,7 @@ public class Logger {
      * @param throwable the related throwable.
      * @param message   the message.
      */
-    public void wrn(@Nonnull final Throwable throwable, @Nullable final String message) {
+    public void wrn(@NotNull final Throwable throwable, @Nullable final String message) {
 
         if (mLevel <= WARNING_LEVEL) {
 
@@ -753,7 +753,7 @@ public class Logger {
      * @param format    the message format.
      * @param arg1      the first format argument.
      */
-    public void wrn(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -770,7 +770,7 @@ public class Logger {
      * @param arg1      the first format argument.
      * @param arg2      the second format argument.
      */
-    public void wrn(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -788,7 +788,7 @@ public class Logger {
      * @param arg2      the second format argument.
      * @param arg3      the third format argument.
      */
-    public void wrn(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -807,7 +807,7 @@ public class Logger {
      * @param arg3      the third format argument.
      * @param arg4      the fourth format argument.
      */
-    public void wrn(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
             @Nullable final Object arg4) {
 
@@ -824,7 +824,7 @@ public class Logger {
      * @param format    the message format.
      * @param args      the format arguments.
      */
-    public void wrn(@Nonnull final Throwable throwable, @Nonnull final String format,
+    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
             @Nullable final Object... args) {
 
         if (mLevel <= WARNING_LEVEL) {

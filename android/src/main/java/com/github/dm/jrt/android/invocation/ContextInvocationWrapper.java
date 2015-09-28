@@ -19,8 +19,8 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.Invocation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of a platform specific Android invocation wrapping a base invocation instance.
@@ -40,7 +40,7 @@ public class ContextInvocationWrapper<IN, OUT> implements ContextInvocation<IN, 
      * @param invocation the wrapped invocation.
      */
     @SuppressWarnings("ConstantConditions")
-    public ContextInvocationWrapper(@Nonnull final Invocation<IN, OUT> invocation) {
+    public ContextInvocationWrapper(@NotNull final Invocation<IN, OUT> invocation) {
 
         if (invocation == null) {
 
@@ -65,12 +65,12 @@ public class ContextInvocationWrapper<IN, OUT> implements ContextInvocation<IN, 
         mInvocation.onInitialize();
     }
 
-    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         mInvocation.onResult(result);
     }
@@ -80,7 +80,7 @@ public class ContextInvocationWrapper<IN, OUT> implements ContextInvocation<IN, 
         mInvocation.onTerminate();
     }
 
-    public void onContext(@Nonnull final Context context) {
+    public void onContext(@NotNull final Context context) {
 
     }
 }

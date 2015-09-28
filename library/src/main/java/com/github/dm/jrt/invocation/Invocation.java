@@ -16,8 +16,8 @@ package com.github.dm.jrt.invocation;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a routine invocation.
@@ -112,7 +112,7 @@ public interface Invocation<IN, OUT> {
      * @param input  the input.
      * @param result the result channel.
      */
-    void onInput(IN input, @Nonnull ResultChannel<OUT> result);
+    void onInput(IN input, @NotNull ResultChannel<OUT> result);
 
     /**
      * Called when all the inputs has been passed to the routine.<br/>
@@ -121,7 +121,7 @@ public interface Invocation<IN, OUT> {
      *
      * @param result the result channel.
      */
-    void onResult(@Nonnull ResultChannel<OUT> result);
+    void onResult(@NotNull ResultChannel<OUT> result);
 
     /**
      * Called when the invocation execution has completed.

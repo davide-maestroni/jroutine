@@ -15,8 +15,8 @@ package com.github.dm.jrt.invocation;
 
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception wrapping any throwable escaping an invocation execution.
@@ -42,7 +42,7 @@ public class InvocationException extends RoutineException {
      * @param cause the throwable to wrap.
      * @return the throwable or an invocation exception wrapping it.
      */
-    @Nonnull
+    @NotNull
     public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
 
         return (cause instanceof RoutineException) ? (RoutineException) cause

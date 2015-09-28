@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.builder;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration.Builder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a configurable builder of routines backed by loaders.
@@ -35,6 +35,6 @@ public interface LoaderConfigurableBuilder<TYPE> {
      *
      * @return the loader configuration builder.
      */
-    @Nonnull
+    @NotNull
     Builder<? extends TYPE> loaders();
 }

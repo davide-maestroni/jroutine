@@ -19,7 +19,7 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.log.Logger;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Default implementation of a routine object instantiating invocation objects through a factory.
@@ -40,8 +40,8 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      * @param factory       the invocation factory.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultRoutine(@Nonnull final InvocationConfiguration configuration,
-            @Nonnull final InvocationFactory<IN, OUT> factory) {
+    DefaultRoutine(@NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationFactory<IN, OUT> factory) {
 
         super(configuration);
 
@@ -53,9 +53,9 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         mFactory = factory;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation(@Nonnull final InvocationType type) {
+    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
         final Logger logger = getLogger();
 

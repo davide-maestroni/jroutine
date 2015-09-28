@@ -30,10 +30,10 @@ import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.ContextInvocations;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -42,13 +42,13 @@ import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.github.dm.jrt.util.Reflection.findConstructor;
 
@@ -128,7 +128,7 @@ public class InvocationService extends Service {
      * @return the exception or null.
      */
     @Nullable
-    public static Throwable getAbortError(@Nonnull final Message message) {
+    public static Throwable getAbortError(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
 
@@ -148,7 +148,7 @@ public class InvocationService extends Service {
      * @return the value or null.
      */
     @Nullable
-    public static Object getValue(@Nonnull final Message message) {
+    public static Object getValue(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
 
@@ -172,9 +172,9 @@ public class InvocationService extends Service {
      * @param runnerClass             the invocation runner class.
      * @param logClass                the invocation log class.
      */
-    public static void putAsyncInvocation(@Nonnull final Bundle bundle,
-            @Nonnull final String invocationId, @Nonnull final TargetInvocationFactory<?, ?> target,
-            @Nonnull final InvocationConfiguration invocationConfiguration,
+    public static void putAsyncInvocation(@NotNull final Bundle bundle,
+            @NotNull final String invocationId, @NotNull final TargetInvocationFactory<?, ?> target,
+            @NotNull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
@@ -189,7 +189,7 @@ public class InvocationService extends Service {
      * @param invocationId the invocation ID.
      * @param error        the exception instance.
      */
-    public static void putError(@Nonnull final Bundle bundle, @Nonnull final String invocationId,
+    public static void putError(@NotNull final Bundle bundle, @NotNull final String invocationId,
             @Nullable final Throwable error) {
 
         putInvocationId(bundle, invocationId);
@@ -202,8 +202,8 @@ public class InvocationService extends Service {
      * @param bundle       the bundle to fill.
      * @param invocationId the invocation ID.
      */
-    public static void putInvocationId(@Nonnull final Bundle bundle,
-            @Nonnull final String invocationId) {
+    public static void putInvocationId(@NotNull final Bundle bundle,
+            @NotNull final String invocationId) {
 
         bundle.putString(KEY_INVOCATION_ID, invocationId);
     }
@@ -218,9 +218,9 @@ public class InvocationService extends Service {
      * @param runnerClass             the invocation runner class.
      * @param logClass                the invocation log class.
      */
-    public static void putParallelInvocation(@Nonnull final Bundle bundle,
-            @Nonnull final String invocationId, @Nonnull final TargetInvocationFactory<?, ?> target,
-            @Nonnull final InvocationConfiguration invocationConfiguration,
+    public static void putParallelInvocation(@NotNull final Bundle bundle,
+            @NotNull final String invocationId, @NotNull final TargetInvocationFactory<?, ?> target,
+            @NotNull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
@@ -235,22 +235,22 @@ public class InvocationService extends Service {
      * @param invocationId the invocation ID.
      * @param value        the value instance.
      */
-    public static void putValue(@Nonnull final Bundle bundle, @Nonnull final String invocationId,
+    public static void putValue(@NotNull final Bundle bundle, @NotNull final String invocationId,
             @Nullable final Object value) {
 
         putInvocationId(bundle, invocationId);
         putValue(bundle, value);
     }
 
-    private static void putError(@Nonnull final Bundle bundle, @Nullable final Throwable error) {
+    private static void putError(@NotNull final Bundle bundle, @Nullable final Throwable error) {
 
         bundle.putSerializable(KEY_ABORT_EXCEPTION, error);
     }
 
     @SuppressWarnings("ConstantConditions")
-    private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
-            @Nonnull final String invocationId, @Nonnull final TargetInvocationFactory<?, ?> target,
-            @Nonnull final InvocationConfiguration invocationConfiguration,
+    private static void putInvocation(@NotNull final Bundle bundle, boolean isParallel,
+            @NotNull final String invocationId, @NotNull final TargetInvocationFactory<?, ?> target,
+            @NotNull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
@@ -273,7 +273,7 @@ public class InvocationService extends Service {
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
     }
 
-    private static void putValue(@Nonnull final Bundle bundle, @Nullable final Object value) {
+    private static void putValue(@NotNull final Bundle bundle, @Nullable final Object value) {
 
         bundle.putParcelable(KEY_DATA_VALUE, new ParcelableValue(value));
     }
@@ -284,9 +284,9 @@ public class InvocationService extends Service {
      * @param target the invocation target.
      * @return the context invocation factory.
      */
-    @Nonnull
+    @NotNull
     public ContextInvocationFactory<?, ?> getInvocationFactory(
-            @Nonnull final TargetInvocationFactory<?, ?> target) {
+            @NotNull final TargetInvocationFactory<?, ?> target) {
 
         return ContextInvocations.factoryOf(target.getInvocationClass(), target.getFactoryArgs());
     }
@@ -310,13 +310,13 @@ public class InvocationService extends Service {
     }
 
     @Override
-    public IBinder onBind(@Nonnull final Intent intent) {
+    public IBinder onBind(@NotNull final Intent intent) {
 
         return mInMessenger.getBinder();
     }
 
-    @Nonnull
-    private RoutineInvocation getInvocation(@Nonnull final Message message) {
+    @NotNull
+    private RoutineInvocation getInvocation(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
 
@@ -354,7 +354,7 @@ public class InvocationService extends Service {
     }
 
     @SuppressWarnings("unchecked")
-    private void initRoutine(@Nonnull final Message message) {
+    private void initRoutine(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
 
@@ -479,19 +479,19 @@ public class InvocationService extends Service {
          * @param configuration the invocation configuration.
          * @param factory       the invocation factory.
          */
-        private ContextRoutine(@Nonnull final Context context,
-                @Nonnull final InvocationConfiguration configuration,
-                @Nonnull final ContextInvocationFactory<?, ?> factory) {
+        private ContextRoutine(@NotNull final Context context,
+                @NotNull final InvocationConfiguration configuration,
+                @NotNull final ContextInvocationFactory<?, ?> factory) {
 
             super(configuration);
             mContext = context;
             mFactory = factory;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         @SuppressWarnings("unchecked")
-        protected Invocation<Object, Object> newInvocation(@Nonnull final InvocationType type) {
+        protected Invocation<Object, Object> newInvocation(@NotNull final InvocationType type) {
 
             final Logger logger = getLogger();
 
@@ -523,13 +523,13 @@ public class InvocationService extends Service {
          *
          * @param service the service.
          */
-        private IncomingHandler(@Nonnull final InvocationService service) {
+        private IncomingHandler(@NotNull final InvocationService service) {
 
             mService = new WeakReference<InvocationService>(service);
         }
 
         @Override
-        public void handleMessage(@Nonnull final Message msg) {
+        public void handleMessage(@NotNull final Message msg) {
 
             final InvocationService service = mService.get();
 
@@ -665,8 +665,8 @@ public class InvocationService extends Service {
          * @param logClass        the log class.
          * @param logLevel        the log level.
          */
-        private RoutineInfo(@Nonnull final Class<? extends ContextInvocation<?, ?>> invocationClass,
-                @Nonnull final Object[] factoryArgs, @Nullable final OrderType outputOrder,
+        private RoutineInfo(@NotNull final Class<? extends ContextInvocation<?, ?>> invocationClass,
+                @NotNull final Object[] factoryArgs, @Nullable final OrderType outputOrder,
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nullable final LogLevel logLevel) {
 
@@ -728,7 +728,7 @@ public class InvocationService extends Service {
          *
          * @param routine the routine instance.
          */
-        private RoutineState(@Nonnull final ContextRoutine routine) {
+        private RoutineState(@NotNull final ContextRoutine routine) {
 
             mRoutine = routine;
         }
@@ -738,7 +738,7 @@ public class InvocationService extends Service {
          *
          * @return the invocation channel.
          */
-        @Nonnull
+        @NotNull
         InvocationChannel<Object, Object> asyncInvoke() {
 
             ++mInvocationCount;
@@ -750,7 +750,7 @@ public class InvocationService extends Service {
          *
          * @return the invocation channel.
          */
-        @Nonnull
+        @NotNull
         InvocationChannel<Object, Object> parallelInvoke() {
 
             ++mInvocationCount;
@@ -784,8 +784,8 @@ public class InvocationService extends Service {
          * @param messenger  the output messenger.
          */
         @SuppressWarnings("ConstantConditions")
-        private ServiceOutputConsumer(@Nonnull final RoutineInvocation invocation,
-                @Nonnull final Messenger messenger) {
+        private ServiceOutputConsumer(@NotNull final RoutineInvocation invocation,
+                @NotNull final Messenger messenger) {
 
             if (messenger == null) {
 
@@ -851,11 +851,11 @@ public class InvocationService extends Service {
 
         private final String mId;
 
+        private final IOChannel<Object, Object> mIoChannel;
+
         private final RoutineInfo mRoutineInfo;
 
         private final RoutineState mRoutineState;
-
-        private final TransportChannel<Object> mTransport;
 
         /**
          * Constructor.
@@ -865,17 +865,16 @@ public class InvocationService extends Service {
          * @param info    the routine info.
          * @param state   the routine state.
          */
-        private RoutineInvocation(@Nonnull final String id,
-                @Nonnull final InvocationChannel<Object, Object> channel,
-                @Nonnull final RoutineInfo info, @Nonnull final RoutineState state) {
+        private RoutineInvocation(@NotNull final String id,
+                @NotNull final InvocationChannel<Object, Object> channel,
+                @NotNull final RoutineInfo info, @NotNull final RoutineState state) {
 
             mId = id;
             mChannel = channel;
             mRoutineInfo = info;
             mRoutineState = state;
-            final TransportChannel<Object> transportChannel =
-                    (mTransport = JRoutine.transport().buildChannel());
-            channel.pass(transportChannel);
+            final IOChannel<Object, Object> ioChannel = (mIoChannel = JRoutine.io().buildChannel());
+            channel.pass(ioChannel);
         }
 
         /**
@@ -885,7 +884,7 @@ public class InvocationService extends Service {
          */
         void abort(@Nullable final Throwable reason) {
 
-            mTransport.abort(reason);
+            mIoChannel.abort(reason);
         }
 
         /**
@@ -893,7 +892,7 @@ public class InvocationService extends Service {
          */
         void close() {
 
-            mTransport.close();
+            mIoChannel.close();
         }
 
         /**
@@ -905,7 +904,7 @@ public class InvocationService extends Service {
          */
         void pass(@Nullable final Object input) {
 
-            mTransport.pass(input);
+            mIoChannel.pass(input);
         }
 
         /**
@@ -915,7 +914,7 @@ public class InvocationService extends Service {
          * @throws java.lang.IllegalStateException            if the channel is already closed or
          *                                                    already bound to a consumer.
          */
-        void passTo(@Nonnull final OutputConsumer<Object> consumer) {
+        void passTo(@NotNull final OutputConsumer<Object> consumer) {
 
             mChannel.result().passTo(consumer);
         }

@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.invocation;
 
 import com.github.dm.jrt.channel.ResultChannel;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Implementation of an invocation simply passing on the input data.
@@ -48,7 +48,7 @@ public class PassingContextInvocation<DATA> extends FilterContextInvocation<DATA
         return (ContextInvocationFactory<DATA, DATA>) sInvocation;
     }
 
-    public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {
+    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
         result.pass(input);
     }

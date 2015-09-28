@@ -20,10 +20,10 @@ import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
-import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Arrays;
 
 import static com.github.dm.jrt.util.ClassToken.tokenOf;
 
@@ -52,9 +52,9 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Class<? extends ContextInvocation<IN, OUT>> targetClass) {
+            @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass) {
 
         return factoryOf(targetClass, (Object[]) null);
     }
@@ -68,9 +68,9 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
+            @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
             @Nullable final Object... factoryArgs) {
 
         return new DefaultTargetInvocationFactory<IN, OUT>(targetClass, factoryArgs);
@@ -84,9 +84,9 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken) {
+            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken) {
 
         return factoryOf(targetToken.getRawClass());
     }
@@ -100,9 +100,9 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken,
+            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken,
             @Nullable final Object... factoryArgs) {
 
         return factoryOf(targetToken.getRawClass(), factoryArgs);
@@ -116,9 +116,9 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @param <OUT>            the output data type.
      * @return the invocation factory target.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ContextInvocation<IN, OUT> targetInvocation) {
+            @NotNull final ContextInvocation<IN, OUT> targetInvocation) {
 
         return factoryOf(tokenOf(targetInvocation));
     }
@@ -132,15 +132,15 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @param <OUT>            the output data type.
      * @return the invocation factory target.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ContextInvocation<IN, OUT> targetInvocation,
+            @NotNull final ContextInvocation<IN, OUT> targetInvocation,
             @Nullable final Object... factoryArgs) {
 
         return factoryOf(tokenOf(targetInvocation), factoryArgs);
     }
 
-    @Nonnull
+    @NotNull
     public abstract Object[] getFactoryArgs();
 
     /**
@@ -148,7 +148,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      *
      * @return the target class.
      */
-    @Nonnull
+    @NotNull
     public abstract Class<? extends ContextInvocation<IN, OUT>> getInvocationClass();
 
     /**
@@ -167,12 +167,12 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
                 new Creator<DefaultTargetInvocationFactory>() {
 
                     public DefaultTargetInvocationFactory createFromParcel(
-                            @Nonnull final Parcel source) {
+                            @NotNull final Parcel source) {
 
                         return new DefaultTargetInvocationFactory(source);
                     }
 
-                    @Nonnull
+                    @NotNull
                     public DefaultTargetInvocationFactory[] newArray(final int size) {
 
                         return new DefaultTargetInvocationFactory[size];
@@ -189,7 +189,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
          * @param source the source parcel.
          */
         @SuppressWarnings("unchecked")
-        private DefaultTargetInvocationFactory(@Nonnull final Parcel source) {
+        private DefaultTargetInvocationFactory(@NotNull final Parcel source) {
 
             this((Class<? extends ContextInvocation<IN, OUT>>) source.readSerializable(),
                  source.readArray(TargetInvocationFactory.class.getClassLoader()));
@@ -203,7 +203,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
          */
         @SuppressWarnings("ConstantConditions")
         private DefaultTargetInvocationFactory(
-                @Nonnull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
+                @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
                 @Nullable final Object[] factoryArgs) {
 
             if (targetClass == null) {
@@ -220,7 +220,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
             return 0;
         }
 
-        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);
@@ -253,14 +253,14 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
             return result;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Object[] getFactoryArgs() {
 
             return mFactoryArgs;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Class<? extends ContextInvocation<IN, OUT>> getInvocationClass() {
 

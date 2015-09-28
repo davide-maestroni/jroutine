@@ -15,6 +15,8 @@ package com.github.dm.jrt.runner;
 
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,8 +25,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.annotation.Nonnull;
 
 /**
  * Class providing ordering of executions based on priority.<br/>
@@ -85,7 +85,7 @@ public class PriorityRunner {
      * @param wrapped the wrapped instance.
      */
     @SuppressWarnings("ConstantConditions")
-    private PriorityRunner(@Nonnull final Runner wrapped) {
+    private PriorityRunner(@NotNull final Runner wrapped) {
 
         if (wrapped == null) {
 
@@ -96,8 +96,8 @@ public class PriorityRunner {
         mQueue = new PriorityBlockingQueue<PriorityExecution>(10, PRIORITY_EXECUTION_COMPARATOR);
     }
 
-    @Nonnull
-    static PriorityRunner getInstance(@Nonnull final Runner wrapped) {
+    @NotNull
+    static PriorityRunner getInstance(@NotNull final Runner wrapped) {
 
         if (wrapped instanceof QueuingRunner) {
 
@@ -130,7 +130,7 @@ public class PriorityRunner {
      * @param priority the execution priority.
      * @return the runner instance.
      */
-    @Nonnull
+    @NotNull
     public Runner getRunner(final int priority) {
 
         synchronized (mRunners) {
@@ -166,8 +166,8 @@ public class PriorityRunner {
          * @param queue     the queue.
          * @param execution the priority execution.
          */
-        private DelayedExecution(@Nonnull final PriorityBlockingQueue<PriorityExecution> queue,
-                @Nonnull final PriorityExecution execution) {
+        private DelayedExecution(@NotNull final PriorityBlockingQueue<PriorityExecution> queue,
+                @NotNull final PriorityExecution execution) {
 
             mQueue = queue;
             mExecution = execution;
@@ -210,7 +210,7 @@ public class PriorityRunner {
          * @param priority  the execution priority.
          * @param age       the execution age.
          */
-        private PriorityExecution(@Nonnull final Execution execution, final int priority,
+        private PriorityExecution(@NotNull final Execution execution, final int priority,
                 final long age) {
 
             mExecution = execution;
@@ -267,7 +267,7 @@ public class PriorityRunner {
             mPriority = priority;
         }
 
-        public void cancel(@Nonnull final Execution execution) {
+        public void cancel(@NotNull final Execution execution) {
 
             synchronized (mExecutions) {
 
@@ -297,8 +297,8 @@ public class PriorityRunner {
             return mRunner.isExecutionThread();
         }
 
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+        public void run(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
 
             final boolean mayBeCanceled = execution.mayBeCanceled();
             final PriorityExecution priorityExecution =

@@ -19,8 +19,8 @@ import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.Reflection;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Class storing the service configuration.
@@ -66,7 +66,7 @@ public final class ServiceConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<ServiceConfiguration> builder() {
 
         return new Builder<ServiceConfiguration>(sDefaultConfigurable);
@@ -78,7 +78,7 @@ public final class ServiceConfiguration {
      * @param initialConfiguration the initial configuration.
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<ServiceConfiguration> builderFrom(
             @Nullable final ServiceConfiguration initialConfiguration) {
 
@@ -91,7 +91,7 @@ public final class ServiceConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public Builder<ServiceConfiguration> builderFrom() {
 
         return builderFrom(this);
@@ -190,8 +190,8 @@ public final class ServiceConfiguration {
          * @param configuration the configuration.
          * @return the configurable instance.
          */
-        @Nonnull
-        TYPE setConfiguration(@Nonnull ServiceConfiguration configuration);
+        @NotNull
+        TYPE setConfiguration(@NotNull ServiceConfiguration configuration);
     }
 
     /**
@@ -215,7 +215,7 @@ public final class ServiceConfiguration {
          * @param configurable the configurable instance.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
 
@@ -232,8 +232,8 @@ public final class ServiceConfiguration {
          * @param initialConfiguration the initial configuration.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final ServiceConfiguration initialConfiguration) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+                @NotNull final ServiceConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -249,7 +249,7 @@ public final class ServiceConfiguration {
          *
          * @return the configurable object.
          */
-        @Nonnull
+        @NotNull
         public TYPE set() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
@@ -263,7 +263,7 @@ public final class ServiceConfiguration {
          * @param configuration the service configuration.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
 
             if (configuration == null) {
@@ -305,7 +305,7 @@ public final class ServiceConfiguration {
          * @throws java.lang.IllegalArgumentException if the specified class has no default
          *                                            constructor.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
 
             if (logClass != null) {
@@ -324,7 +324,7 @@ public final class ServiceConfiguration {
          * @param looper the looper instance.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withResultLooper(@Nullable final Looper looper) {
 
             mLooper = looper;
@@ -340,7 +340,7 @@ public final class ServiceConfiguration {
          * @throws java.lang.IllegalArgumentException if the specified class has no default
          *                                            constructor.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
 
             if (runnerClass != null) {
@@ -352,13 +352,13 @@ public final class ServiceConfiguration {
             return this;
         }
 
-        @Nonnull
+        @NotNull
         private ServiceConfiguration buildConfiguration() {
 
             return new ServiceConfiguration(mLooper, mRunnerClass, mLogClass);
         }
 
-        private void setConfiguration(@Nonnull final ServiceConfiguration configuration) {
+        private void setConfiguration(@NotNull final ServiceConfiguration configuration) {
 
             mLooper = configuration.mLooper;
             mRunnerClass = configuration.mRunnerClass;
@@ -371,9 +371,9 @@ public final class ServiceConfiguration {
      */
     private static class DefaultConfigurable implements Configurable<ServiceConfiguration> {
 
-        @Nonnull
+        @NotNull
         public ServiceConfiguration setConfiguration(
-                @Nonnull final ServiceConfiguration configuration) {
+                @NotNull final ServiceConfiguration configuration) {
 
             return configuration;
         }

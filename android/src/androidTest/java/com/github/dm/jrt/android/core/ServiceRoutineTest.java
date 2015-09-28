@@ -42,10 +42,10 @@ import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
@@ -380,7 +380,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     private static class Abort extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onResult(@Nonnull final ResultChannel<Data> result) {
+        public void onResult(@NotNull final ResultChannel<Data> result) {
 
             try {
 
@@ -404,19 +404,19 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         private int mWrnCount;
 
-        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void err(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+        public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mWrnCount;
@@ -442,12 +442,12 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         public static final Creator<Data> CREATOR = new Creator<Data>() {
 
-            public Data createFromParcel(@Nonnull final Parcel source) {
+            public Data createFromParcel(@NotNull final Parcel source) {
 
                 return new Data();
             }
 
-            @Nonnull
+            @NotNull
             public Data[] newArray(final int size) {
 
                 return new Data[size];
@@ -459,7 +459,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
             return 0;
         }
 
-        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
         }
     }
@@ -467,7 +467,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
 
             result.after(TimeDuration.millis(500)).pass(d);
         }
@@ -477,14 +477,14 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         public static final Creator<MyParcelable> CREATOR = new Creator<MyParcelable>() {
 
-            public MyParcelable createFromParcel(@Nonnull final Parcel source) {
+            public MyParcelable createFromParcel(@NotNull final Parcel source) {
 
                 final int x = source.readInt();
                 final int y = source.readInt();
                 return new MyParcelable(x, y);
             }
 
-            @Nonnull
+            @NotNull
             public MyParcelable[] newArray(final int size) {
 
                 return new MyParcelable[0];
@@ -532,7 +532,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
             return 0;
         }
 
-        public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
+        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
 
             dest.writeInt(mX);
             dest.writeInt(mY);
@@ -543,7 +543,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
             extends FilterContextInvocation<MyParcelable, MyParcelable> {
 
         public void onInput(final MyParcelable myParcelable,
-                @Nonnull final ResultChannel<MyParcelable> result) {
+                @NotNull final ResultChannel<MyParcelable> result) {
 
             result.pass(myParcelable);
         }
@@ -560,7 +560,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     private static class StringDelay extends TemplateContextInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(TimeDuration.millis(100)).pass(s);
         }
@@ -570,8 +570,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
             extends FunctionContextInvocation<String, String> {
 
         @Override
-        protected void onCall(@Nonnull final List<? extends String> strings,
-                @Nonnull final ResultChannel<String> result) {
+        protected void onCall(@NotNull final List<? extends String> strings,
+                @NotNull final ResultChannel<String> result) {
 
             result.pass(strings);
         }
@@ -579,7 +579,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
     private static class StringPassingInvocation extends FilterContextInvocation<String, String> {
 
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.pass(s);
         }

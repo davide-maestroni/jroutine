@@ -19,12 +19,14 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.invocation.FilterContextInvocation;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,8 +35,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
@@ -76,7 +76,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testBufferEquals() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -543,7 +544,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testReadByte() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -571,7 +573,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testReadByteArray() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -619,7 +622,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testReadBytes() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -754,7 +758,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testReadOutput() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -857,7 +862,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testWriteByte() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -891,7 +897,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testWriteByteArray() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -929,7 +936,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testWriteBytes() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -1055,7 +1063,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void testWriteInput() throws IOException {
 
-        final TransportChannel<ParcelableByteBuffer> channel = JRoutine.transport().buildChannel();
+        final IOChannel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+                JRoutine.io().buildChannel();
         final OutputChannel<ParcelableByteBuffer> result = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingInvocation.class))
@@ -1095,7 +1104,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
             extends FilterContextInvocation<ParcelableByteBuffer, ParcelableByteBuffer> {
 
         public void onInput(final ParcelableByteBuffer input,
-                @Nonnull final ResultChannel<ParcelableByteBuffer> result) {
+                @NotNull final ResultChannel<ParcelableByteBuffer> result) {
 
             result.pass(input);
         }

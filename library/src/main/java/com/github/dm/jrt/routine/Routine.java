@@ -15,9 +15,10 @@ package com.github.dm.jrt.routine;
 
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This interface defines the main component of the library architecture.
@@ -73,7 +74,7 @@ import javax.annotation.Nullable;
  * <p/>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
  * the implementation honors the specific contracts, it is possible to seamlessly combine different
- * routine implementations, even the ones coming from third party libraries.
+ * routine instances, even the ones coming from third party libraries.
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *
@@ -87,7 +88,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall();
 
     /**
@@ -96,7 +97,7 @@ public interface Routine<IN, OUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable IN input);
 
     /**
@@ -105,7 +106,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable IN... inputs);
 
     /**
@@ -114,7 +115,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
@@ -123,7 +124,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> asyncCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
@@ -131,8 +132,16 @@ public interface Routine<IN, OUT> {
      *
      * @return the invocation channel.
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> asyncInvoke();
+
+    /**
+     * Creates a streaming channel by invoking this routine in asynchronous mode.
+     *
+     * @return the streaming channel.
+     */
+    @NotNull
+    StreamingChannel<IN, OUT> asyncStream();
 
     /**
      * Short for {@code parallelInvoke().result()}.
@@ -142,7 +151,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall();
 
     /**
@@ -154,7 +163,7 @@ public interface Routine<IN, OUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable IN input);
 
     /**
@@ -163,7 +172,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable IN... inputs);
 
     /**
@@ -172,7 +181,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
@@ -181,7 +190,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> parallelCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
@@ -189,8 +198,16 @@ public interface Routine<IN, OUT> {
      *
      * @return the invocation channel.
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> parallelInvoke();
+
+    /**
+     * Creates a streaming channel by invoking this routine in parallel mode.
+     *
+     * @return the streaming channel.
+     */
+    @NotNull
+    StreamingChannel<IN, OUT> parallelStream();
 
     /**
      * Makes the routine destroy all the cached invocation instances.
@@ -207,7 +224,7 @@ public interface Routine<IN, OUT> {
      *
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall();
 
     /**
@@ -216,7 +233,7 @@ public interface Routine<IN, OUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable IN input);
 
     /**
@@ -225,7 +242,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable IN... inputs);
 
     /**
@@ -234,7 +251,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable Iterable<? extends IN> inputs);
 
     /**
@@ -243,7 +260,7 @@ public interface Routine<IN, OUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> syncCall(@Nullable OutputChannel<? extends IN> inputs);
 
     /**
@@ -251,6 +268,14 @@ public interface Routine<IN, OUT> {
      *
      * @return the invocation channel.
      */
-    @Nonnull
+    @NotNull
     InvocationChannel<IN, OUT> syncInvoke();
+
+    /**
+     * Creates a streaming channel by invoking this routine in synchronous mode.
+     *
+     * @return the streaming channel.
+     */
+    @NotNull
+    StreamingChannel<IN, OUT> syncStream();
 }

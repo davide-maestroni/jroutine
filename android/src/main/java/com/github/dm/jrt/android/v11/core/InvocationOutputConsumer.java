@@ -15,20 +15,20 @@ package com.github.dm.jrt.android.v11.core;
 
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.channel.AbortException;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.TemplateExecution;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Class consuming the invocation loader results.
@@ -64,8 +64,8 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
      * @param logger the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationOutputConsumer(@Nonnull final InvocationLoader<?, OUT> loader,
-            @Nonnull final Logger logger) {
+    InvocationOutputConsumer(@NotNull final InvocationLoader<?, OUT> loader,
+            @NotNull final Logger logger) {
 
         if (loader == null) {
 
@@ -207,9 +207,9 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
             }
         }
 
-        public boolean passTo(@Nonnull final Collection<TransportChannel<OUT>> newChannels,
-                @Nonnull final Collection<TransportChannel<OUT>> oldChannels,
-                @Nonnull final Collection<TransportChannel<OUT>> abortedChannels) {
+        public boolean passTo(@NotNull final Collection<IOChannel<OUT, OUT>> newChannels,
+                @NotNull final Collection<IOChannel<OUT, OUT>> oldChannels,
+                @NotNull final Collection<IOChannel<OUT, OUT>> abortedChannels) {
 
             synchronized (mMutex) {
 
@@ -228,7 +228,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
 
                     logger.dbg("passing result: %s + %s", cachedResults, lastResults);
 
-                    for (final TransportChannel<OUT> newChannel : newChannels) {
+                    for (final IOChannel<OUT, OUT> newChannel : newChannels) {
 
                         try {
 
@@ -244,7 +244,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
                         }
                     }
 
-                    for (final TransportChannel<OUT> channel : oldChannels) {
+                    for (final IOChannel<OUT, OUT> channel : oldChannels) {
 
                         try {
 

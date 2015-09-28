@@ -15,7 +15,7 @@ package com.github.dm.jrt.builder;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a configurable builder of routines.
@@ -35,6 +35,6 @@ public interface ConfigurableBuilder<TYPE> {
      *
      * @return the invocation configuration builder.
      */
-    @Nonnull
+    @NotNull
     Builder<? extends TYPE> invocations();
 }

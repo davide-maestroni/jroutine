@@ -17,7 +17,7 @@ import com.github.dm.jrt.android.invocation.MissingInvocationException;
 import com.github.dm.jrt.android.invocation.ProcedureContextInvocation;
 import com.github.dm.jrt.channel.ResultChannel;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Invocation used to know whether a loader with a specific ID is present or not.
@@ -40,7 +40,7 @@ final class MissingLoaderInvocation<OUT> extends ProcedureContextInvocation<OUT>
         mId = id;
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         result.abort(new MissingInvocationException(mId));
     }

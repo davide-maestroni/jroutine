@@ -13,9 +13,9 @@
  */
 package com.github.dm.jrt.runner;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class implementing a queued synchronous runner.
@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
  */
 class QueuedRunner implements Runner {
 
-    public void cancel(@Nonnull final Execution execution) {
+    public void cancel(@NotNull final Execution execution) {
 
         LocalQueue.cancel(execution);
     }
@@ -37,8 +37,8 @@ class QueuedRunner implements Runner {
         return true;
     }
 
-    public void run(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public void run(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         LocalQueue.run(execution, delay, timeUnit);
     }

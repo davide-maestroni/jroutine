@@ -24,10 +24,10 @@ import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.util.ClassToken;
 
-import java.lang.reflect.Constructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
 
 import static com.github.dm.jrt.util.Reflection.findConstructor;
 
@@ -59,8 +59,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderProxyRoutineBuilder(@Nonnull final LoaderContext context,
-            @Nonnull final ContextInvocationTarget<?> target) {
+    DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderContext context,
+            @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
 
@@ -76,14 +76,14 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         mTarget = target;
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         return buildProxy(ClassToken.tokenOf(itf));
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         final Class<TYPE> itfClass = itf.getRawClass();
 
@@ -114,31 +114,31 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                       .buildProxy();
     }
 
-    @Nonnull
+    @NotNull
     public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaders() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -149,10 +149,10 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyRoutineBuilder setConfiguration(
-            @Nonnull final ProxyConfiguration configuration) {
+            @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -163,10 +163,10 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public LoaderProxyRoutineBuilder setConfiguration(
-            @Nonnull final LoaderConfiguration configuration) {
+            @NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -198,16 +198,16 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
          * @param target         the invocation target.
          * @param interfaceToken the proxy interface token.
          */
-        private TargetLoaderProxyObjectBuilder(@Nonnull final LoaderContext context,
-                @Nonnull final ContextInvocationTarget<?> target,
-                @Nonnull final ClassToken<TYPE> interfaceToken) {
+        private TargetLoaderProxyObjectBuilder(@NotNull final LoaderContext context,
+                @NotNull final ContextInvocationTarget<?> target,
+                @NotNull final ClassToken<TYPE> interfaceToken) {
 
             mContext = context;
             mTarget = target;
             mInterfaceToken = interfaceToken;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         protected ClassToken<TYPE> getInterfaceToken() {
 
@@ -221,18 +221,18 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
             return mContext.getComponent();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         protected Class<?> getTargetClass() {
 
             return mTarget.getTargetClass();
         }
 
-        @Nonnull
+        @NotNull
         @Override
-        protected TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
-                @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final LoaderConfiguration loaderConfiguration) {
+        protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
+                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final LoaderConfiguration loaderConfiguration) {
 
             try {
 

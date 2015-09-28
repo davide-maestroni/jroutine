@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 21 // Travis does not support an higher version
+        targetSdkVersion 22 // Travis does not support an higher version
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
@@ -51,16 +51,21 @@ android {
 }
 
 dependencies {
-    // Travis does not support an higher version
-    compile 'com.android.support:support-v4:21.0.3'
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
+    // Travis does not support an higher version
+    compile 'com.android.support:support-v4:22.2.1'
 }
 conditionalDependencies {
     compile name: 'library', artifact: { it.parent.name }
 }
 
 findbugs {
-    toolVersion '3.0.0'
+    toolVersion '3.0.1'
+}
+
+tasks.withType(FindBugs) {
+    // Too many false positives...
+    excludeFilter = file('findbugs.xml')
 }
 
 tasks.withType(Javadoc) {

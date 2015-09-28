@@ -19,7 +19,7 @@ import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -149,8 +149,8 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
      * @param context the service context.
      * @return the context builder.
      */
-    @Nonnull
-    public static ContextBuilder with(@Nonnull final LoaderContext context) {
+    @NotNull
+    public static ContextBuilder with(@NotNull final LoaderContext context) {
 
         return new ContextBuilder(context);
     }
@@ -168,7 +168,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@Nonnull final LoaderContext context) {
+        private ContextBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
 
@@ -180,8 +180,8 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
 
         /**
          * Returns a builder of routines bound to the builder context.<br/>
-         * In order to prevent undesired leaks, the class of the specified factory must be static,
-         * and should never be a platform component (like Activity, Fragment, etc.).<br/>
+         * In order to prevent undesired leaks, the class of the specified factory must have a
+         * static context.<br/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a
          * deadlock.
@@ -193,9 +193,9 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
          *                                            static.
          */
-        @Nonnull
+        @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
+                @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         }
@@ -213,8 +213,8 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @param target the invocation target.
          * @return the routine builder instance.
          */
-        @Nonnull
-        public LoaderObjectRoutineBuilder on(@Nonnull final ContextInvocationTarget<?> target) {
+        @NotNull
+        public LoaderObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
             return new DefaultLoaderObjectRoutineBuilder(mContext, target);
         }
@@ -233,7 +233,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @param loaderId the loader ID.
          * @return the channel builder instance.
          */
-        @Nonnull
+        @NotNull
         public LoaderChannelBuilder onId(final int loaderId) {
 
             return new DefaultLoaderChannelBuilder(mContext).loaders().withId(loaderId).set();

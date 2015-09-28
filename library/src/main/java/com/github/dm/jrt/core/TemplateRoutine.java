@@ -11,12 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.routine;
+package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.builder.ChannelConfiguration;
+import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.routine.Routine;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.builder.ChannelConfiguration.DEFAULT;
+import static com.github.dm.jrt.builder.ChannelConfiguration.builder;
 
 /**
  * Empty abstract implementation of a routine.
@@ -31,97 +38,144 @@ import javax.annotation.Nullable;
  */
 public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall() {
 
         return asyncInvoke().result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final IN input) {
 
         return asyncInvoke().pass(input).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final IN... inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> asyncCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return asyncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
+    public StreamingChannel<IN, OUT> asyncStream() {
+
+        final DefaultIOChannel<IN> ioChannel =
+                new DefaultIOChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, asyncCall(ioChannel));
+    }
+
+    @NotNull
     public OutputChannel<OUT> parallelCall() {
 
         return parallelInvoke().result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final IN input) {
 
         return parallelInvoke().pass(input).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final IN... inputs) {
 
         return parallelInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return parallelInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> parallelCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return parallelInvoke().pass(inputs).result();
+    }
+
+    @NotNull
+    public StreamingChannel<IN, OUT> parallelStream() {
+
+        final DefaultIOChannel<IN> ioChannel =
+                new DefaultIOChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, parallelCall(ioChannel));
     }
 
     public void purge() {
 
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall() {
 
         return syncInvoke().result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final IN input) {
 
         return syncInvoke().pass(input).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final IN... inputs) {
 
         return syncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final Iterable<? extends IN> inputs) {
 
         return syncInvoke().pass(inputs).result();
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<OUT> syncCall(@Nullable final OutputChannel<? extends IN> inputs) {
 
         return syncInvoke().pass(inputs).result();
+    }
+
+    @NotNull
+    public StreamingChannel<IN, OUT> syncStream() {
+
+        final DefaultIOChannel<IN> ioChannel =
+                new DefaultIOChannel<IN>(buildChannelConfiguration());
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, syncCall(ioChannel));
+    }
+
+    /**
+     * Returns the invocation configuration.
+     *
+     * @return the configuration.
+     */
+    @NotNull
+    protected abstract InvocationConfiguration getConfiguration();
+
+    @NotNull
+    private ChannelConfiguration buildChannelConfiguration() {
+
+        final InvocationConfiguration configuration = getConfiguration();
+        return builder().withAsyncRunner(configuration.getRunnerOr(null))
+                        .withChannelMaxSize(configuration.getInputMaxSizeOr(DEFAULT))
+                        .withChannelOrder(configuration.getInputOrderTypeOr(null))
+                        .withChannelTimeout(configuration.getInputTimeoutOr(null))
+                        .withPassTimeout(configuration.getExecutionTimeoutOr(null))
+                        .withPassTimeoutAction(configuration.getExecutionTimeoutActionOr(null))
+                        .withLog(configuration.getLogOr(null))
+                        .withLogLevel(configuration.getLogLevelOr(null))
+                        .set();
     }
 }

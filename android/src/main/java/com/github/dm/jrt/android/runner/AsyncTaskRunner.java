@@ -21,14 +21,14 @@ import android.os.Build.VERSION_CODES;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Implementation of a runner employing {@link android.os.AsyncTask} instances to execute the
@@ -61,7 +61,7 @@ class AsyncTaskRunner extends MainRunner {
     }
 
     @Override
-    public void cancel(@Nonnull final Execution execution) {
+    public void cancel(@NotNull final Execution execution) {
 
         synchronized (mTasks) {
 
@@ -85,8 +85,8 @@ class AsyncTaskRunner extends MainRunner {
     }
 
     @Override
-    public void run(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public void run(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
 
@@ -132,8 +132,8 @@ class AsyncTaskRunner extends MainRunner {
          * @param executor  the executor.
          * @param threads   the map of runner threads.
          */
-        private ExecutionTask(@Nonnull final Execution execution, @Nullable final Executor executor,
-                @Nonnull final Map<Thread, Void> threads) {
+        private ExecutionTask(@NotNull final Execution execution, @Nullable final Executor executor,
+                @NotNull final Map<Thread, Void> threads) {
 
             mExecution = execution;
             mExecutor = executor;
@@ -161,7 +161,7 @@ class AsyncTaskRunner extends MainRunner {
         }
 
         @Override
-        protected Void doInBackground(@Nonnull final Void... voids) {
+        protected Void doInBackground(@NotNull final Void... voids) {
 
             final Thread currentThread = Thread.currentThread();
 

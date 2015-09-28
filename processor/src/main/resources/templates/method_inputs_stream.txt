@@ -15,15 +15,7 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
     @SuppressWarnings({"unchecked", "RedundantCast"})
-    public ${resultType} ${methodName}(${paramVars}) {
+    public ${resultType} ${methodName}() {
 
-        final com.github.dm.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        final com.github.dm.jrt.channel.InvocationChannel<Object, ${resultClassName}> $$channel = $$routine.parallelInvoke()${inputOptions};
-
-        for (final Object $$object: ${params}) {
-
-            $$channel.pass($$object);
-        }
-
-        return $$channel.result()${outputOptions}.all().iterator().next();
+        return (${resultType}) this.mRoutine${methodCount}.${streamMethod}();
     }

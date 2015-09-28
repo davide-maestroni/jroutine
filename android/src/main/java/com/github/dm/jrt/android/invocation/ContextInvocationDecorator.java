@@ -18,8 +18,8 @@ import android.content.Context;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base context invocation decorator implementation.
@@ -39,7 +39,7 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
      * @param wrapped the wrapped invocation instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public ContextInvocationDecorator(@Nonnull final ContextInvocation<IN, OUT> wrapped) {
+    public ContextInvocationDecorator(@NotNull final ContextInvocation<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -64,12 +64,12 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
         mInvocation.onInitialize();
     }
 
-    public void onInput(final IN input, @Nonnull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         mInvocation.onResult(result);
     }
@@ -79,7 +79,7 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
         mInvocation.onTerminate();
     }
 
-    public void onContext(@Nonnull final Context context) {
+    public void onContext(@NotNull final Context context) {
 
         mInvocation.onContext(context);
     }

@@ -13,24 +13,23 @@
  */
 package com.github.dm.jrt.builder;
 
-import com.github.dm.jrt.channel.TransportChannel;
+import com.github.dm.jrt.channel.IOChannel;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of transport channel objects.
+ * Interface defining a builder of I/O channel objects.
  * <p/>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface TransportChannelBuilder
-        extends ConfigurableChannelBuilder<TransportChannelBuilder> {
+public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBuilder> {
 
     /**
-     * Builds and returns the transport channel instance.
+     * Builds and returns the I/O channel instance.
      *
      * @param <DATA> the data type.
      * @return the newly created channel.
      */
-    @Nonnull
-    <DATA> TransportChannel<DATA> buildChannel();
+    @NotNull
+    <DATA> IOChannel<DATA, DATA> buildChannel();
 }

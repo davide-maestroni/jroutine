@@ -15,14 +15,18 @@ package com.github.dm.jrt.android.invocation;
 
 import android.content.Context;
 
+import com.github.dm.jrt.function.Functions.SupplierObject;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.function.Functions.newSupplier;
 
 /**
  * Utility class for creating context invocation factory objects.
@@ -46,9 +50,9 @@ public class ContextInvocations {
      * @param <OUT>   the output data type.
      * @return the context invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
-            @Nonnull final InvocationFactory<IN, OUT> factory) {
+            @NotNull final InvocationFactory<IN, OUT> factory) {
 
         return new DecoratingContextInvocationFactory<IN, OUT>(factory);
     }
@@ -68,9 +72,9 @@ public class ContextInvocations {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
+            @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
 
         return factoryOf(invocationClass, (Object[]) null);
     }
@@ -91,9 +95,9 @@ public class ContextInvocations {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
+            @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
         return new DefaultContextInvocationFactory<IN, OUT>(invocationClass, args);
@@ -114,9 +118,9 @@ public class ContextInvocations {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken) {
+            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
     }
@@ -137,9 +141,9 @@ public class ContextInvocations {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
+    @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @Nonnull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken,
+            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
         return factoryOf(invocationToken.getRawClass(), args);
@@ -154,11 +158,34 @@ public class ContextInvocations {
      * @param <OUT>   the output data type.
      * @return the invocation factory.
      */
-    @Nonnull
-    public static <IN, OUT> InvocationFactory<IN, OUT> fromFactory(@Nonnull final Context context,
-            @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> fromFactory(@NotNull final Context context,
+            @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
         return new AdaptingContextInvocationFactory<IN, OUT>(context, factory);
+    }
+
+    /**
+     * Builds and returns a new context invocation factory based on the specified supplier instance.
+     * <br/>
+     * In order to prevent undesired leaks, the class of the specified supplier must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param supplier the supplier instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the context invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> supplierFactory(
+            @NotNull final Supplier<? extends ContextInvocation<IN, OUT>> supplier) {
+
+        return new SupplierContextInvocationFactory<IN, OUT>(newSupplier(supplier));
     }
 
     /**
@@ -180,8 +207,8 @@ public class ContextInvocations {
          * @param factory the context invocation class.
          */
         @SuppressWarnings("ConstantConditions")
-        private AdaptingContextInvocationFactory(@Nonnull final Context context,
-                @Nonnull final ContextInvocationFactory<IN, OUT> factory) {
+        private AdaptingContextInvocationFactory(@NotNull final Context context,
+                @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
             if (context == null) {
 
@@ -197,7 +224,7 @@ public class ContextInvocations {
             mFactory = factory;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
@@ -225,7 +252,7 @@ public class ContextInvocations {
          */
         @SuppressWarnings("ConstantConditions")
         private DecoratingContextInvocationFactory(
-                @Nonnull final InvocationFactory<IN, OUT> factory) {
+                @NotNull final InvocationFactory<IN, OUT> factory) {
 
             super(factory);
 
@@ -237,7 +264,7 @@ public class ContextInvocations {
             mFactory = factory;
         }
 
-        @Nonnull
+        @NotNull
         public ContextInvocation<IN, OUT> newInvocation() {
 
             return new ContextInvocationWrapper<IN, OUT>(mFactory.newInvocation());
@@ -262,7 +289,7 @@ public class ContextInvocations {
          * @param args            the invocation constructor arguments.
          */
         private DefaultContextInvocationFactory(
-                @Nonnull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
+                @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
             super(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS);
@@ -270,10 +297,48 @@ public class ContextInvocations {
                                              args);
         }
 
-        @Nonnull
+        @NotNull
         public ContextInvocation<IN, OUT> newInvocation() {
 
             return (ContextInvocation<IN, OUT>) mFactory.newInvocation();
+        }
+    }
+
+    /**
+     * Implementation of a context invocation factory based on a supplier function.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class SupplierContextInvocationFactory<IN, OUT>
+            extends AbstractContextInvocationFactory<IN, OUT> {
+
+        private final SupplierObject<? extends ContextInvocation<IN, OUT>> mSupplier;
+
+        /**
+         * Constructor.
+         *
+         * @param supplier the supplier function.
+         */
+        private SupplierContextInvocationFactory(
+                @NotNull final SupplierObject<? extends ContextInvocation<IN, OUT>> supplier) {
+
+            super(supplier);
+
+            if (!supplier.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the supplier class must have a static context: " + supplier.getClass());
+            }
+
+            mSupplier = supplier;
+        }
+
+        @NotNull
+        @Override
+        public ContextInvocation<IN, OUT> newInvocation() {
+
+            return mSupplier.get();
         }
     }
 }

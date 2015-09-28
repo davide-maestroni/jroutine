@@ -15,12 +15,13 @@ package com.github.dm.jrt.android.processor;
 
 import com.github.dm.jrt.processor.RoutineProcessor;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -82,7 +83,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getTypeFromName("com.github.dm.jrt.android.annotation.ResultStaleTime").asType();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected String buildRoutineFieldsInit(final int size) {
 
@@ -112,7 +113,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return builder.toString();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     @SuppressWarnings("UnusedParameters")
     protected String getHeaderTemplate() throws IOException {
@@ -153,10 +154,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return super.getHeaderTemplate();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     @SuppressWarnings("UnusedParameters")
-    protected String getMethodHeaderTemplate(@Nonnull final ExecutableElement methodElement,
+    protected String getMethodHeaderTemplate(@NotNull final ExecutableElement methodElement,
             final int count) throws IOException {
 
         if (mCurrentAnnotationElement != mServiceProxyElement) {
@@ -178,10 +179,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return mMethodHeader;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected String getMethodInvocationFooterTemplate(
-            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationFooter == null) {
 
@@ -192,10 +193,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return mMethodInvocationFooter;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected String getMethodInvocationHeaderTemplate(
-            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
+            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationHeader == null) {
 
@@ -206,16 +207,16 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return mMethodInvocationHeader;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected String getSourceName(@Nonnull final TypeElement annotationElement,
-            @Nonnull final TypeElement element, @Nonnull final TypeElement targetElement) {
+    protected String getSourceName(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
 
         mCurrentAnnotationElement = annotationElement;
         return super.getSourceName(annotationElement, element, targetElement);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected List<TypeElement> getSupportedAnnotationElements() {
 

@@ -13,6 +13,8 @@
  */
 package com.github.dm.jrt.runner;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -20,8 +22,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 /**
  * Scheduled thread pool executor implementing a dynamic allocation of threads.<br/>
@@ -45,7 +45,7 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      * @param keepAliveUnit   the time unit for the keep alive time.
      */
     DynamicScheduledThreadExecutor(final int corePoolSize, final int maximumPoolSize,
-            final long keepAliveTime, @Nonnull final TimeUnit keepAliveUnit) {
+            final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
 
         super(1);
         final RejectingBlockingQueue internalQueue = new RejectingBlockingQueue();
@@ -56,7 +56,7 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
                                        internalQueue, rejectedExecutionHandler);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public ScheduledFuture<?> schedule(final Runnable command, final long delay,
             final TimeUnit unit) {
@@ -79,8 +79,8 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
          * @param executor the executor instance.
          * @param command  the command to execute.
          */
-        private CommandRunnable(@Nonnull final ThreadPoolExecutor executor,
-                @Nonnull final Runnable command) {
+        private CommandRunnable(@NotNull final ThreadPoolExecutor executor,
+                @NotNull final Runnable command) {
 
             mExecutor = executor;
             mCommand = command;
@@ -104,7 +104,7 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
          *
          * @param queue the command queue.
          */
-        private QueueRejectedExecutionHandler(@Nonnull final RejectingBlockingQueue queue) {
+        private QueueRejectedExecutionHandler(@NotNull final RejectingBlockingQueue queue) {
 
             mQueue = queue;
         }
@@ -158,18 +158,18 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
 
         @Override
         public boolean offer(final Runnable runnable, final long timeout,
-                @Nonnull final TimeUnit timeUnit) throws InterruptedException {
+                @NotNull final TimeUnit timeUnit) throws InterruptedException {
 
             return false;
         }
 
         @Override
-        public boolean offer(@Nonnull final Runnable runnable) {
+        public boolean offer(@NotNull final Runnable runnable) {
 
             return false;
         }
 
-        private boolean push(@Nonnull final Runnable runnable) {
+        private boolean push(@NotNull final Runnable runnable) {
 
             return super.offer(runnable);
         }

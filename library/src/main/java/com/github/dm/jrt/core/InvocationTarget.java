@@ -13,10 +13,10 @@
  */
 package com.github.dm.jrt.core;
 
-import java.lang.ref.WeakReference;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 
 /**
  * Class representing an invocation target.
@@ -41,9 +41,9 @@ public abstract class InvocationTarget<TYPE> {
      * @param <TYPE>      the target object type.
      * @return the invocation target.
      */
-    @Nonnull
+    @NotNull
     public static <TYPE> ClassInvocationTarget<TYPE> classOfType(
-            @Nonnull final Class<TYPE> targetClass) {
+            @NotNull final Class<TYPE> targetClass) {
 
         return new ClassInvocationTarget<TYPE>(targetClass);
     }
@@ -55,8 +55,8 @@ public abstract class InvocationTarget<TYPE> {
      * @param <TYPE> the target object type.
      * @return the invocation target.
      */
-    @Nonnull
-    public static <TYPE> InstanceInvocationTarget<TYPE> instance(@Nonnull final TYPE target) {
+    @NotNull
+    public static <TYPE> InstanceInvocationTarget<TYPE> instance(@NotNull final TYPE target) {
 
         return new InstanceInvocationTarget<TYPE>(target);
     }
@@ -74,7 +74,7 @@ public abstract class InvocationTarget<TYPE> {
      *
      * @return the target class.
      */
-    @Nonnull
+    @NotNull
     public abstract Class<? extends TYPE> getTargetClass();
 
     /**
@@ -83,7 +83,7 @@ public abstract class InvocationTarget<TYPE> {
      * @param otherClass the other class.
      * @return whether the invocation target is assignable to the class.
      */
-    public abstract boolean isAssignableTo(@Nonnull Class<?> otherClass);
+    public abstract boolean isAssignableTo(@NotNull Class<?> otherClass);
 
     /**
      * Checks if this invocation target is of the specified type.
@@ -91,7 +91,7 @@ public abstract class InvocationTarget<TYPE> {
      * @param type the type class.
      * @return whether the invocation target is of the specified type.
      */
-    public abstract boolean isSameTypeOf(@Nonnull Class<?> type);
+    public abstract boolean isSameTypeOf(@NotNull Class<?> type);
 
     /**
      * Invocation target wrapping a class.
@@ -108,7 +108,7 @@ public abstract class InvocationTarget<TYPE> {
          * @param targetClass the target class.
          */
         @SuppressWarnings("ConstantConditions")
-        private ClassInvocationTarget(@Nonnull final Class<TYPE> targetClass) {
+        private ClassInvocationTarget(@NotNull final Class<TYPE> targetClass) {
 
             if (targetClass == null) {
 
@@ -132,7 +132,7 @@ public abstract class InvocationTarget<TYPE> {
         }
 
         @Override
-        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+        public boolean isSameTypeOf(@NotNull final Class<?> type) {
 
             return (mTargetClass == type);
         }
@@ -154,7 +154,7 @@ public abstract class InvocationTarget<TYPE> {
             return mTargetClass.equals(that.mTargetClass);
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
 
@@ -162,7 +162,7 @@ public abstract class InvocationTarget<TYPE> {
         }
 
         @Override
-        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
+        public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
 
             return otherClass.isAssignableFrom(mTargetClass);
         }
@@ -185,14 +185,14 @@ public abstract class InvocationTarget<TYPE> {
          * @param target the target instance.
          */
         @SuppressWarnings("unchecked")
-        private InstanceInvocationTarget(@Nonnull final TYPE target) {
+        private InstanceInvocationTarget(@NotNull final TYPE target) {
 
             mTarget = new WeakReference<TYPE>(target);
             mTargetClass = (Class<? extends TYPE>) target.getClass();
         }
 
         @Override
-        public boolean isSameTypeOf(@Nonnull final Class<?> type) {
+        public boolean isSameTypeOf(@NotNull final Class<?> type) {
 
             return type.isInstance(mTarget.get());
         }
@@ -232,7 +232,7 @@ public abstract class InvocationTarget<TYPE> {
             return mTarget.get();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
 
@@ -240,7 +240,7 @@ public abstract class InvocationTarget<TYPE> {
         }
 
         @Override
-        public boolean isAssignableTo(@Nonnull final Class<?> otherClass) {
+        public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
 
             return otherClass.isInstance(mTarget.get());
         }

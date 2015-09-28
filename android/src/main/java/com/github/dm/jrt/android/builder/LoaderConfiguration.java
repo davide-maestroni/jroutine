@@ -17,10 +17,10 @@ import android.os.Looper;
 
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 
@@ -96,7 +96,7 @@ public final class LoaderConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<LoaderConfiguration> builder() {
 
         return new Builder<LoaderConfiguration>(sDefaultConfigurable);
@@ -108,7 +108,7 @@ public final class LoaderConfiguration {
      * @param initialConfiguration the initial loader configuration.
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<LoaderConfiguration> builderFrom(
             @Nullable final LoaderConfiguration initialConfiguration) {
 
@@ -121,7 +121,7 @@ public final class LoaderConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public Builder<LoaderConfiguration> builderFrom() {
 
         return builderFrom(this);
@@ -325,8 +325,8 @@ public final class LoaderConfiguration {
          * @param configuration the configuration.
          * @return the configurable instance.
          */
-        @Nonnull
-        TYPE setConfiguration(@Nonnull LoaderConfiguration configuration);
+        @NotNull
+        TYPE setConfiguration(@NotNull LoaderConfiguration configuration);
     }
 
     /**
@@ -356,7 +356,7 @@ public final class LoaderConfiguration {
          * @param configurable the configurable instance.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
 
@@ -373,8 +373,8 @@ public final class LoaderConfiguration {
          * @param initialConfiguration the initial loader configuration.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final LoaderConfiguration initialConfiguration) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+                @NotNull final LoaderConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -390,7 +390,7 @@ public final class LoaderConfiguration {
          *
          * @return the configurable object.
          */
-        @Nonnull
+        @NotNull
         public TYPE set() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
@@ -404,7 +404,7 @@ public final class LoaderConfiguration {
          * @param configuration the loader configuration.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
 
             if (configuration == null) {
@@ -465,7 +465,7 @@ public final class LoaderConfiguration {
          * @param strategyType the cache strategy type.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withCacheStrategy(@Nullable final CacheStrategyType strategyType) {
 
             mStrategyType = strategyType;
@@ -480,7 +480,7 @@ public final class LoaderConfiguration {
          * @param resolutionType the type of resolution.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withClashResolution(
                 @Nullable final ClashResolutionType resolutionType) {
 
@@ -494,7 +494,7 @@ public final class LoaderConfiguration {
          * @param loaderId the loader ID.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withId(final int loaderId) {
 
             mLoaderId = loaderId;
@@ -509,7 +509,7 @@ public final class LoaderConfiguration {
          * @param resolutionType the type of resolution.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withInputClashResolution(
                 @Nullable final ClashResolutionType resolutionType) {
 
@@ -524,7 +524,7 @@ public final class LoaderConfiguration {
          * @param looper the looper instance.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withResultLooper(@Nullable final Looper looper) {
 
             mLooper = looper;
@@ -539,7 +539,7 @@ public final class LoaderConfiguration {
          * @param staleTime the stale time.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withResultStaleTime(@Nullable final TimeDuration staleTime) {
 
             mStaleTime = staleTime;
@@ -554,21 +554,21 @@ public final class LoaderConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withResultStaleTime(final long time,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             return withResultStaleTime(fromUnit(time, timeUnit));
         }
 
-        @Nonnull
+        @NotNull
         private LoaderConfiguration buildConfiguration() {
 
             return new LoaderConfiguration(mLooper, mLoaderId, mResolutionType,
                                            mInputResolutionType, mStrategyType, mStaleTime);
         }
 
-        private void setConfiguration(@Nonnull final LoaderConfiguration configuration) {
+        private void setConfiguration(@NotNull final LoaderConfiguration configuration) {
 
             mLooper = configuration.mLooper;
             mLoaderId = configuration.mLoaderId;
@@ -584,9 +584,9 @@ public final class LoaderConfiguration {
      */
     private static class DefaultConfigurable implements Configurable<LoaderConfiguration> {
 
-        @Nonnull
+        @NotNull
         public LoaderConfiguration setConfiguration(
-                @Nonnull final LoaderConfiguration configuration) {
+                @NotNull final LoaderConfiguration configuration) {
 
             return configuration;
         }

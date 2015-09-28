@@ -17,7 +17,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.invocation.Invocation;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining an invocation aware of the specific Android context.
@@ -34,5 +34,5 @@ public interface ContextInvocation<IN, OUT> extends Invocation<IN, OUT> {
      *
      * @param context the context of the invocation.
      */
-    void onContext(@Nonnull Context context);
+    void onContext(@NotNull Context context);
 }

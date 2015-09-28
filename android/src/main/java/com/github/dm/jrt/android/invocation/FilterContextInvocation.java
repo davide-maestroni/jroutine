@@ -18,8 +18,8 @@ import android.content.Context;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation filtering each input and transforming it in output data.
@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
 public abstract class FilterContextInvocation<IN, OUT> extends ContextInvocationFactory<IN, OUT>
         implements ContextInvocation<IN, OUT> {
 
-    @Nonnull
+    @NotNull
     @Override
     public final ContextInvocation<IN, OUT> newInvocation() {
 
@@ -53,7 +53,7 @@ public abstract class FilterContextInvocation<IN, OUT> extends ContextInvocation
 
     }
 
-    public final void onResult(@Nonnull final ResultChannel<OUT> result) {
+    public final void onResult(@NotNull final ResultChannel<OUT> result) {
 
     }
 
@@ -61,7 +61,7 @@ public abstract class FilterContextInvocation<IN, OUT> extends ContextInvocation
 
     }
 
-    public final void onContext(@Nonnull final Context context) {
+    public final void onContext(@NotNull final Context context) {
 
     }
 }

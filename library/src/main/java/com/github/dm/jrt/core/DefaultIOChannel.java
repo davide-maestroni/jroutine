@@ -15,32 +15,32 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.TransportChannel;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.TimeDuration;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
- * Default implementation of a transport channel.
+ * Default implementation of an I/O channel.
  * <p/>
  * Created by davide-maestroni on 10/24/2014.
  *
  * @param <DATA> the data type.
  */
-class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
+class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
 
     private final DefaultResultChannel<DATA> mInputChannel;
 
@@ -51,7 +51,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
      *
      * @param configuration the channel configuration.
      */
-    DefaultTransportChannel(@Nonnull final ChannelConfiguration configuration) {
+    DefaultIOChannel(@NotNull final ChannelConfiguration configuration) {
 
         final InvocationConfiguration invocationConfiguration =
                 configuration.toOutputChannelConfiguration();
@@ -64,7 +64,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         abortHandler.setChannel(inputChannel);
         mInputChannel = inputChannel;
         mOutputChannel = inputChannel.getOutput();
-        logger.dbg("building transport channel with configuration: %s", configuration);
+        logger.dbg("building I/O channel with configuration: %s", configuration);
     }
 
     public boolean abort() {
@@ -79,7 +79,7 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
 
     public boolean isEmpty() {
 
-        return mInputChannel.isEmpty();
+        return mInputChannel.isEmpty() && mOutputChannel.isEmpty();
     }
 
     public boolean isOpen() {
@@ -87,159 +87,159 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mInputChannel.isOpen();
     }
 
-    @Nonnull
-    public TransportChannel<DATA> after(@Nonnull final TimeDuration delay) {
+    @NotNull
+    public IOChannel<DATA, DATA> after(@NotNull final TimeDuration delay) {
 
         mInputChannel.after(delay);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+    @NotNull
+    public IOChannel<DATA, DATA> after(final long delay, @NotNull final TimeUnit timeUnit) {
 
         mInputChannel.after(delay, timeUnit);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> now() {
+    @NotNull
+    public IOChannel<DATA, DATA> now() {
 
         mInputChannel.now();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> orderByCall() {
+    @NotNull
+    public IOChannel<DATA, DATA> orderByCall() {
 
         mInputChannel.orderByCall();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> orderByChance() {
+    @NotNull
+    public IOChannel<DATA, DATA> orderByChance() {
 
         mInputChannel.orderByChance();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> orderByDelay() {
+    @NotNull
+    public IOChannel<DATA, DATA> orderByDelay() {
 
         mInputChannel.orderByDelay();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> pass(@Nullable final OutputChannel<? extends DATA> channel) {
+    @NotNull
+    public IOChannel<DATA, DATA> pass(@Nullable final OutputChannel<? extends DATA> channel) {
 
         mInputChannel.pass(channel);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> pass(@Nullable final Iterable<? extends DATA> inputs) {
+    @NotNull
+    public IOChannel<DATA, DATA> pass(@Nullable final Iterable<? extends DATA> inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> pass(@Nullable final DATA input) {
+    @NotNull
+    public IOChannel<DATA, DATA> pass(@Nullable final DATA input) {
 
         mInputChannel.pass(input);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> pass(@Nullable final DATA... inputs) {
+    @NotNull
+    public IOChannel<DATA, DATA> pass(@Nullable final DATA... inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> afterMax(@Nonnull final TimeDuration timeout) {
+    @NotNull
+    public IOChannel<DATA, DATA> afterMax(@NotNull final TimeDuration timeout) {
 
         mOutputChannel.afterMax(timeout);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
+    @NotNull
+    public IOChannel<DATA, DATA> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
         mOutputChannel.afterMax(timeout, timeUnit);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> allInto(@Nonnull final Collection<? super DATA> results) {
+    @NotNull
+    public IOChannel<DATA, DATA> allInto(@NotNull final Collection<? super DATA> results) {
 
         mOutputChannel.allInto(results);
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> eventually() {
+    @NotNull
+    public IOChannel<DATA, DATA> eventually() {
 
         mOutputChannel.eventually();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> eventuallyAbort() {
+    @NotNull
+    public IOChannel<DATA, DATA> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> eventuallyExit() {
+    @NotNull
+    public IOChannel<DATA, DATA> eventuallyExit() {
 
         mOutputChannel.eventuallyExit();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> eventuallyThrow() {
+    @NotNull
+    public IOChannel<DATA, DATA> eventuallyThrow() {
 
         mOutputChannel.eventuallyThrow();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> immediately() {
+    @NotNull
+    public IOChannel<DATA, DATA> immediately() {
 
         mOutputChannel.immediately();
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> passTo(@Nonnull final OutputConsumer<? super DATA> consumer) {
+    @NotNull
+    public IOChannel<DATA, DATA> passTo(@NotNull final OutputConsumer<? super DATA> consumer) {
 
         mOutputChannel.passTo(consumer);
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public InputChannel<DATA> asInput() {
 
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public OutputChannel<DATA> asOutput() {
 
         return this;
     }
 
-    @Nonnull
-    public TransportChannel<DATA> close() {
+    @NotNull
+    public IOChannel<DATA, DATA> close() {
 
         mInputChannel.close();
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public List<DATA> all() {
 
         return mOutputChannel.all();
@@ -265,8 +265,8 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         return mOutputChannel.isBound();
     }
 
-    @Nonnull
-    public <IN extends InputChannel<? super DATA>> IN passTo(@Nonnull final IN channel) {
+    @NotNull
+    public <IN extends InputChannel<? super DATA>> IN passTo(@NotNull final IN channel) {
 
         return mOutputChannel.passTo(channel);
     }
@@ -294,12 +294,12 @@ class DefaultTransportChannel<DATA> implements TransportChannel<DATA> {
         private DefaultResultChannel<?> mChannel;
 
         public void onAbort(@Nullable final RoutineException reason, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             mChannel.close(reason);
         }
 
-        private void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
+        private void setChannel(@NotNull final DefaultResultChannel<?> channel) {
 
             mChannel = channel;
         }

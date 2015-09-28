@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.log;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class for creating and sharing log instances.
@@ -38,7 +38,7 @@ public class Logs {
      *
      * @return the shared instance.
      */
-    @Nonnull
+    @NotNull
     public static NullLog nullLog() {
 
         return sNullLog;
@@ -49,7 +49,7 @@ public class Logs {
      *
      * @return the shared instance.
      */
-    @Nonnull
+    @NotNull
     public static SystemLog systemLog() {
 
         return sSystemLog;

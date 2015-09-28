@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.invocation;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class decorating the invocations produced by an invocation factory.
@@ -33,7 +33,7 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
      * @param wrapped the wrapped factory instance.
      */
     @SuppressWarnings("ConstantConditions")
-    public DecoratingInvocationFactory(@Nonnull final InvocationFactory<IN, OUT> wrapped) {
+    public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -43,7 +43,7 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
         mFactory = wrapped;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public final Invocation<IN, OUT> newInvocation() {
 
@@ -56,6 +56,6 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
      * @param invocation the invocation instance to decorate.
      * @return the decorated invocation.
      */
-    @Nonnull
-    protected abstract Invocation<IN, OUT> decorate(@Nonnull Invocation<IN, OUT> invocation);
+    @NotNull
+    protected abstract Invocation<IN, OUT> decorate(@NotNull Invocation<IN, OUT> invocation);
 }

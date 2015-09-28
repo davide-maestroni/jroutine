@@ -13,10 +13,10 @@
  */
 package com.github.dm.jrt.log;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Log implementation simply discarding all messages.
@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 public class NullLog extends TemplateLog {
 
     @Override
-    protected void log(@Nonnull final LogLevel level, @Nonnull final List<Object> contexts,
+    protected void log(@NotNull final LogLevel level, @NotNull final List<Object> contexts,
             @Nullable final String message, @Nullable final Throwable throwable) {
 
     }

@@ -26,9 +26,9 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.TimeDuration;
 
-import java.util.concurrent.Semaphore;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.concurrent.Semaphore;
 
 import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.contextFrom;
@@ -198,7 +198,7 @@ public class LoaderRoutineRotationTest
     private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
 
             result.after(TimeDuration.millis(500)).pass(d);
         }
@@ -207,7 +207,7 @@ public class LoaderRoutineRotationTest
     private static class ToUpperCase extends TemplateContextInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(TimeDuration.millis(500)).pass(s.toUpperCase());
         }

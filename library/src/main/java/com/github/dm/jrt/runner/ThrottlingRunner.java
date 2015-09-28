@@ -15,12 +15,12 @@ package com.github.dm.jrt.runner;
 
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 /**
  * Runner implementation throttling the number of running executions so to keep it under a specified
@@ -51,7 +51,7 @@ class ThrottlingRunner implements Runner {
      * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
      */
     @SuppressWarnings("ConstantConditions")
-    ThrottlingRunner(@Nonnull final Runner wrapped, final int maxExecutions) {
+    ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
 
         if (wrapped == null) {
 
@@ -69,7 +69,7 @@ class ThrottlingRunner implements Runner {
         mMaxRunning = maxExecutions;
     }
 
-    public void cancel(@Nonnull final Execution execution) {
+    public void cancel(@NotNull final Execution execution) {
 
         ThrottlingExecution throttlingExecution = null;
 
@@ -107,8 +107,8 @@ class ThrottlingRunner implements Runner {
         return mRunner.isExecutionThread();
     }
 
-    public void run(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
+    public void run(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
 
         ThrottlingExecution throttlingExecution = null;
 
@@ -132,8 +132,8 @@ class ThrottlingRunner implements Runner {
         }
     }
 
-    @Nonnull
-    private ThrottlingExecution getThrottlingExecution(@Nonnull final Execution execution) {
+    @NotNull
+    private ThrottlingExecution getThrottlingExecution(@NotNull final Execution execution) {
 
         final WeakReference<ThrottlingExecution> executionReference = mExecutions.get(execution);
         ThrottlingExecution throttlingExecution =
@@ -171,8 +171,8 @@ class ThrottlingRunner implements Runner {
          * @param delay     the execution delay.
          * @param timeUnit  the delay time unit.
          */
-        private PendingExecution(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+        private PendingExecution(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
 
             mExecution = execution;
             mDelay = delay;
@@ -205,7 +205,7 @@ class ThrottlingRunner implements Runner {
          *
          * @param execution the execution.
          */
-        private ThrottlingExecution(@Nonnull final Execution execution) {
+        private ThrottlingExecution(@NotNull final Execution execution) {
 
             mExecution = execution;
         }

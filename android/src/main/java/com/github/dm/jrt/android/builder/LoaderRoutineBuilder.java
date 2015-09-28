@@ -17,7 +17,7 @@ import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.RoutineBuilder;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routines bound to a context lifecycle through loaders.
@@ -45,7 +45,7 @@ public interface LoaderRoutineBuilder<IN, OUT>
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     LoaderRoutine<IN, OUT> buildRoutine();
 
     /**
@@ -53,6 +53,6 @@ public interface LoaderRoutineBuilder<IN, OUT>
      *
      * @return the invocation configuration builder.
      */
-    @Nonnull
+    @NotNull
     Builder<? extends LoaderRoutineBuilder<IN, OUT>> invocations();
 }

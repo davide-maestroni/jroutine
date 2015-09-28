@@ -19,7 +19,7 @@ import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.util.ClassToken;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routines wrapping an object methods, bound to a context
@@ -37,6 +37,7 @@ public interface LoaderProxyRoutineBuilder
      * optional {@link com.github.dm.jrt.annotation.Alias Alias},
      * {@link com.github.dm.jrt.annotation.Input Input},
      * {@link com.github.dm.jrt.annotation.Inputs Inputs},
+     * {@link com.github.dm.jrt.annotation.Invoke Invoke},
      * {@link com.github.dm.jrt.annotation.Output Output},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
      * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
@@ -65,8 +66,8 @@ public interface LoaderProxyRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -75,6 +76,7 @@ public interface LoaderProxyRoutineBuilder
      * optional {@link com.github.dm.jrt.annotation.Alias Alias},
      * {@link com.github.dm.jrt.annotation.Input Input},
      * {@link com.github.dm.jrt.annotation.Inputs Inputs},
+     * {@link com.github.dm.jrt.annotation.Invoke Invoke},
      * {@link com.github.dm.jrt.annotation.Output Output},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
      * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
@@ -102,20 +104,20 @@ public interface LoaderProxyRoutineBuilder
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
      */
-    @Nonnull
-    <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
      * Note that the configured asynchronous runner will be ignored.
      *
      * @return the invocation configuration builder.
      */
-    @Nonnull
+    @NotNull
     InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocations();
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NotNull
     ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxies();
 }

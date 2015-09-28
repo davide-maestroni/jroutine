@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.invocation;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception wrapping a thread interrupted exception caught inside a routine execution.

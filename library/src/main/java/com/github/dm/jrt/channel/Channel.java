@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.channel;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining the basic communication channel with the routine invocation.

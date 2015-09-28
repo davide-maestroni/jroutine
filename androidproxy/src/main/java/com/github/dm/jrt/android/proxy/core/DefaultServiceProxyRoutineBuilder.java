@@ -26,10 +26,10 @@ import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.util.ClassToken;
 
-import java.lang.reflect.Constructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
 
 import static com.github.dm.jrt.util.Reflection.findConstructor;
 
@@ -61,8 +61,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceProxyRoutineBuilder(@Nonnull final ServiceContext context,
-            @Nonnull final ContextInvocationTarget<?> target) {
+    DefaultServiceProxyRoutineBuilder(@NotNull final ServiceContext context,
+            @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
 
@@ -78,14 +78,14 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         mTarget = target;
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         return buildProxy(ClassToken.tokenOf(itf));
     }
 
-    @Nonnull
-    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         final Class<TYPE> itfClass = itf.getRawClass();
 
@@ -116,31 +116,31 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                       .buildProxy();
     }
 
-    @Nonnull
+    @NotNull
     public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ServiceProxyRoutineBuilder setConfiguration(
-            @Nonnull final InvocationConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -151,10 +151,10 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ServiceProxyRoutineBuilder setConfiguration(
-            @Nonnull final ProxyConfiguration configuration) {
+            @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -165,10 +165,10 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         return this;
     }
 
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ServiceProxyRoutineBuilder setConfiguration(
-            @Nonnull final ServiceConfiguration configuration) {
+            @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
 
@@ -199,16 +199,16 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
          * @param target         the invocation target.
          * @param interfaceToken the proxy interface token.
          */
-        private ObjectServiceProxyBuilder(@Nonnull final ServiceContext context,
-                @Nonnull final ContextInvocationTarget<?> target,
-                @Nonnull final ClassToken<TYPE> interfaceToken) {
+        private ObjectServiceProxyBuilder(@NotNull final ServiceContext context,
+                @NotNull final ContextInvocationTarget<?> target,
+                @NotNull final ClassToken<TYPE> interfaceToken) {
 
             mContext = context;
             mTarget = target;
             mInterfaceToken = interfaceToken;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         protected ClassToken<TYPE> getInterfaceToken() {
 
@@ -222,18 +222,18 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             return mContext.getServiceContext();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         protected Class<?> getTargetClass() {
 
             return mTarget.getTargetClass();
         }
 
-        @Nonnull
+        @NotNull
         @Override
-        protected TYPE newProxy(@Nonnull final InvocationConfiguration invocationConfiguration,
-                @Nonnull final ProxyConfiguration proxyConfiguration,
-                @Nonnull final ServiceConfiguration serviceConfiguration) {
+        protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
+                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ServiceConfiguration serviceConfiguration) {
 
             try {
 

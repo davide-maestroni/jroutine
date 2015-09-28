@@ -23,10 +23,10 @@ import android.os.Build.VERSION_CODES;
 
 import com.github.dm.jrt.util.Reflection;
 
-import java.lang.ref.WeakReference;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 
 /**
  * Class representing an Android loader context (like activities or fragments).
@@ -51,8 +51,8 @@ public abstract class LoaderContext {
      * @param activity the activity instance.
      * @return the loader context.
      */
-    @Nonnull
-    public static LoaderContext contextFrom(@Nonnull final Activity activity) {
+    @NotNull
+    public static LoaderContext contextFrom(@NotNull final Activity activity) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -74,9 +74,9 @@ public abstract class LoaderContext {
      * @param context  the context used to get the application one.
      * @return the loader context.
      */
-    @Nonnull
-    public static LoaderContext contextFrom(@Nonnull final Activity activity,
-            @Nonnull final Context context) {
+    @NotNull
+    public static LoaderContext contextFrom(@NotNull final Activity activity,
+            @NotNull final Context context) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -95,8 +95,8 @@ public abstract class LoaderContext {
      * @param fragment the fragment instance.
      * @return the loader context.
      */
-    @Nonnull
-    public static LoaderContext contextFrom(@Nonnull final Fragment fragment) {
+    @NotNull
+    public static LoaderContext contextFrom(@NotNull final Fragment fragment) {
 
         return new FragmentContext(fragment);
     }
@@ -110,9 +110,9 @@ public abstract class LoaderContext {
      * @param context  the context used to get the application one.
      * @return the loader context.
      */
-    @Nonnull
-    public static LoaderContext contextFrom(@Nonnull final Fragment fragment,
-            @Nonnull final Context context) {
+    @NotNull
+    public static LoaderContext contextFrom(@NotNull final Fragment fragment,
+            @NotNull final Context context) {
 
         return new WrappedFragmentContext(fragment, context);
     }
@@ -155,7 +155,7 @@ public abstract class LoaderContext {
          * @param activity the wrapped activity.
          */
         @SuppressWarnings("ConstantConditions")
-        private ActivityContext(@Nonnull final Activity activity) {
+        private ActivityContext(@NotNull final Activity activity) {
 
             if (activity == null) {
 
@@ -227,7 +227,7 @@ public abstract class LoaderContext {
          * @param fragment the wrapped fragment.
          */
         @SuppressWarnings("ConstantConditions")
-        private FragmentContext(@Nonnull final Fragment fragment) {
+        private FragmentContext(@NotNull final Fragment fragment) {
 
             if (fragment == null) {
 
@@ -300,17 +300,17 @@ public abstract class LoaderContext {
          * @param context  the wrapped context.
          */
         @SuppressWarnings("ConstantConditions")
-        private WrappedActivityContext(@Nonnull final Activity activity,
-                @Nonnull final Context context) {
+        private WrappedActivityContext(@NotNull final Activity activity,
+                @NotNull final Context context) {
 
             super(activity);
 
             final Class<? extends Context> contextClass = context.getClass();
 
-            if (!Reflection.isStaticClass(contextClass)) {
+            if (!Reflection.hasStaticContext(contextClass)) {
 
                 throw new IllegalArgumentException(
-                        "the context class must be static: " + contextClass.getName());
+                        "the context class must have a static context: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);
@@ -370,17 +370,17 @@ public abstract class LoaderContext {
          * @param context  the wrapped context.
          */
         @SuppressWarnings("ConstantConditions")
-        private WrappedFragmentContext(@Nonnull final Fragment fragment,
-                @Nonnull final Context context) {
+        private WrappedFragmentContext(@NotNull final Fragment fragment,
+                @NotNull final Context context) {
 
             super(fragment);
 
             final Class<? extends Context> contextClass = context.getClass();
 
-            if (!Reflection.isStaticClass(contextClass)) {
+            if (!Reflection.hasStaticContext(contextClass)) {
 
                 throw new IllegalArgumentException(
-                        "the context class must be static: " + contextClass.getName());
+                        "the context class must have a static context: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);

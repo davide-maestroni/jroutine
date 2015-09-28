@@ -15,7 +15,7 @@ package com.github.dm.jrt.builder;
 
 import com.github.dm.jrt.routine.Routine;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routine objects.
@@ -36,6 +36,6 @@ public interface RoutineBuilder<IN, OUT>
      *
      * @return the newly created routine instance.
      */
-    @Nonnull
+    @NotNull
     Routine<IN, OUT> buildRoutine();
 }

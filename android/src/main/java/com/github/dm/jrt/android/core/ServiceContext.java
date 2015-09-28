@@ -18,10 +18,10 @@ import android.content.Intent;
 
 import com.github.dm.jrt.android.service.InvocationService;
 
-import java.lang.ref.WeakReference;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 
 /**
  * Class representing an Android service context.
@@ -48,8 +48,8 @@ public abstract class ServiceContext {
      * @param context the context.
      * @return the service context.
      */
-    @Nonnull
-    public static ServiceContext serviceFrom(@Nonnull final Context context) {
+    @NotNull
+    public static ServiceContext serviceFrom(@NotNull final Context context) {
 
         return serviceFrom(context, InvocationService.class);
     }
@@ -62,9 +62,9 @@ public abstract class ServiceContext {
      * @param serviceClass the service type.
      * @return the service context.
      */
-    @Nonnull
-    public static ServiceContext serviceFrom(@Nonnull final Context context,
-            @Nonnull final Class<? extends InvocationService> serviceClass) {
+    @NotNull
+    public static ServiceContext serviceFrom(@NotNull final Context context,
+            @NotNull final Class<? extends InvocationService> serviceClass) {
 
         return serviceFrom(context, new Intent(context, serviceClass));
     }
@@ -77,9 +77,9 @@ public abstract class ServiceContext {
      * @param service the service intent.
      * @return the service context.
      */
-    @Nonnull
-    public static ServiceContext serviceFrom(@Nonnull final Context context,
-            @Nonnull final Intent service) {
+    @NotNull
+    public static ServiceContext serviceFrom(@NotNull final Context context,
+            @NotNull final Intent service) {
 
         return new IntentServiceContext(context, service);
     }
@@ -97,7 +97,7 @@ public abstract class ServiceContext {
      *
      * @return the intent.
      */
-    @Nonnull
+    @NotNull
     public abstract Intent getServiceIntent();
 
     /**
@@ -116,8 +116,8 @@ public abstract class ServiceContext {
          * @param service the service intent.
          */
         @SuppressWarnings("ConstantConditions")
-        private IntentServiceContext(@Nonnull final Context context,
-                @Nonnull final Intent service) {
+        private IntentServiceContext(@NotNull final Context context,
+                @NotNull final Intent service) {
 
             if (context == null) {
 
@@ -168,7 +168,7 @@ public abstract class ServiceContext {
             return mContext.get();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Intent getServiceIntent() {
 

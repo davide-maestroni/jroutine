@@ -37,6 +37,9 @@ import com.github.dm.jrt.util.TimeDuration;
 import com.github.dm.jrt.util.TimeDuration.Check;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,9 +47,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -126,9 +126,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultResultChannel(@Nonnull final InvocationConfiguration configuration,
-            @Nonnull final AbortHandler handler, @Nonnull final Runner runner,
-            @Nonnull final Logger logger) {
+    DefaultResultChannel(@NotNull final InvocationConfiguration configuration,
+            @NotNull final AbortHandler handler, @NotNull final Runner runner,
+            @NotNull final Logger logger) {
 
         if (handler == null) {
 
@@ -167,8 +167,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mState = new OutputChannelState();
     }
 
-    @Nonnull
-    private static Object getMutex(@Nonnull final OutputConsumer<?> consumer) {
+    @NotNull
+    private static Object getMutex(@NotNull final OutputConsumer<?> consumer) {
 
         synchronized (sConsumerMutexes) {
 
@@ -190,8 +190,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return abort(null);
     }
 
-    @Nonnull
-    public ResultChannel<OUT> after(@Nonnull final TimeDuration delay) {
+    @NotNull
+    public ResultChannel<OUT> after(@NotNull final TimeDuration delay) {
 
         synchronized (mMutex) {
 
@@ -201,19 +201,19 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    @Nonnull
-    public ResultChannel<OUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+    @NotNull
+    public ResultChannel<OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> now() {
 
         return after(ZERO);
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> orderByCall() {
 
         synchronized (mMutex) {
@@ -224,7 +224,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> orderByChance() {
 
         synchronized (mMutex) {
@@ -235,7 +235,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> orderByDelay() {
 
         synchronized (mMutex) {
@@ -246,7 +246,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> pass(@Nullable final OutputChannel<? extends OUT> channel) {
 
         final OutputConsumer<OUT> consumer;
@@ -264,7 +264,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> pass(@Nullable final Iterable<? extends OUT> outputs) {
 
         final TimeDuration delay;
@@ -288,7 +288,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> pass(@Nullable final OUT output) {
 
         final TimeDuration delay;
@@ -312,7 +312,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ResultChannel<OUT> pass(@Nullable final OUT... outputs) {
 
         final TimeDuration delay;
@@ -423,7 +423,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      *
      * @return the output channel.
      */
-    @Nonnull
+    @NotNull
     OutputChannel<OUT> getOutput() {
 
         final TimeoutActionType action = mTimeoutActionType;
@@ -465,8 +465,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
-    private void closeConsumer(@Nonnull final OutputChannelState state,
-            @Nonnull final OutputConsumer<? super OUT> consumer) {
+    private void closeConsumer(@NotNull final OutputChannelState state,
+            @NotNull final OutputConsumer<? super OUT> consumer) {
 
         state.closeConsumer(consumer);
 
@@ -599,8 +599,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mState = new ExceptionChannelState();
     }
 
-    private boolean isNextAvailable(@Nonnull final TimeDuration timeout,
-            @Nonnull final TimeoutActionType timeoutAction) {
+    private boolean isNextAvailable(@NotNull final TimeDuration timeout,
+            @NotNull final TimeoutActionType timeoutAction) {
 
         boolean isAbort = false;
 
@@ -703,7 +703,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    private OUT nextOutput(@Nonnull final TimeDuration timeout) {
+    private OUT nextOutput(@NotNull final TimeDuration timeout) {
 
         final Object result = mOutputQueue.removeFirst();
         mLogger.dbg("reading output [#%d]: %s [%s]", mOutputCount, result, timeout);
@@ -720,8 +720,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     }
 
     @Nullable
-    private OUT readNext(@Nonnull final TimeDuration timeout,
-            @Nonnull final TimeoutActionType timeoutAction) {
+    private OUT readNext(@NotNull final TimeDuration timeout,
+            @NotNull final TimeoutActionType timeoutAction) {
 
         boolean isAbort = false;
 
@@ -746,8 +746,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     }
 
     @Nullable
-    private OUT readQueue(@Nonnull final TimeDuration timeout,
-            @Nonnull final TimeoutActionType action) {
+    private OUT readQueue(@NotNull final TimeDuration timeout,
+            @NotNull final TimeoutActionType action) {
 
         verifyBound();
         final Logger logger = mLogger;
@@ -827,7 +827,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
-    private void waitOutputs(final int count, @Nonnull final TimeDuration delay) {
+    private void waitOutputs(final int count, @NotNull final TimeDuration delay) {
 
         if (mOutputTimeout.isZero()) {
 
@@ -871,7 +871,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param delay    the abortion delay.
          * @param timeUnit the delay time unit.
          */
-        void onAbort(@Nullable RoutineException reason, long delay, @Nonnull TimeUnit timeUnit);
+        void onAbort(@Nullable RoutineException reason, long delay, @NotNull TimeUnit timeUnit);
     }
 
     /**
@@ -883,7 +883,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        RoutineException abortConsumer(@Nonnull final Throwable reason) {
+        RoutineException abortConsumer(@NotNull final Throwable reason) {
 
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
             mSubLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
@@ -898,7 +898,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        void closeConsumer(@Nonnull final OutputConsumer<? super OUT> consumer) {
+        void closeConsumer(@NotNull final OutputConsumer<? super OUT> consumer) {
 
         }
     }
@@ -920,7 +920,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return true;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         OutputChannelState toDoneState() {
 
@@ -943,8 +943,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param timeout the output timeout.
          * @param action  the timeout action.
          */
-        private DefaultIterator(@Nonnull final TimeDuration timeout,
-                @Nonnull final TimeoutActionType action) {
+        private DefaultIterator(@NotNull final TimeDuration timeout,
+                @NotNull final TimeoutActionType action) {
 
             mTimeout = timeout;
             mAction = action;
@@ -979,9 +979,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         private TimeoutActionType mTimeoutActionType = TimeoutActionType.THROW;
 
-        @Nonnull
+        @NotNull
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUT> afterMax(@Nonnull final TimeDuration timeout) {
+        public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
             synchronized (mMutex) {
 
@@ -997,13 +997,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return this;
         }
 
-        @Nonnull
-        public OutputChannel<OUT> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        @NotNull
+        public OutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
             return afterMax(fromUnit(timeout, timeUnit));
         }
 
-        @Nonnull
+        @NotNull
         public List<OUT> all() {
 
             final ArrayList<OUT> results = new ArrayList<OUT>();
@@ -1011,9 +1011,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return results;
         }
 
-        @Nonnull
+        @NotNull
         @SuppressWarnings({"unchecked", "ConstantConditions"})
-        public OutputChannel<OUT> allInto(@Nonnull final Collection<? super OUT> results) {
+        public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
             boolean isAbort = false;
 
@@ -1180,13 +1180,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventually() {
 
             return afterMax(INFINITY);
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventuallyAbort() {
 
             synchronized (mMutex) {
@@ -1197,7 +1197,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventuallyExit() {
 
             synchronized (mMutex) {
@@ -1208,7 +1208,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> eventuallyThrow() {
 
             synchronized (mMutex) {
@@ -1249,7 +1249,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return readNext(timeout, timeoutAction);
         }
 
-        @Nonnull
+        @NotNull
         public OutputChannel<OUT> immediately() {
 
             return afterMax(ZERO);
@@ -1263,16 +1263,16 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         }
 
-        @Nonnull
-        public <IN extends InputChannel<? super OUT>> IN passTo(@Nonnull final IN channel) {
+        @NotNull
+        public <IN extends InputChannel<? super OUT>> IN passTo(@NotNull final IN channel) {
 
             channel.pass(this);
             return channel;
         }
 
-        @Nonnull
+        @NotNull
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUT> passTo(@Nonnull final OutputConsumer<? super OUT> consumer) {
+        public OutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
             final boolean forceClose;
 
@@ -1295,7 +1295,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return this;
         }
 
-        @Nonnull
+        @NotNull
         public Iterator<OUT> iterator() {
 
             final TimeDuration timeout;
@@ -1482,7 +1482,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param queue   the output queue.
          * @param outputs the list of output data.
          */
-        private DelayedListOutputExecution(@Nonnull final NestedQueue<Object> queue,
+        private DelayedListOutputExecution(@NotNull final NestedQueue<Object> queue,
                 final ArrayList<OUT> outputs) {
 
             mOutputs = outputs;
@@ -1520,7 +1520,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param queue  the output queue.
          * @param output the output.
          */
-        private DelayedOutputExecution(@Nonnull final NestedQueue<Object> queue,
+        private DelayedOutputExecution(@NotNull final NestedQueue<Object> queue,
                 @Nullable final OUT output) {
 
             mQueue = queue;
@@ -1575,7 +1575,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return false;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         OutputChannelState toDoneState() {
 
@@ -1592,32 +1592,32 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        RoutineException abortConsumer(@Nonnull final Throwable reason) {
+        RoutineException abortConsumer(@NotNull final Throwable reason) {
 
             return null;
         }
 
         @Override
-        void after(@Nonnull final TimeDuration delay) {
+        void after(@NotNull final TimeDuration delay) {
 
             throw abortException();
         }
 
         @Override
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
+        boolean onConsumerComplete(@NotNull final NestedQueue<Object> queue) {
 
             throw abortException();
         }
 
         @Nullable
         @Override
-        Execution onConsumerOutput(@Nonnull final NestedQueue<Object> queue, final OUT output,
-                @Nonnull final TimeDuration delay, final OrderType orderType) {
+        Execution onConsumerOutput(@NotNull final NestedQueue<Object> queue, final OUT output,
+                @NotNull final TimeDuration delay, final OrderType orderType) {
 
             throw abortException();
         }
 
-        @Nonnull
+        @NotNull
         private RoutineException abortException() {
 
             final RoutineException abortException = mAbortException;
@@ -1626,7 +1626,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        void orderBy(@Nonnull final OrderType orderType) {
+        void orderBy(@NotNull final OrderType orderType) {
 
             throw abortException();
         }
@@ -1673,7 +1673,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             throw abortException();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         OutputChannelState toDoneState() {
 
@@ -1688,7 +1688,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
-        @Nonnull
+        @NotNull
         private IllegalStateException exception() {
 
             mSubLogger.err("consumer invalid call on closed channel");
@@ -1698,7 +1698,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @Nullable
         @Override
         RoutineException abortInvocation(@Nullable final Throwable reason,
-                @Nonnull final TimeDuration delay) {
+                @NotNull final TimeDuration delay) {
 
             mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
@@ -1713,7 +1713,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        boolean delayedOutput(@Nonnull final NestedQueue<Object> queue,
+        boolean delayedOutput(@NotNull final NestedQueue<Object> queue,
                 @Nullable final OUT output) {
 
             mSubLogger.dbg("avoiding delayed output execution since channel is closed: %s", output);
@@ -1721,7 +1721,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        boolean delayedOutputs(@Nonnull final NestedQueue<Object> queue, final List<OUT> outputs) {
+        boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
             mSubLogger.dbg("avoiding delayed output execution since channel is closed: %s",
                            outputs);
@@ -1729,7 +1729,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
+        boolean onConsumerComplete(@NotNull final NestedQueue<Object> queue) {
 
             throw exception();
         }
@@ -1743,8 +1743,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        Execution onConsumerOutput(@Nonnull final NestedQueue<Object> queue, final OUT output,
-                @Nonnull final TimeDuration delay, final OrderType orderType) {
+        Execution onConsumerOutput(@NotNull final NestedQueue<Object> queue, final OUT output,
+                @NotNull final TimeDuration delay, final OrderType orderType) {
 
             throw exception();
         }
@@ -1770,7 +1770,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @return the abort exception or null.
          */
         @Nullable
-        RoutineException abortConsumer(@Nonnull final Throwable reason) {
+        RoutineException abortConsumer(@NotNull final Throwable reason) {
 
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
             mSubLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
@@ -1787,7 +1787,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         @Nullable
         RoutineException abortInvocation(@Nullable final Throwable reason,
-                @Nonnull final TimeDuration delay) {
+                @NotNull final TimeDuration delay) {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
 
@@ -1821,7 +1821,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param delay the delay.
          */
         @SuppressWarnings("ConstantConditions")
-        void after(@Nonnull final TimeDuration delay) {
+        void after(@NotNull final TimeDuration delay) {
 
             if (delay == null) {
 
@@ -1837,7 +1837,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          *
          * @param consumer the consumer instance.
          */
-        void closeConsumer(@Nonnull final OutputConsumer<? super OUT> consumer) {
+        void closeConsumer(@NotNull final OutputConsumer<? super OUT> consumer) {
 
             final Logger logger = mSubLogger;
 
@@ -1895,7 +1895,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param output the output.
          * @return whether the queue content has changed.
          */
-        boolean delayedOutput(@Nonnull final NestedQueue<Object> queue,
+        boolean delayedOutput(@NotNull final NestedQueue<Object> queue,
                 @Nullable final OUT output) {
 
             mSubLogger.dbg("delayed output execution: %s", output);
@@ -1912,7 +1912,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param outputs the outputs.
          * @return whether the queue content has changed.
          */
-        boolean delayedOutputs(@Nonnull final NestedQueue<Object> queue, final List<OUT> outputs) {
+        boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
             mSubLogger.dbg("delayed output execution: %s", outputs);
             --mPendingOutputCount;
@@ -1957,7 +1957,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param queue the output queue.
          * @return whether the queue content has changed.
          */
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
+        boolean onConsumerComplete(@NotNull final NestedQueue<Object> queue) {
 
             queue.close();
             --mPendingOutputCount;
@@ -1988,8 +1988,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onConsumerOutput(@Nonnull final NestedQueue<Object> queue, final OUT output,
-                @Nonnull final TimeDuration delay, final OrderType orderType) {
+        Execution onConsumerOutput(@NotNull final NestedQueue<Object> queue, final OUT output,
+                @NotNull final TimeDuration delay, final OrderType orderType) {
 
             mSubLogger.dbg("consumer output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
@@ -2021,7 +2021,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          *
          * @param orderType the result order type.
          */
-        void orderBy(@Nonnull final OrderType orderType) {
+        void orderBy(@NotNull final OrderType orderType) {
 
             mResultOrder = orderType;
         }
@@ -2199,7 +2199,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          *
          * @return the done state.
          */
-        @Nonnull
+        @NotNull
         OutputChannelState toDoneState() {
 
             return new DoneChannelState();
@@ -2213,7 +2213,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
-        @Nonnull
+        @NotNull
         private IllegalStateException exception() {
 
             mSubLogger.err("invalid call on closed channel");
@@ -2221,7 +2221,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        void after(@Nonnull final TimeDuration delay) {
+        void after(@NotNull final TimeDuration delay) {
 
             throw exception();
         }
@@ -2234,7 +2234,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        boolean delayedOutput(@Nonnull final NestedQueue<Object> queue,
+        boolean delayedOutput(@NotNull final NestedQueue<Object> queue,
                 @Nullable final OUT output) {
 
             mSubLogger.dbg("delayed output execution: %s", output);
@@ -2250,7 +2250,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        boolean delayedOutputs(@Nonnull final NestedQueue<Object> queue, final List<OUT> outputs) {
+        boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
             mSubLogger.dbg("delayed output execution: %s", outputs);
 
@@ -2265,7 +2265,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        void orderBy(@Nonnull final OrderType orderType) {
+        void orderBy(@NotNull final OrderType orderType) {
 
             throw exception();
         }
@@ -2277,7 +2277,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        boolean onConsumerComplete(@Nonnull final NestedQueue<Object> queue) {
+        boolean onConsumerComplete(@NotNull final NestedQueue<Object> queue) {
 
             queue.close();
 

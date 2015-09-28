@@ -20,13 +20,13 @@ import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
- * Class storing the transport channel configuration.
+ * Class storing the channel configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
@@ -108,7 +108,7 @@ public final class ChannelConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<ChannelConfiguration> builder() {
 
         return new Builder<ChannelConfiguration>(sDefaultConfigurable);
@@ -120,7 +120,7 @@ public final class ChannelConfiguration {
      * @param initialConfiguration the initial configuration.
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public static Builder<ChannelConfiguration> builderFrom(
             @Nullable final ChannelConfiguration initialConfiguration) {
 
@@ -133,7 +133,7 @@ public final class ChannelConfiguration {
      *
      * @return the builder.
      */
-    @Nonnull
+    @NotNull
     public Builder<ChannelConfiguration> builderFrom() {
 
         return builderFrom(this);
@@ -333,7 +333,7 @@ public final class ChannelConfiguration {
      *
      * @return the invocation configuration.
      */
-    @Nonnull
+    @NotNull
     public InvocationConfiguration toInputChannelConfiguration() {
 
         return toInvocationConfiguration().builderFrom()
@@ -349,7 +349,7 @@ public final class ChannelConfiguration {
      *
      * @return the invocation configuration.
      */
-    @Nonnull
+    @NotNull
     public InvocationConfiguration toInvocationConfiguration() {
 
         return InvocationConfiguration.builder()
@@ -367,7 +367,7 @@ public final class ChannelConfiguration {
      *
      * @return the invocation configuration.
      */
-    @Nonnull
+    @NotNull
     public InvocationConfiguration toOutputChannelConfiguration() {
 
         return toInvocationConfiguration().builderFrom()
@@ -391,8 +391,8 @@ public final class ChannelConfiguration {
          * @param configuration the configuration.
          * @return the configurable instance.
          */
-        @Nonnull
-        TYPE setConfiguration(@Nonnull ChannelConfiguration configuration);
+        @NotNull
+        TYPE setConfiguration(@NotNull ChannelConfiguration configuration);
     }
 
     /**
@@ -426,7 +426,7 @@ public final class ChannelConfiguration {
          * @param configurable the configurable instance.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
 
@@ -444,8 +444,8 @@ public final class ChannelConfiguration {
          * @param initialConfiguration the initial configuration.
          */
         @SuppressWarnings("ConstantConditions")
-        public Builder(@Nonnull final Configurable<? extends TYPE> configurable,
-                @Nonnull final ChannelConfiguration initialConfiguration) {
+        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+                @NotNull final ChannelConfiguration initialConfiguration) {
 
             if (configurable == null) {
 
@@ -461,7 +461,7 @@ public final class ChannelConfiguration {
          *
          * @return the configurable object.
          */
-        @Nonnull
+        @NotNull
         public TYPE set() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
@@ -475,7 +475,7 @@ public final class ChannelConfiguration {
          * @param configuration the channel configuration.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> with(@Nullable final ChannelConfiguration configuration) {
 
             if (configuration == null) {
@@ -550,7 +550,7 @@ public final class ChannelConfiguration {
          * @param runner the runner instance.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withAsyncRunner(@Nullable final Runner runner) {
 
             mAsyncRunner = runner;
@@ -566,7 +566,7 @@ public final class ChannelConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withChannelMaxSize(final int maxSize) {
 
             if ((maxSize != DEFAULT) && (maxSize <= 0)) {
@@ -588,7 +588,7 @@ public final class ChannelConfiguration {
          * @param orderType the order type.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withChannelOrder(@Nullable final OrderType orderType) {
 
             mChannelOrderType = orderType;
@@ -603,9 +603,9 @@ public final class ChannelConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withChannelTimeout(final long timeout,
-                @Nonnull final TimeUnit timeUnit) {
+                @NotNull final TimeUnit timeUnit) {
 
             return withChannelTimeout(TimeDuration.fromUnit(timeout, timeUnit));
         }
@@ -617,7 +617,7 @@ public final class ChannelConfiguration {
          * @param timeout the timeout.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withChannelTimeout(@Nullable final TimeDuration timeout) {
 
             mChannelTimeout = timeout;
@@ -631,7 +631,7 @@ public final class ChannelConfiguration {
          * @param log the log instance.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withLog(@Nullable final Log log) {
 
             mLog = log;
@@ -645,7 +645,7 @@ public final class ChannelConfiguration {
          * @param level the log level.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withLogLevel(@Nullable final LogLevel level) {
 
             mLogLevel = level;
@@ -662,8 +662,8 @@ public final class ChannelConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
-        @Nonnull
-        public Builder<TYPE> withPassTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        @NotNull
+        public Builder<TYPE> withPassTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
 
             return withPassTimeout(TimeDuration.fromUnit(timeout, timeUnit));
         }
@@ -677,7 +677,7 @@ public final class ChannelConfiguration {
          * @param timeout the timeout.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withPassTimeout(@Nullable final TimeDuration timeout) {
 
             mPassTimeout = timeout;
@@ -694,14 +694,14 @@ public final class ChannelConfiguration {
          * @param actionType the action type.
          * @return this builder.
          */
-        @Nonnull
+        @NotNull
         public Builder<TYPE> withPassTimeoutAction(@Nullable final TimeoutActionType actionType) {
 
             mTimeoutActionType = actionType;
             return this;
         }
 
-        @Nonnull
+        @NotNull
         private ChannelConfiguration buildConfiguration() {
 
             return new ChannelConfiguration(mAsyncRunner, mPassTimeout, mTimeoutActionType,
@@ -709,7 +709,7 @@ public final class ChannelConfiguration {
                                             mLog, mLogLevel);
         }
 
-        private void setConfiguration(@Nonnull final ChannelConfiguration configuration) {
+        private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
             mAsyncRunner = configuration.mAsyncRunner;
             mPassTimeout = configuration.mPassTimeout;
@@ -727,9 +727,9 @@ public final class ChannelConfiguration {
      */
     private static class DefaultConfigurable implements Configurable<ChannelConfiguration> {
 
-        @Nonnull
+        @NotNull
         public ChannelConfiguration setConfiguration(
-                @Nonnull final ChannelConfiguration configuration) {
+                @NotNull final ChannelConfiguration configuration) {
 
             return configuration;
         }

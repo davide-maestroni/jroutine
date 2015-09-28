@@ -16,8 +16,8 @@
 
         @Override
         @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
-        protected void onCall(@javax.annotation.Nonnull final java.util.List<?> objects,
-                @javax.annotation.Nonnull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) {
+        protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) {
 
             synchronized(mMutex) {
 

@@ -18,12 +18,21 @@
     public ${resultType} ${methodName}(${paramVars}) {
 
         final com.github.dm.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        final com.github.dm.jrt.channel.InvocationChannel<Object, ${resultClassName}> $$channel = $$routine.parallelInvoke()${inputOptions};
+        final com.github.dm.jrt.channel.InvocationChannel<Object, ${resultClassName}> $$channel = $$routine.${invokeMethod}()${inputOptions};
 
         for (final Object $$object: ${params}) {
 
             $$channel.pass($$object);
         }
 
-        return $$channel.result()${outputOptions};
+        final java.util.List<${resultClassName}> $$list = $$channel.result()${outputOptions}.all();
+        final int $$size = $$list.size();
+        final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
+
+        for (int $$i = 0; $$i < $$size; ++$$i) {
+
+            $$array[$$i] = $$list.get($$i);
+        }
+
+        return $$array;
     }

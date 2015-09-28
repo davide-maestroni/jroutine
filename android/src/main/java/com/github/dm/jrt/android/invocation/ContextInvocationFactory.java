@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.android.invocation;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Context invocation factory interface.
@@ -30,6 +30,6 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      *
      * @return the context invocation instance.
      */
-    @Nonnull
+    @NotNull
     public abstract ContextInvocation<IN, OUT> newInvocation();
 }

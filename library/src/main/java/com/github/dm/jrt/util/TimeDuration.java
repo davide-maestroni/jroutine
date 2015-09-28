@@ -13,9 +13,9 @@
  */
 package com.github.dm.jrt.util;
 
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.concurrent.TimeUnit;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -49,7 +49,7 @@ public class TimeDuration extends Time {
      * @param unit     the time unit.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    protected TimeDuration(final long duration, @Nonnull final TimeUnit unit) {
+    protected TimeDuration(final long duration, @NotNull final TimeUnit unit) {
 
         super(duration, unit);
 
@@ -66,7 +66,7 @@ public class TimeDuration extends Time {
      * @return the time instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration days(final long days) {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
@@ -86,9 +86,9 @@ public class TimeDuration extends Time {
      * @return the time instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     @SuppressWarnings("ConstantConditions")
-    public static TimeDuration fromUnit(final long time, @Nonnull final TimeUnit unit) {
+    public static TimeDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
 
         if (unit == null) {
 
@@ -105,7 +105,7 @@ public class TimeDuration extends Time {
      * @return the time instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration hours(final long hours) {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
@@ -123,7 +123,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration micros(final long micros) {
 
         return new TimeDuration(micros, TimeUnit.MICROSECONDS);
@@ -136,7 +136,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration millis(final long millis) {
 
         return new TimeDuration(millis, TimeUnit.MILLISECONDS);
@@ -149,7 +149,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration minutes(final long minutes) {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
@@ -167,7 +167,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration nanos(final long nanos) {
 
         return new TimeDuration(nanos, TimeUnit.NANOSECONDS);
@@ -180,7 +180,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration seconds(final long seconds) {
 
         return new TimeDuration(seconds, TimeUnit.SECONDS);
@@ -195,7 +195,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @see java.lang.System#currentTimeMillis()
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration timeSinceMillis(final long milliTime) {
 
         final long millis = System.currentTimeMillis() - milliTime;
@@ -211,7 +211,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @see java.lang.System#nanoTime()
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration timeSinceNanos(final long nanoTime) {
 
         final long nanos = System.nanoTime() - nanoTime;
@@ -227,7 +227,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @see java.lang.System#currentTimeMillis()
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration timeUntilMillis(final long milliTime) {
 
         final long millis = milliTime - System.currentTimeMillis();
@@ -243,7 +243,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @see java.lang.System#nanoTime()
      */
-    @Nonnull
+    @NotNull
     public static TimeDuration timeUntilNanos(final long nanoTime) {
 
         final long nanos = nanoTime - System.nanoTime();
@@ -255,7 +255,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
     public TimeDuration daysTime() {
 
@@ -267,7 +267,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
     public TimeDuration hoursTime() {
 
@@ -279,7 +279,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
     public TimeDuration microsTime() {
 
@@ -291,7 +291,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
     public TimeDuration millisTime() {
 
@@ -306,9 +306,9 @@ public class TimeDuration extends Time {
      * @param time the time to subtract.
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
-    public TimeDuration minus(@Nonnull final Time time) {
+    public TimeDuration minus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
 
@@ -323,7 +323,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
     public TimeDuration minutesTime() {
 
@@ -335,7 +335,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
     public TimeDuration nanosTime() {
 
@@ -350,9 +350,9 @@ public class TimeDuration extends Time {
      * @param time the time to add.
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
-    public TimeDuration plus(@Nonnull final Time time) {
+    public TimeDuration plus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
 
@@ -367,7 +367,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
-    @Nonnull
+    @NotNull
     @Override
     public TimeDuration secondsTime() {
 
@@ -390,7 +390,7 @@ public class TimeDuration extends Time {
      * @param target the target thread.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
-    public void join(@Nonnull final Thread target) throws InterruptedException {
+    public void join(@NotNull final Thread target) throws InterruptedException {
 
         unit.timedJoin(target, time);
     }
@@ -518,7 +518,7 @@ public class TimeDuration extends Time {
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
             justification = "this is just a wrapper on an Object.wait() call")
-    public void wait(@Nonnull final Object target) throws InterruptedException {
+    public void wait(@NotNull final Object target) throws InterruptedException {
 
         if (isZero()) {
 
@@ -546,7 +546,7 @@ public class TimeDuration extends Time {
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
             justification = "this is just a wrapper on an Object.wait() call")
-    public boolean waitSinceMillis(@Nonnull final Object target, final long milliTime) throws
+    public boolean waitSinceMillis(@NotNull final Object target, final long milliTime) throws
             InterruptedException {
 
         if (isZero()) {
@@ -583,7 +583,7 @@ public class TimeDuration extends Time {
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
             justification = "this is just a wrapper on an Object.wait() call")
-    public boolean waitSinceNanos(@Nonnull final Object target, final long nanoTime) throws
+    public boolean waitSinceNanos(@NotNull final Object target, final long nanoTime) throws
             InterruptedException {
 
         if (isZero()) {
@@ -617,7 +617,7 @@ public class TimeDuration extends Time {
      * @return whether the check became true before the timeout elapsed.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
-    public boolean waitTrue(@Nonnull final Object target, @Nonnull final Check check) throws
+    public boolean waitTrue(@NotNull final Object target, @NotNull final Check check) throws
             InterruptedException {
 
         if (isZero()) {

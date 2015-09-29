@@ -364,9 +364,9 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             return mOutput;
         }
 
-        public boolean hasDelays() {
+        public boolean isStreaming() {
 
-            return mInput.hasDelays();
+            return mInput.isStreaming();
         }
 
         private void bindService() {

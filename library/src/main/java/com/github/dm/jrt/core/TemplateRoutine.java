@@ -22,7 +22,6 @@ import com.github.dm.jrt.routine.Routine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.builder.ChannelConfiguration.DEFAULT;
 import static com.github.dm.jrt.builder.ChannelConfiguration.builder;
 
 /**
@@ -169,11 +168,7 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
         final InvocationConfiguration configuration = getConfiguration();
         return builder().withAsyncRunner(configuration.getRunnerOr(null))
-                        .withChannelMaxSize(configuration.getInputMaxSizeOr(DEFAULT))
                         .withChannelOrder(configuration.getInputOrderTypeOr(null))
-                        .withChannelTimeout(configuration.getInputTimeoutOr(null))
-                        .withPassTimeout(configuration.getExecutionTimeoutOr(null))
-                        .withPassTimeoutAction(configuration.getExecutionTimeoutActionOr(null))
                         .withLog(configuration.getLogOr(null))
                         .withLogLevel(configuration.getLogLevelOr(null))
                         .set();

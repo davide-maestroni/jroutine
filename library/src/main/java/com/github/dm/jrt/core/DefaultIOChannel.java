@@ -20,7 +20,7 @@ import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
+import com.github.dm.jrt.core.DefaultResultChannel.InvocationHandler;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.TimeDuration;
@@ -56,7 +56,7 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
         final InvocationConfiguration invocationConfiguration =
                 configuration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);
-        final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
+        final ChannelInvocationHandler abortHandler = new ChannelInvocationHandler();
         final DefaultResultChannel<DATA> inputChannel =
                 new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler,
                                                invocationConfiguration.getRunnerOr(
@@ -271,9 +271,9 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
         return mOutputChannel.passTo(channel);
     }
 
-    public boolean hasDelays() {
+    public boolean isStreaming() {
 
-        return mInputChannel.hasDelays();
+        return mInputChannel.isStreaming();
     }
 
     public Iterator<DATA> iterator() {
@@ -289,9 +289,14 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     /**
      * Abort handler used to close the input channel on abort.
      */
-    private static class ChannelAbortHandler implements AbortHandler {
+    private static class ChannelInvocationHandler implements InvocationHandler {
 
         private DefaultResultChannel<?> mChannel;
+
+        public boolean isStreaming() {
+
+            return mChannel.isStreaming();
+        }
 
         public void onAbort(@Nullable final RoutineException reason, final long delay,
                 @NotNull final TimeUnit timeUnit) {

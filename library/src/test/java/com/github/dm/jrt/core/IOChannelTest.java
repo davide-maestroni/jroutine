@@ -271,7 +271,7 @@ public class IOChannelTest {
         ioChannel.next();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.after(millis(100)).pass("test").isEmpty()).isTrue();
-        assertThat(ioChannel.close().eventually().checkComplete()).isTrue();
+        assertThat(ioChannel.close().afterMax(seconds(10)).checkComplete()).isTrue();
         assertThat(ioChannel.isEmpty()).isFalse();
     }
 
@@ -545,19 +545,23 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
+        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
+        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isTrue();
+        assertThat(channel.isStreaming()).isFalse();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
+        channel.pass(ioChannel);
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.isStreaming()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isTrue();
-        seconds(1).sleepAtLeast();
+        assertThat(channel.isStreaming()).isTrue();
+        ioChannel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isFalse();
+        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test
@@ -565,16 +569,20 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
+        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
+        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isTrue();
+        assertThat(channel.isStreaming()).isFalse();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
+        channel.pass(ioChannel);
+        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.isStreaming()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isFalse();
+        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test

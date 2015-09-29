@@ -44,6 +44,7 @@ import java.util.Map;
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
+import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -947,7 +948,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channel3.close();
         channel4.close();
 
-        assertThat(outputChannel.eventually().all()).containsExactly("0", "1", "2", "3");
+        assertThat(outputChannel.afterMax(seconds(1)).all()).containsExactly("0", "1", "2", "3");
     }
 
     @SuppressWarnings("unchecked")

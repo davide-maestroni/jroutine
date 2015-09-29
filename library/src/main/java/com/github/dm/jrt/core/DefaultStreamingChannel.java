@@ -288,9 +288,9 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
         return this;
     }
 
-    public boolean hasDelays() {
+    public boolean isStreaming() {
 
-        return mInputChannel.hasDelays();
+        return mInputChannel.isStreaming();
     }
 
     public Iterator<OUT> iterator() {

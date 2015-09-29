@@ -52,7 +52,10 @@ public class JRoutineProxy {
     /**
      * Returns a routine builder wrapping the specified target object.<br/>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
+     * instance to prevent it from being garbage collected.<br/>
+     * Note also that the invocation input data will be cached, and the results will be produced
+     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+     * order to prevent starvation or out of memory errors.
      *
      * @param target the invocation target.
      * @return the routine builder instance.

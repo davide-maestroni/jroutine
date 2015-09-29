@@ -64,7 +64,6 @@ import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
 import static com.github.dm.jrt.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -366,7 +365,7 @@ public class ProxyRoutineTest {
         final Impl impl = new Impl();
         final Itf itf = JRoutineProxy.on(instance(impl))
                                      .invocations()
-                                     .withExecutionTimeout(INFINITY)
+                                     .withExecutionTimeout(seconds(10))
                                      .set()
                                      .buildProxy(Itf.class);
 

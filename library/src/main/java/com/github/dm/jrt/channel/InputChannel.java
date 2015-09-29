@@ -60,12 +60,11 @@ public interface InputChannel<IN> extends Channel {
     InputChannel<IN> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
-     * Checks if the channel has any delayed input, either because passed with an explicit delay or
-     * because expected to be fetched from an output channel.
+     * Checks if the channel is streaming data fetched from an output channel.
      *
-     * @return whether the channel has any pending input.
+     * @return whether the channel is streaming data.
      */
-    boolean hasDelays();
+    boolean isStreaming();
 
     /**
      * Tells the channel to not delay the transfer of data.

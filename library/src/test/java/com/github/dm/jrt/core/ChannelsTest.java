@@ -41,6 +41,7 @@ import java.util.Map;
 
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
+import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -508,17 +509,17 @@ public class ChannelsTest {
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
+        assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
+        assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
+        assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
     }
 
     @Test
@@ -659,7 +660,7 @@ public class ChannelsTest {
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(Channels.<Object>join(channel1, channel2))
-                          .eventually()
+                          .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -667,7 +668,7 @@ public class ChannelsTest {
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(
                 Channels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                          .eventually()
+                          .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -679,7 +680,7 @@ public class ChannelsTest {
                 .close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(Channels.<Object>join(channel1, channel2))
-                          .eventually()
+                          .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
     }
 
@@ -735,7 +736,7 @@ public class ChannelsTest {
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2))
-                          .eventually()
+                          .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -743,7 +744,7 @@ public class ChannelsTest {
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(
                 Channels.joinAndFlush(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                          .eventually()
+                          .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -757,7 +758,9 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2)).eventually().all();
+            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2))
+                   .afterMax(seconds(10))
+                   .all();
 
             fail();
 
@@ -968,7 +971,7 @@ public class ChannelsTest {
         channel3.close();
         channel4.close();
 
-        assertThat(outputChannel.eventually().all()).containsExactly("0", "1", "2", "3");
+        assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("0", "1", "2", "3");
     }
 
     @Test

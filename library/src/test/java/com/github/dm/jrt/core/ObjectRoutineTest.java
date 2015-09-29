@@ -771,7 +771,7 @@ public class ObjectRoutineTest {
         final Impl impl = new Impl();
         final Itf itf = JRoutine.on(instance(impl))
                                 .invocations()
-                                .withExecutionTimeout(INFINITY)
+                                .withExecutionTimeout(seconds(10))
                                 .set()
                                 .buildProxy(Itf.class);
 

@@ -16,19 +16,18 @@ package com.github.dm.jrt.channel;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception indicating a possible deadlock while waiting for results to become available.
+ * Exception indicating a possible deadlock while streaming data through a bound channel.
  * <p/>
- * Created by davide-maestroni on 07/19/2015.
+ * Created by davide-maestroni on 09/28/2015.
  */
-public class ExecutionDeadlockException extends DeadlockException {
+public class StreamingDeadlockException extends DeadlockException {
 
     /**
-     * Constructor.<br/>
-     * A default message will be set.
+     * Constructor.
      */
-    public ExecutionDeadlockException() {
+    public StreamingDeadlockException() {
 
-        this("cannot wait on the invocation runner thread: " + Thread.currentThread());
+        this("cannot wait indefinitely when streaming inputs");
     }
 
     /**
@@ -36,8 +35,8 @@ public class ExecutionDeadlockException extends DeadlockException {
      *
      * @param message the error message.
      */
-    public ExecutionDeadlockException(@Nullable final String message) {
+    public StreamingDeadlockException(@Nullable final String message) {
 
-        super(message + "\nTry binding the output channel or employing a different runner");
+        super(message + "\nTry setting a different timeout");
     }
 }

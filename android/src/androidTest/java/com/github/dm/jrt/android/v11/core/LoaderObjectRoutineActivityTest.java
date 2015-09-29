@@ -783,7 +783,7 @@ public class LoaderObjectRoutineActivityTest
         final Itf itf = JRoutine.with(contextFrom(getActivity()))
                                 .on(instanceOf(Impl.class))
                                 .invocations()
-                                .withExecutionTimeout(INFINITY)
+                                .withExecutionTimeout(seconds(10))
                                 .set()
                                 .buildProxy(Itf.class);
 

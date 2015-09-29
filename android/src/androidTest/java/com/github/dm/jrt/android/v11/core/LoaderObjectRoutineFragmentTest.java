@@ -850,7 +850,7 @@ public class LoaderObjectRoutineFragmentTest
         final Itf itf = JRoutine.with(contextFrom(fragment))
                                 .on(instanceOf(Impl.class))
                                 .invocations()
-                                .withExecutionTimeout(INFINITY)
+                                .withExecutionTimeout(seconds(10))
                                 .set()
                                 .buildProxy(Itf.class);
 

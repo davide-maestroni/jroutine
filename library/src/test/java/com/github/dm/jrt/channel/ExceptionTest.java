@@ -98,6 +98,13 @@ public class ExceptionTest {
     }
 
     @Test
+    public void testStreamingDeadlockException() {
+
+        assertThat(new StreamingDeadlockException().getMessage()).isNotEmpty();
+        assertThat(new StreamingDeadlockException("")).hasNoCause();
+    }
+
+    @Test
     public void testTimeoutException() {
 
         assertThat(new TimeoutException("")).hasNoCause();

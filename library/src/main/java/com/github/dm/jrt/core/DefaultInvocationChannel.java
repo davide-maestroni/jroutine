@@ -22,7 +22,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
+import com.github.dm.jrt.core.DefaultResultChannel.InvocationHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
@@ -90,9 +90,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private int mPendingExecutionCount;
 
-    private int mPendingInputCount;
-
     private InputChannelState mState;
+
+    private int mStreamingChannels;
 
     /**
      * Constructor.
@@ -127,7 +127,12 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 return (mInputCount <= maxInputSize);
             }
         };
-        mResultChanel = new DefaultResultChannel<OUT>(configuration, new AbortHandler() {
+        mResultChanel = new DefaultResultChannel<OUT>(configuration, new InvocationHandler() {
+
+            public boolean isStreaming() {
+
+                return DefaultInvocationChannel.this.isStreaming();
+            }
 
             public void onAbort(@Nullable final RoutineException reason, final long delay,
                     @NotNull final TimeUnit timeUnit) {
@@ -349,18 +354,18 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         return result;
     }
 
-    public boolean hasDelays() {
+    public boolean isStreaming() {
 
         synchronized (mMutex) {
 
-            return (mPendingInputCount > 0);
+            return (mStreamingChannels > 0);
         }
     }
 
     private void internalAbort(@Nullable final RoutineException abortException) {
 
         mInputQueue.clear();
-        mPendingInputCount = 0;
+        mStreamingChannels = 0;
         mAbortException = abortException;
         mRunner.cancel(mExecution);
     }
@@ -849,7 +854,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         @Override
         OutputChannel<OUT> getOutputChannel() {
 
-            mPendingInputCount = 0;
+            mStreamingChannels = 0;
             mState = new AbortedChannelState();
             final OutputChannel<OUT> outputChannel = mResultChanel.getOutput();
             outputChannel.abort(mAbortException);
@@ -929,7 +934,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution delayedInput(@NotNull final NestedQueue<IN> queue, @Nullable final IN input) {
 
             mSubLogger.dbg("delayed input execution: %s", input);
-            --mPendingInputCount;
             queue.add(input);
             queue.close();
             return mExecution;
@@ -946,7 +950,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution delayedInputs(@NotNull final NestedQueue<IN> queue, final List<IN> inputs) {
 
             mSubLogger.dbg("delayed input execution: %s", inputs);
-            --mPendingInputCount;
             queue.addAll(inputs);
             queue.close();
             return mExecution;
@@ -984,7 +987,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution onConsumerComplete(@NotNull final NestedQueue<IN> queue) {
 
             mSubLogger.dbg("closing consumer");
-            --mPendingInputCount;
+            --mStreamingChannels;
             queue.close();
 
             if (!mIsPendingExecution && !mIsConsuming) {
@@ -1010,7 +1013,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution onConsumerError(@Nullable final RoutineException error) {
 
             mSubLogger.dbg("aborting consumer");
-            mPendingInputCount = 0;
+            mStreamingChannels = 0;
             mAbortException = error;
             mState = new ExceptionChannelState();
             mRunner.cancel(mExecution);
@@ -1058,7 +1061,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 return null;
             }
 
-            ++mPendingInputCount;
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
                     (orderType != OrderType.BY_CHANCE) ? queue.addNested() : queue, input);
@@ -1125,7 +1127,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
 
             mBoundChannels.add(channel);
-            ++mPendingInputCount;
+            ++mStreamingChannels;
             ++mPendingExecutionCount;
             mSubLogger.dbg("passing channel: %s", channel);
             return new DefaultOutputConsumer();
@@ -1190,7 +1192,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 return null;
             }
 
-            ++mPendingInputCount;
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
                     (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
@@ -1235,7 +1236,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 return null;
             }
 
-            ++mPendingInputCount;
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
                     (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
@@ -1297,7 +1297,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 return null;
             }
 
-            ++mPendingInputCount;
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
                     (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,

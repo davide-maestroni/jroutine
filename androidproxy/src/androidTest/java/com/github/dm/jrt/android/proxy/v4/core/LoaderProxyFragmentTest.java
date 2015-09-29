@@ -63,7 +63,6 @@ import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
-import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -380,7 +379,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final Itf itf = JRoutineProxy.with(contextFrom(fragment))
                                      .on(instanceOf(Impl.class))
                                      .invocations()
-                                     .withExecutionTimeout(INFINITY)
+                                     .withExecutionTimeout(seconds(10))
                                      .set()
                                      .buildProxy(Itf.class);
 

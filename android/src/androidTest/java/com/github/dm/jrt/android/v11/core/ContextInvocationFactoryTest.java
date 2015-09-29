@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.util.TimeDuration.millis;
+import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -82,7 +83,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final LoaderRoutine<String, String> routine =
                 JRoutine.with(contextFrom(getActivity())).on(decoratedFactory).buildRoutine();
-        assertThat(routine.asyncCall("test").eventually().all()).containsExactly("test");
+        assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsExactly("test");
         routine.purge();
     }
 

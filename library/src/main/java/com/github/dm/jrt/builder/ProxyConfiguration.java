@@ -16,17 +16,23 @@ package com.github.dm.jrt.builder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Class storing the proxy configuration.
  * <p/>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
  * <p/>
- * The configuration has a share group associated. Every method within a specific group is protected
- * so that shared class members can be safely accessed only from the other methods sharing the same
- * group name. That means that the invocation of methods within the same group cannot happen in
- * parallel. In a dual way, methods belonging to different groups can be invoked in parallel but
- * should not access the same members to avoid concurrency issues.
+ * The configuration has a list of shared variables associated. Every method accessing a specific
+ * variable is protected so that the related member fields can be safely accessed only from the
+ * other methods sharing the same variable name. That means that the invocation of methods with the
+ * same variable name cannot happen in parallel. In a dual way, methods whose variable names do not
+ * overlap can be invoked in parallel, though, they should not access the same member fields in
+ * order to avoid concurrency issues.
  * <p/>
  * Created by davide-maestroni on 04/20/2015.
  */
@@ -39,16 +45,16 @@ public final class ProxyConfiguration {
      */
     public static final ProxyConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
-    private final String mGroupName;
+    private final List<String> mVarNames;
 
     /**
      * Constructor.
      *
-     * @param groupName the share group name.
+     * @param varNames the shared variable names.
      */
-    private ProxyConfiguration(@Nullable final String groupName) {
+    private ProxyConfiguration(@Nullable final List<String> varNames) {
 
-        mGroupName = groupName;
+        mVarNames = varNames;
     }
 
     /**
@@ -88,22 +94,22 @@ public final class ProxyConfiguration {
     }
 
     /**
-     * Returns the share group name (null by default).
+     * Returns the shared variable names (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
-     * @return the group name.
+     * @return the variable names.
      */
-    public String getShareGroupOr(@Nullable final String valueIfNotSet) {
+    public List<String> getSharedVarsOr(@Nullable final List<String> valueIfNotSet) {
 
-        final String groupName = mGroupName;
-        return (groupName != null) ? groupName : valueIfNotSet;
+        final List<String> varNames = mVarNames;
+        return (varNames != null) ? varNames : valueIfNotSet;
     }
 
     @Override
     public int hashCode() {
 
         // AUTO-GENERATED CODE
-        return mGroupName != null ? mGroupName.hashCode() : 0;
+        return mVarNames != null ? mVarNames.hashCode() : 0;
     }
 
     @Override
@@ -121,8 +127,7 @@ public final class ProxyConfiguration {
         }
 
         final ProxyConfiguration that = (ProxyConfiguration) o;
-        return !(mGroupName != null ? !mGroupName.equals(that.mGroupName)
-                : that.mGroupName != null);
+        return !(mVarNames != null ? !mVarNames.equals(that.mVarNames) : that.mVarNames != null);
     }
 
     @Override
@@ -130,7 +135,7 @@ public final class ProxyConfiguration {
 
         // AUTO-GENERATED CODE
         return "ProxyConfiguration{" +
-                "mGroupName='" + mGroupName + '\'' +
+                "mVarNames='" + mVarNames + '\'' +
                 '}';
     }
 
@@ -160,7 +165,7 @@ public final class ProxyConfiguration {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private String mGroupName;
+        private List<String> mVarNames;
 
         /**
          * Constructor.
@@ -225,39 +230,54 @@ public final class ProxyConfiguration {
                 return this;
             }
 
-            final String groupName = configuration.mGroupName;
+            final List<String> varNames = configuration.mVarNames;
 
-            if (groupName != null) {
+            if (varNames != null) {
 
-                withShareGroup(groupName);
+                withSharedVars(varNames);
             }
 
             return this;
         }
 
         /**
-         * Sets the share group name. A null value means that it is up to the specific
-         * implementation to choose a default one.
+         * Sets the share variable names. A null value means that it is up to the specific
+         * implementation to choose a default.
          *
-         * @param groupName the group name.
+         * @param varNames the variable names.
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withShareGroup(@Nullable final String groupName) {
+        public Builder<TYPE> withSharedVars(@Nullable final String... varNames) {
 
-            mGroupName = groupName;
+            mVarNames = (varNames != null) ? Arrays.asList(varNames) : null;
+            return this;
+        }
+
+        /**
+         * Sets the share variable names. A null value means that it is up to the specific
+         * implementation to choose a default.
+         *
+         * @param varNames the variable names.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withSharedVars(@Nullable final List<String> varNames) {
+
+            mVarNames = (varNames != null) ? Collections.unmodifiableList(
+                    new ArrayList<String>(varNames)) : null;
             return this;
         }
 
         @NotNull
         private ProxyConfiguration buildConfiguration() {
 
-            return new ProxyConfiguration(mGroupName);
+            return new ProxyConfiguration(mVarNames);
         }
 
         private void setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
-            mGroupName = configuration.mGroupName;
+            mVarNames = configuration.mVarNames;
         }
     }
 

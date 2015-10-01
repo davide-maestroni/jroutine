@@ -22,7 +22,7 @@ import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.ShareGroup;
+import com.github.dm.jrt.annotation.SharedVars;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
@@ -1994,17 +1994,31 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
                                             buildRoutineOptions(methodElement));
-        final ShareGroup shareGroupAnnotation = methodElement.getAnnotation(ShareGroup.class);
+        final SharedVars sharedVarsAnnotation = methodElement.getAnnotation(SharedVars.class);
 
-        if (shareGroupAnnotation != null) {
+        if (sharedVarsAnnotation != null) {
 
-            methodHeader = methodHeader.replace("${shareGroup}",
-                                                "\"" + shareGroupAnnotation.value() + "\"");
+            final String[] names = sharedVarsAnnotation.value();
+            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final int length = names.length;
+
+            for (int i = 0; i < length; i++) {
+
+                if (i != 0) {
+
+                    builder.append(", ");
+                }
+
+                builder.append("\"").append(names[i]).append("\"");
+            }
+
+            builder.append(")");
+            methodHeader = methodHeader.replace("${sharedVars}", builder.toString());
 
         } else {
 
-            methodHeader = methodHeader.replace("${shareGroup}",
-                                                "proxyConfiguration.getShareGroupOr(null)");
+            methodHeader = methodHeader.replace("${sharedVars}",
+                                                "proxyConfiguration.getSharedVarsOr(null)");
         }
 
         writer.append(methodHeader);
@@ -2039,16 +2053,31 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocationHeader =
                 methodInvocationHeader.replace("${genericTypes}", buildGenericTypes(element));
 
-        if (shareGroupAnnotation != null) {
+        if (sharedVarsAnnotation != null) {
 
-            methodInvocationHeader = methodInvocationHeader.replace("${shareGroup}", "\""
-                    + shareGroupAnnotation.value() + "\"");
+            final String[] names = sharedVarsAnnotation.value();
+            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final int length = names.length;
+
+            for (int i = 0; i < length; i++) {
+
+                if (i != 0) {
+
+                    builder.append(", ");
+                }
+
+                builder.append("\"").append(names[i]).append("\"");
+            }
+
+            builder.append(")");
+            methodInvocationHeader =
+                    methodInvocationHeader.replace("${sharedVars}", builder.toString());
 
         } else {
 
-            methodInvocationHeader = methodInvocationHeader.replace("${shareGroup}",
+            methodInvocationHeader = methodInvocationHeader.replace("${sharedVars}",
                                                                     "proxyConfiguration"
-                                                                            + ".getShareGroupOr"
+                                                                            + ".getSharedVarsOr"
                                                                             + "(null)");
         }
 

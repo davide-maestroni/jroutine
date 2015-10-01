@@ -19,23 +19,27 @@
         protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) {
 
-            synchronized(mMutex) {
+            int i = 0;
+            final ${componentType}[] array = new ${componentType}[objects.size()];
 
-                int i = 0;
-                final ${componentType}[] array = new ${componentType}[objects.size()];
+            for (final Object object : objects) {
 
-                for (final Object object : objects) {
+                array[i++] = (${boxedType}) object;
+            }
 
-                    array[i++] = (${boxedType}) object;
-                }
+            final com.github.dm.jrt.util.Mutex mutex = mMutex;
+            mutex.acquire();
 
-                try {
+            try {
 
-                    result.pass(${invocationTarget}.${targetMethodName}(array));
+                result.pass(${invocationTarget}.${targetMethodName}(array));
 
-                } catch (final Throwable t) {
+            } catch (final Throwable t) {
 
-                    throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
-                }
+                throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
+
+            } finally {
+
+                mutex.release();
             }
         }

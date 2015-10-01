@@ -300,7 +300,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    public void testShareGroup() {
+    public void testSharedVars() {
 
         final LoaderProxyRoutineBuilder builder = JRoutineProxy.with(contextFrom(getActivity()))
                                                                .on(instanceOf(TestClass2.class))
@@ -311,12 +311,12 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne = builder.proxies()
-                                               .withShareGroup("1")
+                                               .withSharedVars("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
         OutputChannel<Integer> getTwo = builder.proxies()
-                                               .withShareGroup("2")
+                                               .withSharedVars("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getTwo();

@@ -38,7 +38,7 @@ public interface LoaderObjectRoutineBuilder
      * Returns a routine used to call the method whose identifying name is specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation.<br/>
      * Optional {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout},
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction}, as well as
      * {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
@@ -64,7 +64,7 @@ public interface LoaderObjectRoutineBuilder
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.github.dm.jrt.annotation.Alias Alias},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout},
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction}, as well as
      * {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
@@ -90,7 +90,7 @@ public interface LoaderObjectRoutineBuilder
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.github.dm.jrt.annotation.Alias Alias},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout},
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction}, as well as
      * {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
@@ -116,7 +116,7 @@ public interface LoaderObjectRoutineBuilder
      * The method is searched via reflection ignoring a name specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout},
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction},
      * as well as {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
@@ -144,7 +144,7 @@ public interface LoaderObjectRoutineBuilder
      * The method is invoked ignoring a name specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout},
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction},
      * as well as {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},

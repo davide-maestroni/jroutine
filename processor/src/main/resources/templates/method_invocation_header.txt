@@ -16,7 +16,7 @@
 
     private static class Invocation${methodCount}${genericTypes} extends com.github.dm.jrt.invocation.FunctionInvocation<Object, ${resultClassName}> {
 
-        private final Object mMutex;
+        private final com.github.dm.jrt.util.Mutex mMutex;
 
         @SuppressWarnings("unused")
         private final com.github.dm.jrt.core.InvocationTarget<?> mTarget;
@@ -26,15 +26,14 @@
                  @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget<?> target) {
 
             final Object mutexTarget = ${mutexTarget};
-            final String shareGroup = ${shareGroup};
 
-            if ((mutexTarget != null) && !com.github.dm.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
+            if (mutexTarget != null) {
 
-                mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, shareGroup);
+                mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, ${sharedVars});
 
             } else {
 
-                mMutex = this;
+                mMutex = new com.github.dm.jrt.util.Mutex.NO_MUTEX;
             }
 
             mTarget = target;

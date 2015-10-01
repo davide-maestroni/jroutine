@@ -19,27 +19,31 @@
         protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) {
 
-            synchronized(mMutex) {
+            if (objects.size() > ${maxParamSize}) {
 
-                if (objects.size() > ${maxParamSize}) {
+                throw new IllegalArgumentException(
+                        "wrong number of input parameters for method '${targetMethodName}': was " +
+                        objects.size() + " while expected " + (${maxParamSize}));
+            }
 
-                    throw new IllegalArgumentException(
-                            "wrong number of input parameters for method '${targetMethodName}': " +
-                            "was " + objects.size() + " while expected " + (${maxParamSize}));
+            final com.github.dm.jrt.util.Mutex mutex = mMutex;
+            mutex.acquire();
+
+            try {
+
+                result.orderByCall();
+
+                for (final ${resultClassName} element : ${invocationTarget}.${targetMethodName}(${paramValues})) {
+
+                    result.pass(element);
                 }
 
-                try {
+            } catch (final Throwable t) {
 
-                    result.orderByCall();
+                throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
 
-                    for (final ${resultClassName} element : ${invocationTarget}.${targetMethodName}(${paramValues})) {
+            } finally {
 
-                        result.pass(element);
-                    }
-
-                } catch (final Throwable t) {
-
-                    throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
-                }
+                mutex.release();
             }
         }

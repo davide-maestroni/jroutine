@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * {@link com.github.dm.jrt.annotation.Invoke Invoke},
  * {@link com.github.dm.jrt.annotation.Output Output},
  * {@link com.github.dm.jrt.annotation.Priority Priority},
- * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+ * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
  * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
  * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations defined for each
  * interface method.

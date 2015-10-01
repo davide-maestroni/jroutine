@@ -317,7 +317,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    public void testShareGroup() {
+    public void testSharedVars() {
 
         final ServiceProxyRoutineBuilder builder =
                 JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
@@ -329,12 +329,12 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne = builder.proxies()
-                                               .withShareGroup("1")
+                                               .withSharedVars("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
         OutputChannel<Integer> getTwo = builder.proxies()
-                                               .withShareGroup("2")
+                                               .withSharedVars("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getTwo();

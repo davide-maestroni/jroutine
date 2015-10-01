@@ -18,14 +18,14 @@
 
     private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.android.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
 
-        private final String mShareGroup;
+        private final java.util.List<String> mSharedVars;
 
         private final com.github.dm.jrt.android.core.ContextInvocationTarget<?> mTarget;
 
-        private ContextInvocationFactory${methodCount}(@org.jetbrains.annotations.Nullable final String shareGroup,
+        private ContextInvocationFactory${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedVars,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
-            mShareGroup = shareGroup;
+            mSharedVars = sharedVars;
             mTarget = target;
         }
 
@@ -33,7 +33,7 @@
         @Override
         public com.github.dm.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation() {
 
-            return new ContextInvocation${methodCount}${genericTypes}(mShareGroup, mTarget);
+            return new ContextInvocation${methodCount}${genericTypes}(mSharedVars, mTarget);
         }
     }
 
@@ -44,7 +44,7 @@
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
-        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${shareGroup}, target))
+        return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${sharedVars}, target))
                                            .invocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}

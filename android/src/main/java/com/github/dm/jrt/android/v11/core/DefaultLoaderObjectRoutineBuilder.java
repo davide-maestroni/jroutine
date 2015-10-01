@@ -29,7 +29,6 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.Output.OutputMode;
-import com.github.dm.jrt.annotation.ShareGroup;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -38,6 +37,7 @@ import com.github.dm.jrt.core.RoutineBuilders.MethodInfo;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
+import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -534,7 +534,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private Object mInstance;
 
-        private Object mMutex;
+        private Mutex mMutex = Mutex.NO_MUTEX;
 
         /**
          * Constructor.
@@ -555,7 +555,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mTarget = target;
             mInputMode = inputMode;
             mOutputMode = outputMode;
-            mMutex = this;
         }
 
         @Override
@@ -584,11 +583,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 final Object mutexTarget =
                         (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
                                 : target.getTarget();
-                final String shareGroup = mProxyConfiguration.getShareGroupOr(null);
 
-                if ((mutexTarget != null) && !ShareGroup.NONE.equals(shareGroup)) {
+                if (mutexTarget != null) {
 
-                    mMutex = getSharedMutex(mutexTarget, shareGroup);
+                    mMutex = getSharedMutex(mutexTarget, mProxyConfiguration.getSharedVarsOr(null));
                 }
 
                 mInstance = target.getTarget();

@@ -28,12 +28,11 @@ import java.lang.annotation.Target;
  * routines as well.
  * <p/>
  * Through this annotation, it is possible to exclude single methods from this kind of protection,
- * by indicating them as having a different share group. Each group has a name associated, and every
- * method, within a specific group, is protected so that shared class members can be safely accessed
- * only from the other methods sharing the same group name. That means that the invocation of
- * methods within the same group cannot happen in parallel. In a dual way, methods belonging to
- * different groups can be invoked in parallel, but should not access the same members to avoid
- * concurrency issues.
+ * by indicating them as having a different shared variables. Every method sharing the same variable
+ * names is protected so that related member fields can be safely accessed. That means that the
+ * invocation of with the same variable name cannot happen in parallel. In a dual way, methods whose
+ * variable names do not overlap can be invoked in parallel, though, they should not access the same
+ * member fields in order to avoid concurrency issues.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
@@ -47,7 +46,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.ShareGroup *;
+ *              &#64;com.github.dm.jrt.annotation.SharedVars *;
  *         }
  *     </code>
  * </pre>
@@ -59,22 +58,12 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ShareGroup {
+public @interface SharedVars {
 
     /**
-     * Constant indicating the default share group, that is, all member fields are protected.
-     */
-    String ALL = "com.github.dm.jrt.annotation.ShareGroup.ALL";
-
-    /**
-     * Constant indicating that no member field needs to be protected.
-     */
-    String NONE = "";
-
-    /**
-     * The share group name associated with the annotated method.
+     * The shared variable names associated with the annotated method.
      *
-     * @return the group name.
+     * @return the variable names.
      */
-    String value();
+    String[] value();
 }

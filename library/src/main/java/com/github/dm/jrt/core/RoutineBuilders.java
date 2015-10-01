@@ -22,7 +22,7 @@ import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.ShareGroup;
+import com.github.dm.jrt.annotation.SharedVars;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -34,6 +34,7 @@ import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -48,6 +49,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -58,14 +61,28 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class RoutineBuilders {
 
+    private static final Mutex NO_MUTEX = new Mutex() {
+
+        public void acquire() {
+
+        }
+
+        public void release() {
+
+        }
+    };
+
     private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasMethods =
             new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
 
+    private static final WeakIdentityHashMap<Object, ReentrantLock> sDefaultLocks =
+            new WeakIdentityHashMap<Object, ReentrantLock>();
+
+    private static final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> sLocks =
+            new WeakIdentityHashMap<Object, Map<String, ReentrantLock>>();
+
     private static final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> sMethods =
             new WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>>();
-
-    private static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexes =
-            new WeakIdentityHashMap<Object, Map<String, Object>>();
 
     /**
      * Avoid direct instantiation.
@@ -88,7 +105,7 @@ public class RoutineBuilders {
      */
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public static void callFromInvocation(@NotNull final Method targetMethod,
-            @NotNull final Object mutex, @NotNull final Object target,
+            @NotNull final Mutex mutex, @NotNull final Object target,
             @NotNull final List<?> objects, @NotNull final ResultChannel<Object> result,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
@@ -97,8 +114,9 @@ public class RoutineBuilders {
         try {
 
             final Object methodResult;
+            mutex.acquire();
 
-            synchronized (mutex) {
+            try {
 
                 final Object[] args;
 
@@ -129,6 +147,10 @@ public class RoutineBuilders {
                 }
 
                 methodResult = targetMethod.invoke(target, args);
+
+            } finally {
+
+                mutex.release();
             }
 
             final Class<?> returnType = targetMethod.getReturnType();
@@ -223,7 +245,7 @@ public class RoutineBuilders {
      * @param configuration the initial configuration.
      * @param method        the target method.
      * @return the modified configuration.
-     * @see com.github.dm.jrt.annotation.ShareGroup ShareGroup
+     * @see com.github.dm.jrt.annotation.SharedVars SharedVars
      */
     @NotNull
     public static ProxyConfiguration configurationWithAnnotations(
@@ -231,11 +253,11 @@ public class RoutineBuilders {
 
         final ProxyConfiguration.Builder<ProxyConfiguration> builder =
                 ProxyConfiguration.builderFrom(configuration);
-        final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+        final SharedVars sharedVarsAnnotation = method.getAnnotation(SharedVars.class);
 
-        if (shareGroupAnnotation != null) {
+        if (sharedVarsAnnotation != null) {
 
-            builder.withShareGroup(shareGroupAnnotation.value());
+            builder.withSharedVars(sharedVarsAnnotation.value());
         }
 
         return builder.set();
@@ -505,38 +527,69 @@ public class RoutineBuilders {
     }
 
     /**
-     * Returns the cached mutex associated with the specified target and share group.<br/>
+     * Returns the cached mutex associated with the specified target and shared variables.<br/>
      * If the cache was empty, it is filled with a new object automatically created.
      *
      * @param target     the target object instance.
-     * @param shareGroup the share group name.
+     * @param sharedVars the shared variable names.
      * @return the cached mutex.
      */
     @NotNull
-    public static Object getSharedMutex(@NotNull final Object target,
-            @Nullable final String shareGroup) {
+    public static Mutex getSharedMutex(@NotNull final Object target,
+            @Nullable final List<String> sharedVars) {
 
-        synchronized (sMutexes) {
+        if (sharedVars == null) {
 
-            final WeakIdentityHashMap<Object, Map<String, Object>> mutexCache = sMutexes;
-            Map<String, Object> mutexMap = mutexCache.get(target);
+            synchronized (sDefaultLocks) {
 
-            if (mutexMap == null) {
+                final WeakIdentityHashMap<Object, ReentrantLock> defaultLocks = sDefaultLocks;
+                ReentrantLock defaultLock = defaultLocks.get(target);
 
-                mutexMap = new HashMap<String, Object>();
-                mutexCache.put(target, mutexMap);
+                if (defaultLock == null) {
+
+                    defaultLock = new ReentrantLock();
+                    defaultLocks.put(target, defaultLock);
+                }
+
+                return new BuilderMutex(new ReentrantLock[]{defaultLock});
+            }
+        }
+
+        if (sharedVars.isEmpty()) {
+
+            return NO_MUTEX;
+        }
+
+        synchronized (sLocks) {
+
+            final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> locksCache = sLocks;
+            Map<String, ReentrantLock> lockMap = locksCache.get(target);
+
+            if (lockMap == null) {
+
+                lockMap = new HashMap<String, ReentrantLock>();
+                locksCache.put(target, lockMap);
             }
 
-            final String groupName = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
-            Object mutex = mutexMap.get(groupName);
+            final TreeSet<String> nameSet = new TreeSet<String>(sharedVars);
+            final int size = nameSet.size();
+            final ReentrantLock[] locks = new ReentrantLock[size];
+            int i = 0;
 
-            if (mutex == null) {
+            for (final String name : nameSet) {
 
-                mutex = new Object();
-                mutexMap.put(groupName, mutex);
+                ReentrantLock lock = lockMap.get(name);
+
+                if (lock == null) {
+
+                    lock = new ReentrantLock();
+                    lockMap.put(name, lock);
+                }
+
+                locks[i++] = lock;
             }
 
-            return mutex;
+            return new BuilderMutex(locks);
         }
     }
 
@@ -911,6 +964,43 @@ public class RoutineBuilders {
             this.invocationMode = invocationMode;
             this.inputMode = inputMode;
             this.outputMode = outputMode;
+        }
+    }
+
+    /**
+     * Mutex implementation.
+     */
+    private static class BuilderMutex implements Mutex {
+
+        private final ReentrantLock[] mLocks;
+
+        /**
+         * Constructor.
+         *
+         * @param locks the locks.
+         */
+        private BuilderMutex(@NotNull final ReentrantLock[] locks) {
+
+            mLocks = locks;
+        }
+
+        public void acquire() {
+
+            for (final ReentrantLock lock : mLocks) {
+
+                lock.lock();
+            }
+        }
+
+        public void release() {
+
+            final ReentrantLock[] locks = mLocks;
+            final int length = locks.length;
+
+            for (int i = length - 1; i >= 0; --i) {
+
+                locks[i].unlock();
+            }
         }
     }
 }

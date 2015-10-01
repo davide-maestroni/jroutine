@@ -323,7 +323,7 @@ public class ProxyRoutineTest {
     }
 
     @Test
-    public void testShareGroup() {
+    public void testSharedVars() {
 
         final TestClass2 test = new TestClass2();
         final ProxyRoutineBuilder builder = JRoutineProxy.on(instance(test))
@@ -334,12 +334,12 @@ public class ProxyRoutineTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne = builder.proxies()
-                                               .withShareGroup("1")
+                                               .withSharedVars("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
         OutputChannel<Integer> getTwo = builder.proxies()
-                                               .withShareGroup("2")
+                                               .withSharedVars("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getTwo();

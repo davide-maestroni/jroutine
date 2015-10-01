@@ -40,7 +40,7 @@ public interface ServiceProxyRoutineBuilder
      * {@link com.github.dm.jrt.annotation.Invoke Invoke},
      * {@link com.github.dm.jrt.annotation.Output Output},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -72,7 +72,7 @@ public interface ServiceProxyRoutineBuilder
      * {@link com.github.dm.jrt.annotation.Invoke Invoke},
      * {@link com.github.dm.jrt.annotation.Output Output},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
+     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.

@@ -377,7 +377,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    public void testShareGroup() {
+    public void testSharedVars() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -396,12 +396,12 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne = builder.proxies()
-                                               .withShareGroup("1")
+                                               .withSharedVars("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
         OutputChannel<Integer> getTwo = builder.proxies()
-                                               .withShareGroup("2")
+                                               .withSharedVars("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getTwo();

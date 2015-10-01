@@ -15,7 +15,6 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.Output.OutputMode;
-import com.github.dm.jrt.annotation.ShareGroup;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
@@ -27,6 +26,7 @@ import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
+import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -230,7 +230,7 @@ class DefaultObjectRoutineBuilder
 
         private final Method mMethod;
 
-        private final Object mMutex;
+        private final Mutex mMutex;
 
         private final OutputMode mOutputMode;
 
@@ -252,15 +252,14 @@ class DefaultObjectRoutineBuilder
             final Object mutexTarget =
                     (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass()
                             : target.getTarget();
-            final String shareGroup = proxyConfiguration.getShareGroupOr(null);
 
-            if ((mutexTarget != null) && !ShareGroup.NONE.equals(shareGroup)) {
+            if (mutexTarget != null) {
 
-                mMutex = getSharedMutex(mutexTarget, shareGroup);
+                mMutex = getSharedMutex(mutexTarget, proxyConfiguration.getSharedVarsOr(null));
 
             } else {
 
-                mMutex = this;
+                mMutex = Mutex.NO_MUTEX;
             }
 
             mTarget = target;

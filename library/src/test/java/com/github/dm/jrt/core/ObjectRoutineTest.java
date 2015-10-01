@@ -22,7 +22,7 @@ import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.ShareGroup;
+import com.github.dm.jrt.annotation.SharedVars;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -632,7 +632,7 @@ public class ObjectRoutineTest {
                                                          .withMaxInstances(1)
                                                          .set()
                                                          .proxies()
-                                                         .withShareGroup("test")
+                                                         .withSharedVars("test")
                                                          .set()
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
@@ -1198,7 +1198,7 @@ public class ObjectRoutineTest {
     }
 
     @Test
-    public void testShareGroup() throws NoSuchMethodException {
+    public void testSharedVars() throws NoSuchMethodException {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder =
@@ -1207,9 +1207,9 @@ public class ObjectRoutineTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
+                builder.proxies().withSharedVars("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
+                builder.proxies().withSharedVars("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1226,7 +1226,7 @@ public class ObjectRoutineTest {
     }
 
     @Test
-    public void testShareGroup2() throws NoSuchMethodException {
+    public void testSharedVars2() throws NoSuchMethodException {
 
         final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
                                                      .invocations()
@@ -1236,9 +1236,9 @@ public class ObjectRoutineTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
+                builder.proxies().withSharedVars("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
+                builder.proxies().withSharedVars("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1265,7 +1265,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(0)
                                                          .set()
                                                          .proxies()
-                                                         .withShareGroup("test")
+                                                         .withSharedVars("test")
                                                          .set()
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
@@ -1976,7 +1976,7 @@ public class ObjectRoutineTest {
         @Timeout(1000)
         int computeAsync(@Input(int.class) OutputChannel<Integer> i);
 
-        @ShareGroup(ShareGroup.NONE)
+        @SharedVars({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
@@ -1989,14 +1989,14 @@ public class ObjectRoutineTest {
         OutputChannel<Integer> computeParallel2(
                 @Input(value = int.class, mode = InputMode.ELEMENT) Integer... i);
 
-        @ShareGroup(ShareGroup.NONE)
+        @SharedVars({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
         OutputChannel<Integer> computeParallel3(
                 @Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
 
-        @ShareGroup(ShareGroup.NONE)
+        @SharedVars({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output

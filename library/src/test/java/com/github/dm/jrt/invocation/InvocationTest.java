@@ -395,7 +395,8 @@ public class InvocationTest {
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFunction().hashCode());
         assertThat(consumerInvocation(sink)).isEqualTo(consumerInvocation(sink));
-        assertThat(consumerInvocation(sink).hashCode()).isEqualTo(consumerInvocation(sink).hashCode());
+        assertThat(consumerInvocation(sink).hashCode()).isEqualTo(
+                consumerInvocation(sink).hashCode());
     }
 
     @Test

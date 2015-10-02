@@ -69,7 +69,7 @@ public class ByteChannel {
      * @param corePoolSize   the maximum number of retained data buffers.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    protected ByteChannel(final int dataBufferSize, final int corePoolSize) {
+    private ByteChannel(final int dataBufferSize, final int corePoolSize) {
 
         if (dataBufferSize < 1) {
 

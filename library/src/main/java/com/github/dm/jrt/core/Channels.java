@@ -1091,11 +1091,11 @@ public class Channels {
      */
     private static class JoinOutputConsumer<OUT> implements OutputConsumer<Selectable<OUT>> {
 
-        protected final IOChannel<List<? extends OUT>, List<? extends OUT>> mChannel;
-
-        protected final SimpleQueue<OUT>[] mQueues;
+        private final IOChannel<List<? extends OUT>, List<? extends OUT>> mChannel;
 
         private final boolean mIsFlush;
+
+        private final SimpleQueue<OUT>[] mQueues;
 
         /**
          * Constructor.

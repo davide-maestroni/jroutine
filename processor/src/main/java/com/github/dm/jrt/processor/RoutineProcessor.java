@@ -221,7 +221,6 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final Element element : ElementFilter.typesIn(
                     roundEnvironment.getElementsAnnotatedWith(annotationElement))) {
 
-                // TODO: 02/10/15 inherited methods...
                 if (element.getKind() != ElementKind.INTERFACE) {
 
                     processingEnv.getMessager()
@@ -1527,13 +1526,14 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
-     * Checks if the specified methods have the same parameters.
+     * Checks if the specified methods have assignable parameters, that is, all the parameters of
+     * the first method can be assigned to the ones of the second in the same order.
      *
      * @param firstMethodElement  the first method element.
      * @param secondMethodElement the second method element.
      * @return whether the methods have the same parameters.
      */
-    protected boolean haveSameParameters(@NotNull final ExecutableElement firstMethodElement,
+    protected boolean haveAssignableParameters(@NotNull final ExecutableElement firstMethodElement,
             @NotNull final ExecutableElement secondMethodElement) {
 
         final List<? extends VariableElement> firstTypeParameters =
@@ -1554,7 +1554,8 @@ public class RoutineProcessor extends AbstractProcessor {
             final TypeMirror firstType = firstTypeParameters.get(i).asType();
             final TypeMirror secondType = secondTypeParameters.get(i).asType();
 
-            if (!typeUtils.isSameType(firstType, secondType)) {
+            if (!typeUtils.isAssignable(typeUtils.erasure(firstType),
+                                        typeUtils.erasure(secondType))) {
 
                 return false;
             }
@@ -1804,6 +1805,8 @@ public class RoutineProcessor extends AbstractProcessor {
     private void mergeParentMethods(@NotNull final List<ExecutableElement> methods,
             @NotNull final List<ExecutableElement> parentMethods) {
 
+        final Types typeUtils = processingEnv.getTypeUtils();
+
         for (final ExecutableElement parentMethod : parentMethods) {
 
             boolean isOverride = false;
@@ -1811,9 +1814,11 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement method : methods) {
 
                 if (parentMethod.getSimpleName().equals(method.getSimpleName())
-                        && parentMethod.getReturnType().equals(method.getReturnType())) {
+                        && typeUtils.isAssignable(typeUtils.erasure(method.getReturnType()),
+                                                  typeUtils.erasure(
+                                                          parentMethod.getReturnType()))) {
 
-                    if (haveSameParameters(parentMethod, method)) {
+                    if (haveAssignableParameters(method, parentMethod)) {
 
                         isOverride = true;
                         break;
@@ -1879,10 +1884,11 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             final TypeMirror returnType = methodElement.getReturnType();
+            final TypeMirror returnErasure = typeUtils.erasure(returnType);
 
-            if (!typeUtils.isAssignable(streamingChannelType, typeUtils.erasure(returnType))
-                    && !typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
-                    && !typeUtils.isAssignable(routineType, typeUtils.erasure(returnType))) {
+            if (!typeUtils.isAssignable(streamingChannelType, returnErasure)
+                    && !typeUtils.isAssignable(invocationChannelType, returnErasure)
+                    && !typeUtils.isAssignable(routineType, returnErasure)) {
 
                 throw new IllegalArgumentException(
                         "the proxy method has incompatible return type: " + methodElement);
@@ -1891,12 +1897,11 @@ public class RoutineProcessor extends AbstractProcessor {
             inputMode = InputMode.CHANNEL;
             outputMode = OutputMode.CHANNEL;
 
-            if (typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))) {
+            if (typeUtils.isAssignable(invocationChannelType, returnErasure)) {
 
                 method = getMethodInputsChannelTemplate(methodElement, count);
 
-            } else if (typeUtils.isAssignable(streamingChannelType,
-                                              typeUtils.erasure(returnType))) {
+            } else if (typeUtils.isAssignable(streamingChannelType, returnErasure)) {
 
                 method = getMethodInputsStreamTemplate(methodElement, count);
 

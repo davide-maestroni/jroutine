@@ -33,7 +33,7 @@
 
             } else {
 
-                mMutex = new com.github.dm.jrt.util.Mutex.NO_MUTEX;
+                mMutex = com.github.dm.jrt.util.Mutex.NO_MUTEX;
             }
 
             mTarget = target;

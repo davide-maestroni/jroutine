@@ -33,6 +33,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
+import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
@@ -61,28 +62,17 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class RoutineBuilders {
 
-    private static final Mutex NO_MUTEX = new Mutex() {
-
-        public void acquire() {
-
-        }
-
-        public void release() {
-
-        }
-    };
-
     private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasMethods =
             new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
-
-    private static final WeakIdentityHashMap<Object, ReentrantLock> sDefaultLocks =
-            new WeakIdentityHashMap<Object, ReentrantLock>();
 
     private static final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> sLocks =
             new WeakIdentityHashMap<Object, Map<String, ReentrantLock>>();
 
     private static final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> sMethods =
             new WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>>();
+
+    private static final WeakIdentityHashMap<Object, ExchangeMutex> sMutexes =
+            new WeakIdentityHashMap<Object, ExchangeMutex>();
 
     /**
      * Avoid direct instantiation.
@@ -538,26 +528,28 @@ public class RoutineBuilders {
     public static Mutex getSharedMutex(@NotNull final Object target,
             @Nullable final List<String> sharedVars) {
 
-        if (sharedVars == null) {
+        if ((sharedVars != null) && sharedVars.isEmpty()) {
 
-            synchronized (sDefaultLocks) {
+            return Mutex.NO_MUTEX;
+        }
 
-                final WeakIdentityHashMap<Object, ReentrantLock> defaultLocks = sDefaultLocks;
-                ReentrantLock defaultLock = defaultLocks.get(target);
+        ExchangeMutex exchangeMutex;
 
-                if (defaultLock == null) {
+        synchronized (sMutexes) {
 
-                    defaultLock = new ReentrantLock();
-                    defaultLocks.put(target, defaultLock);
-                }
+            final WeakIdentityHashMap<Object, ExchangeMutex> mutexes = sMutexes;
+            exchangeMutex = mutexes.get(target);
 
-                return new BuilderMutex(new ReentrantLock[]{defaultLock});
+            if (exchangeMutex == null) {
+
+                exchangeMutex = new ExchangeMutex();
+                mutexes.put(target, exchangeMutex);
             }
         }
 
-        if (sharedVars.isEmpty()) {
+        if (sharedVars == null) {
 
-            return NO_MUTEX;
+            return exchangeMutex;
         }
 
         synchronized (sLocks) {
@@ -589,7 +581,7 @@ public class RoutineBuilders {
                 locks[i++] = lock;
             }
 
-            return new BuilderMutex(locks);
+            return new BuilderMutex(exchangeMutex, locks);
         }
     }
 
@@ -974,17 +966,24 @@ public class RoutineBuilders {
 
         private final ReentrantLock[] mLocks;
 
+        private final ExchangeMutex mMutex;
+
         /**
          * Constructor.
          *
+         * @param mutex the exchange mutex.
          * @param locks the locks.
          */
-        private BuilderMutex(@NotNull final ReentrantLock[] locks) {
+        private BuilderMutex(@NotNull final ExchangeMutex mutex,
+                @NotNull final ReentrantLock[] locks) {
 
+            mMutex = mutex;
             mLocks = locks;
         }
 
         public void acquire() {
+
+            mMutex.acquirePartialMutex();
 
             for (final ReentrantLock lock : mLocks) {
 
@@ -1000,6 +999,90 @@ public class RoutineBuilders {
             for (int i = length - 1; i >= 0; --i) {
 
                 locks[i].unlock();
+            }
+
+            mMutex.releasePartialMutex();
+        }
+    }
+
+    /**
+     * Class used to synchronize between partial and full mutexes.
+     */
+    private static class ExchangeMutex implements Mutex {
+
+        private final ReentrantLock mLock = new ReentrantLock();
+
+        private final Object mMutex = new Object();
+
+        private int mFullMutexCount;
+
+        private int mPartialMutexCount;
+
+        /**
+         * Acquires a partial mutex making sure that no full one is already taken.
+         */
+        public void acquirePartialMutex() {
+
+            try {
+
+                synchronized (mMutex) {
+
+                    while (mFullMutexCount > 0) {
+
+                        mMutex.wait();
+                    }
+
+                    ++mPartialMutexCount;
+                }
+
+            } catch (final InterruptedException e) {
+
+                InvocationInterruptedException.ignoreIfPossible(e);
+            }
+        }
+
+        /**
+         * Releases a partial mutex.
+         */
+        public void releasePartialMutex() {
+
+            synchronized (mMutex) {
+
+                --mPartialMutexCount;
+                mMutex.notifyAll();
+            }
+        }
+
+        public void acquire() {
+
+            try {
+
+                synchronized (mMutex) {
+
+                    while (mPartialMutexCount > 0) {
+
+                        mMutex.wait();
+                    }
+
+                    ++mFullMutexCount;
+                }
+
+                mLock.lock();
+
+            } catch (final InterruptedException e) {
+
+                InvocationInterruptedException.ignoreIfPossible(e);
+            }
+        }
+
+        public void release() {
+
+            mLock.unlock();
+
+            synchronized (mMutex) {
+
+                --mFullMutexCount;
+                mMutex.notifyAll();
             }
         }
     }

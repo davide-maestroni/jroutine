@@ -60,9 +60,9 @@ import java.lang.annotation.Target;
 public @interface SharedFields {
 
     /**
-     * The shared variable names associated with the annotated method.
+     * The shared field names associated with the annotated method.
      *
-     * @return the variable names.
+     * @return the field names.
      */
     String[] value();
 }

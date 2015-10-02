@@ -189,7 +189,7 @@
 
                 final ClassRoutineBuilder builder =
                         on(classOfType(Main.class)).proxies()
-                                                   .withSharedVars()
+                                                   .withSharedFields()
                                                    .set()
                                                    .invocations()
                                                    .withExecutionTimeout(TimeDuration.INFINITY)
@@ -248,7 +248,7 @@
 
                 final Main main = new Main();
                 final AsyncMain proxy = on(instance(main)).proxies()
-                                                          .withSharedVars()
+                                                          .withSharedFields()
                                                           .set()
                                                           .invocations()
                                                           .withExecutionTimeout(TimeDuration.INFINITY)

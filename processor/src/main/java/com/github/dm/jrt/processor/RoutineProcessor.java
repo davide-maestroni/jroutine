@@ -22,7 +22,7 @@ import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.SharedVars;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
@@ -221,6 +221,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final Element element : ElementFilter.typesIn(
                     roundEnvironment.getElementsAnnotatedWith(annotationElement))) {
 
+                // TODO: 02/10/15 inherited methods...
                 if (element.getKind() != ElementKind.INTERFACE) {
 
                     processingEnv.getMessager()
@@ -1994,11 +1995,11 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
                                             buildRoutineOptions(methodElement));
-        final SharedVars sharedVarsAnnotation = methodElement.getAnnotation(SharedVars.class);
+        final SharedFields sharedFieldsAnnotation = methodElement.getAnnotation(SharedFields.class);
 
-        if (sharedVarsAnnotation != null) {
+        if (sharedFieldsAnnotation != null) {
 
-            final String[] names = sharedVarsAnnotation.value();
+            final String[] names = sharedFieldsAnnotation.value();
             final StringBuilder builder = new StringBuilder("Arrays.asList(");
             final int length = names.length;
 
@@ -2013,12 +2014,12 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             builder.append(")");
-            methodHeader = methodHeader.replace("${sharedVars}", builder.toString());
+            methodHeader = methodHeader.replace("${sharedFields}", builder.toString());
 
         } else {
 
-            methodHeader = methodHeader.replace("${sharedVars}",
-                                                "proxyConfiguration.getSharedVarsOr(null)");
+            methodHeader = methodHeader.replace("${sharedFields}",
+                                                "proxyConfiguration.getSharedFieldsOr(null)");
         }
 
         writer.append(methodHeader);
@@ -2053,9 +2054,9 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocationHeader =
                 methodInvocationHeader.replace("${genericTypes}", buildGenericTypes(element));
 
-        if (sharedVarsAnnotation != null) {
+        if (sharedFieldsAnnotation != null) {
 
-            final String[] names = sharedVarsAnnotation.value();
+            final String[] names = sharedFieldsAnnotation.value();
             final StringBuilder builder = new StringBuilder("Arrays.asList(");
             final int length = names.length;
 
@@ -2071,13 +2072,13 @@ public class RoutineProcessor extends AbstractProcessor {
 
             builder.append(")");
             methodInvocationHeader =
-                    methodInvocationHeader.replace("${sharedVars}", builder.toString());
+                    methodInvocationHeader.replace("${sharedFields}", builder.toString());
 
         } else {
 
-            methodInvocationHeader = methodInvocationHeader.replace("${sharedVars}",
+            methodInvocationHeader = methodInvocationHeader.replace("${sharedFields}",
                                                                     "proxyConfiguration"
-                                                                            + ".getSharedVarsOr"
+                                                                            + ".getSharedFieldsOr"
                                                                             + "(null)");
         }
 

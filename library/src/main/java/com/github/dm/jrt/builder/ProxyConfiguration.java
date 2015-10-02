@@ -27,12 +27,10 @@ import java.util.List;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
  * <p/>
- * The configuration has a list of shared variables associated. Every method accessing a specific
- * variable is protected so that the related member fields can be safely accessed only from the
- * other methods sharing the same variable name. That means that the invocation of methods with the
- * same variable name cannot happen in parallel. In a dual way, methods whose variable names do not
- * overlap can be invoked in parallel, though, they should not access the same member fields in
- * order to avoid concurrency issues.
+ * The configuration has a list of shared fields associated. Every method accessing a specific
+ * set of fields is protected so that the related variables can be accessed in a thread safe way.
+ * By default all fields are protected.<br/>
+ * Note however that methods sharing the same fields cannot be executed in parallel.
  * <p/>
  * Created by davide-maestroni on 04/20/2015.
  */
@@ -45,16 +43,16 @@ public final class ProxyConfiguration {
      */
     public static final ProxyConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
-    private final List<String> mVarNames;
+    private final List<String> mFieldNames;
 
     /**
      * Constructor.
      *
-     * @param varNames the shared variable names.
+     * @param fieldNames the shared field names.
      */
-    private ProxyConfiguration(@Nullable final List<String> varNames) {
+    private ProxyConfiguration(@Nullable final List<String> fieldNames) {
 
-        mVarNames = varNames;
+        mFieldNames = fieldNames;
     }
 
     /**
@@ -94,22 +92,22 @@ public final class ProxyConfiguration {
     }
 
     /**
-     * Returns the shared variable names (null by default).
+     * Returns the shared field names (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
-     * @return the variable names.
+     * @return the field names.
      */
-    public List<String> getSharedVarsOr(@Nullable final List<String> valueIfNotSet) {
+    public List<String> getSharedFieldsOr(@Nullable final List<String> valueIfNotSet) {
 
-        final List<String> varNames = mVarNames;
-        return (varNames != null) ? varNames : valueIfNotSet;
+        final List<String> fieldNames = mFieldNames;
+        return (fieldNames != null) ? fieldNames : valueIfNotSet;
     }
 
     @Override
     public int hashCode() {
 
         // AUTO-GENERATED CODE
-        return mVarNames != null ? mVarNames.hashCode() : 0;
+        return mFieldNames != null ? mFieldNames.hashCode() : 0;
     }
 
     @Override
@@ -127,7 +125,8 @@ public final class ProxyConfiguration {
         }
 
         final ProxyConfiguration that = (ProxyConfiguration) o;
-        return !(mVarNames != null ? !mVarNames.equals(that.mVarNames) : that.mVarNames != null);
+        return !(mFieldNames != null ? !mFieldNames.equals(that.mFieldNames)
+                : that.mFieldNames != null);
     }
 
     @Override
@@ -135,7 +134,7 @@ public final class ProxyConfiguration {
 
         // AUTO-GENERATED CODE
         return "ProxyConfiguration{" +
-                "mVarNames='" + mVarNames + '\'' +
+                "mFieldNames='" + mFieldNames + '\'' +
                 '}';
     }
 
@@ -165,7 +164,7 @@ public final class ProxyConfiguration {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private List<String> mVarNames;
+        private List<String> mFieldNames;
 
         /**
          * Constructor.
@@ -230,54 +229,52 @@ public final class ProxyConfiguration {
                 return this;
             }
 
-            final List<String> varNames = configuration.mVarNames;
+            final List<String> fieldNames = configuration.mFieldNames;
 
-            if (varNames != null) {
+            if (fieldNames != null) {
 
-                withSharedVars(varNames);
+                withSharedFields(fieldNames);
             }
 
             return this;
         }
 
         /**
-         * Sets the share variable names. A null value means that it is up to the specific
-         * implementation to choose a default.
+         * Sets the shared field names. A null value means that all fields are shared.
          *
-         * @param varNames the variable names.
+         * @param fieldNames the field names.
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withSharedVars(@Nullable final String... varNames) {
+        public Builder<TYPE> withSharedFields(@Nullable final String... fieldNames) {
 
-            mVarNames = (varNames != null) ? Arrays.asList(varNames) : null;
+            mFieldNames = (fieldNames != null) ? Arrays.asList(fieldNames) : null;
             return this;
         }
 
         /**
-         * Sets the share variable names. A null value means that it is up to the specific
-         * implementation to choose a default.
+         * Sets the shared field names. A null value means that all fields are shared.
          *
-         * @param varNames the variable names.
+         * @param fieldNames the field names.
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withSharedVars(@Nullable final List<String> varNames) {
+        public Builder<TYPE> withSharedFields(@Nullable final List<String> fieldNames) {
 
-            mVarNames = (varNames != null) ? Collections.unmodifiableList(
-                    new ArrayList<String>(varNames)) : null;
+            mFieldNames = (fieldNames != null) ? Collections.unmodifiableList(
+                    new ArrayList<String>(fieldNames)) : null;
             return this;
         }
 
         @NotNull
         private ProxyConfiguration buildConfiguration() {
 
-            return new ProxyConfiguration(mVarNames);
+            return new ProxyConfiguration(mFieldNames);
         }
 
         private void setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
-            mVarNames = configuration.mVarNames;
+            mFieldNames = configuration.mFieldNames;
         }
     }
 

@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.android.proxy.annotation;
 
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 
 import java.lang.annotation.ElementType;
@@ -33,7 +34,7 @@ import java.lang.annotation.Target;
  * {@link com.github.dm.jrt.annotation.Invoke Invoke},
  * {@link com.github.dm.jrt.annotation.Output Output},
  * {@link com.github.dm.jrt.annotation.Priority Priority},
- * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
+ * {@link SharedFields SharedFields},
  * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
  * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations defined for each
  * interface method.

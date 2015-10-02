@@ -583,12 +583,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 final Object mutexTarget =
                         (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
                                 : target.getTarget();
-
-                if (mutexTarget != null) {
-
-                    mMutex = getSharedMutex(mutexTarget, mProxyConfiguration.getSharedVarsOr(null));
-                }
-
+                mMutex = getSharedMutex(mutexTarget, mProxyConfiguration.getSharedFieldsOr(null));
                 mInstance = target.getTarget();
 
             } catch (final Throwable t) {

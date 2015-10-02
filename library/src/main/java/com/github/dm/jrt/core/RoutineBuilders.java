@@ -22,7 +22,7 @@ import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.SharedVars;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -235,7 +235,7 @@ public class RoutineBuilders {
      * @param configuration the initial configuration.
      * @param method        the target method.
      * @return the modified configuration.
-     * @see com.github.dm.jrt.annotation.SharedVars SharedVars
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
      */
     @NotNull
     public static ProxyConfiguration configurationWithAnnotations(
@@ -243,11 +243,11 @@ public class RoutineBuilders {
 
         final ProxyConfiguration.Builder<ProxyConfiguration> builder =
                 ProxyConfiguration.builderFrom(configuration);
-        final SharedVars sharedVarsAnnotation = method.getAnnotation(SharedVars.class);
+        final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
 
-        if (sharedVarsAnnotation != null) {
+        if (sharedFieldsAnnotation != null) {
 
-            builder.withSharedVars(sharedVarsAnnotation.value());
+            builder.withSharedFields(sharedFieldsAnnotation.value());
         }
 
         return builder.set();
@@ -517,18 +517,19 @@ public class RoutineBuilders {
     }
 
     /**
-     * Returns the cached mutex associated with the specified target and shared variables.<br/>
-     * If the cache was empty, it is filled with a new object automatically created.
+     * Returns the cached mutex associated with the specified target and shared fields.<br/>
+     * If the cache was empty, it is filled with a new object automatically created.<br/>
+     * If the target is null {@link Mutex#NO_MUTEX} will be returned.
      *
-     * @param target     the target object instance.
-     * @param sharedVars the shared variable names.
+     * @param target       the target object instance.
+     * @param sharedFields the shared field names.
      * @return the cached mutex.
      */
     @NotNull
-    public static Mutex getSharedMutex(@NotNull final Object target,
-            @Nullable final List<String> sharedVars) {
+    public static Mutex getSharedMutex(@Nullable final Object target,
+            @Nullable final List<String> sharedFields) {
 
-        if ((sharedVars != null) && sharedVars.isEmpty()) {
+        if ((target == null) || ((sharedFields != null) && sharedFields.isEmpty())) {
 
             return Mutex.NO_MUTEX;
         }
@@ -547,7 +548,7 @@ public class RoutineBuilders {
             }
         }
 
-        if (sharedVars == null) {
+        if (sharedFields == null) {
 
             return exchangeMutex;
         }
@@ -563,7 +564,7 @@ public class RoutineBuilders {
                 locksCache.put(target, lockMap);
             }
 
-            final TreeSet<String> nameSet = new TreeSet<String>(sharedVars);
+            final TreeSet<String> nameSet = new TreeSet<String>(sharedFields);
             final int size = nameSet.size();
             final ReentrantLock[] locks = new ReentrantLock[size];
             int i = 0;

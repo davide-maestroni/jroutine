@@ -252,16 +252,7 @@ class DefaultObjectRoutineBuilder
             final Object mutexTarget =
                     (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass()
                             : target.getTarget();
-
-            if (mutexTarget != null) {
-
-                mMutex = getSharedMutex(mutexTarget, proxyConfiguration.getSharedVarsOr(null));
-
-            } else {
-
-                mMutex = Mutex.NO_MUTEX;
-            }
-
+            mMutex = getSharedMutex(mutexTarget, proxyConfiguration.getSharedFieldsOr(null));
             mTarget = target;
             mMethod = method;
             mInputMode = inputMode;

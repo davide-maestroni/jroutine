@@ -25,16 +25,6 @@
         private Invocation${methodCount}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
                  @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget<?> target) {
 
-            final Object mutexTarget = ${mutexTarget};
-
-            if (mutexTarget != null) {
-
-                mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, ${sharedVars});
-
-            } else {
-
-                mMutex = com.github.dm.jrt.util.Mutex.NO_MUTEX;
-            }
-
+            mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, ${sharedFields});
             mTarget = target;
         }

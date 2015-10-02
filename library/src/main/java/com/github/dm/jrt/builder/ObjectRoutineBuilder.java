@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  * @see com.github.dm.jrt.annotation.Invoke Invoke
  * @see com.github.dm.jrt.annotation.Output Output
  * @see com.github.dm.jrt.annotation.Priority Priority
- * @see com.github.dm.jrt.annotation.SharedVars SharedVars
+ * @see com.github.dm.jrt.annotation.SharedFields SharedFields
  * @see com.github.dm.jrt.annotation.Timeout Timeout
  * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
  */
@@ -42,7 +42,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * Returns a routine used to call the method whose identifying name is specified in a
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation.<br/>
      * Optional {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
+     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
      * honored.<br/>
@@ -66,7 +66,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.github.dm.jrt.annotation.Alias Alias},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
+     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -95,7 +95,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.github.dm.jrt.annotation.Alias Alias},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
+     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -124,7 +124,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * The method is searched via reflection ignoring a name specified in a
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
+     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
      * honored.<br/>
@@ -147,7 +147,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * The method is invoked ignoring a name specified in a
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
+     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} method annotations will be
      * honored.<br/>

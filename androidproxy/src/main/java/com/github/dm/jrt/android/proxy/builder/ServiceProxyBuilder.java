@@ -14,6 +14,7 @@
 package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.builder.ServiceConfigurableBuilder;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
@@ -41,7 +42,7 @@ public interface ServiceProxyBuilder<TYPE>
      * {@link com.github.dm.jrt.annotation.Invoke Invoke},
      * {@link com.github.dm.jrt.annotation.Output Output},
      * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedVars SharedVars},
+     * {@link SharedFields SharedFields},
      * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
      * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.

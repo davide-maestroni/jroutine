@@ -32,7 +32,7 @@ import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
-import com.github.dm.jrt.annotation.SharedVars;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -267,7 +267,7 @@ public class LoaderObjectRoutineFragmentTest
                 .with(configuration)
                 .set()
                 .proxies()
-                .withSharedVars("test")
+                .withSharedFields("test")
                 .set()
                 .aliasMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
@@ -278,7 +278,7 @@ public class LoaderObjectRoutineFragmentTest
                 .with(configuration)
                 .set()
                 .proxies()
-                .withSharedVars("test")
+                .withSharedFields("test")
                 .set()
                 .buildProxy(SquareItf.class)
                 .compute(3);
@@ -691,7 +691,7 @@ public class LoaderObjectRoutineFragmentTest
                                                          .withMaxInstances(1)
                                                          .set()
                                                          .proxies()
-                                                         .withSharedVars("test")
+                                                         .withSharedFields("test")
                                                          .set()
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
@@ -1153,7 +1153,7 @@ public class LoaderObjectRoutineFragmentTest
         assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
     }
 
-    public void testSharedVars() throws NoSuchMethodException {
+    public void testSharedFields() throws NoSuchMethodException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -1172,9 +1172,9 @@ public class LoaderObjectRoutineFragmentTest
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withSharedVars("1").set().method("getOne").asyncCall();
+                builder.proxies().withSharedFields("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withSharedVars("2").set().method("getTwo").asyncCall();
+                builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1856,7 +1856,7 @@ public class LoaderObjectRoutineFragmentTest
         @Timeout(10000)
         int computeAsync(@Input(int.class) OutputChannel<Integer> i);
 
-        @SharedVars({})
+        @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
@@ -1869,14 +1869,14 @@ public class LoaderObjectRoutineFragmentTest
         OutputChannel<Integer> computeParallel2(
                 @Input(value = int.class, mode = InputMode.ELEMENT) Integer... i);
 
-        @SharedVars({})
+        @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
         OutputChannel<Integer> computeParallel3(
                 @Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
 
-        @SharedVars({})
+        @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output

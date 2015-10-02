@@ -27,12 +27,11 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
  * <p/>
- * Through this annotation, it is possible to exclude single methods from this kind of protection,
- * by indicating them as having a different shared variables. Every method sharing the same variable
- * names is protected so that related member fields can be safely accessed. That means that the
- * invocation of with the same variable name cannot happen in parallel. In a dual way, methods whose
- * variable names do not overlap can be invoked in parallel, though, they should not access the same
- * member fields in order to avoid concurrency issues.
+ * This annotation is meant to have a finer control on this kind of protection. Each method can be
+ * associated to specific fields accessed by the implementation, so that, shared ones are
+ * guaranteed to be handled in a thread safe way. By default, that is when this annotation is
+ * missing, all fields are protected.<br/>
+ * Note that methods sharing the same fields cannot be executed in parallel.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
@@ -46,7 +45,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.SharedVars *;
+ *              &#64;com.github.dm.jrt.annotation.SharedFields *;
  *         }
  *     </code>
  * </pre>
@@ -58,7 +57,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SharedVars {
+public @interface SharedFields {
 
     /**
      * The shared variable names associated with the annotated method.

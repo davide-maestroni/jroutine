@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.Output.OutputMode;
-import com.github.dm.jrt.annotation.SharedVars;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -103,6 +103,20 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         mTarget = target;
     }
 
+    @Nullable
+    private static List<String> fieldsWithShareAnnotation(
+            @NotNull final ProxyConfiguration configuration, @NotNull final Method method) {
+
+        final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
+
+        if (sharedFieldsAnnotation != null) {
+
+            return Arrays.asList(sharedFieldsAnnotation.value());
+        }
+
+        return configuration.getSharedFieldsOr(null);
+    }
+
     @NotNull
     private static Class<?>[] forNames(@NotNull final String[] names) throws
             ClassNotFoundException {
@@ -144,20 +158,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return names;
     }
 
-    @Nullable
-    private static List<String> varsWithShareAnnotation(
-            @NotNull final ProxyConfiguration configuration, @NotNull final Method method) {
-
-        final SharedVars sharedVarsAnnotation = method.getAnnotation(SharedVars.class);
-
-        if (sharedVarsAnnotation != null) {
-
-            return Arrays.asList(sharedVarsAnnotation.value());
-        }
-
-        return configuration.getSharedVarsOr(null);
-    }
-
     @NotNull
     public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
 
@@ -170,8 +170,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     "no annotated method with alias '" + name + "' has been found");
         }
 
-        final List<String> sharedVars = varsWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{sharedVars, target, name};
+        final List<String> sharedFields =
+                fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
+        final Object[] args = new Object[]{sharedFields, target, name};
         return JRoutine.with(mContext)
                        .on(factoryOf(new MethodAliasToken<IN, OUT>(), args))
                        .invocations()
@@ -209,8 +210,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
-        final List<String> sharedVars = varsWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{sharedVars, target, name, toNames(parameterTypes)};
+        final List<String> sharedFields =
+                fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
+        final Object[] args = new Object[]{sharedFields, target, name, toNames(parameterTypes)};
         return JRoutine.with(mContext)
                        .on(factoryOf(new MethodSignatureToken<IN, OUT>(), args))
                        .invocations()
@@ -301,7 +303,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final String mAliasName;
 
-        private final List<String> mSharedVars;
+        private final List<String> mSharedFields;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -312,14 +314,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param sharedVars the list of shared variable names.
-         * @param target     the invocation target.
-         * @param name       the alias name.
+         * @param sharedFields the list of shared field names.
+         * @param target       the invocation target.
+         * @param name         the alias name.
          */
-        private MethodAliasInvocation(@Nullable final List<String> sharedVars,
+        private MethodAliasInvocation(@Nullable final List<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
 
-            mSharedVars = sharedVars;
+            mSharedFields = sharedFields;
             mTarget = target;
             mAliasName = name;
         }
@@ -335,7 +337,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
                                    .proxies()
-                                   .withSharedVars(mSharedVars)
+                                   .withSharedFields(mSharedFields)
                                    .set()
                                    .aliasMethod(mAliasName);
 
@@ -384,7 +386,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Class<?>[] mParameterTypes;
 
-        private final List<String> mSharedVars;
+        private final List<String> mSharedFields;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -395,17 +397,17 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param sharedVars     the list of shared variable names.
+         * @param sharedFields   the list of shared field names.
          * @param target         the invocation target.
          * @param name           the method name.
          * @param parameterTypes the method parameter type names.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
-        private MethodSignatureInvocation(@Nullable final List<String> sharedVars,
+        private MethodSignatureInvocation(@Nullable final List<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
                 @NotNull final String[] parameterTypes) throws ClassNotFoundException {
 
-            mSharedVars = sharedVars;
+            mSharedFields = sharedFields;
             mTarget = target;
             mMethodName = name;
             mParameterTypes = forNames(parameterTypes);
@@ -436,7 +438,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
                                    .proxies()
-                                   .withSharedVars(mSharedVars)
+                                   .withSharedFields(mSharedFields)
                                    .set()
                                    .method(mMethodName, mParameterTypes);
 
@@ -467,7 +469,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final OutputMode mOutputMode;
 
-        private final List<String> mSharedVars;
+        private final List<String> mSharedFields;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -480,7 +482,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param sharedVars           the list of shared variable names.
+         * @param sharedFields         the list of shared field names.
          * @param target               the invocation target.
          * @param targetMethodName     the target method name.
          * @param targetParameterTypes the target method parameter type names.
@@ -489,14 +491,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
-        private ProxyInvocation(@Nullable final List<String> sharedVars,
+        private ProxyInvocation(@Nullable final List<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target,
                 @NotNull final String targetMethodName,
                 @NotNull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) throws ClassNotFoundException,
                 NoSuchMethodException {
 
-            mSharedVars = sharedVars;
+            mSharedFields = sharedFields;
             mTarget = target;
             mTargetMethod = target.getTargetClass()
                                   .getMethod(targetMethodName, forNames(targetParameterTypes));
@@ -530,12 +532,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 final Object mutexTarget =
                         (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
                                 : target.getTarget();
-
-                if (mutexTarget != null) {
-
-                    mMutex = getSharedMutex(mutexTarget, mSharedVars);
-                }
-
+                mMutex = getSharedMutex(mutexTarget, mSharedFields);
                 mInstance = target.getTarget();
 
             } catch (final Throwable t) {
@@ -583,8 +580,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
-            final List<String> sharedVars = varsWithShareAnnotation(mProxyConfiguration, method);
-            final Object[] factoryArgs = new Object[]{sharedVars, target, targetMethod.getName(),
+            final List<String> sharedFields =
+                    fieldsWithShareAnnotation(mProxyConfiguration, method);
+            final Object[] factoryArgs = new Object[]{sharedFields, target, targetMethod.getName(),
                                                       toNames(targetParameterTypes), inputMode,
                                                       outputMode};
             final TargetInvocationFactory<Object, Object> targetFactory =

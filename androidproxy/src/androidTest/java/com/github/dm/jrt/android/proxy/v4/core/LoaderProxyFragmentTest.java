@@ -331,7 +331,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    public void testSharedVars() {
+    public void testSharedFields() {
 
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
@@ -345,12 +345,12 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne = builder.proxies()
-                                               .withSharedVars("1")
+                                               .withSharedFields("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
         OutputChannel<Integer> getTwo = builder.proxies()
-                                               .withSharedVars("2")
+                                               .withSharedFields("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getTwo();

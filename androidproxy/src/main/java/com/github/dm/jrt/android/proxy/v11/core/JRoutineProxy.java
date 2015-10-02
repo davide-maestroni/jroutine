@@ -16,6 +16,7 @@ package com.github.dm.jrt.android.proxy.v11.core;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.annotation.SharedFields;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +48,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.annotation.Invoke Invoke
  * @see com.github.dm.jrt.annotation.Output Output
  * @see com.github.dm.jrt.annotation.Priority Priority
- * @see com.github.dm.jrt.annotation.SharedVars SharedVars
+ * @see SharedFields SharedFields
  * @see com.github.dm.jrt.annotation.Timeout Timeout
  * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
  */

@@ -101,7 +101,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .on(instanceOf(TestArgs.class, 17))
                            .method("getId")
                            .asyncCall()
-                           .eventually()
+                           .afterMax(seconds(10))
                            .next()).isEqualTo(17);
     }
 

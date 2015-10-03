@@ -121,12 +121,6 @@ public interface StreamingChannel<IN, OUT> extends IOChannel<IN, OUT> {
      * {@inheritDoc}
      */
     @NotNull
-    StreamingChannel<IN, OUT> eventually();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     StreamingChannel<IN, OUT> eventuallyAbort();
 
     /**

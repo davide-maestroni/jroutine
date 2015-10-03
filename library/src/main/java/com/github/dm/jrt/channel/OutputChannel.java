@@ -118,16 +118,6 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
     boolean checkComplete();
 
     /**
-     * Tells the channel to wait indefinitely for results to be available.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @return this channel.
-     */
-    @NotNull
-    OutputChannel<OUT> eventually();
-
-    /**
      * Tells the channel to abort the invocation execution in case no result is available before
      * the timeout has elapsed.
      * <p/>

@@ -118,12 +118,6 @@ public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> eventually();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     IOChannel<IN, OUT> eventuallyAbort();
 
     /**

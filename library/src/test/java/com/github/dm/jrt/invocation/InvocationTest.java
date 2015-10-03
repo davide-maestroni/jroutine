@@ -42,6 +42,7 @@ import static com.github.dm.jrt.invocation.Invocations.functionFilter;
 import static com.github.dm.jrt.invocation.Invocations.functionInvocation;
 import static com.github.dm.jrt.invocation.Invocations.supplierFactory;
 import static com.github.dm.jrt.invocation.Invocations.supplierProcedure;
+import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -150,7 +151,8 @@ public class InvocationTest {
     public void testFactory() {
 
         final Routine<Object, String> routine = JRoutine.on(createFactory()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test", "1");
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                                                                                         "1");
     }
 
     @Test
@@ -212,14 +214,16 @@ public class InvocationTest {
     public void testFilter() {
 
         final Routine<Object, String> routine = JRoutine.on(createFilter()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test", "1");
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                                                                                         "1");
     }
 
     @Test
     public void testFilter2() {
 
         final Routine<Object, String> routine = JRoutine.on(createFilter2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test", "1");
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                                                                                         "1");
     }
 
     @Test
@@ -319,14 +323,15 @@ public class InvocationTest {
     public void testFunction() {
 
         final Routine<?, String> routine = JRoutine.on(createFunction()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test", "1");
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                                                                                         "1");
     }
 
     @Test
     public void testFunction2() {
 
         final Routine<?, String> routine = JRoutine.on(createFunction2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).eventually().all()).containsOnly("test1");
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test1");
     }
 
     @Test
@@ -586,14 +591,14 @@ public class InvocationTest {
     public void testProcedure() {
 
         final Routine<Void, String> routine = JRoutine.on(createProcedure()).buildRoutine();
-        assertThat(routine.asyncCall().eventually().all()).containsOnly("test");
+        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testProcedure2() {
 
         final Routine<Void, String> routine = JRoutine.on(createProcedure2()).buildRoutine();
-        assertThat(routine.asyncCall().eventually().all()).containsOnly("test");
+        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test

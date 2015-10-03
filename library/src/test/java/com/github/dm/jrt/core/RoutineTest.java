@@ -37,7 +37,7 @@ import com.github.dm.jrt.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
-import com.github.dm.jrt.core.DefaultResultChannel.InvocationHandler;
+import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.invocation.DelegatingInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
@@ -543,7 +543,7 @@ public class RoutineTest {
 
         try {
 
-            routine2.asyncCall("test").eventually().all();
+            routine2.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -560,7 +560,7 @@ public class RoutineTest {
 
         try {
 
-            routine1.asyncCall("test").eventually().all();
+            routine1.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -577,7 +577,7 @@ public class RoutineTest {
 
         try {
 
-            routine3.asyncCall("test").eventually().all();
+            routine3.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -593,7 +593,7 @@ public class RoutineTest {
 
         try {
 
-            routine4.asyncCall("test").eventually().all();
+            routine4.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1094,7 +1094,7 @@ public class RoutineTest {
         assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
         final OutputChannel<Object> result = channel.result();
         assertThat(result.isEmpty()).isTrue();
-        assertThat(result.eventually().checkComplete()).isTrue();
+        assertThat(result.afterMax(seconds(10)).checkComplete()).isTrue();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(result.isEmpty()).isFalse();
     }
@@ -1194,8 +1194,8 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestInvocationHandler(),
-                                                     Runners.syncRunner(), logger);
+                                                     new TestAbortHandler(), Runners.syncRunner(),
+                                                     logger);
 
             new InvocationExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
 
@@ -1209,8 +1209,8 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestInvocationHandler(),
-                                                     Runners.syncRunner(), logger);
+                                                     new TestAbortHandler(), Runners.syncRunner(),
+                                                     logger);
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
                                                     logger);
@@ -1236,8 +1236,8 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestInvocationHandler(),
-                                                     Runners.syncRunner(), logger);
+                                                     new TestAbortHandler(), Runners.syncRunner(),
+                                                     logger);
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
                                                     new TestInputIterator(), channel, null);
@@ -1456,7 +1456,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputRunnerDeadlock()).asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1466,7 +1466,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputListRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputListRunnerDeadlock()).asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1476,7 +1476,10 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputArrayRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputArrayRunnerDeadlock())
+                    .asyncCall("test")
+                    .afterMax(seconds(1))
+                    .all();
 
             fail();
 
@@ -1486,7 +1489,10 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputConsumerRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputConsumerRunnerDeadlock())
+                    .asyncCall("test")
+                    .afterMax(seconds(1))
+                    .all();
 
             fail();
 
@@ -1536,7 +1542,7 @@ public class RoutineTest {
                            .now()
                            .pass("test2")
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
@@ -1552,7 +1558,7 @@ public class RoutineTest {
                            .now()
                            .pass(new Object[]{"test2"})
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
@@ -1568,7 +1574,7 @@ public class RoutineTest {
                            .now()
                            .pass(Collections.singletonList("test2"))
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
@@ -1586,7 +1592,7 @@ public class RoutineTest {
                            .now()
                            .pass(channel)
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
     }
 
@@ -1732,7 +1738,7 @@ public class RoutineTest {
 
         try {
 
-            routine.asyncCall().eventually().next();
+            routine.asyncCall().afterMax(seconds(1)).next();
 
             fail();
 
@@ -1830,13 +1836,13 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .asyncCall("test1", "test2", "test3", "test4")
-                           .eventually()
+                           .afterMax(seconds(1))
                            .next(2)).containsExactly("test1", "test2");
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .asyncCall("test1")
                            .eventuallyExit()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .next(2)).containsExactly("test1");
 
         try {
@@ -1844,7 +1850,7 @@ public class RoutineTest {
             JRoutine.on(PassingInvocation.factoryOf())
                     .asyncCall("test1")
                     .eventuallyAbort()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .next(2);
 
             fail();
@@ -1858,7 +1864,7 @@ public class RoutineTest {
             JRoutine.on(PassingInvocation.factoryOf())
                     .asyncCall("test1")
                     .eventuallyThrow()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .next(2);
 
             fail();
@@ -1889,7 +1895,7 @@ public class RoutineTest {
 
         try {
 
-            routine1.asyncCall("test1", "test2").eventually().all();
+            routine1.asyncCall("test1", "test2").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1915,7 +1921,7 @@ public class RoutineTest {
 
         try {
 
-            routine2.asyncCall("test1", "test2").eventually().all();
+            routine2.asyncCall("test1", "test2").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1937,7 +1943,7 @@ public class RoutineTest {
         try {
 
             final OutputChannel<String> outputChannel =
-                    routine.asyncCall("test1", "test2").eventually();
+                    routine.asyncCall("test1", "test2").afterMax(seconds(1));
             outputChannel.checkComplete();
             outputChannel.all();
 
@@ -2044,23 +2050,17 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isTrue();
         channel.result();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isTrue();
         ioChannel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test
@@ -2069,20 +2069,15 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test
@@ -2105,7 +2100,7 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestInvocationHandler(), null, logger);
+                                             new TestAbortHandler(), null, logger);
 
             fail();
 
@@ -2116,8 +2111,7 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestInvocationHandler(), Runners.sharedRunner(),
-                                             null);
+                                             new TestAbortHandler(), Runners.sharedRunner(), null);
 
             fail();
 
@@ -2128,8 +2122,8 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestInvocationHandler(), Runners.sharedRunner(),
-                                             logger).after(null);
+                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
+                    .after(null);
 
             fail();
 
@@ -2140,8 +2134,8 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestInvocationHandler(), Runners.sharedRunner(),
-                                             logger).after(0, null);
+                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
+                    .after(0, null);
 
             fail();
 
@@ -2153,8 +2147,8 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestInvocationHandler(),
-                                                     Runners.sharedRunner(), logger);
+                                                     new TestAbortHandler(), Runners.sharedRunner(),
+                                                     logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
 
@@ -2316,7 +2310,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2333,7 +2327,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2350,7 +2344,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2367,7 +2361,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2491,14 +2485,14 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .asyncCall("test1", "test2", "test3", "test4")
-                           .eventually()
+                           .afterMax(seconds(1))
                            .skip(2)
                            .all()).containsExactly("test3", "test4");
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .asyncCall("test1")
                            .eventuallyExit()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .skip(2)
                            .all()).isEmpty();
 
@@ -2507,7 +2501,7 @@ public class RoutineTest {
             JRoutine.on(PassingInvocation.factoryOf())
                     .asyncCall("test1")
                     .eventuallyAbort()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .skip(2);
 
             fail();
@@ -2521,7 +2515,7 @@ public class RoutineTest {
             JRoutine.on(PassingInvocation.factoryOf())
                     .asyncCall("test1")
                     .eventuallyThrow()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .skip(2);
 
             fail();
@@ -3412,7 +3406,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
         }
     }
@@ -3423,7 +3417,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .checkComplete();
         }
     }
@@ -3634,7 +3628,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .iterator()
                     .hasNext();
         }
@@ -3721,7 +3715,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .iterator()
                     .next();
         }
@@ -3822,6 +3816,14 @@ public class RoutineTest {
 
             final int input = integer;
             result.pass(input * input);
+        }
+    }
+
+    private static class TestAbortHandler implements AbortHandler {
+
+        public void onAbort(@Nullable final RoutineException reason, final long delay,
+                @NotNull final TimeUnit timeUnit) {
+
         }
     }
 
@@ -3965,19 +3967,6 @@ public class RoutineTest {
         }
 
         public void onInvocationComplete() {
-
-        }
-    }
-
-    private static class TestInvocationHandler implements InvocationHandler {
-
-        public boolean isStreaming() {
-
-            return false;
-        }
-
-        public void onAbort(@Nullable final RoutineException reason, final long delay,
-                @NotNull final TimeUnit timeUnit) {
 
         }
     }

@@ -83,9 +83,9 @@ public class ChannelsTest {
                 .pass(new Selectable<String>("test5", 31))
                 .pass(new Selectable<Integer>(5, 17))
                 .close();
-        assertThat(channel1.result().eventually().all()).containsExactly("test1", "test2", "test3",
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1", "test2", "test3",
                                                                          "test4", "test5");
-        assertThat(channel2.result().eventually().all()).containsExactly(1, 2, 3, 4, 5);
+        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -109,7 +109,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -123,7 +123,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -133,7 +133,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -147,7 +147,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -157,7 +157,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -171,7 +171,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -181,7 +181,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -199,7 +199,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -209,7 +209,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -284,9 +284,9 @@ public class ChannelsTest {
                 .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
         Channels.distribute(channel1, channel2).pass(Collections.singletonList("test3-1")).close();
-        assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
-        assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2");
+        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2", "test2-2");
     }
 
     @Test
@@ -300,7 +300,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -310,7 +310,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -324,7 +324,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -334,7 +334,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -359,9 +359,9 @@ public class ChannelsTest {
         Channels.distributeAndFlush(channel1, channel2)
                 .pass(Collections.singletonList("test3-1"))
                 .close();
-        assertThat(channel1.result().eventually().all()).containsExactly("test1-1", "test2-1",
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1", "test2-1",
                                                                          "test3-1");
-        assertThat(channel2.result().eventually().all()).containsExactly("test1-2", "test2-2",
+        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2", "test2-2",
                                                                          null);
     }
 
@@ -376,7 +376,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -386,7 +386,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -400,7 +400,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().next();
+            channel1.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -410,7 +410,7 @@ public class ChannelsTest {
 
         try {
 
-            channel2.result().eventually().next();
+            channel2.result().afterMax(seconds(1)).next();
 
             fail();
 
@@ -428,7 +428,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().all();
+            channel1.result().afterMax(seconds(1)).all();
 
             fail();
 
@@ -466,7 +466,7 @@ public class ChannelsTest {
 
         try {
 
-            channel1.result().eventually().all();
+            channel1.result().afterMax(seconds(1)).all();
 
             fail();
 
@@ -536,7 +536,7 @@ public class ChannelsTest {
 
         try {
 
-            channel.result().eventually().all();
+            channel.result().afterMax(seconds(1)).all();
 
             fail();
 
@@ -551,7 +551,7 @@ public class ChannelsTest {
 
         try {
 
-            channel.result().eventually().all();
+            channel.result().afterMax(seconds(1)).all();
 
             fail();
 
@@ -566,7 +566,7 @@ public class ChannelsTest {
 
         try {
 
-            channel.result().eventually().all();
+            channel.result().afterMax(seconds(1)).all();
 
             fail();
 
@@ -610,7 +610,7 @@ public class ChannelsTest {
 
         try {
 
-            channel.close().eventually().all();
+            channel.close().afterMax(seconds(1)).all();
 
             fail();
 
@@ -628,7 +628,7 @@ public class ChannelsTest {
                 .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                       new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
                 .close();
-        assertThat(channel.close().eventually().all()).containsExactly("test1", "test3");
+        assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly("test1", "test3");
     }
 
     @Test
@@ -639,7 +639,7 @@ public class ChannelsTest {
 
         try {
 
-            channel.close().eventually().all();
+            channel.close().afterMax(seconds(1)).all();
 
             fail();
 
@@ -698,7 +698,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>join(channel1, channel2)).eventually().all();
+            routine.asyncCall(Channels.<Object>join(channel1, channel2)).afterMax(seconds(1)).all();
 
             fail();
 
@@ -714,7 +714,7 @@ public class ChannelsTest {
         try {
 
             routine.asyncCall(Channels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                   .eventually()
+                   .afterMax(seconds(1))
                    .all();
 
             fail();
@@ -783,7 +783,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2)).eventually().all();
+            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2)).afterMax(seconds(1)).all();
 
             fail();
 
@@ -800,7 +800,7 @@ public class ChannelsTest {
 
             routine.asyncCall(
                     Channels.joinAndFlush(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                   .eventually()
+                   .afterMax(seconds(1))
                    .all();
 
             fail();
@@ -886,9 +886,9 @@ public class ChannelsTest {
         channel1.close();
         channel2.close();
 
-        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsExactly("0", "1", "2",
+        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsExactly("0", "1", "2",
                                                                                    "3");
-        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsExactly(0, 1, 2, 3);
+        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsExactly(0, 1, 2, 3);
     }
 
     @Test
@@ -904,7 +904,7 @@ public class ChannelsTest {
         outputChannel = Channels.<Object>merge(-7, channel1, channel2);
         channel1.pass("test1").close();
         channel2.pass(13).close();
-        assertThat(outputChannel.eventually().all()).containsOnly(
+        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test1", -7), new Selectable<Integer>(13, -6));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -912,21 +912,21 @@ public class ChannelsTest {
                 Channels.<Object>merge(11, Arrays.<OutputChannel<?>>asList(channel1, channel2));
         channel2.pass(13).close();
         channel1.pass("test1").close();
-        assertThat(outputChannel.eventually().all()).containsOnly(
+        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test1", 11), new Selectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Channels.<Object>merge(channel1, channel2);
         channel1.pass("test2").close();
         channel2.pass(-17).close();
-        assertThat(outputChannel.eventually().all()).containsOnly(
+        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Channels.<Object>merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
         channel1.pass("test2").close();
         channel2.pass(-17).close();
-        assertThat(outputChannel.eventually().all()).containsOnly(
+        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -937,7 +937,7 @@ public class ChannelsTest {
         outputChannel = Channels.<Object>merge(channelMap);
         channel1.pass("test3").close();
         channel2.pass(111).close();
-        assertThat(outputChannel.eventually().all()).containsOnly(
+        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test3", 7), new Selectable<Integer>(111, -3));
     }
 
@@ -990,7 +990,7 @@ public class ChannelsTest {
 
         try {
 
-            outputChannel.eventually().all();
+            outputChannel.afterMax(seconds(1)).all();
 
             fail();
 
@@ -1007,7 +1007,7 @@ public class ChannelsTest {
 
         try {
 
-            outputChannel.eventually().all();
+            outputChannel.afterMax(seconds(1)).all();
 
             fail();
 
@@ -1023,7 +1023,7 @@ public class ChannelsTest {
 
         try {
 
-            outputChannel.eventually().all();
+            outputChannel.afterMax(seconds(1)).all();
 
             fail();
 
@@ -1039,7 +1039,7 @@ public class ChannelsTest {
 
         try {
 
-            outputChannel.eventually().all();
+            outputChannel.afterMax(seconds(1)).all();
 
             fail();
 
@@ -1059,7 +1059,7 @@ public class ChannelsTest {
 
         try {
 
-            outputChannel.eventually().all();
+            outputChannel.afterMax(seconds(1)).all();
 
             fail();
 
@@ -1133,18 +1133,18 @@ public class ChannelsTest {
         channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
                                     new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.map(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
-        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
+        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
+        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
         channel = routine.asyncCall(new Selectable<Object>(-11, Sort.INTEGER),
                                     new Selectable<Object>("test21", Sort.STRING));
         channelMap = Channels.map(channel, Sort.INTEGER, Sort.STRING);
-        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
+        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
+        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
         channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
                                     new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.map(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
-        assertThat(channelMap.get(Sort.INTEGER).eventually().all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).eventually().all()).containsOnly("test21");
+        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
+        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
     }
 
     @Test
@@ -1165,7 +1165,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.STRING).eventually().all();
+            channelMap.get(Sort.STRING).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1175,7 +1175,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.INTEGER).eventually().all();
+            channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1193,7 +1193,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.STRING).eventually().all();
+            channelMap.get(Sort.STRING).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1203,7 +1203,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.INTEGER).eventually().all();
+            channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1221,7 +1221,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.STRING).eventually().all();
+            channelMap.get(Sort.STRING).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1231,7 +1231,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.INTEGER).eventually().all();
+            channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1277,7 +1277,7 @@ public class ChannelsTest {
 
         try {
 
-            outputChannel.eventually().all();
+            outputChannel.afterMax(seconds(1)).all();
 
             fail();
 
@@ -1293,7 +1293,7 @@ public class ChannelsTest {
         final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(
-                Channels.toSelectable(channel.asOutput(), 33).eventually().all()).containsExactly(
+                Channels.toSelectable(channel.asOutput(), 33).afterMax(seconds(1)).all()).containsExactly(
                 new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
                 new Selectable<String>("test3", 33));
     }
@@ -1306,7 +1306,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.toSelectable(channel.asOutput(), 33).eventually().all();
+            Channels.toSelectable(channel.asOutput(), 33).afterMax(seconds(1)).all();
 
             fail();
 

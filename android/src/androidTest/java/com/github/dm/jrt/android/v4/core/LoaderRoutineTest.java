@@ -39,8 +39,6 @@ import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
-import com.github.dm.jrt.channel.DeadlockException;
-import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -372,7 +370,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            channel.result().eventually().next();
+            channel.result().afterMax(seconds(10)).next();
 
         } catch (final AbortException e) {
 
@@ -972,7 +970,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            channel.result().eventually().next();
+            channel.result().afterMax(seconds(10)).next();
 
         } catch (final AbortException e) {
 
@@ -1283,35 +1281,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);
-    }
-
-    public void testInputStreaming() {
-
-        OutputChannel<Object> result = JRoutine.with(contextFrom(getActivity()))
-                                               .on(PassingContextInvocation.factoryOf())
-                                               .asyncInvoke()
-                                               .after(seconds(1))
-                                               .pass("test")
-                                               .result();
-        assertThat(result.eventually().next()).isEqualTo("test");
-
-        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
-        result = JRoutine.with(contextFrom(getActivity()))
-                         .on(PassingContextInvocation.factoryOf())
-                         .asyncInvoke()
-                         .after(seconds(2))
-                         .pass(ioChannel)
-                         .result();
-
-        try {
-
-            result.eventually().next();
-
-            fail();
-
-        } catch (final DeadlockException ignored) {
-
-        }
     }
 
     public void testInvocations() {

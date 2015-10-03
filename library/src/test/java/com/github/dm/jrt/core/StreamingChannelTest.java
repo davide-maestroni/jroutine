@@ -95,7 +95,7 @@ public class StreamingChannelTest {
 
         try {
 
-            streamingChannel.eventually().next();
+            streamingChannel.afterMax(seconds(1)).next();
 
             fail();
 
@@ -648,24 +648,18 @@ public class StreamingChannelTest {
         final StreamingChannel<String, String> channel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncStream();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         final IOChannel<String, String> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isTrue();
         ioChannel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test
@@ -674,20 +668,15 @@ public class StreamingChannelTest {
         final StreamingChannel<String, String> channel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncStream();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         final IOChannel<String, String> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test

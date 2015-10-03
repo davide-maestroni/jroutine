@@ -364,11 +364,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             return mOutput;
         }
 
-        public boolean isStreaming() {
-
-            return mInput.isStreaming();
-        }
-
         private void bindService() {
 
             synchronized (mMutex) {

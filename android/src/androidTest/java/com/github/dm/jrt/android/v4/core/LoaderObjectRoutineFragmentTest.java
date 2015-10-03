@@ -114,7 +114,7 @@ public class LoaderObjectRoutineFragmentTest
                            .on(instanceOf(TestArgs.class, 17))
                            .method("getId")
                            .asyncCall()
-                           .eventually()
+                           .afterMax(seconds(10))
                            .next()).isEqualTo(17);
     }
 
@@ -264,7 +264,7 @@ public class LoaderObjectRoutineFragmentTest
                            .on(instanceOf(String.class))
                            .method("toString")
                            .asyncCall()
-                           .eventually()
+                           .afterMax(seconds(10))
                            .next()).isEqualTo("test1");
     }
 

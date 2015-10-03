@@ -26,7 +26,6 @@ import com.github.dm.jrt.channel.OutputDeadlockException;
 import com.github.dm.jrt.channel.OutputTimeoutException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.StreamingDeadlockException;
 import com.github.dm.jrt.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
@@ -52,7 +51,6 @@ import java.util.concurrent.TimeUnit;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static com.github.dm.jrt.util.Time.current;
-import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 import static com.github.dm.jrt.util.TimeDuration.timeUntilMillis;
@@ -80,7 +78,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private final Object mFlushMutex = new Object();
 
-    private final InvocationHandler mHandler;
+    private final AbortHandler mHandler;
 
     private final Check mHasOutputs;
 
@@ -120,8 +118,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private OutputChannelState mState;
 
-    private int mStreamingChannels;
-
     /**
      * Constructor.
      *
@@ -132,7 +128,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     @SuppressWarnings("ConstantConditions")
     DefaultResultChannel(@NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationHandler handler, @NotNull final Runner runner,
+            @NotNull final AbortHandler handler, @NotNull final Runner runner,
             @NotNull final Logger logger) {
 
         if (handler == null) {
@@ -339,14 +335,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         return this;
-    }
-
-    public boolean isStreaming() {
-
-        synchronized (mMutex) {
-
-            return (mStreamingChannels > 0);
-        }
     }
 
     /**
@@ -599,7 +587,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void internalAbort(@Nullable final RoutineException abortException) {
 
         mOutputQueue.clear();
-        mStreamingChannels = 0;
         mPendingOutputCount = 0;
         mAbortException = abortException;
         mState = new ExceptionChannelState();
@@ -649,11 +636,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 if (mIsWaitingInvocation) {
 
                     throw new InvocationDeadlockException();
-                }
-
-                if (isStreamingDeadlock(timeout)) {
-
-                    throw new StreamingDeadlockException();
                 }
 
                 if (mOutputHasNext == null) {
@@ -710,11 +692,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         abort();
         throw new AbortException(null);
-    }
-
-    private boolean isStreamingDeadlock(@NotNull final TimeDuration timeout) {
-
-        return timeout.isInfinite() && mHandler.isStreaming();
     }
 
     @Nullable
@@ -798,11 +775,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         if (mIsWaitingInvocation) {
 
             throw new InvocationDeadlockException();
-        }
-
-        if (isStreamingDeadlock(timeout)) {
-
-            throw new StreamingDeadlockException();
         }
 
         if (mOutputNotEmpty == null) {
@@ -889,14 +861,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     /**
      * Interface defining an abort handler.
      */
-    interface InvocationHandler {
-
-        /**
-         * Checks if the invocation is streaming data fetched from an output channel.
-         *
-         * @return whether the invocation is streaming data.
-         */
-        boolean isStreaming();
+    interface AbortHandler {
 
         /**
          * Called on an abort.
@@ -1123,11 +1088,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                                 throw new InvocationDeadlockException();
                             }
 
-                            if (isStreamingDeadlock(executionTimeout)) {
-
-                                throw new StreamingDeadlockException();
-                            }
-
                         } while (executionTimeout.waitSinceMillis(mMutex, startTime));
 
                         isTimeout = !mState.isDone();
@@ -1186,11 +1146,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                         throw new InvocationDeadlockException();
                     }
-
-                    if (isStreamingDeadlock(executionTimeout)) {
-
-                        throw new StreamingDeadlockException();
-                    }
                 }
 
                 final boolean isDone;
@@ -1222,12 +1177,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 return isDone;
             }
-        }
-
-        @NotNull
-        public OutputChannel<OUT> eventually() {
-
-            return afterMax(INFINITY);
         }
 
         @NotNull
@@ -2151,7 +2100,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             mBoundChannels.add(channel);
-            ++mStreamingChannels;
             ++mPendingOutputCount;
             mSubLogger.dbg("passing channel: %s", channel);
             return new DefaultOutputConsumer();
@@ -2390,7 +2338,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean onConsumerComplete(@NotNull final NestedQueue<Object> queue) {
 
             queue.close();
-            --mStreamingChannels;
 
             if (--mPendingOutputCount == 0) {
 

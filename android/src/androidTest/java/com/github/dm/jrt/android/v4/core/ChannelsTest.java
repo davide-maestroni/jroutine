@@ -37,6 +37,7 @@ import java.util.Arrays;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -66,17 +67,17 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channelMap = Channels.spread(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
+        assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.spread(channel, Sort.INTEGER, Sort.STRING);
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
+        assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
         channelMap = Channels.spread(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.result().eventually().all()).containsOnlyElementsOf(outputs);
+        assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
     }
 
     public void testInputMapAbort() {
@@ -92,7 +93,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channel.result().eventually().all();
+            channel.result().afterMax(seconds(10)).all();
 
             fail();
 
@@ -107,7 +108,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channel.result().eventually().all();
+            channel.result().afterMax(seconds(10)).all();
 
             fail();
 
@@ -122,7 +123,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channel.result().eventually().all();
+            channel.result().afterMax(seconds(10)).all();
 
             fail();
 
@@ -161,7 +162,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 Channels.merge(channelMap);
         channel1.pass("test3").close();
         channel2.pass(111).close();
-        assertThat(outputChannel.eventually().all()).containsOnly(
+        assertThat(outputChannel.afterMax(seconds(10)).all()).containsOnly(
                 new ParcelableSelectable<String>("test3", 7),
                 new ParcelableSelectable<Integer>(111, -3));
     }
@@ -184,7 +185,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            outputChannel.eventually().all();
+            outputChannel.afterMax(seconds(10)).all();
 
             fail();
 

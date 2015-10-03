@@ -339,7 +339,7 @@ public class IOChannelTest {
                            .buildChannel()
                            .pass("test1", "test2", "test3", "test4")
                            .close()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .next(2)).containsExactly("test1", "test2");
 
         assertThat(JRoutine.io()
@@ -347,7 +347,7 @@ public class IOChannelTest {
                            .pass("test1")
                            .close()
                            .eventuallyExit()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .next(2)).containsExactly("test1");
 
         try {
@@ -357,7 +357,7 @@ public class IOChannelTest {
                     .pass("test1")
                     .close()
                     .eventuallyAbort()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .next(2);
 
             fail();
@@ -373,7 +373,7 @@ public class IOChannelTest {
                     .pass("test1")
                     .close()
                     .eventuallyThrow()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .next(2);
 
             fail();
@@ -597,23 +597,17 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isTrue();
         ioChannel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test
@@ -621,20 +615,15 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isFalse();
         final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.isStreaming()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.isStreaming()).isFalse();
     }
 
     @Test
@@ -657,7 +646,7 @@ public class IOChannelTest {
                            .buildChannel()
                            .pass("test1", "test2", "test3", "test4")
                            .close()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .skip(2)
                            .all()).containsExactly("test3", "test4");
 
@@ -666,7 +655,7 @@ public class IOChannelTest {
                            .pass("test1")
                            .close()
                            .eventuallyExit()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .skip(2)
                            .all()).isEmpty();
 
@@ -677,7 +666,7 @@ public class IOChannelTest {
                     .pass("test1")
                     .close()
                     .eventuallyAbort()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .skip(2);
 
             fail();
@@ -693,7 +682,7 @@ public class IOChannelTest {
                     .pass("test1")
                     .close()
                     .eventuallyThrow()
-                    .eventually()
+                    .afterMax(seconds(1))
                     .skip(2);
 
             fail();

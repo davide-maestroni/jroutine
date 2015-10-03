@@ -60,13 +60,6 @@ public interface InputChannel<IN> extends Channel {
     InputChannel<IN> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
-     * Checks if the channel is streaming data fetched from an output channel.
-     *
-     * @return whether the channel is streaming data.
-     */
-    boolean isStreaming();
-
-    /**
      * Tells the channel to not delay the transfer of data.
      *
      * @return this channel.

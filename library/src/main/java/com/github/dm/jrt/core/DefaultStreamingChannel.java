@@ -179,13 +179,6 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> eventually() {
-
-        mOutputChannel.eventually();
-        return this;
-    }
-
-    @NotNull
     public StreamingChannel<IN, OUT> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
@@ -299,11 +292,6 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     public OutputChannel<OUT> asOutput() {
 
         return this;
-    }
-
-    public boolean isStreaming() {
-
-        return mInputChannel.isStreaming();
     }
 
     public Iterator<OUT> iterator() {

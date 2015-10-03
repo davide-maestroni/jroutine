@@ -96,7 +96,7 @@ public class Downloader {
         final File downloadDir = new File(args[0]);
         final Downloader downloader = new Downloader(Integer.parseInt(args[1]));
 
-        for (int i = 2; i < args.length; i++) {
+        for (int i = 2; i < args.length; ++i) {
 
             final URI uri = new URI(args[i]);
             downloader.download(uri, new File(downloadDir, getFileName(uri)));

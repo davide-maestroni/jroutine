@@ -34,6 +34,7 @@ import com.github.dm.jrt.channel.OutputTimeoutException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.InvocationHandler;
@@ -1825,6 +1826,49 @@ public class RoutineTest {
     }
 
     @Test
+    public void testNext() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1", "test2", "test3", "test4")
+                           .eventually()
+                           .next(2)).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1")
+                           .eventuallyExit()
+                           .eventually()
+                           .next(2)).containsExactly("test1");
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyAbort()
+                    .eventually()
+                    .next(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyThrow()
+                    .eventually()
+                    .next(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
+    }
+
+    @Test
     public void testOutputDeadlock() {
 
         final Routine<String, String> routine1 =
@@ -2440,6 +2484,51 @@ public class RoutineTest {
 
         assertThat(sumRoutine.syncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(10);
         assertThat(sumRoutine.asyncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(10);
+    }
+
+    @Test
+    public void testSkip() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1", "test2", "test3", "test4")
+                           .eventually()
+                           .skip(2)
+                           .all()).containsExactly("test3", "test4");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1")
+                           .eventuallyExit()
+                           .eventually()
+                           .skip(2)
+                           .all()).isEmpty();
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyAbort()
+                    .eventually()
+                    .skip(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyThrow()
+                    .eventually()
+                    .skip(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
     }
 
     @Test

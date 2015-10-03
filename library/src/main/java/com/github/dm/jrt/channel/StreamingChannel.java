@@ -157,6 +157,12 @@ public interface StreamingChannel<IN, OUT> extends IOChannel<IN, OUT> {
      * {@inheritDoc}
      */
     @NotNull
+    StreamingChannel<IN, OUT> skip(int count);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     StreamingChannel<IN, OUT> close();
 
     /**

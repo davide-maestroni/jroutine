@@ -244,6 +244,29 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
     boolean isBound();
 
     /**
+     * Consumes the first {@code count} available results by waiting at the maximum for the set
+     * timeout.
+     *
+     * @return the first available results.
+     * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to throw an
+     *                                                             exception when the timeout
+     *                                                             elapses.
+     * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+     *                                                             aborted.
+     * @throws java.lang.IllegalStateException                     if this channel is already bound
+     *                                                             to a consumer.
+     * @see #afterMax(TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
+     * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyExit()
+     * @see #eventuallyThrow()
+     */
+    @NotNull
+    List<OUT> next(int count);
+
+    /**
      * Binds this channel to the specified one. After the call, all the output will be passed
      * only to the specified input channel. Attempting to read through the dedicated methods will
      * cause an {@link java.lang.IllegalStateException} to be thrown.
@@ -268,4 +291,27 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      */
     @NotNull
     OutputChannel<OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
+
+    /**
+     * Skips the first {@code count} available results by waiting at the maximum for the set
+     * timeout.
+     *
+     * @return the first available results.
+     * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to throw an
+     *                                                             exception when the timeout
+     *                                                             elapses.
+     * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+     *                                                             aborted.
+     * @throws java.lang.IllegalStateException                     if this channel is already bound
+     *                                                             to a consumer.
+     * @see #afterMax(TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
+     * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyExit()
+     * @see #eventuallyThrow()
+     */
+    @NotNull
+    OutputChannel<OUT> skip(int count);
 }

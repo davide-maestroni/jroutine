@@ -92,7 +92,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         final StringBuilder builder = new StringBuilder();
 
-        for (int i = 1; i <= size; i++) {
+        for (int i = 1; i <= size; ++i) {
 
             builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
 

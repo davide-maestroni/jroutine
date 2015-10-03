@@ -777,7 +777,7 @@ public class RoutineBuilders {
 
                 final int length = Array.getLength(arg);
 
-                for (int i = 0; i < length; i++) {
+                for (int i = 0; i < length; ++i) {
 
                     invocationChannel.pass(Array.get(arg, i));
                 }

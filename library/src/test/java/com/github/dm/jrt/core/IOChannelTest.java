@@ -20,6 +20,7 @@ import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
@@ -332,6 +333,57 @@ public class IOChannelTest {
     }
 
     @Test
+    public void testNext() {
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
+                           .eventually()
+                           .next(2)).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1")
+                           .close()
+                           .eventuallyExit()
+                           .eventually()
+                           .next(2)).containsExactly("test1");
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyAbort()
+                    .eventually()
+                    .next(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyThrow()
+                    .eventually()
+                    .next(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
+    }
+
+    @Test
     public void testNextIteratorTimeout() {
 
         final IOChannel<String, String> ioChannel = JRoutine.io().buildChannel();
@@ -596,6 +648,59 @@ public class IOChannelTest {
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
+    }
+
+    @Test
+    public void testSkip() {
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
+                           .eventually()
+                           .skip(2)
+                           .all()).containsExactly("test3", "test4");
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1")
+                           .close()
+                           .eventuallyExit()
+                           .eventually()
+                           .skip(2)
+                           .all()).isEmpty();
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyAbort()
+                    .eventually()
+                    .skip(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyThrow()
+                    .eventually()
+                    .skip(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
     }
 
     @SuppressWarnings("unused")

@@ -981,7 +981,7 @@ public class Channels {
 
             final boolean isFlush = mIsFlush;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 final IOChannel<Object, Object> channel =
                         (IOChannel<Object, Object>) channels.get(i);
@@ -1113,7 +1113,7 @@ public class Channels {
             mChannel = channel;
             mIsFlush = isFlush;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 queues[i] = new SimpleQueue<OUT>();
             }

@@ -489,7 +489,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final StringBuilder builder = new StringBuilder();
 
-        for (int i = 1; i <= size; i++) {
+        for (int i = 1; i <= size; ++i) {
 
             builder.append("mRoutine")
                    .append(i)
@@ -1549,7 +1549,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             final TypeMirror firstType = firstTypeParameters.get(i).asType();
             final TypeMirror secondType = secondTypeParameters.get(i).asType();
@@ -1753,7 +1753,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                     boolean matches = true;
 
-                    for (int i = 0; i < length; i++) {
+                    for (int i = 0; i < length; ++i) {
 
                         Object value = null;
                         final VariableElement variableElement = interfaceTypeParameters.get(i);
@@ -2008,7 +2008,7 @@ public class RoutineProcessor extends AbstractProcessor {
             final StringBuilder builder = new StringBuilder("Arrays.asList(");
             final int length = names.length;
 
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
 
                 if (i != 0) {
 
@@ -2065,7 +2065,7 @@ public class RoutineProcessor extends AbstractProcessor {
             final StringBuilder builder = new StringBuilder("Arrays.asList(");
             final int length = names.length;
 
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
 
                 if (i != 0) {
 

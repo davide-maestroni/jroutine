@@ -22,6 +22,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
@@ -351,6 +352,57 @@ public class StreamingChannelTest {
     }
 
     @Test
+    public void testNext() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncStream()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
+                           .afterMax(seconds(3))
+                           .next(2)).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncStream()
+                           .pass("test1")
+                           .close()
+                           .afterMax(seconds(3))
+                           .eventuallyExit()
+                           .next(2)).containsExactly("test1");
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncStream()
+                    .pass("test1")
+                    .close()
+                    .afterMax(seconds(3))
+                    .eventuallyAbort()
+                    .next(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncStream()
+                    .pass("test1")
+                    .close()
+                    .afterMax(seconds(3))
+                    .eventuallyThrow()
+                    .next(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
+    }
+
+    @Test
     public void testNextIteratorTimeout() {
 
         final StreamingChannel<String, String> streamingChannel =
@@ -667,6 +719,59 @@ public class StreamingChannelTest {
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(streamingChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
+    }
+
+    @Test
+    public void testSkip() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncStream()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
+                           .afterMax(seconds(3))
+                           .skip(2)
+                           .all()).containsExactly("test3", "test4");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncStream()
+                           .pass("test1")
+                           .close()
+                           .afterMax(seconds(3))
+                           .eventuallyExit()
+                           .skip(2)
+                           .all()).isEmpty();
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncStream()
+                    .pass("test1")
+                    .close()
+                    .afterMax(seconds(3))
+                    .eventuallyAbort()
+                    .skip(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncStream()
+                    .pass("test1")
+                    .close()
+                    .afterMax(seconds(3))
+                    .eventuallyThrow()
+                    .skip(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
     }
 
     @SuppressWarnings("unused")

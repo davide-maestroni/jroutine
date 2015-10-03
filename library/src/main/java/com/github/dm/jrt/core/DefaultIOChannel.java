@@ -221,6 +221,13 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     }
 
     @NotNull
+    public IOChannel<DATA, DATA> skip(final int count) {
+
+        mOutputChannel.skip(count);
+        return this;
+    }
+
+    @NotNull
     public InputChannel<DATA> asInput() {
 
         return this;
@@ -263,6 +270,12 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     public boolean isBound() {
 
         return mOutputChannel.isBound();
+    }
+
+    @NotNull
+    public List<DATA> next(final int count) {
+
+        return mOutputChannel.next(count);
     }
 
     @NotNull

@@ -571,7 +571,7 @@ public class ByteChannel {
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
 
-                for (int i = mIndex; i < size; i++) {
+                for (int i = mIndex; i < size; ++i) {
 
                     available += streams.get(i).available();
                 }
@@ -612,7 +612,7 @@ public class ByteChannel {
                 streams.get(index).reset();
                 final int size = streams.size();
 
-                for (int i = index + 1; i < size; i++) {
+                for (int i = index + 1; i < size; ++i) {
 
                     streams.get(i).reset();
                 }
@@ -672,7 +672,7 @@ public class ByteChannel {
             final byte[] buffer = mBuffer;
             int result = size;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 result = 31 * result + buffer[i];
             }
@@ -704,7 +704,7 @@ public class ByteChannel {
             final byte[] thisBuffer = mBuffer;
             final byte[] thatBuffer = that.mBuffer;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 if (thisBuffer[i] != thatBuffer[i]) {
 

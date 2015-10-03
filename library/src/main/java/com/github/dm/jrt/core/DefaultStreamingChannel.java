@@ -221,6 +221,13 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
+    public StreamingChannel<IN, OUT> skip(final int count) {
+
+        mOutputChannel.skip(count);
+        return this;
+    }
+
+    @NotNull
     public StreamingChannel<IN, OUT> close() {
 
         mInputChannel.close();
@@ -267,6 +274,12 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     public boolean isBound() {
 
         return mOutputChannel.isBound();
+    }
+
+    @NotNull
+    public List<OUT> next(final int count) {
+
+        return mOutputChannel.next(count);
     }
 
     @NotNull

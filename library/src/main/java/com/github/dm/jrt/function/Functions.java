@@ -338,7 +338,7 @@ public class Functions {
                 return false;
             }
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
 
@@ -468,7 +468,7 @@ public class Functions {
                 return false;
             }
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
 
@@ -634,7 +634,7 @@ public class Functions {
                 return false;
             }
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 if (thisFunctions.get(i).getClass() != thatFunctions.get(i).getClass()) {
 
@@ -788,7 +788,7 @@ public class Functions {
                 return false;
             }
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 if (thisFunctions.get(i).getClass() != thatFunctions.get(i).getClass()) {
 

@@ -126,7 +126,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Class<?>[] classes = new Class[length];
         final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             final String name = names[i];
             final Class<?> primitiveClass = classMap.get(name);
@@ -150,7 +150,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final int length = classes.length;
         final String[] names = new String[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             names[i] = classes[i].getName();
         }

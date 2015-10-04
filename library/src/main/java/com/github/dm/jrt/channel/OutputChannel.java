@@ -74,7 +74,6 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      *                                                             to a consumer.
      * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyExit()
@@ -98,7 +97,6 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      *                                                             to a consumer.
      * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyExit()
@@ -180,7 +178,6 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      *                                                             to a consumer.
      * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyExit()
@@ -206,7 +203,6 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      *                                                             thrown).
      * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyExit()
@@ -247,7 +243,6 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      *                                                             to a consumer.
      * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyExit()
@@ -296,7 +291,6 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      *                                                             to a consumer.
      * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #eventually()
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyExit()

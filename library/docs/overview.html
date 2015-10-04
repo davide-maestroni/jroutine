@@ -25,7 +25,7 @@
                         on(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
-                                   .eventually()
+                                   .afterMax(seconds(1))
                                    .next();
                 System.out.println(rms);
                 System.exit(0);
@@ -102,7 +102,7 @@
 
                 final Double rms =
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
-                                   .eventually()
+                                   .afterMax(seconds(1))
                                    .next();
                 System.out.println(rms);
                 System.exit(0);

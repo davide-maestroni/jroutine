@@ -61,7 +61,7 @@ import org.jetbrains.annotations.NotNull;
  *         channel.pass(doSomething1.asyncCall())
  *                .pass(doSomething2.asyncCall())
  *                .close();
- *                .eventually()
+ *                .afterMax(seconds(20))
  *                .allInto(results);
  *     </code>
  * </pre>
@@ -71,8 +71,8 @@ import org.jetbrains.annotations.NotNull;
  *
  *         final OutputChannel&lt;Result&gt; output1 = doSomething1.asyncCall();
  *         final OutputChannel&lt;Result&gt; output2 = doSomething2.asyncCall();
- *         output1.eventually().allInto(results);
- *         output2.eventually().allInto(results);
+ *         output1.afterMax(seconds(20)).allInto(results);
+ *         output2.afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
@@ -82,7 +82,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         doSomething2.asyncCall(doSomething1.asyncCall())).eventually().allInto(results);
+ *         doSomething2.asyncCall(doSomething1.asyncCall())).afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -124,7 +124,7 @@ import org.jetbrains.annotations.NotNull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                          .buildRoutine();
- *         routine.asyncCall(channel).eventually().allInto(results);
+ *         routine.asyncCall(channel).afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * <p/>

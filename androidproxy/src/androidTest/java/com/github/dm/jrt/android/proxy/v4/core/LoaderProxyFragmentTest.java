@@ -114,7 +114,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final LoaderProxyRoutineBuilder builder = JRoutineProxy.with(contextFrom(fragment))
                                                                .on(instanceOf(TestList.class))
                                                                .invocations()
-                                                               .withExecutionTimeout(seconds(10))
+                                                               .withTimeout(seconds(10))
                                                                .set();
 
         final TestListItf<String> testListItf1 =
@@ -339,7 +339,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final LoaderProxyRoutineBuilder builder = JRoutineProxy.with(contextFrom(fragment))
                                                                .on(instanceOf(TestClass2.class))
                                                                .invocations()
-                                                               .withExecutionTimeout(seconds(10))
+                                                               .withTimeout(seconds(10))
                                                                .set();
 
         long startTime = System.currentTimeMillis();
@@ -379,7 +379,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final Itf itf = JRoutineProxy.with(contextFrom(fragment))
                                      .on(instanceOf(Impl.class))
                                      .invocations()
-                                     .withExecutionTimeout(seconds(10))
+                                     .withTimeout(seconds(10))
                                      .set()
                                      .buildProxy(Itf.class);
 
@@ -646,7 +646,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineProxy.with(contextFrom(fragment))
                                 .on(instanceOf(TestTimeout.class))
                                 .invocations()
-                                .withExecutionTimeout(seconds(10))
+                                .withTimeout(seconds(10))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).containsExactly(31);
@@ -656,7 +656,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
             JRoutineProxy.with(contextFrom(fragment))
                          .on(instanceOf(TestTimeout.class))
                          .invocations()
-                         .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                         .withTimeoutAction(TimeoutActionType.THROW)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();

@@ -328,7 +328,7 @@ public class ProxyRoutineTest {
         final TestClass2 test = new TestClass2();
         final ProxyRoutineBuilder builder = JRoutineProxy.on(instance(test))
                                                          .invocations()
-                                                         .withExecutionTimeout(seconds(2))
+                                                         .withTimeout(seconds(2))
                                                          .set();
 
         long startTime = System.currentTimeMillis();
@@ -365,7 +365,7 @@ public class ProxyRoutineTest {
         final Impl impl = new Impl();
         final Itf itf = JRoutineProxy.on(instance(impl))
                                      .invocations()
-                                     .withExecutionTimeout(seconds(10))
+                                     .withTimeout(seconds(10))
                                      .set()
                                      .buildProxy(Itf.class);
 
@@ -630,7 +630,7 @@ public class ProxyRoutineTest {
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutineProxy.on(instance(testTimeout))
                                 .invocations()
-                                .withExecutionTimeout(seconds(1))
+                                .withTimeout(seconds(1))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).containsExactly(31);
@@ -639,7 +639,7 @@ public class ProxyRoutineTest {
 
             JRoutineProxy.on(instance(testTimeout))
                          .invocations()
-                         .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                         .withTimeoutAction(TimeoutActionType.THROW)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();

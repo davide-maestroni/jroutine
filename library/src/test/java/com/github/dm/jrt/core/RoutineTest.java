@@ -1812,7 +1812,7 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(instance(test))
                            .invocations()
-                           .withExecutionTimeout(timeout)
+                           .withTimeout(timeout)
                            .set()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
@@ -1824,8 +1824,7 @@ public class RoutineTest {
 
         final TestInterfaceAsync testInterfaceAsync = JRoutine.on(instance(test))
                                                               .invocations()
-                                                              .withExecutionTimeout(1,
-                                                                                    TimeUnit.SECONDS)
+                                                              .withTimeout(1, TimeUnit.SECONDS)
                                                               .set()
                                                               .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
@@ -2531,7 +2530,7 @@ public class RoutineTest {
         final Routine<String, String> routine1 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                        .withTimeoutAction(TimeoutActionType.ABORT)
                         .set()
                         .buildRoutine();
 
@@ -2591,8 +2590,8 @@ public class RoutineTest {
         final Routine<String, String> routine2 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
-                        .withExecutionTimeout(millis(10))
+                        .withTimeoutAction(TimeoutActionType.ABORT)
+                        .withTimeout(millis(10))
                         .set()
                         .buildRoutine();
 
@@ -2652,7 +2651,7 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                        .withTimeoutAction(TimeoutActionType.THROW)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel3 = routine3.asyncCall("test1");
@@ -2768,7 +2767,7 @@ public class RoutineTest {
         final Routine<String, String> routine4 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.EXIT)
+                        .withTimeoutAction(TimeoutActionType.EXIT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel4 = routine4.asyncCall("test1");

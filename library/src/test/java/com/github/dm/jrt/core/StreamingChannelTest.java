@@ -590,8 +590,8 @@ public class StreamingChannelTest {
         final StreamingChannel<Object, Object> streamingChannel =
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
-                        .withExecutionTimeout(millis(10))
-                        .withExecutionTimeoutAction(TimeoutActionType.EXIT)
+                        .withTimeout(millis(10))
+                        .withTimeoutAction(TimeoutActionType.EXIT)
                         .set()
                         .asyncStream();
 
@@ -604,8 +604,8 @@ public class StreamingChannelTest {
         final StreamingChannel<Object, Object> streamingChannel =
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
-                        .withExecutionTimeout(millis(10))
-                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                        .withTimeout(millis(10))
+                        .withTimeoutAction(TimeoutActionType.ABORT)
                         .set()
                         .asyncStream();
 
@@ -626,8 +626,8 @@ public class StreamingChannelTest {
         final StreamingChannel<Object, Object> streamingChannel =
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
-                        .withExecutionTimeout(millis(10))
-                        .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                        .withTimeout(millis(10))
+                        .withTimeoutAction(TimeoutActionType.THROW)
                         .set()
                         .asyncStream();
 

@@ -14,17 +14,26 @@
 package com.github.dm.jrt.processor;
 
 import com.github.dm.jrt.annotation.Alias;
+import com.github.dm.jrt.annotation.CoreInstances;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
+import com.github.dm.jrt.annotation.InputMaxSize;
+import com.github.dm.jrt.annotation.InputOrder;
+import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
+import com.github.dm.jrt.annotation.OutputMaxSize;
+import com.github.dm.jrt.annotation.OutputOrder;
+import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
 import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
+import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
@@ -353,52 +362,6 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
-     * Builds the string used to replace "${outputOptions}" in the template.
-     *
-     * @param methodElement the method element.
-     * @return the string.
-     */
-    @NotNull
-    protected String buildOutputOptions(@NotNull final ExecutableElement methodElement) {
-
-        final StringBuilder builder = new StringBuilder();
-        final Timeout timeoutAnnotation = methodElement.getAnnotation(Timeout.class);
-
-        if (timeoutAnnotation != null) {
-
-            builder.append(".afterMax(")
-                   .append(timeoutAnnotation.value())
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(timeoutAnnotation.unit())
-                   .append(")");
-        }
-
-        final TimeoutAction actionAnnotation = methodElement.getAnnotation(TimeoutAction.class);
-
-        if (actionAnnotation != null) {
-
-            final TimeoutActionType timeoutActionType = actionAnnotation.value();
-
-            if (timeoutActionType == TimeoutActionType.THROW) {
-
-                builder.append(".eventuallyThrow()");
-
-            } else if (timeoutActionType == TimeoutActionType.EXIT) {
-
-                builder.append(".eventuallyExit()");
-
-            } else if (timeoutActionType == TimeoutActionType.ABORT) {
-
-                builder.append(".eventuallyAbort()");
-            }
-        }
-
-        return builder.toString();
-    }
-
-    /**
      * Builds the string used to replace "${paramValues}" in the template.
      *
      * @param targetMethodElement the target method element.
@@ -512,9 +475,119 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     protected String buildRoutineOptions(@NotNull final ExecutableElement methodElement) {
 
+        final StringBuilder builder = new StringBuilder();
+        final CoreInstances coreInstancesAnnotation =
+                methodElement.getAnnotation(CoreInstances.class);
+
+        if (coreInstancesAnnotation != null) {
+
+            builder.append(".withCoreInstances(")
+                   .append(coreInstancesAnnotation.value())
+                   .append(")");
+        }
+
+        final InputMaxSize inputSizeAnnotation = methodElement.getAnnotation(InputMaxSize.class);
+
+        if (inputSizeAnnotation != null) {
+
+            builder.append(".withInputMaxSize(").append(inputSizeAnnotation.value()).append(")");
+        }
+
+        final InputOrder inputOrderAnnotation = methodElement.getAnnotation(InputOrder.class);
+
+        if (inputOrderAnnotation != null) {
+
+            builder.append(".withInputOrder(")
+                   .append(OrderType.class.getCanonicalName())
+                   .append(".")
+                   .append(inputOrderAnnotation.value())
+                   .append(")");
+        }
+
+        final InputTimeout inputTimeoutAnnotation = methodElement.getAnnotation(InputTimeout.class);
+
+        if (inputTimeoutAnnotation != null) {
+
+            builder.append(".withInputTimeout(")
+                   .append(inputTimeoutAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(inputTimeoutAnnotation.unit())
+                   .append(")");
+        }
+
+        final MaxInstances maxInstancesAnnotation = methodElement.getAnnotation(MaxInstances.class);
+
+        if (maxInstancesAnnotation != null) {
+
+            builder.append(".withMaxInstances(").append(maxInstancesAnnotation.value()).append(")");
+        }
+
+        final OutputMaxSize outputSizeAnnotation = methodElement.getAnnotation(OutputMaxSize.class);
+
+        if (outputSizeAnnotation != null) {
+
+            builder.append(".withOutputMaxSize(").append(outputSizeAnnotation.value()).append(")");
+        }
+
+        final OutputOrder outputOrderAnnotation = methodElement.getAnnotation(OutputOrder.class);
+
+        if (outputOrderAnnotation != null) {
+
+            builder.append(".withOutputOrder(")
+                   .append(OrderType.class.getCanonicalName())
+                   .append(".")
+                   .append(outputOrderAnnotation.value())
+                   .append(")");
+        }
+
+        final OutputTimeout outputTimeoutAnnotation =
+                methodElement.getAnnotation(OutputTimeout.class);
+
+        if (outputTimeoutAnnotation != null) {
+
+            builder.append(".withOutputTimeout(")
+                   .append(outputTimeoutAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(outputTimeoutAnnotation.unit())
+                   .append(")");
+        }
+
         final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
-        return (priorityAnnotation != null) ? ".withPriority(" + priorityAnnotation.value() + ")"
-                : "";
+
+        if (priorityAnnotation != null) {
+
+            builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
+        }
+
+        final Timeout timeoutAnnotation = methodElement.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            builder.append(".withTimeout(")
+                   .append(timeoutAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(timeoutAnnotation.unit())
+                   .append(")");
+        }
+
+        final TimeoutAction actionAnnotation = methodElement.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.append(".withTimeoutAction(")
+                   .append(TimeoutActionType.class.getCanonicalName())
+                   .append(".")
+                   .append(actionAnnotation.value())
+                   .append(")");
+        }
+
+        return builder.toString();
     }
 
     /**
@@ -2038,7 +2111,6 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${paramVars}", buildParamVars(methodElement));
         method = method.replace("${inputOptions}", buildInputOptions(methodElement, inputMode));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
-        method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
         method = method.replace("${invokeMethod}",
                                 (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
                                         : (invocationMode == InvocationMode.PARALLEL)

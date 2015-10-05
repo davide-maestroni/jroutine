@@ -37,15 +37,8 @@ public interface LoaderObjectRoutineBuilder
     /**
      * Returns a routine used to call the method whose identifying name is specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation.<br/>
-     * Optional {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
-     * {@link com.github.dm.jrt.annotation.Timeout Timeout},
-     * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction}, as well as
-     * {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
-     * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} method
+     * Optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
+     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} method
      * annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -54,6 +47,28 @@ public interface LoaderObjectRoutineBuilder
      * @param <OUT> the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
+     * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
+     * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
+     * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
+     * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
+     * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
+     * @see com.github.dm.jrt.annotation.Alias Alias
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.Input Input
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.Inputs Inputs
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.Invoke Invoke
+     * @see com.github.dm.jrt.annotation.Output Output
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     * @see com.github.dm.jrt.annotation.Timeout Timeout
+     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull String name);
@@ -62,16 +77,9 @@ public interface LoaderObjectRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation.Alias Alias},
-     * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
-     * {@link com.github.dm.jrt.annotation.Timeout Timeout},
-     * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction}, as well as
-     * {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
-     * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations.
+     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
+     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*}
+     * annotations.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -80,6 +88,28 @@ public interface LoaderObjectRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
+     * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
+     * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
+     * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
+     * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
+     * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
+     * @see com.github.dm.jrt.annotation.Alias Alias
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.Input Input
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.Inputs Inputs
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.Invoke Invoke
+     * @see com.github.dm.jrt.annotation.Output Output
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     * @see com.github.dm.jrt.annotation.Timeout Timeout
+     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
@@ -88,16 +118,9 @@ public interface LoaderObjectRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation.Alias Alias},
-     * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
-     * {@link com.github.dm.jrt.annotation.Timeout Timeout},
-     * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction}, as well as
-     * {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
-     * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} annotations.
+     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
+     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*}
+     * annotations.
      * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -106,6 +129,28 @@ public interface LoaderObjectRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
+     * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
+     * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
+     * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
+     * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
+     * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
+     * @see com.github.dm.jrt.annotation.Alias Alias
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.Input Input
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.Inputs Inputs
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.Invoke Invoke
+     * @see com.github.dm.jrt.annotation.Output Output
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     * @see com.github.dm.jrt.annotation.Timeout Timeout
+     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
@@ -115,15 +160,8 @@ public interface LoaderObjectRoutineBuilder
      * <p/>
      * The method is searched via reflection ignoring a name specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
-     * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
-     * {@link com.github.dm.jrt.annotation.Timeout Timeout},
-     * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction},
-     * as well as {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
-     * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} method
+     * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
+     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} method
      * annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -133,6 +171,28 @@ public interface LoaderObjectRoutineBuilder
      * @param <OUT>          the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
+     * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
+     * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
+     * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
+     * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
+     * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
+     * @see com.github.dm.jrt.annotation.Alias Alias
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.Input Input
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.Inputs Inputs
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.Invoke Invoke
+     * @see com.github.dm.jrt.annotation.Output Output
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     * @see com.github.dm.jrt.annotation.Timeout Timeout
+     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name,
@@ -143,15 +203,8 @@ public interface LoaderObjectRoutineBuilder
      * <p/>
      * The method is invoked ignoring a name specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
-     * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.SharedFields SharedFields},
-     * {@link com.github.dm.jrt.annotation.Timeout Timeout},
-     * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction},
-     * as well as {@link com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy},
-     * {@link com.github.dm.jrt.android.annotation.ClashResolution ClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution},
-     * {@link com.github.dm.jrt.android.annotation.LoaderId LoaderId} and
-     * {@link com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime} method
+     * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
+     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} method
      * annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
@@ -159,6 +212,28 @@ public interface LoaderObjectRoutineBuilder
      * @param <IN>   the input data type.
      * @param <OUT>  the output data type.
      * @return the routine.
+     * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
+     * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
+     * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
+     * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
+     * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
+     * @see com.github.dm.jrt.annotation.Alias Alias
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.Input Input
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.Inputs Inputs
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.Invoke Invoke
+     * @see com.github.dm.jrt.annotation.Output Output
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     * @see com.github.dm.jrt.annotation.Timeout Timeout
+     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull Method method);

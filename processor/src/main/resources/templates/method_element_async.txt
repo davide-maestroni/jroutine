@@ -25,5 +25,5 @@
             $$channel.pass($$object);
         }
 
-        return $$channel.result()${outputOptions};
+        return $$channel.result();
     }

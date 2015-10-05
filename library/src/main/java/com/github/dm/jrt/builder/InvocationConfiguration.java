@@ -200,33 +200,6 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the action to be taken if the timeout elapses before a readable result is available
-     * (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the action type.
-     */
-    public TimeoutActionType getExecutionTimeoutActionOr(
-            @Nullable final TimeoutActionType valueIfNotSet) {
-
-        final TimeoutActionType timeoutActionType = mTimeoutActionType;
-        return (timeoutActionType != null) ? timeoutActionType : valueIfNotSet;
-    }
-
-    /**
-     * Returns the timeout for an invocation instance to produce a readable result (null by
-     * default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the timeout.
-     */
-    public TimeDuration getExecutionTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
-
-        final TimeDuration executionTimeout = mExecutionTimeout;
-        return (executionTimeout != null) ? executionTimeout : valueIfNotSet;
-    }
-
-    /**
      * Returns the maximum number of buffered input data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -358,6 +331,32 @@ public final class InvocationConfiguration {
 
         final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
+    }
+
+    /**
+     * Returns the action to be taken if the timeout elapses before a readable result is available
+     * (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the action type.
+     */
+    public TimeoutActionType getTimeoutActionOr(@Nullable final TimeoutActionType valueIfNotSet) {
+
+        final TimeoutActionType timeoutActionType = mTimeoutActionType;
+        return (timeoutActionType != null) ? timeoutActionType : valueIfNotSet;
+    }
+
+    /**
+     * Returns the timeout for an invocation instance to produce a readable result (null by
+     * default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the timeout.
+     */
+    public TimeDuration getTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+
+        final TimeDuration executionTimeout = mExecutionTimeout;
+        return (executionTimeout != null) ? executionTimeout : valueIfNotSet;
     }
 
     @Override
@@ -771,57 +770,6 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the timeout for an invocation instance to produce a readable result.<br/>
-         * Note that this is just the initial configuration of the invocation, since the output
-         * timeout can be dynamically changed through the dedicated methods.
-         *
-         * @param timeout  the timeout.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         */
-        @NotNull
-        public Builder<TYPE> withExecutionTimeout(final long timeout,
-                @NotNull final TimeUnit timeUnit) {
-
-            return withExecutionTimeout(fromUnit(timeout, timeUnit));
-        }
-
-        /**
-         * Sets the timeout for an invocation instance to produce a readable result. A null value
-         * means that it is up to the specific implementation to choose a default one.<br/>
-         * Note that this is just the initial configuration of the invocation, since the output
-         * timeout can be dynamically changed through the dedicated methods.
-         *
-         * @param timeout the timeout.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withExecutionTimeout(@Nullable final TimeDuration timeout) {
-
-            mExecutionTimeout = timeout;
-            return this;
-        }
-
-        /**
-         * Sets the action to be taken if the timeout elapses before a result can be read from the
-         * output channel. A null value means that it is up to the specific implementation to choose
-         * a default one.<br/>
-         * Note that this is just the initial configuration of the invocation, since the output
-         * timeout action can be dynamically changed through the dedicated methods.
-         *
-         * @param actionType the action type.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withExecutionTimeoutAction(
-                @Nullable final TimeoutActionType actionType) {
-
-            mTimeoutActionType = actionType;
-            return this;
-        }
-
-        /**
          * Sets the maximum number of data that the input channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.
@@ -1035,6 +983,55 @@ public final class InvocationConfiguration {
             return this;
         }
 
+        /**
+         * Sets the timeout for an invocation instance to produce a readable result.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout can be dynamically changed through the dedicated methods.
+         *
+         * @param timeout  the timeout.
+         * @param timeUnit the timeout time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+         */
+        @NotNull
+        public Builder<TYPE> withTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
+
+            return withTimeout(fromUnit(timeout, timeUnit));
+        }
+
+        /**
+         * Sets the timeout for an invocation instance to produce a readable result. A null value
+         * means that it is up to the specific implementation to choose a default one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout can be dynamically changed through the dedicated methods.
+         *
+         * @param timeout the timeout.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withTimeout(@Nullable final TimeDuration timeout) {
+
+            mExecutionTimeout = timeout;
+            return this;
+        }
+
+        /**
+         * Sets the action to be taken if the timeout elapses before a result can be read from the
+         * output channel. A null value means that it is up to the specific implementation to choose
+         * a default one.<br/>
+         * Note that this is just the initial configuration of the invocation, since the output
+         * timeout action can be dynamically changed through the dedicated methods.
+         *
+         * @param actionType the action type.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withTimeoutAction(@Nullable final TimeoutActionType actionType) {
+
+            mTimeoutActionType = actionType;
+            return this;
+        }
+
         private void applyBaseConfiguration(@NotNull final InvocationConfiguration configuration) {
 
             final Runner runner = configuration.mRunner;
@@ -1069,14 +1066,14 @@ public final class InvocationConfiguration {
 
             if (executionTimeout != null) {
 
-                withExecutionTimeout(executionTimeout);
+                withTimeout(executionTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
 
             if (timeoutActionType != null) {
 
-                withExecutionTimeoutAction(timeoutActionType);
+                withTimeoutAction(timeoutActionType);
             }
         }
 

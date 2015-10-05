@@ -112,7 +112,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                 JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                              .on(instanceOf(TestList.class))
                              .invocations()
-                             .withExecutionTimeout(seconds(10))
+                             .withTimeout(seconds(10))
                              .set();
 
         final TestListItf<String> testListItf1 =
@@ -323,7 +323,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                 JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                              .on(instanceOf(TestClass2.class))
                              .invocations()
-                             .withExecutionTimeout(seconds(10))
+                             .withTimeout(seconds(10))
                              .set();
 
         long startTime = System.currentTimeMillis();
@@ -360,7 +360,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final Itf itf = JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                                      .on(instanceOf(Impl.class))
                                      .invocations()
-                                     .withExecutionTimeout(INFINITY)
+                                     .withTimeout(INFINITY)
                                      .set()
                                      .buildProxy(Itf.class);
 
@@ -624,7 +624,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         assertThat(JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                                 .on(instanceOf(TestTimeout.class))
                                 .invocations()
-                                .withExecutionTimeout(seconds(10))
+                                .withTimeout(seconds(10))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).containsExactly(31);
@@ -634,7 +634,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
             JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                          .on(instanceOf(TestTimeout.class))
                          .invocations()
-                         .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                         .withTimeoutAction(TimeoutActionType.THROW)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();

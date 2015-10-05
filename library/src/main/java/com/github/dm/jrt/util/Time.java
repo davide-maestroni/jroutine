@@ -147,7 +147,7 @@ public class Time {
 
         if (unit == null) {
 
-            throw new NullPointerException("the time unit cannot be null");
+            throw new NullPointerException("the time unit must not be null");
         }
 
         return new Time(time, unit);

@@ -14,13 +14,21 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.annotation.Alias;
+import com.github.dm.jrt.annotation.CoreInstances;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
+import com.github.dm.jrt.annotation.InputMaxSize;
+import com.github.dm.jrt.annotation.InputOrder;
+import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
+import com.github.dm.jrt.annotation.OutputMaxSize;
+import com.github.dm.jrt.annotation.OutputOrder;
+import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
 import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
@@ -194,6 +202,14 @@ public class RoutineBuilders {
      * @param configuration the initial configuration.
      * @param method        the target method.
      * @return the modified configuration.
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
      * @see com.github.dm.jrt.annotation.Timeout Timeout
      * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
@@ -204,6 +220,63 @@ public class RoutineBuilders {
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
+        final CoreInstances coreInstancesAnnotation = method.getAnnotation(CoreInstances.class);
+
+        if (coreInstancesAnnotation != null) {
+
+            builder.withCoreInstances(coreInstancesAnnotation.value());
+        }
+
+        final InputMaxSize inputSizeAnnotation = method.getAnnotation(InputMaxSize.class);
+
+        if (inputSizeAnnotation != null) {
+
+            builder.withInputMaxSize(inputSizeAnnotation.value());
+        }
+
+        final InputOrder inputOrderAnnotation = method.getAnnotation(InputOrder.class);
+
+        if (inputOrderAnnotation != null) {
+
+            builder.withInputOrder(inputOrderAnnotation.value());
+        }
+
+        final InputTimeout inputTimeoutAnnotation = method.getAnnotation(InputTimeout.class);
+
+        if (inputTimeoutAnnotation != null) {
+
+            builder.withInputTimeout(inputTimeoutAnnotation.value(), inputTimeoutAnnotation.unit());
+        }
+
+        final MaxInstances maxInstancesAnnotation = method.getAnnotation(MaxInstances.class);
+
+        if (maxInstancesAnnotation != null) {
+
+            builder.withMaxInstances(maxInstancesAnnotation.value());
+        }
+
+        final OutputMaxSize outputSizeAnnotation = method.getAnnotation(OutputMaxSize.class);
+
+        if (outputSizeAnnotation != null) {
+
+            builder.withOutputMaxSize(outputSizeAnnotation.value());
+        }
+
+        final OutputOrder outputOrderAnnotation = method.getAnnotation(OutputOrder.class);
+
+        if (outputOrderAnnotation != null) {
+
+            builder.withOutputOrder(outputOrderAnnotation.value());
+        }
+
+        final OutputTimeout outputTimeoutAnnotation = method.getAnnotation(OutputTimeout.class);
+
+        if (outputTimeoutAnnotation != null) {
+
+            builder.withOutputTimeout(outputTimeoutAnnotation.value(),
+                                      outputTimeoutAnnotation.unit());
+        }
+
         final Priority priorityAnnotation = method.getAnnotation(Priority.class);
 
         if (priorityAnnotation != null) {
@@ -215,14 +288,14 @@ public class RoutineBuilders {
 
         if (timeoutAnnotation != null) {
 
-            builder.withExecutionTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            builder.withTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
         }
 
         final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
 
         if (actionAnnotation != null) {
 
-            builder.withExecutionTimeoutAction(actionAnnotation.value());
+            builder.withTimeoutAction(actionAnnotation.value());
         }
 
         return builder.set();

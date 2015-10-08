@@ -46,6 +46,7 @@ import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
 import static com.github.dm.jrt.core.RoutineBuilders.getSharedMutex;
 import static com.github.dm.jrt.core.RoutineBuilders.getTargetMethodInfo;
 import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -415,8 +416,8 @@ class DefaultObjectRoutineBuilder
                     getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
                                configurationWithAnnotations(mProxyConfiguration, method),
                                methodInfo.method, inputMode, outputMode);
-            return invokeRoutine(routine, method, (args != null) ? args : Reflection.NO_ARGS,
-                                 methodInfo.invocationMode, inputMode, outputMode);
+            return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
+                                 inputMode, outputMode);
         }
     }
 }

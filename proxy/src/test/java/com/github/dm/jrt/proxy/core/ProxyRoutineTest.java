@@ -326,10 +326,8 @@ public class ProxyRoutineTest {
     public void testSharedFields() {
 
         final TestClass2 test = new TestClass2();
-        final ProxyRoutineBuilder builder = JRoutineProxy.on(instance(test))
-                                                         .invocations()
-                                                         .withTimeout(seconds(2))
-                                                         .set();
+        final ProxyRoutineBuilder builder =
+                JRoutineProxy.on(instance(test)).invocations().withTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 

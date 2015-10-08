@@ -24,9 +24,6 @@ import java.util.List;
  * Special abstract implementation that centralizes the routine invocation inside a single method,
  * which gets called only when all the inputs are available.
  * <p/>
- * The implementing class may additionally override the invocation methods to specifically handle
- * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
- * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *
  * @param <IN>  the input data type.
@@ -37,7 +34,7 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
     private ArrayList<IN> mInputs;
 
     @Override
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+    public final void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         if (mInputs == null) {
 
@@ -48,7 +45,7 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
+    public final void onResult(@NotNull final ResultChannel<OUT> result) {
 
         final ArrayList<IN> inputs = mInputs;
         final ArrayList<IN> clone;
@@ -66,7 +63,7 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
     }
 
     @Override
-    public void onTerminate() {
+    public final void onTerminate() {
 
         final ArrayList<IN> inputs = mInputs;
 

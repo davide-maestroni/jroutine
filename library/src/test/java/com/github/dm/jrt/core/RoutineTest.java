@@ -39,6 +39,7 @@ import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
+import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -49,7 +50,6 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.PassingInvocation;
-import com.github.dm.jrt.invocation.ProcedureInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.log.Logger;
@@ -81,6 +81,7 @@ import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -1556,7 +1557,7 @@ public class RoutineTest {
                            .after(millis(100))
                            .pass("test1")
                            .now()
-                           .pass(new Object[]{"test2"})
+                           .pass(asArgs("test2"))
                            .result()
                            .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
@@ -1727,7 +1728,7 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() throws InterruptedException {
 
-        final Routine<Void, Void> routine = JRoutine.on(new SleepProcedure())
+        final Routine<Void, Void> routine = JRoutine.on(new SleepCommand())
                                                     .invocations()
                                                     .withMaxInstances(1)
                                                     .set()
@@ -3770,6 +3771,21 @@ public class RoutineTest {
         }
     }
 
+    private static class SleepCommand extends CommandInvocation<Void> {
+
+        public void onResult(@NotNull final ResultChannel<Void> result) {
+
+            try {
+
+                seconds(1).sleepAtLeast();
+
+            } catch (final InterruptedException e) {
+
+                throw new InvocationInterruptedException(e);
+            }
+        }
+    }
+
     private static class SleepInvocation extends FilterInvocation<Object, Object> {
 
         private final TimeDuration mSleepDuration;
@@ -3791,21 +3807,6 @@ public class RoutineTest {
             }
 
             result.pass(input);
-        }
-    }
-
-    private static class SleepProcedure extends ProcedureInvocation<Void> {
-
-        public void onResult(@NotNull final ResultChannel<Void> result) {
-
-            try {
-
-                seconds(1).sleepAtLeast();
-
-            } catch (final InterruptedException e) {
-
-                throw new InvocationInterruptedException(e);
-            }
         }
     }
 

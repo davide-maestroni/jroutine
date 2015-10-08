@@ -90,7 +90,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                         .withLog(new NullLog())
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
-
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 

@@ -164,13 +164,11 @@ public class InvocationConfigurationTest {
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .set();
-        assertThat(configuration).isNotEqualTo(
-                builder().withTimeout(TimeDuration.ZERO).set());
+        assertThat(configuration).isNotEqualTo(builder().withTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
                 builder().withTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom()
-                                .withTimeout(TimeDuration.millis(1))
-                                .set()).isNotEqualTo(
+        assertThat(
+                configuration.builderFrom().withTimeout(TimeDuration.millis(1)).set()).isNotEqualTo(
                 builder().withTimeout(1, TimeUnit.MILLISECONDS).set());
     }
 

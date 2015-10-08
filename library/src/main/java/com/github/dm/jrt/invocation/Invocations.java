@@ -52,6 +52,27 @@ public class Invocations {
     }
 
     /**
+     * Builds and returns a new command invocation based on the specified consumer instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified consumer must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the consumer instance.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <OUT> CommandInvocation<OUT> consumerCommand(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return new ConsumerCommandInvocation<OUT>(newConsumer(consumer));
+    }
+
+    /**
      * Builds and returns a new filter invocation based on the specified bi-consumer instance.<br/>
      * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
      * static context.
@@ -95,27 +116,6 @@ public class Invocations {
                     consumer) {
 
         return new ConsumerInvocationFactory<IN, OUT>(newBiConsumer(consumer));
-    }
-
-    /**
-     * Builds and returns a new procedure invocation based on the specified consumer instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified consumer must have a static
-     * context.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param consumer the consumer instance.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <OUT> ProcedureInvocation<OUT> consumerProcedure(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-        return new ConsumerProcedureInvocation<OUT>(newConsumer(consumer));
     }
 
     /**
@@ -291,6 +291,27 @@ public class Invocations {
     }
 
     /**
+     * Builds and returns a new command invocation based on the specified supplier instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified supplier must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <OUT> CommandInvocation<OUT> supplierCommand(
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        return new SupplierCommandInvocation<OUT>(newSupplier(supplier));
+    }
+
+    /**
      * Builds and returns a new invocation factory based on the specified supplier instance.<br/>
      * In order to prevent undesired leaks, the class of the specified supplier must have a static
      * context.
@@ -313,24 +334,58 @@ public class Invocations {
     }
 
     /**
-     * Builds and returns a new procedure invocation based on the specified supplier instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified supplier must have a static
-     * context.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
+     * Command invocation based on a consumer instance.
      *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
+     * @param <OUT> the output data type.
      */
-    @NotNull
-    public static <OUT> ProcedureInvocation<OUT> supplierProcedure(
-            @NotNull final Supplier<? extends OUT> supplier) {
+    private static class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-        return new SupplierProcedureInvocation<OUT>(newSupplier(supplier));
+        private final ConsumerObject<? super ResultChannel<OUT>> mConsumer;
+
+        /**
+         * Constructor.
+         *
+         * @param consumer the consumer instance.
+         */
+        public ConsumerCommandInvocation(
+                final ConsumerObject<? super ResultChannel<OUT>> consumer) {
+
+            if (!consumer.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the consumer class must have a static context: " + consumer.getClass());
+            }
+
+            mConsumer = consumer;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mConsumer.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ConsumerCommandInvocation)) {
+
+                return false;
+            }
+
+            final ConsumerCommandInvocation<?> that = (ConsumerCommandInvocation<?>) o;
+            return mConsumer.equals(that.mConsumer);
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            mConsumer.accept(result);
+        }
     }
 
     /**
@@ -360,16 +415,17 @@ public class Invocations {
             mConsumer = consumer;
         }
 
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+            mConsumer.accept(input, result);
+        }
+
         @Override
         public int hashCode() {
 
             return mConsumer.hashCode();
         }
 
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-            mConsumer.accept(input, result);
-        }
 
         @Override
         public boolean equals(final Object o) {
@@ -454,61 +510,6 @@ public class Invocations {
 
             final ConsumerInvocationFactory<?, ?> that = (ConsumerInvocationFactory<?, ?>) o;
             return mConsumer.equals(that.mConsumer);
-        }
-    }
-
-    /**
-     * Procedure invocation based on a consumer instance.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class ConsumerProcedureInvocation<OUT> extends ProcedureInvocation<OUT> {
-
-        private final ConsumerObject<? super ResultChannel<OUT>> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        public ConsumerProcedureInvocation(
-                final ConsumerObject<? super ResultChannel<OUT>> consumer) {
-
-            if (!consumer.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the consumer class must have a static context: " + consumer.getClass());
-            }
-
-            mConsumer = consumer;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mConsumer.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof ConsumerProcedureInvocation)) {
-
-                return false;
-            }
-
-            final ConsumerProcedureInvocation<?> that = (ConsumerProcedureInvocation<?>) o;
-            return mConsumer.equals(that.mConsumer);
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            mConsumer.accept(result);
         }
     }
 
@@ -705,6 +706,60 @@ public class Invocations {
     }
 
     /**
+     * Command invocation based on a supplier instance.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
+
+        private final SupplierObject<? extends OUT> mSupplier;
+
+        /**
+         * Constructor.
+         *
+         * @param supplier the supplier instance.
+         */
+        public SupplierCommandInvocation(final SupplierObject<? extends OUT> supplier) {
+
+            if (!supplier.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the supplier class must have a static context: " + supplier.getClass());
+            }
+
+            mSupplier = supplier;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mSupplier.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof SupplierCommandInvocation)) {
+
+                return false;
+            }
+
+            final SupplierCommandInvocation<?> that = (SupplierCommandInvocation<?>) o;
+            return mSupplier.equals(that.mSupplier);
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            result.pass(mSupplier.get());
+        }
+    }
+
+    /**
      * Implementation of an invocation factory based on a supplier function.
      *
      * @param <IN>  the input data type.
@@ -759,60 +814,6 @@ public class Invocations {
         public int hashCode() {
 
             return mSupplier.hashCode();
-        }
-    }
-
-    /**
-     * Procedure invocation based on a supplier instance.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class SupplierProcedureInvocation<OUT> extends ProcedureInvocation<OUT> {
-
-        private final SupplierObject<? extends OUT> mSupplier;
-
-        /**
-         * Constructor.
-         *
-         * @param supplier the supplier instance.
-         */
-        public SupplierProcedureInvocation(final SupplierObject<? extends OUT> supplier) {
-
-            if (!supplier.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the supplier class must have a static context: " + supplier.getClass());
-            }
-
-            mSupplier = supplier;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mSupplier.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof SupplierProcedureInvocation)) {
-
-                return false;
-            }
-
-            final SupplierProcedureInvocation<?> that = (SupplierProcedureInvocation<?>) o;
-            return mSupplier.equals(that.mSupplier);
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            result.pass(mSupplier.get());
         }
     }
 }

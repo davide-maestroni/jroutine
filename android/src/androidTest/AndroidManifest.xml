@@ -29,6 +29,9 @@
             android:name="com.github.dm.jrt.android.service.InvocationService"
             android:process=":remote"/>
         <service
+            android:name="com.github.dm.jrt.android.core.DecoratingService"
+            android:process=":remote"/>
+        <service
             android:name="com.github.dm.jrt.android.core.TestService"
             android:process=":remote"/>
     </application>

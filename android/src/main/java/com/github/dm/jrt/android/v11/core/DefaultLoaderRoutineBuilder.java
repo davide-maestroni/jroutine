@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.v11.core;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -40,7 +40,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
     private final LoaderContext mContext;
 
-    private final ContextInvocationFactory<IN, OUT> mFactory;
+    private final FunctionContextInvocationFactory<IN, OUT> mFactory;
 
     private final InvocationConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>>
             mRoutineConfigurable =
@@ -66,14 +66,14 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutineBuilder(@NotNull final LoaderContext context,
-            @NotNull final ContextInvocationFactory<IN, OUT> factory) {
+            @NotNull final FunctionContextInvocationFactory<IN, OUT> factory) {
 
         if (context == null) {
 
             throw new NullPointerException("the routine context must not be null");
         }
 
-        final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
+        final Class<? extends FunctionContextInvocationFactory> factoryClass = factory.getClass();
 
         if (!Reflection.hasStaticContext(factoryClass)) {
 

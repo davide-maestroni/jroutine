@@ -63,6 +63,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static com.github.dm.jrt.util.Reflection.asArgs;
+
 /**
  * Utility class used to manage cached objects shared by routine builders.
  * <p/>
@@ -132,11 +134,11 @@ public class RoutineBuilders {
                             Array.set(array, i, objects.get(i));
                         }
 
-                        args = new Object[]{array};
+                        args = asArgs(array);
 
                     } else {
 
-                        args = new Object[]{objects};
+                        args = asArgs(objects);
                     }
 
                 } else {

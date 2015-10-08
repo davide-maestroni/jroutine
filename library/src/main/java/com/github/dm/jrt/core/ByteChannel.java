@@ -665,6 +665,19 @@ public class ByteChannel {
             mStream = new DefaultBufferInputStream(this);
         }
 
+        /**
+         * Returns the size in number of bytes of this buffer.
+         *
+         * @return the buffer size.
+         */
+        public int getSize() {
+
+            synchronized (mMutex) {
+
+                return mSize;
+            }
+        }
+
         @Override
         public int hashCode() {
 
@@ -724,14 +737,6 @@ public class ByteChannel {
             }
 
             mState = updated;
-        }
-
-        private int getSize() {
-
-            synchronized (mMutex) {
-
-                return mSize;
-            }
         }
 
         @NotNull

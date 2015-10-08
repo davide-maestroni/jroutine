@@ -88,7 +88,7 @@ class DefaultLoaderChannelBuilder
         }
 
         final LoaderRoutineBuilder<Void, OUT> builder =
-                JRoutine.with(context).on(new MissingLoaderInvocation<OUT>(loaderId));
+                JRoutine.with(context).on(new MissingLoaderInvocationFactory<OUT>(loaderId));
         final InvocationConfiguration invocationConfiguration =
                 mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);

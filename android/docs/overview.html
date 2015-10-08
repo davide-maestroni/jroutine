@@ -57,32 +57,36 @@
                 }
             }
 
-            private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends FunctionContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
+                protected void onCall(final List&lt;? extends URI&gt; uris,
+                    &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
 
-                    try {
+                    for (final URI uri : uris) {
 
-                        final InputStream stream = uri.toURL().openConnection().getInputStream();
-                        final Bitmap bitmap = BitmapFactory.decodeStream(stream);
+                        try {
 
-                        if (bitmap != null) {
+                            final InputStream stream = uri.toURL().openConnection().getInputStream();
+                            final Bitmap bitmap = BitmapFactory.decodeStream(stream);
 
-                            result.pass(bitmap);
+                            if (bitmap != null) {
 
-                        } else {
+                                result.pass(bitmap);
 
-                            result.abort();
+                            } else {
+
+                                result.abort();
+                            }
+
+                        } catch (final IOException e) {
+
+                            throw new InvocationException(e);
+
+                        } catch (final InterruptedException e) {
+
+                            throw new InvocationInterruptedException(e);
                         }
-
-                    } catch (final IOException e) {
-
-                        throw new InvocationException(e);
-
-                    } catch (final InterruptedException e) {
-
-                        throw new InvocationInterruptedException(e);
                     }
                 }
             }
@@ -136,37 +140,41 @@
                 }
             }
 
-            private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends FunctionContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
+                protected void onCall(final List&lt;? extends URI&gt; uris,
+                    &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
 
-                    try {
+                    for (final URI uri : uris) {
 
-                        final InputStream stream = uri.toURL().openConnection().getInputStream();
-                        final Bitmap bitmap = BitmapFactory.decodeStream(stream);
+                        try {
 
-                        if (bitmap != null) {
+                            final InputStream stream = uri.toURL().openConnection().getInputStream();
+                            final Bitmap bitmap = BitmapFactory.decodeStream(stream);
 
-                            result.pass(bitmap);
+                            if (bitmap != null) {
 
-                        } else {
+                                result.pass(bitmap);
 
-                            result.abort();
+                            } else {
+
+                                result.abort();
+                            }
+
+                        } catch (final IOException e) {
+
+                            throw new InvocationException(e);
+
+                        } catch (final InterruptedException e) {
+
+                            throw new InvocationInterruptedException(e);
                         }
-
-                    } catch (final IOException e) {
-
-                        throw new InvocationException(e);
-
-                    } catch (final InterruptedException e) {
-
-                        throw new InvocationInterruptedException(e);
                     }
                 }
             }
 
-            private static class LoadBitmapFromService extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmapFromService extends FunctionContextInvocation&lt;URI, Bitmap&gt; {
 
                 private Routine&lt;URI, Bitmap&gt; mRoutine;
 
@@ -180,9 +188,10 @@
                 }
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
+                protected void onCall(final List&lt;? extends URI&gt; uris,
+                    &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
 
-                    result.pass(mRoutine.asyncCall(uri));
+                    result.pass(mRoutine.asyncCall(uris));
                 }
             }
         }

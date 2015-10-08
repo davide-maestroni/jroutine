@@ -22,15 +22,12 @@ import com.github.dm.jrt.android.R;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.invocation.ContextInvocation;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.invocation.DelegatingContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.InvocationClashException;
 import com.github.dm.jrt.android.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.invocation.MissingInvocationException;
-import com.github.dm.jrt.android.invocation.PassingContextInvocation;
-import com.github.dm.jrt.android.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.android.invocation.PassingFunctionContextInvocation;
 import com.github.dm.jrt.android.log.Logs;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.Runners;
@@ -45,8 +42,6 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.invocation.Invocations;
-import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.log.Logger;
@@ -65,13 +60,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryFrom;
-import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
-import static com.github.dm.jrt.android.invocation.ContextInvocations.supplierFactory;
+import static com.github.dm.jrt.android.invocation.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.android.invocation.FunctionContextInvocations.factoryOf;
+import static com.github.dm.jrt.android.invocation.FunctionContextInvocations.supplierFactory;
 import static com.github.dm.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
-import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -90,11 +83,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         super(TestActivity.class);
     }
 
-    private static ContextInvocationFactory<String, String> createFactory() {
+    private static FunctionContextInvocationFactory<String, String> createFactory() {
 
-        return supplierFactory(new Supplier<ContextInvocation<String, String>>() {
+        return supplierFactory(new Supplier<FunctionContextInvocation<String, String>>() {
 
-            public ContextInvocation<String, String> get() {
+            public FunctionContextInvocation<String, String> get() {
 
                 return new StringFunctionInvocation();
             }
@@ -226,8 +219,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(contextFrom(getActivity()))
-                                                    .on(factoryFrom(
-                                                            Invocations.factoryOf(Abort.class)))
+                                                    .on(factoryOf(Abort.class))
                                                     .loaders()
                                                     .withId(0)
                                                     .withCacheStrategy(
@@ -292,8 +284,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         AbortException error = null;
         final OutputChannel<Data> result2 = JRoutine.with(contextFrom(getActivity()))
-                                                    .on(factoryFrom(
-                                                            Invocations.factoryOf(Abort.class)))
+                                                    .on(factoryOf(Abort.class))
                                                     .loaders()
                                                     .withId(0)
                                                     .withCacheStrategy(
@@ -316,8 +307,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result2.checkComplete();
 
         final OutputChannel<Data> result3 = JRoutine.with(contextFrom(getActivity()))
-                                                    .on(factoryFrom(
-                                                            Invocations.factoryOf(Abort.class)))
+                                                    .on(factoryOf(Abort.class))
                                                     .loaders()
                                                     .withId(0)
                                                     .set()
@@ -342,8 +332,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final ClassToken<GetContextInvocation<String>> classToken =
                 new ClassToken<GetContextInvocation<String>>() {};
-        assertThat(JRoutine.on(fromFactory(getActivity(), factoryOf(classToken))).syncCall().next())
-                .isSameAs(getActivity());
         assertThat(JRoutine.with(contextFrom(getActivity()))
                            .on(factoryOf(classToken))
                            .syncCall()
@@ -354,13 +342,13 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 = JRoutine.with(contextFrom(getActivity()))
-                                                         .on(PassingContextInvocation.factoryOf())
+                                                         .on(PassingFunctionContextInvocation
+                                                                     .factoryOf())
                                                          .buildRoutine();
-        final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, TEST_ROUTINE_ID,
-                                                        DelegationType.SYNC);
-        final Routine<Object, Object> routine2 =
-                JRoutine.with(contextFrom(getActivity())).on(factory).buildRoutine();
+        final Routine<Object, Object> routine2 = JRoutine.with(contextFrom(getActivity()))
+                                                         .on(factoryFrom(routine1, TEST_ROUTINE_ID,
+                                                                         DelegationType.SYNC))
+                                                         .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
 
@@ -467,7 +455,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.with(contextFrom(getActivity())).on((ContextInvocationFactory<?, ?>) null);
+            JRoutine.with(contextFrom(getActivity()))
+                    .on((FunctionContextInvocationFactory<?, ?>) null);
 
             fail();
 
@@ -610,8 +599,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         AbortException error = null;
         final OutputChannel<Data> result3 = JRoutine.with(contextFrom(getActivity()))
-                                                    .on(factoryFrom(
-                                                            Invocations.factoryOf(Abort.class)))
+                                                    .on(factoryOf(Abort.class))
                                                     .loaders()
                                                     .withId(0)
                                                     .withCacheStrategy(CacheStrategyType.CACHE)
@@ -633,8 +621,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result3.checkComplete();
 
         final OutputChannel<Data> result4 = JRoutine.with(contextFrom(getActivity()))
-                                                    .on(factoryFrom(
-                                                            Invocations.factoryOf(Abort.class)))
+                                                    .on(factoryOf(Abort.class))
                                                     .loaders()
                                                     .withId(0)
                                                     .set()
@@ -776,8 +763,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         result1.checkComplete();
 
         final OutputChannel<Data> result2 = JRoutine.with(contextFrom(getActivity()))
-                                                    .on(factoryFrom(
-                                                            Invocations.factoryOf(Abort.class)))
+                                                    .on(factoryOf(Abort.class))
                                                     .loaders()
                                                     .withId(0)
                                                     .set()
@@ -800,8 +786,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     @SuppressWarnings("ConstantConditions")
     public void testConfigurationErrors() {
 
-        final ContextInvocationFactory<Object, Object> factory =
-                PassingContextInvocation.factoryOf();
+        final FunctionContextInvocationFactory<Object, Object> factory =
+                PassingFunctionContextInvocation.factoryOf();
 
         try {
 
@@ -954,13 +940,13 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 = JRoutine.with(contextFrom(fragment))
-                                                         .on(PassingContextInvocation.factoryOf())
+                                                         .on(PassingFunctionContextInvocation
+                                                                     .factoryOf())
                                                          .buildRoutine();
-        final ContextInvocationFactory<Object, Object> factory =
-                DelegatingContextInvocation.factoryFrom(routine1, TEST_ROUTINE_ID,
-                                                        DelegationType.ASYNC);
-        final Routine<Object, Object> routine2 =
-                JRoutine.with(contextFrom(fragment)).on(factory).buildRoutine();
+        final Routine<Object, Object> routine2 = JRoutine.with(contextFrom(fragment))
+                                                         .on(factoryFrom(routine1, TEST_ROUTINE_ID,
+                                                                         DelegationType.ASYNC))
+                                                         .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
 
@@ -1083,7 +1069,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutine.with(contextFrom(fragment)).on((ContextInvocationFactory<?, ?>) null);
+            JRoutine.with(contextFrom(fragment)).on((FunctionContextInvocationFactory<?, ?>) null);
 
             fail();
 
@@ -1287,7 +1273,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine1 = JRoutine.with(contextFrom(getActivity()))
-                                                         .on(PassingContextInvocation
+                                                         .on(PassingFunctionContextInvocation
                                                                      .<String>factoryOf())
                                                          .invocations()
                                                          .withLog(Logs.androidLog())
@@ -1475,10 +1461,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                            .all()).containsExactly("test");
     }
 
-    private static class Abort extends TemplateInvocation<Data, Data> {
+    private static class Abort extends FunctionContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
+        protected void onCall(@NotNull final List<? extends Data> inputs,
+                @NotNull final ResultChannel<Data> result) {
 
             try {
 
@@ -1540,34 +1527,42 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     }
 
-    private static class Delay extends TemplateContextInvocation<Data, Data> {
+    private static class Delay extends FunctionContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
+        protected void onCall(@NotNull final List<? extends Data> inputs,
+                @NotNull final ResultChannel<Data> result) {
 
-            result.after(millis(500)).pass(d);
+            result.after(TimeDuration.millis(500)).pass(inputs);
         }
     }
 
     @SuppressWarnings("unused")
-    private static class ErrorInvocation extends TemplateContextInvocation<String, String> {
+    private static class ErrorInvocation extends FunctionContextInvocation<String, String> {
 
         private ErrorInvocation(final int ignored) {
+
+        }
+
+        @Override
+        protected void onCall(@NotNull final List<? extends String> inputs,
+                @NotNull final ResultChannel<String> result) {
 
         }
     }
 
     private static class GetContextInvocation<DATA>
-            extends TemplateContextInvocation<DATA, Context> {
+            extends FunctionContextInvocation<DATA, Context> {
 
         @Override
-        public void onResult(@NotNull final ResultChannel<Context> result) {
+        protected void onCall(@NotNull final List<? extends DATA> inputs,
+                @NotNull final ResultChannel<Context> result) {
 
             result.pass(getContext());
         }
     }
 
-    private static class PurgeContextInvocation extends TemplateContextInvocation<String, String> {
+    private static class PurgeContextInvocation extends FunctionContextInvocation<String, String> {
 
         private static final Semaphore sSemaphore = new Semaphore(0);
 
@@ -1585,9 +1580,10 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         @Override
-        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
+        protected void onCall(@NotNull final List<? extends String> inputs,
+                @NotNull final ResultChannel<String> result) {
 
-            result.pass(s);
+            result.pass(inputs);
         }
     }
 
@@ -1602,12 +1598,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class ToUpperCase extends TemplateContextInvocation<String, String> {
+    private static class ToUpperCase extends FunctionContextInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
+        protected void onCall(@NotNull final List<? extends String> inputs,
+                @NotNull final ResultChannel<String> result) {
 
-            result.after(millis(500)).pass(s.toUpperCase());
+            result.after(TimeDuration.millis(500));
+
+            for (final String input : inputs) {
+
+                result.pass(input.toUpperCase());
+            }
         }
     }
 }

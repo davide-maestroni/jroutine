@@ -34,6 +34,14 @@ import org.jetbrains.annotations.Nullable;
 public abstract class FilterContextInvocation<IN, OUT> extends ContextInvocationFactory<IN, OUT>
         implements ContextInvocation<IN, OUT> {
 
+    /**
+     * Constructor.
+     */
+    protected FilterContextInvocation() {
+
+        super(null);
+    }
+
     @NotNull
     @Override
     public final ContextInvocation<IN, OUT> newInvocation() {

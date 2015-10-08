@@ -83,8 +83,9 @@ public class ChannelsTest {
                 .pass(new Selectable<String>("test5", 31))
                 .pass(new Selectable<Integer>(5, 17))
                 .close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1", "test2", "test3",
-                                                                         "test4", "test5");
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1", "test2",
+                                                                                 "test3", "test4",
+                                                                                 "test5");
         assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
@@ -284,9 +285,11 @@ public class ChannelsTest {
                 .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
         Channels.distribute(channel1, channel2).pass(Collections.singletonList("test3-1")).close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1", "test2-1",
-                                                                         "test3-1");
-        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2", "test2-2");
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
+                                                                                 "test2-1",
+                                                                                 "test3-1");
+        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
+                                                                                 "test2-2");
     }
 
     @Test
@@ -359,10 +362,11 @@ public class ChannelsTest {
         Channels.distributeAndFlush(channel1, channel2)
                 .pass(Collections.singletonList("test3-1"))
                 .close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1", "test2-1",
-                                                                         "test3-1");
-        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2", "test2-2",
-                                                                         null);
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
+                                                                                 "test2-1",
+                                                                                 "test3-1");
+        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
+                                                                                 "test2-2", null);
     }
 
     @Test
@@ -783,7 +787,9 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2))
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -886,9 +892,11 @@ public class ChannelsTest {
         channel1.close();
         channel2.close();
 
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsExactly("0", "1", "2",
-                                                                                   "3");
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsExactly(0, 1, 2, 3);
+        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsExactly("0", "1",
+                                                                                           "2",
+                                                                                           "3");
+        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsExactly(0, 1, 2,
+                                                                                            3);
     }
 
     @Test
@@ -1292,10 +1300,11 @@ public class ChannelsTest {
 
         final IOChannel<String, String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
-        assertThat(
-                Channels.toSelectable(channel.asOutput(), 33).afterMax(seconds(1)).all()).containsExactly(
-                new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
-                new Selectable<String>("test3", 33));
+        assertThat(Channels.toSelectable(channel.asOutput(), 33)
+                           .afterMax(seconds(1))
+                           .all()).containsExactly(new Selectable<String>("test1", 33),
+                                                   new Selectable<String>("test2", 33),
+                                                   new Selectable<String>("test3", 33));
     }
 
     @Test

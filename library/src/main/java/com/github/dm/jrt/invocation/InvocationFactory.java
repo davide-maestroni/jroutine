@@ -16,7 +16,7 @@ package com.github.dm.jrt.invocation;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Invocation factory interface.
+ * Abstract class defining an invocation factory.
  * <p/>
  * Created by davide-maestroni on 02/12/2015.
  *

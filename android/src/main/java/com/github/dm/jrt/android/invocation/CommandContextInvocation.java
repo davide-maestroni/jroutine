@@ -11,7 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.android.invocation;
+
+import android.content.Context;
 
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
@@ -20,21 +22,29 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Abstract implementation of an invocation performing a procedure (that is, no input is required)
+ * Abstract implementation of an invocation performing a command (that is, no input is required)
  * eventually returning output data.
  * <p/>
  * Note that the implementing class must not retain an internal variable state.
  * <p/>
- * Created by davide-maestroni on 06/05/2015.
+ * Created by davide-maestroni on 01/08/2015.
  *
  * @param <OUT> the output data type.
  */
-public abstract class ProcedureInvocation<OUT> extends InvocationFactory<Void, OUT>
-        implements Invocation<Void, OUT> {
+public abstract class CommandContextInvocation<OUT> extends ContextInvocationFactory<Void, OUT>
+        implements ContextInvocation<Void, OUT> {
+
+    /**
+     * Constructor.
+     */
+    protected CommandContextInvocation() {
+
+        super(null);
+    }
 
     @NotNull
     @Override
-    public final Invocation<Void, OUT> newInvocation() {
+    public final ContextInvocation<Void, OUT> newInvocation() {
 
         return this;
     }
@@ -56,6 +66,10 @@ public abstract class ProcedureInvocation<OUT> extends InvocationFactory<Void, O
     }
 
     public final void onTerminate() {
+
+    }
+
+    public final void onContext(@NotNull final Context context) {
 
     }
 }

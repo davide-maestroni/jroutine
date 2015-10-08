@@ -47,6 +47,18 @@ public class Reflection {
     }
 
     /**
+     * Returns the specified objects as an array of arguments.
+     *
+     * @param args the argument objects.
+     * @return the array.
+     */
+    @NotNull
+    public static Object[] asArgs(@Nullable final Object... args) {
+
+        return (args != null) ? args : Reflection.NO_ARGS;
+    }
+
+    /**
      * Returns the class boxing the specified primitive type.
      * <p/>
      * If the passed class does not represent a primitive type the same class is returned.

@@ -20,6 +20,7 @@ import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
+import com.github.dm.jrt.android.invocation.CommandContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationWrapper;
 import com.github.dm.jrt.android.invocation.FilterContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
@@ -348,6 +349,26 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                            .all()).containsOnly("1", "2", "3", "4", "5");
     }
 
+    public void testInvocations5() throws InterruptedException {
+
+        final TimeDuration timeout = seconds(10);
+        final TargetInvocationFactory<Void, String> targetFactory =
+                factoryOf(TextCommandInvocation.class);
+        final Routine<Void, String> routine4 = JRoutine.with(serviceFrom(getActivity()))
+                                                       .on(targetFactory)
+                                                       .invocations()
+                                                       .withCoreInstances(0)
+                                                       .withMaxInstances(2)
+                                                       .set()
+                                                       .buildRoutine();
+        assertThat(routine4.syncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
+                                                                             "test3");
+        assertThat(routine4.asyncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
+                                                                              "test3");
+        assertThat(routine4.parallelCall().afterMax(timeout).all()).containsOnly("test1", "test2",
+                                                                                 "test3");
+    }
+
     public void testParcelable() {
 
         final TimeDuration timeout = seconds(10);
@@ -580,6 +601,14 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.pass(s);
+        }
+    }
+
+    private static class TextCommandInvocation extends CommandContextInvocation<String> {
+
+        public void onResult(@NotNull final ResultChannel<String> result) {
+
+            result.pass("test1", "test2", "test3");
         }
     }
 }

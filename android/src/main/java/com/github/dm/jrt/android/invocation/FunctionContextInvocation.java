@@ -23,9 +23,6 @@ import org.jetbrains.annotations.NotNull;
  * This is a special abstract implementation that centralizes the routine invocation inside a
  * single method, which gets called only when all the inputs are available.
  * <p/>
- * The implementing class may additionally override the invocation methods to specifically handle
- * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
- * <p/>
  * Created by davide-maestroni on 01/08/2015.
  *
  * @param <IN>  the input data type.

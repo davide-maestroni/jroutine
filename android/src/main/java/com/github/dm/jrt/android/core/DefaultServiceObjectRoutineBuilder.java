@@ -30,7 +30,6 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Mutex;
-import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +49,7 @@ import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
 import static com.github.dm.jrt.core.RoutineBuilders.getSharedMutex;
 import static com.github.dm.jrt.core.RoutineBuilders.getTargetMethodInfo;
 import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 import static com.github.dm.jrt.util.Reflection.findMethod;
 
 /**
@@ -172,7 +172,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final List<String> sharedFields =
                 fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{sharedFields, target, name};
+        final Object[] args = asArgs(sharedFields, target, name);
         return JRoutine.with(mContext)
                        .on(factoryOf(new MethodAliasToken<IN, OUT>(), args))
                        .invocations()
@@ -212,7 +212,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
         final List<String> sharedFields =
                 fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
-        final Object[] args = new Object[]{sharedFields, target, name, toNames(parameterTypes)};
+        final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
         return JRoutine.with(mContext)
                        .on(factoryOf(new MethodSignatureToken<IN, OUT>(), args))
                        .invocations()
@@ -582,9 +582,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
             final List<String> sharedFields =
                     fieldsWithShareAnnotation(mProxyConfiguration, method);
-            final Object[] factoryArgs = new Object[]{sharedFields, target, targetMethod.getName(),
-                                                      toNames(targetParameterTypes), inputMode,
-                                                      outputMode};
+            final Object[] factoryArgs = asArgs(sharedFields, target, targetMethod.getName(),
+                                                toNames(targetParameterTypes), inputMode,
+                                                outputMode);
             final TargetInvocationFactory<Object, Object> targetFactory =
                     factoryOf(PROXY_TOKEN, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
@@ -598,8 +598,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                                             .with(mServiceConfiguration)
                                                             .set()
                                                             .buildRoutine();
-            return invokeRoutine(routine, method, (args == null) ? Reflection.NO_ARGS : args,
-                                 methodInfo.invocationMode, inputMode, outputMode);
+            return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
+                                 inputMode, outputMode);
         }
     }
 

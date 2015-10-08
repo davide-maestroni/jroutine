@@ -65,7 +65,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         routine.purge();
     }
 
-    private static class PassingStringInvocation extends FilterContextInvocation<String, String>
+    public static class PassingStringInvocation extends FilterContextInvocation<String, String>
             implements StringInvocation {
 
         public void onInput(final String input, @NotNull final ResultChannel<String> result) {

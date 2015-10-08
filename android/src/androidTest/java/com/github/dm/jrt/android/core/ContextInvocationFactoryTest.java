@@ -47,25 +47,25 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     public void testInvocationDecoratorAbort() {
 
-        final Routine<String, String> routine = JRoutine.with(serviceFrom(getActivity()))
-                                                        .on(factoryOf(
-                                                                PassingStringInvocation.class))
-                                                        .buildRoutine();
+        final Routine<String, String> routine =
+                JRoutine.with(serviceFrom(getActivity(), DecoratingService.class))
+                        .on(factoryOf(PassingStringInvocation.class))
+                        .buildRoutine();
         assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
         routine.purge();
     }
 
     public void testInvocationDecoratorLifecycle() {
 
-        final Routine<String, String> routine = JRoutine.with(serviceFrom(getActivity()))
-                                                        .on(factoryOf(
-                                                                PassingStringInvocation.class))
-                                                        .buildRoutine();
+        final Routine<String, String> routine =
+                JRoutine.with(serviceFrom(getActivity(), DecoratingService.class))
+                        .on(factoryOf(PassingStringInvocation.class))
+                        .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsExactly("test");
         routine.purge();
     }
 
-    public static class PassingStringInvocation extends FilterContextInvocation<String, String>
+    private static class PassingStringInvocation extends FilterContextInvocation<String, String>
             implements StringInvocation {
 
         public void onInput(final String input, @NotNull final ResultChannel<String> result) {

@@ -36,7 +36,7 @@ public class DecoratingService extends InvocationService {
 
         final ContextInvocationFactory<?, ?> factory = super.getInvocationFactory(target);
 
-        if (target.getInvocationClass().isAssignableFrom(StringInvocation.class)) {
+        if (StringInvocation.class.isAssignableFrom(target.getInvocationClass())) {
 
             return new TestInvocationFactory((ContextInvocationFactory<String, String>) factory);
         }

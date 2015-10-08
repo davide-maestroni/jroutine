@@ -19,8 +19,6 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.DecoratingService.StringInvocation;
 import com.github.dm.jrt.android.invocation.FilterContextInvocation;
-import com.github.dm.jrt.android.v11.core.JRoutine;
-import com.github.dm.jrt.android.v11.core.TestActivity;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.routine.Routine;
 

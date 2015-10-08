@@ -59,7 +59,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                 JRoutine.with(serviceFrom(getActivity(), DecoratingService.class))
                         .on(factoryOf(PassingStringInvocation.class))
                         .buildRoutine();
-        assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsExactly("test");
+        assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test");
         routine.purge();
     }
 

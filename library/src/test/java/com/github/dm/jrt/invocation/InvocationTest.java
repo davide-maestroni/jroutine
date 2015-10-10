@@ -35,11 +35,11 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.github.dm.jrt.invocation.Invocations.consumerCommand;
+import static com.github.dm.jrt.invocation.Invocations.consumerFactory;
 import static com.github.dm.jrt.invocation.Invocations.consumerFilter;
-import static com.github.dm.jrt.invocation.Invocations.consumerInvocation;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.invocation.Invocations.functionFactory;
 import static com.github.dm.jrt.invocation.Invocations.functionFilter;
-import static com.github.dm.jrt.invocation.Invocations.functionInvocation;
 import static com.github.dm.jrt.invocation.Invocations.supplierCommand;
 import static com.github.dm.jrt.invocation.Invocations.supplierFactory;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -117,7 +117,7 @@ public class InvocationTest {
 
     private static InvocationFactory<?, String> createFunction() {
 
-        return consumerInvocation(new BiConsumer<List<?>, ResultChannel<String>>() {
+        return consumerFactory(new BiConsumer<List<?>, ResultChannel<String>>() {
 
             public void accept(final List<?> objects, final ResultChannel<String> result) {
 
@@ -131,7 +131,7 @@ public class InvocationTest {
 
     private static InvocationFactory<?, String> createFunction2() {
 
-        return functionInvocation(new Function<List<?>, String>() {
+        return functionFactory(new Function<List<?>, String>() {
 
             public String apply(final List<?> objects) {
 
@@ -448,13 +448,13 @@ public class InvocationTest {
         final FunctionChain<List<?>, ? super List<?>> identity = Functions.identity();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFunction2());
-        assertThat(factory).isNotEqualTo(functionInvocation(identity));
+        assertThat(factory).isNotEqualTo(functionFactory(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFunction2().hashCode());
-        assertThat(functionInvocation(identity)).isEqualTo(functionInvocation(identity));
-        assertThat(functionInvocation(identity).hashCode()).isEqualTo(
-                functionInvocation(identity).hashCode());
+        assertThat(functionFactory(identity)).isEqualTo(functionFactory(identity));
+        assertThat(functionFactory(identity).hashCode()).isEqualTo(
+                functionFactory(identity).hashCode());
     }
 
     @Test
@@ -463,7 +463,7 @@ public class InvocationTest {
 
         try {
 
-            functionInvocation(null);
+            functionFactory(null);
 
             fail();
 
@@ -473,7 +473,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(functionInvocation(new Function<List<?>, String>() {
+            JRoutine.on(functionFactory(new Function<List<?>, String>() {
 
                 public String apply(final List<?> objects) {
 
@@ -502,13 +502,12 @@ public class InvocationTest {
         final BiConsumerChain<List<?>, ResultChannel<Object>> sink = Functions.biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isEqualTo(createFunction());
-        assertThat(factory).isNotEqualTo(consumerInvocation(sink));
+        assertThat(factory).isNotEqualTo(consumerFactory(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(factory.hashCode()).isEqualTo(createFunction().hashCode());
-        assertThat(consumerInvocation(sink)).isEqualTo(consumerInvocation(sink));
-        assertThat(consumerInvocation(sink).hashCode()).isEqualTo(
-                consumerInvocation(sink).hashCode());
+        assertThat(consumerFactory(sink)).isEqualTo(consumerFactory(sink));
+        assertThat(consumerFactory(sink).hashCode()).isEqualTo(consumerFactory(sink).hashCode());
     }
 
     @Test
@@ -517,7 +516,7 @@ public class InvocationTest {
 
         try {
 
-            consumerInvocation(null);
+            consumerFactory(null);
 
             fail();
 
@@ -527,7 +526,7 @@ public class InvocationTest {
 
         try {
 
-            JRoutine.on(consumerInvocation(new BiConsumer<List<?>, ResultChannel<String>>() {
+            JRoutine.on(consumerFactory(new BiConsumer<List<?>, ResultChannel<String>>() {
 
                 public void accept(final List<?> objects, final ResultChannel<String> result) {
 

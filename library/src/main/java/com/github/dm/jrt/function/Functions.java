@@ -30,16 +30,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class Functions {
 
-    private static final BiConsumerObject<?, ?> sBiSink =
-            newBiConsumer(new BiConsumer<Object, Object>() {
+    private static final BiConsumerChain<?, ?> sBiSink =
+            biConsumerChain(new BiConsumer<Object, Object>() {
 
                 public void accept(final Object in1, final Object in2) {
 
                 }
             });
 
-    private static final FunctionObject<?, ?> sIdentity =
-            newFunction(new Function<Object, Object>() {
+    private static final FunctionChain<?, ?> sIdentity =
+            functionChain(new Function<Object, Object>() {
 
                 public Object apply(final Object in) {
 
@@ -47,7 +47,7 @@ public class Functions {
                 }
             });
 
-    private static final ConsumerObject<?> sSink = newConsumer(new Consumer<Object>() {
+    private static final ConsumerChain<?> sSink = consumerChain(new Consumer<Object>() {
 
         public void accept(final Object in) {
 
@@ -59,55 +59,6 @@ public class Functions {
      */
     protected Functions() {
 
-    }
-
-    /**
-     * Returns a bi-consumer instance just discarding the passed inputs.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
-     * @return the wrapped bi-consumer.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiConsumerObject<IN1, IN2> biSink() {
-
-        return (BiConsumerObject<IN1, IN2>) sBiSink;
-    }
-
-    /**
-     * Returns a supplier instance always returning the same result.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param result the result.
-     * @param <OUT>  the output data type.
-     * @return the wrapped supplier.
-     */
-    @NotNull
-    public static <OUT> SupplierObject<OUT> constant(final OUT result) {
-
-        return newSupplier(new Supplier<OUT>() {
-
-            public OUT get() {
-
-                return result;
-            }
-        });
-    }
-
-    /**
-     * Returns the identity function.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the wrapped function.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> FunctionObject<IN, IN> identity() {
-
-        return (FunctionObject<IN, IN>) sIdentity;
     }
 
     /**
@@ -127,16 +78,50 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <IN1, IN2> BiConsumerObject<IN1, IN2> newBiConsumer(
+    public static <IN1, IN2> BiConsumerChain<IN1, IN2> biConsumerChain(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
 
-        if (consumer.getClass() == BiConsumerObject.class) {
+        if (consumer.getClass() == BiConsumerChain.class) {
 
-            return (BiConsumerObject<IN1, IN2>) consumer;
+            return (BiConsumerChain<IN1, IN2>) consumer;
         }
 
-        return new BiConsumerObject<IN1, IN2>(
-                Collections.<BiConsumer<?, ?>>singletonList(consumer));
+        return new BiConsumerChain<IN1, IN2>(Collections.<BiConsumer<?, ?>>singletonList(consumer));
+    }
+
+    /**
+     * Returns a bi-consumer chain just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the wrapped bi-consumer.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiConsumerChain<IN1, IN2> biSink() {
+
+        return (BiConsumerChain<IN1, IN2>) sBiSink;
+    }
+
+    /**
+     * Returns a supplier chain always returning the same result.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param result the result.
+     * @param <OUT>  the output data type.
+     * @return the wrapped supplier.
+     */
+    @NotNull
+    public static <OUT> SupplierChain<OUT> constant(final OUT result) {
+
+        return supplierChain(new Supplier<OUT>() {
+
+            public OUT get() {
+
+                return result;
+            }
+        });
     }
 
     /**
@@ -155,14 +140,14 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <IN> ConsumerObject<IN> newConsumer(@NotNull final Consumer<IN> consumer) {
+    public static <IN> ConsumerChain<IN> consumerChain(@NotNull final Consumer<IN> consumer) {
 
-        if (consumer.getClass() == ConsumerObject.class) {
+        if (consumer.getClass() == ConsumerChain.class) {
 
-            return (ConsumerObject<IN>) consumer;
+            return (ConsumerChain<IN>) consumer;
         }
 
-        return new ConsumerObject<IN>(Collections.<Consumer<?>>singletonList(consumer));
+        return new ConsumerChain<IN>(Collections.<Consumer<?>>singletonList(consumer));
     }
 
     /**
@@ -182,15 +167,43 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <IN, OUT> FunctionObject<IN, OUT> newFunction(
+    public static <IN, OUT> FunctionChain<IN, OUT> functionChain(
             @NotNull final Function<IN, OUT> function) {
 
-        if (function.getClass() == FunctionObject.class) {
+        if (function.getClass() == FunctionChain.class) {
 
-            return (FunctionObject<IN, OUT>) function;
+            return (FunctionChain<IN, OUT>) function;
         }
 
-        return new FunctionObject<IN, OUT>(Collections.<Function<?, ?>>singletonList(function));
+        return new FunctionChain<IN, OUT>(Collections.<Function<?, ?>>singletonList(function));
+    }
+
+    /**
+     * Returns the identity function.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the wrapped function.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> FunctionChain<IN, IN> identity() {
+
+        return (FunctionChain<IN, IN>) sIdentity;
+    }
+
+    /**
+     * Returns a consumer chain just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the wrapped consumer.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> ConsumerChain<IN> sink() {
+
+        return (ConsumerChain<IN>) sSink;
     }
 
     /**
@@ -209,28 +222,14 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <OUT> SupplierObject<OUT> newSupplier(@NotNull final Supplier<OUT> supplier) {
+    public static <OUT> SupplierChain<OUT> supplierChain(@NotNull final Supplier<OUT> supplier) {
 
-        if (supplier.getClass() == SupplierObject.class) {
+        if (supplier.getClass() == SupplierChain.class) {
 
-            return (SupplierObject<OUT>) supplier;
+            return (SupplierChain<OUT>) supplier;
         }
 
-        return new SupplierObject<OUT>(supplier, Collections.<Function<?, ?>>emptyList());
-    }
-
-    /**
-     * Returns a consumer instance just discarding the passed inputs.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the wrapped consumer.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> ConsumerObject<IN> sink() {
-
-        return (ConsumerObject<IN>) sSink;
+        return new SupplierChain<OUT>(supplier, Collections.<Function<?, ?>>emptyList());
     }
 
     /**
@@ -239,7 +238,7 @@ public class Functions {
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
      */
-    public static class BiConsumerObject<IN1, IN2> implements BiConsumer<IN1, IN2> {
+    public static class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
         private final List<BiConsumer<?, ?>> mConsumers;
 
@@ -248,14 +247,14 @@ public class Functions {
          *
          * @param consumers the list of wrapped consumers.
          */
-        private BiConsumerObject(@NotNull final List<BiConsumer<?, ?>> consumers) {
+        private BiConsumerChain(@NotNull final List<BiConsumer<?, ?>> consumers) {
 
             mConsumers = consumers;
         }
 
         /**
-         * Returns a composed bi-consumer that performs, in sequence, this operation followed by the
-         * after operation.
+         * Returns a composed bi-consumer chain that performs, in sequence, this operation followed
+         * by the after operation.
          *
          * @param after the operation to perform after this operation.
          * @return the composed bi-consumer.
@@ -263,7 +262,7 @@ public class Functions {
         @NotNull
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
-        public BiConsumerObject<IN1, IN2> andThen(
+        public BiConsumerChain<IN1, IN2> andThen(
                 @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
 
             final Class<? extends BiConsumer> consumerClass = after.getClass();
@@ -272,20 +271,20 @@ public class Functions {
                     new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
             newConsumers.addAll(consumers);
 
-            if (consumerClass == BiConsumerObject.class) {
+            if (consumerClass == BiConsumerChain.class) {
 
-                newConsumers.addAll(((BiConsumerObject<?, ?>) after).mConsumers);
+                newConsumers.addAll(((BiConsumerChain<?, ?>) after).mConsumers);
 
             } else {
 
                 newConsumers.add(after);
             }
 
-            return new BiConsumerObject<IN1, IN2>(newConsumers);
+            return new BiConsumerChain<IN1, IN2>(newConsumers);
         }
 
         /**
-         * Checks if this bi-consumer instance has a static context.
+         * Checks if this bi-consumer chain has a static context.
          *
          * @return whether this instance has a static context.
          */
@@ -328,7 +327,7 @@ public class Functions {
                 return false;
             }
 
-            final BiConsumerObject<?, ?> that = (BiConsumerObject<?, ?>) o;
+            final BiConsumerChain<?, ?> that = (BiConsumerChain<?, ?>) o;
             final List<BiConsumer<?, ?>> thisConsumers = mConsumers;
             final List<BiConsumer<?, ?>> thatConsumers = that.mConsumers;
             final int size = thisConsumers.size();
@@ -370,7 +369,7 @@ public class Functions {
      *
      * @param <IN> the input data type.
      */
-    public static class ConsumerObject<IN> implements Consumer<IN> {
+    public static class ConsumerChain<IN> implements Consumer<IN> {
 
         private final List<Consumer<?>> mConsumers;
 
@@ -379,14 +378,14 @@ public class Functions {
          *
          * @param consumers the list of wrapped consumers.
          */
-        private ConsumerObject(@NotNull final List<Consumer<?>> consumers) {
+        private ConsumerChain(@NotNull final List<Consumer<?>> consumers) {
 
             mConsumers = consumers;
         }
 
         /**
-         * Returns a composed consumer that performs, in sequence, this operation followed by the
-         * after operation.
+         * Returns a composed consumer chain that performs, in sequence, this operation followed by
+         * the after operation.
          *
          * @param after the operation to perform after this operation.
          * @return the composed consumer.
@@ -394,7 +393,7 @@ public class Functions {
         @NotNull
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
-        public ConsumerObject<IN> andThen(@NotNull final Consumer<? super IN> after) {
+        public ConsumerChain<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
             final Class<? extends Consumer> consumerClass = after.getClass();
             final List<Consumer<?>> consumers = mConsumers;
@@ -402,20 +401,20 @@ public class Functions {
                     new ArrayList<Consumer<?>>(consumers.size() + 1);
             newConsumers.addAll(consumers);
 
-            if (consumerClass == ConsumerObject.class) {
+            if (consumerClass == ConsumerChain.class) {
 
-                newConsumers.addAll(((ConsumerObject<?>) after).mConsumers);
+                newConsumers.addAll(((ConsumerChain<?>) after).mConsumers);
 
             } else {
 
                 newConsumers.add(after);
             }
 
-            return new ConsumerObject<IN>(newConsumers);
+            return new ConsumerChain<IN>(newConsumers);
         }
 
         /**
-         * Checks if this consumer instance has a static context.
+         * Checks if this consumer chain has a static context.
          *
          * @return whether this instance has a static context.
          */
@@ -458,7 +457,7 @@ public class Functions {
                 return false;
             }
 
-            final ConsumerObject<?> that = (ConsumerObject<?>) o;
+            final ConsumerChain<?> that = (ConsumerChain<?>) o;
             final List<Consumer<?>> thisConsumers = mConsumers;
             final List<Consumer<?>> thatConsumers = that.mConsumers;
             final int size = thisConsumers.size();
@@ -500,7 +499,7 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    public static class FunctionObject<IN, OUT> implements Function<IN, OUT> {
+    public static class FunctionChain<IN, OUT> implements Function<IN, OUT> {
 
         private final List<Function<?, ?>> mFunctions;
 
@@ -509,13 +508,13 @@ public class Functions {
          *
          * @param functions the list of wrapped functions.
          */
-        private FunctionObject(@NotNull final List<Function<?, ?>> functions) {
+        private FunctionChain(@NotNull final List<Function<?, ?>> functions) {
 
             mFunctions = functions;
         }
 
         /**
-         * Returns a composed function that first applies this function to its input, and then
+         * Returns a composed function chain that first applies this function to its input, and then
          * applies the after function to the result.
          *
          * @param after   the function to apply after this function is applied.
@@ -525,7 +524,7 @@ public class Functions {
         @NotNull
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
-        public <AFTER> FunctionObject<IN, AFTER> andThen(
+        public <AFTER> FunctionChain<IN, AFTER> andThen(
                 @NotNull final Function<? super OUT, AFTER> after) {
 
             final Class<? extends Function> functionClass = after.getClass();
@@ -534,21 +533,21 @@ public class Functions {
                     new ArrayList<Function<?, ?>>(functions.size() + 1);
             newFunctions.addAll(functions);
 
-            if (functionClass == FunctionObject.class) {
+            if (functionClass == FunctionChain.class) {
 
-                newFunctions.addAll(((FunctionObject<?, ?>) after).mFunctions);
+                newFunctions.addAll(((FunctionChain<?, ?>) after).mFunctions);
 
             } else {
 
                 newFunctions.add(after);
             }
 
-            return new FunctionObject<IN, AFTER>(newFunctions);
+            return new FunctionChain<IN, AFTER>(newFunctions);
         }
 
         /**
-         * Returns a composed function that first applies the before function to its input, and then
-         * applies this function to the result.
+         * Returns a composed function chain that first applies the before function to its input,
+         * and then applies this function to the result.
          *
          * @param before   the function to apply before this function is applied.
          * @param <BEFORE> the type of input to the before function.
@@ -557,7 +556,7 @@ public class Functions {
         @NotNull
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
-        public <BEFORE> FunctionObject<BEFORE, OUT> compose(
+        public <BEFORE> FunctionChain<BEFORE, OUT> compose(
                 @NotNull final Function<BEFORE, ? extends IN> before) {
 
             final Class<? extends Function> functionClass = before.getClass();
@@ -565,9 +564,9 @@ public class Functions {
             final ArrayList<Function<?, ?>> newFunctions =
                     new ArrayList<Function<?, ?>>(functions.size() + 1);
 
-            if (functionClass == FunctionObject.class) {
+            if (functionClass == FunctionChain.class) {
 
-                newFunctions.addAll(((FunctionObject<?, ?>) before).mFunctions);
+                newFunctions.addAll(((FunctionChain<?, ?>) before).mFunctions);
 
             } else {
 
@@ -575,11 +574,11 @@ public class Functions {
             }
 
             newFunctions.addAll(functions);
-            return new FunctionObject<BEFORE, OUT>(newFunctions);
+            return new FunctionChain<BEFORE, OUT>(newFunctions);
         }
 
         /**
-         * Checks if this function instance has a static context.
+         * Checks if this function chain has a static context.
          *
          * @return whether this instance has a static context.
          */
@@ -624,7 +623,7 @@ public class Functions {
                 return false;
             }
 
-            final FunctionObject<?, ?> that = (FunctionObject<?, ?>) o;
+            final FunctionChain<?, ?> that = (FunctionChain<?, ?>) o;
             final List<Function<?, ?>> thisFunctions = mFunctions;
             final List<Function<?, ?>> thatFunctions = that.mFunctions;
             final int size = thisFunctions.size();
@@ -670,7 +669,7 @@ public class Functions {
      *
      * @param <OUT> the output data type.
      */
-    public static class SupplierObject<OUT> implements Supplier<OUT> {
+    public static class SupplierChain<OUT> implements Supplier<OUT> {
 
         private final List<Function<?, ?>> mFunctions;
 
@@ -682,7 +681,7 @@ public class Functions {
          * @param supplier  the initial wrapped supplier.
          * @param functions the list of wrapped functions.
          */
-        private SupplierObject(@NotNull final Supplier<?> supplier,
+        private SupplierChain(@NotNull final Supplier<?> supplier,
                 @NotNull final List<Function<?, ?>> functions) {
 
             mSupplier = supplier;
@@ -690,8 +689,8 @@ public class Functions {
         }
 
         /**
-         * Returns a composed supplier that first gets this supplier result, and then
-         * applies the after function to it.
+         * Returns a composed supplier chain that first gets this supplier result, and then applies
+         * the after function to it.
          *
          * @param after   the function to apply after this function is applied.
          * @param <AFTER> the type of output of the after function.
@@ -700,7 +699,7 @@ public class Functions {
         @NotNull
         @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                 justification = "class comparison with == is done")
-        public <AFTER> SupplierObject<AFTER> andThen(
+        public <AFTER> SupplierChain<AFTER> andThen(
                 @NotNull final Function<? super OUT, AFTER> after) {
 
             final Class<? extends Function> functionClass = after.getClass();
@@ -709,20 +708,20 @@ public class Functions {
                     new ArrayList<Function<?, ?>>(functions.size() + 1);
             newFunctions.addAll(functions);
 
-            if (functionClass == FunctionObject.class) {
+            if (functionClass == FunctionChain.class) {
 
-                newFunctions.addAll(((FunctionObject<?, ?>) after).mFunctions);
+                newFunctions.addAll(((FunctionChain<?, ?>) after).mFunctions);
 
             } else {
 
                 newFunctions.add(after);
             }
 
-            return new SupplierObject<AFTER>(mSupplier, newFunctions);
+            return new SupplierChain<AFTER>(mSupplier, newFunctions);
         }
 
         /**
-         * Checks if this supplier instance has a static context.
+         * Checks if this supplier chain has a static context.
          *
          * @return whether this instance has a static context.
          */
@@ -772,7 +771,7 @@ public class Functions {
                 return false;
             }
 
-            final SupplierObject<?> that = (SupplierObject<?>) o;
+            final SupplierChain<?> that = (SupplierChain<?>) o;
 
             if (mSupplier.getClass() != that.mSupplier.getClass()) {
 

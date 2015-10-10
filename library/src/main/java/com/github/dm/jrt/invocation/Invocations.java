@@ -17,10 +17,10 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Functions.BiConsumerObject;
-import com.github.dm.jrt.function.Functions.ConsumerObject;
-import com.github.dm.jrt.function.Functions.FunctionObject;
-import com.github.dm.jrt.function.Functions.SupplierObject;
+import com.github.dm.jrt.function.Functions.BiConsumerChain;
+import com.github.dm.jrt.function.Functions.ConsumerChain;
+import com.github.dm.jrt.function.Functions.FunctionChain;
+import com.github.dm.jrt.function.Functions.SupplierChain;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
@@ -32,10 +32,10 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.dm.jrt.function.Functions.newBiConsumer;
-import static com.github.dm.jrt.function.Functions.newConsumer;
-import static com.github.dm.jrt.function.Functions.newFunction;
-import static com.github.dm.jrt.function.Functions.newSupplier;
+import static com.github.dm.jrt.function.Functions.biConsumerChain;
+import static com.github.dm.jrt.function.Functions.consumerChain;
+import static com.github.dm.jrt.function.Functions.functionChain;
+import static com.github.dm.jrt.function.Functions.supplierChain;
 
 /**
  * Utility class for creating invocation factory objects.
@@ -69,7 +69,7 @@ public class Invocations {
     public static <OUT> CommandInvocation<OUT> consumerCommand(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerCommandInvocation<OUT>(newConsumer(consumer));
+        return new ConsumerCommandInvocation<OUT>(consumerChain(consumer));
     }
 
     /**
@@ -91,7 +91,7 @@ public class Invocations {
     public static <IN, OUT> FilterInvocation<IN, OUT> consumerFilter(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerFilterInvocation<IN, OUT>(newBiConsumer(consumer));
+        return new ConsumerFilterInvocation<IN, OUT>(biConsumerChain(consumer));
     }
 
     /**
@@ -115,7 +115,7 @@ public class Invocations {
             @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
                     consumer) {
 
-        return new ConsumerInvocationFactory<IN, OUT>(newBiConsumer(consumer));
+        return new ConsumerInvocationFactory<IN, OUT>(biConsumerChain(consumer));
     }
 
     /**
@@ -264,7 +264,7 @@ public class Invocations {
     public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
             @NotNull final Function<? super IN, ? extends OUT> function) {
 
-        return new FunctionFilterInvocation<IN, OUT>(newFunction(function));
+        return new FunctionFilterInvocation<IN, OUT>(functionChain(function));
     }
 
     /**
@@ -287,7 +287,7 @@ public class Invocations {
     public static <IN, OUT> InvocationFactory<IN, OUT> functionInvocation(
             @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
 
-        return new FunctionInvocationFactory<IN, OUT>(newFunction(function));
+        return new FunctionInvocationFactory<IN, OUT>(functionChain(function));
     }
 
     /**
@@ -308,7 +308,7 @@ public class Invocations {
     public static <OUT> CommandInvocation<OUT> supplierCommand(
             @NotNull final Supplier<? extends OUT> supplier) {
 
-        return new SupplierCommandInvocation<OUT>(newSupplier(supplier));
+        return new SupplierCommandInvocation<OUT>(supplierChain(supplier));
     }
 
     /**
@@ -330,7 +330,7 @@ public class Invocations {
     public static <IN, OUT> InvocationFactory<IN, OUT> supplierFactory(
             @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
 
-        return new SupplierInvocationFactory<IN, OUT>(newSupplier(supplier));
+        return new SupplierInvocationFactory<IN, OUT>(supplierChain(supplier));
     }
 
     /**
@@ -340,15 +340,14 @@ public class Invocations {
      */
     private static class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-        private final ConsumerObject<? super ResultChannel<OUT>> mConsumer;
+        private final ConsumerChain<? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
          *
          * @param consumer the consumer instance.
          */
-        public ConsumerCommandInvocation(
-                final ConsumerObject<? super ResultChannel<OUT>> consumer) {
+        public ConsumerCommandInvocation(final ConsumerChain<? super ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
 
@@ -396,7 +395,7 @@ public class Invocations {
      */
     private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final BiConsumerObject<? super IN, ? super ResultChannel<OUT>> mConsumer;
+        private final BiConsumerChain<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
@@ -404,7 +403,7 @@ public class Invocations {
          * @param consumer the consumer instance.
          */
         private ConsumerFilterInvocation(
-                @NotNull final BiConsumerObject<? super IN, ? super ResultChannel<OUT>> consumer) {
+                @NotNull final BiConsumerChain<? super IN, ? super ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
 
@@ -453,7 +452,7 @@ public class Invocations {
      */
     private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final BiConsumerObject<? super List<? extends IN>, ? super ResultChannel<OUT>>
+        private final BiConsumerChain<? super List<? extends IN>, ? super ResultChannel<OUT>>
                 mConsumer;
 
         /**
@@ -462,7 +461,7 @@ public class Invocations {
          * @param consumer the consumer instance.
          */
         private ConsumerInvocationFactory(
-                @NotNull final BiConsumerObject<? super List<? extends IN>, ? super
+                @NotNull final BiConsumerChain<? super List<? extends IN>, ? super
                         ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
@@ -591,7 +590,7 @@ public class Invocations {
      */
     private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final FunctionObject<? super IN, ? extends OUT> mFunction;
+        private final FunctionChain<? super IN, ? extends OUT> mFunction;
 
         /**
          * Constructor.
@@ -599,7 +598,7 @@ public class Invocations {
          * @param function the function instance.
          */
         private FunctionFilterInvocation(
-                @NotNull final FunctionObject<? super IN, ? extends OUT> function) {
+                @NotNull final FunctionChain<? super IN, ? extends OUT> function) {
 
             if (!function.hasStaticContext()) {
 
@@ -647,7 +646,7 @@ public class Invocations {
      */
     private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final FunctionObject<? super List<? extends IN>, ? extends OUT> mFunction;
+        private final FunctionChain<? super List<? extends IN>, ? extends OUT> mFunction;
 
         /**
          * Constructor.
@@ -655,7 +654,7 @@ public class Invocations {
          * @param function the function instance.
          */
         private FunctionInvocationFactory(
-                @NotNull final FunctionObject<? super List<? extends IN>, ? extends OUT> function) {
+                @NotNull final FunctionChain<? super List<? extends IN>, ? extends OUT> function) {
 
             if (!function.hasStaticContext()) {
 
@@ -712,14 +711,14 @@ public class Invocations {
      */
     private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-        private final SupplierObject<? extends OUT> mSupplier;
+        private final SupplierChain<? extends OUT> mSupplier;
 
         /**
          * Constructor.
          *
          * @param supplier the supplier instance.
          */
-        public SupplierCommandInvocation(final SupplierObject<? extends OUT> supplier) {
+        public SupplierCommandInvocation(final SupplierChain<? extends OUT> supplier) {
 
             if (!supplier.hasStaticContext()) {
 
@@ -767,7 +766,7 @@ public class Invocations {
      */
     private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final SupplierObject<? extends Invocation<IN, OUT>> mSupplier;
+        private final SupplierChain<? extends Invocation<IN, OUT>> mSupplier;
 
         /**
          * Constructor.
@@ -775,7 +774,7 @@ public class Invocations {
          * @param supplier the supplier function.
          */
         private SupplierInvocationFactory(
-                @NotNull final SupplierObject<? extends Invocation<IN, OUT>> supplier) {
+                @NotNull final SupplierChain<? extends Invocation<IN, OUT>> supplier) {
 
             if (!supplier.hasStaticContext()) {
 

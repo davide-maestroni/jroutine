@@ -13,21 +13,21 @@
  */
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.function.Functions.BiConsumerObject;
-import com.github.dm.jrt.function.Functions.ConsumerObject;
-import com.github.dm.jrt.function.Functions.FunctionObject;
-import com.github.dm.jrt.function.Functions.SupplierObject;
+import com.github.dm.jrt.function.Functions.BiConsumerChain;
+import com.github.dm.jrt.function.Functions.ConsumerChain;
+import com.github.dm.jrt.function.Functions.FunctionChain;
+import com.github.dm.jrt.function.Functions.SupplierChain;
 
 import org.junit.Test;
 
+import static com.github.dm.jrt.function.Functions.biConsumerChain;
 import static com.github.dm.jrt.function.Functions.biSink;
 import static com.github.dm.jrt.function.Functions.constant;
+import static com.github.dm.jrt.function.Functions.consumerChain;
+import static com.github.dm.jrt.function.Functions.functionChain;
 import static com.github.dm.jrt.function.Functions.identity;
-import static com.github.dm.jrt.function.Functions.newBiConsumer;
-import static com.github.dm.jrt.function.Functions.newConsumer;
-import static com.github.dm.jrt.function.Functions.newFunction;
-import static com.github.dm.jrt.function.Functions.newSupplier;
 import static com.github.dm.jrt.function.Functions.sink;
+import static com.github.dm.jrt.function.Functions.supplierChain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -42,13 +42,13 @@ public class FunctionsTest {
     public void testBiConsumer() {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
-        final BiConsumerObject<Object, Object> consumer2 = newBiConsumer(consumer1);
-        assertThat(newBiConsumer(consumer2)).isSameAs(consumer2);
+        final BiConsumerChain<Object, Object> consumer2 = biConsumerChain(consumer1);
+        assertThat(biConsumerChain(consumer2)).isSameAs(consumer2);
         consumer2.accept("test", "test");
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
         final TestBiConsumer consumer3 = new TestBiConsumer();
-        final BiConsumerObject<Object, Object> consumer4 = consumer2.andThen(consumer3);
+        final BiConsumerChain<Object, Object> consumer4 = consumer2.andThen(consumer3);
         consumer4.accept("test", "test");
         assertThat(consumer1.isCalled()).isTrue();
         assertThat(consumer3.isCalled()).isTrue();
@@ -57,8 +57,8 @@ public class FunctionsTest {
     @Test
     public void testBiConsumerContext() {
 
-        final BiConsumerObject<Object, Object> consumer1 =
-                newBiConsumer(new TestBiConsumer()).andThen(new TestBiConsumer());
+        final BiConsumerChain<Object, Object> consumer1 =
+                biConsumerChain(new TestBiConsumer()).andThen(new TestBiConsumer());
         assertThat(consumer1.hasStaticContext()).isTrue();
         assertThat(consumer1.andThen(new BiConsumer<Object, Object>() {
 
@@ -73,34 +73,34 @@ public class FunctionsTest {
     public void testBiConsumerEquals() {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
-        assertThat(newBiConsumer(consumer1)).isEqualTo(newBiConsumer(consumer1));
-        final BiConsumerObject<Object, Object> consumer2 = newBiConsumer(consumer1);
+        assertThat(biConsumerChain(consumer1)).isEqualTo(biConsumerChain(consumer1));
+        final BiConsumerChain<Object, Object> consumer2 = biConsumerChain(consumer1);
         assertThat(consumer2).isNotEqualTo(null);
         assertThat(consumer2).isNotEqualTo("test");
-        assertThat(newBiConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+        assertThat(biConsumerChain(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer2).hashCode());
-        assertThat(newBiConsumer(consumer1).andThen(consumer2)).isEqualTo(
+        assertThat(biConsumerChain(consumer1).andThen(consumer2)).isEqualTo(
                 consumer2.andThen(consumer2));
         assertThat(consumer2.andThen(consumer2)).isEqualTo(
-                newBiConsumer(consumer1).andThen(consumer2));
-        assertThat(newBiConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+                biConsumerChain(consumer1).andThen(consumer2));
+        assertThat(biConsumerChain(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer1).hashCode());
-        assertThat(newBiConsumer(consumer1).andThen(consumer2)).isEqualTo(
+        assertThat(biConsumerChain(consumer1).andThen(consumer2)).isEqualTo(
                 consumer2.andThen(consumer1));
         assertThat(consumer2.andThen(consumer1)).isEqualTo(
-                newBiConsumer(consumer1).andThen(consumer2));
-        assertThat(newBiConsumer(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
+                biConsumerChain(consumer1).andThen(consumer2));
+        assertThat(biConsumerChain(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(newBiConsumer(consumer1).andThen(consumer2)).isNotEqualTo(
+        assertThat(biConsumerChain(consumer1).andThen(consumer2)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                newBiConsumer(consumer1).andThen(consumer2));
-        assertThat(newBiConsumer(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
+                biConsumerChain(consumer1).andThen(consumer2));
+        assertThat(biConsumerChain(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(newBiConsumer(consumer1).andThen(consumer1)).isNotEqualTo(
+        assertThat(biConsumerChain(consumer1).andThen(consumer1)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                newBiConsumer(consumer1).andThen(consumer1));
+                biConsumerChain(consumer1).andThen(consumer1));
         assertThat(consumer2.andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(biSink()).hashCode());
         assertThat(consumer2.andThen(consumer1)).isNotEqualTo(consumer2.andThen(biSink()));
@@ -113,7 +113,7 @@ public class FunctionsTest {
 
         try {
 
-            newBiConsumer(new TestBiConsumer()).andThen(null);
+            biConsumerChain(new TestBiConsumer()).andThen(null);
 
             fail();
 
@@ -126,7 +126,7 @@ public class FunctionsTest {
     public void testBiSink() {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
-        final BiConsumerObject<Object, Object> consumer2 = biSink().andThen(consumer1);
+        final BiConsumerChain<Object, Object> consumer2 = biSink().andThen(consumer1);
         consumer2.accept("test", "test");
         assertThat(consumer1.isCalled()).isTrue();
         assertThat(consumer2.hasStaticContext()).isTrue();
@@ -137,7 +137,7 @@ public class FunctionsTest {
     public void testConstant() {
 
         final TestFunction function = new TestFunction();
-        final SupplierObject<Object> supplier = constant("test").andThen(function);
+        final SupplierChain<Object> supplier = constant("test").andThen(function);
         assertThat(supplier.get()).isEqualTo("test");
         assertThat(function.isCalled()).isTrue();
         assertThat(supplier.hasStaticContext()).isTrue();
@@ -147,13 +147,13 @@ public class FunctionsTest {
     public void testConsumer() {
 
         final TestConsumer consumer1 = new TestConsumer();
-        final ConsumerObject<Object> consumer2 = newConsumer(consumer1);
-        assertThat(newConsumer(consumer2)).isSameAs(consumer2);
+        final ConsumerChain<Object> consumer2 = consumerChain(consumer1);
+        assertThat(consumerChain(consumer2)).isSameAs(consumer2);
         consumer2.accept("test");
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
         final TestConsumer consumer3 = new TestConsumer();
-        final ConsumerObject<Object> consumer4 = consumer2.andThen(consumer3);
+        final ConsumerChain<Object> consumer4 = consumer2.andThen(consumer3);
         consumer4.accept("test");
         assertThat(consumer1.isCalled()).isTrue();
         assertThat(consumer3.isCalled()).isTrue();
@@ -162,8 +162,8 @@ public class FunctionsTest {
     @Test
     public void testConsumerContext() {
 
-        final ConsumerObject<Object> consumer1 =
-                newConsumer(new TestConsumer()).andThen(new TestConsumer());
+        final ConsumerChain<Object> consumer1 =
+                consumerChain(new TestConsumer()).andThen(new TestConsumer());
         assertThat(consumer1.hasStaticContext()).isTrue();
         assertThat(consumer1.andThen(new Consumer<Object>() {
 
@@ -178,34 +178,34 @@ public class FunctionsTest {
     public void testConsumerEquals() {
 
         final TestConsumer consumer1 = new TestConsumer();
-        assertThat(newConsumer(consumer1)).isEqualTo(newConsumer(consumer1));
-        final ConsumerObject<Object> consumer2 = newConsumer(consumer1);
+        assertThat(consumerChain(consumer1)).isEqualTo(consumerChain(consumer1));
+        final ConsumerChain<Object> consumer2 = consumerChain(consumer1);
         assertThat(consumer2).isNotEqualTo(null);
         assertThat(consumer2).isNotEqualTo("test");
-        assertThat(newConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+        assertThat(consumerChain(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer2).hashCode());
-        assertThat(newConsumer(consumer1).andThen(consumer2)).isEqualTo(
+        assertThat(consumerChain(consumer1).andThen(consumer2)).isEqualTo(
                 consumer2.andThen(consumer2));
         assertThat(consumer2.andThen(consumer2)).isEqualTo(
-                newConsumer(consumer1).andThen(consumer2));
-        assertThat(newConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+                consumerChain(consumer1).andThen(consumer2));
+        assertThat(consumerChain(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer1).hashCode());
-        assertThat(newConsumer(consumer1).andThen(consumer2)).isEqualTo(
+        assertThat(consumerChain(consumer1).andThen(consumer2)).isEqualTo(
                 consumer2.andThen(consumer1));
         assertThat(consumer2.andThen(consumer1)).isEqualTo(
-                newConsumer(consumer1).andThen(consumer2));
-        assertThat(newConsumer(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
+                consumerChain(consumer1).andThen(consumer2));
+        assertThat(consumerChain(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(newConsumer(consumer1).andThen(consumer2)).isNotEqualTo(
+        assertThat(consumerChain(consumer1).andThen(consumer2)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                newConsumer(consumer1).andThen(consumer2));
-        assertThat(newConsumer(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
+                consumerChain(consumer1).andThen(consumer2));
+        assertThat(consumerChain(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(newConsumer(consumer1).andThen(consumer1)).isNotEqualTo(
+        assertThat(consumerChain(consumer1).andThen(consumer1)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                newConsumer(consumer1).andThen(consumer1));
+                consumerChain(consumer1).andThen(consumer1));
         assertThat(consumer2.andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(sink()).hashCode());
         assertThat(consumer2.andThen(consumer1)).isNotEqualTo(consumer2.andThen(sink()));
@@ -218,7 +218,7 @@ public class FunctionsTest {
 
         try {
 
-            newConsumer(new TestConsumer()).andThen(null);
+            consumerChain(new TestConsumer()).andThen(null);
 
             fail();
 
@@ -231,18 +231,18 @@ public class FunctionsTest {
     public void testFunction() {
 
         final TestFunction function1 = new TestFunction();
-        final FunctionObject<Object, Object> function2 = newFunction(function1);
-        assertThat(newFunction(function2)).isSameAs(function2);
+        final FunctionChain<Object, Object> function2 = functionChain(function1);
+        assertThat(functionChain(function2)).isSameAs(function2);
         assertThat(function2.apply("test")).isEqualTo("test");
         assertThat(function1.isCalled()).isTrue();
         function1.reset();
         final TestFunction function3 = new TestFunction();
-        final FunctionObject<Object, Object> function4 = function2.andThen(function3);
+        final FunctionChain<Object, Object> function4 = function2.andThen(function3);
         assertThat(function4.apply("test")).isEqualTo("test");
         assertThat(function1.isCalled()).isTrue();
         assertThat(function3.isCalled()).isTrue();
-        final FunctionObject<String, Integer> function5 =
-                newFunction(new Function<String, Integer>() {
+        final FunctionChain<String, Integer> function5 =
+                functionChain(new Function<String, Integer>() {
 
                     public Integer apply(final String s) {
 
@@ -268,8 +268,8 @@ public class FunctionsTest {
     @Test
     public void testFunctionContext() {
 
-        final FunctionObject<Object, Object> function1 =
-                newFunction(new TestFunction()).andThen(new TestFunction());
+        final FunctionChain<Object, Object> function1 =
+                functionChain(new TestFunction()).andThen(new TestFunction());
         assertThat(function1.hasStaticContext()).isTrue();
         assertThat(function1.andThen(new Function<Object, Object>() {
 
@@ -293,62 +293,62 @@ public class FunctionsTest {
     public void testFunctionEquals() {
 
         final TestFunction function1 = new TestFunction();
-        assertThat(newFunction(function1)).isEqualTo(newFunction(function1));
-        final FunctionObject<Object, Object> function2 = newFunction(function1);
+        assertThat(functionChain(function1)).isEqualTo(functionChain(function1));
+        final FunctionChain<Object, Object> function2 = functionChain(function1);
         assertThat(function2).isNotEqualTo(null);
         assertThat(function2).isNotEqualTo("test");
-        assertThat(newFunction(function1).andThen(function2).hashCode()).isEqualTo(
+        assertThat(functionChain(function1).andThen(function2).hashCode()).isEqualTo(
                 function2.andThen(function2).hashCode());
-        assertThat(newFunction(function1).andThen(function2)).isEqualTo(
+        assertThat(functionChain(function1).andThen(function2)).isEqualTo(
                 function2.andThen(function2));
         assertThat(function2.andThen(function2)).isEqualTo(
-                newFunction(function1).andThen(function2));
-        assertThat(newFunction(function1).andThen(function2).hashCode()).isEqualTo(
+                functionChain(function1).andThen(function2));
+        assertThat(functionChain(function1).andThen(function2).hashCode()).isEqualTo(
                 function2.andThen(function1).hashCode());
-        assertThat(newFunction(function1).andThen(function2)).isEqualTo(
+        assertThat(functionChain(function1).andThen(function2)).isEqualTo(
                 function2.andThen(function1));
         assertThat(function2.andThen(function1)).isEqualTo(
-                newFunction(function1).andThen(function2));
-        assertThat(newFunction(function1).andThen(function2).hashCode()).isNotEqualTo(
+                functionChain(function1).andThen(function2));
+        assertThat(functionChain(function1).andThen(function2).hashCode()).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)).hashCode());
-        assertThat(newFunction(function1).andThen(function2)).isNotEqualTo(
+        assertThat(functionChain(function1).andThen(function2)).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)));
         assertThat(function2.andThen(function2.andThen(function1))).isNotEqualTo(
-                newFunction(function1).andThen(function2));
-        assertThat(newFunction(function1).andThen(function1).hashCode()).isNotEqualTo(
+                functionChain(function1).andThen(function2));
+        assertThat(functionChain(function1).andThen(function1).hashCode()).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)).hashCode());
-        assertThat(newFunction(function1).andThen(function1)).isNotEqualTo(
+        assertThat(functionChain(function1).andThen(function1)).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)));
         assertThat(function2.andThen(function2.andThen(function1))).isNotEqualTo(
-                newFunction(function1).andThen(function1));
+                functionChain(function1).andThen(function1));
         assertThat(function2.andThen(function1).hashCode()).isNotEqualTo(
                 function2.andThen(identity()).hashCode());
         assertThat(function2.andThen(function1)).isNotEqualTo(function2.andThen(identity()));
         assertThat(function2.andThen(identity())).isNotEqualTo(function2.andThen(function1));
-        assertThat(newFunction(function1).compose(function2).hashCode()).isEqualTo(
+        assertThat(functionChain(function1).compose(function2).hashCode()).isEqualTo(
                 function2.compose(function2).hashCode());
-        assertThat(newFunction(function1).compose(function2)).isEqualTo(
+        assertThat(functionChain(function1).compose(function2)).isEqualTo(
                 function2.compose(function2));
         assertThat(function2.compose(function2)).isEqualTo(
-                newFunction(function1).compose(function2));
-        assertThat(newFunction(function1).compose(function2).hashCode()).isEqualTo(
+                functionChain(function1).compose(function2));
+        assertThat(functionChain(function1).compose(function2).hashCode()).isEqualTo(
                 function2.compose(function1).hashCode());
-        assertThat(newFunction(function1).compose(function2)).isEqualTo(
+        assertThat(functionChain(function1).compose(function2)).isEqualTo(
                 function2.compose(function1));
         assertThat(function2.compose(function1)).isEqualTo(
-                newFunction(function1).compose(function2));
-        assertThat(newFunction(function1).compose(function2).hashCode()).isNotEqualTo(
+                functionChain(function1).compose(function2));
+        assertThat(functionChain(function1).compose(function2).hashCode()).isNotEqualTo(
                 function2.compose(function2.compose(function1)).hashCode());
-        assertThat(newFunction(function1).compose(function2)).isNotEqualTo(
+        assertThat(functionChain(function1).compose(function2)).isNotEqualTo(
                 function2.compose(function2.compose(function1)));
         assertThat(function2.compose(function2.compose(function1))).isNotEqualTo(
-                newFunction(function1).compose(function2));
-        assertThat(newFunction(function1).compose(function1).hashCode()).isNotEqualTo(
+                functionChain(function1).compose(function2));
+        assertThat(functionChain(function1).compose(function1).hashCode()).isNotEqualTo(
                 function2.compose(function2.compose(function1)).hashCode());
-        assertThat(newFunction(function1).compose(function1)).isNotEqualTo(
+        assertThat(functionChain(function1).compose(function1)).isNotEqualTo(
                 function2.compose(function2.compose(function1)));
         assertThat(function2.compose(function2.compose(function1))).isNotEqualTo(
-                newFunction(function1).compose(function1));
+                functionChain(function1).compose(function1));
         assertThat(function2.compose(function1).hashCode()).isNotEqualTo(
                 function2.compose(identity()).hashCode());
         assertThat(function2.compose(function1)).isNotEqualTo(function2.compose(identity()));
@@ -361,7 +361,7 @@ public class FunctionsTest {
 
         try {
 
-            newFunction(new TestFunction()).andThen(null);
+            functionChain(new TestFunction()).andThen(null);
 
             fail();
 
@@ -384,7 +384,7 @@ public class FunctionsTest {
     public void testIdentity() {
 
         final TestFunction function1 = new TestFunction();
-        final FunctionObject<Object, Object> function2 = identity().andThen(function1);
+        final FunctionChain<Object, Object> function2 = identity().andThen(function1);
         assertThat(function2.apply("test")).isEqualTo("test");
         assertThat(function1.isCalled()).isTrue();
         assertThat(function2.hasStaticContext()).isTrue();
@@ -395,7 +395,7 @@ public class FunctionsTest {
     public void testSink() {
 
         final TestConsumer consumer1 = new TestConsumer();
-        final ConsumerObject<Object> consumer2 = sink().andThen(consumer1);
+        final ConsumerChain<Object> consumer2 = sink().andThen(consumer1);
         consumer2.accept("test");
         assertThat(consumer1.isCalled()).isTrue();
         assertThat(consumer2.hasStaticContext()).isTrue();
@@ -406,13 +406,13 @@ public class FunctionsTest {
     public void testSupplier() {
 
         final TestSupplier supplier1 = new TestSupplier();
-        final SupplierObject<Object> supplier2 = newSupplier(supplier1);
-        assertThat(newSupplier(supplier2)).isSameAs(supplier2);
+        final SupplierChain<Object> supplier2 = supplierChain(supplier1);
+        assertThat(supplierChain(supplier2)).isSameAs(supplier2);
         assertThat(supplier2.get()).isSameAs(supplier1);
         assertThat(supplier1.isCalled()).isTrue();
         supplier1.reset();
         final TestFunction function = new TestFunction();
-        final SupplierObject<Object> supplier3 = supplier2.andThen(function);
+        final SupplierChain<Object> supplier3 = supplier2.andThen(function);
         assertThat(supplier3.get()).isSameAs(supplier1);
         assertThat(supplier1.isCalled()).isTrue();
         assertThat(function.isCalled()).isTrue();
@@ -434,8 +434,8 @@ public class FunctionsTest {
     @Test
     public void testSupplierContext() {
 
-        final SupplierObject<Object> supplier1 =
-                newSupplier(new TestSupplier()).andThen(new TestFunction());
+        final SupplierChain<Object> supplier1 =
+                supplierChain(new TestSupplier()).andThen(new TestFunction());
         assertThat(supplier1.hasStaticContext()).isTrue();
         assertThat(supplier1.andThen(new Function<Object, Object>() {
 
@@ -451,33 +451,36 @@ public class FunctionsTest {
     public void testSupplierEquals() {
 
         final TestSupplier supplier1 = new TestSupplier();
-        assertThat(newSupplier(supplier1)).isEqualTo(newSupplier(supplier1));
-        final SupplierObject<Object> supplier2 = newSupplier(supplier1);
+        assertThat(supplierChain(supplier1)).isEqualTo(supplierChain(supplier1));
+        final SupplierChain<Object> supplier2 = supplierChain(supplier1);
         assertThat(supplier2).isNotEqualTo(null);
         assertThat(supplier2).isNotEqualTo("test");
         final TestFunction function = new TestFunction();
-        assertThat(newSupplier(supplier1).andThen(function).hashCode()).isEqualTo(
+        assertThat(supplierChain(supplier1).andThen(function).hashCode()).isEqualTo(
                 supplier2.andThen(function).hashCode());
-        assertThat(newSupplier(supplier1).andThen(function)).isEqualTo(supplier2.andThen(function));
-        assertThat(supplier2.andThen(function)).isEqualTo(newSupplier(supplier1).andThen(function));
-        assertThat(newSupplier(supplier1).andThen(newFunction(function)).hashCode()).isEqualTo(
-                supplier2.andThen(function).hashCode());
-        assertThat(newSupplier(supplier1).andThen(newFunction(function))).isEqualTo(
+        assertThat(supplierChain(supplier1).andThen(function)).isEqualTo(
                 supplier2.andThen(function));
         assertThat(supplier2.andThen(function)).isEqualTo(
-                newSupplier(supplier1).andThen(newFunction(function)));
-        assertThat(newSupplier(supplier1).andThen(newFunction(function)).hashCode()).isNotEqualTo(
-                supplier2.andThen(newFunction(function).andThen(function)).hashCode());
-        assertThat(newSupplier(supplier1).andThen(newFunction(function))).isNotEqualTo(
-                supplier2.andThen(newFunction(function).andThen(function)));
-        assertThat(supplier2.andThen(newFunction(function).andThen(function))).isNotEqualTo(
-                newSupplier(supplier1).andThen(newFunction(function)));
-        assertThat(newSupplier(supplier1).andThen(function).hashCode()).isNotEqualTo(
-                supplier2.andThen(newFunction(function).andThen(function)).hashCode());
-        assertThat(newSupplier(supplier1).andThen(function)).isNotEqualTo(
-                supplier2.andThen(newFunction(function).andThen(function)));
-        assertThat(supplier2.andThen(newFunction(function).andThen(function))).isNotEqualTo(
-                newSupplier(supplier1).andThen(function));
+                supplierChain(supplier1).andThen(function));
+        assertThat(supplierChain(supplier1).andThen(functionChain(function)).hashCode()).isEqualTo(
+                supplier2.andThen(function).hashCode());
+        assertThat(supplierChain(supplier1).andThen(functionChain(function))).isEqualTo(
+                supplier2.andThen(function));
+        assertThat(supplier2.andThen(function)).isEqualTo(
+                supplierChain(supplier1).andThen(functionChain(function)));
+        assertThat(
+                supplierChain(supplier1).andThen(functionChain(function)).hashCode()).isNotEqualTo(
+                supplier2.andThen(functionChain(function).andThen(function)).hashCode());
+        assertThat(supplierChain(supplier1).andThen(functionChain(function))).isNotEqualTo(
+                supplier2.andThen(functionChain(function).andThen(function)));
+        assertThat(supplier2.andThen(functionChain(function).andThen(function))).isNotEqualTo(
+                supplierChain(supplier1).andThen(functionChain(function)));
+        assertThat(supplierChain(supplier1).andThen(function).hashCode()).isNotEqualTo(
+                supplier2.andThen(functionChain(function).andThen(function)).hashCode());
+        assertThat(supplierChain(supplier1).andThen(function)).isNotEqualTo(
+                supplier2.andThen(functionChain(function).andThen(function)));
+        assertThat(supplier2.andThen(functionChain(function).andThen(function))).isNotEqualTo(
+                supplierChain(supplier1).andThen(function));
         assertThat(supplier2.andThen(function).hashCode()).isNotEqualTo(
                 supplier2.andThen(identity()).hashCode());
         assertThat(supplier2.andThen(function)).isNotEqualTo(supplier2.andThen(identity()));
@@ -490,7 +493,7 @@ public class FunctionsTest {
 
         try {
 
-            newSupplier(new TestSupplier()).andThen(null);
+            supplierChain(new TestSupplier()).andThen(null);
 
             fail();
 

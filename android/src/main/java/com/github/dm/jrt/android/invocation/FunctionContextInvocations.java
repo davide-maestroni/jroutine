@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.android.invocation;
 
-import com.github.dm.jrt.function.Functions.SupplierObject;
+import com.github.dm.jrt.function.Functions.SupplierChain;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -24,7 +24,7 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.function.Functions.newSupplier;
+import static com.github.dm.jrt.function.Functions.supplierChain;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
@@ -154,7 +154,7 @@ public class FunctionContextInvocations {
     public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> supplierFactory(
             @NotNull final Supplier<? extends FunctionContextInvocation<IN, OUT>> supplier) {
 
-        return new SupplierContextInvocationFactory<IN, OUT>(newSupplier(supplier));
+        return new SupplierContextInvocationFactory<IN, OUT>(supplierChain(supplier));
     }
 
     /**
@@ -199,7 +199,7 @@ public class FunctionContextInvocations {
     private static class SupplierContextInvocationFactory<IN, OUT>
             extends FunctionContextInvocationFactory<IN, OUT> {
 
-        private final SupplierObject<? extends FunctionContextInvocation<IN, OUT>> mSupplier;
+        private final SupplierChain<? extends FunctionContextInvocation<IN, OUT>> mSupplier;
 
         /**
          * Constructor.
@@ -207,7 +207,7 @@ public class FunctionContextInvocations {
          * @param supplier the supplier function.
          */
         private SupplierContextInvocationFactory(
-                @NotNull final SupplierObject<? extends FunctionContextInvocation<IN, OUT>>
+                @NotNull final SupplierChain<? extends FunctionContextInvocation<IN, OUT>>
                         supplier) {
 
             super(asArgs(supplier));

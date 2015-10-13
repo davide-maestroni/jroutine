@@ -147,13 +147,11 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .set();
         assertThat(configuration).isNotEqualTo(
-                builder().withTimeoutAction(TimeoutActionType.ABORT).set());
+                builder().withReadTimeoutAction(TimeoutActionType.ABORT).set());
         assertThat(configuration).isNotEqualTo(
-                builder().withTimeoutAction(TimeoutActionType.EXIT).set());
-        assertThat(configuration.builderFrom()
-                                .withTimeoutAction(TimeoutActionType.THROW)
-                                .set()).isNotEqualTo(
-                builder().withTimeoutAction(TimeoutActionType.THROW).set());
+                builder().withReadTimeoutAction(TimeoutActionType.EXIT).set());
+        assertThat(configuration.builderFrom().withReadTimeoutAction(TimeoutActionType.THROW).set())
+                .isNotEqualTo(builder().withReadTimeoutAction(TimeoutActionType.THROW).set());
     }
 
     @Test
@@ -164,12 +162,13 @@ public class InvocationConfigurationTest {
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .set();
-        assertThat(configuration).isNotEqualTo(builder().withTimeout(TimeDuration.ZERO).set());
+        assertThat(configuration).isNotEqualTo(builder().withReadTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
-                builder().withTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(
-                configuration.builderFrom().withTimeout(TimeDuration.millis(1)).set()).isNotEqualTo(
-                builder().withTimeout(1, TimeUnit.MILLISECONDS).set());
+                builder().withReadTimeout(1, TimeUnit.MILLISECONDS).set());
+        assertThat(configuration.builderFrom()
+                                .withReadTimeout(TimeDuration.millis(1))
+                                .set()).isNotEqualTo(
+                builder().withReadTimeout(1, TimeUnit.MILLISECONDS).set());
     }
 
     @Test

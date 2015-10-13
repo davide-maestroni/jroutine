@@ -30,9 +30,9 @@ import com.github.dm.jrt.annotation.OutputMaxSize;
 import com.github.dm.jrt.annotation.OutputOrder;
 import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
+import com.github.dm.jrt.annotation.ReadTimeout;
+import com.github.dm.jrt.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.annotation.SharedFields;
-import com.github.dm.jrt.annotation.Timeout;
-import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.InvocationChannel;
@@ -557,24 +557,25 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
         }
 
-        final Timeout timeoutAnnotation = methodElement.getAnnotation(Timeout.class);
+        final ReadTimeout readTimeoutAnnotation = methodElement.getAnnotation(ReadTimeout.class);
 
-        if (timeoutAnnotation != null) {
+        if (readTimeoutAnnotation != null) {
 
-            builder.append(".withTimeout(")
-                   .append(timeoutAnnotation.value())
+            builder.append(".withReadTimeout(")
+                   .append(readTimeoutAnnotation.value())
                    .append(", ")
                    .append(TimeUnit.class.getCanonicalName())
                    .append(".")
-                   .append(timeoutAnnotation.unit())
+                   .append(readTimeoutAnnotation.unit())
                    .append(")");
         }
 
-        final TimeoutAction actionAnnotation = methodElement.getAnnotation(TimeoutAction.class);
+        final ReadTimeoutAction actionAnnotation =
+                methodElement.getAnnotation(ReadTimeoutAction.class);
 
         if (actionAnnotation != null) {
 
-            builder.append(".withTimeoutAction(")
+            builder.append(".withReadTimeoutAction(")
                    .append(TimeoutActionType.class.getCanonicalName())
                    .append(".")
                    .append(actionAnnotation.value())

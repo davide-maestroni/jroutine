@@ -16,7 +16,7 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.annotation.Alias;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Output;
-import com.github.dm.jrt.annotation.Timeout;
+import com.github.dm.jrt.annotation.ReadTimeout;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.AgingPriority;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
@@ -1813,7 +1813,7 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(instance(test))
                            .invocations()
-                           .withTimeout(timeout)
+                           .withReadTimeout(timeout)
                            .set()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
@@ -1825,7 +1825,7 @@ public class RoutineTest {
 
         final TestInterfaceAsync testInterfaceAsync = JRoutine.on(instance(test))
                                                               .invocations()
-                                                              .withTimeout(1, TimeUnit.SECONDS)
+                                                              .withReadTimeout(1, TimeUnit.SECONDS)
                                                               .set()
                                                               .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
@@ -2531,7 +2531,7 @@ public class RoutineTest {
         final Routine<String, String> routine1 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withTimeoutAction(TimeoutActionType.ABORT)
+                        .withReadTimeoutAction(TimeoutActionType.ABORT)
                         .set()
                         .buildRoutine();
 
@@ -2591,8 +2591,8 @@ public class RoutineTest {
         final Routine<String, String> routine2 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withTimeoutAction(TimeoutActionType.ABORT)
-                        .withTimeout(millis(10))
+                        .withReadTimeoutAction(TimeoutActionType.ABORT)
+                        .withReadTimeout(millis(10))
                         .set()
                         .buildRoutine();
 
@@ -2652,7 +2652,7 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withTimeoutAction(TimeoutActionType.THROW)
+                        .withReadTimeoutAction(TimeoutActionType.THROW)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel3 = routine3.asyncCall("test1");
@@ -2768,7 +2768,7 @@ public class RoutineTest {
         final Routine<String, String> routine4 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withTimeoutAction(TimeoutActionType.EXIT)
+                        .withReadTimeoutAction(TimeoutActionType.EXIT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel4 = routine4.asyncCall("test1");
@@ -3304,7 +3304,7 @@ public class RoutineTest {
 
     private interface TestInterface {
 
-        @Timeout(value = 1, unit = TimeUnit.SECONDS)
+        @ReadTimeout(value = 1, unit = TimeUnit.SECONDS)
         int getInt(int i);
     }
 

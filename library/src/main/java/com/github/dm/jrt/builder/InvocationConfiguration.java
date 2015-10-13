@@ -78,8 +78,6 @@ public final class InvocationConfiguration {
 
     private final int mCoreInstances;
 
-    private final TimeDuration mExecutionTimeout;
-
     private final int mInputMaxSize;
 
     private final OrderType mInputOrderType;
@@ -100,6 +98,8 @@ public final class InvocationConfiguration {
 
     private final int mPriority;
 
+    private final TimeDuration mReadTimeout;
+
     private final Runner mRunner;
 
     private final TimeoutActionType mTimeoutActionType;
@@ -107,39 +107,38 @@ public final class InvocationConfiguration {
     /**
      * Constructor.
      *
-     * @param runner           the runner used for asynchronous invocations.
-     * @param priority         the invocation priority.
-     * @param maxInstances     the maximum number of parallel running invocations. Must be positive.
-     * @param coreInstances    the maximum number of retained invocation instances. Must be 0 or a
-     *                         positive number.
-     * @param executionTimeout the timeout for an invocation instance to produce a result.
-     * @param actionType       the action to be taken if the timeout elapses before a readable
-     *                         result is available.
-     * @param inputOrderType   the order in which input data are collected from the input channel.
-     * @param inputMaxSize     the maximum number of buffered input data. Must be positive.
-     * @param inputTimeout     the maximum timeout while waiting for an input to be passed to the
-     *                         input channel.
-     * @param outputOrderType  the order in which output data are collected from the result channel.
-     * @param outputMaxSize    the maximum number of buffered output data. Must be positive.
-     * @param outputTimeout    the maximum timeout while waiting for an output to be passed to the
-     *                         result channel.
-     * @param log              the log instance.
-     * @param logLevel         the log level.
+     * @param runner          the runner used for asynchronous invocations.
+     * @param priority        the invocation priority.
+     * @param maxInstances    the maximum number of parallel running invocations. Must be positive.
+     * @param coreInstances   the maximum number of retained invocation instances. Must be 0 or a
+     *                        positive number.
+     * @param readTimeout     the timeout for an invocation instance to produce a result.
+     * @param actionType      the action to be taken if the timeout elapses before a readable
+     *                        result is available.
+     * @param inputOrderType  the order in which input data are collected from the input channel.
+     * @param inputMaxSize    the maximum number of buffered input data. Must be positive.
+     * @param inputTimeout    the maximum timeout while waiting for an input to be passed to the
+     *                        input channel.
+     * @param outputOrderType the order in which output data are collected from the result channel.
+     * @param outputMaxSize   the maximum number of buffered output data. Must be positive.
+     * @param outputTimeout   the maximum timeout while waiting for an output to be passed to the
+     *                        result channel.
+     * @param log             the log instance.
+     * @param logLevel        the log level.
      */
     private InvocationConfiguration(@Nullable final Runner runner, final int priority,
             final int maxInstances, final int coreInstances,
-            @Nullable final TimeDuration executionTimeout,
-            @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
-            final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
-            @Nullable final OrderType outputOrderType, final int outputMaxSize,
-            @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
-            @Nullable final LogLevel logLevel) {
+            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
+            @Nullable final OrderType inputOrderType, final int inputMaxSize,
+            @Nullable final TimeDuration inputTimeout, @Nullable final OrderType outputOrderType,
+            final int outputMaxSize, @Nullable final TimeDuration outputTimeout,
+            @Nullable final Log log, @Nullable final LogLevel logLevel) {
 
         mRunner = runner;
         mPriority = priority;
         mMaxInstances = maxInstances;
         mCoreInstances = coreInstances;
-        mExecutionTimeout = executionTimeout;
+        mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
         mInputOrderType = inputOrderType;
         mInputMaxSize = inputMaxSize;
@@ -322,25 +321,14 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the runner used for asynchronous invocations (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the runner instance.
-     */
-    public Runner getRunnerOr(@Nullable final Runner valueIfNotSet) {
-
-        final Runner runner = mRunner;
-        return (runner != null) ? runner : valueIfNotSet;
-    }
-
-    /**
      * Returns the action to be taken if the timeout elapses before a readable result is available
      * (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutActionType getTimeoutActionOr(@Nullable final TimeoutActionType valueIfNotSet) {
+    public TimeoutActionType getReadTimeoutActionOr(
+            @Nullable final TimeoutActionType valueIfNotSet) {
 
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
         return (timeoutActionType != null) ? timeoutActionType : valueIfNotSet;
@@ -353,10 +341,22 @@ public final class InvocationConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getReadTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
 
-        final TimeDuration executionTimeout = mExecutionTimeout;
-        return (executionTimeout != null) ? executionTimeout : valueIfNotSet;
+        final TimeDuration readTimeout = mReadTimeout;
+        return (readTimeout != null) ? readTimeout : valueIfNotSet;
+    }
+
+    /**
+     * Returns the runner used for asynchronous invocations (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the runner instance.
+     */
+    public Runner getRunnerOr(@Nullable final Runner valueIfNotSet) {
+
+        final Runner runner = mRunner;
+        return (runner != null) ? runner : valueIfNotSet;
     }
 
     @Override
@@ -365,7 +365,6 @@ public final class InvocationConfiguration {
         // AUTO-GENERATED CODE
         int result = mRunner != null ? mRunner.hashCode() : 0;
         result = 31 * result + mCoreInstances;
-        result = 31 * result + (mExecutionTimeout != null ? mExecutionTimeout.hashCode() : 0);
         result = 31 * result + mInputMaxSize;
         result = 31 * result + (mInputOrderType != null ? mInputOrderType.hashCode() : 0);
         result = 31 * result + (mInputTimeout != null ? mInputTimeout.hashCode() : 0);
@@ -376,6 +375,7 @@ public final class InvocationConfiguration {
         result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + mPriority;
+        result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
     }
@@ -427,12 +427,6 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mExecutionTimeout != null ? !mExecutionTimeout.equals(that.mExecutionTimeout)
-                : that.mExecutionTimeout != null) {
-
-            return false;
-        }
-
         if (mInputOrderType != that.mInputOrderType) {
 
             return false;
@@ -465,6 +459,12 @@ public final class InvocationConfiguration {
             return false;
         }
 
+        if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
+                : that.mReadTimeout != null) {
+
+            return false;
+        }
+
         return mTimeoutActionType == that.mTimeoutActionType;
     }
 
@@ -475,7 +475,6 @@ public final class InvocationConfiguration {
         return "InvocationConfiguration{" +
                 "mRunner=" + mRunner +
                 ", mCoreInstances=" + mCoreInstances +
-                ", mExecutionTimeout=" + mExecutionTimeout +
                 ", mInputMaxSize=" + mInputMaxSize +
                 ", mInputOrderType=" + mInputOrderType +
                 ", mInputTimeout=" + mInputTimeout +
@@ -486,6 +485,7 @@ public final class InvocationConfiguration {
                 ", mOutputOrderType=" + mOutputOrderType +
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mPriority=" + mPriority +
+                ", mReadTimeout=" + mReadTimeout +
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
     }
@@ -646,8 +646,6 @@ public final class InvocationConfiguration {
 
         private int mCoreInstances;
 
-        private TimeDuration mExecutionTimeout;
-
         private int mInputMaxSize;
 
         private OrderType mInputOrderType;
@@ -667,6 +665,8 @@ public final class InvocationConfiguration {
         private TimeDuration mOutputTimeout;
 
         private int mPriority;
+
+        private TimeDuration mReadTimeout;
 
         private Runner mRunner;
 
@@ -970,20 +970,6 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the asynchronous runner instance. A null value means that it is up to the specific
-         * implementation to choose a default one.
-         *
-         * @param runner the runner instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withRunner(@Nullable final Runner runner) {
-
-            mRunner = runner;
-            return this;
-        }
-
-        /**
          * Sets the timeout for an invocation instance to produce a readable result.<br/>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout can be dynamically changed through the dedicated methods.
@@ -994,9 +980,9 @@ public final class InvocationConfiguration {
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @NotNull
-        public Builder<TYPE> withTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
+        public Builder<TYPE> withReadTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-            return withTimeout(fromUnit(timeout, timeUnit));
+            return withReadTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -1009,9 +995,9 @@ public final class InvocationConfiguration {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
 
-            mExecutionTimeout = timeout;
+            mReadTimeout = timeout;
             return this;
         }
 
@@ -1026,9 +1012,23 @@ public final class InvocationConfiguration {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withTimeoutAction(@Nullable final TimeoutActionType actionType) {
+        public Builder<TYPE> withReadTimeoutAction(@Nullable final TimeoutActionType actionType) {
 
             mTimeoutActionType = actionType;
+            return this;
+        }
+
+        /**
+         * Sets the asynchronous runner instance. A null value means that it is up to the specific
+         * implementation to choose a default one.
+         *
+         * @param runner the runner instance.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withRunner(@Nullable final Runner runner) {
+
+            mRunner = runner;
             return this;
         }
 
@@ -1062,18 +1062,18 @@ public final class InvocationConfiguration {
                 withCoreInstances(coreInvocations);
             }
 
-            final TimeDuration executionTimeout = configuration.mExecutionTimeout;
+            final TimeDuration readTimeout = configuration.mReadTimeout;
 
-            if (executionTimeout != null) {
+            if (readTimeout != null) {
 
-                withTimeout(executionTimeout);
+                withReadTimeout(readTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
 
             if (timeoutActionType != null) {
 
-                withTimeoutAction(timeoutActionType);
+                withReadTimeoutAction(timeoutActionType);
             }
         }
 
@@ -1144,10 +1144,9 @@ public final class InvocationConfiguration {
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
-                                               mExecutionTimeout, mTimeoutActionType,
-                                               mInputOrderType, mInputMaxSize, mInputTimeout,
-                                               mOutputOrderType, mOutputMaxSize, mOutputTimeout,
-                                               mLog, mLogLevel);
+                                               mReadTimeout, mTimeoutActionType, mInputOrderType,
+                                               mInputMaxSize, mInputTimeout, mOutputOrderType,
+                                               mOutputMaxSize, mOutputTimeout, mLog, mLogLevel);
         }
 
         private void setConfiguration(@NotNull final InvocationConfiguration configuration) {
@@ -1156,7 +1155,7 @@ public final class InvocationConfiguration {
             mPriority = configuration.mPriority;
             mMaxInstances = configuration.mMaxInstances;
             mCoreInstances = configuration.mCoreInstances;
-            mExecutionTimeout = configuration.mExecutionTimeout;
+            mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mInputOrderType = configuration.mInputOrderType;
             mInputMaxSize = configuration.mInputMaxSize;

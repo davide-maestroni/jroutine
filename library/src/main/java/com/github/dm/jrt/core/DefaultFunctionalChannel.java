@@ -296,40 +296,6 @@ class DefaultFunctionalChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceAsync(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        return andThenMap(asyncStream(
-                JRoutine.on(consumerFactory(consumer)).invocations().with(mConfiguration).set()));
-    }
-
-    @NotNull
-    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceAsync(
-            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
-
-        return andThenMap(asyncStream(
-                JRoutine.on(functionFactory(function)).invocations().with(mConfiguration).set()));
-    }
-
-    @NotNull
-    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceSync(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        return andThenMap(syncStream(
-                JRoutine.on(consumerFactory(consumer)).invocations().with(mConfiguration).set()));
-    }
-
-    @NotNull
-    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceSync(
-            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
-
-        return andThenMap(syncStream(
-                JRoutine.on(functionFactory(function)).invocations().with(mConfiguration).set()));
-    }
-
-    @NotNull
     public <AFTER> FunctionalChannel<IN, AFTER> andThenMapSync(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
@@ -349,6 +315,40 @@ class DefaultFunctionalChannel<IN, OUT>
             @NotNull final Function<? super OUT, AFTER> function) {
 
         return andThenMapSync(functionFilter(function));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceAsync(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return andThenMap(asyncStream(
+                JRoutine.on(consumerFactory(consumer)).invocations().with(mConfiguration).set()));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceAsync(
+            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+        return andThenMap(asyncStream(
+                JRoutine.on(functionFactory(function)).invocations().with(mConfiguration).set()));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceSync(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return andThenMap(syncStream(
+                JRoutine.on(consumerFactory(consumer)).invocations().with(mConfiguration).set()));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalChannel<IN, AFTER> andThenReduceSync(
+            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+        return andThenMap(syncStream(
+                JRoutine.on(functionFactory(function)).invocations().with(mConfiguration).set()));
     }
 
     @NotNull

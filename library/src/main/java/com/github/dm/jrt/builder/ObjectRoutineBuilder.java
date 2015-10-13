@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.builder;
 
-import com.github.dm.jrt.annotation.Timeout;
-import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 
@@ -33,9 +31,9 @@ import java.lang.reflect.Method;
  * @see com.github.dm.jrt.annotation.Invoke Invoke
  * @see com.github.dm.jrt.annotation.Output Output
  * @see com.github.dm.jrt.annotation.Priority Priority
+ * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+ * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
  * @see com.github.dm.jrt.annotation.SharedFields SharedFields
- * @see Timeout Timeout
- * @see TimeoutAction TimeoutAction
  */
 public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineBuilder>,
         ProxyConfigurableBuilder<ObjectRoutineBuilder> {
@@ -69,9 +67,9 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull String name);
@@ -112,9 +110,9 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
@@ -155,9 +153,9 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
@@ -192,9 +190,9 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> Routine<IN, OUT> method(@NotNull String name, @NotNull Class<?>... parameterTypes);
@@ -229,9 +227,9 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> Routine<IN, OUT> method(@NotNull Method method);

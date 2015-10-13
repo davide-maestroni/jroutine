@@ -44,7 +44,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.TimeoutAction *;
+ *              &#64;com.github.dm.jrt.annotation.ReadTimeoutAction *;
  *         }
  *     </code>
  * </pre>
@@ -56,7 +56,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TimeoutAction {
+public @interface ReadTimeoutAction {
 
     /**
      * The type of action to be taken on output channel timeout.

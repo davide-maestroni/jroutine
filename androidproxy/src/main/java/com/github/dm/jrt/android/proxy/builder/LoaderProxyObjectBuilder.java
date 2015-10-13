@@ -14,6 +14,8 @@
 package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.builder.LoaderConfigurableBuilder;
+import com.github.dm.jrt.annotation.ReadTimeout;
+import com.github.dm.jrt.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
@@ -67,8 +69,8 @@ public interface LoaderProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
+     * @see ReadTimeout ReadTimeout
+     * @see ReadTimeoutAction ReadTimeoutAction
      */
     @NotNull
     TYPE buildProxy();

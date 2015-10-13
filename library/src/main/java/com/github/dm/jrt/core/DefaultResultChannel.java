@@ -145,8 +145,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mHandler = handler;
         mRunner = runner;
         mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_CHANCE);
-        mExecutionTimeout = configuration.getTimeoutOr(ZERO);
-        mTimeoutActionType = configuration.getTimeoutActionOr(TimeoutActionType.THROW);
+        mExecutionTimeout = configuration.getReadTimeoutOr(ZERO);
+        mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.THROW);
         mMaxOutput = configuration.getOutputMaxSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
         mOutputQueue = new NestedQueue<Object>() {

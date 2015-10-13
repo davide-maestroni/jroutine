@@ -30,8 +30,8 @@ import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
-import com.github.dm.jrt.annotation.Timeout;
-import com.github.dm.jrt.annotation.TimeoutAction;
+import com.github.dm.jrt.annotation.ReadTimeout;
+import com.github.dm.jrt.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.AbortException;
@@ -111,7 +111,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                 JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                              .on(instanceOf(TestList.class))
                              .invocations()
-                             .withTimeout(seconds(10))
+                             .withReadTimeout(seconds(10))
                              .set();
 
         final TestListItf<String> testListItf1 =
@@ -322,7 +322,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                 JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                              .on(instanceOf(TestClass2.class))
                              .invocations()
-                             .withTimeout(seconds(10))
+                             .withReadTimeout(seconds(10))
                              .set();
 
         long startTime = System.currentTimeMillis();
@@ -359,7 +359,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final Itf itf = JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                                      .on(instanceOf(Impl.class))
                                      .invocations()
-                                     .withTimeout(INFINITY)
+                                     .withReadTimeout(INFINITY)
                                      .set()
                                      .buildProxy(Itf.class);
 
@@ -598,7 +598,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         assertThat(JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                                 .on(instanceOf(TestTimeout.class))
                                 .invocations()
-                                .withTimeout(seconds(10))
+                                .withReadTimeout(seconds(10))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).containsExactly(31);
@@ -608,7 +608,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
             JRoutineProxy.with(serviceFrom(getActivity(), TestService.class))
                          .on(instanceOf(TestTimeout.class))
                          .invocations()
-                         .withTimeoutAction(TimeoutActionType.THROW)
+                         .withReadTimeoutAction(TimeoutActionType.THROW)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();
@@ -1039,7 +1039,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     @ServiceProxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Output
         OutputChannel<Integer> getOne();
     }
@@ -1064,55 +1064,55 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
             classPackage = "com.github.dm.jrt.android.proxy")
     public interface TestProxy {
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Invoke(InvocationMode.PARALLEL)
         @Output
         Iterable<Iterable> getList(@Input(value = List.class,
                 mode = InputMode.ELEMENT) List<? extends List<String>> i);
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Output
         OutputChannel<Integer> getOne();
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Invoke(InvocationMode.PARALLEL)
         String getString(@Input(value = int.class, mode = InputMode.ELEMENT) int... i);
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Invoke(InvocationMode.PARALLEL)
         @Output
         OutputChannel<String> getString(
                 @Input(value = int.class, mode = InputMode.ELEMENT) HashSet<Integer> i);
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<String> getString(@Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         Iterable<String> getString(
                 @Input(value = int.class, mode = InputMode.ELEMENT) Iterable<Integer> i);
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         String[] getString(
                 @Input(value = int.class, mode = InputMode.ELEMENT) Collection<Integer> i);
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
     @ServiceProxy(TestClass.class)
     public interface TestStatic {
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Output
         OutputChannel<Integer> getOne();
 
-        @Timeout(3000)
+        @ReadTimeout(3000)
         @Output
         OutputChannel<Integer> getTwo();
     }
@@ -1121,7 +1121,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     public interface TestTimeoutItf {
 
         @Output(OutputMode.COLLECTION)
-        @TimeoutAction(TimeoutActionType.ABORT)
+        @ReadTimeoutAction(TimeoutActionType.ABORT)
         List<Integer> getInt();
     }
 

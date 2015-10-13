@@ -66,9 +66,9 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull String name);
@@ -107,9 +107,9 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
@@ -148,9 +148,9 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
@@ -190,9 +190,9 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name,
@@ -231,9 +231,9 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      * @see com.github.dm.jrt.annotation.SharedFields SharedFields
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull Method method);

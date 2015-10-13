@@ -30,9 +30,9 @@ import com.github.dm.jrt.annotation.OutputMaxSize;
 import com.github.dm.jrt.annotation.OutputOrder;
 import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
+import com.github.dm.jrt.annotation.ReadTimeout;
+import com.github.dm.jrt.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.annotation.SharedFields;
-import com.github.dm.jrt.annotation.Timeout;
-import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.InvocationChannel;
@@ -212,8 +212,8 @@ public class RoutineBuilders {
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
-     * @see com.github.dm.jrt.annotation.Timeout Timeout
-     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
      */
     @NotNull
     public static InvocationConfiguration configurationWithAnnotations(
@@ -285,18 +285,18 @@ public class RoutineBuilders {
             builder.withPriority(priorityAnnotation.value());
         }
 
-        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+        final ReadTimeout readTimeoutAnnotation = method.getAnnotation(ReadTimeout.class);
 
-        if (timeoutAnnotation != null) {
+        if (readTimeoutAnnotation != null) {
 
-            builder.withTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            builder.withReadTimeout(readTimeoutAnnotation.value(), readTimeoutAnnotation.unit());
         }
 
-        final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
+        final ReadTimeoutAction actionAnnotation = method.getAnnotation(ReadTimeoutAction.class);
 
         if (actionAnnotation != null) {
 
-            builder.withTimeoutAction(actionAnnotation.value());
+            builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
         return builder.set();

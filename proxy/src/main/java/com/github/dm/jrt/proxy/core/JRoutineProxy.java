@@ -43,9 +43,9 @@ import org.jetbrains.annotations.NotNull;
  * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
  * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
  * @see com.github.dm.jrt.annotation.Priority Priority
+ * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+ * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
  * @see com.github.dm.jrt.annotation.SharedFields SharedFields
- * @see com.github.dm.jrt.annotation.Timeout Timeout
- * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
  * @see com.github.dm.jrt.proxy.annotation.Proxy Proxy
  */
 public class JRoutineProxy {

@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.builder.FunctionalChannelBuilder;
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.RoutineBuilder;
@@ -155,6 +156,17 @@ public class JRoutine {
      */
     protected JRoutine() {
 
+    }
+
+    /**
+     * Returns a function channel builder.
+     *
+     * @return the channel builder instance.
+     */
+    @NotNull
+    public static FunctionalChannelBuilder functional() {
+
+        return new DefaultFunctionalChannelBuilder();
     }
 
     /**

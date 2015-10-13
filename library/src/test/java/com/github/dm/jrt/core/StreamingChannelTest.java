@@ -215,7 +215,7 @@ public class StreamingChannelTest {
                 JRoutine.on(new StringLength()).buildRoutine();
         assertThat(asyncStream(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 4);
-        assertThat(asyncStream(doubleString).append(asyncStream(stringLength))
+        assertThat(asyncStream(doubleString).concat(asyncStream(stringLength))
                                             .pass("test")
                                             .afterMax(seconds(10))
                                             .next()).isEqualTo(8);
@@ -681,7 +681,7 @@ public class StreamingChannelTest {
                 JRoutine.on(new StringLength()).buildRoutine();
         assertThat(asyncStream(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 4);
-        assertThat(asyncStream(stringLength).prepend(asyncStream(doubleString))
+        assertThat(asyncStream(stringLength).combine(asyncStream(doubleString))
                                             .pass("test")
                                             .afterMax(seconds(10))
                                             .next()).isEqualTo(8);

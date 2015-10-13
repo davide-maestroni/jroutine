@@ -228,19 +228,19 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
-    public <AFTER> StreamingChannel<IN, AFTER> append(
-            @NotNull final IOChannel<? super OUT, AFTER> channel) {
-
-        mOutputChannel.passTo(channel);
-        return new DefaultStreamingChannel<IN, AFTER>(mInputChannel, channel.close());
-    }
-
-    @NotNull
-    public <BEFORE> StreamingChannel<BEFORE, OUT> prepend(
+    public <BEFORE> StreamingChannel<BEFORE, OUT> combine(
             @NotNull final IOChannel<BEFORE, ? extends IN> channel) {
 
         mInputChannel.pass(channel).close();
         return new DefaultStreamingChannel<BEFORE, OUT>(channel, mOutputChannel);
+    }
+
+    @NotNull
+    public <AFTER> StreamingChannel<IN, AFTER> concat(
+            @NotNull final IOChannel<? super OUT, AFTER> channel) {
+
+        mOutputChannel.passTo(channel);
+        return new DefaultStreamingChannel<IN, AFTER>(mInputChannel, channel.close());
     }
 
     @NotNull

@@ -42,6 +42,8 @@ import java.lang.reflect.Type;
  */
 public abstract class ClassToken<TYPE> {
 
+    // TODO: 13/10/15 export Proguard file...
+
     private Type mGenericType;
 
     private Class<TYPE> mRawClass;

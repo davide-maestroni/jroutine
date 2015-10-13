@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the interface type.
  */
-public interface ServiceProxyBuilder<TYPE>
-        extends ProxyObjectBuilder<TYPE>, ServiceConfigurableBuilder<ServiceProxyBuilder<TYPE>> {
+public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>,
+        ServiceConfigurableBuilder<ServiceProxyObjectBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -70,11 +70,11 @@ public interface ServiceProxyBuilder<TYPE>
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> invocations();
+    InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> invocations();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> proxies();
+    ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> proxies();
 }

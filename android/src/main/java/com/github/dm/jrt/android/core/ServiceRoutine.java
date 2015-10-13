@@ -154,13 +154,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         mRoutine.purge();
     }
 
-    @NotNull
-    @Override
-    protected InvocationConfiguration getConfiguration() {
-
-        return mInvocationConfiguration;
-    }
-
     /**
      * Service invocation channel implementation.
      *

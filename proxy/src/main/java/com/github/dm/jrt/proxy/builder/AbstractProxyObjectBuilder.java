@@ -15,7 +15,6 @@ package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
-import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +43,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
         final Object target = getTarget();
@@ -61,14 +61,13 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
-            final ClassToken<TYPE> token = getInterfaceToken();
             final ClassInfo classInfo =
-                    new ClassInfo(token, invocationConfiguration, proxyConfiguration);
+                    new ClassInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration);
             final Object instance = proxyMap.get(classInfo);
 
             if (instance != null) {
 
-                return token.cast(instance);
+                return (TYPE) instance;
             }
 
             try {
@@ -127,12 +126,12 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     }
 
     /**
-     * Returns the builder proxy class token.
+     * Returns the builder proxy class.
      *
-     * @return the proxy class token.
+     * @return the proxy class.
      */
     @NotNull
-    protected abstract ClassToken<TYPE> getInterfaceToken();
+    protected abstract Class<? super TYPE> getInterfaceClass();
 
     /**
      * Returns the builder target object.
@@ -167,15 +166,15 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
         /**
          * Constructor.
          *
-         * @param token                   the proxy interface token.
+         * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
          * @param proxyConfiguration      the proxy configuration.
          */
-        private ClassInfo(@NotNull final ClassToken<?> token,
+        private ClassInfo(@NotNull final Class<?> itf,
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration) {
 
-            mType = token.getRawClass();
+            mType = itf;
             mInvocationConfiguration = invocationConfiguration;
             mProxyConfiguration = proxyConfiguration;
         }

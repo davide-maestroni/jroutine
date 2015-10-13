@@ -39,7 +39,6 @@ import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
@@ -62,7 +61,6 @@ import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.invocation.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.invocation.FunctionContextInvocations.factoryOf;
-import static com.github.dm.jrt.android.invocation.FunctionContextInvocations.supplierFactory;
 import static com.github.dm.jrt.android.v4.core.LoaderContext.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -81,17 +79,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public LoaderRoutineTest() {
 
         super(TestActivity.class);
-    }
-
-    private static FunctionContextInvocationFactory<String, String> createFactory() {
-
-        return supplierFactory(new Supplier<FunctionContextInvocation<String, String>>() {
-
-            public FunctionContextInvocation<String, String> get() {
-
-                return new StringFunctionInvocation();
-            }
-        });
     }
 
     public void testActivityAbort() {
@@ -1450,15 +1437,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    public void testSupplierFactory() {
-
-        assertThat(JRoutine.with(contextFrom(getActivity()))
-                           .on(createFactory())
-                           .asyncCall("test")
-                           .afterMax(seconds(10))
-                           .all()).containsExactly("test");
     }
 
     private static class Abort extends FunctionContextInvocation<Data, Data> {

@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.android.invocation;
 
-import com.github.dm.jrt.function.Functions.SupplierChain;
-import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
@@ -24,7 +22,6 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.function.Functions.supplierChain;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
@@ -135,29 +132,6 @@ public class FunctionContextInvocations {
     }
 
     /**
-     * Builds and returns a new context invocation factory based on the specified supplier instance.
-     * <br/>
-     * In order to prevent undesired leaks, the class of the specified supplier must have a static
-     * context.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param supplier the supplier instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the context invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> supplierFactory(
-            @NotNull final Supplier<? extends FunctionContextInvocation<IN, OUT>> supplier) {
-
-        return new SupplierContextInvocationFactory<IN, OUT>(supplierChain(supplier));
-    }
-
-    /**
      * Default implementation of an invocation factory.
      *
      * @param <IN>  the input data type.
@@ -187,45 +161,6 @@ public class FunctionContextInvocations {
         public FunctionContextInvocation<IN, OUT> newInvocation() {
 
             return (FunctionContextInvocation<IN, OUT>) mFactory.newInvocation();
-        }
-    }
-
-    /**
-     * Implementation of a context invocation factory based on a supplier function.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class SupplierContextInvocationFactory<IN, OUT>
-            extends FunctionContextInvocationFactory<IN, OUT> {
-
-        private final SupplierChain<? extends FunctionContextInvocation<IN, OUT>> mSupplier;
-
-        /**
-         * Constructor.
-         *
-         * @param supplier the supplier function.
-         */
-        private SupplierContextInvocationFactory(
-                @NotNull final SupplierChain<? extends FunctionContextInvocation<IN, OUT>>
-                        supplier) {
-
-            super(asArgs(supplier));
-
-            if (!supplier.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the supplier class must have a static context: " + supplier.getClass());
-            }
-
-            mSupplier = supplier;
-        }
-
-        @NotNull
-        @Override
-        public FunctionContextInvocation<IN, OUT> newInvocation() {
-
-            return mSupplier.get();
         }
     }
 }

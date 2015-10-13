@@ -16,8 +16,8 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.ConsumerChain;
 import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.function.Functions.ConsumerChain;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

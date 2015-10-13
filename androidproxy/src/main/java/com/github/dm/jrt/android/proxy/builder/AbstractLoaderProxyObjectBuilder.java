@@ -17,7 +17,6 @@ import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +50,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
         synchronized (sContextProxies) {
@@ -84,15 +84,14 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
-            final ClassToken<TYPE> token = getInterfaceToken();
             final ProxyInfo proxyInfo =
-                    new ProxyInfo(token, invocationConfiguration, proxyConfiguration,
+                    new ProxyInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration,
                                   loaderConfiguration);
             final Object instance = proxies.get(proxyInfo);
 
             if (instance != null) {
 
-                return token.cast(instance);
+                return (TYPE) instance;
             }
 
             final Runner asyncRunner = invocationConfiguration.getRunnerOr(null);
@@ -182,12 +181,12 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     /**
-     * Returns the builder proxy class token.
+     * Returns the builder proxy class.
      *
-     * @return the proxy class token.
+     * @return the proxy class.
      */
     @NotNull
-    protected abstract ClassToken<TYPE> getInterfaceToken();
+    protected abstract Class<? super TYPE> getInterfaceClass();
 
     /**
      * Returns the context or component (Activity, Fragment, etc.) on which the invocation is based.
@@ -236,17 +235,17 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         /**
          * Constructor.
          *
-         * @param token                   the proxy interface token.
+         * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
          * @param proxyConfiguration      the proxy configuration.
          * @param loaderConfiguration     the loader configuration.
          */
-        private ProxyInfo(@NotNull final ClassToken<?> token,
+        private ProxyInfo(@NotNull final Class<?> itf,
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final LoaderConfiguration loaderConfiguration) {
 
-            mType = token.getRawClass();
+            mType = itf;
             mInvocationConfiguration = invocationConfiguration;
             mProxyConfiguration = proxyConfiguration;
             mLoaderConfiguration = loaderConfiguration;

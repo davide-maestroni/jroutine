@@ -37,7 +37,6 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -108,8 +107,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
     protected TypeMirror routineType;
 
-    protected TypeMirror streamingChannelType;
-
     private String mFooter;
 
     private String mHeader;
@@ -139,8 +136,6 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodInputsChannel;
 
     private String mMethodInputsRoutine;
-
-    private String mMethodInputsStream;
 
     private String mMethodInvocation;
 
@@ -206,7 +201,6 @@ public class RoutineProcessor extends AbstractProcessor {
         routineType = getTypeFromName(Routine.class.getCanonicalName()).asType();
         invocationChannelType =
                 getTypeFromName(InvocationChannel.class.getCanonicalName()).asType();
-        streamingChannelType = getTypeFromName(StreamingChannel.class.getCanonicalName()).asType();
         outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
         iterableType = getTypeFromName(Iterable.class.getCanonicalName()).asType();
         listType = getTypeFromName(List.class.getCanonicalName()).asType();
@@ -1278,27 +1272,6 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @NotNull
     @SuppressWarnings("UnusedParameters")
-    protected String getMethodInputsStreamTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodInputsStream == null) {
-
-            mMethodInputsStream = parseTemplate("/templates/method_inputs_stream.txt");
-        }
-
-        return mMethodInputsStream;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param methodElement the method element.
-     * @param count         the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
     protected String getMethodInvocationCollectionTemplate(
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
@@ -1735,6 +1708,8 @@ public class RoutineProcessor extends AbstractProcessor {
             header = header.replace("${interfaceFullName}", element.asType().toString());
             header = header.replace("${classErasure}",
                                     typeUtils.erasure(targetElement.asType()).toString());
+            header = header.replace("${interfaceErasure}",
+                                    typeUtils.erasure(element.asType()).toString());
             header = header.replace("${routineFieldsInit}",
                                     buildRoutineFieldsInit(methodElements.size()));
             writer.append(header);
@@ -1959,8 +1934,7 @@ public class RoutineProcessor extends AbstractProcessor {
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnErasure = typeUtils.erasure(returnType);
 
-            if (!typeUtils.isAssignable(streamingChannelType, returnErasure)
-                    && !typeUtils.isAssignable(invocationChannelType, returnErasure)
+            if (!typeUtils.isAssignable(invocationChannelType, returnErasure)
                     && !typeUtils.isAssignable(routineType, returnErasure)) {
 
                 throw new IllegalArgumentException(
@@ -1973,10 +1947,6 @@ public class RoutineProcessor extends AbstractProcessor {
             if (typeUtils.isAssignable(invocationChannelType, returnErasure)) {
 
                 method = getMethodInputsChannelTemplate(methodElement, count);
-
-            } else if (typeUtils.isAssignable(streamingChannelType, returnErasure)) {
-
-                method = getMethodInputsStreamTemplate(methodElement, count);
 
             } else {
 
@@ -2115,10 +2085,6 @@ public class RoutineProcessor extends AbstractProcessor {
                                 (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
                                         : (invocationMode == InvocationMode.PARALLEL)
                                                 ? "parallelInvoke" : "asyncInvoke");
-        method = method.replace("${streamMethod}",
-                                (invocationMode == InvocationMode.SYNC) ? "syncStream"
-                                        : (invocationMode == InvocationMode.PARALLEL)
-                                                ? "parallelStream" : "asyncStream");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader = getMethodInvocationHeaderTemplate(methodElement, count);

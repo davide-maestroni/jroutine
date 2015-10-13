@@ -74,8 +74,12 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
         return this;
     }
 
+    /**
+     * Returns the builder invocation configuration.
+     *
+     * @return the invocation configuration.
+     */
     @NotNull
-    @Override
     protected InvocationConfiguration getConfiguration() {
 
         return mConfiguration;

@@ -214,13 +214,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
     }
 
-    @NotNull
-    @Override
-    protected InvocationConfiguration getConfiguration() {
-
-        return mConfiguration;
-    }
-
     /**
      * Converts an invocation instance to the specified type.
      *
@@ -234,6 +227,17 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             @NotNull final InvocationType type) {
 
         return invocation;
+    }
+
+    /**
+     * Returns the routine invocation configuration.
+     *
+     * @return the invocation configuration.
+     */
+    @NotNull
+    protected InvocationConfiguration getConfiguration() {
+
+        return mConfiguration;
     }
 
     /**

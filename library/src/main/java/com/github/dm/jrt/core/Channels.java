@@ -18,6 +18,8 @@ import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +44,23 @@ public class Channels {
      */
     protected Channels() {
 
+    }
+
+    /**
+     * Creates and returns a new streaming channel by invoking the specified routine in asynchronous
+     * mode.
+     *
+     * @param routine the routine to be invoked.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the streaming channel.
+     */
+    @NotNull
+    public static <IN, OUT> StreamingChannel<IN, OUT> asyncStream(
+            @NotNull final Routine<IN, OUT> routine) {
+
+        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, routine.asyncCall(ioChannel));
     }
 
     /**
@@ -655,6 +674,23 @@ public class Channels {
     }
 
     /**
+     * Creates and returns a new streaming channel by invoking the specified routine in parallel
+     * mode.
+     *
+     * @param routine the routine to be invoked.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the streaming channel.
+     */
+    @NotNull
+    public static <IN, OUT> StreamingChannel<IN, OUT> parallelStream(
+            @NotNull final Routine<IN, OUT> routine) {
+
+        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, routine.parallelCall(ioChannel));
+    }
+
+    /**
      * Returns a new channel transforming the input data into selectable ones.<br/>
      * Note that the returned channel must be closed in order to ensure the completion of the
      * invocation lifecycle.
@@ -705,6 +741,23 @@ public class Channels {
         }
 
         return ioChannel;
+    }
+
+    /**
+     * Creates and returns a new streaming channel by invoking the specified routine in synchronous
+     * mode.
+     *
+     * @param routine the routine to be invoked.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the streaming channel.
+     */
+    @NotNull
+    public static <IN, OUT> StreamingChannel<IN, OUT> syncStream(
+            @NotNull final Routine<IN, OUT> routine) {
+
+        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
+        return new DefaultStreamingChannel<IN, OUT>(ioChannel, routine.syncCall(ioChannel));
     }
 
     /**

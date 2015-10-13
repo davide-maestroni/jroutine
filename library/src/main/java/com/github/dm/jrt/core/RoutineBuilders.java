@@ -39,7 +39,6 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.routine.Routine;
@@ -707,8 +706,7 @@ public class RoutineBuilders {
 
                     final Class<?> returnType = proxyMethod.getReturnType();
 
-                    if (!returnType.isAssignableFrom(StreamingChannel.class)
-                            && !returnType.isAssignableFrom(InvocationChannel.class)
+                    if (!returnType.isAssignableFrom(InvocationChannel.class)
                             && !returnType.isAssignableFrom(Routine.class)) {
 
                         throw new IllegalArgumentException(
@@ -818,12 +816,6 @@ public class RoutineBuilders {
                 return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
-
-            } else if (returnType.isAssignableFrom(StreamingChannel.class)) {
-
-                return (invocationMode == InvocationMode.SYNC) ? routine.syncStream()
-                        : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelStream()
-                                : routine.asyncStream();
             }
 
             return routine;

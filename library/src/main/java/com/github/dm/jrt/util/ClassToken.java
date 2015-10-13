@@ -27,6 +27,15 @@ import java.lang.reflect.Type;
  * The workaround consists in forcing the inheritance from a special generic class, then inspected
  * via reflection, to obtain the generic type rather than the class object.
  * <p/>
+ * Remember that, in order for the workaround to properly work at run time, you will need to add the
+ * following rule to your Proguard file (if employing it for shrinking or obfuscation):
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes Signature
+ *     </code>
+ * </pre>
+ * <p/>
  * Created by davide-maestroni on 06/14/2014.
  *
  * @param <TYPE> the class type.

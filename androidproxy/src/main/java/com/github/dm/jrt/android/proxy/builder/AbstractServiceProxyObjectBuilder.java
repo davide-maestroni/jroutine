@@ -18,7 +18,6 @@ import android.content.Context;
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
-import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,10 +34,11 @@ import java.util.HashMap;
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyBuilder<TYPE>,
-        InvocationConfiguration.Configurable<ServiceProxyBuilder<TYPE>>,
-        ProxyConfiguration.Configurable<ServiceProxyBuilder<TYPE>>,
-        ServiceConfiguration.Configurable<ServiceProxyBuilder<TYPE>> {
+public abstract class AbstractServiceProxyObjectBuilder<TYPE>
+        implements ServiceProxyObjectBuilder<TYPE>,
+        InvocationConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>,
+        ProxyConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>,
+        ServiceConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>> {
 
     private static final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
             sContextProxies =
@@ -52,6 +52,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
         synchronized (sContextProxies) {
@@ -85,15 +86,14 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ProxyConfiguration proxyConfiguration = mProxyConfiguration;
             final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-            final ClassToken<TYPE> token = getInterfaceToken();
             final ProxyInfo proxyInfo =
-                    new ProxyInfo(token, invocationConfiguration, proxyConfiguration,
+                    new ProxyInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration,
                                   serviceConfiguration);
             final Object instance = proxies.get(proxyInfo);
 
             if (instance != null) {
 
-                return token.cast(instance);
+                return (TYPE) instance;
             }
 
             try {
@@ -111,29 +111,30 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> invocations() {
+    public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> invocations
+            () {
 
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
+        return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> proxies() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> proxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
+        return new ProxyConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> service() {
+    public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> service() {
 
         final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceProxyBuilder<TYPE>>(this, config);
+        return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public ServiceProxyBuilder<TYPE> setConfiguration(
+    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
@@ -147,7 +148,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
 
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public ServiceProxyBuilder<TYPE> setConfiguration(
+    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
@@ -161,7 +162,7 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
 
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public ServiceProxyBuilder<TYPE> setConfiguration(
+    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
@@ -174,12 +175,12 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
     }
 
     /**
-     * Returns the builder proxy class token.
+     * Returns the builder proxy class.
      *
-     * @return the proxy class token.
+     * @return the proxy class.
      */
     @NotNull
-    protected abstract ClassToken<TYPE> getInterfaceToken();
+    protected abstract Class<? super TYPE> getInterfaceClass();
 
     /**
      * Returns the context on which the invocation is based.
@@ -228,17 +229,17 @@ public abstract class AbstractServiceProxyBuilder<TYPE> implements ServiceProxyB
         /**
          * Constructor.
          *
-         * @param token                   the proxy interface token.
+         * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
          * @param proxyConfiguration      the proxy configuration.
          * @param serviceConfiguration    the service configuration.
          */
-        private ProxyInfo(@NotNull final ClassToken<?> token,
+        private ProxyInfo(@NotNull final Class<?> itf,
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration) {
 
-            mType = token.getRawClass();
+            mType = itf;
             mInvocationConfiguration = invocationConfiguration;
             mProxyConfiguration = proxyConfiguration;
             mServiceConfiguration = serviceConfiguration;

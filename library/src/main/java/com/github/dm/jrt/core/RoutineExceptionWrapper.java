@@ -40,21 +40,6 @@ class RoutineExceptionWrapper {
     }
 
     /**
-     * If the specified object is a wrapper instance, the wrapped routine exception is thrown.
-     *
-     * @param obj the object to check.
-     * @throws com.github.dm.jrt.channel.RoutineException if the specified object is an exception
-     *                                                    wrapper instance.
-     */
-    static void raise(@Nullable final Object obj) {
-
-        if (obj instanceof RoutineExceptionWrapper) {
-
-            throw ((RoutineExceptionWrapper) obj).raise();
-        }
-    }
-
-    /**
      * Creates an instance wrapping the specified exception.
      *
      * @param t the throwable to wrap.

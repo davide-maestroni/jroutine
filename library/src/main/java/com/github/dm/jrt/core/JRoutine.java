@@ -61,7 +61,7 @@ import org.jetbrains.annotations.NotNull;
  *         channel.pass(doSomething1.asyncCall())
  *                .pass(doSomething2.asyncCall())
  *                .close();
- *                .eventually()
+ *                .afterMax(seconds(20))
  *                .allInto(results);
  *     </code>
  * </pre>
@@ -71,8 +71,8 @@ import org.jetbrains.annotations.NotNull;
  *
  *         final OutputChannel&lt;Result&gt; output1 = doSomething1.asyncCall();
  *         final OutputChannel&lt;Result&gt; output2 = doSomething2.asyncCall();
- *         output1.eventually().allInto(results);
- *         output2.eventually().allInto(results);
+ *         output1.afterMax(seconds(20)).allInto(results);
+ *         output2.afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
@@ -82,7 +82,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         doSomething2.asyncCall(doSomething1.asyncCall())).eventually().allInto(results);
+ *         doSomething2.asyncCall(doSomething1.asyncCall())).afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -124,19 +124,27 @@ import org.jetbrains.annotations.NotNull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                          .buildRoutine();
- *         routine.asyncCall(channel).eventually().allInto(results);
+ *         routine.asyncCall(channel).afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *
  * @see com.github.dm.jrt.annotation.Alias Alias
+ * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
  * @see com.github.dm.jrt.annotation.Input Input
+ * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+ * @see com.github.dm.jrt.annotation.InputOrder InputOrder
  * @see com.github.dm.jrt.annotation.Inputs Inputs
+ * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+ * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
  * @see com.github.dm.jrt.annotation.Invoke Invoke
  * @see com.github.dm.jrt.annotation.Output Output
+ * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+ * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+ * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
  * @see com.github.dm.jrt.annotation.Priority Priority
- * @see com.github.dm.jrt.annotation.ShareGroup ShareGroup
+ * @see com.github.dm.jrt.annotation.SharedFields SharedFields
  * @see com.github.dm.jrt.annotation.Timeout Timeout
  * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
  */
@@ -163,7 +171,10 @@ public class JRoutine {
     /**
      * Returns a routine builder wrapping the specified target object.<br/>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
+     * instance to prevent it from being garbage collected.<br/>
+     * Note also that the invocation input data will be cached, and the results will be produced
+     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+     * order to prevent starvation or out of memory errors.
      *
      * @param target the invocation target.
      * @return the routine builder instance.

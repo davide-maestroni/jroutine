@@ -26,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
  * <pre>
  *     <code>
  *
+ *                   &lt;init&gt;
+ *
  *                   |     |
  *                   |     |-------------------------------
  *                   V     |                               |
@@ -71,9 +73,12 @@ import org.jetbrains.annotations.Nullable;
  * The {@code onTerminate()} method is meant to allow the clean up and reset operations needed to
  * prepare the invocation object to be reused. When the method is not called or does not complete
  * successfully, the invocation object is discarded.<br/>
- * The {@code onDestroy()} method is meant to indicate that the invocation object is no longer
+ * While the {@code onDestroy()} method is meant to indicate that the invocation object is no longer
  * needed, so any associated resource can be safely released. Note that this method may never get
  * called if the routine is automatically garbage collected.
+ * <p/>
+ * Be aware that there is no guarantee about how and when an invocation will produce a result. It
+ * might return one or more output for each input, or no output at all.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
  * {@link com.github.dm.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause

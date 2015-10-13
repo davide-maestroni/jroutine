@@ -18,7 +18,7 @@
     public ${resultType} ${methodName}(${paramVars}) {
 
         final com.github.dm.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        final java.util.List<${resultClassName}> $$list = $$routine.${invokeMethod}()${inputOptions}${inputParams}.result()${outputOptions}.all();
+        final java.util.List<${resultClassName}> $$list = $$routine.${invokeMethod}()${inputOptions}${inputParams}.result().all();
         final int $$size = $$list.size();
         final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
 

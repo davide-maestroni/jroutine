@@ -34,10 +34,12 @@ import com.github.dm.jrt.channel.OutputTimeoutException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
+import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -48,7 +50,6 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.PassingInvocation;
-import com.github.dm.jrt.invocation.ProcedureInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.log.Log.LogLevel;
 import com.github.dm.jrt.log.Logger;
@@ -80,6 +81,7 @@ import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -542,7 +544,7 @@ public class RoutineTest {
 
         try {
 
-            routine2.asyncCall("test").eventually().all();
+            routine2.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -559,7 +561,7 @@ public class RoutineTest {
 
         try {
 
-            routine1.asyncCall("test").eventually().all();
+            routine1.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -576,7 +578,7 @@ public class RoutineTest {
 
         try {
 
-            routine3.asyncCall("test").eventually().all();
+            routine3.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -592,7 +594,7 @@ public class RoutineTest {
 
         try {
 
-            routine4.asyncCall("test").eventually().all();
+            routine4.asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1093,7 +1095,7 @@ public class RoutineTest {
         assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
         final OutputChannel<Object> result = channel.result();
         assertThat(result.isEmpty()).isTrue();
-        assertThat(result.eventually().checkComplete()).isTrue();
+        assertThat(result.afterMax(seconds(10)).checkComplete()).isTrue();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(result.isEmpty()).isFalse();
     }
@@ -1455,7 +1457,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputRunnerDeadlock()).asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1465,7 +1467,7 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputListRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputListRunnerDeadlock()).asyncCall("test").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1475,7 +1477,10 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputArrayRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputArrayRunnerDeadlock())
+                    .asyncCall("test")
+                    .afterMax(seconds(1))
+                    .all();
 
             fail();
 
@@ -1485,7 +1490,10 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(new InputConsumerRunnerDeadlock()).asyncCall("test").eventually().all();
+            JRoutine.on(new InputConsumerRunnerDeadlock())
+                    .asyncCall("test")
+                    .afterMax(seconds(1))
+                    .all();
 
             fail();
 
@@ -1535,7 +1543,7 @@ public class RoutineTest {
                            .now()
                            .pass("test2")
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
@@ -1549,9 +1557,9 @@ public class RoutineTest {
                            .after(millis(100))
                            .pass("test1")
                            .now()
-                           .pass(new Object[]{"test2"})
+                           .pass(asArgs("test2"))
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
@@ -1567,7 +1575,7 @@ public class RoutineTest {
                            .now()
                            .pass(Collections.singletonList("test2"))
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
@@ -1585,7 +1593,7 @@ public class RoutineTest {
                            .now()
                            .pass(channel)
                            .result()
-                           .eventually()
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
     }
 
@@ -1720,7 +1728,7 @@ public class RoutineTest {
     @Test
     public void testInvocationNotAvailable() throws InterruptedException {
 
-        final Routine<Void, Void> routine = JRoutine.on(new SleepProcedure())
+        final Routine<Void, Void> routine = JRoutine.on(new SleepCommand())
                                                     .invocations()
                                                     .withMaxInstances(1)
                                                     .set()
@@ -1731,7 +1739,7 @@ public class RoutineTest {
 
         try {
 
-            routine.asyncCall().eventually().next();
+            routine.asyncCall().afterMax(seconds(1)).next();
 
             fail();
 
@@ -1805,7 +1813,7 @@ public class RoutineTest {
 
         assertThat(JRoutine.on(instance(test))
                            .invocations()
-                           .withExecutionTimeout(timeout)
+                           .withTimeout(timeout)
                            .set()
                            .buildProxy(TestInterfaceAsync.class)
                            .take(77)).isEqualTo(77);
@@ -1817,11 +1825,53 @@ public class RoutineTest {
 
         final TestInterfaceAsync testInterfaceAsync = JRoutine.on(instance(test))
                                                               .invocations()
-                                                              .withExecutionTimeout(1,
-                                                                                    TimeUnit.SECONDS)
+                                                              .withTimeout(1, TimeUnit.SECONDS)
                                                               .set()
                                                               .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
+    }
+
+    @Test
+    public void testNext() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1", "test2", "test3", "test4")
+                           .afterMax(seconds(1))
+                           .next(2)).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1")
+                           .eventuallyExit()
+                           .afterMax(seconds(1))
+                           .next(2)).containsExactly("test1");
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyAbort()
+                    .afterMax(seconds(1))
+                    .next(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyThrow()
+                    .afterMax(seconds(1))
+                    .next(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
     }
 
     @Test
@@ -1845,7 +1895,7 @@ public class RoutineTest {
 
         try {
 
-            routine1.asyncCall("test1", "test2").eventually().all();
+            routine1.asyncCall("test1", "test2").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1871,7 +1921,7 @@ public class RoutineTest {
 
         try {
 
-            routine2.asyncCall("test1", "test2").eventually().all();
+            routine2.asyncCall("test1", "test2").afterMax(seconds(1)).all();
 
             fail();
 
@@ -1893,7 +1943,7 @@ public class RoutineTest {
         try {
 
             final OutputChannel<String> outputChannel =
-                    routine.asyncCall("test1", "test2").eventually();
+                    routine.asyncCall("test1", "test2").afterMax(seconds(1));
             outputChannel.checkComplete();
             outputChannel.all();
 
@@ -1918,7 +1968,7 @@ public class RoutineTest {
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel1.eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel1.afterMax(seconds(10)).all()).containsOnly("test1", "test2");
 
         final IOChannel<String, String> channel2 = JRoutine.io()
                                                            .channels()
@@ -1935,7 +1985,7 @@ public class RoutineTest {
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel2.eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel2.afterMax(seconds(10)).all()).containsOnly("test1", "test2");
 
         final IOChannel<String, String> channel3 = JRoutine.io()
                                                            .channels()
@@ -1952,7 +2002,7 @@ public class RoutineTest {
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel3.eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel3.afterMax(seconds(10)).all()).containsOnly("test1", "test2");
 
         final IOChannel<String, String> channel4 = JRoutine.io()
                                                            .channels()
@@ -1971,7 +2021,7 @@ public class RoutineTest {
             }
         }.start();
         millis(100).sleepAtLeast();
-        assertThat(channel4.eventually().all()).containsOnly("test1", "test2");
+        assertThat(channel4.afterMax(seconds(10)).all()).containsOnly("test1", "test2");
     }
 
     @Test
@@ -2000,19 +2050,17 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isTrue();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
+        channel.pass(ioChannel);
+        assertThat(channel.isOpen()).isTrue();
         channel.result();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isTrue();
-        seconds(1).sleepAtLeast();
+        ioChannel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -2021,16 +2069,15 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isTrue();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
+        channel.pass(ioChannel);
+        assertThat(channel.isOpen()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -2263,7 +2310,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2280,7 +2327,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2297,7 +2344,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2314,7 +2361,7 @@ public class RoutineTest {
                     .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
 
             fail();
@@ -2434,12 +2481,57 @@ public class RoutineTest {
     }
 
     @Test
+    public void testSkip() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1", "test2", "test3", "test4")
+                           .afterMax(seconds(1))
+                           .skip(2)
+                           .all()).containsExactly("test3", "test4");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1")
+                           .eventuallyExit()
+                           .afterMax(seconds(1))
+                           .skip(2)
+                           .all()).isEmpty();
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyAbort()
+                    .afterMax(seconds(1))
+                    .skip(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyThrow()
+                    .afterMax(seconds(1))
+                    .skip(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
+    }
+
+    @Test
     public void testTimeoutActions() {
 
         final Routine<String, String> routine1 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
+                        .withTimeoutAction(TimeoutActionType.ABORT)
                         .set()
                         .buildRoutine();
 
@@ -2499,8 +2591,8 @@ public class RoutineTest {
         final Routine<String, String> routine2 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.ABORT)
-                        .withExecutionTimeout(millis(10))
+                        .withTimeoutAction(TimeoutActionType.ABORT)
+                        .withTimeout(millis(10))
                         .set()
                         .buildRoutine();
 
@@ -2560,7 +2652,7 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                        .withTimeoutAction(TimeoutActionType.THROW)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel3 = routine3.asyncCall("test1");
@@ -2676,7 +2768,7 @@ public class RoutineTest {
         final Routine<String, String> routine4 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
                         .invocations()
-                        .withExecutionTimeoutAction(TimeoutActionType.EXIT)
+                        .withTimeoutAction(TimeoutActionType.EXIT)
                         .set()
                         .buildRoutine();
         final OutputChannel<String> channel4 = routine4.asyncCall("test1");
@@ -3314,7 +3406,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .all();
         }
     }
@@ -3325,7 +3417,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .checkComplete();
         }
     }
@@ -3536,7 +3628,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .iterator()
                     .hasNext();
         }
@@ -3623,7 +3715,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
-                    .eventually()
+                    .afterMax(seconds(1))
                     .iterator()
                     .next();
         }
@@ -3679,6 +3771,21 @@ public class RoutineTest {
         }
     }
 
+    private static class SleepCommand extends CommandInvocation<Void> {
+
+        public void onResult(@NotNull final ResultChannel<Void> result) {
+
+            try {
+
+                seconds(1).sleepAtLeast();
+
+            } catch (final InterruptedException e) {
+
+                throw new InvocationInterruptedException(e);
+            }
+        }
+    }
+
     private static class SleepInvocation extends FilterInvocation<Object, Object> {
 
         private final TimeDuration mSleepDuration;
@@ -3700,21 +3807,6 @@ public class RoutineTest {
             }
 
             result.pass(input);
-        }
-    }
-
-    private static class SleepProcedure extends ProcedureInvocation<Void> {
-
-        public void onResult(@NotNull final ResultChannel<Void> result) {
-
-            try {
-
-                seconds(1).sleepAtLeast();
-
-            } catch (final InterruptedException e) {
-
-                throw new InvocationInterruptedException(e);
-            }
         }
     }
 

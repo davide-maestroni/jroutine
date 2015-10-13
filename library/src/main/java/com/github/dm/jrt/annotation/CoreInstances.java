@@ -13,6 +13,8 @@
  */
 package com.github.dm.jrt.annotation;
 
+import com.github.dm.jrt.builder.InvocationConfiguration;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -27,16 +29,11 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
  * <p/>
- * Through this annotation, it is possible to exclude single methods from this kind of protection,
- * by indicating them as having a different share group. Each group has a name associated, and every
- * method, within a specific group, is protected so that shared class members can be safely accessed
- * only from the other methods sharing the same group name. That means that the invocation of
- * methods within the same group cannot happen in parallel. In a dual way, methods belonging to
- * different groups can be invoked in parallel, but should not access the same members to avoid
- * concurrency issues.
+ * Through this annotation, it is possible to indicate the size of the core pool of reusable
+ * invocation instances.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
- * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * means that, in case a {@link SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
@@ -47,34 +44,24 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.ShareGroup *;
+ *              &#64;com.github.dm.jrt.annotation.CoreInstances *;
  *         }
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 01/26/2015.
+ * Created by davide-maestroni on 10/05/2015.
  *
- * @see com.github.dm.jrt.builder.ProxyConfiguration ProxyConfiguration
+ * @see InvocationConfiguration InvocationConfiguration
  */
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ShareGroup {
+public @interface CoreInstances {
 
     /**
-     * Constant indicating the default share group, that is, all member fields are protected.
-     */
-    String ALL = "com.github.dm.jrt.annotation.ShareGroup.ALL";
-
-    /**
-     * Constant indicating that no member field needs to be protected.
-     */
-    String NONE = "";
-
-    /**
-     * The share group name associated with the annotated method.
+     * The number of invocation instances which represents the core pool of reusable invocations.
      *
-     * @return the group name.
+     * @return the instance number.
      */
-    String value();
+    int value();
 }

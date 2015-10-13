@@ -19,7 +19,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -28,9 +28,10 @@ import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
+import static com.github.dm.jrt.android.invocation.FunctionContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContext.contextFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -196,21 +197,28 @@ public class LoaderRoutineRotationTest
 
     }
 
-    private static class Delay extends TemplateContextInvocation<Data, Data> {
+    private static class Delay extends FunctionContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
+        protected void onCall(@NotNull final List<? extends Data> inputs,
+                @NotNull final ResultChannel<Data> result) {
 
-            result.after(TimeDuration.millis(500)).pass(d);
+            result.after(TimeDuration.millis(500)).pass(inputs);
         }
     }
 
-    private static class ToUpperCase extends TemplateContextInvocation<String, String> {
+    private static class ToUpperCase extends FunctionContextInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
+        protected void onCall(@NotNull final List<? extends String> inputs,
+                @NotNull final ResultChannel<String> result) {
 
-            result.after(TimeDuration.millis(500)).pass(s.toUpperCase());
+            result.after(TimeDuration.millis(500));
+
+            for (final String input : inputs) {
+
+                result.pass(input.toUpperCase());
+            }
         }
     }
 }

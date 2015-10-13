@@ -25,7 +25,7 @@
             $$channel.pass($$object);
         }
 
-        final java.util.List<${resultClassName}> $$list = $$channel.result()${outputOptions}.all();
+        final java.util.List<${resultClassName}> $$list = $$channel.result().all();
         final int $$size = $$list.size();
         final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
 

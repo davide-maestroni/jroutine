@@ -15,7 +15,6 @@ package com.github.dm.jrt.routine;
 
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -136,14 +135,6 @@ public interface Routine<IN, OUT> {
     InvocationChannel<IN, OUT> asyncInvoke();
 
     /**
-     * Creates a streaming channel by invoking this routine in asynchronous mode.
-     *
-     * @return the streaming channel.
-     */
-    @NotNull
-    StreamingChannel<IN, OUT> asyncStream();
-
-    /**
      * Short for {@code parallelInvoke().result()}.
      * <p/>
      * (This method actually makes little sense, and should never need to be called, thought it is
@@ -200,14 +191,6 @@ public interface Routine<IN, OUT> {
      */
     @NotNull
     InvocationChannel<IN, OUT> parallelInvoke();
-
-    /**
-     * Creates a streaming channel by invoking this routine in parallel mode.
-     *
-     * @return the streaming channel.
-     */
-    @NotNull
-    StreamingChannel<IN, OUT> parallelStream();
 
     /**
      * Makes the routine destroy all the cached invocation instances.
@@ -270,12 +253,4 @@ public interface Routine<IN, OUT> {
      */
     @NotNull
     InvocationChannel<IN, OUT> syncInvoke();
-
-    /**
-     * Creates a streaming channel by invoking this routine in synchronous mode.
-     *
-     * @return the streaming channel.
-     */
-    @NotNull
-    StreamingChannel<IN, OUT> syncStream();
 }

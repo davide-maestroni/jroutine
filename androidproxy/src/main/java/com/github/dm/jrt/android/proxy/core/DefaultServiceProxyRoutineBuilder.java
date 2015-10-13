@@ -19,7 +19,7 @@ import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
-import com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyBuilder;
+import com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
@@ -81,29 +81,21 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
-        return buildProxy(ClassToken.tokenOf(itf));
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        final Class<TYPE> itfClass = itf.getRawClass();
-
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itfClass.getName());
+                    "the specified class is not an interface: " + itf.getName());
         }
 
-        if (!itfClass.isAnnotationPresent(ServiceProxy.class)) {
+        if (!itf.isAnnotationPresent(ServiceProxy.class)) {
 
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + ServiceProxy.class.getName()
-                            + ": " + itfClass.getName());
+                            + ": " + itf.getName());
         }
 
-        final ObjectServiceProxyBuilder<TYPE> builder =
-                new ObjectServiceProxyBuilder<TYPE>(mContext, mTarget, itf);
+        final TargetServiceProxyObjectBuilder<TYPE> builder =
+                new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
         return builder.invocations()
                       .with(mInvocationConfiguration)
                       .set()
@@ -114,6 +106,12 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                       .with(mServiceConfiguration)
                       .set()
                       .buildProxy();
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -184,11 +182,12 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      *
      * @param <TYPE> the interface type.
      */
-    private static class ObjectServiceProxyBuilder<TYPE> extends AbstractServiceProxyBuilder<TYPE> {
+    private static class TargetServiceProxyObjectBuilder<TYPE>
+            extends AbstractServiceProxyObjectBuilder<TYPE> {
 
         private final ServiceContext mContext;
 
-        private final ClassToken<TYPE> mInterfaceToken;
+        private final Class<? super TYPE> mInterfaceClass;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -197,22 +196,22 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
          *
          * @param context        the service context.
          * @param target         the invocation target.
-         * @param interfaceToken the proxy interface token.
+         * @param interfaceClass the proxy interface class.
          */
-        private ObjectServiceProxyBuilder(@NotNull final ServiceContext context,
+        private TargetServiceProxyObjectBuilder(@NotNull final ServiceContext context,
                 @NotNull final ContextInvocationTarget<?> target,
-                @NotNull final ClassToken<TYPE> interfaceToken) {
+                @NotNull final Class<? super TYPE> interfaceClass) {
 
             mContext = context;
             mTarget = target;
-            mInterfaceToken = interfaceToken;
+            mInterfaceClass = interfaceClass;
         }
 
         @NotNull
         @Override
-        protected ClassToken<TYPE> getInterfaceToken() {
+        protected Class<? super TYPE> getInterfaceClass() {
 
-            return mInterfaceToken;
+            return mInterfaceClass;
         }
 
         @Nullable
@@ -231,6 +230,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         @NotNull
         @Override
+        @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration) {
@@ -239,7 +239,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
                 final ServiceContext context = mContext;
                 final ContextInvocationTarget<?> target = mTarget;
-                final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
+                final Class<? super TYPE> interfaceClass = mInterfaceClass;
                 final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
                 String packageName = annotation.classPackage();
 
@@ -273,9 +273,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                         findConstructor(Class.forName(fullClassName), context, target,
                                         invocationConfiguration, proxyConfiguration,
                                         serviceConfiguration);
-                return interfaceClass.cast(
-                        constructor.newInstance(context, target, invocationConfiguration,
-                                                proxyConfiguration, serviceConfiguration));
+                return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
+                                                      proxyConfiguration, serviceConfiguration);
 
             } catch (final Throwable t) {
 

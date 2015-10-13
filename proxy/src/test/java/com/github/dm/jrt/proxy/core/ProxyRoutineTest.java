@@ -31,7 +31,6 @@ import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
@@ -64,7 +63,6 @@ import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
 import static com.github.dm.jrt.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -324,23 +322,21 @@ public class ProxyRoutineTest {
     }
 
     @Test
-    public void testShareGroup() {
+    public void testSharedFields() {
 
         final TestClass2 test = new TestClass2();
-        final ProxyRoutineBuilder builder = JRoutineProxy.on(instance(test))
-                                                         .invocations()
-                                                         .withExecutionTimeout(seconds(2))
-                                                         .set();
+        final ProxyRoutineBuilder builder =
+                JRoutineProxy.on(instance(test)).invocations().withTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Integer> getOne = builder.proxies()
-                                               .withShareGroup("1")
+                                               .withSharedFields("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
         OutputChannel<Integer> getTwo = builder.proxies()
-                                               .withShareGroup("2")
+                                               .withSharedFields("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getTwo();
@@ -366,7 +362,7 @@ public class ProxyRoutineTest {
         final Impl impl = new Impl();
         final Itf itf = JRoutineProxy.on(instance(impl))
                                      .invocations()
-                                     .withExecutionTimeout(INFINITY)
+                                     .withTimeout(seconds(10))
                                      .set()
                                      .buildProxy(Itf.class);
 
@@ -387,9 +383,6 @@ public class ProxyRoutineTest {
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
-        assertThat(itf.add8().pass('d').close().all()).containsOnly((int) 'd');
-        assertThat(itf.add9().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
-                                                                              (int) 'f');
         assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
         assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
@@ -454,13 +447,6 @@ public class ProxyRoutineTest {
         assertThat(itf.addA21()
                       .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                       .result()
-                      .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-                                           new int[]{'f', 'z'});
-        assertThat(itf.addA22().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
-                new int[]{'c', 'z'});
-        assertThat(itf.addA23()
-                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                      .close()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                            new int[]{'f', 'z'});
         assertThat(itf.addA24().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
@@ -551,15 +537,6 @@ public class ProxyRoutineTest {
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                            Arrays.asList((int) 'e', (int) 'z'),
                                            Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL22().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
-                Arrays.asList((int) 'c', (int) 'z'));
-        assertThat(itf.addL23()
-                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                            Arrays.asList('f', 'z'))
-                      .close()
-                      .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                           Arrays.asList((int) 'e', (int) 'z'),
-                                           Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL24().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL25()
@@ -571,21 +548,18 @@ public class ProxyRoutineTest {
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().result().all()).containsExactly(31);
-        assertThat(itf.get3().close().all()).containsExactly(31);
         assertThat(itf.get4().asyncCall().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().result().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA5().close().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA6().asyncCall().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().result().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL5().close().all()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL6().asyncCall().all()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final IOChannel<Integer, Integer> channel35 = JRoutine.io().buildChannel();
@@ -595,7 +569,6 @@ public class ProxyRoutineTest {
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).result().checkComplete();
-        itf.set4().pass(-17).close().checkComplete();
         itf.set5().asyncCall(-17).checkComplete();
         itf.setA0(new int[]{1, 2, 3});
         final IOChannel<int[], int[]> channel37 = JRoutine.io().buildChannel();
@@ -608,7 +581,6 @@ public class ProxyRoutineTest {
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
-        itf.setA5().pass(new int[]{1, 2, 3}).close().checkComplete();
         itf.setA6().asyncCall(new int[]{1, 2, 3}).checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final IOChannel<List<Integer>, List<Integer>> channel40 = JRoutine.io().buildChannel();
@@ -621,7 +593,6 @@ public class ProxyRoutineTest {
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
-        itf.setL5().pass(Arrays.asList(1, 2, 3)).close().checkComplete();
         itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
     }
 
@@ -631,7 +602,7 @@ public class ProxyRoutineTest {
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutineProxy.on(instance(testTimeout))
                                 .invocations()
-                                .withExecutionTimeout(seconds(1))
+                                .withTimeout(seconds(1))
                                 .set()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).containsExactly(31);
@@ -640,7 +611,7 @@ public class ProxyRoutineTest {
 
             JRoutineProxy.on(instance(testTimeout))
                          .invocations()
-                         .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                         .withTimeoutAction(TimeoutActionType.THROW)
                          .set()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();
@@ -697,15 +668,6 @@ public class ProxyRoutineTest {
         @Invoke(InvocationMode.PARALLEL)
         @Inputs(char.class)
         InvocationChannel<Character, Integer> add7();
-
-        @Alias("a")
-        @Inputs(char.class)
-        StreamingChannel<Character, Integer> add8();
-
-        @Alias("a")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char.class)
-        StreamingChannel<Character, Integer> add9();
 
         @Alias("aa")
         int[] addA00(char[] c);
@@ -811,15 +773,6 @@ public class ProxyRoutineTest {
         @Invoke(InvocationMode.PARALLEL)
         @Inputs(char[].class)
         InvocationChannel<char[], int[]> addA21();
-
-        @Alias("aa")
-        @Inputs(char[].class)
-        StreamingChannel<char[], int[]> addA22();
-
-        @Alias("aa")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char[].class)
-        StreamingChannel<char[], int[]> addA23();
 
         @Alias("aa")
         @Inputs(char[].class)
@@ -937,15 +890,6 @@ public class ProxyRoutineTest {
 
         @Alias("al")
         @Inputs(List.class)
-        StreamingChannel<List<Character>, List<Integer>> addL22();
-
-        @Alias("al")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(List.class)
-        StreamingChannel<List<Character>, List<Integer>> addL23();
-
-        @Alias("al")
-        @Inputs(List.class)
         Routine<List<Character>, List<Integer>> addL24();
 
         @Alias("al")
@@ -973,10 +917,6 @@ public class ProxyRoutineTest {
         @Alias("s")
         @Invoke(InvocationMode.PARALLEL)
         void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
-
-        @Alias("g")
-        @Inputs({})
-        StreamingChannel<Void, Integer> get3();
 
         @Alias("g")
         @Inputs({})
@@ -1014,10 +954,6 @@ public class ProxyRoutineTest {
         @Alias("ga")
         @Inputs({})
         InvocationChannel<Void, int[]> getA4();
-
-        @Alias("ga")
-        @Inputs({})
-        StreamingChannel<Void, int[]> getA5();
 
         @Alias("ga")
         @Inputs({})
@@ -1060,19 +996,11 @@ public class ProxyRoutineTest {
 
         @Alias("gl")
         @Inputs({})
-        StreamingChannel<Void, List<Integer>> getL5();
-
-        @Alias("gl")
-        @Inputs({})
         Routine<Void, List<Integer>> getL6();
 
         @Alias("s")
         @Inputs(int.class)
         InvocationChannel<Integer, Void> set3();
-
-        @Alias("s")
-        @Inputs(int.class)
-        StreamingChannel<Integer, Void> set4();
 
         @Alias("s")
         @Inputs(int.class)
@@ -1084,19 +1012,11 @@ public class ProxyRoutineTest {
 
         @Alias("sa")
         @Inputs(int[].class)
-        StreamingChannel<int[], Void> setA5();
-
-        @Alias("sa")
-        @Inputs(int[].class)
         Routine<int[], Void> setA6();
 
         @Alias("sl")
         @Inputs(List.class)
         InvocationChannel<List<Integer>, Void> setL4();
-
-        @Alias("sl")
-        @Inputs(List.class)
-        StreamingChannel<List<Integer>, Void> setL5();
 
         @Alias("sl")
         @Inputs(List.class)

@@ -28,7 +28,7 @@ public class ExecutionDeadlockException extends DeadlockException {
      */
     public ExecutionDeadlockException() {
 
-        super("cannot wait on the invocation runner thread: " + Thread.currentThread());
+        this("cannot wait on the invocation runner thread: " + Thread.currentThread());
     }
 
     /**

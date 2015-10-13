@@ -14,21 +14,29 @@
 package com.github.dm.jrt.processor;
 
 import com.github.dm.jrt.annotation.Alias;
+import com.github.dm.jrt.annotation.CoreInstances;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
+import com.github.dm.jrt.annotation.InputMaxSize;
+import com.github.dm.jrt.annotation.InputOrder;
+import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
+import com.github.dm.jrt.annotation.OutputMaxSize;
+import com.github.dm.jrt.annotation.OutputOrder;
+import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.ShareGroup;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
+import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -99,8 +107,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
     protected TypeMirror routineType;
 
-    protected TypeMirror streamingChannelType;
-
     private String mFooter;
 
     private String mHeader;
@@ -130,8 +136,6 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodInputsChannel;
 
     private String mMethodInputsRoutine;
-
-    private String mMethodInputsStream;
 
     private String mMethodInvocation;
 
@@ -197,7 +201,6 @@ public class RoutineProcessor extends AbstractProcessor {
         routineType = getTypeFromName(Routine.class.getCanonicalName()).asType();
         invocationChannelType =
                 getTypeFromName(InvocationChannel.class.getCanonicalName()).asType();
-        streamingChannelType = getTypeFromName(StreamingChannel.class.getCanonicalName()).asType();
         outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
         iterableType = getTypeFromName(Iterable.class.getCanonicalName()).asType();
         listType = getTypeFromName(List.class.getCanonicalName()).asType();
@@ -353,52 +356,6 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
-     * Builds the string used to replace "${outputOptions}" in the template.
-     *
-     * @param methodElement the method element.
-     * @return the string.
-     */
-    @NotNull
-    protected String buildOutputOptions(@NotNull final ExecutableElement methodElement) {
-
-        final StringBuilder builder = new StringBuilder();
-        final Timeout timeoutAnnotation = methodElement.getAnnotation(Timeout.class);
-
-        if (timeoutAnnotation != null) {
-
-            builder.append(".afterMax(")
-                   .append(timeoutAnnotation.value())
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(timeoutAnnotation.unit())
-                   .append(")");
-        }
-
-        final TimeoutAction actionAnnotation = methodElement.getAnnotation(TimeoutAction.class);
-
-        if (actionAnnotation != null) {
-
-            final TimeoutActionType timeoutActionType = actionAnnotation.value();
-
-            if (timeoutActionType == TimeoutActionType.THROW) {
-
-                builder.append(".eventuallyThrow()");
-
-            } else if (timeoutActionType == TimeoutActionType.EXIT) {
-
-                builder.append(".eventuallyExit()");
-
-            } else if (timeoutActionType == TimeoutActionType.ABORT) {
-
-                builder.append(".eventuallyAbort()");
-            }
-        }
-
-        return builder.toString();
-    }
-
-    /**
      * Builds the string used to replace "${paramValues}" in the template.
      *
      * @param targetMethodElement the target method element.
@@ -489,7 +446,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final StringBuilder builder = new StringBuilder();
 
-        for (int i = 1; i <= size; i++) {
+        for (int i = 1; i <= size; ++i) {
 
             builder.append("mRoutine")
                    .append(i)
@@ -512,9 +469,119 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     protected String buildRoutineOptions(@NotNull final ExecutableElement methodElement) {
 
+        final StringBuilder builder = new StringBuilder();
+        final CoreInstances coreInstancesAnnotation =
+                methodElement.getAnnotation(CoreInstances.class);
+
+        if (coreInstancesAnnotation != null) {
+
+            builder.append(".withCoreInstances(")
+                   .append(coreInstancesAnnotation.value())
+                   .append(")");
+        }
+
+        final InputMaxSize inputSizeAnnotation = methodElement.getAnnotation(InputMaxSize.class);
+
+        if (inputSizeAnnotation != null) {
+
+            builder.append(".withInputMaxSize(").append(inputSizeAnnotation.value()).append(")");
+        }
+
+        final InputOrder inputOrderAnnotation = methodElement.getAnnotation(InputOrder.class);
+
+        if (inputOrderAnnotation != null) {
+
+            builder.append(".withInputOrder(")
+                   .append(OrderType.class.getCanonicalName())
+                   .append(".")
+                   .append(inputOrderAnnotation.value())
+                   .append(")");
+        }
+
+        final InputTimeout inputTimeoutAnnotation = methodElement.getAnnotation(InputTimeout.class);
+
+        if (inputTimeoutAnnotation != null) {
+
+            builder.append(".withInputTimeout(")
+                   .append(inputTimeoutAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(inputTimeoutAnnotation.unit())
+                   .append(")");
+        }
+
+        final MaxInstances maxInstancesAnnotation = methodElement.getAnnotation(MaxInstances.class);
+
+        if (maxInstancesAnnotation != null) {
+
+            builder.append(".withMaxInstances(").append(maxInstancesAnnotation.value()).append(")");
+        }
+
+        final OutputMaxSize outputSizeAnnotation = methodElement.getAnnotation(OutputMaxSize.class);
+
+        if (outputSizeAnnotation != null) {
+
+            builder.append(".withOutputMaxSize(").append(outputSizeAnnotation.value()).append(")");
+        }
+
+        final OutputOrder outputOrderAnnotation = methodElement.getAnnotation(OutputOrder.class);
+
+        if (outputOrderAnnotation != null) {
+
+            builder.append(".withOutputOrder(")
+                   .append(OrderType.class.getCanonicalName())
+                   .append(".")
+                   .append(outputOrderAnnotation.value())
+                   .append(")");
+        }
+
+        final OutputTimeout outputTimeoutAnnotation =
+                methodElement.getAnnotation(OutputTimeout.class);
+
+        if (outputTimeoutAnnotation != null) {
+
+            builder.append(".withOutputTimeout(")
+                   .append(outputTimeoutAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(outputTimeoutAnnotation.unit())
+                   .append(")");
+        }
+
         final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
-        return (priorityAnnotation != null) ? ".withPriority(" + priorityAnnotation.value() + ")"
-                : "";
+
+        if (priorityAnnotation != null) {
+
+            builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
+        }
+
+        final Timeout timeoutAnnotation = methodElement.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            builder.append(".withTimeout(")
+                   .append(timeoutAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(timeoutAnnotation.unit())
+                   .append(")");
+        }
+
+        final TimeoutAction actionAnnotation = methodElement.getAnnotation(TimeoutAction.class);
+
+        if (actionAnnotation != null) {
+
+            builder.append(".withTimeoutAction(")
+                   .append(TimeoutActionType.class.getCanonicalName())
+                   .append(".")
+                   .append(actionAnnotation.value())
+                   .append(")");
+        }
+
+        return builder.toString();
     }
 
     /**
@@ -1205,27 +1272,6 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @NotNull
     @SuppressWarnings("UnusedParameters")
-    protected String getMethodInputsStreamTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
-
-        if (mMethodInputsStream == null) {
-
-            mMethodInputsStream = parseTemplate("/templates/method_inputs_stream.txt");
-        }
-
-        return mMethodInputsStream;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param methodElement the method element.
-     * @param count         the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
     protected String getMethodInvocationCollectionTemplate(
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
@@ -1526,13 +1572,14 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
-     * Checks if the specified methods have the same parameters.
+     * Checks if the specified methods have assignable parameters, that is, all the parameters of
+     * the first method can be assigned to the ones of the second in the same order.
      *
      * @param firstMethodElement  the first method element.
      * @param secondMethodElement the second method element.
      * @return whether the methods have the same parameters.
      */
-    protected boolean haveSameParameters(@NotNull final ExecutableElement firstMethodElement,
+    protected boolean haveAssignableParameters(@NotNull final ExecutableElement firstMethodElement,
             @NotNull final ExecutableElement secondMethodElement) {
 
         final List<? extends VariableElement> firstTypeParameters =
@@ -1548,12 +1595,13 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             final TypeMirror firstType = firstTypeParameters.get(i).asType();
             final TypeMirror secondType = secondTypeParameters.get(i).asType();
 
-            if (!typeUtils.isSameType(firstType, secondType)) {
+            if (!typeUtils.isAssignable(typeUtils.erasure(firstType),
+                                        typeUtils.erasure(secondType))) {
 
                 return false;
             }
@@ -1660,6 +1708,8 @@ public class RoutineProcessor extends AbstractProcessor {
             header = header.replace("${interfaceFullName}", element.asType().toString());
             header = header.replace("${classErasure}",
                                     typeUtils.erasure(targetElement.asType()).toString());
+            header = header.replace("${interfaceErasure}",
+                                    typeUtils.erasure(element.asType()).toString());
             header = header.replace("${routineFieldsInit}",
                                     buildRoutineFieldsInit(methodElements.size()));
             writer.append(header);
@@ -1751,7 +1801,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                     boolean matches = true;
 
-                    for (int i = 0; i < length; i++) {
+                    for (int i = 0; i < length; ++i) {
 
                         Object value = null;
                         final VariableElement variableElement = interfaceTypeParameters.get(i);
@@ -1803,6 +1853,8 @@ public class RoutineProcessor extends AbstractProcessor {
     private void mergeParentMethods(@NotNull final List<ExecutableElement> methods,
             @NotNull final List<ExecutableElement> parentMethods) {
 
+        final Types typeUtils = processingEnv.getTypeUtils();
+
         for (final ExecutableElement parentMethod : parentMethods) {
 
             boolean isOverride = false;
@@ -1810,9 +1862,11 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement method : methods) {
 
                 if (parentMethod.getSimpleName().equals(method.getSimpleName())
-                        && parentMethod.getReturnType().equals(method.getReturnType())) {
+                        && typeUtils.isAssignable(typeUtils.erasure(method.getReturnType()),
+                                                  typeUtils.erasure(
+                                                          parentMethod.getReturnType()))) {
 
-                    if (haveSameParameters(parentMethod, method)) {
+                    if (haveAssignableParameters(method, parentMethod)) {
 
                         isOverride = true;
                         break;
@@ -1878,10 +1932,10 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             final TypeMirror returnType = methodElement.getReturnType();
+            final TypeMirror returnErasure = typeUtils.erasure(returnType);
 
-            if (!typeUtils.isAssignable(streamingChannelType, typeUtils.erasure(returnType))
-                    && !typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))
-                    && !typeUtils.isAssignable(routineType, typeUtils.erasure(returnType))) {
+            if (!typeUtils.isAssignable(invocationChannelType, returnErasure)
+                    && !typeUtils.isAssignable(routineType, returnErasure)) {
 
                 throw new IllegalArgumentException(
                         "the proxy method has incompatible return type: " + methodElement);
@@ -1890,14 +1944,9 @@ public class RoutineProcessor extends AbstractProcessor {
             inputMode = InputMode.CHANNEL;
             outputMode = OutputMode.CHANNEL;
 
-            if (typeUtils.isAssignable(invocationChannelType, typeUtils.erasure(returnType))) {
+            if (typeUtils.isAssignable(invocationChannelType, returnErasure)) {
 
                 method = getMethodInputsChannelTemplate(methodElement, count);
-
-            } else if (typeUtils.isAssignable(streamingChannelType,
-                                              typeUtils.erasure(returnType))) {
-
-                method = getMethodInputsStreamTemplate(methodElement, count);
 
             } else {
 
@@ -1994,17 +2043,31 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = methodHeader.replace("${genericTypes}", buildGenericTypes(element));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
                                             buildRoutineOptions(methodElement));
-        final ShareGroup shareGroupAnnotation = methodElement.getAnnotation(ShareGroup.class);
+        final SharedFields sharedFieldsAnnotation = methodElement.getAnnotation(SharedFields.class);
 
-        if (shareGroupAnnotation != null) {
+        if (sharedFieldsAnnotation != null) {
 
-            methodHeader = methodHeader.replace("${shareGroup}",
-                                                "\"" + shareGroupAnnotation.value() + "\"");
+            final String[] names = sharedFieldsAnnotation.value();
+            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final int length = names.length;
+
+            for (int i = 0; i < length; ++i) {
+
+                if (i != 0) {
+
+                    builder.append(", ");
+                }
+
+                builder.append("\"").append(names[i]).append("\"");
+            }
+
+            builder.append(")");
+            methodHeader = methodHeader.replace("${sharedFields}", builder.toString());
 
         } else {
 
-            methodHeader = methodHeader.replace("${shareGroup}",
-                                                "proxyConfiguration.getShareGroupOr(null)");
+            methodHeader = methodHeader.replace("${sharedFields}",
+                                                "proxyConfiguration.getSharedFieldsOr(null)");
         }
 
         writer.append(methodHeader);
@@ -2018,15 +2081,10 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${paramVars}", buildParamVars(methodElement));
         method = method.replace("${inputOptions}", buildInputOptions(methodElement, inputMode));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
-        method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
         method = method.replace("${invokeMethod}",
                                 (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
                                         : (invocationMode == InvocationMode.PARALLEL)
                                                 ? "parallelInvoke" : "asyncInvoke");
-        method = method.replace("${streamMethod}",
-                                (invocationMode == InvocationMode.SYNC) ? "syncStream"
-                                        : (invocationMode == InvocationMode.PARALLEL)
-                                                ? "parallelStream" : "asyncStream");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader = getMethodInvocationHeaderTemplate(methodElement, count);
@@ -2039,16 +2097,31 @@ public class RoutineProcessor extends AbstractProcessor {
         methodInvocationHeader =
                 methodInvocationHeader.replace("${genericTypes}", buildGenericTypes(element));
 
-        if (shareGroupAnnotation != null) {
+        if (sharedFieldsAnnotation != null) {
 
-            methodInvocationHeader = methodInvocationHeader.replace("${shareGroup}", "\""
-                    + shareGroupAnnotation.value() + "\"");
+            final String[] names = sharedFieldsAnnotation.value();
+            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final int length = names.length;
+
+            for (int i = 0; i < length; ++i) {
+
+                if (i != 0) {
+
+                    builder.append(", ");
+                }
+
+                builder.append("\"").append(names[i]).append("\"");
+            }
+
+            builder.append(")");
+            methodInvocationHeader =
+                    methodInvocationHeader.replace("${sharedFields}", builder.toString());
 
         } else {
 
-            methodInvocationHeader = methodInvocationHeader.replace("${shareGroup}",
+            methodInvocationHeader = methodInvocationHeader.replace("${sharedFields}",
                                                                     "proxyConfiguration"
-                                                                            + ".getShareGroupOr"
+                                                                            + ".getSharedFieldsOr"
                                                                             + "(null)");
         }
 

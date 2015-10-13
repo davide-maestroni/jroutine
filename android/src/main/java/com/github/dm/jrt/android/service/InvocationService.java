@@ -908,7 +908,7 @@ public class InvocationService extends Service {
         }
 
         /**
-         * Bbinds the specified consumer to the output channel.
+         * Binds the specified consumer to the output channel.
          *
          * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException            if the channel is already closed or

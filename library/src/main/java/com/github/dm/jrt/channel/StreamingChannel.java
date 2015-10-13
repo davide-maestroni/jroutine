@@ -121,12 +121,6 @@ public interface StreamingChannel<IN, OUT> extends IOChannel<IN, OUT> {
      * {@inheritDoc}
      */
     @NotNull
-    StreamingChannel<IN, OUT> eventually();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     StreamingChannel<IN, OUT> eventuallyAbort();
 
     /**
@@ -152,6 +146,12 @@ public interface StreamingChannel<IN, OUT> extends IOChannel<IN, OUT> {
      */
     @NotNull
     StreamingChannel<IN, OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamingChannel<IN, OUT> skip(int count);
 
     /**
      * {@inheritDoc}

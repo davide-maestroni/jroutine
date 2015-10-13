@@ -14,19 +14,28 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.annotation.Alias;
+import com.github.dm.jrt.annotation.CoreInstances;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
+import com.github.dm.jrt.annotation.InputMaxSize;
+import com.github.dm.jrt.annotation.InputOrder;
+import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
+import com.github.dm.jrt.annotation.OutputMaxSize;
+import com.github.dm.jrt.annotation.OutputOrder;
+import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.ShareGroup;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.AgingPriority;
+import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.ProxyConfiguration;
@@ -35,7 +44,6 @@ import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
@@ -59,8 +67,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
+import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
 import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,8 +119,7 @@ public class ObjectRoutineTest {
                                                         .withRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
-                                                        .withExecutionTimeoutAction(
-                                                                TimeoutActionType.EXIT)
+                                                        .withTimeoutAction(TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
@@ -155,7 +164,7 @@ public class ObjectRoutineTest {
         final Sum sum = new Sum();
         final SumItf sumAsync = JRoutine.on(instance(sum))
                                         .invocations()
-                                        .withExecutionTimeout(timeout)
+                                        .withTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
         final IOChannel<Integer, Integer> channel3 = JRoutine.io().buildChannel();
@@ -171,7 +180,6 @@ public class ObjectRoutineTest {
         assertThat(sumAsync.compute1(channel5)).isEqualTo(10);
         assertThat(sumAsync.compute2().pass(new int[]{1, 2, 3, 4}).result().next()).isEqualTo(10);
         assertThat(sumAsync.compute3().pass(17).result().next()).isEqualTo(17);
-        assertThat(sumAsync.compute4().pass(17).close().next()).isEqualTo(17);
 
         final IOChannel<Integer, Integer> channel6 = JRoutine.io().buildChannel();
         channel6.pass(1, 2, 3, 4).close();
@@ -189,7 +197,7 @@ public class ObjectRoutineTest {
         final Count count = new Count();
         final CountItf countAsync = JRoutine.on(instance(count))
                                             .invocations()
-                                            .withExecutionTimeout(timeout)
+                                            .withTimeout(timeout)
                                             .set()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
@@ -197,6 +205,26 @@ public class ObjectRoutineTest {
         assertThat(countAsync.count2(2).all()).containsExactly(0, 1);
         assertThat(countAsync.countList(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.countList1(3).all()).containsExactly(0, 1, 2);
+    }
+
+    @Test
+    public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
+
+        assertThat(configurationWithAnnotations(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                                AnnotationItf.class.getMethod(
+                                                        "toString"))).isEqualTo(
+                builder().withCoreInstances(3)
+                         .withInputMaxSize(33)
+                         .withInputOrder(OrderType.BY_DELAY)
+                         .withInputTimeout(7777, TimeUnit.MICROSECONDS)
+                         .withMaxInstances(17)
+                         .withOutputMaxSize(77)
+                         .withOutputOrder(OrderType.BY_CALL)
+                         .withOutputTimeout(3333, TimeUnit.NANOSECONDS)
+                         .withPriority(41)
+                         .withTimeout(1111, TimeUnit.MICROSECONDS)
+                         .withTimeoutAction(TimeoutActionType.ABORT)
+                         .set());
     }
 
     @Test
@@ -498,7 +526,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(instance(test))
                     .invocations()
-                    .withExecutionTimeout(INFINITY)
+                    .withTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException(null);
@@ -513,7 +541,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(instance(test))
                     .invocations()
-                    .withExecutionTimeout(INFINITY)
+                    .withTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
@@ -632,7 +660,7 @@ public class ObjectRoutineTest {
                                                          .withMaxInstances(1)
                                                          .set()
                                                          .proxies()
-                                                         .withShareGroup("test")
+                                                         .withSharedFields("test")
                                                          .set()
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
@@ -771,7 +799,7 @@ public class ObjectRoutineTest {
         final Impl impl = new Impl();
         final Itf itf = JRoutine.on(instance(impl))
                                 .invocations()
-                                .withExecutionTimeout(INFINITY)
+                                .withTimeout(seconds(10))
                                 .set()
                                 .buildProxy(Itf.class);
 
@@ -792,9 +820,6 @@ public class ObjectRoutineTest {
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
-        assertThat(itf.add8().pass('d').close().all()).containsOnly((int) 'd');
-        assertThat(itf.add9().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
-                                                                              (int) 'f');
         assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
         assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
@@ -859,13 +884,6 @@ public class ObjectRoutineTest {
         assertThat(itf.addA21()
                       .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                       .result()
-                      .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-                                           new int[]{'f', 'z'});
-        assertThat(itf.addA22().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
-                new int[]{'c', 'z'});
-        assertThat(itf.addA23()
-                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                      .close()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                            new int[]{'f', 'z'});
         assertThat(itf.addA24().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
@@ -956,15 +974,6 @@ public class ObjectRoutineTest {
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                            Arrays.asList((int) 'e', (int) 'z'),
                                            Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL22().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
-                Arrays.asList((int) 'c', (int) 'z'));
-        assertThat(itf.addL23()
-                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                            Arrays.asList('f', 'z'))
-                      .close()
-                      .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                           Arrays.asList((int) 'e', (int) 'z'),
-                                           Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL24().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL25()
@@ -976,21 +985,18 @@ public class ObjectRoutineTest {
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().result().all()).containsExactly(31);
-        assertThat(itf.get3().close().all()).containsExactly(31);
         assertThat(itf.get4().asyncCall().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().result().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA5().close().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA6().asyncCall().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().result().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL5().close().all()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL6().asyncCall().all()).containsExactly(Arrays.asList(1, 2, 3));
         itf.set0(-17);
         final IOChannel<Integer, Integer> channel35 = JRoutine.io().buildChannel();
@@ -1000,7 +1006,6 @@ public class ObjectRoutineTest {
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).result().checkComplete();
-        itf.set4().pass(-17).close().checkComplete();
         itf.set5().asyncCall(-17).checkComplete();
         itf.setA0(new int[]{1, 2, 3});
         final IOChannel<int[], int[]> channel37 = JRoutine.io().buildChannel();
@@ -1013,7 +1018,6 @@ public class ObjectRoutineTest {
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
-        itf.setA5().pass(new int[]{1, 2, 3}).close().checkComplete();
         itf.setA6().asyncCall(new int[]{1, 2, 3}).checkComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final IOChannel<List<Integer>, List<Integer>> channel40 = JRoutine.io().buildChannel();
@@ -1026,7 +1030,6 @@ public class ObjectRoutineTest {
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
-        itf.setL5().pass(Arrays.asList(1, 2, 3)).close().checkComplete();
         itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
     }
 
@@ -1198,18 +1201,18 @@ public class ObjectRoutineTest {
     }
 
     @Test
-    public void testShareGroup() throws NoSuchMethodException {
+    public void testSharedFields() throws NoSuchMethodException {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder =
-                JRoutine.on(instance(test2)).invocations().withExecutionTimeout(seconds(2)).set();
+                JRoutine.on(instance(test2)).invocations().withTimeout(seconds(2)).set();
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
+                builder.proxies().withSharedFields("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
+                builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1226,19 +1229,19 @@ public class ObjectRoutineTest {
     }
 
     @Test
-    public void testShareGroup2() throws NoSuchMethodException {
+    public void testSharedFields2() throws NoSuchMethodException {
 
         final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
                                                      .invocations()
-                                                     .withExecutionTimeout(seconds(2))
+                                                     .withTimeout(seconds(2))
                                                      .set();
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withShareGroup("1").set().method("getOne").asyncCall();
+                builder.proxies().withSharedFields("1").set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withShareGroup("2").set().method("getTwo").asyncCall();
+                builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1265,7 +1268,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(0)
                                                          .set()
                                                          .proxies()
-                                                         .withShareGroup("test")
+                                                         .withSharedFields("test")
                                                          .set()
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
@@ -1308,7 +1311,7 @@ public class ObjectRoutineTest {
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
-                           .withExecutionTimeout(seconds(1))
+                           .withTimeout(seconds(1))
                            .set()
                            .aliasMethod("test")
                            .asyncCall()
@@ -1318,7 +1321,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(instance(testTimeout))
                     .invocations()
-                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                    .withTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .aliasMethod("test")
                     .asyncCall()
@@ -1332,7 +1335,7 @@ public class ObjectRoutineTest {
 
         assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
-                           .withExecutionTimeout(seconds(1))
+                           .withTimeout(seconds(1))
                            .set()
                            .method("getInt")
                            .asyncCall()
@@ -1342,7 +1345,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(instance(testTimeout))
                     .invocations()
-                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                    .withTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .method("getInt")
                     .asyncCall()
@@ -1356,7 +1359,7 @@ public class ObjectRoutineTest {
 
         assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
-                           .withExecutionTimeout(seconds(1))
+                           .withTimeout(seconds(1))
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .asyncCall()
@@ -1366,7 +1369,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(instance(testTimeout))
                     .invocations()
-                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                    .withTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .asyncCall()
@@ -1380,7 +1383,7 @@ public class ObjectRoutineTest {
 
         assertThat(JRoutine.on(instance(testTimeout))
                            .invocations()
-                           .withExecutionTimeout(seconds(1))
+                           .withTimeout(seconds(1))
                            .set()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
@@ -1389,7 +1392,7 @@ public class ObjectRoutineTest {
 
             JRoutine.on(instance(testTimeout))
                     .invocations()
-                    .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                    .withTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
@@ -1399,6 +1402,22 @@ public class ObjectRoutineTest {
         } catch (final AbortException ignored) {
 
         }
+    }
+
+    public interface AnnotationItf {
+
+        @CoreInstances(3)
+        @InputMaxSize(33)
+        @InputOrder(OrderType.BY_DELAY)
+        @InputTimeout(value = 7777, unit = TimeUnit.MICROSECONDS)
+        @MaxInstances(17)
+        @OutputMaxSize(77)
+        @OutputOrder(OrderType.BY_CALL)
+        @OutputTimeout(value = 3333, unit = TimeUnit.NANOSECONDS)
+        @Priority(41)
+        @Timeout(value = 1111, unit = TimeUnit.MICROSECONDS)
+        @TimeoutAction(TimeoutActionType.ABORT)
+        String toString();
     }
 
     public interface Itf {
@@ -1445,15 +1464,6 @@ public class ObjectRoutineTest {
         @Invoke(InvocationMode.PARALLEL)
         @Inputs(char.class)
         InvocationChannel<Character, Integer> add7();
-
-        @Alias("a")
-        @Inputs(char.class)
-        StreamingChannel<Character, Integer> add8();
-
-        @Alias("a")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char.class)
-        StreamingChannel<Character, Integer> add9();
 
         @Alias("aa")
         int[] addA00(char[] c);
@@ -1559,15 +1569,6 @@ public class ObjectRoutineTest {
         @Invoke(InvocationMode.PARALLEL)
         @Inputs(char[].class)
         InvocationChannel<char[], int[]> addA21();
-
-        @Alias("aa")
-        @Inputs(char[].class)
-        StreamingChannel<char[], int[]> addA22();
-
-        @Alias("aa")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char[].class)
-        StreamingChannel<char[], int[]> addA23();
 
         @Alias("aa")
         @Inputs(char[].class)
@@ -1685,15 +1686,6 @@ public class ObjectRoutineTest {
 
         @Alias("al")
         @Inputs(List.class)
-        StreamingChannel<List<Character>, List<Integer>> addL22();
-
-        @Alias("al")
-        @Invoke(InvocationMode.PARALLEL)
-        @Inputs(List.class)
-        StreamingChannel<List<Character>, List<Integer>> addL23();
-
-        @Alias("al")
-        @Inputs(List.class)
         Routine<List<Character>, List<Integer>> addL24();
 
         @Alias("al")
@@ -1721,10 +1713,6 @@ public class ObjectRoutineTest {
         @Alias("s")
         @Invoke(InvocationMode.PARALLEL)
         void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
-
-        @Alias("g")
-        @Inputs({})
-        StreamingChannel<Void, Integer> get3();
 
         @Alias("g")
         @Inputs({})
@@ -1762,10 +1750,6 @@ public class ObjectRoutineTest {
         @Alias("ga")
         @Inputs({})
         InvocationChannel<Void, int[]> getA4();
-
-        @Alias("ga")
-        @Inputs({})
-        StreamingChannel<Void, int[]> getA5();
 
         @Alias("ga")
         @Inputs({})
@@ -1808,19 +1792,11 @@ public class ObjectRoutineTest {
 
         @Alias("gl")
         @Inputs({})
-        StreamingChannel<Void, List<Integer>> getL5();
-
-        @Alias("gl")
-        @Inputs({})
         Routine<Void, List<Integer>> getL6();
 
         @Alias("s")
         @Inputs(int.class)
         InvocationChannel<Integer, Void> set3();
-
-        @Alias("s")
-        @Inputs(int.class)
-        StreamingChannel<Integer, Void> set4();
 
         @Alias("s")
         @Inputs(int.class)
@@ -1832,19 +1808,11 @@ public class ObjectRoutineTest {
 
         @Alias("sa")
         @Inputs(int[].class)
-        StreamingChannel<int[], Void> setA5();
-
-        @Alias("sa")
-        @Inputs(int[].class)
         Routine<int[], Void> setA6();
 
         @Alias("sl")
         @Inputs(List.class)
         InvocationChannel<List<Integer>, Void> setL4();
-
-        @Alias("sl")
-        @Inputs(List.class)
-        StreamingChannel<List<Integer>, Void> setL5();
 
         @Alias("sl")
         @Inputs(List.class)
@@ -1963,20 +1931,20 @@ public class ObjectRoutineTest {
         int compute(int i);
 
         @Alias("compute")
-        @Output(OutputMode.COLLECTION)
         @Timeout(1000)
+        @Output(OutputMode.COLLECTION)
         int[] compute1(int length);
 
         @Alias("compute")
-        @Output(OutputMode.COLLECTION)
         @Timeout(1000)
+        @Output(OutputMode.COLLECTION)
         List<Integer> compute2(int length);
 
         @Alias("compute")
         @Timeout(1000)
         int computeAsync(@Input(int.class) OutputChannel<Integer> i);
 
-        @ShareGroup(ShareGroup.NONE)
+        @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
@@ -1989,14 +1957,14 @@ public class ObjectRoutineTest {
         OutputChannel<Integer> computeParallel2(
                 @Input(value = int.class, mode = InputMode.ELEMENT) Integer... i);
 
-        @ShareGroup(ShareGroup.NONE)
+        @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
         OutputChannel<Integer> computeParallel3(
                 @Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
 
-        @ShareGroup(ShareGroup.NONE)
+        @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
@@ -2047,10 +2015,6 @@ public class ObjectRoutineTest {
         @Alias("compute")
         @Inputs(int.class)
         InvocationChannel<Integer, Integer> compute3();
-
-        @Alias("compute")
-        @Inputs(int.class)
-        StreamingChannel<Integer, Integer> compute4();
 
         @Alias("compute")
         int computeList(@Input(value = List.class,

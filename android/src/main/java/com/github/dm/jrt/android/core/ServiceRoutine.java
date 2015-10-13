@@ -154,13 +154,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         mRoutine.purge();
     }
 
-    @NotNull
-    @Override
-    protected InvocationConfiguration getConfiguration() {
-
-        return mInvocationConfiguration;
-    }
-
     /**
      * Service invocation channel implementation.
      *
@@ -242,16 +235,15 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final int outputMaxSize =
                     invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
-            final TimeDuration executionTimeout =
-                    invocationConfiguration.getExecutionTimeoutOr(null);
+            final TimeDuration executionTimeout = invocationConfiguration.getTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
-                    invocationConfiguration.getExecutionTimeoutActionOr(null);
+                    invocationConfiguration.getTimeoutActionOr(null);
             mOutput = JRoutine.io()
                               .channels()
                               .withChannelMaxSize(outputMaxSize)
                               .withChannelTimeout(outputTimeout)
-                              .withPassTimeout(executionTimeout)
-                              .withPassTimeoutAction(timeoutActionType)
+                              .withReadTimeout(executionTimeout)
+                              .withReadTimeoutAction(timeoutActionType)
                               .withLog(log)
                               .withLogLevel(logLevel)
                               .set()
@@ -362,11 +354,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             bindService();
             mInput.close();
             return mOutput;
-        }
-
-        public boolean hasDelays() {
-
-            return mInput.hasDelays();
         }
 
         private void bindService() {

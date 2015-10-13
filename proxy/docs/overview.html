@@ -26,7 +26,7 @@
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineProxy.on(instance(main))
                                                      .proxies()
-                                                     .withShareGroup(ShareGroup.NONE)
+                                                     .withSharedFields()
                                                      .set()
                                                      .invocations()
                                                      .withExecutionTimeout(TimeDuration.INFINITY)
@@ -97,7 +97,7 @@
                 final Main main = new Main();
                 final AsyncMain proxy = Proxy_Main_AsyncMain.on(main)
                                                             .proxies()
-                                                            .withShareGroup(ShareGroup.NONE)
+                                                            .withSharedFields()
                                                             .set()
                                                             .invocations()
                                                             .withExecutionTimeout(TimeDuration.INFINITY)

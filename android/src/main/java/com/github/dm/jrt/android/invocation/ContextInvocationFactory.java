@@ -13,10 +13,15 @@
  */
 package com.github.dm.jrt.android.invocation;
 
+import com.github.dm.jrt.util.Reflection;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 /**
- * Context invocation factory interface.
+ * Abstract class defining a factory of context invocations.
  * <p/>
  * Created by davide-maestroni on 05/01/2015.
  *
@@ -25,8 +30,57 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class ContextInvocationFactory<IN, OUT> {
 
+    private final Object[] mArgs;
+
     /**
-     * Creates and return a new context invocation instance.
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected ContextInvocationFactory(@Nullable final Object[] args) {
+
+        mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * Forces the inheriting classes to explicitly pass the arguments.
+     */
+    @SuppressWarnings("unused")
+    private ContextInvocationFactory() {
+
+        mArgs = Reflection.NO_ARGS;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!getClass().isInstance(o)) {
+
+            return false;
+        }
+
+        final ContextInvocationFactory<?, ?> that = (ContextInvocationFactory<?, ?>) o;
+        return Arrays.deepEquals(mArgs, that.mArgs);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
+    }
+
+    /**
+     * Creates and return a new context invocation instance.<br/>
+     * A proper implementation will return a new invocation instance each time it is called, unless
+     * the returned object is immutable and does not cause any side effect.<br/>
+     * Any behavior other than that may lead to unexpected results.
      *
      * @return the context invocation instance.
      */

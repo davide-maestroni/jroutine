@@ -14,15 +14,23 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.annotation.Alias;
+import com.github.dm.jrt.annotation.CoreInstances;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
+import com.github.dm.jrt.annotation.InputMaxSize;
+import com.github.dm.jrt.annotation.InputOrder;
+import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
+import com.github.dm.jrt.annotation.OutputMaxSize;
+import com.github.dm.jrt.annotation.OutputOrder;
+import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
-import com.github.dm.jrt.annotation.ShareGroup;
+import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.annotation.Timeout;
 import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
@@ -31,9 +39,10 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
+import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -48,8 +57,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Utility class used to manage cached objects shared by routine builders.
@@ -61,11 +74,14 @@ public class RoutineBuilders {
     private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasMethods =
             new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
 
+    private static final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> sLocks =
+            new WeakIdentityHashMap<Object, Map<String, ReentrantLock>>();
+
     private static final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> sMethods =
             new WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>>();
 
-    private static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexes =
-            new WeakIdentityHashMap<Object, Map<String, Object>>();
+    private static final WeakIdentityHashMap<Object, ExchangeMutex> sMutexes =
+            new WeakIdentityHashMap<Object, ExchangeMutex>();
 
     /**
      * Avoid direct instantiation.
@@ -88,7 +104,7 @@ public class RoutineBuilders {
      */
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public static void callFromInvocation(@NotNull final Method targetMethod,
-            @NotNull final Object mutex, @NotNull final Object target,
+            @NotNull final Mutex mutex, @NotNull final Object target,
             @NotNull final List<?> objects, @NotNull final ResultChannel<Object> result,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
@@ -97,8 +113,9 @@ public class RoutineBuilders {
         try {
 
             final Object methodResult;
+            mutex.acquire();
 
-            synchronized (mutex) {
+            try {
 
                 final Object[] args;
 
@@ -116,11 +133,11 @@ public class RoutineBuilders {
                             Array.set(array, i, objects.get(i));
                         }
 
-                        args = new Object[]{array};
+                        args = asArgs(array);
 
                     } else {
 
-                        args = new Object[]{objects};
+                        args = asArgs(objects);
                     }
 
                 } else {
@@ -129,6 +146,10 @@ public class RoutineBuilders {
                 }
 
                 methodResult = targetMethod.invoke(target, args);
+
+            } finally {
+
+                mutex.release();
             }
 
             final Class<?> returnType = targetMethod.getReturnType();
@@ -182,6 +203,14 @@ public class RoutineBuilders {
      * @param configuration the initial configuration.
      * @param method        the target method.
      * @return the modified configuration.
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
      * @see com.github.dm.jrt.annotation.Timeout Timeout
      * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
@@ -192,6 +221,63 @@ public class RoutineBuilders {
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
+        final CoreInstances coreInstancesAnnotation = method.getAnnotation(CoreInstances.class);
+
+        if (coreInstancesAnnotation != null) {
+
+            builder.withCoreInstances(coreInstancesAnnotation.value());
+        }
+
+        final InputMaxSize inputSizeAnnotation = method.getAnnotation(InputMaxSize.class);
+
+        if (inputSizeAnnotation != null) {
+
+            builder.withInputMaxSize(inputSizeAnnotation.value());
+        }
+
+        final InputOrder inputOrderAnnotation = method.getAnnotation(InputOrder.class);
+
+        if (inputOrderAnnotation != null) {
+
+            builder.withInputOrder(inputOrderAnnotation.value());
+        }
+
+        final InputTimeout inputTimeoutAnnotation = method.getAnnotation(InputTimeout.class);
+
+        if (inputTimeoutAnnotation != null) {
+
+            builder.withInputTimeout(inputTimeoutAnnotation.value(), inputTimeoutAnnotation.unit());
+        }
+
+        final MaxInstances maxInstancesAnnotation = method.getAnnotation(MaxInstances.class);
+
+        if (maxInstancesAnnotation != null) {
+
+            builder.withMaxInstances(maxInstancesAnnotation.value());
+        }
+
+        final OutputMaxSize outputSizeAnnotation = method.getAnnotation(OutputMaxSize.class);
+
+        if (outputSizeAnnotation != null) {
+
+            builder.withOutputMaxSize(outputSizeAnnotation.value());
+        }
+
+        final OutputOrder outputOrderAnnotation = method.getAnnotation(OutputOrder.class);
+
+        if (outputOrderAnnotation != null) {
+
+            builder.withOutputOrder(outputOrderAnnotation.value());
+        }
+
+        final OutputTimeout outputTimeoutAnnotation = method.getAnnotation(OutputTimeout.class);
+
+        if (outputTimeoutAnnotation != null) {
+
+            builder.withOutputTimeout(outputTimeoutAnnotation.value(),
+                                      outputTimeoutAnnotation.unit());
+        }
+
         final Priority priorityAnnotation = method.getAnnotation(Priority.class);
 
         if (priorityAnnotation != null) {
@@ -203,14 +289,14 @@ public class RoutineBuilders {
 
         if (timeoutAnnotation != null) {
 
-            builder.withExecutionTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            builder.withTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
         }
 
         final TimeoutAction actionAnnotation = method.getAnnotation(TimeoutAction.class);
 
         if (actionAnnotation != null) {
 
-            builder.withExecutionTimeoutAction(actionAnnotation.value());
+            builder.withTimeoutAction(actionAnnotation.value());
         }
 
         return builder.set();
@@ -223,7 +309,7 @@ public class RoutineBuilders {
      * @param configuration the initial configuration.
      * @param method        the target method.
      * @return the modified configuration.
-     * @see com.github.dm.jrt.annotation.ShareGroup ShareGroup
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
      */
     @NotNull
     public static ProxyConfiguration configurationWithAnnotations(
@@ -231,11 +317,11 @@ public class RoutineBuilders {
 
         final ProxyConfiguration.Builder<ProxyConfiguration> builder =
                 ProxyConfiguration.builderFrom(configuration);
-        final ShareGroup shareGroupAnnotation = method.getAnnotation(ShareGroup.class);
+        final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
 
-        if (shareGroupAnnotation != null) {
+        if (sharedFieldsAnnotation != null) {
 
-            builder.withShareGroup(shareGroupAnnotation.value());
+            builder.withSharedFields(sharedFieldsAnnotation.value());
         }
 
         return builder.set();
@@ -505,38 +591,72 @@ public class RoutineBuilders {
     }
 
     /**
-     * Returns the cached mutex associated with the specified target and share group.<br/>
-     * If the cache was empty, it is filled with a new object automatically created.
+     * Returns the cached mutex associated with the specified target and shared fields.<br/>
+     * If the cache was empty, it is filled with a new object automatically created.<br/>
+     * If the target is null {@link Mutex#NO_MUTEX} will be returned.
      *
-     * @param target     the target object instance.
-     * @param shareGroup the share group name.
+     * @param target       the target object instance.
+     * @param sharedFields the shared field names.
      * @return the cached mutex.
      */
     @NotNull
-    public static Object getSharedMutex(@NotNull final Object target,
-            @Nullable final String shareGroup) {
+    public static Mutex getSharedMutex(@Nullable final Object target,
+            @Nullable final List<String> sharedFields) {
+
+        if ((target == null) || ((sharedFields != null) && sharedFields.isEmpty())) {
+
+            return Mutex.NO_MUTEX;
+        }
+
+        ExchangeMutex exchangeMutex;
 
         synchronized (sMutexes) {
 
-            final WeakIdentityHashMap<Object, Map<String, Object>> mutexCache = sMutexes;
-            Map<String, Object> mutexMap = mutexCache.get(target);
+            final WeakIdentityHashMap<Object, ExchangeMutex> mutexes = sMutexes;
+            exchangeMutex = mutexes.get(target);
 
-            if (mutexMap == null) {
+            if (exchangeMutex == null) {
 
-                mutexMap = new HashMap<String, Object>();
-                mutexCache.put(target, mutexMap);
+                exchangeMutex = new ExchangeMutex();
+                mutexes.put(target, exchangeMutex);
+            }
+        }
+
+        if (sharedFields == null) {
+
+            return exchangeMutex;
+        }
+
+        synchronized (sLocks) {
+
+            final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> locksCache = sLocks;
+            Map<String, ReentrantLock> lockMap = locksCache.get(target);
+
+            if (lockMap == null) {
+
+                lockMap = new HashMap<String, ReentrantLock>();
+                locksCache.put(target, lockMap);
             }
 
-            final String groupName = (shareGroup != null) ? shareGroup : ShareGroup.ALL;
-            Object mutex = mutexMap.get(groupName);
+            final TreeSet<String> nameSet = new TreeSet<String>(sharedFields);
+            final int size = nameSet.size();
+            final ReentrantLock[] locks = new ReentrantLock[size];
+            int i = 0;
 
-            if (mutex == null) {
+            for (final String name : nameSet) {
 
-                mutex = new Object();
-                mutexMap.put(groupName, mutex);
+                ReentrantLock lock = lockMap.get(name);
+
+                if (lock == null) {
+
+                    lock = new ReentrantLock();
+                    lockMap.put(name, lock);
+                }
+
+                locks[i++] = lock;
             }
 
-            return mutex;
+            return new BuilderMutex(exchangeMutex, locks);
         }
     }
 
@@ -586,8 +706,7 @@ public class RoutineBuilders {
 
                     final Class<?> returnType = proxyMethod.getReturnType();
 
-                    if (!returnType.isAssignableFrom(StreamingChannel.class)
-                            && !returnType.isAssignableFrom(InvocationChannel.class)
+                    if (!returnType.isAssignableFrom(InvocationChannel.class)
                             && !returnType.isAssignableFrom(Routine.class)) {
 
                         throw new IllegalArgumentException(
@@ -697,12 +816,6 @@ public class RoutineBuilders {
                 return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
-
-            } else if (returnType.isAssignableFrom(StreamingChannel.class)) {
-
-                return (invocationMode == InvocationMode.SYNC) ? routine.syncStream()
-                        : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelStream()
-                                : routine.asyncStream();
             }
 
             return routine;
@@ -731,7 +844,7 @@ public class RoutineBuilders {
 
                 final int length = Array.getLength(arg);
 
-                for (int i = 0; i < length; i++) {
+                for (int i = 0; i < length; ++i) {
 
                     invocationChannel.pass(Array.get(arg, i));
                 }
@@ -911,6 +1024,134 @@ public class RoutineBuilders {
             this.invocationMode = invocationMode;
             this.inputMode = inputMode;
             this.outputMode = outputMode;
+        }
+    }
+
+    /**
+     * Mutex implementation.
+     */
+    private static class BuilderMutex implements Mutex {
+
+        private final ReentrantLock[] mLocks;
+
+        private final ExchangeMutex mMutex;
+
+        /**
+         * Constructor.
+         *
+         * @param mutex the exchange mutex.
+         * @param locks the locks.
+         */
+        private BuilderMutex(@NotNull final ExchangeMutex mutex,
+                @NotNull final ReentrantLock[] locks) {
+
+            mMutex = mutex;
+            mLocks = locks;
+        }
+
+        public void acquire() {
+
+            mMutex.acquirePartialMutex();
+
+            for (final ReentrantLock lock : mLocks) {
+
+                lock.lock();
+            }
+        }
+
+        public void release() {
+
+            final ReentrantLock[] locks = mLocks;
+            final int length = locks.length;
+
+            for (int i = length - 1; i >= 0; --i) {
+
+                locks[i].unlock();
+            }
+
+            mMutex.releasePartialMutex();
+        }
+    }
+
+    /**
+     * Class used to synchronize between partial and full mutexes.
+     */
+    private static class ExchangeMutex implements Mutex {
+
+        private final ReentrantLock mLock = new ReentrantLock();
+
+        private final Object mMutex = new Object();
+
+        private int mFullMutexCount;
+
+        private int mPartialMutexCount;
+
+        /**
+         * Acquires a partial mutex making sure that no full one is already taken.
+         */
+        public void acquirePartialMutex() {
+
+            try {
+
+                synchronized (mMutex) {
+
+                    while (mFullMutexCount > 0) {
+
+                        mMutex.wait();
+                    }
+
+                    ++mPartialMutexCount;
+                }
+
+            } catch (final InterruptedException e) {
+
+                InvocationInterruptedException.ignoreIfPossible(e);
+            }
+        }
+
+        /**
+         * Releases a partial mutex.
+         */
+        public void releasePartialMutex() {
+
+            synchronized (mMutex) {
+
+                --mPartialMutexCount;
+                mMutex.notifyAll();
+            }
+        }
+
+        public void acquire() {
+
+            try {
+
+                synchronized (mMutex) {
+
+                    while (mPartialMutexCount > 0) {
+
+                        mMutex.wait();
+                    }
+
+                    ++mFullMutexCount;
+                }
+
+                mLock.lock();
+
+            } catch (final InterruptedException e) {
+
+                InvocationInterruptedException.ignoreIfPossible(e);
+            }
+        }
+
+        public void release() {
+
+            mLock.unlock();
+
+            synchronized (mMutex) {
+
+                --mFullMutexCount;
+                mMutex.notifyAll();
+            }
         }
     }
 }

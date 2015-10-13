@@ -13,11 +13,15 @@
  */
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.util.Reflection;
+import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.invocation.CommandInvocation;
+import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.FunctionInvocation;
+import com.github.dm.jrt.invocation.Invocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,16 +34,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class Functions {
 
-    private static final BiConsumerObject<?, ?> sBiSink =
-            newBiConsumer(new BiConsumer<Object, Object>() {
+    private static final BiConsumerChain<?, ?> sBiSink =
+            biConsumerChain(new BiConsumer<Object, Object>() {
 
                 public void accept(final Object in1, final Object in2) {
 
                 }
             });
 
-    private static final FunctionObject<?, ?> sIdentity =
-            newFunction(new Function<Object, Object>() {
+    private static final FunctionChain<?, ?> sIdentity =
+            functionChain(new Function<Object, Object>() {
 
                 public Object apply(final Object in) {
 
@@ -47,7 +51,7 @@ public class Functions {
                 }
             });
 
-    private static final ConsumerObject<?> sSink = newConsumer(new Consumer<Object>() {
+    private static final ConsumerChain<?> sSink = consumerChain(new Consumer<Object>() {
 
         public void accept(final Object in) {
 
@@ -59,55 +63,6 @@ public class Functions {
      */
     protected Functions() {
 
-    }
-
-    /**
-     * Returns a bi-consumer instance just discarding the passed inputs.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
-     * @return the wrapped bi-consumer.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiConsumerObject<IN1, IN2> biSink() {
-
-        return (BiConsumerObject<IN1, IN2>) sBiSink;
-    }
-
-    /**
-     * Returns a supplier instance always returning the same result.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param result the result.
-     * @param <OUT>  the output data type.
-     * @return the wrapped supplier.
-     */
-    @NotNull
-    public static <OUT> SupplierObject<OUT> constant(final OUT result) {
-
-        return newSupplier(new Supplier<OUT>() {
-
-            public OUT get() {
-
-                return result;
-            }
-        });
-    }
-
-    /**
-     * Returns the identity function.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the wrapped function.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> FunctionObject<IN, IN> identity() {
-
-        return (FunctionObject<IN, IN>) sIdentity;
     }
 
     /**
@@ -127,16 +82,50 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <IN1, IN2> BiConsumerObject<IN1, IN2> newBiConsumer(
+    public static <IN1, IN2> BiConsumerChain<IN1, IN2> biConsumerChain(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
 
-        if (consumer.getClass() == BiConsumerObject.class) {
+        if (consumer.getClass() == BiConsumerChain.class) {
 
-            return (BiConsumerObject<IN1, IN2>) consumer;
+            return (BiConsumerChain<IN1, IN2>) consumer;
         }
 
-        return new BiConsumerObject<IN1, IN2>(
-                Collections.<BiConsumer<?, ?>>singletonList(consumer));
+        return new BiConsumerChain<IN1, IN2>(Collections.<BiConsumer<?, ?>>singletonList(consumer));
+    }
+
+    /**
+     * Returns a bi-consumer chain just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the wrapped bi-consumer.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiConsumerChain<IN1, IN2> biSink() {
+
+        return (BiConsumerChain<IN1, IN2>) sBiSink;
+    }
+
+    /**
+     * Returns a supplier chain always returning the same result.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param result the result.
+     * @param <OUT>  the output data type.
+     * @return the wrapped supplier.
+     */
+    @NotNull
+    public static <OUT> SupplierChain<OUT> constant(final OUT result) {
+
+        return supplierChain(new Supplier<OUT>() {
+
+            public OUT get() {
+
+                return result;
+            }
+        });
     }
 
     /**
@@ -155,14 +144,80 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <IN> ConsumerObject<IN> newConsumer(@NotNull final Consumer<IN> consumer) {
+    public static <IN> ConsumerChain<IN> consumerChain(@NotNull final Consumer<IN> consumer) {
 
-        if (consumer.getClass() == ConsumerObject.class) {
+        if (consumer.getClass() == ConsumerChain.class) {
 
-            return (ConsumerObject<IN>) consumer;
+            return (ConsumerChain<IN>) consumer;
         }
 
-        return new ConsumerObject<IN>(Collections.<Consumer<?>>singletonList(consumer));
+        return new ConsumerChain<IN>(Collections.<Consumer<?>>singletonList(consumer));
+    }
+
+    /**
+     * Builds and returns a new command invocation based on the specified consumer instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified consumer must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the consumer instance.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <OUT> CommandInvocation<OUT> consumerCommand(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return new ConsumerCommandInvocation<OUT>(consumerChain(consumer));
+    }
+
+    /**
+     * Builds and returns a new invocation factory based on the specified bi-consumer instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
+     * static context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
+            @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
+                    consumer) {
+
+        return new ConsumerInvocationFactory<IN, OUT>(biConsumerChain(consumer));
+    }
+
+    /**
+     * Builds and returns a new filter invocation based on the specified bi-consumer instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
+     * static context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> FilterInvocation<IN, OUT> consumerFilter(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+        return new ConsumerFilterInvocation<IN, OUT>(biConsumerChain(consumer));
     }
 
     /**
@@ -182,15 +237,87 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <IN, OUT> FunctionObject<IN, OUT> newFunction(
+    public static <IN, OUT> FunctionChain<IN, OUT> functionChain(
             @NotNull final Function<IN, OUT> function) {
 
-        if (function.getClass() == FunctionObject.class) {
+        if (function.getClass() == FunctionChain.class) {
 
-            return (FunctionObject<IN, OUT>) function;
+            return (FunctionChain<IN, OUT>) function;
         }
 
-        return new FunctionObject<IN, OUT>(Collections.<Function<?, ?>>singletonList(function));
+        return new FunctionChain<IN, OUT>(Collections.<Function<?, ?>>singletonList(function));
+    }
+
+    /**
+     * Builds and returns a new invocation factory based on the specified function instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
+            @NotNull final Function<? super List<? extends IN>, OUT> function) {
+
+        return new FunctionInvocationFactory<IN, OUT>(functionChain(function));
+    }
+
+    /**
+     * Builds and returns a new filter invocation based on the specified function instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
+            @NotNull final Function<? super IN, OUT> function) {
+
+        return new FunctionFilterInvocation<IN, OUT>(functionChain(function));
+    }
+
+    /**
+     * Returns the identity function.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the wrapped function.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> FunctionChain<IN, IN> identity() {
+
+        return (FunctionChain<IN, IN>) sIdentity;
+    }
+
+    /**
+     * Returns a consumer chain just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the wrapped consumer.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> ConsumerChain<IN> sink() {
+
+        return (ConsumerChain<IN>) sSink;
     }
 
     /**
@@ -209,110 +336,89 @@ public class Functions {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public static <OUT> SupplierObject<OUT> newSupplier(@NotNull final Supplier<OUT> supplier) {
+    public static <OUT> SupplierChain<OUT> supplierChain(@NotNull final Supplier<OUT> supplier) {
 
-        if (supplier.getClass() == SupplierObject.class) {
+        if (supplier.getClass() == SupplierChain.class) {
 
-            return (SupplierObject<OUT>) supplier;
+            return (SupplierChain<OUT>) supplier;
         }
 
-        return new SupplierObject<OUT>(supplier, Collections.<Function<?, ?>>emptyList());
+        return new SupplierChain<OUT>(supplier, Functions.<OUT>identity());
     }
 
     /**
-     * Returns a consumer instance just discarding the passed inputs.<br/>
-     * The returned object will support concatenation and comparison.
+     * Builds and returns a new command invocation based on the specified supplier instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified supplier must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
-     * @param <IN> the input data type.
-     * @return the wrapped consumer.
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> ConsumerObject<IN> sink() {
+    public static <OUT> CommandInvocation<OUT> supplierCommand(
+            @NotNull final Supplier<OUT> supplier) {
 
-        return (ConsumerObject<IN>) sSink;
+        return new SupplierCommandInvocation<OUT>(supplierChain(supplier));
     }
 
     /**
-     * Class wrapping a bi-consumer instance.
+     * Builds and returns a new invocation factory based on the specified supplier instance.<br/>
+     * In order to prevent undesired leaks, the class of the specified supplier must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
      *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
+     * @param supplier the supplier instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
      */
-    public static class BiConsumerObject<IN1, IN2> implements BiConsumer<IN1, IN2> {
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> supplierFactory(
+            @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
 
-        private final List<BiConsumer<?, ?>> mConsumers;
+        return new SupplierInvocationFactory<IN, OUT>(supplierChain(supplier));
+    }
+
+    /**
+     * Command invocation based on a consumer instance.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
+
+        private final ConsumerChain<? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
          *
-         * @param consumers the list of wrapped consumers.
+         * @param consumer the consumer instance.
          */
-        private BiConsumerObject(@NotNull final List<BiConsumer<?, ?>> consumers) {
+        public ConsumerCommandInvocation(
+                @NotNull final ConsumerChain<? super ResultChannel<OUT>> consumer) {
 
-            mConsumers = consumers;
-        }
+            if (!consumer.hasStaticContext()) {
 
-        /**
-         * Returns a composed bi-consumer that performs, in sequence, this operation followed by the
-         * after operation.
-         *
-         * @param after the operation to perform after this operation.
-         * @return the composed bi-consumer.
-         */
-        @NotNull
-        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-                justification = "class comparison with == is done")
-        public BiConsumerObject<IN1, IN2> andThen(
-                @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
-
-            final Class<? extends BiConsumer> consumerClass = after.getClass();
-            final List<BiConsumer<?, ?>> consumers = mConsumers;
-            final ArrayList<BiConsumer<?, ?>> newConsumers =
-                    new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
-            newConsumers.addAll(consumers);
-
-            if (consumerClass == BiConsumerObject.class) {
-
-                newConsumers.addAll(((BiConsumerObject<?, ?>) after).mConsumers);
-
-            } else {
-
-                newConsumers.add(after);
+                throw new IllegalArgumentException(
+                        "the consumer class must have a static context: " + consumer.getClass());
             }
 
-            return new BiConsumerObject<IN1, IN2>(newConsumers);
-        }
-
-        /**
-         * Checks if this bi-consumer instance has a static context.
-         *
-         * @return whether this instance has a static context.
-         */
-        public boolean hasStaticContext() {
-
-            for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-                if (!Reflection.hasStaticContext(consumer.getClass())) {
-
-                    return false;
-                }
-            }
-
-            return true;
+            mConsumer = consumer;
         }
 
         @Override
         public int hashCode() {
 
-            int result = 0;
-
-            for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-                result = 31 * result + consumer.getClass().hashCode();
-            }
-
-            return result;
+            return mConsumer.hashCode();
         }
 
         @Override
@@ -323,295 +429,61 @@ public class Functions {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof ConsumerCommandInvocation)) {
 
                 return false;
             }
 
-            final BiConsumerObject<?, ?> that = (BiConsumerObject<?, ?>) o;
-            final List<BiConsumer<?, ?>> thisConsumers = mConsumers;
-            final List<BiConsumer<?, ?>> thatConsumers = that.mConsumers;
-            final int size = thisConsumers.size();
-
-            if (size != thatConsumers.size()) {
-
-                return false;
-            }
-
-            for (int i = 0; i < size; i++) {
-
-                if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
-
-                    return false;
-                }
-            }
-
-            return true;
+            final ConsumerCommandInvocation<?> that = (ConsumerCommandInvocation<?>) o;
+            return mConsumer.equals(that.mConsumer);
         }
 
-        /**
-         * Performs this operation on the given arguments.
-         *
-         * @param in1 the first input argument.
-         * @param in2 the second input argument.
-         */
-        @SuppressWarnings("unchecked")
-        public void accept(final IN1 in1, final IN2 in2) {
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-            for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-                ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
-            }
+            mConsumer.accept(result);
         }
     }
 
     /**
-     * Class wrapping a consumer instance.
-     *
-     * @param <IN> the input data type.
-     */
-    public static class ConsumerObject<IN> implements Consumer<IN> {
-
-        private final List<Consumer<?>> mConsumers;
-
-        /**
-         * Constructor.
-         *
-         * @param consumers the list of wrapped consumers.
-         */
-        private ConsumerObject(@NotNull final List<Consumer<?>> consumers) {
-
-            mConsumers = consumers;
-        }
-
-        /**
-         * Returns a composed consumer that performs, in sequence, this operation followed by the
-         * after operation.
-         *
-         * @param after the operation to perform after this operation.
-         * @return the composed consumer.
-         */
-        @NotNull
-        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-                justification = "class comparison with == is done")
-        public ConsumerObject<IN> andThen(@NotNull final Consumer<? super IN> after) {
-
-            final Class<? extends Consumer> consumerClass = after.getClass();
-            final List<Consumer<?>> consumers = mConsumers;
-            final ArrayList<Consumer<?>> newConsumers =
-                    new ArrayList<Consumer<?>>(consumers.size() + 1);
-            newConsumers.addAll(consumers);
-
-            if (consumerClass == ConsumerObject.class) {
-
-                newConsumers.addAll(((ConsumerObject<?>) after).mConsumers);
-
-            } else {
-
-                newConsumers.add(after);
-            }
-
-            return new ConsumerObject<IN>(newConsumers);
-        }
-
-        /**
-         * Checks if this consumer instance has a static context.
-         *
-         * @return whether this instance has a static context.
-         */
-        public boolean hasStaticContext() {
-
-            for (final Consumer<?> consumer : mConsumers) {
-
-                if (!Reflection.hasStaticContext(consumer.getClass())) {
-
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = 0;
-
-            for (final Consumer<?> consumer : mConsumers) {
-
-                result = 31 * result + consumer.getClass().hashCode();
-            }
-
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if ((o == null) || (getClass() != o.getClass())) {
-
-                return false;
-            }
-
-            final ConsumerObject<?> that = (ConsumerObject<?>) o;
-            final List<Consumer<?>> thisConsumers = mConsumers;
-            final List<Consumer<?>> thatConsumers = that.mConsumers;
-            final int size = thisConsumers.size();
-
-            if (size != thatConsumers.size()) {
-
-                return false;
-            }
-
-            for (int i = 0; i < size; i++) {
-
-                if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
-
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /**
-         * Performs this operation on the given argument.
-         *
-         * @param in the input argument.
-         */
-        @SuppressWarnings("unchecked")
-        public void accept(final IN in) {
-
-            for (final Consumer<?> consumer : mConsumers) {
-
-                ((Consumer<Object>) consumer).accept(in);
-            }
-        }
-    }
-
-    /**
-     * Class wrapping a function instance.
+     * Filter invocation based on a bi-consumer instance.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    public static class FunctionObject<IN, OUT> implements Function<IN, OUT> {
+    private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final List<Function<?, ?>> mFunctions;
+        private final BiConsumerChain<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
          *
-         * @param functions the list of wrapped functions.
+         * @param consumer the consumer instance.
          */
-        private FunctionObject(@NotNull final List<Function<?, ?>> functions) {
+        private ConsumerFilterInvocation(
+                @NotNull final BiConsumerChain<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-            mFunctions = functions;
-        }
+            if (!consumer.hasStaticContext()) {
 
-        /**
-         * Returns a composed function that first applies this function to its input, and then
-         * applies the after function to the result.
-         *
-         * @param after   the function to apply after this function is applied.
-         * @param <AFTER> the type of output of the after function.
-         * @return the composed function.
-         */
-        @NotNull
-        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-                justification = "class comparison with == is done")
-        public <AFTER> FunctionObject<IN, AFTER> andThen(
-                @NotNull final Function<? super OUT, AFTER> after) {
-
-            final Class<? extends Function> functionClass = after.getClass();
-            final List<Function<?, ?>> functions = mFunctions;
-            final ArrayList<Function<?, ?>> newFunctions =
-                    new ArrayList<Function<?, ?>>(functions.size() + 1);
-            newFunctions.addAll(functions);
-
-            if (functionClass == FunctionObject.class) {
-
-                newFunctions.addAll(((FunctionObject<?, ?>) after).mFunctions);
-
-            } else {
-
-                newFunctions.add(after);
+                throw new IllegalArgumentException(
+                        "the bi-consumer class must have a static context: " + consumer.getClass());
             }
 
-            return new FunctionObject<IN, AFTER>(newFunctions);
+            mConsumer = consumer;
         }
 
-        /**
-         * Returns a composed function that first applies the before function to its input, and then
-         * applies this function to the result.
-         *
-         * @param before   the function to apply before this function is applied.
-         * @param <BEFORE> the type of input to the before function.
-         * @return the composed function.
-         */
-        @NotNull
-        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-                justification = "class comparison with == is done")
-        public <BEFORE> FunctionObject<BEFORE, OUT> compose(
-                @NotNull final Function<BEFORE, ? extends IN> before) {
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-            final Class<? extends Function> functionClass = before.getClass();
-            final List<Function<?, ?>> functions = mFunctions;
-            final ArrayList<Function<?, ?>> newFunctions =
-                    new ArrayList<Function<?, ?>>(functions.size() + 1);
-
-            if (functionClass == FunctionObject.class) {
-
-                newFunctions.addAll(((FunctionObject<?, ?>) before).mFunctions);
-
-            } else {
-
-                newFunctions.add(before);
-            }
-
-            newFunctions.addAll(functions);
-            return new FunctionObject<BEFORE, OUT>(newFunctions);
-        }
-
-        /**
-         * Checks if this function instance has a static context.
-         *
-         * @return whether this instance has a static context.
-         */
-        public boolean hasStaticContext() {
-
-            for (final Function<?, ?> function : mFunctions) {
-
-                if (!Reflection.hasStaticContext(function.getClass())) {
-
-                    return false;
-                }
-            }
-
-            return true;
+            mConsumer.accept(input, result);
         }
 
         @Override
         public int hashCode() {
 
-            int result = 0;
-
-            for (final Function<?, ?> function : mFunctions) {
-
-                result = 31 * result + function.getClass().hashCode();
-            }
-
-            return result;
+            return mConsumer.hashCode();
         }
 
+
         @Override
-        @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT",
-                justification = "comparing class of the internal list objects")
         public boolean equals(final Object o) {
 
             if (this == o) {
@@ -619,144 +491,64 @@ public class Functions {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof ConsumerFilterInvocation)) {
 
                 return false;
             }
 
-            final FunctionObject<?, ?> that = (FunctionObject<?, ?>) o;
-            final List<Function<?, ?>> thisFunctions = mFunctions;
-            final List<Function<?, ?>> thatFunctions = that.mFunctions;
-            final int size = thisFunctions.size();
-
-            if (size != thatFunctions.size()) {
-
-                return false;
-            }
-
-            for (int i = 0; i < size; i++) {
-
-                if (thisFunctions.get(i).getClass() != thatFunctions.get(i).getClass()) {
-
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /**
-         * Applies this function to the given argument.
-         *
-         * @param in the input argument.
-         * @return the function result.
-         */
-        @SuppressWarnings("unchecked")
-        public OUT apply(final IN in) {
-
-            Object result = in;
-
-            for (final Function<?, ?> function : mFunctions) {
-
-                result = ((Function<Object, Object>) function).apply(result);
-            }
-
-            return (OUT) result;
+            final ConsumerFilterInvocation<?, ?> that = (ConsumerFilterInvocation<?, ?>) o;
+            return mConsumer.equals(that.mConsumer);
         }
     }
 
     /**
-     * Class wrapping a supplier instance.
+     * Factory of function invocations based on a bi-consumer instance.
      *
+     * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    public static class SupplierObject<OUT> implements Supplier<OUT> {
+    private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final List<Function<?, ?>> mFunctions;
-
-        private final Supplier<?> mSupplier;
+        private final BiConsumerChain<? super List<? extends IN>, ? super ResultChannel<OUT>>
+                mConsumer;
 
         /**
          * Constructor.
          *
-         * @param supplier  the initial wrapped supplier.
-         * @param functions the list of wrapped functions.
+         * @param consumer the consumer instance.
          */
-        private SupplierObject(@NotNull final Supplier<?> supplier,
-                @NotNull final List<Function<?, ?>> functions) {
+        private ConsumerInvocationFactory(
+                @NotNull final BiConsumerChain<? super List<? extends IN>, ? super
+                        ResultChannel<OUT>> consumer) {
 
-            mSupplier = supplier;
-            mFunctions = functions;
+            if (!consumer.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the bi-consumer class must have a static context: " + consumer.getClass());
+            }
+
+            mConsumer = consumer;
         }
 
-        /**
-         * Returns a composed supplier that first gets this supplier result, and then
-         * applies the after function to it.
-         *
-         * @param after   the function to apply after this function is applied.
-         * @param <AFTER> the type of output of the after function.
-         * @return the composed function.
-         */
         @NotNull
-        @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-                justification = "class comparison with == is done")
-        public <AFTER> SupplierObject<AFTER> andThen(
-                @NotNull final Function<? super OUT, AFTER> after) {
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
 
-            final Class<? extends Function> functionClass = after.getClass();
-            final List<Function<?, ?>> functions = mFunctions;
-            final ArrayList<Function<?, ?>> newFunctions =
-                    new ArrayList<Function<?, ?>>(functions.size() + 1);
-            newFunctions.addAll(functions);
+            return new FunctionInvocation<IN, OUT>() {
 
-            if (functionClass == FunctionObject.class) {
+                @Override
+                protected void onCall(@NotNull final List<? extends IN> inputs,
+                        @NotNull final ResultChannel<OUT> result) {
 
-                newFunctions.addAll(((FunctionObject<?, ?>) after).mFunctions);
-
-            } else {
-
-                newFunctions.add(after);
-            }
-
-            return new SupplierObject<AFTER>(mSupplier, newFunctions);
-        }
-
-        /**
-         * Checks if this supplier instance has a static context.
-         *
-         * @return whether this instance has a static context.
-         */
-        public boolean hasStaticContext() {
-
-            final Supplier<?> supplier = mSupplier;
-
-            if (!Reflection.hasStaticContext(supplier.getClass())) {
-
-                return false;
-            }
-
-            for (final Function<?, ?> function : mFunctions) {
-
-                if (!Reflection.hasStaticContext(function.getClass())) {
-
-                    return false;
+                    mConsumer.accept(inputs, result);
                 }
-            }
-
-            return true;
+            };
         }
 
         @Override
         public int hashCode() {
 
-            int result = mSupplier.getClass().hashCode();
-
-            for (final Function<?, ?> function : mFunctions) {
-
-                result = 31 * result + function.getClass().hashCode();
-            }
-
-            return result;
+            return mConsumer.hashCode();
         }
 
         @Override
@@ -767,54 +559,247 @@ public class Functions {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof ConsumerInvocationFactory)) {
 
                 return false;
             }
 
-            final SupplierObject<?> that = (SupplierObject<?>) o;
-
-            if (mSupplier.getClass() != that.mSupplier.getClass()) {
-
-                return false;
-            }
-
-            final List<Function<?, ?>> thisFunctions = mFunctions;
-            final List<Function<?, ?>> thatFunctions = that.mFunctions;
-            final int size = thisFunctions.size();
-
-            if (size != thatFunctions.size()) {
-
-                return false;
-            }
-
-            for (int i = 0; i < size; i++) {
-
-                if (thisFunctions.get(i).getClass() != thatFunctions.get(i).getClass()) {
-
-                    return false;
-                }
-            }
-
-            return true;
+            final ConsumerInvocationFactory<?, ?> that = (ConsumerInvocationFactory<?, ?>) o;
+            return mConsumer.equals(that.mConsumer);
         }
+    }
+
+    /**
+     * Filter invocation based on a function instance.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
+
+        private final FunctionChain<? super IN, OUT> mFunction;
 
         /**
-         * Gets a result.
+         * Constructor.
          *
-         * @return a result.
+         * @param function the function instance.
          */
-        @SuppressWarnings("unchecked")
-        public OUT get() {
+        private FunctionFilterInvocation(@NotNull final FunctionChain<? super IN, OUT> function) {
 
-            Object result = mSupplier.get();
+            if (!function.hasStaticContext()) {
 
-            for (final Function<?, ?> function : mFunctions) {
-
-                result = ((Function<Object, Object>) function).apply(result);
+                throw new IllegalArgumentException(
+                        "the function class must have a static context: " + function.getClass());
             }
 
-            return (OUT) result;
+            mFunction = function;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mFunction.hashCode();
+        }
+
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+            result.pass(mFunction.apply(input));
+        }
+
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof FunctionFilterInvocation)) {
+
+                return false;
+            }
+
+            final FunctionFilterInvocation<?, ?> that = (FunctionFilterInvocation<?, ?>) o;
+            return mFunction.equals(that.mFunction);
+        }
+    }
+
+    /**
+     * Factory of function invocations based on a function instance.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
+        private final FunctionChain<? super List<? extends IN>, OUT> mFunction;
+
+        /**
+         * Constructor.
+         *
+         * @param function the function instance.
+         */
+        private FunctionInvocationFactory(
+                @NotNull final FunctionChain<? super List<? extends IN>, OUT> function) {
+
+            if (!function.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the function class must have a static context: " + function.getClass());
+            }
+
+            mFunction = function;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return new FunctionInvocation<IN, OUT>() {
+
+                @Override
+                protected void onCall(@NotNull final List<? extends IN> inputs,
+                        @NotNull final ResultChannel<OUT> result) {
+
+                    result.pass(mFunction.apply(inputs));
+                }
+            };
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mFunction.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof FunctionInvocationFactory)) {
+
+                return false;
+            }
+
+            final FunctionInvocationFactory<?, ?> that = (FunctionInvocationFactory<?, ?>) o;
+            return mFunction.equals(that.mFunction);
+        }
+    }
+
+    /**
+     * Command invocation based on a supplier instance.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
+
+        private final SupplierChain<OUT> mSupplier;
+
+        /**
+         * Constructor.
+         *
+         * @param supplier the supplier instance.
+         */
+        public SupplierCommandInvocation(@NotNull final SupplierChain<OUT> supplier) {
+
+            if (!supplier.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the supplier class must have a static context: " + supplier.getClass());
+            }
+
+            mSupplier = supplier;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mSupplier.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof SupplierCommandInvocation)) {
+
+                return false;
+            }
+
+            final SupplierCommandInvocation<?> that = (SupplierCommandInvocation<?>) o;
+            return mSupplier.equals(that.mSupplier);
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            result.pass(mSupplier.get());
+        }
+    }
+
+    /**
+     * Implementation of an invocation factory based on a supplier function.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
+        private final SupplierChain<? extends Invocation<IN, OUT>> mSupplier;
+
+        /**
+         * Constructor.
+         *
+         * @param supplier the supplier function.
+         */
+        private SupplierInvocationFactory(
+                @NotNull final SupplierChain<? extends Invocation<IN, OUT>> supplier) {
+
+            if (!supplier.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the supplier class must have a static context: " + supplier.getClass());
+            }
+
+            mSupplier = supplier;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return mSupplier.get();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof SupplierInvocationFactory)) {
+
+                return false;
+            }
+
+            final SupplierInvocationFactory<?, ?> that = (SupplierInvocationFactory<?, ?>) o;
+            return mSupplier.equals(that.mSupplier);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mSupplier.hashCode();
         }
     }
 }

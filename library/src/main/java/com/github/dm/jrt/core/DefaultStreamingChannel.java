@@ -179,13 +179,6 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> eventually() {
-
-        mOutputChannel.eventually();
-        return this;
-    }
-
-    @NotNull
     public StreamingChannel<IN, OUT> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
@@ -217,6 +210,13 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     public StreamingChannel<IN, OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
         mOutputChannel.passTo(consumer);
+        return this;
+    }
+
+    @NotNull
+    public StreamingChannel<IN, OUT> skip(final int count) {
+
+        mOutputChannel.skip(count);
         return this;
     }
 
@@ -270,6 +270,12 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
+    public List<OUT> next(final int count) {
+
+        return mOutputChannel.next(count);
+    }
+
+    @NotNull
     public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
             @NotNull final CHANNEL channel) {
 
@@ -286,11 +292,6 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     public OutputChannel<OUT> asOutput() {
 
         return this;
-    }
-
-    public boolean hasDelays() {
-
-        return mInputChannel.hasDelays();
     }
 
     public Iterator<OUT> iterator() {

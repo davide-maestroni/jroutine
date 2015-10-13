@@ -15,6 +15,8 @@ package com.github.dm.jrt.android.invocation;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.dm.jrt.util.Reflection.asArgs;
+
 /**
  * Class decorating the invocations produced by a context invocation factory.
  * <p/>
@@ -36,6 +38,8 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
     @SuppressWarnings("ConstantConditions")
     public DecoratingContextInvocationFactory(
             @NotNull final ContextInvocationFactory<IN, OUT> wrapped) {
+
+        super(asArgs(wrapped));
 
         if (wrapped == null) {
 

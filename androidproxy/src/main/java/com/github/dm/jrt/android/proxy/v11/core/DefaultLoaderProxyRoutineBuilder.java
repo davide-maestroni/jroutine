@@ -79,25 +79,17 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
-        return buildProxy(ClassToken.tokenOf(itf));
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        final Class<TYPE> itfClass = itf.getRawClass();
-
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itfClass.getName());
+                    "the specified class is not an interface: " + itf.getName());
         }
 
-        if (!itfClass.isAnnotationPresent(V11Proxy.class)) {
+        if (!itf.isAnnotationPresent(V11Proxy.class)) {
 
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + V11Proxy.class.getName() + ": "
-                            + itfClass.getName());
+                            + itf.getName());
         }
 
         final TargetLoaderProxyObjectBuilder<TYPE> builder =
@@ -112,6 +104,12 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                       .with(mLoaderConfiguration)
                       .set()
                       .buildProxy();
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -187,7 +185,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         private final LoaderContext mContext;
 
-        private final ClassToken<TYPE> mInterfaceToken;
+        private final Class<? super TYPE> mInterfaceClass;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -196,22 +194,22 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
          *
          * @param context        the routine context.
          * @param target         the invocation target.
-         * @param interfaceToken the proxy interface token.
+         * @param interfaceClass the proxy interface class.
          */
         private TargetLoaderProxyObjectBuilder(@NotNull final LoaderContext context,
                 @NotNull final ContextInvocationTarget<?> target,
-                @NotNull final ClassToken<TYPE> interfaceToken) {
+                @NotNull final Class<? super TYPE> interfaceClass) {
 
             mContext = context;
             mTarget = target;
-            mInterfaceToken = interfaceToken;
+            mInterfaceClass = interfaceClass;
         }
 
         @NotNull
         @Override
-        protected ClassToken<TYPE> getInterfaceToken() {
+        protected Class<? super TYPE> getInterfaceClass() {
 
-            return mInterfaceToken;
+            return mInterfaceClass;
         }
 
         @Nullable
@@ -230,6 +228,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         @NotNull
         @Override
+        @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final LoaderConfiguration loaderConfiguration) {
@@ -238,7 +237,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
                 final LoaderContext context = mContext;
                 final ContextInvocationTarget<?> target = mTarget;
-                final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
+                final Class<? super TYPE> interfaceClass = mInterfaceClass;
                 final V11Proxy annotation = interfaceClass.getAnnotation(V11Proxy.class);
                 String packageName = annotation.classPackage();
 
@@ -272,9 +271,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                         findConstructor(Class.forName(fullClassName), context, target,
                                         invocationConfiguration, proxyConfiguration,
                                         loaderConfiguration);
-                return interfaceClass.cast(
-                        constructor.newInstance(context, target, invocationConfiguration,
-                                                proxyConfiguration, loaderConfiguration));
+                return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
+                                                      proxyConfiguration, loaderConfiguration);
 
             } catch (final Throwable t) {
 

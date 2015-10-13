@@ -58,8 +58,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.core.InvocationTarget<?> mTarget;
 
-        private final com.github.dm.jrt.util.ClassToken<${interfaceFullName}> mToken = new com.github.dm.jrt.util.ClassToken<${interfaceFullName}>() {};
-
         private ProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget<?> target) {
 
             mTarget = target;
@@ -67,9 +65,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         @Override
         @org.jetbrains.annotations.NotNull
-        protected com.github.dm.jrt.util.ClassToken<${interfaceFullName}> getInterfaceToken() {
+        protected Class<? super ${interfaceFullName}> getInterfaceClass() {
 
-            return mToken;
+            return ${interfaceErasure}.class;
         }
 
         @Override

@@ -50,9 +50,10 @@ import java.util.concurrent.TimeUnit;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.github.dm.jrt.util.TimeDuration.INFINITY;
+import static com.github.dm.jrt.util.Time.current;
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.util.TimeDuration.timeUntilMillis;
 
 /**
  * Class handling the invocation output.
@@ -144,8 +145,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mHandler = handler;
         mRunner = runner;
         mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_CHANCE);
-        mExecutionTimeout = configuration.getExecutionTimeoutOr(ZERO);
-        mTimeoutActionType = configuration.getExecutionTimeoutActionOr(TimeoutActionType.THROW);
+        mExecutionTimeout = configuration.getTimeoutOr(ZERO);
+        mTimeoutActionType = configuration.getTimeoutActionOr(TimeoutActionType.THROW);
         mMaxOutput = configuration.getOutputMaxSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
         mOutputQueue = new NestedQueue<Object>() {
@@ -334,14 +335,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         return this;
-    }
-
-    public boolean hasDelays() {
-
-        synchronized (mMutex) {
-
-            return (mPendingOutputCount > 0);
-        }
     }
 
     /**
@@ -707,7 +700,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final Object result = mOutputQueue.removeFirst();
         mLogger.dbg("reading output [#%d]: %s [%s]", mOutputCount, result, timeout);
-        RoutineExceptionWrapper.raise(result);
+
+        if (result instanceof RoutineExceptionWrapper) {
+
+            mOutputQueue.add(result);
+            throw ((RoutineExceptionWrapper) result).raise();
+        }
+
         final int maxOutput = mMaxOutput;
         final int prevOutputCount = mOutputCount;
 
@@ -805,7 +804,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             throw new InvocationDeadlockException();
         }
 
-        if (isTimeout) {
+        if (isTimeout || outputQueue.isEmpty()) {
 
             logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
 
@@ -1181,12 +1180,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
-        public OutputChannel<OUT> eventually() {
-
-            return afterMax(INFINITY);
-        }
-
-        @NotNull
         public OutputChannel<OUT> eventuallyAbort() {
 
             synchronized (mMutex) {
@@ -1264,6 +1257,40 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
+        public List<OUT> next(final int count) {
+
+            if (count <= 0) {
+
+                return Collections.emptyList();
+            }
+
+            final TimeDuration timeout;
+            final TimeoutActionType timeoutAction;
+
+            synchronized (mMutex) {
+
+                timeout = mExecutionTimeout;
+                timeoutAction = mTimeoutActionType;
+            }
+
+            final ArrayList<OUT> results = new ArrayList<OUT>(count);
+            final long endTime = current().plus(timeout).toMillis();
+
+            try {
+
+                for (int i = 0; i < count; ++i) {
+
+                    results.add(readNext(timeUntilMillis(endTime), timeoutAction));
+                }
+
+            } catch (final NoSuchElementException ignored) {
+
+            }
+
+            return results;
+        }
+
+        @NotNull
         public <IN extends InputChannel<? super OUT>> IN passTo(@NotNull final IN channel) {
 
             channel.pass(this);
@@ -1292,6 +1319,37 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             flushOutput(forceClose);
+            return this;
+        }
+
+        @NotNull
+        public OutputChannel<OUT> skip(final int count) {
+
+            if (count > 0) {
+
+                final TimeDuration timeout;
+                final TimeoutActionType timeoutAction;
+
+                synchronized (mMutex) {
+
+                    timeout = mExecutionTimeout;
+                    timeoutAction = mTimeoutActionType;
+                }
+
+                final long endTime = current().plus(timeout).toMillis();
+
+                try {
+
+                    for (int i = 0; i < count; ++i) {
+
+                        readNext(timeUntilMillis(endTime), timeoutAction);
+                    }
+
+                } catch (final NoSuchElementException ignored) {
+
+                }
+            }
+
             return this;
         }
 

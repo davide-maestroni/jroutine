@@ -118,12 +118,6 @@ public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> eventually();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     IOChannel<IN, OUT> eventuallyAbort();
 
     /**
@@ -149,6 +143,12 @@ public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT>
      */
     @NotNull
     IOChannel<IN, OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    IOChannel<IN, OUT> skip(int count);
 
     /**
      * Returns this channel as an input one.

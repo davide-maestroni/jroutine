@@ -15,7 +15,6 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.Output.OutputMode;
-import com.github.dm.jrt.annotation.ShareGroup;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
@@ -27,6 +26,7 @@ import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
+import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -46,6 +46,7 @@ import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
 import static com.github.dm.jrt.core.RoutineBuilders.getSharedMutex;
 import static com.github.dm.jrt.core.RoutineBuilders.getTargetMethodInfo;
 import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -230,7 +231,7 @@ class DefaultObjectRoutineBuilder
 
         private final Method mMethod;
 
-        private final Object mMutex;
+        private final Mutex mMutex;
 
         private final OutputMode mOutputMode;
 
@@ -252,17 +253,7 @@ class DefaultObjectRoutineBuilder
             final Object mutexTarget =
                     (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass()
                             : target.getTarget();
-            final String shareGroup = proxyConfiguration.getShareGroupOr(null);
-
-            if ((mutexTarget != null) && !ShareGroup.NONE.equals(shareGroup)) {
-
-                mMutex = getSharedMutex(mutexTarget, shareGroup);
-
-            } else {
-
-                mMutex = this;
-            }
-
+            mMutex = getSharedMutex(mutexTarget, proxyConfiguration.getSharedFieldsOr(null));
             mTarget = target;
             mMethod = method;
             mInputMode = inputMode;
@@ -425,8 +416,8 @@ class DefaultObjectRoutineBuilder
                     getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
                                configurationWithAnnotations(mProxyConfiguration, method),
                                methodInfo.method, inputMode, outputMode);
-            return invokeRoutine(routine, method, (args != null) ? args : Reflection.NO_ARGS,
-                                 methodInfo.invocationMode, inputMode, outputMode);
+            return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
+                                 inputMode, outputMode);
         }
     }
 }

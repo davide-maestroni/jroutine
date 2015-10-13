@@ -39,12 +39,20 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
  * @see com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy
  * @see com.github.dm.jrt.annotation.Alias Alias
+ * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
  * @see com.github.dm.jrt.annotation.Input Input
+ * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+ * @see com.github.dm.jrt.annotation.InputOrder InputOrder
  * @see com.github.dm.jrt.annotation.Inputs Inputs
+ * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+ * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
  * @see com.github.dm.jrt.annotation.Invoke Invoke
  * @see com.github.dm.jrt.annotation.Output Output
+ * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+ * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+ * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
  * @see com.github.dm.jrt.annotation.Priority Priority
- * @see com.github.dm.jrt.annotation.ShareGroup ShareGroup
+ * @see com.github.dm.jrt.annotation.SharedFields SharedFields
  * @see com.github.dm.jrt.annotation.Timeout Timeout
  * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
  */
@@ -97,11 +105,15 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
         /**
          * Returns a builder of routines bound to the builder context, wrapping the specified target
          * object.<br/>
-         * Note that it is responsibility of the caller to retain a strong reference to the target
-         * instance to prevent it from being garbage collected.<br/>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.builder.FactoryContext FactoryContext} as the
          * application context.
+         * <p/>
+         * Note that it is responsibility of the caller to retain a strong reference to the target
+         * instance to prevent it from being garbage collected.<br/>
+         * Note also that the invocation input data will be cached, and the results will be produced
+         * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+         * order to prevent starvation or out of memory errors.
          *
          * @param target the invocation target.
          * @return the routine builder instance.

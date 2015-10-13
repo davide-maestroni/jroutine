@@ -261,7 +261,7 @@ public class TimeDurationTest {
     public void testInfinite() {
 
         assertThat(TimeDuration.INFINITY.isZero()).isFalse();
-        assertThat(TimeDuration.INFINITY.isInfinite()).isTrue();
+        assertThat(TimeDuration.INFINITY.isInfinity()).isTrue();
     }
 
     @Test

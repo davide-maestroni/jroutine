@@ -17,31 +17,23 @@ import android.content.Context;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.invocation.ContextInvocation;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.channel.DeadlockException;
-import com.github.dm.jrt.channel.InputChannel;
-import com.github.dm.jrt.channel.InvocationChannel;
-import com.github.dm.jrt.channel.OutputChannel;
-import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +52,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
     private final LoaderContext mContext;
 
-    private final ContextInvocationFactory<IN, OUT> mFactory;
+    private final FunctionContextInvocationFactory<IN, OUT> mFactory;
 
     private final int mLoaderId;
 
@@ -76,7 +68,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutine(@NotNull final LoaderContext context,
-            @NotNull final ContextInvocationFactory<IN, OUT> factory,
+            @NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration) {
 
@@ -98,20 +90,6 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         mLoaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mOrderType = invocationConfiguration.getOutputOrderTypeOr(null);
         getLogger().dbg("building context routine with configuration: %s", loaderConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public InvocationChannel<IN, OUT> asyncInvoke() {
-
-        return new InvocationChannelDecorator<IN, OUT>(super.asyncInvoke());
-    }
-
-    @NotNull
-    @Override
-    public InvocationChannel<IN, OUT> parallelInvoke() {
-
-        return new InvocationChannelDecorator<IN, OUT>(super.parallelInvoke());
     }
 
     @Override
@@ -166,7 +144,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         try {
 
-            final ContextInvocationFactory<IN, OUT> factory = mFactory;
+            final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
             logger.dbg("creating a new invocation instance");
             final ContextInvocation<IN, OUT> invocation = factory.newInvocation();
             invocation.onContext(loaderContext.getApplicationContext());
@@ -245,303 +223,13 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     }
 
     /**
-     * Decorator of invocation channels used to detect deadlocks.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class InvocationChannelDecorator<IN, OUT> implements InvocationChannel<IN, OUT> {
-
-        private final InvocationChannel<IN, OUT> mChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped channel.
-         */
-        private InvocationChannelDecorator(@NotNull final InvocationChannel<IN, OUT> wrapped) {
-
-            mChannel = wrapped;
-        }
-
-        public boolean abort() {
-
-            return mChannel.abort();
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> after(@NotNull final TimeDuration delay) {
-
-            mChannel.after(delay);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> after(final long delay,
-                @NotNull final TimeUnit timeUnit) {
-
-            mChannel.after(delay, timeUnit);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> now() {
-
-            mChannel.now();
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> orderByCall() {
-
-            mChannel.orderByCall();
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> orderByChance() {
-
-            mChannel.orderByChance();
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> orderByDelay() {
-
-            mChannel.orderByDelay();
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(
-                @Nullable final OutputChannel<? extends IN> channel) {
-
-            mChannel.pass(channel);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
-
-            mChannel.pass(inputs);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(@Nullable final IN input) {
-
-            mChannel.pass(input);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(@Nullable final IN... inputs) {
-
-            mChannel.pass(inputs);
-            return this;
-        }
-
-        @NotNull
-        public OutputChannel<OUT> result() {
-
-            return new OutputChannelDecorator<OUT>(mChannel);
-        }
-
-        public boolean hasDelays() {
-
-            return mChannel.hasDelays();
-        }
-
-        public boolean abort(@Nullable final Throwable reason) {
-
-            return mChannel.abort(reason);
-        }
-
-        public boolean isEmpty() {
-
-            return mChannel.isEmpty();
-        }
-
-        public boolean isOpen() {
-
-            return mChannel.isOpen();
-        }
-    }
-
-    /**
-     * Decorator of invocation channels used to detect deadlocks.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class OutputChannelDecorator<OUT> implements OutputChannel<OUT> {
-
-        private final InvocationChannel<?, OUT> mInputChannel;
-
-        private final OutputChannel<OUT> mOutputChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the invocation channel.
-         */
-        private OutputChannelDecorator(@NotNull final InvocationChannel<?, OUT> channel) {
-
-            mInputChannel = channel;
-            mOutputChannel = channel.result();
-        }
-
-        @NotNull
-        public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
-
-            if (!timeout.isZero() && mInputChannel.hasDelays()) {
-
-                throw new DeadlockException(
-                        "cannot wait for outputs when inputs are still pending");
-            }
-
-            mOutputChannel.afterMax(timeout);
-            return this;
-        }
-
-        @NotNull
-        public OutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
-
-            if ((timeout > 0) && mInputChannel.hasDelays()) {
-
-                throw new DeadlockException(
-                        "cannot wait for outputs when inputs are still pending");
-            }
-
-            mOutputChannel.afterMax(timeout, timeUnit);
-            return this;
-        }
-
-        @NotNull
-        public List<OUT> all() {
-
-            return mOutputChannel.all();
-        }
-
-        @NotNull
-        public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
-
-            mOutputChannel.allInto(results);
-            return this;
-        }
-
-        public boolean checkComplete() {
-
-            return mOutputChannel.checkComplete();
-        }
-
-        @NotNull
-        public OutputChannel<OUT> eventually() {
-
-            if (mInputChannel.hasDelays()) {
-
-                throw new DeadlockException(
-                        "cannot wait for outputs when inputs are still pending");
-            }
-
-            mOutputChannel.eventually();
-            return this;
-        }
-
-        @NotNull
-        public OutputChannel<OUT> eventuallyAbort() {
-
-            mOutputChannel.eventuallyAbort();
-            return this;
-        }
-
-        @NotNull
-        public OutputChannel<OUT> eventuallyExit() {
-
-            mOutputChannel.eventuallyExit();
-            return this;
-        }
-
-        @NotNull
-        public OutputChannel<OUT> eventuallyThrow() {
-
-            mOutputChannel.eventuallyThrow();
-            return this;
-        }
-
-        public boolean hasNext() {
-
-            return mOutputChannel.hasNext();
-        }
-
-        public OUT next() {
-
-            return mOutputChannel.next();
-        }
-
-        @NotNull
-        public OutputChannel<OUT> immediately() {
-
-            mOutputChannel.immediately();
-            return this;
-        }
-
-        public boolean isBound() {
-
-            return mOutputChannel.isBound();
-        }
-
-        @NotNull
-        public <IN extends InputChannel<? super OUT>> IN passTo(@NotNull final IN channel) {
-
-            return mOutputChannel.passTo(channel);
-        }
-
-        @NotNull
-        public OutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
-
-            mOutputChannel.passTo(consumer);
-            return this;
-        }
-
-        public Iterator<OUT> iterator() {
-
-            return mOutputChannel.iterator();
-        }
-
-        public void remove() {
-
-            mOutputChannel.remove();
-        }
-
-        public boolean abort() {
-
-            return mOutputChannel.abort();
-        }
-
-        public boolean abort(@Nullable final Throwable reason) {
-
-            return mOutputChannel.abort(reason);
-        }
-
-        public boolean isEmpty() {
-
-            return mOutputChannel.isEmpty();
-        }
-
-        public boolean isOpen() {
-
-            return mOutputChannel.isOpen();
-        }
-    }
-
-    /**
      * Execution implementation purging all loaders with a specific invocation factory.
      */
     private static class PurgeExecution extends TemplateExecution {
 
         private final LoaderContext mContext;
 
-        private final ContextInvocationFactory<?, ?> mFactory;
+        private final FunctionContextInvocationFactory<?, ?> mFactory;
 
         private final int mLoaderId;
 
@@ -553,7 +241,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param loaderId the loader ID.
          */
         private PurgeExecution(@NotNull final LoaderContext context,
-                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
+                @NotNull final FunctionContextInvocationFactory<?, ?> factory, final int loaderId) {
 
             mContext = context;
             mFactory = factory;
@@ -575,7 +263,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         private final LoaderContext mContext;
 
-        private final ContextInvocationFactory<?, ?> mFactory;
+        private final FunctionContextInvocationFactory<?, ?> mFactory;
 
         private final List<IN> mInputs;
 
@@ -590,7 +278,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param inputs   the list of inputs.
          */
         private PurgeInputsExecution(@NotNull final LoaderContext context,
-                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
+                @NotNull final FunctionContextInvocationFactory<?, ?> factory, final int loaderId,
                 @NotNull final List<IN> inputs) {
 
             mContext = context;

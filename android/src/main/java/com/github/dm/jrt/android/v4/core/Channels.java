@@ -63,7 +63,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
         final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> ioChannel =
                 JRoutine.io().buildChannel();
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
 
             ioChannel.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
         }

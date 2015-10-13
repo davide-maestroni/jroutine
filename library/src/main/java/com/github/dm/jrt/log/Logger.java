@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.github.dm.jrt.util.Reflection.asArgs;
+
 /**
  * Utility class used for logging messages.
  * <p/>
@@ -141,7 +143,7 @@ public class Logger {
             throw new NullPointerException("the context must not be null");
         }
 
-        return new Logger(new Object[]{context}, log, level);
+        return new Logger(asArgs(context), log, level);
     }
 
     /**

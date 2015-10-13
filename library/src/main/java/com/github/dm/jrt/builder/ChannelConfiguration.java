@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.util.TimeDuration.fromUnit;
+
 /**
  * Class storing the channel configuration.
  * <p/>
@@ -69,7 +71,7 @@ public final class ChannelConfiguration {
 
     private final LogLevel mLogLevel;
 
-    private final TimeDuration mPassTimeout;
+    private final TimeDuration mReadTimeout;
 
     private final TimeoutActionType mTimeoutActionType;
 
@@ -77,9 +79,9 @@ public final class ChannelConfiguration {
      * Constructor.
      *
      * @param asyncRunner      the runner used for asynchronous inputs.
-     * @param passTimeout      the timeout for the channel to produce a result.
+     * @param readTimeout      the timeout for the channel to produce an output.
      * @param actionType       the action to be taken if the timeout elapses before a readable
-     *                         result is available.
+     *                         output is available.
      * @param channelOrderType the order in which data are collected from the output channel.
      * @param channelMaxSize   the maximum number of buffered data. Must be positive.
      * @param channelTimeout   the maximum timeout while waiting for an object to be passed to the
@@ -88,13 +90,13 @@ public final class ChannelConfiguration {
      * @param logLevel         the log level.
      */
     private ChannelConfiguration(@Nullable final Runner asyncRunner,
-            @Nullable final TimeDuration passTimeout, @Nullable final TimeoutActionType actionType,
+            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType channelOrderType, final int channelMaxSize,
             @Nullable final TimeDuration channelTimeout, @Nullable final Log log,
             @Nullable final LogLevel logLevel) {
 
         mAsyncRunner = asyncRunner;
-        mPassTimeout = passTimeout;
+        mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
         mChannelOrderType = channelOrderType;
         mChannelMaxSize = channelMaxSize;
@@ -213,13 +215,13 @@ public final class ChannelConfiguration {
     }
 
     /**
-     * Returns the action to be taken if the timeout elapses before a readable result is available
+     * Returns the action to be taken if the timeout elapses before a readable output is available
      * (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutActionType getPassTimeoutActionOr(
+    public TimeoutActionType getReadTimeoutActionOr(
             @Nullable final TimeoutActionType valueIfNotSet) {
 
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
@@ -227,14 +229,14 @@ public final class ChannelConfiguration {
     }
 
     /**
-     * Returns the timeout for the channel to produce a readable result (null by default).
+     * Returns the timeout for the channel to produce a readable output (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getPassTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getReadTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
 
-        final TimeDuration passTimeout = mPassTimeout;
+        final TimeDuration passTimeout = mReadTimeout;
         return (passTimeout != null) ? passTimeout : valueIfNotSet;
     }
 
@@ -248,7 +250,7 @@ public final class ChannelConfiguration {
         result = 31 * result + (mChannelTimeout != null ? mChannelTimeout.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
-        result = 31 * result + (mPassTimeout != null ? mPassTimeout.hashCode() : 0);
+        result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
     }
@@ -302,8 +304,8 @@ public final class ChannelConfiguration {
             return false;
         }
 
-        if (mPassTimeout != null ? !mPassTimeout.equals(that.mPassTimeout)
-                : that.mPassTimeout != null) {
+        if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
+                : that.mReadTimeout != null) {
 
             return false;
         }
@@ -322,7 +324,7 @@ public final class ChannelConfiguration {
                 ", mChannelTimeout=" + mChannelTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
-                ", mPassTimeout=" + mPassTimeout +
+                ", mReadTimeout=" + mReadTimeout +
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
     }
@@ -354,8 +356,8 @@ public final class ChannelConfiguration {
 
         return InvocationConfiguration.builder()
                                       .withRunner(getAsyncRunnerOr(null))
-                                      .withExecutionTimeout(getPassTimeoutOr(null))
-                                      .withExecutionTimeoutAction(getPassTimeoutActionOr(null))
+                                      .withTimeout(getReadTimeoutOr(null))
+                                      .withTimeoutAction(getReadTimeoutActionOr(null))
                                       .withLog(getLogOr(null))
                                       .withLogLevel(getLogLevelOr(null))
                                       .set();
@@ -491,18 +493,18 @@ public final class ChannelConfiguration {
                 withAsyncRunner(asyncRunner);
             }
 
-            final TimeDuration passTimeout = configuration.mPassTimeout;
+            final TimeDuration passTimeout = configuration.mReadTimeout;
 
             if (passTimeout != null) {
 
-                withPassTimeout(passTimeout);
+                withReadTimeout(passTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
 
             if (timeoutActionType != null) {
 
-                withPassTimeoutAction(timeoutActionType);
+                withReadTimeoutAction(timeoutActionType);
             }
 
             final OrderType orderType = configuration.mChannelOrderType;
@@ -607,7 +609,7 @@ public final class ChannelConfiguration {
         public Builder<TYPE> withChannelTimeout(final long timeout,
                 @NotNull final TimeUnit timeUnit) {
 
-            return withChannelTimeout(TimeDuration.fromUnit(timeout, timeUnit));
+            return withChannelTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -653,7 +655,7 @@ public final class ChannelConfiguration {
         }
 
         /**
-         * Sets the timeout for the channel instance to produce a readable result.<br/>
+         * Sets the timeout for the channel instance to produce a readable output.<br/>
          * Note that this is just the initial configuration, since the output timeout can be
          * dynamically changed through the dedicated methods.
          *
@@ -663,13 +665,13 @@ public final class ChannelConfiguration {
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @NotNull
-        public Builder<TYPE> withPassTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
+        public Builder<TYPE> withReadTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-            return withPassTimeout(TimeDuration.fromUnit(timeout, timeUnit));
+            return withReadTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
-         * Sets the timeout for the channel instance to produce a readable result. A null value
+         * Sets the timeout for the channel instance to produce a readable output. A null value
          * means that it is up to the specific implementation to choose a default one.<br/>
          * Note that this is just the initial configuration, since the output timeout can be
          * dynamically changed through the dedicated methods.
@@ -678,14 +680,14 @@ public final class ChannelConfiguration {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withPassTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
 
             mPassTimeout = timeout;
             return this;
         }
 
         /**
-         * Sets the action to be taken if the timeout elapses before a result can be read from the
+         * Sets the action to be taken if the timeout elapses before an output can be read from the
          * output channel. A null value means that it is up to the specific implementation to choose
          * a default one.<br/>
          * Note that this is just the initial configuration, since the output timeout action can be
@@ -695,7 +697,7 @@ public final class ChannelConfiguration {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withPassTimeoutAction(@Nullable final TimeoutActionType actionType) {
+        public Builder<TYPE> withReadTimeoutAction(@Nullable final TimeoutActionType actionType) {
 
             mTimeoutActionType = actionType;
             return this;
@@ -712,7 +714,7 @@ public final class ChannelConfiguration {
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
             mAsyncRunner = configuration.mAsyncRunner;
-            mPassTimeout = configuration.mPassTimeout;
+            mPassTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;
             mChannelMaxSize = configuration.mChannelMaxSize;

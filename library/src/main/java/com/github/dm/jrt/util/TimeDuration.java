@@ -92,7 +92,7 @@ public class TimeDuration extends Time {
 
         if (unit == null) {
 
-            throw new NullPointerException("the time unit cannot be null");
+            throw new NullPointerException("the time unit must not be null");
         }
 
         return new TimeDuration(time, unit);
@@ -379,7 +379,7 @@ public class TimeDuration extends Time {
      *
      * @return whether this duration is infinite.
      */
-    public boolean isInfinite() {
+    public boolean isInfinity() {
 
         return equals(INFINITY);
     }
@@ -525,7 +525,7 @@ public class TimeDuration extends Time {
             return;
         }
 
-        if (isInfinite()) {
+        if (isInfinity()) {
 
             target.wait();
             return;
@@ -554,7 +554,7 @@ public class TimeDuration extends Time {
             return false;
         }
 
-        if (isInfinite() || (toDays() > MILLI_DAYS_OVERFLOW)) {
+        if (isInfinity() || (toDays() > MILLI_DAYS_OVERFLOW)) {
 
             target.wait();
             return true;
@@ -591,7 +591,7 @@ public class TimeDuration extends Time {
             return false;
         }
 
-        if (isInfinite() || (toDays() > NANO_DAYS_OVERFLOW)) {
+        if (isInfinity() || (toDays() > NANO_DAYS_OVERFLOW)) {
 
             target.wait();
             return true;
@@ -625,7 +625,7 @@ public class TimeDuration extends Time {
             return check.isTrue();
         }
 
-        if (isInfinite()) {
+        if (isInfinity()) {
 
             while (!check.isTrue()) {
 

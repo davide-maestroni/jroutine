@@ -28,22 +28,15 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the interface type.
  */
-public interface ServiceProxyBuilder<TYPE>
-        extends ProxyObjectBuilder<TYPE>, ServiceConfigurableBuilder<ServiceProxyBuilder<TYPE>> {
+public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>,
+        ServiceConfigurableBuilder<ServiceProxyObjectBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation.Alias Alias},
-     * {@link com.github.dm.jrt.annotation.Input Input},
-     * {@link com.github.dm.jrt.annotation.Inputs Inputs},
-     * {@link com.github.dm.jrt.annotation.Invoke Invoke},
-     * {@link com.github.dm.jrt.annotation.Output Output},
-     * {@link com.github.dm.jrt.annotation.Priority Priority},
-     * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
-     * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
-     * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations.<br/>
+     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} annotations.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
@@ -52,6 +45,23 @@ public interface ServiceProxyBuilder<TYPE>
      * to the specific project dependencies.
      *
      * @return the proxy object.
+     * @see com.github.dm.jrt.annotation.Alias Alias
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.Input Input
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.Inputs Inputs
+     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.Invoke Invoke
+     * @see com.github.dm.jrt.annotation.Output Output
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     * @see com.github.dm.jrt.annotation.Timeout Timeout
+     * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
      */
     @NotNull
     TYPE buildProxy();
@@ -60,11 +70,11 @@ public interface ServiceProxyBuilder<TYPE>
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> invocations();
+    InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> invocations();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceProxyBuilder<TYPE>> proxies();
+    ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> proxies();
 }

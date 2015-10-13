@@ -59,7 +59,7 @@ public class ParcelableByteChannel {
     /**
      * Constructor.
      */
-    protected ParcelableByteChannel() {
+    private ParcelableByteChannel() {
 
         mByteChannel = ByteChannel.byteChannel();
     }
@@ -71,7 +71,7 @@ public class ParcelableByteChannel {
      *                       routine channels.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    protected ParcelableByteChannel(final int dataBufferSize) {
+    private ParcelableByteChannel(final int dataBufferSize) {
 
         mByteChannel = ByteChannel.byteChannel(dataBufferSize);
     }
@@ -85,7 +85,7 @@ public class ParcelableByteChannel {
      *                       created to fulfill the bytes requirement will be discarded.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    protected ParcelableByteChannel(final int dataBufferSize, final int corePoolSize) {
+    private ParcelableByteChannel(final int dataBufferSize, final int corePoolSize) {
 
         mByteChannel = ByteChannel.byteChannel(dataBufferSize, corePoolSize);
     }

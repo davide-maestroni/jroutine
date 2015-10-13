@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.github.dm.jrt.util.TimeDuration.millis;
+import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -55,7 +56,7 @@ public class InvocationFactoryTest {
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final Routine<String, String> routine = JRoutine.on(decoratedFactory).buildRoutine();
-        assertThat(routine.asyncCall("test").eventually().all()).containsExactly("test");
+        assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsExactly("test");
         routine.purge();
     }
 

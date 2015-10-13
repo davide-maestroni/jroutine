@@ -128,7 +128,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
             try {
 
-                for (int i = 0; i < count; i++) {
+                for (int i = 0; i < count; ++i) {
 
                     try {
 
@@ -313,7 +313,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
                 try {
 
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
 
                         if (!inputIterator.isAborting()) {
 

@@ -69,7 +69,7 @@ public class ByteChannel {
      * @param corePoolSize   the maximum number of retained data buffers.
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
-    protected ByteChannel(final int dataBufferSize, final int corePoolSize) {
+    private ByteChannel(final int dataBufferSize, final int corePoolSize) {
 
         if (dataBufferSize < 1) {
 
@@ -571,7 +571,7 @@ public class ByteChannel {
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
 
-                for (int i = mIndex; i < size; i++) {
+                for (int i = mIndex; i < size; ++i) {
 
                     available += streams.get(i).available();
                 }
@@ -612,7 +612,7 @@ public class ByteChannel {
                 streams.get(index).reset();
                 final int size = streams.size();
 
-                for (int i = index + 1; i < size; i++) {
+                for (int i = index + 1; i < size; ++i) {
 
                     streams.get(i).reset();
                 }
@@ -665,6 +665,19 @@ public class ByteChannel {
             mStream = new DefaultBufferInputStream(this);
         }
 
+        /**
+         * Returns the size in number of bytes of this buffer.
+         *
+         * @return the buffer size.
+         */
+        public int getSize() {
+
+            synchronized (mMutex) {
+
+                return mSize;
+            }
+        }
+
         @Override
         public int hashCode() {
 
@@ -672,7 +685,7 @@ public class ByteChannel {
             final byte[] buffer = mBuffer;
             int result = size;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 result = 31 * result + buffer[i];
             }
@@ -704,7 +717,7 @@ public class ByteChannel {
             final byte[] thisBuffer = mBuffer;
             final byte[] thatBuffer = that.mBuffer;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 if (thisBuffer[i] != thatBuffer[i]) {
 
@@ -724,14 +737,6 @@ public class ByteChannel {
             }
 
             mState = updated;
-        }
-
-        private int getSize() {
-
-            synchronized (mMutex) {
-
-                return mSize;
-            }
         }
 
         @NotNull

@@ -147,13 +147,13 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .set();
         assertThat(configuration).isNotEqualTo(
-                builder().withExecutionTimeoutAction(TimeoutActionType.ABORT).set());
+                builder().withTimeoutAction(TimeoutActionType.ABORT).set());
         assertThat(configuration).isNotEqualTo(
-                builder().withExecutionTimeoutAction(TimeoutActionType.EXIT).set());
+                builder().withTimeoutAction(TimeoutActionType.EXIT).set());
         assertThat(configuration.builderFrom()
-                                .withExecutionTimeoutAction(TimeoutActionType.THROW)
+                                .withTimeoutAction(TimeoutActionType.THROW)
                                 .set()).isNotEqualTo(
-                builder().withExecutionTimeoutAction(TimeoutActionType.THROW).set());
+                builder().withTimeoutAction(TimeoutActionType.THROW).set());
     }
 
     @Test
@@ -164,14 +164,12 @@ public class InvocationConfigurationTest {
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .set();
+        assertThat(configuration).isNotEqualTo(builder().withTimeout(TimeDuration.ZERO).set());
         assertThat(configuration).isNotEqualTo(
-                builder().withExecutionTimeout(TimeDuration.ZERO).set());
-        assertThat(configuration).isNotEqualTo(
-                builder().withExecutionTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom()
-                                .withExecutionTimeout(TimeDuration.millis(1))
-                                .set()).isNotEqualTo(
-                builder().withExecutionTimeout(1, TimeUnit.MILLISECONDS).set());
+                builder().withTimeout(1, TimeUnit.MILLISECONDS).set());
+        assertThat(
+                configuration.builderFrom().withTimeout(TimeDuration.millis(1)).set()).isNotEqualTo(
+                builder().withTimeout(1, TimeUnit.MILLISECONDS).set());
     }
 
     @Test

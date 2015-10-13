@@ -25,15 +25,7 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.github.dm.jrt.annotation.Alias Alias},
- * {@link com.github.dm.jrt.annotation.Input Input},
- * {@link com.github.dm.jrt.annotation.Inputs Inputs},
- * {@link com.github.dm.jrt.annotation.Invoke Invoke},
- * {@link com.github.dm.jrt.annotation.Output Output},
- * {@link com.github.dm.jrt.annotation.Priority Priority},
- * {@link com.github.dm.jrt.annotation.ShareGroup ShareGroup},
- * {@link com.github.dm.jrt.annotation.Timeout Timeout} and
- * {@link com.github.dm.jrt.annotation.TimeoutAction TimeoutAction} annotations defined for each
+ * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} annotations defined for each
  * interface method.
  * <p/>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
@@ -108,6 +100,24 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Created by davide-maestroni on 11/03/2014.
+ *
+ * @see com.github.dm.jrt.annotation.Alias Alias
+ * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+ * @see com.github.dm.jrt.annotation.Input Input
+ * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+ * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+ * @see com.github.dm.jrt.annotation.Inputs Inputs
+ * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+ * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+ * @see com.github.dm.jrt.annotation.Invoke Invoke
+ * @see com.github.dm.jrt.annotation.Output Output
+ * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+ * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+ * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
+ * @see com.github.dm.jrt.annotation.Priority Priority
+ * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+ * @see com.github.dm.jrt.annotation.Timeout Timeout
+ * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

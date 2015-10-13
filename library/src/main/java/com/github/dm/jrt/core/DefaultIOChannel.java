@@ -179,13 +179,6 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> eventually() {
-
-        mOutputChannel.eventually();
-        return this;
-    }
-
-    @NotNull
     public IOChannel<DATA, DATA> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
@@ -217,6 +210,13 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     public IOChannel<DATA, DATA> passTo(@NotNull final OutputConsumer<? super DATA> consumer) {
 
         mOutputChannel.passTo(consumer);
+        return this;
+    }
+
+    @NotNull
+    public IOChannel<DATA, DATA> skip(final int count) {
+
+        mOutputChannel.skip(count);
         return this;
     }
 
@@ -266,14 +266,15 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     }
 
     @NotNull
+    public List<DATA> next(final int count) {
+
+        return mOutputChannel.next(count);
+    }
+
+    @NotNull
     public <IN extends InputChannel<? super DATA>> IN passTo(@NotNull final IN channel) {
 
         return mOutputChannel.passTo(channel);
-    }
-
-    public boolean hasDelays() {
-
-        return mInputChannel.hasDelays();
     }
 
     public Iterator<DATA> iterator() {

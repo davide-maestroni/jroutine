@@ -129,8 +129,11 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * <p/>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,
-         * will result in a deadlock.<br/>
-         * By default output results are dispatched in the main looper.
+         * will result in a deadlock. By default output results are dispatched in the main looper.
+         * <br/>
+         * Note also that the invocation input data will be cached, and the results will be produced
+         * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+         * order to prevent starvation or out of memory errors.
          *
          * @param target the invocation target.
          * @return the routine builder instance.
@@ -149,8 +152,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * <p/>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,
-         * will result in a deadlock.<br/>
-         * By default output results are dispatched in the main looper.
+         * will result in a deadlock. By default output results are dispatched in the main looper.
          *
          * @param target the invocation target.
          * @param <IN>   the input data type.

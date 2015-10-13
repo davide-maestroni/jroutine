@@ -18,20 +18,20 @@
 
         private final  com.github.dm.jrt.android.core.ContextInvocationTarget<?> mContextTarget;
 
-        private final String mShareGroup;
+        private final java.util.List<String> mSharedFields;
 
         @SuppressWarnings("unused")
         private Object mInstance;
 
-        private Object mMutex = this;
+        private com.github.dm.jrt.util.Mutex mMutex = com.github.dm.jrt.util.Mutex.NO_MUTEX;
 
         @SuppressWarnings("unused")
         private com.github.dm.jrt.core.InvocationTarget mTarget;
 
-        private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final String shareGroup,
+        private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
-            mShareGroup = shareGroup;
+            mSharedFields = sharedFields;
             mContextTarget = target;
         }
 
@@ -44,14 +44,7 @@
             try {
 
                 final com.github.dm.jrt.core.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
-                final Object mutexTarget = ${mutexTarget};
-                final String shareGroup = mShareGroup;
-
-                if ((mutexTarget != null) && !com.github.dm.jrt.annotation.ShareGroup.NONE.equals(shareGroup)) {
-
-                    mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(mutexTarget, shareGroup);
-                }
-
+                mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, mSharedFields);
                 mTarget = target;
                 mInstance = target.getTarget();
 

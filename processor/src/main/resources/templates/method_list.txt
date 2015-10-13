@@ -18,5 +18,5 @@
     public ${resultType} ${methodName}(${paramVars}) {
 
         final com.github.dm.jrt.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        return $$routine.${invokeMethod}()${inputOptions}${inputParams}.result()${outputOptions}.all();
+        return $$routine.${invokeMethod}()${inputOptions}${inputParams}.result().all();
     }

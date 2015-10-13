@@ -17,7 +17,7 @@ import com.github.dm.jrt.android.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -110,7 +110,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <pre>
  *     <code>
  *
- *         public class LoadResource extends TemplateContextInvocation&lt;URI, MyResource&gt; {
+ *         public class LoadResource extends FunctionContextInvocation&lt;URI, MyResource&gt; {
  *
  *             private Routine&lt;URI, MyResource&gt; mRoutine;
  *
@@ -124,10 +124,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             }
  *
  *             &#64;Override
- *             public void onInput(final URI uri,
+ *             protected void onCall(final List&lt;? extends URI&gt; uris,
  *                     &#64;Nonnull final ResultChannel&lt;MyResource&gt; result) {
  *
- *                 result.pass(mRoutine.asyncCall(uri));
+ *                 result.pass(mRoutine.asyncCall(uris));
  *             }
  *         }
  *     </code>
@@ -195,7 +195,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final ContextInvocationFactory<IN, OUT> factory) {
+                @NotNull final FunctionContextInvocationFactory<IN, OUT> factory) {
 
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         }

@@ -16,13 +16,13 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.ConsumerChain;
 import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.function.Functions.ConsumerObject;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.function.Functions.newConsumer;
+import static com.github.dm.jrt.function.Functions.consumerChain;
 
 /**
  * Utility class used to build output consumer based on consumer functions.
@@ -33,11 +33,11 @@ import static com.github.dm.jrt.function.Functions.newConsumer;
  */
 public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
 
-    private final ConsumerObject<Void> mOnComplete;
+    private final ConsumerChain<Void> mOnComplete;
 
-    private final ConsumerObject<RoutineException> mOnError;
+    private final ConsumerChain<RoutineException> mOnError;
 
-    private final ConsumerObject<OUT> mOnOutput;
+    private final ConsumerChain<OUT> mOnOutput;
 
     /**
      * Constructor.
@@ -46,9 +46,9 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @param onError    the error consumer.
      * @param onComplete the complete consumer.
      */
-    private OutputConsumerBuilder(@NotNull final ConsumerObject<OUT> onOutput,
-            @NotNull final ConsumerObject<RoutineException> onError,
-            @NotNull final ConsumerObject<Void> onComplete) {
+    private OutputConsumerBuilder(@NotNull final ConsumerChain<OUT> onOutput,
+            @NotNull final ConsumerChain<RoutineException> onError,
+            @NotNull final ConsumerChain<Void> onComplete) {
 
         mOnOutput = onOutput;
         mOnError = onError;
@@ -67,7 +67,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
 
         return new OutputConsumerBuilder<Object>(Functions.sink(),
                                                  Functions.<RoutineException>sink(),
-                                                 newConsumer(consumer));
+                                                 consumerChain(consumer));
     }
 
     /**
@@ -81,7 +81,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     public static OutputConsumerBuilder<Object> onError(
             @NotNull final Consumer<RoutineException> consumer) {
 
-        return new OutputConsumerBuilder<Object>(Functions.sink(), newConsumer(consumer),
+        return new OutputConsumerBuilder<Object>(Functions.sink(), consumerChain(consumer),
                                                  Functions.<Void>sink());
     }
 
@@ -96,7 +96,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     @NotNull
     public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
 
-        return new OutputConsumerBuilder<OUT>(newConsumer(consumer),
+        return new OutputConsumerBuilder<OUT>(consumerChain(consumer),
                                               Functions.<RoutineException>sink(),
                                               Functions.<Void>sink());
     }

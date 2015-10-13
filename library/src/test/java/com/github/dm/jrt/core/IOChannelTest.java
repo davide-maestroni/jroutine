@@ -20,6 +20,7 @@ import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.LogLevel;
@@ -271,7 +272,7 @@ public class IOChannelTest {
         ioChannel.next();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.after(millis(100)).pass("test").isEmpty()).isTrue();
-        assertThat(ioChannel.close().eventually().checkComplete()).isTrue();
+        assertThat(ioChannel.close().afterMax(seconds(10)).checkComplete()).isTrue();
         assertThat(ioChannel.isEmpty()).isFalse();
     }
 
@@ -329,6 +330,57 @@ public class IOChannelTest {
         }
 
         assertThat(ioChannel.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testNext() {
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
+                           .afterMax(seconds(1))
+                           .next(2)).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1")
+                           .close()
+                           .eventuallyExit()
+                           .afterMax(seconds(1))
+                           .next(2)).containsExactly("test1");
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyAbort()
+                    .afterMax(seconds(1))
+                    .next(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyThrow()
+                    .afterMax(seconds(1))
+                    .next(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
     }
 
     @Test
@@ -487,8 +539,8 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel1 = JRoutine.io()
                                                            .channels()
-                                                           .withPassTimeout(millis(10))
-                                                           .withPassTimeoutAction(
+                                                           .withReadTimeout(millis(10))
+                                                           .withReadTimeoutAction(
                                                                    TimeoutActionType.EXIT)
                                                            .set()
                                                            .buildChannel();
@@ -501,8 +553,8 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel2 = JRoutine.io()
                                                            .channels()
-                                                           .withPassTimeout(millis(10))
-                                                           .withPassTimeoutAction(
+                                                           .withReadTimeout(millis(10))
+                                                           .withReadTimeoutAction(
                                                                    TimeoutActionType.ABORT)
                                                            .set()
                                                            .buildChannel();
@@ -523,8 +575,8 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel3 = JRoutine.io()
                                                            .channels()
-                                                           .withPassTimeout(millis(10))
-                                                           .withPassTimeoutAction(
+                                                           .withReadTimeout(millis(10))
+                                                           .withReadTimeoutAction(
                                                                    TimeoutActionType.THROW)
                                                            .set()
                                                            .buildChannel();
@@ -545,19 +597,17 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isTrue();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
+        channel.pass(ioChannel);
+        assertThat(channel.isOpen()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isTrue();
-        seconds(1).sleepAtLeast();
+        ioChannel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -565,16 +615,15 @@ public class IOChannelTest {
 
         final IOChannel<Object, Object> channel = JRoutine.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isFalse();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.hasDelays()).isTrue();
+        final IOChannel<Object, Object> ioChannel = JRoutine.io().buildChannel();
+        channel.pass(ioChannel);
+        assertThat(channel.isOpen()).isTrue();
         channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasDelays()).isFalse();
     }
 
     @Test
@@ -588,6 +637,59 @@ public class IOChannelTest {
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
+    }
+
+    @Test
+    public void testSkip() {
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
+                           .afterMax(seconds(1))
+                           .skip(2)
+                           .all()).containsExactly("test3", "test4");
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1")
+                           .close()
+                           .eventuallyExit()
+                           .afterMax(seconds(1))
+                           .skip(2)
+                           .all()).isEmpty();
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyAbort()
+                    .afterMax(seconds(1))
+                    .skip(2);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyThrow()
+                    .afterMax(seconds(1))
+                    .skip(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
     }
 
     @SuppressWarnings("unused")

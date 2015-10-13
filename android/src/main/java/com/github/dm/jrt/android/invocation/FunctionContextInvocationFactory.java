@@ -11,37 +11,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.android.v4.core;
-
-import com.github.dm.jrt.android.invocation.MissingInvocationException;
-import com.github.dm.jrt.android.invocation.ProcedureContextInvocation;
-import com.github.dm.jrt.channel.ResultChannel;
+package com.github.dm.jrt.android.invocation;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Invocation used to know whether a loader with a specific ID is present or not.
+ * Abstract class defining a factory of function context invocations.
  * <p/>
- * Created by davide-maestroni on 01/14/2015.
+ * Created by davide-maestroni on 10/06/2015.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-final class MissingLoaderInvocation<OUT> extends ProcedureContextInvocation<OUT> {
-
-    private final int mId;
+public abstract class FunctionContextInvocationFactory<IN, OUT>
+        extends ContextInvocationFactory<IN, OUT> {
 
     /**
      * Constructor.
      *
-     * @param id the loader ID.
+     * @param args the constructor arguments.
      */
-    MissingLoaderInvocation(final int id) {
+    protected FunctionContextInvocationFactory(@Nullable final Object[] args) {
 
-        mId = id;
+        super(args);
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-        result.abort(new MissingInvocationException(mId));
-    }
+    @NotNull
+    @Override
+    public abstract FunctionContextInvocation<IN, OUT> newInvocation();
 }

@@ -63,25 +63,17 @@ class DefaultProxyRoutineBuilder
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
-        return buildProxy(ClassToken.tokenOf(itf));
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        final Class<TYPE> itfClass = itf.getRawClass();
-
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itfClass.getName());
+                    "the specified class is not an interface: " + itf.getName());
         }
 
-        if (!itfClass.isAnnotationPresent(Proxy.class)) {
+        if (!itf.isAnnotationPresent(Proxy.class)) {
 
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + Proxy.class.getName() + ": "
-                            + itfClass.getName());
+                            + itf.getName());
         }
 
         final TargetProxyObjectBuilder<TYPE> builder =
@@ -93,6 +85,12 @@ class DefaultProxyRoutineBuilder
                       .with(mProxyConfiguration)
                       .set()
                       .buildProxy();
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -143,7 +141,7 @@ class DefaultProxyRoutineBuilder
      */
     private static class TargetProxyObjectBuilder<TYPE> extends AbstractProxyObjectBuilder<TYPE> {
 
-        private final ClassToken<TYPE> mInterfaceToken;
+        private final Class<? super TYPE> mInterfaceClass;
 
         private final InvocationTarget<?> mTarget;
 
@@ -151,20 +149,20 @@ class DefaultProxyRoutineBuilder
          * Constructor.
          *
          * @param target         the invocation target.
-         * @param interfaceToken the proxy interface token.
+         * @param interfaceClass the proxy interface class.
          */
         private TargetProxyObjectBuilder(@NotNull final InvocationTarget<?> target,
-                @NotNull final ClassToken<TYPE> interfaceToken) {
+                @NotNull final Class<? super TYPE> interfaceClass) {
 
             mTarget = target;
-            mInterfaceToken = interfaceToken;
+            mInterfaceClass = interfaceClass;
         }
 
         @NotNull
         @Override
-        protected ClassToken<TYPE> getInterfaceToken() {
+        protected Class<? super TYPE> getInterfaceClass() {
 
-            return mInterfaceToken;
+            return mInterfaceClass;
         }
 
         @Nullable
@@ -176,13 +174,14 @@ class DefaultProxyRoutineBuilder
 
         @NotNull
         @Override
+        @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration) {
 
             try {
 
                 final Object target = mTarget;
-                final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
+                final Class<? super TYPE> interfaceClass = mInterfaceClass;
                 final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
                 String packageName = annotation.classPackage();
 
@@ -215,8 +214,8 @@ class DefaultProxyRoutineBuilder
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(fullClassName), target,
                                         invocationConfiguration, proxyConfiguration);
-                return interfaceClass.cast(constructor.newInstance(target, invocationConfiguration,
-                                                                   proxyConfiguration));
+                return (TYPE) constructor.newInstance(target, invocationConfiguration,
+                                                      proxyConfiguration);
 
             } catch (final Throwable t) {
 

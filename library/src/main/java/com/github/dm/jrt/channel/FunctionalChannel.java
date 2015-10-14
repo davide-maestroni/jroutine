@@ -384,7 +384,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> compose(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMap(
             @NotNull IOChannel<BEFORE, ? extends IN> channel);
 
     /**
@@ -399,7 +399,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeAsync(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapAsync(
             @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
 
     /**
@@ -414,7 +414,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeAsync(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapAsync(
             @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
 
     /**
@@ -429,7 +429,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeAsync(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapAsync(
             @NotNull Function<BEFORE, ? extends IN> function);
 
     /**
@@ -443,7 +443,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeParallel(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapParallel(
             @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
 
     /**
@@ -457,7 +457,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeParallel(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapParallel(
             @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
 
     /**
@@ -471,7 +471,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeParallel(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapParallel(
             @NotNull Function<BEFORE, ? extends IN> function);
 
     /**
@@ -486,7 +486,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeSync(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapSync(
             @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
 
     /**
@@ -501,7 +501,7 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeSync(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapSync(
             @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
 
     /**
@@ -516,8 +516,70 @@ public interface FunctionalChannel<IN, OUT>
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> FunctionalChannel<BEFORE, OUT> composeSync(
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapSync(
             @NotNull Function<BEFORE, ? extends IN> function);
+
+    /**
+     * Creates a new functional channel which is the concatenation of the specified reducing
+     * consumer and this channel.
+     * <p/>
+     * Note that the routine created on the specified consumer will be invoked in an asynchronous
+     * mode.
+     *
+     * @param consumer the consumer after which to concatenate this channel.
+     * @param <BEFORE> the concatenation output type.
+     * @return the concatenated channel.
+     */
+    @NotNull
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceAsync(
+            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer);
+
+    /**
+     * Creates a new functional channel which is the concatenation of the specified reducing
+     * function and this channel.
+     * <p/>
+     * Note that the routine created on the specified function will be invoked in an asynchronous
+     * mode.
+     *
+     * @param function the function after which to concatenate this channel.
+     * @param <BEFORE> the concatenation output type.
+     * @return the concatenated channel.
+     */
+    @NotNull
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceAsync(
+            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
+
+    /**
+     * Creates a new functional channel which is the concatenation of the specified reducing
+     * consumer and this channel.
+     * <p/>
+     * Note that the routine created on the specified consumer will be invoked in a synchronous
+     * mode.
+     *
+     * @param consumer the consumer after which to concatenate this channel.
+     * @param <BEFORE> the concatenation output type.
+     * @return the concatenated channel.
+     */
+    @NotNull
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceSync(
+            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer);
+
+    /**
+     * Creates a new functional channel which is the concatenation of the specified reducing
+     * function and this channel.
+     * <p/>
+     * Note that the routine created on the specified function will be invoked in a synchronous
+     * mode.
+     *
+     * @param function the function after which to concatenate this channel.
+     * @param <BEFORE> the concatenation output type.
+     * @return the concatenated channel.
+     */
+    @NotNull
+    <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceSync(
+            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
 
     /**
      * {@inheritDoc}

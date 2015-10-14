@@ -352,76 +352,110 @@ class DefaultFunctionalChannel<IN, OUT>
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> compose(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMap(
             @NotNull final IOChannel<BEFORE, ? extends IN> channel) {
 
         return new DefaultFunctionalChannel<BEFORE, OUT>(mConfiguration, mChannel.combine(channel));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeAsync(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapAsync(
             @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
 
-        return compose(
+        return composeMap(
                 asyncStream(JRoutine.on(invocation).invocations().with(mConfiguration).set()));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeAsync(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapAsync(
             @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
 
-        return composeAsync(consumerFilter(consumer));
+        return composeMapAsync(consumerFilter(consumer));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeAsync(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapAsync(
             @NotNull final Function<BEFORE, ? extends IN> function) {
 
-        return composeAsync(functionFilter(function));
+        return composeMapAsync(functionFilter(function));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeParallel(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapParallel(
             @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
 
-        return compose(
+        return composeMap(
                 parallelStream(JRoutine.on(invocation).invocations().with(mConfiguration).set()));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeParallel(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapParallel(
             @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
 
-        return composeParallel(consumerFilter(consumer));
+        return composeMapParallel(consumerFilter(consumer));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeParallel(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapParallel(
             @NotNull final Function<BEFORE, ? extends IN> function) {
 
-        return composeParallel(functionFilter(function));
+        return composeMapParallel(functionFilter(function));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeSync(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapSync(
             @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
 
-        return compose(
+        return composeMap(
                 syncStream(JRoutine.on(invocation).invocations().with(mConfiguration).set()));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeSync(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapSync(
             @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
 
-        return composeSync(consumerFilter(consumer));
+        return composeMapSync(consumerFilter(consumer));
     }
 
     @NotNull
-    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeSync(
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeMapSync(
             @NotNull final Function<BEFORE, ? extends IN> function) {
 
-        return composeSync(functionFilter(function));
+        return composeMapSync(functionFilter(function));
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceAsync(
+            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer) {
+
+        return composeMap(asyncStream(
+                JRoutine.on(consumerFactory(consumer)).invocations().with(mConfiguration).set()));
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceAsync(
+            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
+
+        return composeMap(asyncStream(
+                JRoutine.on(functionFactory(function)).invocations().with(mConfiguration).set()));
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceSync(
+            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer) {
+
+        return composeMap(syncStream(
+                JRoutine.on(consumerFactory(consumer)).invocations().with(mConfiguration).set()));
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalChannel<BEFORE, OUT> composeReduceSync(
+            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
+
+        return composeMap(syncStream(
+                JRoutine.on(functionFactory(function)).invocations().with(mConfiguration).set()));
     }
 
     @NotNull

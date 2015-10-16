@@ -213,6 +213,171 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     }
 
     @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
+
+        return composeMapAsync(JRoutine.on(Functions.consumerFilter(consumer))
+                                       .invocations()
+                                       .with(mConfiguration)
+                                       .set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
+
+        return composeMapAsync(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull final Function<BEFORE, ? extends IN> function) {
+
+        return composeMapAsync(JRoutine.on(Functions.functionFilter(function))
+                                       .invocations()
+                                       .with(mConfiguration)
+                                       .set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull final Routine<BEFORE, ? extends IN> routine) {
+
+        return compose(routine, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
+
+        return composeMapParallel(JRoutine.on(Functions.consumerFilter(consumer))
+                                          .invocations()
+                                          .with(mConfiguration)
+                                          .set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
+
+        return composeMapParallel(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull final Function<BEFORE, ? extends IN> function) {
+
+        return composeMapParallel(JRoutine.on(Functions.functionFilter(function))
+                                          .invocations()
+                                          .with(mConfiguration)
+                                          .set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull final Routine<BEFORE, ? extends IN> routine) {
+
+        return compose(routine, DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
+
+        return composeMapSync(JRoutine.on(Functions.consumerFilter(consumer))
+                                      .invocations()
+                                      .with(mConfiguration)
+                                      .set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
+
+        return composeMapSync(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull final Function<BEFORE, ? extends IN> function) {
+
+        return composeMapSync(JRoutine.on(Functions.functionFilter(function))
+                                      .invocations()
+                                      .with(mConfiguration)
+                                      .set());
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull final Routine<BEFORE, ? extends IN> routine) {
+
+        return compose(routine, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
+            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer) {
+
+        return compose(JRoutine.on(Functions.consumerFactory(consumer))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
+            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
+
+        return compose(JRoutine.on(Functions.functionFactory(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
+            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer) {
+
+        return compose(JRoutine.on(Functions.consumerFactory(consumer))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
+            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
+
+        return compose(JRoutine.on(Functions.functionFactory(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
+            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer) {
+
+        return compose(JRoutine.on(Functions.consumerFactory(consumer))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
+            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
+
+        return compose(JRoutine.on(Functions.functionFactory(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.SYNC);
+    }
+
+    @NotNull
     public Builder<? extends FunctionalRoutine<IN, OUT>> invocations() {
 
         return new Builder<FunctionalRoutine<IN, OUT>>(this, mConfiguration);

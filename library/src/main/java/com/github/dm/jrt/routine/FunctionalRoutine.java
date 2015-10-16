@@ -103,4 +103,79 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull Function<BEFORE, ? extends IN> function);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
+            @NotNull Routine<BEFORE, ? extends IN> routine);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull Function<BEFORE, ? extends IN> function);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
+            @NotNull Routine<BEFORE, ? extends IN> routine);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull Function<BEFORE, ? extends IN> function);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
+            @NotNull Routine<BEFORE, ? extends IN> routine);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
+            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
+            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
+            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
+            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
+            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
+                    consumer);
+
+    @NotNull
+    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
+            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
 }

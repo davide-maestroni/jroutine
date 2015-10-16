@@ -421,6 +421,8 @@ public class Functions {
      * @return the wrapped predicate.
      */
     @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
     public static <IN> PredicateChain<IN> predicateChain(@NotNull final Predicate<IN> predicate) {
 
         if (predicate.getClass() == PredicateChain.class) {

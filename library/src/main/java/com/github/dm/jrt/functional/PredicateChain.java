@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Class wrapping a predicate instance.
  * <p/>
@@ -105,7 +107,8 @@ public class PredicateChain<IN> implements Predicate<IN> {
      * @return the composed predicate.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
     public PredicateChain<IN> and(@NotNull final Predicate<? super IN> other) {
 
         final Class<? extends Predicate> otherClass = other.getClass();
@@ -120,7 +123,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
         if (otherClass == PredicateChain.class) {
 
             newPredicates.add(OPEN_PREDICATE);
-            newPredicates.addAll(((PredicateChain<? super IN>) other).mPredicates);
+            newPredicates.addAll(((PredicateChain<?>) other).mPredicates);
             newPredicates.add(CLOSE_PREDICATE);
 
         } else {
@@ -266,7 +269,8 @@ public class PredicateChain<IN> implements Predicate<IN> {
      * @return the composed predicate.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
     public PredicateChain<IN> or(@NotNull final Predicate<? super IN> other) {
 
         final Class<? extends Predicate> otherClass = other.getClass();
@@ -281,7 +285,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
         if (otherClass == PredicateChain.class) {
 
             newPredicates.add(OPEN_PREDICATE);
-            newPredicates.addAll(((PredicateChain<? super IN>) other).mPredicates);
+            newPredicates.addAll(((PredicateChain<?>) other).mPredicates);
             newPredicates.add(CLOSE_PREDICATE);
 
         } else {

@@ -43,18 +43,12 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
         if (consumers.isEmpty()) {
 
-            throw new IllegalArgumentException("the list of consumer must not be empty");
+            throw new IllegalArgumentException("the list of consumers must not be empty");
         }
 
         mConsumers = consumers;
     }
 
-    /**
-     * Performs this operation on the given arguments.
-     *
-     * @param in1 the first input argument.
-     * @param in2 the second input argument.
-     */
     @SuppressWarnings("unchecked")
     public void accept(final IN1 in1, final IN2 in2) {
 

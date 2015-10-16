@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class PredicateChain<IN> implements Predicate<IN> {
 
-    private static final Predicate<?> OPEN_PREDICATE = new Predicate<Object>() {
+    private static final Predicate<?> AND_PREDICATE = new Predicate<Object>() {
 
         public boolean test(final Object o) {
 
@@ -45,7 +45,15 @@ public class PredicateChain<IN> implements Predicate<IN> {
         }
     };
 
-    private static final Predicate<?> AND_PREDICATE = new Predicate<Object>() {
+    private static final Predicate<?> NEGATE_PREDICATE = new Predicate<Object>() {
+
+        public boolean test(final Object o) {
+
+            return false;
+        }
+    };
+
+    private static final Predicate<?> OPEN_PREDICATE = new Predicate<Object>() {
 
         public boolean test(final Object o) {
 
@@ -54,14 +62,6 @@ public class PredicateChain<IN> implements Predicate<IN> {
     };
 
     private static final Predicate<?> OR_PREDICATE = new Predicate<Object>() {
-
-        public boolean test(final Object o) {
-
-            return false;
-        }
-    };
-
-    private static final Predicate<?> NEGATE_PREDICATE = new Predicate<Object>() {
 
         public boolean test(final Object o) {
 
@@ -95,6 +95,40 @@ public class PredicateChain<IN> implements Predicate<IN> {
 
         mPredicate = predicate;
         mPredicates = predicates;
+    }
+
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical AND of this predicate
+     * and another.
+     *
+     * @param other a predicate that will be logically-ANDed with this predicate.
+     * @return the composed predicate.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public PredicateChain<IN> and(@NotNull final Predicate<? super IN> other) {
+
+        final Class<? extends Predicate> otherClass = other.getClass();
+        final List<Predicate<?>> predicates = mPredicates;
+        final ArrayList<Predicate<?>> newPredicates =
+                new ArrayList<Predicate<?>>(predicates.size() + 4);
+        newPredicates.add(OPEN_PREDICATE);
+        newPredicates.addAll(predicates);
+        newPredicates.add(CLOSE_PREDICATE);
+        newPredicates.add(AND_PREDICATE);
+
+        if (otherClass == PredicateChain.class) {
+
+            newPredicates.add(OPEN_PREDICATE);
+            newPredicates.addAll(((PredicateChain<? super IN>) other).mPredicates);
+            newPredicates.add(CLOSE_PREDICATE);
+
+        } else {
+
+            newPredicates.add(other);
+        }
+
+        return new PredicateChain<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
     }
 
     /**
@@ -163,37 +197,23 @@ public class PredicateChain<IN> implements Predicate<IN> {
     }
 
     /**
-     * Returns a composed predicate that represents a short-circuiting logical AND of this predicate
-     * and another.
+     * Returns a predicate that represents the logical negation of this predicate.
      *
-     * @param other a predicate that will be logically-ANDed with this predicate.
-     * @return the composed predicate.
+     * @return the negated predicate.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public PredicateChain<IN> and(@NotNull final Predicate<? super IN> other) {
+    public PredicateChain<IN> negate() {
 
-        final Class<? extends Predicate> otherClass = other.getClass();
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
-                new ArrayList<Predicate<?>>(predicates.size() + 4);
+                new ArrayList<Predicate<?>>(predicates.size() + 3);
+        newPredicates.add(NEGATE_PREDICATE);
         newPredicates.add(OPEN_PREDICATE);
         newPredicates.addAll(predicates);
         newPredicates.add(CLOSE_PREDICATE);
-        newPredicates.add(AND_PREDICATE);
 
-        if (otherClass == PredicateChain.class) {
-
-            newPredicates.add(OPEN_PREDICATE);
-            newPredicates.addAll(((PredicateChain<? super IN>) other).mPredicates);
-            newPredicates.add(CLOSE_PREDICATE);
-
-        } else {
-
-            newPredicates.add(other);
-        }
-
-        return new PredicateChain<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
+        return new PredicateChain<IN>(new NegatePredicate<IN>(mPredicate), newPredicates);
     }
 
     /**
@@ -231,28 +251,33 @@ public class PredicateChain<IN> implements Predicate<IN> {
     }
 
     /**
-     * Returns a predicate that represents the logical negation of this predicate.
+     * Predicate implementation logically-ANDing the wrapped ones.
      *
-     * @return the negated predicate.
+     * @param <IN> the input data type.
      */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public PredicateChain<IN> negate() {
+    private static final class AndPredicate<IN> implements Predicate<IN> {
 
-        final List<Predicate<?>> predicates = mPredicates;
-        final ArrayList<Predicate<?>> newPredicates =
-                new ArrayList<Predicate<?>>(predicates.size() + 3);
-        newPredicates.add(NEGATE_PREDICATE);
-        newPredicates.add(OPEN_PREDICATE);
-        newPredicates.addAll(predicates);
-        newPredicates.add(CLOSE_PREDICATE);
+        private final Predicate<? super IN> mOther;
 
-        return new PredicateChain<IN>(new NegatePredicate<IN>(mPredicate), newPredicates);
-    }
+        private final Predicate<? super IN> mPredicate;
 
-    public boolean test(final IN in) {
+        /**
+         * Constructor.
+         *
+         * @param predicate the wrapped predicate.
+         * @param other     the other predicate to be logically-ANDed.
+         */
+        private AndPredicate(@NotNull final Predicate<? super IN> predicate,
+                @NotNull final Predicate<? super IN> other) {
 
-        return mPredicate.test(in);
+            mPredicate = predicate;
+            mOther = other;
+        }
+
+        public boolean test(final IN in) {
+
+            return mPredicate.test(in) && mOther.test(in);
+        }
     }
 
     /**
@@ -310,33 +335,8 @@ public class PredicateChain<IN> implements Predicate<IN> {
         }
     }
 
-    /**
-     * Predicate implementation logically-ANDing the wrapped ones.
-     *
-     * @param <IN> the input data type.
-     */
-    private static final class AndPredicate<IN> implements Predicate<IN> {
+    public boolean test(final IN in) {
 
-        private final Predicate<? super IN> mOther;
-
-        private final Predicate<? super IN> mPredicate;
-
-        /**
-         * Constructor.
-         *
-         * @param predicate the wrapped predicate.
-         * @param other     the other predicate to be logically-ANDed.
-         */
-        private AndPredicate(@NotNull final Predicate<? super IN> predicate,
-                @NotNull final Predicate<? super IN> other) {
-
-            mPredicate = predicate;
-            mOther = other;
-        }
-
-        public boolean test(final IN in) {
-
-            return mPredicate.test(in) && mOther.test(in);
-        }
+        return mPredicate.test(in);
     }
 }

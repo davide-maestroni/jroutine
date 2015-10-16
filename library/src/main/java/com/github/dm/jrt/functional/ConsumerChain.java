@@ -42,17 +42,12 @@ public class ConsumerChain<IN> implements Consumer<IN> {
 
         if (consumers.isEmpty()) {
 
-            throw new IllegalArgumentException("the list of consumer must not be empty");
+            throw new IllegalArgumentException("the list of consumers must not be empty");
         }
 
         mConsumers = consumers;
     }
 
-    /**
-     * Performs this operation on the given argument.
-     *
-     * @param in the input argument.
-     */
     @SuppressWarnings("unchecked")
     public void accept(final IN in) {
 

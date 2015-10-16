@@ -41,6 +41,11 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
      */
     FunctionChain(@NotNull final List<Function<?, ?>> functions) {
 
+        if (functions.isEmpty()) {
+
+            throw new IllegalArgumentException("the list of functions must not be empty");
+        }
+
         mFunctions = functions;
     }
 
@@ -76,12 +81,6 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
         return new FunctionChain<IN, AFTER>(newFunctions);
     }
 
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param in the input argument.
-     * @return the function result.
-     */
     @SuppressWarnings("unchecked")
     public OUT apply(final IN in) {
 

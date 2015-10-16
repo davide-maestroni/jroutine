@@ -14,15 +14,15 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.functional.Consumer;
+import com.github.dm.jrt.functional.Functions;
 
 import org.junit.Test;
 
 import static com.github.dm.jrt.core.OutputConsumerBuilder.onComplete;
 import static com.github.dm.jrt.core.OutputConsumerBuilder.onError;
 import static com.github.dm.jrt.core.OutputConsumerBuilder.onOutput;
-import static com.github.dm.jrt.function.Functions.consumerChain;
+import static com.github.dm.jrt.functional.Functions.consumerChain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

@@ -11,9 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.github.dm.jrt.functional;
+
 /**
- * Functional interfaces and utility classes.
+ * Interface representing an operation that accepts an input argument and returns no result.
  * <p/>
- * Created by davide-maestroni on 09/22/2015.
+ * Created by davide-maestroni on 09/21/2015.
  */
-package com.github.dm.jrt.function;
+public interface Consumer<IN> {
+
+    /**
+     * Performs this operation on the given argument.
+     *
+     * @param in the input argument.
+     */
+    void accept(IN in);
+}

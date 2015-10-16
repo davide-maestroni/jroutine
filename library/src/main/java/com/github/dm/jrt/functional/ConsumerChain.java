@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.functional;
 
 import com.github.dm.jrt.util.Reflection;
 
@@ -23,23 +23,22 @@ import java.util.List;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Class wrapping a bi-consumer instance.
+ * Class wrapping a consumer instance.
  * <p/>
  * Created by davide-maestroni on 10/11/2015.
  *
- * @param <IN1> the first input data type.
- * @param <IN2> the second input data type.
+ * @param <IN> the input data type.
  */
-public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
+public class ConsumerChain<IN> implements Consumer<IN> {
 
-    private final List<BiConsumer<?, ?>> mConsumers;
+    private final List<Consumer<?>> mConsumers;
 
     /**
      * Constructor.
      *
      * @param consumers the list of wrapped consumers.
      */
-    BiConsumerChain(@NotNull final List<BiConsumer<?, ?>> consumers) {
+    ConsumerChain(@NotNull final List<Consumer<?>> consumers) {
 
         if (consumers.isEmpty()) {
 
@@ -50,59 +49,57 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
     }
 
     /**
-     * Performs this operation on the given arguments.
+     * Performs this operation on the given argument.
      *
-     * @param in1 the first input argument.
-     * @param in2 the second input argument.
+     * @param in the input argument.
      */
     @SuppressWarnings("unchecked")
-    public void accept(final IN1 in1, final IN2 in2) {
+    public void accept(final IN in) {
 
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
+        for (final Consumer<?> consumer : mConsumers) {
 
-            ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
+            ((Consumer<Object>) consumer).accept(in);
         }
     }
 
     /**
-     * Returns a composed bi-consumer chain that performs, in sequence, this operation followed
-     * by the after operation.
+     * Returns a composed consumer chain that performs, in sequence, this operation followed by
+     * the after operation.
      *
      * @param after the operation to perform after this operation.
-     * @return the composed bi-consumer.
+     * @return the composed consumer.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public BiConsumerChain<IN1, IN2> andThen(
-            @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
+    public ConsumerChain<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
-        final Class<? extends BiConsumer> consumerClass = after.getClass();
-        final List<BiConsumer<?, ?>> consumers = mConsumers;
-        final ArrayList<BiConsumer<?, ?>> newConsumers =
-                new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
+        final Class<? extends Consumer> consumerClass = after.getClass();
+        final List<Consumer<?>> consumers = mConsumers;
+        final ArrayList<Consumer<?>> newConsumers =
+                new ArrayList<Consumer<?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
 
-        if (consumerClass == BiConsumerChain.class) {
+        if (consumerClass == ConsumerChain.class) {
 
-            newConsumers.addAll(((BiConsumerChain<?, ?>) after).mConsumers);
+            newConsumers.addAll(((ConsumerChain<?>) after).mConsumers);
 
         } else {
 
             newConsumers.add(after);
         }
 
-        return new BiConsumerChain<IN1, IN2>(newConsumers);
+        return new ConsumerChain<IN>(newConsumers);
     }
 
     /**
-     * Checks if this bi-consumer chain has a static context.
+     * Checks if this consumer chain has a static context.
      *
      * @return whether this instance has a static context.
      */
     public boolean hasStaticContext() {
 
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
+        for (final Consumer<?> consumer : mConsumers) {
 
             if (!Reflection.hasStaticContext(consumer.getClass())) {
 
@@ -118,7 +115,7 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
         int result = 0;
 
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
+        for (final Consumer<?> consumer : mConsumers) {
 
             result = 31 * result + consumer.getClass().hashCode();
         }
@@ -139,9 +136,9 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
             return false;
         }
 
-        final BiConsumerChain<?, ?> that = (BiConsumerChain<?, ?>) o;
-        final List<BiConsumer<?, ?>> thisConsumers = mConsumers;
-        final List<BiConsumer<?, ?>> thatConsumers = that.mConsumers;
+        final ConsumerChain<?> that = (ConsumerChain<?>) o;
+        final List<Consumer<?>> thisConsumers = mConsumers;
+        final List<Consumer<?>> thatConsumers = that.mConsumers;
         final int size = thisConsumers.size();
 
         if (size != thatConsumers.size()) {

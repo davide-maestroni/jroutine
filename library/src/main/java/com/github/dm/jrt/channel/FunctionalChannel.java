@@ -15,8 +15,8 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.functional.BiConsumer;
+import com.github.dm.jrt.functional.Function;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.util.TimeDuration;
 

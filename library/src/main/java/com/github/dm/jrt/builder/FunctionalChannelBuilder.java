@@ -16,9 +16,9 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.channel.FunctionalChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.functional.BiConsumer;
+import com.github.dm.jrt.functional.Function;
+import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 

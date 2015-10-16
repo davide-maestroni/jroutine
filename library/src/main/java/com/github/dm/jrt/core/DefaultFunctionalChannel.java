@@ -23,8 +23,8 @@ import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.StreamingChannel;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.functional.BiConsumer;
+import com.github.dm.jrt.functional.Function;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.util.TimeDuration;
 
@@ -39,10 +39,10 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.Channels.asyncStream;
 import static com.github.dm.jrt.core.Channels.parallelStream;
 import static com.github.dm.jrt.core.Channels.syncStream;
-import static com.github.dm.jrt.function.Functions.consumerFactory;
-import static com.github.dm.jrt.function.Functions.consumerFilter;
-import static com.github.dm.jrt.function.Functions.functionFactory;
-import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.functional.Functions.consumerFactory;
+import static com.github.dm.jrt.functional.Functions.consumerFilter;
+import static com.github.dm.jrt.functional.Functions.functionFactory;
+import static com.github.dm.jrt.functional.Functions.functionFilter;
 
 /**
  * Default implementation of a functional channel.

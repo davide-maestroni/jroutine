@@ -15,14 +15,14 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.ConsumerChain;
-import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.functional.Consumer;
+import com.github.dm.jrt.functional.ConsumerChain;
+import com.github.dm.jrt.functional.Functions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.function.Functions.consumerChain;
+import static com.github.dm.jrt.functional.Functions.consumerChain;
 
 /**
  * Utility class used to build output consumer based on consumer functions.

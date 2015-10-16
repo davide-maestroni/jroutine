@@ -19,9 +19,9 @@ import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.FunctionalChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.functional.BiConsumer;
+import com.github.dm.jrt.functional.Function;
+import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 
@@ -30,9 +30,9 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.Channels.asyncStream;
 import static com.github.dm.jrt.core.Channels.parallelStream;
 import static com.github.dm.jrt.core.Channels.syncStream;
-import static com.github.dm.jrt.function.Functions.consumerFilter;
-import static com.github.dm.jrt.function.Functions.functionFilter;
-import static com.github.dm.jrt.function.Functions.supplierCommand;
+import static com.github.dm.jrt.functional.Functions.consumerFilter;
+import static com.github.dm.jrt.functional.Functions.functionFilter;
+import static com.github.dm.jrt.functional.Functions.supplierCommand;
 
 /**
  * Default implementation of a functional channel builder.

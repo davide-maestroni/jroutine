@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.functional;
 
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.JRoutine;
@@ -27,21 +27,21 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.github.dm.jrt.function.Functions.biConsumerChain;
-import static com.github.dm.jrt.function.Functions.biSink;
-import static com.github.dm.jrt.function.Functions.constant;
-import static com.github.dm.jrt.function.Functions.consumerChain;
-import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerFactory;
-import static com.github.dm.jrt.function.Functions.consumerFilter;
-import static com.github.dm.jrt.function.Functions.functionChain;
-import static com.github.dm.jrt.function.Functions.functionFactory;
-import static com.github.dm.jrt.function.Functions.functionFilter;
-import static com.github.dm.jrt.function.Functions.identity;
-import static com.github.dm.jrt.function.Functions.sink;
-import static com.github.dm.jrt.function.Functions.supplierChain;
-import static com.github.dm.jrt.function.Functions.supplierCommand;
-import static com.github.dm.jrt.function.Functions.supplierFactory;
+import static com.github.dm.jrt.functional.Functions.biConsumerChain;
+import static com.github.dm.jrt.functional.Functions.biSink;
+import static com.github.dm.jrt.functional.Functions.constant;
+import static com.github.dm.jrt.functional.Functions.consumerChain;
+import static com.github.dm.jrt.functional.Functions.consumerCommand;
+import static com.github.dm.jrt.functional.Functions.consumerFactory;
+import static com.github.dm.jrt.functional.Functions.consumerFilter;
+import static com.github.dm.jrt.functional.Functions.functionChain;
+import static com.github.dm.jrt.functional.Functions.functionFactory;
+import static com.github.dm.jrt.functional.Functions.functionFilter;
+import static com.github.dm.jrt.functional.Functions.identity;
+import static com.github.dm.jrt.functional.Functions.sink;
+import static com.github.dm.jrt.functional.Functions.supplierChain;
+import static com.github.dm.jrt.functional.Functions.supplierCommand;
+import static com.github.dm.jrt.functional.Functions.supplierFactory;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;

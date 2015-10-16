@@ -11,19 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.functional;
 
 /**
- * Interface representing an operation that accepts an input argument and returns no result.
+ * Interface representing an operation that accepts two input arguments and returns no result.
  * <p/>
  * Created by davide-maestroni on 09/21/2015.
+ *
+ * @param <IN1> the first input data type.
+ * @param <IN2> the second input data type.
  */
-public interface Consumer<IN> {
+public interface BiConsumer<IN1, IN2> {
 
     /**
-     * Performs this operation on the given argument.
+     * Performs this operation on the given arguments.
      *
-     * @param in the input argument.
+     * @param in1 the first input argument.
+     * @param in2 the second input argument.
      */
-    void accept(IN in);
+    void accept(IN1 in1, IN2 in2);
 }

@@ -87,7 +87,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
 
         if (predicate == null) {
 
-            throw new IllegalArgumentException("the predicate must not be null");
+            throw new NullPointerException("the predicate must not be null");
         }
 
         if (predicates.isEmpty()) {

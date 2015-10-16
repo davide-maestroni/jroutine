@@ -25,6 +25,7 @@ import com.github.dm.jrt.routine.Routine;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.dm.jrt.functional.Functions.biConsumerChain;
@@ -188,6 +189,7 @@ public class FunctionsTest {
         final TestBiConsumer consumer1 = new TestBiConsumer();
         assertThat(biConsumerChain(consumer1)).isEqualTo(biConsumerChain(consumer1));
         final BiConsumerChain<Object, Object> consumer2 = biConsumerChain(consumer1);
+        assertThat(consumer2).isEqualTo(consumer2);
         assertThat(consumer2).isNotEqualTo(null);
         assertThat(consumer2).isNotEqualTo("test");
         assertThat(biConsumerChain(consumer1).andThen(consumer2).hashCode()).isEqualTo(
@@ -223,6 +225,26 @@ public class FunctionsTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testBiConsumerError() {
+
+        try {
+
+            new BiConsumerChain<Object, Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new BiConsumerChain<Object, Object>(Collections.<BiConsumer<?, ?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
 
         try {
 
@@ -293,6 +315,7 @@ public class FunctionsTest {
         final TestBiFunction function1 = new TestBiFunction();
         assertThat(biFunctionChain(function1)).isEqualTo(biFunctionChain(function1));
         final BiFunctionChain<Object, Object, Object> function2 = biFunctionChain(function1);
+        assertThat(function2).isEqualTo(function2);
         assertThat(function2).isNotEqualTo(null);
         assertThat(function2).isNotEqualTo("test");
         final TestFunction function = new TestFunction();
@@ -331,6 +354,26 @@ public class FunctionsTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testBiFunctionError() {
+
+        try {
+
+            new BiFunctionChain<Object, Object, Object>(null, functionChain(new TestFunction()));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new BiFunctionChain<Object, Object, Object>(new TestBiFunction(), null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
 
         try {
 
@@ -518,6 +561,7 @@ public class FunctionsTest {
         final TestConsumer consumer1 = new TestConsumer();
         assertThat(consumerChain(consumer1)).isEqualTo(consumerChain(consumer1));
         final ConsumerChain<Object> consumer2 = consumerChain(consumer1);
+        assertThat(consumer2).isEqualTo(consumer2);
         assertThat(consumer2).isNotEqualTo(null);
         assertThat(consumer2).isNotEqualTo("test");
         assertThat(consumerChain(consumer1).andThen(consumer2).hashCode()).isEqualTo(
@@ -553,6 +597,26 @@ public class FunctionsTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testConsumerError() {
+
+        try {
+
+            new ConsumerChain<Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ConsumerChain<Object>(Collections.<Consumer<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
 
         try {
 
@@ -805,6 +869,7 @@ public class FunctionsTest {
         final TestFunction function1 = new TestFunction();
         assertThat(functionChain(function1)).isEqualTo(functionChain(function1));
         final FunctionChain<Object, Object> function2 = functionChain(function1);
+        assertThat(function2).isEqualTo(function2);
         assertThat(function2).isNotEqualTo(null);
         assertThat(function2).isNotEqualTo("test");
         assertThat(functionChain(function1).andThen(function2).hashCode()).isEqualTo(
@@ -868,6 +933,26 @@ public class FunctionsTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testFunctionError() {
+
+        try {
+
+            new FunctionChain<Object, Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new FunctionChain<Object, Object>(Collections.<Function<?, ?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
 
         try {
 
@@ -1078,11 +1163,28 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testPredicateContext() {
+
+        final PredicateChain<Object> predicate1 =
+                predicateChain(new TestPredicate()).and(new TestPredicate());
+        assertThat(predicate1.hasStaticContext()).isTrue();
+        assertThat(predicate1.or(new Predicate<Object>() {
+
+            public boolean test(final Object o) {
+
+                return false;
+            }
+        }).hasStaticContext()).isFalse();
+        assertThat(predicate1.or(negative()).hasStaticContext()).isTrue();
+    }
+
+    @Test
     public void testPredicateEquals() {
 
         final TestPredicate predicate1 = new TestPredicate();
         assertThat(predicateChain(predicate1)).isEqualTo(predicateChain(predicate1));
         final PredicateChain<Object> predicate2 = predicateChain(predicate1);
+        assertThat(predicate2).isEqualTo(predicate2);
         assertThat(predicate2).isNotEqualTo(null);
         assertThat(predicate2).isNotEqualTo("test");
         assertThat(predicateChain(predicate1).and(predicate2).hashCode()).isEqualTo(
@@ -1151,6 +1253,37 @@ public class FunctionsTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testPredicateError() {
+
+        try {
+
+            new PredicateChain<Object>(null, Collections.<Predicate<?>>singletonList(
+                    new TestPredicate()));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new PredicateChain<Object>(new TestPredicate(), null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new PredicateChain<Object>(new TestPredicate(), Collections.<Predicate<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
 
         try {
 
@@ -1255,6 +1388,7 @@ public class FunctionsTest {
         final TestSupplier supplier1 = new TestSupplier();
         assertThat(supplierChain(supplier1)).isEqualTo(supplierChain(supplier1));
         final SupplierChain<Object> supplier2 = supplierChain(supplier1);
+        assertThat(supplier2).isEqualTo(supplier2);
         assertThat(supplier2).isNotEqualTo(null);
         assertThat(supplier2).isNotEqualTo("test");
         final TestFunction function = new TestFunction();
@@ -1292,6 +1426,26 @@ public class FunctionsTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testSupplierError() {
+
+        try {
+
+            new SupplierChain<Object>(null, functionChain(new TestFunction()));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new SupplierChain<Object>(new TestSupplier(), null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
 
         try {
 

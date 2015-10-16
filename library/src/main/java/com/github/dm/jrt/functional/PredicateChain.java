@@ -206,12 +206,54 @@ public class PredicateChain<IN> implements Predicate<IN> {
     public PredicateChain<IN> negate() {
 
         final List<Predicate<?>> predicates = mPredicates;
-        final ArrayList<Predicate<?>> newPredicates =
-                new ArrayList<Predicate<?>>(predicates.size() + 3);
-        newPredicates.add(NEGATE_PREDICATE);
-        newPredicates.add(OPEN_PREDICATE);
-        newPredicates.addAll(predicates);
-        newPredicates.add(CLOSE_PREDICATE);
+        final int size = predicates.size();
+        final ArrayList<Predicate<?>> newPredicates = new ArrayList<Predicate<?>>(size + 1);
+
+        if (size == 1) {
+
+            newPredicates.add(NEGATE_PREDICATE);
+            newPredicates.add(predicates.get(0));
+
+        } else {
+
+            final Predicate<?> first = predicates.get(0);
+
+            if (first == NEGATE_PREDICATE) {
+
+                newPredicates.add(predicates.get(1));
+
+            } else {
+
+                newPredicates.add(first);
+
+                for (int i = 1; i < size; ++i) {
+
+                    final Predicate<?> predicate = predicates.get(i);
+
+                    if (predicate == NEGATE_PREDICATE) {
+
+                        ++i;
+
+                    } else if (predicate == OR_PREDICATE) {
+
+                        newPredicates.add(AND_PREDICATE);
+
+                    } else if (predicate == AND_PREDICATE) {
+
+                        newPredicates.add(OR_PREDICATE);
+
+                    } else {
+
+                        if ((predicate != OPEN_PREDICATE) && (predicate != CLOSE_PREDICATE)) {
+
+                            newPredicates.add(NEGATE_PREDICATE);
+                        }
+
+                        newPredicates.add(predicate);
+                    }
+                }
+            }
+        }
 
         return new PredicateChain<IN>(new NegatePredicate<IN>(mPredicate), newPredicates);
     }

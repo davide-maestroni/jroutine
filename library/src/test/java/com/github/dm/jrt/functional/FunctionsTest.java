@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.github.dm.jrt.functional.Functions.biConsumerChain;
+import static com.github.dm.jrt.functional.Functions.biFunctionChain;
 import static com.github.dm.jrt.functional.Functions.biSink;
 import static com.github.dm.jrt.functional.Functions.constant;
 import static com.github.dm.jrt.functional.Functions.consumerChain;
@@ -38,6 +39,9 @@ import static com.github.dm.jrt.functional.Functions.functionChain;
 import static com.github.dm.jrt.functional.Functions.functionFactory;
 import static com.github.dm.jrt.functional.Functions.functionFilter;
 import static com.github.dm.jrt.functional.Functions.identity;
+import static com.github.dm.jrt.functional.Functions.negative;
+import static com.github.dm.jrt.functional.Functions.positive;
+import static com.github.dm.jrt.functional.Functions.predicateChain;
 import static com.github.dm.jrt.functional.Functions.sink;
 import static com.github.dm.jrt.functional.Functions.supplierChain;
 import static com.github.dm.jrt.functional.Functions.supplierCommand;
@@ -223,6 +227,124 @@ public class FunctionsTest {
         try {
 
             biConsumerChain(new TestBiConsumer()).andThen(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testBiFunction() {
+
+        final TestBiFunction function1 = new TestBiFunction();
+        final BiFunctionChain<Object, Object, Object> function2 = biFunctionChain(function1);
+        assertThat(biFunctionChain(function2)).isSameAs(function2);
+        assertThat(function2.apply("test", function1)).isSameAs(function1);
+        assertThat(function1.isCalled()).isTrue();
+        function1.reset();
+        final TestFunction function = new TestFunction();
+        final BiFunctionChain<Object, Object, Object> function3 = function2.andThen(function);
+        assertThat(function3.apply("test", function1)).isSameAs(function1);
+        assertThat(function1.isCalled()).isTrue();
+        assertThat(function.isCalled()).isTrue();
+        assertThat(Functions.<String, String>first().andThen(new Function<String, Integer>() {
+
+            public Integer apply(final String s) {
+
+                return s.length();
+            }
+        }).andThen(new Function<Integer, Integer>() {
+
+            public Integer apply(final Integer integer) {
+
+                return integer * 3;
+            }
+        }).apply("test", "long test")).isEqualTo(12);
+        assertThat(Functions.<String, Integer>second().andThen(new Function<Integer, Integer>() {
+
+            public Integer apply(final Integer integer) {
+
+                return integer + 2;
+            }
+        }).apply("test", 3)).isEqualTo(5);
+    }
+
+    @Test
+    public void testBiFunctionContext() {
+
+        final BiFunctionChain<Object, Object, Object> function1 =
+                biFunctionChain(new TestBiFunction()).andThen(new TestFunction());
+        assertThat(function1.hasStaticContext()).isTrue();
+        assertThat(function1.andThen(new Function<Object, Object>() {
+
+            public Object apply(final Object o) {
+
+                return null;
+            }
+        }).hasStaticContext()).isFalse();
+        assertThat(function1.andThen(identity()).hasStaticContext()).isTrue();
+    }
+
+    @Test
+    public void testBiFunctionEquals() {
+
+        final TestBiFunction function1 = new TestBiFunction();
+        assertThat(biFunctionChain(function1)).isEqualTo(biFunctionChain(function1));
+        final BiFunctionChain<Object, Object, Object> function2 = biFunctionChain(function1);
+        assertThat(function2).isNotEqualTo(null);
+        assertThat(function2).isNotEqualTo("test");
+        final TestFunction function = new TestFunction();
+        assertThat(biFunctionChain(function1).andThen(function).hashCode()).isEqualTo(
+                function2.andThen(function).hashCode());
+        assertThat(biFunctionChain(function1).andThen(function)).isEqualTo(
+                function2.andThen(function));
+        assertThat(function2.andThen(function)).isEqualTo(
+                biFunctionChain(function1).andThen(function));
+        assertThat(
+                biFunctionChain(function1).andThen(functionChain(function)).hashCode()).isEqualTo(
+                function2.andThen(function).hashCode());
+        assertThat(biFunctionChain(function1).andThen(functionChain(function))).isEqualTo(
+                function2.andThen(function));
+        assertThat(function2.andThen(function)).isEqualTo(
+                biFunctionChain(function1).andThen(functionChain(function)));
+        assertThat(biFunctionChain(function1).andThen(functionChain(function))
+                                             .hashCode()).isNotEqualTo(
+                function2.andThen(functionChain(function).andThen(function)).hashCode());
+        assertThat(biFunctionChain(function1).andThen(functionChain(function))).isNotEqualTo(
+                function2.andThen(functionChain(function).andThen(function)));
+        assertThat(function2.andThen(functionChain(function).andThen(function))).isNotEqualTo(
+                biFunctionChain(function1).andThen(functionChain(function)));
+        assertThat(biFunctionChain(function1).andThen(function).hashCode()).isNotEqualTo(
+                function2.andThen(functionChain(function).andThen(function)).hashCode());
+        assertThat(biFunctionChain(function1).andThen(function)).isNotEqualTo(
+                function2.andThen(functionChain(function).andThen(function)));
+        assertThat(function2.andThen(functionChain(function).andThen(function))).isNotEqualTo(
+                biFunctionChain(function1).andThen(function));
+        assertThat(function2.andThen(function).hashCode()).isNotEqualTo(
+                function2.andThen(identity()).hashCode());
+        assertThat(function2.andThen(function)).isNotEqualTo(function2.andThen(identity()));
+        assertThat(function2.andThen(identity())).isNotEqualTo(function2.andThen(function));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testBiFunctionError() {
+
+        try {
+
+            biFunctionChain(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            biFunctionChain(new TestBiFunction()).andThen(null);
 
             fail();
 
@@ -898,6 +1020,67 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testPredicate() {
+
+        final TestPredicate predicate1 = new TestPredicate();
+        final PredicateChain<Object> predicate2 = predicateChain(predicate1);
+        assertThat(predicateChain(predicate2)).isSameAs(predicate2);
+        assertThat(predicate2.test(this)).isTrue();
+        assertThat(predicate1.isCalled()).isTrue();
+        predicate1.reset();
+        final TestPredicate predicate3 = new TestPredicate();
+        final PredicateChain<Object> predicate4 = predicate2.and(predicate3);
+        assertThat(predicate4.test(this)).isTrue();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isTrue();
+        predicate1.reset();
+        predicate3.reset();
+        assertThat(predicate4.test(null)).isFalse();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isFalse();
+        predicate1.reset();
+        predicate3.reset();
+        final PredicateChain<Object> predicate5 = predicate2.or(predicate3);
+        assertThat(predicate5.test(this)).isTrue();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isFalse();
+        predicate1.reset();
+        predicate3.reset();
+        assertThat(predicate5.test(null)).isFalse();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isTrue();
+        predicate1.reset();
+        predicate3.reset();
+        final PredicateChain<Object> predicate6 = predicate4.negate();
+        assertThat(predicate6.test(this)).isFalse();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isTrue();
+        predicate1.reset();
+        predicate3.reset();
+        assertThat(predicate6.test(null)).isTrue();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isFalse();
+        predicate1.reset();
+        predicate3.reset();
+        final PredicateChain<Object> predicate7 = predicate5.negate();
+        assertThat(predicate7.test(this)).isFalse();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isFalse();
+        predicate1.reset();
+        predicate3.reset();
+        assertThat(predicate7.test(null)).isTrue();
+        assertThat(predicate1.isCalled()).isTrue();
+        assertThat(predicate3.isCalled()).isTrue();
+        predicate1.reset();
+        predicate3.reset();
+        assertThat(negative().or(positive()).test(null)).isTrue();
+        assertThat(negative().and(positive()).test("test")).isFalse();
+        // TODO: 16/10/15 equals
+        assertThat(negative().negate()).isEqualTo(positive());
+        assertThat(positive().negate()).isEqualTo(negative());
+    }
+
+    @Test
     public void testSink() {
 
         final TestConsumer consumer1 = new TestConsumer();
@@ -1028,6 +1211,27 @@ public class FunctionsTest {
         }
     }
 
+    private static class TestBiFunction implements BiFunction<Object, Object, Object> {
+
+        private boolean mIsCalled;
+
+        public Object apply(final Object in1, final Object in2) {
+
+            mIsCalled = true;
+            return in2;
+        }
+
+        public boolean isCalled() {
+
+            return mIsCalled;
+        }
+
+        public void reset() {
+
+            mIsCalled = false;
+        }
+    }
+
     private static class TestConsumer implements Consumer<Object> {
 
         private boolean mIsCalled;
@@ -1069,6 +1273,27 @@ public class FunctionsTest {
         }
     }
 
+    private static class TestPredicate implements Predicate<Object> {
+
+        private boolean mIsCalled;
+
+        public boolean isCalled() {
+
+            return mIsCalled;
+        }
+
+        public void reset() {
+
+            mIsCalled = false;
+        }
+
+        public boolean test(final Object in) {
+
+            mIsCalled = true;
+            return in != null;
+        }
+    }
+
     private static class TestSupplier implements Supplier<Object> {
 
         private boolean mIsCalled;
@@ -1088,7 +1313,5 @@ public class FunctionsTest {
             mIsCalled = true;
             return this;
         }
-
-
     }
 }

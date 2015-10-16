@@ -51,6 +51,34 @@ public class Functions {
                 }
             });
 
+    private static final BiFunctionChain<?, ?, ?> sFirst =
+            biFunctionChain(new BiFunction<Object, Object, Object>() {
+
+                public Object apply(final Object in1, final Object in2) {
+
+                    return in1;
+                }
+            });
+
+    private static final PredicateChain<?> sNegative = predicateChain(new Predicate<Object>() {
+
+        public boolean test(final Object o) {
+
+            return false;
+        }
+    });
+
+    private static final PredicateChain<?> sPositive = sNegative.negate();
+
+    private static final BiFunctionChain<?, ?, ?> sSecond =
+            biFunctionChain(new BiFunction<Object, Object, Object>() {
+
+                public Object apply(final Object in1, final Object in2) {
+
+                    return in2;
+                }
+            });
+
     private static final ConsumerChain<?> sSink = consumerChain(new Consumer<Object>() {
 
         public void accept(final Object in) {
@@ -91,6 +119,36 @@ public class Functions {
         }
 
         return new BiConsumerChain<IN1, IN2>(Collections.<BiConsumer<?, ?>>singletonList(consumer));
+    }
+
+    /**
+     * Wraps the specified bi-function instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param function the bi-function instance.
+     * @param <IN1>    the first input data type.
+     * @param <IN2>    the second input data type.
+     * @param <OUT>    the output data type.
+     * @return the wrapped bi-function.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN1, IN2, OUT> BiFunctionChain<IN1, IN2, OUT> biFunctionChain(
+            @NotNull final BiFunction<IN1, IN2, OUT> function) {
+
+        if (function.getClass() == BiFunctionChain.class) {
+
+            return (BiFunctionChain<IN1, IN2, OUT>) function;
+        }
+
+        return new BiFunctionChain<IN1, IN2, OUT>(function,
+                                                  functionChain(Functions.<OUT>identity()));
     }
 
     /**
@@ -221,6 +279,21 @@ public class Functions {
     }
 
     /**
+     * Returns a bi-function chain just returning the first passed argument.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the wrapped bi-function.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiFunctionChain<IN1, IN2, IN1> first() {
+
+        return (BiFunctionChain<IN1, IN2, IN1>) sFirst;
+    }
+
+    /**
      * Wraps the specified function instance so to provide additional features.<br/>
      * The returned object will support concatenation and comparison.
      * <p/>
@@ -304,6 +377,74 @@ public class Functions {
     public static <IN> FunctionChain<IN, IN> identity() {
 
         return (FunctionChain<IN, IN>) sIdentity;
+    }
+
+    /**
+     * Returns a predicate chain always returning the false.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the wrapped predicate.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateChain<IN> negative() {
+
+        return (PredicateChain<IN>) sNegative;
+    }
+
+    /**
+     * Returns a predicate chain always returning the true.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the wrapped predicate.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateChain<IN> positive() {
+
+        return (PredicateChain<IN>) sPositive;
+    }
+
+    /**
+     * Wraps the specified predicate instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param predicate the predicate instance.
+     * @param <IN>      the input data type.
+     * @return the wrapped predicate.
+     */
+    @NotNull
+    public static <IN> PredicateChain<IN> predicateChain(@NotNull final Predicate<IN> predicate) {
+
+        if (predicate.getClass() == PredicateChain.class) {
+
+            return (PredicateChain<IN>) predicate;
+        }
+
+        return new PredicateChain<IN>(predicate,
+                                      Collections.<Predicate<?>>singletonList(predicate));
+    }
+
+    /**
+     * Returns a bi-function chain just returning the second passed argument.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the wrapped bi-function.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiFunctionChain<IN1, IN2, IN2> second() {
+
+        return (BiFunctionChain<IN1, IN2, IN2>) sSecond;
     }
 
     /**

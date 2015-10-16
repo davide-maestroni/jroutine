@@ -59,7 +59,8 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
             @NotNull final DelegationType delegationType) {
 
         return new AfterFunctionalRoutine<IN, OUT, AFTER>(getBuilderConfiguration(), this,
-                                                          mDelegationType, routine, delegationType);
+                                                          DelegationType.SYNC, routine,
+                                                          delegationType);
     }
 
     @NotNull
@@ -72,9 +73,9 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
     private static class AfterFunctionalRoutine<IN, OUT, AFTER>
             extends AbstractFunctionalRoutine<IN, AFTER> {
 
-        private final Routine<? super OUT, AFTER> mAfter;
-
         private final DelegationType mAfterDelegationType;
+
+        private final Routine<? super OUT, AFTER> mAfterRoutine;
 
         private final DelegationType mDelegationType;
 
@@ -89,19 +90,19 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
         protected AfterFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
                 @NotNull final FunctionalRoutine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType,
-                @NotNull final Routine<? super OUT, AFTER> after,
+                @NotNull final Routine<? super OUT, AFTER> afterRoutine,
                 @NotNull final DelegationType afterDelegationType) {
 
             super(configuration);
 
-            if (after == null) {
+            if (afterRoutine == null) {
 
                 throw new NullPointerException("the after routine must not be null");
             }
 
             mRoutine = routine;
             mDelegationType = delegationType;
-            mAfter = after;
+            mAfterRoutine = afterRoutine;
             mAfterDelegationType = afterDelegationType;
         }
 
@@ -118,18 +119,29 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         @NotNull
         @Override
+        protected <BEFORE> FunctionalRoutine<BEFORE, AFTER> compose(
+                @NotNull final Routine<BEFORE, ? extends IN> routine,
+                @NotNull final DelegationType delegationType) {
+
+            return new BeforeFunctionalRoutine<BEFORE, IN, AFTER>(getBuilderConfiguration(), this,
+                                                                  DelegationType.SYNC, routine,
+                                                                  delegationType);
+        }
+
+        @NotNull
+        @Override
         protected Invocation<IN, AFTER> newInvocation(@NotNull final InvocationType type) {
 
-            return new AfterInvocation<IN, OUT, AFTER>(mRoutine, mDelegationType, mAfter,
+            return new AfterInvocation<IN, OUT, AFTER>(mRoutine, mDelegationType, mAfterRoutine,
                                                        mAfterDelegationType);
         }
     }
 
     private static class AfterInvocation<IN, OUT, AFTER> implements Invocation<IN, AFTER> {
 
-        private final Routine<? super OUT, AFTER> mAfter;
-
         private final DelegationType mAfterDelegationType;
+
+        private final Routine<? super OUT, AFTER> mAfterRoutine;
 
         private final DelegationType mDelegationType;
 
@@ -139,12 +151,12 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         private AfterInvocation(@NotNull final FunctionalRoutine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType,
-                @NotNull final Routine<? super OUT, AFTER> after,
+                @NotNull final Routine<? super OUT, AFTER> afterRoutine,
                 @NotNull final DelegationType afterDelegationType) {
 
             mRoutine = routine;
             mDelegationType = delegationType;
-            mAfter = after;
+            mAfterRoutine = afterRoutine;
             mAfterDelegationType = afterDelegationType;
         }
 
@@ -169,15 +181,15 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
             if (afterDelegationType == DelegationType.ASYNC) {
 
-                mChannel = streamingChannel.concat(asyncStream(mAfter));
+                mChannel = streamingChannel.concat(asyncStream(mAfterRoutine));
 
             } else if (afterDelegationType == DelegationType.PARALLEL) {
 
-                mChannel = streamingChannel.concat(parallelStream(mAfter));
+                mChannel = streamingChannel.concat(parallelStream(mAfterRoutine));
 
-            } else if (afterDelegationType == DelegationType.SYNC) {
+            } else {
 
-                mChannel = streamingChannel.concat(syncStream(mAfter));
+                mChannel = streamingChannel.concat(syncStream(mAfterRoutine));
             }
         }
 
@@ -209,5 +221,169 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
             mChannel = null;
         }
+    }
+
+    private static class BeforeFunctionalRoutine<BEFORE, IN, OUT>
+            extends AbstractFunctionalRoutine<BEFORE, OUT> {
+
+        private final DelegationType mBeforeDelegationType;
+
+        private final Routine<BEFORE, ? extends IN> mBeforeRoutine;
+
+        private final DelegationType mDelegationType;
+
+        private final FunctionalRoutine<IN, OUT> mRoutine;
+
+        /**
+         * Constructor.
+         *
+         * @param configuration the invocation configuration.
+         */
+        @SuppressWarnings("ConstantConditions")
+        protected BeforeFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
+                @NotNull final FunctionalRoutine<IN, OUT> routine,
+                @NotNull final DelegationType delegationType,
+                @NotNull final Routine<BEFORE, ? extends IN> beforeRoutine,
+                @NotNull final DelegationType beforeDelegationType) {
+
+            super(configuration);
+
+            if (beforeRoutine == null) {
+
+                throw new NullPointerException("the after routine must not be null");
+            }
+
+            mRoutine = routine;
+            mDelegationType = delegationType;
+            mBeforeRoutine = beforeRoutine;
+            mBeforeDelegationType = beforeDelegationType;
+        }
+
+        @NotNull
+        @Override
+        protected <AFTER> FunctionalRoutine<BEFORE, AFTER> andThen(
+                @NotNull final Routine<? super OUT, AFTER> routine,
+                @NotNull final DelegationType delegationType) {
+
+            return new AfterFunctionalRoutine<BEFORE, OUT, AFTER>(getBuilderConfiguration(), this,
+                                                                  DelegationType.SYNC, routine,
+                                                                  delegationType);
+        }
+
+        @NotNull
+        @Override
+        protected <PREV> FunctionalRoutine<PREV, OUT> compose(
+                @NotNull final Routine<PREV, ? extends BEFORE> routine,
+                @NotNull final DelegationType delegationType) {
+
+            return new BeforeFunctionalRoutine<PREV, BEFORE, OUT>(getBuilderConfiguration(), this,
+                                                                  DelegationType.SYNC, routine,
+                                                                  delegationType);
+        }
+
+        @NotNull
+        @Override
+        protected Invocation<BEFORE, OUT> newInvocation(@NotNull final InvocationType type) {
+
+            return new BeforeInvocation<BEFORE, IN, OUT>(mRoutine, mDelegationType, mBeforeRoutine,
+                                                         mBeforeDelegationType);
+        }
+    }
+
+    private static class BeforeInvocation<BEFORE, IN, OUT> implements Invocation<BEFORE, OUT> {
+
+        private final DelegationType mBeforeDelegationType;
+
+        private final Routine<BEFORE, ? extends IN> mBeforeRoutine;
+
+        private final DelegationType mDelegationType;
+
+        private final FunctionalRoutine<IN, OUT> mRoutine;
+
+        private StreamingChannel<BEFORE, OUT> mChannel;
+
+        private BeforeInvocation(@NotNull final FunctionalRoutine<IN, OUT> routine,
+                @NotNull final DelegationType delegationType,
+                @NotNull final Routine<BEFORE, ? extends IN> beforeRoutine,
+                @NotNull final DelegationType beforeDelegationType) {
+
+            mRoutine = routine;
+            mDelegationType = delegationType;
+            mBeforeRoutine = beforeRoutine;
+            mBeforeDelegationType = beforeDelegationType;
+        }
+
+        public void onAbort(@Nullable final RoutineException reason) {
+
+            mChannel.abort(reason);
+        }
+
+        public void onDestroy() {
+
+            mChannel = null;
+        }
+
+        public void onInitialize() {
+
+            final DelegationType delegationType = mDelegationType;
+            final StreamingChannel<IN, OUT> streamingChannel =
+                    (delegationType == DelegationType.ASYNC) ? asyncStream(mRoutine)
+                            : (delegationType == DelegationType.PARALLEL) ? parallelStream(mRoutine)
+                                    : syncStream(mRoutine);
+            final DelegationType afterDelegationType = mBeforeDelegationType;
+
+            if (afterDelegationType == DelegationType.ASYNC) {
+
+                mChannel = streamingChannel.combine(asyncStream(mBeforeRoutine));
+
+            } else if (afterDelegationType == DelegationType.PARALLEL) {
+
+                mChannel = streamingChannel.combine(parallelStream(mBeforeRoutine));
+
+            } else {
+
+                mChannel = streamingChannel.combine(syncStream(mBeforeRoutine));
+            }
+        }
+
+        public void onInput(final BEFORE input, @NotNull final ResultChannel<OUT> result) {
+
+            final StreamingChannel<BEFORE, OUT> channel = mChannel;
+
+            if (!channel.isBound()) {
+
+                channel.passTo(result);
+            }
+
+            channel.pass(input);
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            final StreamingChannel<BEFORE, OUT> channel = mChannel;
+
+            if (!channel.isBound()) {
+
+                channel.passTo(result);
+            }
+
+            channel.close();
+        }
+
+        public void onTerminate() {
+
+            mChannel = null;
+        }
+    }
+
+    @NotNull
+    @Override
+    protected <BEFORE> FunctionalRoutine<BEFORE, OUT> compose(
+            @NotNull final Routine<BEFORE, ? extends IN> routine,
+            @NotNull final DelegationType delegationType) {
+
+        return new BeforeFunctionalRoutine<BEFORE, IN, OUT>(getBuilderConfiguration(), this,
+                                                            DelegationType.SYNC, routine,
+                                                            delegationType);
     }
 }

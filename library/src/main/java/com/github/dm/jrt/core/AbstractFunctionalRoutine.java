@@ -236,6 +236,10 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     protected abstract <AFTER> FunctionalRoutine<IN, AFTER> andThen(
             @NotNull Routine<? super OUT, AFTER> routine, @NotNull DelegationType delegationType);
 
+    @NotNull
+    protected abstract <BEFORE> FunctionalRoutine<BEFORE, OUT> compose(
+            @NotNull Routine<BEFORE, ? extends IN> routine, @NotNull DelegationType delegationType);
+
     /**
      * Returns the builder invocation configuration.
      *

@@ -125,7 +125,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
          * The delegated routine is invoked in asynchronous mode.
          */
         ASYNC,
-        /**
+        mAfterDelegationType, /**
          * The delegated routine is invoked in parallel mode.
          */
         PARALLEL

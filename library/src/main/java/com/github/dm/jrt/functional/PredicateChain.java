@@ -255,10 +255,20 @@ public class PredicateChain<IN> implements Predicate<IN> {
         return mPredicate.test(in);
     }
 
+    /**
+     * Predicate implementation negating the wrapped one.
+     *
+     * @param <IN> the input data type.
+     */
     private static final class NegatePredicate<IN> implements Predicate<IN> {
 
         private final Predicate<? super IN> mPredicate;
 
+        /**
+         * Constructor.
+         *
+         * @param predicate the wrapped predicate.
+         */
         private NegatePredicate(@NotNull final Predicate<? super IN> predicate) {
 
             mPredicate = predicate;
@@ -270,12 +280,23 @@ public class PredicateChain<IN> implements Predicate<IN> {
         }
     }
 
+    /**
+     * Predicate implementation logically-ORing the wrapped ones.
+     *
+     * @param <IN> the input data type.
+     */
     private static final class OrPredicate<IN> implements Predicate<IN> {
 
         private final Predicate<? super IN> mOther;
 
         private final Predicate<? super IN> mPredicate;
 
+        /**
+         * Constructor.
+         *
+         * @param predicate the wrapped predicate.
+         * @param other     the other predicate to be logically-ORed.
+         */
         private OrPredicate(@NotNull final Predicate<? super IN> predicate,
                 @NotNull final Predicate<? super IN> other) {
 
@@ -289,12 +310,23 @@ public class PredicateChain<IN> implements Predicate<IN> {
         }
     }
 
+    /**
+     * Predicate implementation logically-ANDing the wrapped ones.
+     *
+     * @param <IN> the input data type.
+     */
     private static final class AndPredicate<IN> implements Predicate<IN> {
 
         private final Predicate<? super IN> mOther;
 
         private final Predicate<? super IN> mPredicate;
 
+        /**
+         * Constructor.
+         *
+         * @param predicate the wrapped predicate.
+         * @param other     the other predicate to be logically-ANDed.
+         */
         private AndPredicate(@NotNull final Predicate<? super IN> predicate,
                 @NotNull final Predicate<? super IN> other) {
 

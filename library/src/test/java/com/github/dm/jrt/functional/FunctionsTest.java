@@ -1075,9 +1075,122 @@ public class FunctionsTest {
         predicate3.reset();
         assertThat(negative().or(positive()).test(null)).isTrue();
         assertThat(negative().and(positive()).test("test")).isFalse();
-        // TODO: 16/10/15 equals
+    }
+
+    @Test
+    public void testPredicateEquals() {
+
+        final TestPredicate predicate1 = new TestPredicate();
+        assertThat(predicateChain(predicate1)).isEqualTo(predicateChain(predicate1));
+        final PredicateChain<Object> predicate2 = predicateChain(predicate1);
+        assertThat(predicate2).isNotEqualTo(null);
+        assertThat(predicate2).isNotEqualTo("test");
+        assertThat(predicateChain(predicate1).and(predicate2).hashCode()).isEqualTo(
+                predicate2.and(predicate2).hashCode());
+        assertThat(predicateChain(predicate1).and(predicate2)).isEqualTo(
+                predicate2.and(predicate2));
+        assertThat(predicate2.and(predicate2)).isEqualTo(
+                predicateChain(predicate1).and(predicate2));
+        assertThat(predicateChain(predicate1).and(predicate2).hashCode()).isEqualTo(
+                predicate2.and(predicate1).hashCode());
+        assertThat(predicateChain(predicate1).and(predicate2)).isEqualTo(
+                predicate2.and(predicate1));
+        assertThat(predicate2.and(predicate1)).isEqualTo(
+                predicateChain(predicate1).and(predicate2));
+        assertThat(predicateChain(predicate1).and(predicate2).hashCode()).isNotEqualTo(
+                predicate2.and(predicate2.and(predicate1)).hashCode());
+        assertThat(predicateChain(predicate1).and(predicate2)).isNotEqualTo(
+                predicate2.and(predicate2.and(predicate1)));
+        assertThat(predicate2.and(predicate2.and(predicate1))).isNotEqualTo(
+                predicateChain(predicate1).and(predicate2));
+        assertThat(predicateChain(predicate1).and(predicate1).hashCode()).isNotEqualTo(
+                predicate2.and(predicate2.and(predicate1)).hashCode());
+        assertThat(predicateChain(predicate1).and(predicate1)).isNotEqualTo(
+                predicate2.and(predicate2.and(predicate1)));
+        assertThat(predicate2.and(predicate2.and(predicate1))).isNotEqualTo(
+                predicateChain(predicate1).and(predicate1));
+        assertThat(predicate2.and(predicate1).hashCode()).isNotEqualTo(
+                predicate2.and(positive()).hashCode());
+        assertThat(predicate2.and(predicate1)).isNotEqualTo(predicate2.and(positive()));
+        assertThat(predicate2.and(positive())).isNotEqualTo(predicate2.and(predicate1));
+        assertThat(predicateChain(predicate1).or(predicate2).hashCode()).isEqualTo(
+                predicate2.or(predicate2).hashCode());
+        assertThat(predicateChain(predicate1).or(predicate2)).isEqualTo(predicate2.or(predicate2));
+        assertThat(predicate2.or(predicate2)).isEqualTo(predicateChain(predicate1).or(predicate2));
+        assertThat(predicateChain(predicate1).or(predicate2).hashCode()).isEqualTo(
+                predicate2.or(predicate1).hashCode());
+        assertThat(predicateChain(predicate1).or(predicate2)).isEqualTo(predicate2.or(predicate1));
+        assertThat(predicate2.or(predicate1)).isEqualTo(predicateChain(predicate1).or(predicate2));
+        assertThat(predicateChain(predicate1).or(predicate2).hashCode()).isNotEqualTo(
+                predicate2.or(predicate2.or(predicate1)).hashCode());
+        assertThat(predicateChain(predicate1).or(predicate2)).isNotEqualTo(
+                predicate2.or(predicate2.or(predicate1)));
+        assertThat(predicate2.or(predicate2.or(predicate1))).isNotEqualTo(
+                predicateChain(predicate1).or(predicate2));
+        assertThat(predicateChain(predicate1).or(predicate1).hashCode()).isNotEqualTo(
+                predicate2.or(predicate2.or(predicate1)).hashCode());
+        assertThat(predicateChain(predicate1).or(predicate1)).isNotEqualTo(
+                predicate2.or(predicate2.or(predicate1)));
+        assertThat(predicate2.or(predicate2.or(predicate1))).isNotEqualTo(
+                predicateChain(predicate1).or(predicate1));
+        assertThat(predicate2.or(predicate1).hashCode()).isNotEqualTo(
+                predicate2.or(positive()).hashCode());
+        assertThat(predicate2.or(predicate1)).isNotEqualTo(predicate2.or(positive()));
+        assertThat(predicate2.or(positive())).isNotEqualTo(predicate2.or(predicate1));
+        assertThat(predicate2.and(predicate1).negate()).isEqualTo(
+                predicate2.negate().or(predicateChain(predicate1).negate()));
+        assertThat(predicate2.and(predicate1).negate().hashCode()).isEqualTo(
+                predicate2.negate().or(predicateChain(predicate1).negate()).hashCode());
+        final PredicateChain<Object> chain =
+                predicate2.negate().or(predicate2.negate().and(predicate2.negate()));
+        assertThat(predicate2.and(predicate2.or(predicate1)).negate()).isEqualTo(chain);
         assertThat(negative().negate()).isEqualTo(positive());
         assertThat(positive().negate()).isEqualTo(negative());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testPredicateError() {
+
+        try {
+
+            predicateChain(new TestPredicate()).and(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            predicateChain(new TestPredicate()).or(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            negative().and(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            positive().or(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test

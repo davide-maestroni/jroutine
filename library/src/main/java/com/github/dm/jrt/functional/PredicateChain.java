@@ -117,20 +117,18 @@ public class PredicateChain<IN> implements Predicate<IN> {
                 new ArrayList<Predicate<?>>(predicates.size() + 4);
         newPredicates.add(OPEN_PREDICATE);
         newPredicates.addAll(predicates);
-        newPredicates.add(CLOSE_PREDICATE);
         newPredicates.add(AND_PREDICATE);
 
         if (otherClass == PredicateChain.class) {
 
-            newPredicates.add(OPEN_PREDICATE);
             newPredicates.addAll(((PredicateChain<?>) other).mPredicates);
-            newPredicates.add(CLOSE_PREDICATE);
 
         } else {
 
             newPredicates.add(other);
         }
 
+        newPredicates.add(CLOSE_PREDICATE);
         return new PredicateChain<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
     }
 
@@ -279,20 +277,18 @@ public class PredicateChain<IN> implements Predicate<IN> {
                 new ArrayList<Predicate<?>>(predicates.size() + 4);
         newPredicates.add(OPEN_PREDICATE);
         newPredicates.addAll(predicates);
-        newPredicates.add(CLOSE_PREDICATE);
         newPredicates.add(OR_PREDICATE);
 
         if (otherClass == PredicateChain.class) {
 
-            newPredicates.add(OPEN_PREDICATE);
             newPredicates.addAll(((PredicateChain<?>) other).mPredicates);
-            newPredicates.add(CLOSE_PREDICATE);
 
         } else {
 
             newPredicates.add(other);
         }
 
+        newPredicates.add(CLOSE_PREDICATE);
         return new PredicateChain<IN>(new OrPredicate<IN>(mPredicate, other), newPredicates);
     }
 

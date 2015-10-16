@@ -27,6 +27,8 @@ import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * Created by davide-maestroni on 10/16/2015.
  */
@@ -77,6 +79,137 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
             @NotNull final Routine<? super OUT, AFTER> routine) {
 
         return andThen(routine, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
+
+        return andThenMapParallel(JRoutine.on(Functions.consumerFilter(consumer))
+                                          .invocations()
+                                          .with(mConfiguration)
+                                          .set());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
+
+        return andThenMapParallel(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull final Function<? super OUT, AFTER> function) {
+
+        return andThenMapParallel(JRoutine.on(Functions.functionFilter(function))
+                                          .invocations()
+                                          .with(mConfiguration)
+                                          .set());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull final Routine<? super OUT, AFTER> routine) {
+
+        return andThen(routine, DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
+
+        return andThenMapSync(JRoutine.on(Functions.consumerFilter(consumer))
+                                      .invocations()
+                                      .with(mConfiguration)
+                                      .set());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
+
+        return andThenMapSync(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull final Function<? super OUT, AFTER> function) {
+
+        return andThenMapSync(JRoutine.on(Functions.functionFilter(function))
+                                      .invocations()
+                                      .with(mConfiguration)
+                                      .set());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull final Routine<? super OUT, AFTER> routine) {
+
+        return andThen(routine, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return andThen(JRoutine.on(Functions.consumerFactory(consumer))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+        return andThen(JRoutine.on(Functions.functionFactory(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return andThen(JRoutine.on(Functions.consumerFactory(consumer))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
+            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+        return andThen(JRoutine.on(Functions.functionFactory(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return andThen(JRoutine.on(Functions.consumerFactory(consumer))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
+            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+        return andThen(JRoutine.on(Functions.functionFactory(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set(), DelegationType.SYNC);
     }
 
     @NotNull

@@ -21,6 +21,8 @@ import com.github.dm.jrt.invocation.FilterInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * Created by davide-maestroni on 10/16/2015.
  */
@@ -42,4 +44,63 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
             @NotNull Routine<? super OUT, AFTER> routine);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull Function<? super OUT, AFTER> function);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
+            @NotNull Routine<? super OUT, AFTER> routine);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull Function<? super OUT, AFTER> function);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
+            @NotNull Routine<? super OUT, AFTER> routine);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+            @NotNull Function<? super List<? extends OUT>, AFTER> function);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
+            @NotNull Function<? super List<? extends OUT>, AFTER> function);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
+            @NotNull Function<? super List<? extends OUT>, AFTER> function);
 }

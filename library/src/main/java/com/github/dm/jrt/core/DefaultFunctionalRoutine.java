@@ -14,6 +14,7 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.StreamingChannel;
@@ -59,8 +60,7 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
             @NotNull final DelegationType delegationType) {
 
         return new AfterFunctionalRoutine<IN, OUT, AFTER>(getBuilderConfiguration(), this,
-                                                          DelegationType.SYNC, routine,
-                                                          delegationType);
+                                                          mDelegationType, routine, delegationType);
     }
 
     @NotNull
@@ -147,7 +147,9 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         private final FunctionalRoutine<IN, OUT> mRoutine;
 
-        private StreamingChannel<IN, AFTER> mChannel;
+        private StreamingChannel<IN, OUT> mInputChannel;
+
+        private OutputChannel<AFTER> mOutputChannel;
 
         private AfterInvocation(@NotNull final FunctionalRoutine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType,
@@ -162,12 +164,13 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         public void onAbort(@Nullable final RoutineException reason) {
 
-            mChannel.abort(reason);
+            mInputChannel.abort(reason);
         }
 
         public void onDestroy() {
 
-            mChannel = null;
+            mInputChannel = null;
+            mOutputChannel = null;
         }
 
         public void onInitialize() {
@@ -181,45 +184,49 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
             if (afterDelegationType == DelegationType.ASYNC) {
 
-                mChannel = streamingChannel.concat(asyncStream(mAfterRoutine));
+                mOutputChannel = streamingChannel.passTo(mAfterRoutine.asyncInvoke()).result();
+                mInputChannel = streamingChannel;
 
             } else if (afterDelegationType == DelegationType.PARALLEL) {
 
-                mChannel = streamingChannel.concat(parallelStream(mAfterRoutine));
+                mOutputChannel = streamingChannel.passTo(mAfterRoutine.parallelInvoke()).result();
+                mInputChannel = streamingChannel;
 
             } else {
 
-                mChannel = streamingChannel.concat(syncStream(mAfterRoutine));
+                mOutputChannel = streamingChannel.passTo(mAfterRoutine.syncInvoke()).result();
+                mInputChannel = streamingChannel;
             }
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<AFTER> result) {
 
-            final StreamingChannel<IN, AFTER> channel = mChannel;
+            final OutputChannel<AFTER> channel = mOutputChannel;
 
             if (!channel.isBound()) {
 
                 channel.passTo(result);
             }
 
-            channel.pass(input);
+            mInputChannel.pass(input);
         }
 
         public void onResult(@NotNull final ResultChannel<AFTER> result) {
 
-            final StreamingChannel<IN, AFTER> channel = mChannel;
+            final OutputChannel<AFTER> channel = mOutputChannel;
 
             if (!channel.isBound()) {
 
                 channel.passTo(result);
             }
 
-            channel.close();
+            mInputChannel.close();
         }
 
         public void onTerminate() {
 
-            mChannel = null;
+            mInputChannel = null;
+            mOutputChannel = null;
         }
     }
 
@@ -300,7 +307,9 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         private final FunctionalRoutine<IN, OUT> mRoutine;
 
-        private StreamingChannel<BEFORE, OUT> mChannel;
+        private StreamingChannel<BEFORE, ? extends IN> mInputChannel;
+
+        private OutputChannel<OUT> mOutputChannel;
 
         private BeforeInvocation(@NotNull final FunctionalRoutine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType,
@@ -315,64 +324,69 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         public void onAbort(@Nullable final RoutineException reason) {
 
-            mChannel.abort(reason);
+            mInputChannel.abort(reason);
         }
 
         public void onDestroy() {
 
-            mChannel = null;
+            mInputChannel = null;
+            mOutputChannel = null;
         }
 
         public void onInitialize() {
 
+            final DelegationType beforeDelegationType = mBeforeDelegationType;
+            final StreamingChannel<BEFORE, ? extends IN> streamingChannel =
+                    (beforeDelegationType == DelegationType.ASYNC) ? asyncStream(mBeforeRoutine)
+                            : (beforeDelegationType == DelegationType.PARALLEL) ? parallelStream(
+                                    mBeforeRoutine) : syncStream(mBeforeRoutine);
             final DelegationType delegationType = mDelegationType;
-            final StreamingChannel<IN, OUT> streamingChannel =
-                    (delegationType == DelegationType.ASYNC) ? asyncStream(mRoutine)
-                            : (delegationType == DelegationType.PARALLEL) ? parallelStream(mRoutine)
-                                    : syncStream(mRoutine);
-            final DelegationType afterDelegationType = mBeforeDelegationType;
 
-            if (afterDelegationType == DelegationType.ASYNC) {
+            if (delegationType == DelegationType.ASYNC) {
 
-                mChannel = streamingChannel.combine(asyncStream(mBeforeRoutine));
+                mOutputChannel = streamingChannel.passTo(mRoutine.asyncInvoke()).result();
+                mInputChannel = streamingChannel;
 
-            } else if (afterDelegationType == DelegationType.PARALLEL) {
+            } else if (delegationType == DelegationType.PARALLEL) {
 
-                mChannel = streamingChannel.combine(parallelStream(mBeforeRoutine));
+                mOutputChannel = streamingChannel.passTo(mRoutine.parallelInvoke()).result();
+                mInputChannel = streamingChannel;
 
             } else {
 
-                mChannel = streamingChannel.combine(syncStream(mBeforeRoutine));
+                mOutputChannel = streamingChannel.passTo(mRoutine.syncInvoke()).result();
+                mInputChannel = streamingChannel;
             }
         }
 
         public void onInput(final BEFORE input, @NotNull final ResultChannel<OUT> result) {
 
-            final StreamingChannel<BEFORE, OUT> channel = mChannel;
+            final OutputChannel<OUT> channel = mOutputChannel;
 
             if (!channel.isBound()) {
 
                 channel.passTo(result);
             }
 
-            channel.pass(input);
+            mInputChannel.pass(input);
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-            final StreamingChannel<BEFORE, OUT> channel = mChannel;
+            final OutputChannel<OUT> channel = mOutputChannel;
 
             if (!channel.isBound()) {
 
                 channel.passTo(result);
             }
 
-            channel.close();
+            mInputChannel.close();
         }
 
         public void onTerminate() {
 
-            mChannel = null;
+            mInputChannel = null;
+            mOutputChannel = null;
         }
     }
 

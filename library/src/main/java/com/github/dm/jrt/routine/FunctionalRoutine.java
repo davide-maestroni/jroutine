@@ -16,7 +16,9 @@ package com.github.dm.jrt.routine;
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.functional.BiConsumer;
+import com.github.dm.jrt.functional.BiFunction;
 import com.github.dm.jrt.functional.Function;
+import com.github.dm.jrt.functional.Predicate;
 import com.github.dm.jrt.invocation.FilterInvocation;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +32,31 @@ public interface FunctionalRoutine<IN, OUT>
         extends Routine<IN, OUT>, ConfigurableBuilder<FunctionalRoutine<IN, OUT>> {
 
     @NotNull
+    FunctionalRoutine<IN, OUT> andThenAccumulateAsync(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> andThenAccumulateSync(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> composeAccumulateAsync(
+            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> composeAccumulateSync(
+            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> andThenFilterAsync(@NotNull Predicate<? super OUT> predicate);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> andThenFilterParallel(@NotNull Predicate<? super OUT> predicate);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> andThenFilterSync(@NotNull Predicate<? super OUT> predicate);
+
+    @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
@@ -103,6 +130,15 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> composeFilterAsync(@NotNull Predicate<? super IN> predicate);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> composeFilterParallel(@NotNull Predicate<? super IN> predicate);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> composeFilterSync(@NotNull Predicate<? super IN> predicate);
 
     @NotNull
     <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(

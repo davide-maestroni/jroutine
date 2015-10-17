@@ -18,10 +18,15 @@ import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.functional.BiConsumer;
+import com.github.dm.jrt.functional.BiFunction;
 import com.github.dm.jrt.functional.Function;
 import com.github.dm.jrt.functional.Functions;
+import com.github.dm.jrt.functional.Predicate;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.Invocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.FunctionalRoutine;
 import com.github.dm.jrt.routine.Routine;
 
@@ -45,6 +50,55 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     protected AbstractFunctionalRoutine(@NotNull final InvocationConfiguration configuration) {
 
         super(configuration);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> andThenAccumulateAsync(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+
+        return andThenAccumulate(function, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> andThenAccumulateSync(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+
+        return andThenAccumulate(function, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> composeAccumulateAsync(
+            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+
+        return composeAccumulate(function, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> composeAccumulateSync(
+            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+
+        return composeAccumulate(function, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> andThenFilterAsync(
+            @NotNull final Predicate<? super OUT> predicate) {
+
+        return andThenFilter(predicate, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> andThenFilterParallel(
+            @NotNull final Predicate<? super OUT> predicate) {
+
+        return andThenFilter(predicate, DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> andThenFilterSync(
+            @NotNull final Predicate<? super OUT> predicate) {
+
+        return andThenFilter(predicate, DelegationType.SYNC);
     }
 
     @NotNull
@@ -225,6 +279,27 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
                                .with(mConfiguration)
                                .set()
                                .buildRoutine(), DelegationType.SYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> composeFilterAsync(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return composeFilter(predicate, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> composeFilterParallel(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return composeFilter(predicate, DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> composeFilterSync(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return composeFilter(predicate, DelegationType.SYNC);
     }
 
     @NotNull
@@ -444,5 +519,116 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     protected InvocationConfiguration getBuilderConfiguration() {
 
         return mConfiguration;
+    }
+
+    @NotNull
+    private FunctionalRoutine<IN, OUT> andThenAccumulate(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function,
+            @NotNull final DelegationType delegationType) {
+
+        return andThen(JRoutine.on(new AccumulateInvocationFactory<OUT>(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set()
+                               .buildRoutine(), delegationType);
+    }
+
+    @NotNull
+    private FunctionalRoutine<IN, OUT> andThenFilter(@NotNull Predicate<? super OUT> predicate,
+            @NotNull DelegationType delegationType) {
+
+        return andThen(JRoutine.on(Functions.predicateFilter(predicate))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set()
+                               .buildRoutine(), delegationType);
+    }
+
+    @NotNull
+    private FunctionalRoutine<IN, OUT> composeAccumulate(
+            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function,
+            @NotNull final DelegationType delegationType) {
+
+        return compose(JRoutine.on(new AccumulateInvocationFactory<IN>(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set()
+                               .buildRoutine(), delegationType);
+    }
+
+    @NotNull
+    private FunctionalRoutine<IN, OUT> composeFilter(@NotNull final Predicate<? super IN> predicate,
+            @NotNull final DelegationType delegationType) {
+
+        return compose(JRoutine.on(Functions.predicateFilter(predicate))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set()
+                               .buildRoutine(), delegationType);
+    }
+
+    private static class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
+
+        private final BiFunction<? super IN, ? super IN, ? extends IN> mFunction;
+
+        private IN mAccumulated;
+
+        private boolean mIsFirst;
+
+        private AccumulateInvocation(
+                @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+
+            mFunction = function;
+        }
+
+        @Override
+        public void onInitialize() {
+
+            mIsFirst = true;
+        }
+
+        @Override
+        public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
+
+            if (mIsFirst) {
+
+                mIsFirst = false;
+                mAccumulated = input;
+
+            } else {
+
+                mAccumulated = mFunction.apply(mAccumulated, input);
+            }
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<IN> result) {
+
+            result.pass(mAccumulated);
+        }
+
+        @Override
+        public void onTerminate() {
+
+            mAccumulated = null;
+        }
+    }
+
+    private static class AccumulateInvocationFactory<IN> extends InvocationFactory<IN, IN> {
+
+        private final BiFunction<? super IN, ? super IN, ? extends IN> mFunction;
+
+        private AccumulateInvocationFactory(
+                @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+
+            mFunction = function;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, IN> newInvocation() {
+
+            return new AccumulateInvocation<IN>(mFunction);
+        }
     }
 }

@@ -224,7 +224,7 @@ public class Functions {
      *
      * @param consumer the consumer instance.
      * @param <OUT>    the output data type.
-     * @return the invocation factory.
+     * @return the command invocation.
      */
     @NotNull
     public static <OUT> CommandInvocation<OUT> consumerCommand(
@@ -269,7 +269,7 @@ public class Functions {
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the invocation factory.
+     * @return the filter invocation.
      */
     @NotNull
     public static <IN, OUT> FilterInvocation<IN, OUT> consumerFilter(
@@ -356,7 +356,7 @@ public class Functions {
      * @param function the function instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the invocation factory.
+     * @return the filter invocation.
      */
     @NotNull
     public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
@@ -435,6 +435,29 @@ public class Functions {
     }
 
     /**
+     * Builds and returns a new filter invocation based on the specified predicate instance.<br/>
+     * Only the inputs which satisfies the predicate will be passed on, while the others will be
+     * filtered out.<br/>
+     * In order to prevent undesired leaks, the class of the specified predicate must have a static
+     * context.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param predicate the predicate instance.
+     * @param <IN>      the input data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN> FilterInvocation<IN, IN> predicateFilter(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return new PredicateFilterInvocation<IN>(predicateChain(predicate));
+    }
+
+    /**
      * Returns a bi-function chain just returning the second passed argument.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -501,7 +524,7 @@ public class Functions {
      *
      * @param supplier the supplier instance.
      * @param <OUT>    the output data type.
-     * @return the invocation factory.
+     * @return the command invocation.
      */
     @NotNull
     public static <OUT> CommandInvocation<OUT> supplierCommand(
@@ -744,12 +767,6 @@ public class Functions {
             return mFunction.hashCode();
         }
 
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-            result.pass(mFunction.apply(input));
-        }
-
-
         @Override
         public boolean equals(final Object o) {
 
@@ -765,6 +782,11 @@ public class Functions {
 
             final FunctionFilterInvocation<?, ?> that = (FunctionFilterInvocation<?, ?>) o;
             return mFunction.equals(that.mFunction);
+        }
+
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+            result.pass(mFunction.apply(input));
         }
     }
 
@@ -831,6 +853,63 @@ public class Functions {
 
             final FunctionInvocationFactory<?, ?> that = (FunctionInvocationFactory<?, ?>) o;
             return mFunction.equals(that.mFunction);
+        }
+    }
+
+    /**
+     * Filter invocation based on a predicate instance.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class PredicateFilterInvocation<IN> extends FilterInvocation<IN, IN> {
+
+        private final PredicateChain<? super IN> mPredicate;
+
+        /**
+         * Constructor.
+         *
+         * @param predicate the predicate instance.
+         */
+        private PredicateFilterInvocation(@NotNull final PredicateChain<? super IN> predicate) {
+
+            if (!predicate.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the predicate class must have a static context: " + predicate.getClass());
+            }
+
+            mPredicate = predicate;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mPredicate.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof PredicateFilterInvocation)) {
+
+                return false;
+            }
+
+            final PredicateFilterInvocation<?> that = (PredicateFilterInvocation<?>) o;
+            return mPredicate.equals(that.mPredicate);
+        }
+
+        public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
+
+            if (mPredicate.test(input)) {
+
+                result.pass(input);
+            }
         }
     }
 

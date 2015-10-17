@@ -54,14 +54,16 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThenMapAsync(JRoutine.on(Functions.consumerFilter(consumer))
                                        .invocations()
                                        .with(mConfiguration)
-                                       .set());
+                                       .set()
+                                       .buildRoutine());
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return andThenMapAsync(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+        return andThenMapAsync(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
@@ -71,7 +73,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThenMapAsync(JRoutine.on(Functions.functionFilter(function))
                                        .invocations()
                                        .with(mConfiguration)
-                                       .set());
+                                       .set()
+                                       .buildRoutine());
     }
 
     @NotNull
@@ -88,14 +91,16 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThenMapParallel(JRoutine.on(Functions.consumerFilter(consumer))
                                           .invocations()
                                           .with(mConfiguration)
-                                          .set());
+                                          .set()
+                                          .buildRoutine());
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return andThenMapParallel(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+        return andThenMapParallel(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
@@ -105,7 +110,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThenMapParallel(JRoutine.on(Functions.functionFilter(function))
                                           .invocations()
                                           .with(mConfiguration)
-                                          .set());
+                                          .set()
+                                          .buildRoutine());
     }
 
     @NotNull
@@ -122,14 +128,16 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThenMapSync(JRoutine.on(Functions.consumerFilter(consumer))
                                       .invocations()
                                       .with(mConfiguration)
-                                      .set());
+                                      .set()
+                                      .buildRoutine());
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return andThenMapSync(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+        return andThenMapSync(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
@@ -139,7 +147,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThenMapSync(JRoutine.on(Functions.functionFilter(function))
                                       .invocations()
                                       .with(mConfiguration)
-                                      .set());
+                                      .set()
+                                      .buildRoutine());
     }
 
     @NotNull
@@ -157,7 +166,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThen(JRoutine.on(Functions.consumerFactory(consumer))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.ASYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.ASYNC);
     }
 
     @NotNull
@@ -167,7 +177,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThen(JRoutine.on(Functions.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.ASYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.ASYNC);
     }
 
     @NotNull
@@ -178,7 +189,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThen(JRoutine.on(Functions.consumerFactory(consumer))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.PARALLEL);
+                               .set()
+                               .buildRoutine(), DelegationType.PARALLEL);
     }
 
     @NotNull
@@ -188,7 +200,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThen(JRoutine.on(Functions.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.PARALLEL);
+                               .set()
+                               .buildRoutine(), DelegationType.PARALLEL);
     }
 
     @NotNull
@@ -199,7 +212,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThen(JRoutine.on(Functions.consumerFactory(consumer))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.SYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.SYNC);
     }
 
     @NotNull
@@ -209,7 +223,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return andThen(JRoutine.on(Functions.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.SYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.SYNC);
     }
 
     @NotNull
@@ -219,14 +234,16 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return composeMapAsync(JRoutine.on(Functions.consumerFilter(consumer))
                                        .invocations()
                                        .with(mConfiguration)
-                                       .set());
+                                       .set()
+                                       .buildRoutine());
     }
 
     @NotNull
     public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
             @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
 
-        return composeMapAsync(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+        return composeMapAsync(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
@@ -236,7 +253,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return composeMapAsync(JRoutine.on(Functions.functionFilter(function))
                                        .invocations()
                                        .with(mConfiguration)
-                                       .set());
+                                       .set()
+                                       .buildRoutine());
     }
 
     @NotNull
@@ -253,14 +271,16 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return composeMapParallel(JRoutine.on(Functions.consumerFilter(consumer))
                                           .invocations()
                                           .with(mConfiguration)
-                                          .set());
+                                          .set()
+                                          .buildRoutine());
     }
 
     @NotNull
     public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
             @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
 
-        return composeMapParallel(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+        return composeMapParallel(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
@@ -270,7 +290,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return composeMapParallel(JRoutine.on(Functions.functionFilter(function))
                                           .invocations()
                                           .with(mConfiguration)
-                                          .set());
+                                          .set()
+                                          .buildRoutine());
     }
 
     @NotNull
@@ -287,14 +308,16 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return composeMapSync(JRoutine.on(Functions.consumerFilter(consumer))
                                       .invocations()
                                       .with(mConfiguration)
-                                      .set());
+                                      .set()
+                                      .buildRoutine());
     }
 
     @NotNull
     public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
             @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
 
-        return composeMapSync(JRoutine.on(invocation).invocations().with(mConfiguration).set());
+        return composeMapSync(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
@@ -304,7 +327,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return composeMapSync(JRoutine.on(Functions.functionFilter(function))
                                       .invocations()
                                       .with(mConfiguration)
-                                      .set());
+                                      .set()
+                                      .buildRoutine());
     }
 
     @NotNull
@@ -322,7 +346,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return compose(JRoutine.on(Functions.consumerFactory(consumer))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.ASYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.ASYNC);
     }
 
     @NotNull
@@ -332,7 +357,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return compose(JRoutine.on(Functions.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.ASYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.ASYNC);
     }
 
     @NotNull
@@ -343,7 +369,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return compose(JRoutine.on(Functions.consumerFactory(consumer))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.PARALLEL);
+                               .set()
+                               .buildRoutine(), DelegationType.PARALLEL);
     }
 
     @NotNull
@@ -353,7 +380,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return compose(JRoutine.on(Functions.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.PARALLEL);
+                               .set()
+                               .buildRoutine(), DelegationType.PARALLEL);
     }
 
     @NotNull
@@ -364,7 +392,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return compose(JRoutine.on(Functions.consumerFactory(consumer))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.SYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.SYNC);
     }
 
     @NotNull
@@ -374,7 +403,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
         return compose(JRoutine.on(Functions.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
-                               .set(), DelegationType.SYNC);
+                               .set()
+                               .buildRoutine(), DelegationType.SYNC);
     }
 
     @NotNull

@@ -43,6 +43,7 @@ import static com.github.dm.jrt.functional.Functions.identity;
 import static com.github.dm.jrt.functional.Functions.negative;
 import static com.github.dm.jrt.functional.Functions.positive;
 import static com.github.dm.jrt.functional.Functions.predicateChain;
+import static com.github.dm.jrt.functional.Functions.predicateFilter;
 import static com.github.dm.jrt.functional.Functions.sink;
 import static com.github.dm.jrt.functional.Functions.supplierChain;
 import static com.github.dm.jrt.functional.Functions.supplierCommand;
@@ -116,6 +117,17 @@ public class FunctionsTest {
             public String apply(final Object o) {
 
                 return o.toString();
+            }
+        });
+    }
+
+    private static FilterInvocation<String, String> createFilter3() {
+
+        return predicateFilter(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return s.length() > 0;
             }
         });
     }
@@ -745,6 +757,60 @@ public class FunctionsTest {
                 public Object apply(final Object o) {
 
                     return o.toString();
+                }
+            })).buildRoutine();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testFilter3() {
+
+        final Routine<String, String> routine = JRoutine.on(createFilter3()).buildRoutine();
+        assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
+    }
+
+    @Test
+    public void testFilter3Equals() {
+
+        final PredicateChain<Object> negative = Functions.negative();
+        final InvocationFactory<String, String> factory = createFilter3();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isEqualTo(createFilter3());
+        assertThat(factory).isNotEqualTo(predicateFilter(negative));
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(factory.hashCode()).isEqualTo(createFilter3().hashCode());
+        assertThat(predicateFilter(negative)).isEqualTo(predicateFilter(negative));
+        assertThat(predicateFilter(negative).hashCode()).isEqualTo(
+                predicateFilter(negative).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testFilter3Error() {
+
+        try {
+
+            predicateFilter((Predicate<Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(predicateFilter(new Predicate<Object>() {
+
+                public boolean test(final Object o) {
+
+                    return o != null;
                 }
             })).buildRoutine();
 

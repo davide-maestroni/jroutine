@@ -22,7 +22,11 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Invocation implementation accumulating the result returned by a bi-function instance.
+ * <p/>
  * Created by davide-maestroni on 10/18/2015.
+ *
+ * @param <IN> the input data type.
  */
 class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
 
@@ -32,12 +36,25 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
 
     private boolean mIsFirst;
 
+    /**
+     * Constructor.
+     *
+     * @param function the bi-function instance.
+     */
     private AccumulateInvocation(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
 
         mFunction = function;
     }
 
+    /**
+     * Builds and returns a new accumulating invocation factory backed by the specified bi-function
+     * instance.
+     *
+     * @param function the bi-function instance.
+     * @param <IN>     the input data type.
+     * @return the invocation factory.
+     */
     @NotNull
     public static <IN> InvocationFactory<IN, IN> functionFactory(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
@@ -77,11 +94,21 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
         mAccumulated = null;
     }
 
+    /**
+     * Class implementing an accumulating invocation factory.
+     *
+     * @param <IN> the input data type.
+     */
     private static class AccumulateInvocationFactory<IN> extends InvocationFactory<IN, IN> {
 
         private final BiFunction<? super IN, ? super IN, ? extends IN> mFunction;
 
-        AccumulateInvocationFactory(
+        /**
+         * Constructor.
+         *
+         * @param function the bi-function instance.
+         */
+        private AccumulateInvocationFactory(
                 @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
 
             mFunction = function;

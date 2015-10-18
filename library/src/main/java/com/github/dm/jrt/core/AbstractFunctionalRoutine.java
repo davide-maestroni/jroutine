@@ -24,9 +24,6 @@ import com.github.dm.jrt.functional.Functions;
 import com.github.dm.jrt.functional.Predicate;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationFactory;
-import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.FunctionalRoutine;
 import com.github.dm.jrt.routine.Routine;
 
@@ -67,20 +64,6 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     }
 
     @NotNull
-    public FunctionalRoutine<IN, OUT> composeAccumulateAsync(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-        return composeAccumulate(function, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public FunctionalRoutine<IN, OUT> composeAccumulateSync(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-        return composeAccumulate(function, DelegationType.SYNC);
-    }
-
-    @NotNull
     public FunctionalRoutine<IN, OUT> andThenFilterAsync(
             @NotNull final Predicate<? super OUT> predicate) {
 
@@ -105,11 +88,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return andThenMapAsync(JRoutine.on(Functions.consumerFilter(consumer))
-                                       .invocations()
-                                       .with(mConfiguration)
-                                       .set()
-                                       .buildRoutine());
+        return andThenMapAsync(Functions.consumerFilter(consumer));
     }
 
     @NotNull
@@ -124,11 +103,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return andThenMapAsync(JRoutine.on(Functions.functionFilter(function))
-                                       .invocations()
-                                       .with(mConfiguration)
-                                       .set()
-                                       .buildRoutine());
+        return andThenMapAsync(Functions.functionFilter(function));
     }
 
     @NotNull
@@ -142,11 +117,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return andThenMapParallel(JRoutine.on(Functions.consumerFilter(consumer))
-                                          .invocations()
-                                          .with(mConfiguration)
-                                          .set()
-                                          .buildRoutine());
+        return andThenMapParallel(Functions.consumerFilter(consumer));
     }
 
     @NotNull
@@ -161,11 +132,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return andThenMapParallel(JRoutine.on(Functions.functionFilter(function))
-                                          .invocations()
-                                          .with(mConfiguration)
-                                          .set()
-                                          .buildRoutine());
+        return andThenMapParallel(Functions.functionFilter(function));
     }
 
     @NotNull
@@ -179,11 +146,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return andThenMapSync(JRoutine.on(Functions.consumerFilter(consumer))
-                                      .invocations()
-                                      .with(mConfiguration)
-                                      .set()
-                                      .buildRoutine());
+        return andThenMapSync(Functions.consumerFilter(consumer));
     }
 
     @NotNull
@@ -198,11 +161,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return andThenMapSync(JRoutine.on(Functions.functionFilter(function))
-                                      .invocations()
-                                      .with(mConfiguration)
-                                      .set()
-                                      .buildRoutine());
+        return andThenMapSync(Functions.functionFilter(function));
     }
 
     @NotNull
@@ -279,6 +238,20 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
                                .with(mConfiguration)
                                .set()
                                .buildRoutine(), DelegationType.SYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> composeAccumulateAsync(
+            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+
+        return composeAccumulate(function, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> composeAccumulateSync(
+            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+
+        return composeAccumulate(function, DelegationType.SYNC);
     }
 
     @NotNull
@@ -483,6 +456,30 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     }
 
     @NotNull
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftAsync(
+            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function) {
+
+        return lift(function, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftParallel(
+            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function) {
+
+        return lift(function, DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftSync(
+            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function) {
+
+        return lift(function, DelegationType.SYNC);
+    }
+
+    @NotNull
     public Builder<? extends FunctionalRoutine<IN, OUT>> invocations() {
 
         return new Builder<FunctionalRoutine<IN, OUT>>(this, mConfiguration);
@@ -522,11 +519,17 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     }
 
     @NotNull
+    protected abstract <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function,
+            @NotNull final DelegationType delegationType);
+
+    @NotNull
     private FunctionalRoutine<IN, OUT> andThenAccumulate(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function,
             @NotNull final DelegationType delegationType) {
 
-        return andThen(JRoutine.on(new AccumulateInvocationFactory<OUT>(function))
+        return andThen(JRoutine.on(AccumulateInvocation.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
                                .set()
@@ -549,7 +552,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function,
             @NotNull final DelegationType delegationType) {
 
-        return compose(JRoutine.on(new AccumulateInvocationFactory<IN>(function))
+        return compose(JRoutine.on(AccumulateInvocation.functionFactory(function))
                                .invocations()
                                .with(mConfiguration)
                                .set()
@@ -567,68 +570,4 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
                                .buildRoutine(), delegationType);
     }
 
-    private static class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
-
-        private final BiFunction<? super IN, ? super IN, ? extends IN> mFunction;
-
-        private IN mAccumulated;
-
-        private boolean mIsFirst;
-
-        private AccumulateInvocation(
-                @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-            mFunction = function;
-        }
-
-        @Override
-        public void onInitialize() {
-
-            mIsFirst = true;
-        }
-
-        @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
-
-            if (mIsFirst) {
-
-                mIsFirst = false;
-                mAccumulated = input;
-
-            } else {
-
-                mAccumulated = mFunction.apply(mAccumulated, input);
-            }
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<IN> result) {
-
-            result.pass(mAccumulated);
-        }
-
-        @Override
-        public void onTerminate() {
-
-            mAccumulated = null;
-        }
-    }
-
-    private static class AccumulateInvocationFactory<IN> extends InvocationFactory<IN, IN> {
-
-        private final BiFunction<? super IN, ? super IN, ? extends IN> mFunction;
-
-        private AccumulateInvocationFactory(
-                @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-            mFunction = function;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, IN> newInvocation() {
-
-            return new AccumulateInvocation<IN>(mFunction);
-        }
-    }
 }

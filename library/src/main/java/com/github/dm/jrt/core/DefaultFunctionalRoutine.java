@@ -18,6 +18,7 @@ import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.functional.Function;
 import com.github.dm.jrt.invocation.DelegatingInvocation;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.Invocation;
@@ -126,6 +127,17 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
             return new BeforeFunctionalRoutine<BEFORE, IN, AFTER>(getBuilderConfiguration(), this,
                                                                   DelegationType.SYNC, routine,
                                                                   delegationType);
+        }
+
+        @NotNull
+        @Override
+        protected <BEFORE, NEXT> FunctionalRoutine<BEFORE, NEXT> lift(
+                @NotNull final Function<? super Routine<IN, AFTER>, ? extends Routine<BEFORE,
+                        NEXT>> function,
+                @NotNull final DelegationType delegationType) {
+
+            return new DefaultFunctionalRoutine<BEFORE, NEXT>(getBuilderConfiguration(),
+                                                              function.apply(this), delegationType);
         }
 
         @NotNull
@@ -290,6 +302,17 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         @NotNull
         @Override
+        protected <PREV, AFTER> FunctionalRoutine<PREV, AFTER> lift(
+                @NotNull final Function<? super Routine<BEFORE, OUT>, ? extends Routine<PREV,
+                        AFTER>> function,
+                @NotNull final DelegationType delegationType) {
+
+            return new DefaultFunctionalRoutine<PREV, AFTER>(getBuilderConfiguration(),
+                                                             function.apply(this), delegationType);
+        }
+
+        @NotNull
+        @Override
         protected Invocation<BEFORE, OUT> newInvocation(@NotNull final InvocationType type) {
 
             return new BeforeInvocation<BEFORE, IN, OUT>(mRoutine, mDelegationType, mBeforeRoutine,
@@ -399,5 +422,16 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
         return new BeforeFunctionalRoutine<BEFORE, IN, OUT>(getBuilderConfiguration(), this,
                                                             DelegationType.SYNC, routine,
                                                             delegationType);
+    }
+
+    @NotNull
+    @Override
+    protected <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function,
+            @NotNull final DelegationType delegationType) {
+
+        return new DefaultFunctionalRoutine<BEFORE, AFTER>(getBuilderConfiguration(),
+                                                           function.apply(this), delegationType);
     }
 }

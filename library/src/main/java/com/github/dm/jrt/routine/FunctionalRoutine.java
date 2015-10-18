@@ -40,14 +40,6 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     @NotNull
-    FunctionalRoutine<IN, OUT> composeAccumulateAsync(
-            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
-
-    @NotNull
-    FunctionalRoutine<IN, OUT> composeAccumulateSync(
-            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
-
-    @NotNull
     FunctionalRoutine<IN, OUT> andThenFilterAsync(@NotNull Predicate<? super OUT> predicate);
 
     @NotNull
@@ -132,6 +124,14 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
 
     @NotNull
+    FunctionalRoutine<IN, OUT> composeAccumulateAsync(
+            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> composeAccumulateSync(
+            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
+
+    @NotNull
     FunctionalRoutine<IN, OUT> composeFilterAsync(@NotNull Predicate<? super IN> predicate);
 
     @NotNull
@@ -214,4 +214,16 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
             @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
+
+    @NotNull
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftAsync(
+            @NotNull Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>> function);
+
+    @NotNull
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftParallel(
+            @NotNull Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>> function);
+
+    @NotNull
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftSync(
+            @NotNull Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>> function);
 }

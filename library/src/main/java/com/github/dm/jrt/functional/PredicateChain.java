@@ -35,7 +35,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
 
         public boolean test(final Object o) {
 
-            return false;
+            throw new UnsupportedOperationException("should never be called");
         }
     };
 
@@ -43,7 +43,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
 
         public boolean test(final Object o) {
 
-            return false;
+            throw new UnsupportedOperationException("should never be called");
         }
     };
 
@@ -51,7 +51,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
 
         public boolean test(final Object o) {
 
-            return false;
+            throw new UnsupportedOperationException("should never be called");
         }
     };
 
@@ -59,7 +59,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
 
         public boolean test(final Object o) {
 
-            return false;
+            throw new UnsupportedOperationException("should never be called");
         }
     };
 
@@ -67,7 +67,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
 
         public boolean test(final Object o) {
 
-            return false;
+            throw new UnsupportedOperationException("should never be called");
         }
     };
 

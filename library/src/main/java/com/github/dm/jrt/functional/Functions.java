@@ -68,6 +68,16 @@ public class Functions {
         }
     });
 
+    private static final PredicateChain<?> sNotNull = predicateChain(new Predicate<Object>() {
+
+        public boolean test(final Object o) {
+
+            return (o != null);
+        }
+    });
+
+    private static final PredicateChain<?> sIsNull = sNotNull.negate();
+
     private static final PredicateChain<?> sPositive = sNegative.negate();
 
     private static final BiFunctionChain<?, ?, ?> sSecond =
@@ -105,7 +115,7 @@ public class Functions {
      * @param consumer the bi-consumer instance.
      * @param <IN1>    the first input data type.
      * @param <IN2>    the second input data type.
-     * @return the wrapped bi-consumer.
+     * @return the bi-consumer chain.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
@@ -134,7 +144,7 @@ public class Functions {
      * @param <IN1>    the first input data type.
      * @param <IN2>    the second input data type.
      * @param <OUT>    the output data type.
-     * @return the wrapped bi-function.
+     * @return the bi-function chain.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
@@ -157,7 +167,7 @@ public class Functions {
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the wrapped bi-consumer.
+     * @return the bi-consumer chain.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -172,7 +182,7 @@ public class Functions {
      *
      * @param result the result.
      * @param <OUT>  the output data type.
-     * @return the wrapped supplier.
+     * @return the supplier chain.
      */
     @NotNull
     public static <OUT> SupplierChain<OUT> constant(final OUT result) {
@@ -197,7 +207,7 @@ public class Functions {
      *
      * @param consumer the consumer instance.
      * @param <IN>     the input data type.
-     * @return the wrapped consumer.
+     * @return the consumer chain.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
@@ -284,7 +294,7 @@ public class Functions {
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the wrapped bi-function.
+     * @return the bi-function chain.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -305,7 +315,7 @@ public class Functions {
      * @param function the function instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the wrapped function.
+     * @return the function chain.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
@@ -370,7 +380,7 @@ public class Functions {
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the wrapped function.
+     * @return the function chain.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -380,11 +390,25 @@ public class Functions {
     }
 
     /**
+     * Returns a predicate chain returning true when the passed argument is null.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate chain.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateChain<IN> isNull() {
+
+        return (PredicateChain<IN>) sIsNull;
+    }
+
+    /**
      * Returns a predicate chain always returning the false.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the wrapped predicate.
+     * @return the predicate chain.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -394,11 +418,25 @@ public class Functions {
     }
 
     /**
+     * Returns a predicate chain returning true when the passed argument is not null.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate chain.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateChain<IN> notNull() {
+
+        return (PredicateChain<IN>) sNotNull;
+    }
+
+    /**
      * Returns a predicate chain always returning the true.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the wrapped predicate.
+     * @return the predicate chain.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -418,7 +456,7 @@ public class Functions {
      *
      * @param predicate the predicate instance.
      * @param <IN>      the input data type.
-     * @return the wrapped predicate.
+     * @return the predicate chain.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
@@ -463,7 +501,7 @@ public class Functions {
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the wrapped bi-function.
+     * @return the bi-function chain.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -477,7 +515,7 @@ public class Functions {
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the wrapped consumer.
+     * @return the consumer chain.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -497,7 +535,7 @@ public class Functions {
      *
      * @param supplier the supplier instance.
      * @param <OUT>    the output data type.
-     * @return the wrapped supplier.
+     * @return the supplier chain.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",

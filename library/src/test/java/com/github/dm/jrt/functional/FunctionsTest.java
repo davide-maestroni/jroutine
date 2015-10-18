@@ -40,7 +40,9 @@ import static com.github.dm.jrt.functional.Functions.functionChain;
 import static com.github.dm.jrt.functional.Functions.functionFactory;
 import static com.github.dm.jrt.functional.Functions.functionFilter;
 import static com.github.dm.jrt.functional.Functions.identity;
+import static com.github.dm.jrt.functional.Functions.isNull;
 import static com.github.dm.jrt.functional.Functions.negative;
+import static com.github.dm.jrt.functional.Functions.notNull;
 import static com.github.dm.jrt.functional.Functions.positive;
 import static com.github.dm.jrt.functional.Functions.predicateChain;
 import static com.github.dm.jrt.functional.Functions.predicateFilter;
@@ -796,7 +798,7 @@ public class FunctionsTest {
 
         try {
 
-            predicateFilter((Predicate<Object>) null);
+            predicateFilter(null);
 
             fail();
 
@@ -1226,6 +1228,8 @@ public class FunctionsTest {
         predicate3.reset();
         assertThat(negative().or(positive()).test(null)).isTrue();
         assertThat(negative().and(positive()).test("test")).isFalse();
+        assertThat(notNull().or(isNull()).test(null)).isTrue();
+        assertThat(notNull().and(isNull()).test("test")).isFalse();
     }
 
     @Test
@@ -1242,6 +1246,7 @@ public class FunctionsTest {
             }
         }).hasStaticContext()).isFalse();
         assertThat(predicate1.or(negative()).hasStaticContext()).isTrue();
+        assertThat(predicate1.or(isNull()).hasStaticContext()).isTrue();
     }
 
     @Test
@@ -1314,6 +1319,8 @@ public class FunctionsTest {
         assertThat(predicate2.and(predicate2.or(predicate1)).negate()).isEqualTo(chain);
         assertThat(negative().negate()).isEqualTo(positive());
         assertThat(positive().negate()).isEqualTo(negative());
+        assertThat(notNull().negate()).isEqualTo(isNull());
+        assertThat(isNull().negate()).isEqualTo(notNull());
     }
 
     @Test

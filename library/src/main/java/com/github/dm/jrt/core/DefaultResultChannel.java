@@ -804,7 +804,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             throw new InvocationDeadlockException();
         }
 
-        if (isTimeout || outputQueue.isEmpty()) {
+        if (isTimeout) {
 
             logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
 

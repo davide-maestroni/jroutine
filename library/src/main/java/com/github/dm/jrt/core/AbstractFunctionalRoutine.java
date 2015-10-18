@@ -50,409 +50,76 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     }
 
     @NotNull
-    public FunctionalRoutine<IN, OUT> andThenAccumulateAsync(
+    public FunctionalRoutine<IN, OUT> asyncAccumulate(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
         return andThenAccumulate(function, DelegationType.ASYNC);
     }
 
     @NotNull
-    public FunctionalRoutine<IN, OUT> andThenAccumulateSync(
-            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
-
-        return andThenAccumulate(function, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public FunctionalRoutine<IN, OUT> andThenFilterAsync(
-            @NotNull final Predicate<? super OUT> predicate) {
+    public FunctionalRoutine<IN, OUT> asyncFilter(@NotNull final Predicate<? super OUT> predicate) {
 
         return andThenFilter(predicate, DelegationType.ASYNC);
     }
 
     @NotNull
-    public FunctionalRoutine<IN, OUT> andThenFilterParallel(
-            @NotNull final Predicate<? super OUT> predicate) {
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> asyncLift(
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function) {
 
-        return andThenFilter(predicate, DelegationType.PARALLEL);
+        return lift(function, DelegationType.ASYNC);
     }
 
     @NotNull
-    public FunctionalRoutine<IN, OUT> andThenFilterSync(
-            @NotNull final Predicate<? super OUT> predicate) {
-
-        return andThenFilter(predicate, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
+    public <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return andThenMapAsync(Functions.consumerFilter(consumer));
+        return asyncMap(Functions.consumerFilter(consumer));
     }
 
     @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
+    public <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return andThenMapAsync(
+        return asyncMap(
                 JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
+    public <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return andThenMapAsync(Functions.functionFilter(function));
+        return asyncMap(Functions.functionFilter(function));
     }
 
     @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
+    public <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull final Routine<? super OUT, AFTER> routine) {
 
         return andThen(routine, DelegationType.ASYNC);
     }
 
     @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
-
-        return andThenMapParallel(Functions.consumerFilter(consumer));
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
-
-        return andThenMapParallel(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull final Function<? super OUT, AFTER> function) {
-
-        return andThenMapParallel(Functions.functionFilter(function));
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull final Routine<? super OUT, AFTER> routine) {
-
-        return andThen(routine, DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
-
-        return andThenMapSync(Functions.consumerFilter(consumer));
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
-
-        return andThenMapSync(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull final Function<? super OUT, AFTER> function) {
-
-        return andThenMapSync(Functions.functionFilter(function));
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull final Routine<? super OUT, AFTER> routine) {
-
-        return andThen(routine, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+    public <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
             @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer) {
 
-        return andThen(JRoutine.on(Functions.consumerFactory(consumer))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.ASYNC);
+        return asyncMap(JRoutine.on(Functions.consumerFactory(consumer))
+                                .invocations()
+                                .with(mConfiguration)
+                                .set()
+                                .buildRoutine());
     }
 
     @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+    public <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
             @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
 
-        return andThen(JRoutine.on(Functions.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        return andThen(JRoutine.on(Functions.consumerFactory(consumer))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
-            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
-
-        return andThen(JRoutine.on(Functions.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        return andThen(JRoutine.on(Functions.consumerFactory(consumer))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
-            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
-
-        return andThen(JRoutine.on(Functions.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.SYNC);
-    }
-
-    @NotNull
-    public FunctionalRoutine<IN, OUT> composeAccumulateAsync(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-        return composeAccumulate(function, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public FunctionalRoutine<IN, OUT> composeAccumulateSync(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-        return composeAccumulate(function, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public FunctionalRoutine<IN, OUT> composeFilterAsync(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return composeFilter(predicate, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public FunctionalRoutine<IN, OUT> composeFilterParallel(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return composeFilter(predicate, DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public FunctionalRoutine<IN, OUT> composeFilterSync(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return composeFilter(predicate, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
-
-        return composeMapAsync(JRoutine.on(Functions.consumerFilter(consumer))
-                                       .invocations()
-                                       .with(mConfiguration)
-                                       .set()
-                                       .buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
-
-        return composeMapAsync(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull final Function<BEFORE, ? extends IN> function) {
-
-        return composeMapAsync(JRoutine.on(Functions.functionFilter(function))
-                                       .invocations()
-                                       .with(mConfiguration)
-                                       .set()
-                                       .buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull final Routine<BEFORE, ? extends IN> routine) {
-
-        return compose(routine, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
-
-        return composeMapParallel(JRoutine.on(Functions.consumerFilter(consumer))
-                                          .invocations()
-                                          .with(mConfiguration)
-                                          .set()
-                                          .buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
-
-        return composeMapParallel(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull final Function<BEFORE, ? extends IN> function) {
-
-        return composeMapParallel(JRoutine.on(Functions.functionFilter(function))
-                                          .invocations()
-                                          .with(mConfiguration)
-                                          .set()
-                                          .buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull final Routine<BEFORE, ? extends IN> routine) {
-
-        return compose(routine, DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull final BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer) {
-
-        return composeMapSync(JRoutine.on(Functions.consumerFilter(consumer))
-                                      .invocations()
-                                      .with(mConfiguration)
-                                      .set()
-                                      .buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull final FilterInvocation<BEFORE, ? extends IN> invocation) {
-
-        return composeMapSync(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull final Function<BEFORE, ? extends IN> function) {
-
-        return composeMapSync(JRoutine.on(Functions.functionFilter(function))
-                                      .invocations()
-                                      .with(mConfiguration)
-                                      .set()
-                                      .buildRoutine());
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull final Routine<BEFORE, ? extends IN> routine) {
-
-        return compose(routine, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
-            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
-                    consumer) {
-
-        return compose(JRoutine.on(Functions.consumerFactory(consumer))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
-            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
-
-        return compose(JRoutine.on(Functions.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
-            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
-                    consumer) {
-
-        return compose(JRoutine.on(Functions.consumerFactory(consumer))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
-            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
-
-        return compose(JRoutine.on(Functions.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
-            @NotNull final BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
-                    consumer) {
-
-        return compose(JRoutine.on(Functions.consumerFactory(consumer))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
-            @NotNull final Function<? super List<? extends BEFORE>, ? extends IN> function) {
-
-        return compose(JRoutine.on(Functions.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), DelegationType.SYNC);
+        return asyncMap(JRoutine.on(Functions.functionFactory(function))
+                                .invocations()
+                                .with(mConfiguration)
+                                .set()
+                                .buildRoutine());
     }
 
     @NotNull
@@ -464,15 +131,14 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     }
 
     @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftAsync(
-            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function) {
+    public FunctionalRoutine<IN, OUT> parallelFilter(
+            @NotNull final Predicate<? super OUT> predicate) {
 
-        return lift(function, DelegationType.ASYNC);
+        return andThenFilter(predicate, DelegationType.PARALLEL);
     }
 
     @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftParallel(
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> parallelLift(
             @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function) {
 
@@ -480,11 +146,128 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     }
 
     @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftSync(
+    public <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+            @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
+
+        return parallelMap(Functions.consumerFilter(consumer));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
+
+        return parallelMap(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+            @NotNull final Function<? super OUT, AFTER> function) {
+
+        return parallelMap(Functions.functionFilter(function));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+            @NotNull final Routine<? super OUT, AFTER> routine) {
+
+        return andThen(routine, DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> parallelReduce(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return parallelMap(JRoutine.on(Functions.consumerFactory(consumer))
+                                   .invocations()
+                                   .with(mConfiguration)
+                                   .set()
+                                   .buildRoutine());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> parallelReduce(
+            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+        return parallelMap(JRoutine.on(Functions.functionFactory(function))
+                                   .invocations()
+                                   .with(mConfiguration)
+                                   .set()
+                                   .buildRoutine());
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> syncAccumulate(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+
+        return andThenAccumulate(function, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public FunctionalRoutine<IN, OUT> syncFilter(@NotNull final Predicate<? super OUT> predicate) {
+
+        return andThenFilter(predicate, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> syncLift(
             @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function) {
 
         return lift(function, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+            @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
+
+        return syncMap(Functions.consumerFilter(consumer));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
+
+        return syncMap(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+            @NotNull final Function<? super OUT, AFTER> function) {
+
+        return syncMap(Functions.functionFilter(function));
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+            @NotNull final Routine<? super OUT, AFTER> routine) {
+
+        return andThen(routine, DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return syncMap(JRoutine.on(Functions.consumerFactory(consumer))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set()
+                               .buildRoutine());
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+        return syncMap(JRoutine.on(Functions.functionFactory(function))
+                               .invocations()
+                               .with(mConfiguration)
+                               .set()
+                               .buildRoutine());
     }
 
     @NotNull
@@ -510,10 +293,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     @NotNull
     protected abstract <AFTER> FunctionalRoutine<IN, AFTER> andThen(
             @NotNull Routine<? super OUT, AFTER> routine, @NotNull DelegationType delegationType);
-
-    @NotNull
-    protected abstract <BEFORE> FunctionalRoutine<BEFORE, OUT> compose(
-            @NotNull Routine<BEFORE, ? extends IN> routine, @NotNull DelegationType delegationType);
 
     /**
      * Returns the builder invocation configuration.
@@ -545,8 +324,9 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     }
 
     @NotNull
-    private FunctionalRoutine<IN, OUT> andThenFilter(@NotNull Predicate<? super OUT> predicate,
-            @NotNull DelegationType delegationType) {
+    private FunctionalRoutine<IN, OUT> andThenFilter(
+            @NotNull final Predicate<? super OUT> predicate,
+            @NotNull final DelegationType delegationType) {
 
         return andThen(JRoutine.on(Functions.predicateFilter(predicate))
                                .invocations()
@@ -554,28 +334,4 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
                                .set()
                                .buildRoutine(), delegationType);
     }
-
-    @NotNull
-    private FunctionalRoutine<IN, OUT> composeAccumulate(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function,
-            @NotNull final DelegationType delegationType) {
-
-        return compose(JRoutine.on(AccumulateInvocation.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), delegationType);
-    }
-
-    @NotNull
-    private FunctionalRoutine<IN, OUT> composeFilter(@NotNull final Predicate<? super IN> predicate,
-            @NotNull final DelegationType delegationType) {
-
-        return compose(JRoutine.on(Functions.predicateFilter(predicate))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), delegationType);
-    }
-
 }

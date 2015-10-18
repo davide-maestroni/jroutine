@@ -32,188 +32,39 @@ public interface FunctionalRoutine<IN, OUT>
         extends Routine<IN, OUT>, ConfigurableBuilder<FunctionalRoutine<IN, OUT>> {
 
     @NotNull
-    FunctionalRoutine<IN, OUT> andThenAccumulateAsync(
+    FunctionalRoutine<IN, OUT> asyncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     @NotNull
-    FunctionalRoutine<IN, OUT> andThenAccumulateSync(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+    FunctionalRoutine<IN, OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
 
     @NotNull
-    FunctionalRoutine<IN, OUT> andThenFilterAsync(@NotNull Predicate<? super OUT> predicate);
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> asyncLift(
+            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function);
 
     @NotNull
-    FunctionalRoutine<IN, OUT> andThenFilterParallel(@NotNull Predicate<? super OUT> predicate);
-
-    @NotNull
-    FunctionalRoutine<IN, OUT> andThenFilterSync(@NotNull Predicate<? super OUT> predicate);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull FilterInvocation<? super OUT, AFTER> invocation);
 
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
-            @NotNull Function<? super OUT, AFTER> function);
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Function<? super OUT, AFTER> function);
 
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapAsync(
-            @NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull Function<? super OUT, AFTER> function);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapParallel(
-            @NotNull Routine<? super OUT, AFTER> routine);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull Function<? super OUT, AFTER> function);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenMapSync(
-            @NotNull Routine<? super OUT, AFTER> routine);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceAsync(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceParallel(
-            @NotNull Function<? super List<? extends OUT>, AFTER> function);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> andThenReduceSync(
-            @NotNull Function<? super List<? extends OUT>, AFTER> function);
-
-    @NotNull
-    FunctionalRoutine<IN, OUT> composeAccumulateAsync(
-            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
-
-    @NotNull
-    FunctionalRoutine<IN, OUT> composeAccumulateSync(
-            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
-
-    @NotNull
-    FunctionalRoutine<IN, OUT> composeFilterAsync(@NotNull Predicate<? super IN> predicate);
-
-    @NotNull
-    FunctionalRoutine<IN, OUT> composeFilterParallel(@NotNull Predicate<? super IN> predicate);
-
-    @NotNull
-    FunctionalRoutine<IN, OUT> composeFilterSync(@NotNull Predicate<? super IN> predicate);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull Function<BEFORE, ? extends IN> function);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapAsync(
-            @NotNull Routine<BEFORE, ? extends IN> routine);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull Function<BEFORE, ? extends IN> function);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapParallel(
-            @NotNull Routine<BEFORE, ? extends IN> routine);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull BiConsumer<BEFORE, ? super ResultChannel<IN>> consumer);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull FilterInvocation<BEFORE, ? extends IN> invocation);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull Function<BEFORE, ? extends IN> function);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeMapSync(
-            @NotNull Routine<BEFORE, ? extends IN> routine);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
-            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
-                    consumer);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceAsync(
-            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
-            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
-                    consumer);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceParallel(
-            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
-            @NotNull BiConsumer<? super List<? extends BEFORE>, ? super ResultChannel<IN>>
-                    consumer);
-
-    @NotNull
-    <BEFORE> FunctionalRoutine<BEFORE, OUT> composeReduceSync(
-            @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
 
     @NotNull
     <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
@@ -221,17 +72,69 @@ public interface FunctionalRoutine<IN, OUT>
                     FunctionalRoutine<BEFORE, AFTER>> function);
 
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftAsync(
+    FunctionalRoutine<IN, OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
+
+    @NotNull
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> parallelLift(
             @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function);
 
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftParallel(
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+            @NotNull Function<? super OUT, AFTER> function);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelReduce(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelReduce(
+            @NotNull Function<? super List<? extends OUT>, AFTER> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> syncAccumulate(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    @NotNull
+    FunctionalRoutine<IN, OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
+
+    @NotNull
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> syncLift(
             @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function);
 
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftSync(
-            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function);
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Function<? super OUT, AFTER> function);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+            @NotNull Function<? super List<? extends OUT>, AFTER> function);
 }

@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Created by davide-maestroni on 10/16/2015.
  */
-public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
+abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         implements FunctionalRoutine<IN, OUT>, Configurable<FunctionalRoutine<IN, OUT>> {
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -44,7 +44,7 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
      *
      * @param configuration the invocation configuration.
      */
-    protected AbstractFunctionalRoutine(@NotNull final InvocationConfiguration configuration) {
+    AbstractFunctionalRoutine(@NotNull final InvocationConfiguration configuration) {
 
         super(configuration);
     }

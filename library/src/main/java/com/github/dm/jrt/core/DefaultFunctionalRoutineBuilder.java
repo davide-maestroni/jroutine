@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Created by davide-maestroni on 10/18/2015.
  */
-public class DefaultFunctionalRoutineBuilder
+class DefaultFunctionalRoutineBuilder
         implements FunctionalRoutineBuilder, Configurable<FunctionalRoutineBuilder> {
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;

@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.Channels.syncStream;
 /**
  * Created by davide-maestroni on 10/16/2015.
  */
-public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OUT> {
+class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OUT> {
 
     private final DelegationType mDelegationType;
 
@@ -46,7 +46,7 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
      *
      * @param configuration the invocation configuration.
      */
-    protected DefaultFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
+    DefaultFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
             @NotNull final Routine<IN, OUT> routine, @NotNull final DelegationType delegationType) {
 
         super(configuration);
@@ -88,7 +88,7 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
          * @param configuration the invocation configuration.
          */
         @SuppressWarnings("ConstantConditions")
-        protected AfterFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
+        private AfterFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
                 @NotNull final FunctionalRoutine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType,
                 @NotNull final Routine<? super OUT, AFTER> afterRoutine,
@@ -139,7 +139,6 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
                                                                   DelegationType.SYNC, routine,
                                                                   delegationType);
         }
-
 
         @NotNull
         @Override
@@ -260,7 +259,7 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
          * @param configuration the invocation configuration.
          */
         @SuppressWarnings("ConstantConditions")
-        protected BeforeFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
+        private BeforeFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
                 @NotNull final FunctionalRoutine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType,
                 @NotNull final Routine<BEFORE, ? extends IN> beforeRoutine,
@@ -311,7 +310,6 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
                                                                   DelegationType.SYNC, routine,
                                                                   delegationType);
         }
-
 
         @NotNull
         @Override

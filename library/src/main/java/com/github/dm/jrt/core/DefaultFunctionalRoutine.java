@@ -109,6 +109,17 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         @NotNull
         @Override
+        protected <BEFORE, NEXT> FunctionalRoutine<BEFORE, NEXT> lift(
+                @NotNull final Function<? super FunctionalRoutine<IN, AFTER>, ? extends
+                        Routine<BEFORE, NEXT>> function,
+                @NotNull final DelegationType delegationType) {
+
+            return new DefaultFunctionalRoutine<BEFORE, NEXT>(getBuilderConfiguration(),
+                                                              function.apply(this), delegationType);
+        }
+
+        @NotNull
+        @Override
         protected <NEXT> FunctionalRoutine<IN, NEXT> andThen(
                 @NotNull final Routine<? super AFTER, NEXT> routine,
                 @NotNull final DelegationType delegationType) {
@@ -129,16 +140,6 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
                                                                   delegationType);
         }
 
-        @NotNull
-        @Override
-        protected <BEFORE, NEXT> FunctionalRoutine<BEFORE, NEXT> lift(
-                @NotNull final Function<? super Routine<IN, AFTER>, ? extends Routine<BEFORE,
-                        NEXT>> function,
-                @NotNull final DelegationType delegationType) {
-
-            return new DefaultFunctionalRoutine<BEFORE, NEXT>(getBuilderConfiguration(),
-                                                              function.apply(this), delegationType);
-        }
 
         @NotNull
         @Override
@@ -280,6 +281,17 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
 
         @NotNull
         @Override
+        protected <PREV, AFTER> FunctionalRoutine<PREV, AFTER> lift(
+                @NotNull final Function<? super FunctionalRoutine<BEFORE, OUT>, ? extends
+                        Routine<PREV, AFTER>> function,
+                @NotNull final DelegationType delegationType) {
+
+            return new DefaultFunctionalRoutine<PREV, AFTER>(getBuilderConfiguration(),
+                                                             function.apply(this), delegationType);
+        }
+
+        @NotNull
+        @Override
         protected <AFTER> FunctionalRoutine<BEFORE, AFTER> andThen(
                 @NotNull final Routine<? super OUT, AFTER> routine,
                 @NotNull final DelegationType delegationType) {
@@ -300,16 +312,6 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
                                                                   delegationType);
         }
 
-        @NotNull
-        @Override
-        protected <PREV, AFTER> FunctionalRoutine<PREV, AFTER> lift(
-                @NotNull final Function<? super Routine<BEFORE, OUT>, ? extends Routine<PREV,
-                        AFTER>> function,
-                @NotNull final DelegationType delegationType) {
-
-            return new DefaultFunctionalRoutine<PREV, AFTER>(getBuilderConfiguration(),
-                                                             function.apply(this), delegationType);
-        }
 
         @NotNull
         @Override
@@ -427,8 +429,8 @@ public class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine
     @NotNull
     @Override
     protected <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
-            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
-                    function,
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function,
             @NotNull final DelegationType delegationType) {
 
         return new DefaultFunctionalRoutine<BEFORE, AFTER>(getBuilderConfiguration(),

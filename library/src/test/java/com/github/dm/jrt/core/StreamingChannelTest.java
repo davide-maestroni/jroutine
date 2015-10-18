@@ -269,6 +269,7 @@ public class StreamingChannelTest {
 
                 streamingChannel.after(1, TimeUnit.MILLISECONDS)
                                 .after(TimeDuration.millis(200))
+                                .orderByCall()
                                 .pass("test1", "test2")
                                 .pass(Collections.singleton("test3"))
                                 .close();

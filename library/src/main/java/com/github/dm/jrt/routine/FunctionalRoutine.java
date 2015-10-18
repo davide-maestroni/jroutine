@@ -216,14 +216,22 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull Function<? super List<? extends BEFORE>, ? extends IN> function);
 
     @NotNull
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends
+                    FunctionalRoutine<BEFORE, AFTER>> function);
+
+    @NotNull
     <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftAsync(
-            @NotNull Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>> function);
+            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function);
 
     @NotNull
     <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftParallel(
-            @NotNull Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>> function);
+            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function);
 
     @NotNull
     <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftSync(
-            @NotNull Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>> function);
+            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function);
 }

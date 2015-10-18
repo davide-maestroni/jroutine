@@ -456,25 +456,33 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
     }
 
     @NotNull
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends
+                    FunctionalRoutine<BEFORE, AFTER>> function) {
+
+        return function.apply(this);
+    }
+
+    @NotNull
     public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftAsync(
-            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
-                    function) {
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function) {
 
         return lift(function, DelegationType.ASYNC);
     }
 
     @NotNull
     public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftParallel(
-            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
-                    function) {
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function) {
 
         return lift(function, DelegationType.PARALLEL);
     }
 
     @NotNull
     public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> liftSync(
-            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
-                    function) {
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function) {
 
         return lift(function, DelegationType.SYNC);
     }
@@ -520,8 +528,8 @@ public abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine
 
     @NotNull
     protected abstract <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
-            @NotNull final Function<? super Routine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
-                    function,
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function,
             @NotNull final DelegationType delegationType);
 
     @NotNull

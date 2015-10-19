@@ -72,7 +72,7 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> asyncMap(
+    public <OUT> FunctionalRoutine<Void, OUT> async(
             @NotNull final CommandInvocation<OUT> invocation) {
 
         return asyncMap(
@@ -101,9 +101,9 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> asyncMap(@NotNull final Supplier<OUT> supplier) {
+    public <OUT> FunctionalRoutine<Void, OUT> async(@NotNull final Supplier<OUT> supplier) {
 
-        return asyncMap(Functions.supplierCommand(supplier));
+        return async(Functions.supplierCommand(supplier));
     }
 
     @NotNull
@@ -148,7 +148,7 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> parallelMap(
+    public <OUT> FunctionalRoutine<Void, OUT> parallel(
             @NotNull final CommandInvocation<OUT> invocation) {
 
         return parallelMap(
@@ -178,9 +178,9 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> parallelMap(@NotNull final Supplier<OUT> supplier) {
+    public <OUT> FunctionalRoutine<Void, OUT> parallel(@NotNull final Supplier<OUT> supplier) {
 
-        return parallelMap(Functions.supplierCommand(supplier));
+        return parallel(Functions.supplierCommand(supplier));
     }
 
     @NotNull
@@ -236,8 +236,8 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> syncMap(
-            @NotNull final CommandInvocation<OUT> invocation) {
+    public <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull final CommandInvocation<OUT>
+            invocation) {
 
         return syncMap(
                 JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
@@ -264,9 +264,9 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> syncMap(@NotNull final Supplier<OUT> supplier) {
+    public <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull final Supplier<OUT> supplier) {
 
-        return syncMap(Functions.supplierCommand(supplier));
+        return sync(Functions.supplierCommand(supplier));
     }
 
     @NotNull

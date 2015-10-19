@@ -1285,6 +1285,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             } catch (final NoSuchElementException ignored) {
 
+                mSubLogger.wrn("reading output timeout: [%s] => [%s]", timeout, timeoutAction);
+
+                if (timeoutAction == TimeoutActionType.THROW) {
+
+                    throw new ExecutionTimeoutException("timeout while waiting for outputs");
+
+                } else if (timeoutAction == TimeoutActionType.ABORT) {
+
+                    abort();
+                    throw new AbortException(null);
+                }
             }
 
             return results;
@@ -1347,6 +1358,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 } catch (final NoSuchElementException ignored) {
 
+                    mSubLogger.wrn("skipping output timeout: [%s] => [%s]", timeout, timeoutAction);
+
+                    if (timeoutAction == TimeoutActionType.THROW) {
+
+                        throw new ExecutionTimeoutException("timeout while waiting for outputs");
+
+                    } else if (timeoutAction == TimeoutActionType.ABORT) {
+
+                        abort();
+                        throw new AbortException(null);
+                    }
                 }
             }
 

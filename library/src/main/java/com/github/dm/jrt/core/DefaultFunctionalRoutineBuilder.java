@@ -35,12 +35,28 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
+ * Default implementation of a functional routine builder.
+ * <p/>
  * Created by davide-maestroni on 10/18/2015.
  */
 class DefaultFunctionalRoutineBuilder
         implements FunctionalRoutineBuilder, Configurable<FunctionalRoutineBuilder> {
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
+
+    @NotNull
+    public <OUT> FunctionalRoutine<Void, OUT> async(
+            @NotNull final CommandInvocation<OUT> invocation) {
+
+        return asyncMap(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+    }
+
+    @NotNull
+    public <OUT> FunctionalRoutine<Void, OUT> async(@NotNull final Supplier<OUT> supplier) {
+
+        return async(Functions.supplierCommand(supplier));
+    }
 
     @NotNull
     public <IN> FunctionalRoutine<IN, IN> asyncAccumulate(
@@ -72,14 +88,6 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> async(
-            @NotNull final CommandInvocation<OUT> invocation) {
-
-        return asyncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
     public <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(
             @NotNull final FilterInvocation<IN, OUT> invocation) {
 
@@ -98,12 +106,6 @@ class DefaultFunctionalRoutineBuilder
     public <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(@NotNull final Routine<IN, OUT> routine) {
 
         return map(routine, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> async(@NotNull final Supplier<OUT> supplier) {
-
-        return async(Functions.supplierCommand(supplier));
     }
 
     @NotNull
@@ -130,6 +132,20 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
+    public <OUT> FunctionalRoutine<Void, OUT> parallel(
+            @NotNull final CommandInvocation<OUT> invocation) {
+
+        return parallelMap(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+    }
+
+    @NotNull
+    public <OUT> FunctionalRoutine<Void, OUT> parallel(@NotNull final Supplier<OUT> supplier) {
+
+        return parallel(Functions.supplierCommand(supplier));
+    }
+
+    @NotNull
     public <IN> FunctionalRoutine<IN, IN> parallelFilter(
             @NotNull final Predicate<? super IN> predicate) {
 
@@ -145,14 +161,6 @@ class DefaultFunctionalRoutineBuilder
             @NotNull final BiConsumer<IN, ? super ResultChannel<OUT>> consumer) {
 
         return parallelMap(Functions.consumerFilter(consumer));
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> parallel(
-            @NotNull final CommandInvocation<OUT> invocation) {
-
-        return parallelMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
@@ -178,12 +186,6 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> parallel(@NotNull final Supplier<OUT> supplier) {
-
-        return parallel(Functions.supplierCommand(supplier));
-    }
-
-    @NotNull
     public <IN, OUT> FunctionalRoutine<IN, OUT> parallelReduce(
             @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
                     consumer) {
@@ -204,6 +206,20 @@ class DefaultFunctionalRoutineBuilder
                                    .with(mConfiguration)
                                    .set()
                                    .buildRoutine());
+    }
+
+    @NotNull
+    public <OUT> FunctionalRoutine<Void, OUT> sync(
+            @NotNull final CommandInvocation<OUT> invocation) {
+
+        return syncMap(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+    }
+
+    @NotNull
+    public <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull final Supplier<OUT> supplier) {
+
+        return sync(Functions.supplierCommand(supplier));
     }
 
     @NotNull
@@ -236,14 +252,6 @@ class DefaultFunctionalRoutineBuilder
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull final CommandInvocation<OUT>
-            invocation) {
-
-        return syncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
     public <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(
             @NotNull final FilterInvocation<IN, OUT> invocation) {
 
@@ -261,12 +269,6 @@ class DefaultFunctionalRoutineBuilder
     public <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(@NotNull final Routine<IN, OUT> routine) {
 
         return map(routine, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull final Supplier<OUT> supplier) {
-
-        return sync(Functions.supplierCommand(supplier));
     }
 
     @NotNull

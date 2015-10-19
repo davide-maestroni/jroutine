@@ -155,6 +155,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      *
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the functional routine.
      */
     @NotNull
@@ -170,6 +171,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      *
      * @param function the function instance.
      * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the functional routine.
      */
     @NotNull
@@ -275,6 +277,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      *
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the functional routine.
      */
     @NotNull
@@ -290,6 +293,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      *
      * @param function the function instance.
      * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the functional routine.
      */
     @NotNull
@@ -416,6 +420,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      *
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the functional routine.
      */
     @NotNull
@@ -431,6 +436,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      *
      * @param function the function instance.
      * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the functional routine.
      */
     @NotNull

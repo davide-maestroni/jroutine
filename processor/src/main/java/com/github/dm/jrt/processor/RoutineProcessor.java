@@ -1813,23 +1813,14 @@ public class RoutineProcessor extends AbstractProcessor {
                                                        "value");
                         }
 
-                        if (value != null) {
+                        if (!typeUtils.isSameType(typeUtils.erasure(
+                                                          (value != null) ? (TypeMirror) value
+                                                                  : variableElement.asType()),
+                                                  typeUtils.erasure(
+                                                          classTypeParameters.get(i).asType()))) {
 
-                            if (!typeUtils.isSameType((TypeMirror) value, typeUtils.erasure(
-                                    classTypeParameters.get(i).asType()))) {
-
-                                matches = false;
-                                break;
-                            }
-
-                        } else {
-
-                            if (!typeUtils.isSameType(variableElement.asType(), typeUtils.erasure(
-                                    classTypeParameters.get(i).asType()))) {
-
-                                matches = false;
-                                break;
-                            }
+                            matches = false;
+                            break;
                         }
                     }
 

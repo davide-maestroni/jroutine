@@ -72,7 +72,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
 
-        final HashSet<String> types = new HashSet<String>(super.getSupportedAnnotationTypes());
+        final HashSet<String> types = new HashSet<String>();
         types.add("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
         types.add("com.github.dm.jrt.android.proxy.annotation.V4Proxy");
         types.add("com.github.dm.jrt.android.proxy.annotation.V11Proxy");

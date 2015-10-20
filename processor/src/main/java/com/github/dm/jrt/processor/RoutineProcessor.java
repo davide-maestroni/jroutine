@@ -50,6 +50,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -94,6 +95,8 @@ public class RoutineProcessor extends AbstractProcessor {
     private static final boolean DEBUG = false;
 
     private final byte[] mByteBuffer = new byte[2048];
+
+    private final HashMap<String, TypeMirror> mPrimitiveMirrors = new HashMap<String, TypeMirror>();
 
     protected TypeMirror invocationChannelType;
 
@@ -191,6 +194,40 @@ public class RoutineProcessor extends AbstractProcessor {
         iterableType = getMirrorFromName(Iterable.class.getCanonicalName());
         listType = getMirrorFromName(List.class.getCanonicalName());
         objectType = getMirrorFromName(Object.class.getCanonicalName());
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final HashMap<String, TypeMirror> primitiveMirrors = mPrimitiveMirrors;
+        primitiveMirrors.put(char.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.CHAR));
+        primitiveMirrors.put(byte.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.BYTE));
+        primitiveMirrors.put(boolean.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.BOOLEAN));
+        primitiveMirrors.put(short.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.SHORT));
+        primitiveMirrors.put(int.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.INT));
+        primitiveMirrors.put(long.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.LONG));
+        primitiveMirrors.put(float.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.FLOAT));
+        primitiveMirrors.put(double.class.getCanonicalName(),
+                             typeUtils.getPrimitiveType(TypeKind.DOUBLE));
+        primitiveMirrors.put(char[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.CHAR)));
+        primitiveMirrors.put(byte[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.BYTE)));
+        primitiveMirrors.put(boolean[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.BOOLEAN)));
+        primitiveMirrors.put(short[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.SHORT)));
+        primitiveMirrors.put(int[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.INT)));
+        primitiveMirrors.put(long[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.LONG)));
+        primitiveMirrors.put(float[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.FLOAT)));
+        primitiveMirrors.put(double[].class.getCanonicalName(),
+                             typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.DOUBLE)));
     }
 
     @Override
@@ -1430,76 +1467,12 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     protected TypeMirror getMirrorFromName(@NotNull final String typeName) {
 
-        final Types typeUtils = processingEnv.getTypeUtils();
         final String name = normalizeTypeName(typeName);
+        final TypeMirror typeMirror = mPrimitiveMirrors.get(name);
 
-        if (char.class.getCanonicalName().equals(name)) {
+        if (typeMirror != null) {
 
-            return typeUtils.getPrimitiveType(TypeKind.CHAR);
-
-        } else if (byte.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.BYTE);
-
-        } else if (boolean.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.BOOLEAN);
-
-        } else if (short.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.SHORT);
-
-        } else if (int.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.INT);
-
-        } else if (long.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.LONG);
-
-        } else if (float.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.FLOAT);
-
-        } else if (double.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.DOUBLE);
-
-        } else if (void.class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getPrimitiveType(TypeKind.VOID);
-
-        } else if (char[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.CHAR));
-
-        } else if (byte[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.BYTE));
-
-        } else if (boolean[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.BOOLEAN));
-
-        } else if (short[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.SHORT));
-
-        } else if (int[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.INT));
-
-        } else if (long[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.LONG));
-
-        } else if (float[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.FLOAT));
-
-        } else if (double[].class.getCanonicalName().equals(name)) {
-
-            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.DOUBLE));
+            return typeMirror;
         }
 
         final TypeElement typeElement = processingEnv.getElementUtils().getTypeElement(name);
@@ -1947,82 +1920,76 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
             }
 
-        } else {
+        } else if (methodElement.getAnnotation(Inputs.class) != null) {
 
-            if (methodElement.getAnnotation(Inputs.class) != null) {
+            final List<?> annotationParams =
+                    (List<?>) getAnnotationValue(methodElement, inputsAnnotationType, "value");
+            final int length = annotationParams.size();
+            final List<? extends VariableElement> classTypeParameters =
+                    targetMethod.getParameters();
 
-                final List<?> annotationParams =
-                        (List<?>) getAnnotationValue(methodElement, inputsAnnotationType, "value");
-                final int length = annotationParams.size();
-                final List<? extends VariableElement> classTypeParameters =
-                        targetMethod.getParameters();
+            if (length == classTypeParameters.size()) {
 
-                if (length == classTypeParameters.size()) {
+                for (int i = 0; i < length; ++i) {
 
-                    for (int i = 0; i < length; ++i) {
+                    if (getMirrorFromName(annotationParams.get(i).toString()) == null) {
 
-                        if (getMirrorFromName(annotationParams.get(i).toString()) == null) {
-
-                            throw new NullPointerException(
-                                    annotationParams.get(i).toString() + " - "
-                                            + typeUtils.asElement(
-                                            typeUtils.getPrimitiveType(TypeKind.CHAR)));
-                        }
-
-                        final TypeMirror annotationParam =
-                                getMirrorFromName(annotationParams.get(i).toString());
-                        final TypeMirror paramMirror = classTypeParameters.get(i).asType();
-
-                        if (!typeUtils.isSameType(typeUtils.erasure(annotationParam),
-                                                  typeUtils.erasure(paramMirror))) {
-
-                            targetMethod = null;
-                            break;
-                        }
+                        throw new NullPointerException(
+                                annotationParams.get(i).toString() + " - " + typeUtils.asElement(
+                                        typeUtils.getPrimitiveType(TypeKind.CHAR)));
                     }
 
-                } else {
+                    final TypeMirror annotationParam =
+                            getMirrorFromName(annotationParams.get(i).toString());
+                    final TypeMirror paramMirror = classTypeParameters.get(i).asType();
 
-                    targetMethod = null;
+                    if (!typeUtils.isSameType(typeUtils.erasure(annotationParam),
+                                              typeUtils.erasure(paramMirror))) {
+
+                        targetMethod = null;
+                        break;
+                    }
                 }
 
             } else {
 
-                final List<? extends VariableElement> interfaceTypeParameters =
-                        methodElement.getParameters();
-                final int length = interfaceTypeParameters.size();
-                final List<? extends VariableElement> classTypeParameters =
-                        targetMethod.getParameters();
+                targetMethod = null;
+            }
 
-                if (length == classTypeParameters.size()) {
+        } else {
 
-                    for (int i = 0; i < length; ++i) {
+            final List<? extends VariableElement> interfaceTypeParameters =
+                    methodElement.getParameters();
+            final int length = interfaceTypeParameters.size();
+            final List<? extends VariableElement> classTypeParameters =
+                    targetMethod.getParameters();
 
-                        Object value = null;
-                        final VariableElement variableElement = interfaceTypeParameters.get(i);
+            if (length == classTypeParameters.size()) {
 
-                        if (variableElement.getAnnotation(Input.class) != null) {
+                for (int i = 0; i < length; ++i) {
 
-                            value = getAnnotationValue(variableElement, inputAnnotationType,
-                                                       "value");
-                        }
+                    Object value = null;
+                    final VariableElement variableElement = interfaceTypeParameters.get(i);
 
-                        final TypeMirror paramMirror = classTypeParameters.get(i).asType();
+                    if (variableElement.getAnnotation(Input.class) != null) {
 
-                        if (!typeUtils.isSameType(typeUtils.erasure(
-                                                          (value != null) ? (TypeMirror) value
-                                                                  : variableElement.asType()),
-                                                  typeUtils.erasure(paramMirror))) {
-
-                            targetMethod = null;
-                            break;
-                        }
+                        value = getAnnotationValue(variableElement, inputAnnotationType, "value");
                     }
 
-                } else {
+                    final TypeMirror paramMirror = classTypeParameters.get(i).asType();
 
-                    targetMethod = null;
+                    if (!typeUtils.isSameType(typeUtils.erasure((value != null) ? (TypeMirror) value
+                                                                        : variableElement.asType()),
+                                              typeUtils.erasure(paramMirror))) {
+
+                        targetMethod = null;
+                        break;
+                    }
                 }
+
+            } else {
+
+                targetMethod = null;
             }
         }
 

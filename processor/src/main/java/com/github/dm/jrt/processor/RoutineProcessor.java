@@ -1828,41 +1828,46 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 final List<?> annotationParams =
                         (List<?>) getAnnotationValue(methodElement, inputsAnnotationType, "value");
-                final int length = annotationParams.size();
 
-                for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                        targetElement.getEnclosedElements())) {
+                if (annotationParams != null) {
 
-                    if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
+                    final int length = annotationParams.size();
 
-                        continue;
-                    }
+                    for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
+                            targetElement.getEnclosedElements())) {
 
-                    final List<? extends VariableElement> classTypeParameters =
-                            targetMethodElement.getParameters();
+                        if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
 
-                    if (length == classTypeParameters.size()) {
-
-                        boolean matches = true;
-
-                        for (int i = 0; i < length; ++i) {
-
-                            final TypeMirror annotationParam =
-                                    getMirrorFromName(annotationParams.get(i).toString());
-                            final TypeMirror paramMirror = classTypeParameters.get(i).asType();
-
-                            if (!typeUtils.isSameType(typeUtils.erasure(annotationParam),
-                                                      typeUtils.erasure(paramMirror))) {
-
-                                matches = false;
-                                break;
-                            }
+                            continue;
                         }
 
-                        if (matches) {
+                        final List<? extends VariableElement> typeParameterElements =
+                                targetMethodElement.getParameters();
 
-                            targetMethod = targetMethodElement;
-                            break;
+                        if (length == typeParameterElements.size()) {
+
+                            boolean matches = true;
+
+                            for (int i = 0; i < length; ++i) {
+
+                                final TypeMirror paramMirror =
+                                        getMirrorFromName(annotationParams.get(i).toString());
+                                final TypeMirror typeParameterMirror =
+                                        typeParameterElements.get(i).asType();
+
+                                if (!typeUtils.isSameType(typeUtils.erasure(paramMirror),
+                                                          typeUtils.erasure(typeParameterMirror))) {
+
+                                    matches = false;
+                                    break;
+                                }
+                            }
+
+                            if (matches) {
+
+                                targetMethod = targetMethodElement;
+                                break;
+                            }
                         }
                     }
                 }
@@ -1881,10 +1886,10 @@ public class RoutineProcessor extends AbstractProcessor {
                         continue;
                     }
 
-                    final List<? extends VariableElement> classTypeParameters =
+                    final List<? extends VariableElement> typeParameterElements =
                             targetMethodElement.getParameters();
 
-                    if (length == classTypeParameters.size()) {
+                    if (length == typeParameterElements.size()) {
 
                         boolean matches = true;
 
@@ -1899,12 +1904,13 @@ public class RoutineProcessor extends AbstractProcessor {
                                                            "value");
                             }
 
-                            final TypeMirror paramMirror = classTypeParameters.get(i).asType();
+                            final TypeMirror typeParameterMirror =
+                                    typeParameterElements.get(i).asType();
 
                             if (!typeUtils.isSameType(typeUtils.erasure(
                                                               (value != null) ? (TypeMirror) value
                                                                       : variableElement.asType()),
-                                                      typeUtils.erasure(paramMirror))) {
+                                                      typeUtils.erasure(typeParameterMirror))) {
 
                                 matches = false;
                                 break;
@@ -1924,31 +1930,41 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final List<?> annotationParams =
                     (List<?>) getAnnotationValue(methodElement, inputsAnnotationType, "value");
-            final int length = annotationParams.size();
-            final List<? extends VariableElement> classTypeParameters =
-                    targetMethod.getParameters();
 
-            if (length == classTypeParameters.size()) {
+            if (annotationParams != null) {
 
-                for (int i = 0; i < length; ++i) {
+                final int length = annotationParams.size();
+                final List<? extends VariableElement> typeParameterElements =
+                        targetMethod.getParameters();
 
-                    if (getMirrorFromName(annotationParams.get(i).toString()) == null) {
+                if (length == typeParameterElements.size()) {
 
-                        throw new NullPointerException(
-                                annotationParams.get(i).toString() + " - " + typeUtils.asElement(
-                                        typeUtils.getPrimitiveType(TypeKind.CHAR)));
+                    for (int i = 0; i < length; ++i) {
+
+                        if (getMirrorFromName(annotationParams.get(i).toString()) == null) {
+
+                            throw new NullPointerException(
+                                    annotationParams.get(i).toString() + " - "
+                                            + typeUtils.asElement(
+                                            typeUtils.getPrimitiveType(TypeKind.CHAR)));
+                        }
+
+                        final TypeMirror paramMirror =
+                                getMirrorFromName(annotationParams.get(i).toString());
+                        final TypeMirror typeParameterMirror =
+                                typeParameterElements.get(i).asType();
+
+                        if (!typeUtils.isSameType(typeUtils.erasure(paramMirror),
+                                                  typeUtils.erasure(typeParameterMirror))) {
+
+                            targetMethod = null;
+                            break;
+                        }
                     }
 
-                    final TypeMirror annotationParam =
-                            getMirrorFromName(annotationParams.get(i).toString());
-                    final TypeMirror paramMirror = classTypeParameters.get(i).asType();
+                } else {
 
-                    if (!typeUtils.isSameType(typeUtils.erasure(annotationParam),
-                                              typeUtils.erasure(paramMirror))) {
-
-                        targetMethod = null;
-                        break;
-                    }
+                    targetMethod = null;
                 }
 
             } else {
@@ -1961,10 +1977,10 @@ public class RoutineProcessor extends AbstractProcessor {
             final List<? extends VariableElement> interfaceTypeParameters =
                     methodElement.getParameters();
             final int length = interfaceTypeParameters.size();
-            final List<? extends VariableElement> classTypeParameters =
+            final List<? extends VariableElement> typeParameterElements =
                     targetMethod.getParameters();
 
-            if (length == classTypeParameters.size()) {
+            if (length == typeParameterElements.size()) {
 
                 for (int i = 0; i < length; ++i) {
 
@@ -1976,11 +1992,11 @@ public class RoutineProcessor extends AbstractProcessor {
                         value = getAnnotationValue(variableElement, inputAnnotationType, "value");
                     }
 
-                    final TypeMirror paramMirror = classTypeParameters.get(i).asType();
+                    final TypeMirror typeParameterMirror = typeParameterElements.get(i).asType();
 
                     if (!typeUtils.isSameType(typeUtils.erasure((value != null) ? (TypeMirror) value
                                                                         : variableElement.asType()),
-                                              typeUtils.erasure(paramMirror))) {
+                                              typeUtils.erasure(typeParameterMirror))) {
 
                         targetMethod = null;
                         break;
